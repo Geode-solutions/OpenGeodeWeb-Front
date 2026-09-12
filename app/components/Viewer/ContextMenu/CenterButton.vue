@@ -1,12 +1,14 @@
-<script setup>
+<script setup lang="ts">
 import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
 import { useMenuStore } from "@ogw_front/stores/menu";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { isOverTreeview, isOverToolbar } = defineProps({
   isOverTreeview: { type: Boolean, required: true },
   isOverToolbar: { type: Boolean, default: false },
 });
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["drag", "click"]);
 
 const ADAPTIVE_BLUR_VAL = "15px";
@@ -46,14 +48,14 @@ let dragMoved = false;
 let dragStartClientX = 0;
 let dragStartClientY = 0;
 
-function onMouseDown(event) {
+function onMouseDown(event: MouseEvent) {
   dragMoved = false;
   dragStartClientX = event.clientX;
   dragStartClientY = event.clientY;
   emit("drag", event);
 }
 
-function onMouseUp(event) {
+function onMouseUp(event: MouseEvent) {
   const deltaX = event.clientX - dragStartClientX;
   const deltaY = event.clientY - dragStartClientY;
   if (Math.hypot(deltaX, deltaY) > dragThreshold) {
@@ -61,7 +63,7 @@ function onMouseUp(event) {
   }
 }
 
-function onCenterClick(event) {
+function onCenterClick(event: MouseEvent) {
   event.stopPropagation();
   if (!dragMoved) {
     emit("click", event);

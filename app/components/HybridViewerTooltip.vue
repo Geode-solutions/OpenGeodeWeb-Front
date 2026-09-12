@@ -1,9 +1,10 @@
-<script setup>
-import GlassCard from "@ogw_front/components/GlassCard";
+<script setup lang="ts">
+import GlassCard from "@ogw_front/components/GlassCard.vue";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 const TOOLTIP_SCREEN_MARGIN = 10;
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { containerWidth, containerHeight } = defineProps({
   containerWidth: {
     type: Number,
@@ -86,7 +87,7 @@ const sortedAttributes = computed(() => {
   );
 });
 
-function capitalize(val) {
+function capitalize(val: string) {
   if (!val) {
     return "";
   }
@@ -94,7 +95,17 @@ function capitalize(val) {
   return spaced.charAt(0).toUpperCase() + spaced.slice(1);
 }
 
-function formatAttributeValue(val) {
+const fieldTypeLabel = computed(() => {
+  const fieldType = hybridViewerStore.hoverData?.fieldType;
+  return typeof fieldType === "string" ? capitalize(fieldType.toLowerCase()) : "";
+});
+
+const coordinates = computed<number[] | undefined>(() => {
+  const value = hybridViewerStore.hoverData?.attributes.coordinates;
+  return Array.isArray(value) ? (value as number[]) : undefined;
+});
+
+function formatAttributeValue(val: unknown) {
   if (Array.isArray(val)) {
     const formattedValues = val.map((value) => {
       if (typeof value === "number") {
@@ -134,7 +145,7 @@ function formatAttributeValue(val) {
               hybridViewerStore.hoverData.component?.id ||
               hybridViewerStore.hoverData.blockName ||
               hybridViewerStore.hoverData.modelName ||
-              `${capitalize(hybridViewerStore.hoverData.fieldType.toLowerCase())} #${hybridViewerStore.hoverData.pickedId}`
+              `${fieldTypeLabel} #${hybridViewerStore.hoverData.pickedId}`
             }}
           </span>
         </v-col>
@@ -160,15 +171,11 @@ function formatAttributeValue(val) {
       <template v-if="hasOtherAttributes">
         <v-divider class="my-2" opacity="0.15" />
         <v-row no-gutters class="flex-column ga-1">
-          <v-col
-            v-if="hybridViewerStore.hoverData.attributes.coordinates"
-            class="d-flex justify-space-between ga-3"
-          >
+          <v-col v-if="coordinates" class="d-flex justify-space-between ga-3">
             <span class="tooltip-label">Position:</span>
             <span class="tooltip-value font-mono">
-              [ {{ Number(hybridViewerStore.hoverData.attributes.coordinates[0]).toFixed(3) }},
-              {{ Number(hybridViewerStore.hoverData.attributes.coordinates[1]).toFixed(3) }},
-              {{ Number(hybridViewerStore.hoverData.attributes.coordinates[2]).toFixed(3) }} ]
+              [ {{ Number(coordinates[0]).toFixed(3) }}, {{ Number(coordinates[1]).toFixed(3) }},
+              {{ Number(coordinates[2]).toFixed(3) }} ]
             </span>
           </v-col>
           <template v-for="[name, val] in sortedAttributes" :key="name">

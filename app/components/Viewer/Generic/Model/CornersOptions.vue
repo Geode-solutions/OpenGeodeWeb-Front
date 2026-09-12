@@ -1,4 +1,7 @@
-<script setup>
+<script setup lang="ts">
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
+import type { PropType } from "vue";
 import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
@@ -6,10 +9,11 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.jso
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { modelId, cornerId, targetCornerIds } = defineProps({
   modelId: { type: String, required: true },
   cornerId: { type: String, default: undefined },
-  targetCornerIds: { type: Array, required: true },
+  targetCornerIds: { type: Array as PropType<string[]>, required: true },
 });
 
 const dataStyleStore = useDataStyleStore();
@@ -25,8 +29,11 @@ const cornersVisibility = computed({
 });
 
 const cornerVisibility = computed({
-  get: () => dataStyleStore.modelCornerVisibility(modelId, cornerId),
+  get: () => dataStyleStore.modelCornerVisibility(modelId, cornerId) as boolean | undefined,
   set: async (newValue) => {
+    if (cornerId === undefined) {
+      return;
+    }
     await dataStyleStore.setModelCornersVisibility(modelId, [cornerId], newValue);
     hybridViewerStore.remoteRender();
   },
@@ -44,6 +51,9 @@ const cornersColor = computed({
 const cornerColor = computed({
   get: () => dataStyleStore.modelCornerColor(modelId, cornerId),
   set: async (color) => {
+    if (cornerId === undefined) {
+      return;
+    }
     await dataStyleStore.setModelCornersColor(modelId, [cornerId], color);
     hybridViewerStore.remoteRender();
   },
@@ -52,6 +62,9 @@ const cornerColor = computed({
 const cornersActiveColoring = computed({
   get: () => dataStyleStore.getModelComponentTypeActiveColoring(modelId, "Corner"),
   set: async (coloringType) => {
+    if (typeof coloringType !== "string") {
+      return;
+    }
     await dataStyleStore.setModelCornersActiveColoring(modelId, targetCornerIds, coloringType);
     hybridViewerStore.remoteRender();
   },
@@ -60,6 +73,9 @@ const cornersActiveColoring = computed({
 const cornerActiveColoring = computed({
   get: () => dataStyleStore.modelCornerActiveColoring(modelId, cornerId),
   set: async (coloringType) => {
+    if (cornerId === undefined || typeof coloringType !== "string") {
+      return;
+    }
     await dataStyleStore.setModelCornersActiveColoring(modelId, [cornerId], coloringType);
     hybridViewerStore.remoteRender();
   },
@@ -69,6 +85,9 @@ const cornerActiveColoring = computed({
 const cornersVertexAttributeName = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeName(modelId),
   set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
     await dataStyleStore.setModelCornersVertexAttributeName(modelId, targetCornerIds, newValue);
     hybridViewerStore.remoteRender();
   },
@@ -85,11 +104,15 @@ const cornersVertexAttributeItem = computed({
 const cornersVertexAttributeRange = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeRange(modelId),
   set: async (newValue) => {
+    const [minimum, maximum] = newValue;
+    if (minimum === undefined || maximum === undefined) {
+      return;
+    }
     await dataStyleStore.setModelCornersVertexAttributeRange(
       modelId,
       targetCornerIds,
-      newValue[0],
-      newValue[1],
+      minimum,
+      maximum,
     );
     hybridViewerStore.remoteRender();
   },
@@ -119,6 +142,9 @@ const cornersVertexAttributeNoDataColor = computed({
 const vertexAttributeName = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeName(modelId, cornerId),
   set: async (newValue) => {
+    if (cornerId === undefined || newValue === undefined) {
+      return;
+    }
     await dataStyleStore.setModelCornersVertexAttributeName(modelId, [cornerId], newValue);
     hybridViewerStore.remoteRender();
   },
@@ -127,6 +153,9 @@ const vertexAttributeName = computed({
 const vertexAttributeItem = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeItem(modelId, cornerId),
   set: async (newValue) => {
+    if (cornerId === undefined) {
+      return;
+    }
     await dataStyleStore.setModelCornersVertexAttributeItem(modelId, [cornerId], newValue);
     hybridViewerStore.remoteRender();
   },
@@ -135,12 +164,11 @@ const vertexAttributeItem = computed({
 const vertexAttributeRange = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeRange(modelId, cornerId),
   set: async (newValue) => {
-    await dataStyleStore.setModelCornersVertexAttributeRange(
-      modelId,
-      [cornerId],
-      newValue[0],
-      newValue[1],
-    );
+    const [minimum, maximum] = newValue;
+    if (cornerId === undefined || minimum === undefined || maximum === undefined) {
+      return;
+    }
+    await dataStyleStore.setModelCornersVertexAttributeRange(modelId, [cornerId], minimum, maximum);
     hybridViewerStore.remoteRender();
   },
 });
@@ -148,6 +176,9 @@ const vertexAttributeRange = computed({
 const vertexAttributeColorMap = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeColorMap(modelId, cornerId),
   set: async (newValue) => {
+    if (cornerId === undefined) {
+      return;
+    }
     await dataStyleStore.setModelCornersVertexAttributeColorMap(modelId, [cornerId], newValue);
     hybridViewerStore.remoteRender();
   },
@@ -156,6 +187,9 @@ const vertexAttributeColorMap = computed({
 const vertexAttributeNoDataColor = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeNoDataColor(modelId, cornerId),
   set: async (newValue) => {
+    if (cornerId === undefined) {
+      return;
+    }
     await dataStyleStore.setModelCornersVertexAttributeNoDataColor(modelId, [cornerId], newValue);
     hybridViewerStore.remoteRender();
   },

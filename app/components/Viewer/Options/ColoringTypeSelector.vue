@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import ViewerOptionsAttributeSelector from "@ogw_front/components/Viewer/Options/AttributeSelector.vue";
 import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
 import ViewerOptionsTexturesSelector from "@ogw_front/components/Viewer/Options/TexturesSelector.vue";
@@ -47,6 +47,7 @@ const polyhedron_attribute_no_data_color = defineModel("polyhedron_attribute_no_
   type: Object,
 });
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { id, componentIds, capabilities, schemas, allowRandom } = defineProps({
   id: { type: String, required: true },
   componentIds: { type: Array, default: undefined },
@@ -71,14 +72,14 @@ const polygonSchema = schemas.polygon || back_schemas.opengeodeweb_back.polygon_
 const polyhedronSchema =
   schemas.polyhedron || back_schemas.opengeodeweb_back.polyhedron_attribute_names;
 
-function isAvailable(key) {
+function isAvailable(key: string) {
   if (capabilities[key] && capabilities[key].available === false) {
     return false;
   }
   return true;
 }
 
-function hasColorMap(key) {
+function hasColorMap(key: string) {
   if (capabilities[key] && capabilities[key].hasColorMap === false) {
     return false;
   }
@@ -177,7 +178,7 @@ watch(
       polygon: polygon_attribute_name.value,
       polyhedron: polyhedron_attribute_name.value,
     };
-    if (!(key in names) || names[key]) {
+    if (key === undefined || !(key in names) || names[key as keyof typeof names]) {
       coloring_style_key.value = key;
     }
   },
@@ -186,9 +187,12 @@ watch(
 watch(
   coloring_style_key,
   (value) => {
+    if (value === undefined) {
+      return;
+    }
     const index = coloring_styles.value.values.indexOf(value);
     if (index !== -1) {
-      coloring_style_label.value = coloring_styles.value.labels[index];
+      coloring_style_label.value = coloring_styles.value.labels[index] ?? "";
     }
   },
   { immediate: true },

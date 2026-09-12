@@ -1,19 +1,21 @@
-<script setup>
-import OverlappingObjectsPicker from "@ogw_front/components/Viewer/OverlappingObjectsPicker";
-import ViewerContextMenu from "@ogw_front/components/Viewer/ContextMenu/ContextMenu";
-import ViewerObjectTreeLayout from "@ogw_front/components/Viewer/ObjectTree/Layout";
+<script setup lang="ts">
+import OverlappingObjectsPicker from "@ogw_front/components/Viewer/OverlappingObjectsPicker.vue";
+import ViewerContextMenu from "@ogw_front/components/Viewer/ContextMenu/ContextMenu.vue";
+import ViewerObjectTreeLayout from "@ogw_front/components/Viewer/ObjectTree/Layout.vue";
 import { getCurrentInstance } from "vue";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useMenuStore } from "@ogw_front/stores/menu";
 import { useOverlappingPicker } from "@ogw_front/composables/use_overlapping_picker";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { displayMenu, containerWidth, containerHeight } = defineProps({
   displayMenu: { type: Boolean, required: true },
   containerWidth: { type: Number, required: true },
   containerHeight: { type: Number, required: true },
 });
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["show-menu"]);
 const menuStore = useMenuStore();
 const viewerStore = useViewerStore();
@@ -53,7 +55,7 @@ const {
   get_viewer_id: trigger_picker,
 } = useOverlappingPicker();
 
-function get_viewer_id(x, y) {
+function get_viewer_id(x: number, y: number) {
   const instance = getCurrentInstance();
   const containerRect = instance?.proxy?.$el
     ?.closest?.('[data-testid="hybridViewer"]')
@@ -82,7 +84,7 @@ defineExpose({ get_viewer_id });
   />
   <ViewerContextMenu
     v-if="displayMenu"
-    :id="menuStore.current_id"
+    :id="menuStore.current_id ?? ''"
     :x="menuStore.menuX"
     :y="menuStore.menuY"
     :container-width="containerWidth"

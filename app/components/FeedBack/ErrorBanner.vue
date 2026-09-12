@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 const feedbackStore = useFeedbackStore();
@@ -18,7 +18,6 @@ function reload() {
     <v-row>
       <v-col cols="auto" class="text-white text-center">
         <v-icon
-          v-bind="props"
           color="white"
           class="justify-right"
           v-tooltip:bottom="'We turn off our server automatically after 5 minutes of inactivity'"

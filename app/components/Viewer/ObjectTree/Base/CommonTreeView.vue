@@ -1,21 +1,38 @@
-<script setup>
+<script setup lang="ts">
+import type { PropType } from "vue";
 import StickyHeader from "@ogw_front/components/Viewer/ObjectTree/Base/StickyHeader.vue";
 import TreeRow from "@ogw_front/components/Viewer/ObjectTree/Base/TreeRow.vue";
 import { useTreeKeyboardNav } from "@ogw_front/composables/tree_keyboard_nav";
 import { useTreeScroll } from "@ogw_front/composables/tree_scroll";
 import { useVirtualTree } from "@ogw_front/composables/virtual_tree";
+// oxlint-disable-next-line eslint/no-duplicate-imports
+import type { DisplayItem, EmitFn } from "@ogw_front/composables/virtual_tree";
 
+// The useVirtualTree composable's own props type (VirtualTreeProps) isn't exported; this component intentionally stays generic over whatever item shape callers use (plain treeview groups, model component groups, ...), so it is extracted from the composable's signature instead of re-declared here.
+type UnwrapMaybeRefOrGetter<Source> = Source extends () => infer Result
+  ? Result
+  : Source extends { value: infer Result }
+    ? Result
+    : Source;
+type VirtualTreeProps = UnwrapMaybeRefOrGetter<Parameters<typeof useVirtualTree>[0]>;
+
+// oxlint-disable-next-line vue/define-props-declaration
 const { items, opened, selected, active, scrollTop, options } = defineProps({
   items: { type: Array, required: true },
-  opened: { type: Array, required: false, default: () => [] },
-  selected: { type: Array, required: false, default: () => [] },
-  active: { type: Array, required: false, default: () => [] },
+  opened: { type: Array as PropType<unknown[]>, required: false, default: () => [] },
+  selected: { type: Array as PropType<unknown[]>, required: false, default: () => [] },
+  active: { type: Array as PropType<unknown[]>, required: false, default: () => [] },
   scrollTop: { type: Number, required: false, default: 0 },
-  options: { type: Object, required: false, default: () => ({}) },
+  options: {
+    type: Object as PropType<Record<string, unknown>>,
+    required: false,
+    default: () => ({}),
+  },
 });
 
-const treeWrapper = ref(undefined);
+const treeWrapper = ref<HTMLDivElement | undefined>(undefined);
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits([
   "update:opened",
   "update:selected",
@@ -36,20 +53,23 @@ const {
   isSelected,
   getIndeterminate,
 } = useVirtualTree(
-  computed(() => ({
-    items,
-    opened,
-    selected,
-    active,
-    ...options,
-  })),
-  emit,
+  computed(
+    () =>
+      ({
+        items,
+        opened,
+        selected,
+        active,
+        ...options,
+      }) as unknown as VirtualTreeProps,
+  ),
+  emit as EmitFn,
 );
 
 const { virtualScrollRef, stickyHeader, handleScroll, scrollToIndex, getScrollInfo } =
   useTreeScroll(
     computed(() => ({ scrollTop })),
-    emit,
+    emit as EmitFn,
     displayItems,
     actualItemProps,
   );
@@ -57,7 +77,11 @@ const { virtualScrollRef, stickyHeader, handleScroll, scrollToIndex, getScrollIn
 const focusedIndex = ref(-1);
 const lastActiveIndex = ref(-1);
 
-function handleItemClick(item, index, event) {
+function handleItemClick(
+  item: DisplayItem,
+  index: number | undefined,
+  event?: MouseEvent | KeyboardEvent,
+) {
   if (index !== undefined) {
     focusedIndex.value = index;
   }
@@ -106,7 +130,7 @@ function handleItemClick(item, index, event) {
 
 const { handleKeyDown } = useTreeKeyboardNav(
   displayItems,
-  emit,
+  emit as EmitFn,
   scrollToIndex,
   toggleOpen,
   handleItemClick,
@@ -121,8 +145,8 @@ const { handleKeyDown } = useTreeKeyboardNav(
     class="common-tree-view-wrapper"
     tabindex="0"
     @keydown="handleKeyDown"
-    @mousedown="treeWrapper.focus()"
-    @mouseenter="treeWrapper.focus()"
+    @mousedown="treeWrapper?.focus()"
+    @mouseenter="treeWrapper?.focus()"
   >
     <StickyHeader
       v-if="stickyHeader"
@@ -162,11 +186,11 @@ const { handleKeyDown } = useTreeKeyboardNav(
           @mousedown.prevent
           @click="
             handleItemClick(item, index, $event);
-            treeWrapper.focus();
+            treeWrapper?.focus();
           "
           @contextmenu.prevent.stop="
             emit('contextmenu', { event: $event, item: item.raw });
-            treeWrapper.focus();
+            treeWrapper?.focus();
           "
           @mouseenter="emit('hover:enter', { item })"
           @mouseleave="emit('hover:leave', { item })"

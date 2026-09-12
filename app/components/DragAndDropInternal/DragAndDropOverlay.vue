@@ -1,5 +1,6 @@
-<script setup>
+<script setup lang="ts">
 const { isDragging, showOverlay, fullscreen, loading, texts, multiple, accept, showExtensions } =
+  // oxlint-disable-next-line vue/define-props-declaration
   defineProps({
     isDragging: { type: Boolean, required: true },
     showOverlay: { type: Boolean, required: true },

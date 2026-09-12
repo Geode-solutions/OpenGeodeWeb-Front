@@ -1,0 +1,387 @@
+// This file grew past the 310-line limit purely from added type annotations/interfaces during the TypeScript migration, with no new logic.
+// oxlint-disable eslint/max-lines
+// Local imports
+import { getRestApiPort, getRestApiProtocol, isCloudMode } from "@ogw_front/utils/stores.js";
+import { Status } from "@ogw_front/utils/status";
+import { api_fetch } from "@ogw_internal/utils/api_fetch.js";
+import { killExtension } from "@ogw_front/utils/extension.js";
+import { upload_file } from "@ogw_internal/utils/upload_file.js";
+import { useInfraStore } from "@ogw_front/stores/infra";
+
+import type { JsonRpcSchema, RequestHandlers } from "#shared/utils/types.js";
+import type { StateTree } from "pinia";
+
+import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json" with { type: "json" };
+
+// The `share` defineStore option (used by every store in this codebase) is implemented by a runtime pinia plugin outside this package's type surface; this augmentation only teaches the type checker about the option shape already used at each defineStore call site.
+declare module "pinia" {
+  // TypeScript requires a merged interface declaration's type parameter names to match pinia's own (`S`, `Store`) exactly, not just their count.
+  // oxlint-disable-next-line eslint/id-length
+  interface DefineStoreOptionsBase<S extends StateTree, Store> {
+    share?: { omit?: string[] };
+  }
+}
+
+interface RegisterableStore {
+  $id: string;
+  $patch?: (partial: Record<string, unknown>) => void;
+  exportStores?: (params?: Record<string, unknown>) => Promise<unknown>;
+  importStores?: (snapshot: unknown) => Promise<void> | void;
+  [key: string]: unknown;
+}
+
+interface ExtensionMetadata {
+  id: string;
+  store: () => RegisterableStore;
+  [key: string]: unknown;
+}
+
+interface ExtensionModule {
+  metadata: ExtensionMetadata;
+  install: (api: unknown, backendPath?: string) => Promise<void>;
+  [key: string]: unknown;
+}
+
+interface ExtensionData {
+  module: ExtensionModule;
+  id: string;
+  path: string;
+  backendPath: string | undefined;
+  loadedAt: string;
+  metadata: ExtensionMetadata;
+  enabled: boolean;
+}
+
+// oxlint-disable-next-line max-lines-per-function, max-statements
+export const useAppStore = defineStore("app", () => {
+  const stores: RegisterableStore[] = [];
+  const globalComponents = ref<Map<string, Map<string, unknown>>>(new Map());
+  const default_local_port = ref(globalThis.location.port);
+  const status = ref(Status.NOT_CONNECTED);
+  const protocol = computed(() => getRestApiProtocol());
+  const port = computed(() => getRestApiPort(default_local_port.value));
+
+  const base_url = computed(() => {
+    const infraStore = useInfraStore();
+    let app_url = `${protocol.value}://${infraStore.domain_name}:${port.value}`;
+    if (isCloudMode()) {
+      app_url += `/server`;
+    }
+    return app_url;
+  });
+
+  function registerGlobalComponent(
+    extensionId: string,
+    componentId: string,
+    component: unknown,
+  ): void {
+    if (!globalComponents.value.has(extensionId)) {
+      globalComponents.value.set(extensionId, new Map());
+    }
+    globalComponents.value.get(extensionId)?.set(componentId, component);
+    console.log(
+      `[AppStore] Registered global component ${componentId} for extension ${extensionId}`,
+    );
+  }
+
+  function unregisterGlobalComponent(extensionId: string, componentId: string): void {
+    if (globalComponents.value.has(extensionId)) {
+      globalComponents.value.get(extensionId)?.delete(componentId);
+    }
+  }
+
+  function registerStore(store: RegisterableStore): void {
+    const isAlreadyRegistered = stores.some((registeredStore) => registeredStore.$id === store.$id);
+    if (isAlreadyRegistered) {
+      console.log(`[AppStore] Store "${store.$id}" already registered, skipping`);
+      return;
+    }
+    console.log("[AppStore] Registering store", store.$id);
+    stores.push(store);
+  }
+
+  async function exportStores(
+    params: Record<string, unknown> = {},
+  ): Promise<Record<string, unknown>> {
+    const snapshot: Record<string, unknown> = {};
+    let exportCount = 0;
+
+    console.log(`[AppStore] Exporting stores, total registered: ${stores.length}`);
+    await Promise.all(
+      stores.map(async (store) => {
+        if (!store.exportStores) {
+          return;
+        }
+        const storeId = store.$id;
+        try {
+          snapshot[storeId] = await store.exportStores(params);
+          exportCount += 1;
+        } catch (error) {
+          console.error(`[AppStore] Error exporting store "${storeId}":`, error);
+        }
+      }),
+    );
+    console.log(`[AppStore] Exported ${exportCount} stores; snapshot keys:`, Object.keys(snapshot));
+    return snapshot;
+  }
+
+  async function importStores(snapshot: Record<string, unknown> | undefined): Promise<void> {
+    if (!snapshot) {
+      console.warn("[AppStore] import called with invalid snapshot");
+      return;
+    }
+    console.log("[AppStore] Import snapshot keys:", Object.keys(snapshot || {}));
+
+    let importedCount = 0;
+    const notFoundStores: string[] = [];
+    await Promise.all(
+      stores.map(async (store) => {
+        if (!store.importStores) {
+          return;
+        }
+        const storeId = store.$id;
+        if (!snapshot[storeId]) {
+          notFoundStores.push(storeId);
+          return;
+        }
+        try {
+          await store.importStores(snapshot[storeId]);
+          importedCount += 1;
+        } catch (error) {
+          console.error(`[AppStore] Error importing store "${storeId}":`, error);
+        }
+      }),
+    );
+    if (notFoundStores.length > 0) {
+      console.warn(`[AppStore] Stores not found in snapshot: ${notFoundStores.join(", ")}`);
+    }
+    console.log(`[AppStore] Imported ${importedCount} stores`);
+  }
+
+  const loadedExtensions = ref<Map<string, ExtensionData>>(new Map());
+  const extensionAPI = ref<unknown>(undefined);
+  const codeTransformer = ref<((code: string) => string) | undefined>(undefined);
+
+  function setExtensionAPI(api: unknown): void {
+    extensionAPI.value = api;
+  }
+
+  function setCodeTransformer(transformer: (code: string) => string): void {
+    codeTransformer.value = transformer;
+  }
+
+  function getExtension(id: string): ExtensionData | undefined {
+    return loadedExtensions.value.get(id);
+  }
+
+  async function loadExtension(
+    path: string,
+    extensionPort: string,
+    backendPath: string | undefined = undefined,
+  ): Promise<ExtensionModule> {
+    try {
+      let finalURL = path;
+
+      if (codeTransformer.value && path.startsWith("blob:")) {
+        const response = await fetch(path);
+        const code = await response.text();
+        const transformedCode = codeTransformer.value(code);
+
+        const newBlob = new Blob([transformedCode], {
+          type: "application/javascript",
+        });
+        finalURL = URL.createObjectURL(newBlob);
+      }
+      // oxlint-disable-next-line no-inline-comments
+      const extensionModule: ExtensionModule = await import(/* @vite-ignore */ finalURL);
+      const store = extensionModule.metadata.store();
+      store.$patch?.({ default_local_port: extensionPort });
+
+      if (finalURL !== path && finalURL.startsWith("blob:")) {
+        URL.revokeObjectURL(finalURL);
+      }
+
+      if (!extensionModule.metadata?.id) {
+        throw new Error("Extension must have metadata.id");
+      }
+
+      const extensionId = extensionModule.metadata.id;
+
+      if (loadedExtensions.value.has(extensionId)) {
+        console.warn(`[AppStore] Extension "${extensionId}" is already loaded`);
+        throw new Error(`Extension "${extensionId}" is already loaded.`);
+      }
+
+      if (!extensionAPI.value) {
+        throw new Error("Extension API not initialized");
+      }
+
+      if (typeof extensionModule.install !== "function") {
+        throw new TypeError("Extension must export an install function");
+      }
+
+      await extensionModule.install(extensionAPI.value, backendPath);
+
+      const extensionData: ExtensionData = {
+        module: extensionModule,
+        id: extensionId,
+        path,
+        backendPath,
+        loadedAt: new Date().toISOString(),
+        metadata: extensionModule.metadata,
+        enabled: true,
+      };
+      loadedExtensions.value.set(extensionId, extensionData);
+
+      console.log(`[AppStore] Extension loaded successfully: ${extensionId}`);
+      return extensionModule;
+    } catch (error) {
+      console.error(`[AppStore] Failed to load extension from ${path}:`, error);
+      throw error;
+    }
+  }
+
+  function getLoadedExtensions(): ExtensionData[] {
+    return [...loadedExtensions.value.values()];
+  }
+
+  async function unloadExtension(extensionId: string): Promise<boolean> {
+    console.log(`[AppStore] Unloading extension: ${extensionId}`);
+    const infraStore = useInfraStore();
+    await infraStore.unregister_microservice(extensionId);
+    await killExtension(extensionId);
+
+    loadedExtensions.value.delete(extensionId);
+    console.log(`[AppStore] Extension unloaded: ${extensionId}`);
+    return true;
+  }
+
+  function toggleExtension(extensionId: string): boolean {
+    const extensionData = getExtension(extensionId);
+    if (!extensionData) {
+      return false;
+    }
+    extensionData.enabled = !extensionData.enabled;
+    console.log(
+      `[AppStore] Extension ${extensionData.enabled ? "enabled" : "disabled"}: ${extensionId}`,
+    );
+    return extensionData.enabled;
+  }
+
+  function setExtensionEnabled(extensionId: string, enabled: boolean): boolean {
+    const extensionData = getExtension(extensionId);
+    if (!extensionData) {
+      return false;
+    }
+    extensionData.enabled = enabled;
+    console.log(`[AppStore] Extension ${enabled ? "enabled" : "disabled"}: ${extensionId}`);
+    return true;
+  }
+
+  function getExtensionEnabled(extensionId: string): boolean {
+    return getExtension(extensionId)?.enabled ?? false;
+  }
+
+  function upload(file: File, callbacks: RequestHandlers = {}) {
+    const store = useAppStore();
+    const schema = opengeodeweb_front_schemas.api.local.extensions.upload;
+    const { PROJECT: projectName } = useRuntimeConfig().public;
+    const params = { projectName };
+    return upload_file(
+      store,
+      { schema, file, params },
+      {
+        ...callbacks,
+        response_function: async (response: unknown) => {
+          console.log("[APP] Request completed:", schema.$id);
+          if (callbacks.response_function) {
+            await callbacks.response_function(response);
+          }
+        },
+      },
+    );
+  }
+
+  function request(
+    { schema, params }: { schema: JsonRpcSchema; params?: Record<string, unknown> },
+    callbacks: RequestHandlers = {},
+  ) {
+    const store = useAppStore();
+    return api_fetch(
+      store,
+      // The app store is only ever used with HTTP ("front") schemas, which always carry `methods`; the wider JsonRpcSchema param above is kept as-is to match this action's public signature (e.g. relayed from get_version-style callers that only know about the shared, looser schema shape).
+      { schema: schema as JsonRpcSchema & { methods: string[] }, params },
+      {
+        ...callbacks,
+        response_function: async (response: unknown) => {
+          if (callbacks.response_function) {
+            await callbacks.response_function(response);
+          }
+        },
+      },
+    );
+  }
+
+  const request_counter = ref(0);
+  function start_request(): void {
+    request_counter.value += 1;
+  }
+  function stop_request(): void {
+    request_counter.value -= 1;
+  }
+  const is_busy = computed(() => request_counter.value > 0);
+
+  const projectFolderPath = ref("");
+
+  function createProjectFolder() {
+    const { PROJECT } = useRuntimeConfig().public;
+    const schema = opengeodeweb_front_schemas.api.local.app.project_folder_path;
+    const params = { PROJECT };
+    return request(
+      { schema, params },
+      {
+        response_function: (response: unknown) => {
+          const { projectFolderPath: newProjectFolderPath } = response as {
+            projectFolderPath: string;
+          };
+          console.log(`[APP] ${newProjectFolderPath} created`);
+          projectFolderPath.value = newProjectFolderPath;
+        },
+      },
+    );
+  }
+
+  return {
+    stores,
+    default_local_port,
+    request_counter,
+    status,
+    protocol,
+    port,
+    base_url,
+    is_busy,
+    registerStore,
+    exportStores,
+    importStores,
+    loadedExtensions,
+    extensionAPI,
+    setExtensionAPI,
+    setCodeTransformer,
+    loadExtension,
+    getLoadedExtensions,
+    getExtension,
+    unloadExtension,
+    toggleExtension,
+    setExtensionEnabled,
+    getExtensionEnabled,
+    request,
+    upload,
+    projectFolderPath,
+    createProjectFolder,
+    start_request,
+    stop_request,
+    globalComponents,
+    registerGlobalComponent,
+    unregisterGlobalComponent,
+  };
+});

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { sortAndFormatItems, useTreeFilter } from "@ogw_front/composables/tree_filter";
 import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
@@ -9,13 +9,25 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useModelComponents } from "@ogw_front/composables/model_components";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { id, viewId } = defineProps({
   id: { type: String, required: true },
   viewId: { type: String, required: false, default: undefined },
 });
 const actualViewId = viewId || id;
+
+interface TreeViewItem {
+  raw?: TreeViewItem;
+  id: string;
+  category?: string;
+  children?: TreeViewItem[];
+  viewer_id?: string;
+  title?: string;
+}
+
 const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 const hybridViewerStore = useHybridViewerStore();
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["show-menu"]);
 
 const treeviewStore = useTreeviewStore();
@@ -47,20 +59,20 @@ const {
   applySearchFilter,
 } = useTreeFilter(localCategories);
 
-function onUpdateSelection(newSelection) {
+function onUpdateSelection(newSelection: string[]) {
   const finalSelection = applySearchFilter(newSelection, visibleComponents.value);
-  updateVisibility(finalSelection);
+  updateVisibility(finalSelection as string[]);
 }
 
 const visibleSelection = computed(() => applySearchFilter(visibleComponents.value, []));
 
-const itemsForTreeView = computed(() => {
+const itemsForTreeView = computed<TreeViewItem[]>(() => {
   if (search.value && componentsCache.value) {
     const query = search.value.toLowerCase();
-    const result = [];
+    const result: TreeViewItem[] = [];
     for (const type of Object.keys(componentsCache.value)) {
-      const matches = componentsCache.value[type].filter(
-        (component) =>
+      const matches = (componentsCache.value[type] ?? []).filter(
+        (component: { title: string; id: string }) =>
           component.title.toLowerCase().includes(query) ||
           component.id.toLowerCase().includes(query),
       );
@@ -68,28 +80,35 @@ const itemsForTreeView = computed(() => {
         result.push({
           id: type,
           title: `${type}s (${matches.length})`,
-          children: sortAndFormatItems(matches, sortType.value),
+          children: sortAndFormatItems(matches, sortType.value) as unknown as TreeViewItem[],
         });
       }
     }
     return result;
   }
 
-  const result = [];
+  const result: TreeViewItem[] = [];
   for (const category of filteredCategories.value) {
+    const categoryId = category.id as string;
     result.push({
       ...category,
-      children: sortAndFormatItems(componentsCache.value[category.id], sortType.value),
+      id: categoryId,
+      children: sortAndFormatItems(
+        componentsCache.value?.[categoryId],
+        sortType.value,
+      ) as unknown as TreeViewItem[],
     });
   }
   return result;
 });
 
-function showContextMenu(event, item) {
+function showContextMenu(event: unknown, item: TreeViewItem) {
   const actualItem = item.raw || item;
   const typeId = actualItem.category || actualItem.id;
   const typeItem = itemsForTreeView.value.find((type) => type.id === typeId);
-  const targetComponentIds = typeItem ? typeItem.children.map((child) => child.id) : undefined;
+  const targetComponentIds = typeItem
+    ? (typeItem.children ?? []).map((child) => child.id)
+    : undefined;
   emit("show-menu", {
     event,
     itemId: actualItem.category ? actualItem.id : id,
@@ -100,7 +119,13 @@ function showContextMenu(event, item) {
   });
 }
 
-function handleHoverEnter({ item, immediate = false }) {
+function handleHoverEnter({
+  item,
+  immediate = false,
+}: {
+  item: TreeViewItem;
+  immediate?: boolean;
+}) {
   const actualItem = item.raw || item;
 
   if (!actualItem.category && (!actualItem.children || actualItem.children.length === 0)) {
@@ -111,8 +136,8 @@ function handleHoverEnter({ item, immediate = false }) {
     id,
     () =>
       actualItem.category
-        ? [actualItem.viewer_id]
-        : actualItem.children.map((child) => child.viewer_id),
+        ? [Number(actualItem.viewer_id)]
+        : (actualItem.children ?? []).map((child) => Number(child.viewer_id)),
     "model",
     immediate,
   );
@@ -123,8 +148,8 @@ function handleHoverLeave() {
 }
 
 function expandAll() {
-  const allIds = [];
-  function traverse(itemsList) {
+  const allIds: string[] = [];
+  function traverse(itemsList: TreeViewItem[]) {
     for (const item of itemsList) {
       if (item.children && item.children.length > 0) {
         allIds.push(item.id);
@@ -191,7 +216,9 @@ function expandAll() {
           @click.stop="
             hybridViewerStore.focusCameraOnObject(
               id,
-              item.category ? [item.viewer_id] : item.children.map((child) => child.viewer_id),
+              item.category
+                ? [item.viewer_id]
+                : item.children.map((child: TreeViewItem) => child.viewer_id),
             )
           "
         />

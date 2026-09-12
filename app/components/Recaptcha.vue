@@ -1,6 +1,7 @@
-<script setup>
+<script setup lang="ts">
 import { useInfraStore } from "@ogw_front/stores/infra";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { buttonLabel, buttonColor, color } = defineProps({
   buttonLabel: {
     type: String,
@@ -24,13 +25,13 @@ const email = ref("");
 const launch = ref(false);
 const valid = ref(false);
 const emailRules = [
-  (value) => {
+  (value: string) => {
     if (value) {
       return true;
     }
     return "E-mail is required.";
   },
-  (value) => {
+  (value: string) => {
     if (/.+@.+\..+/u.test(value)) {
       return true;
     }
@@ -40,7 +41,7 @@ const emailRules = [
 
 function submit() {
   const infraStore = useInfraStore();
-  return infraStore.create_backend(name.value, email.value, launch.value);
+  return infraStore.create_backend(email.value);
 }
 </script>
 
@@ -61,7 +62,7 @@ function submit() {
           </VRow>
           <VRow>
             <VCol>
-              <VCheckbox label="Load the app" v-model="load" />
+              <VCheckbox label="Load the app" v-model="launch" />
             </VCol>
           </VRow>
         </VContainer>

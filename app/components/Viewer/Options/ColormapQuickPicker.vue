@@ -1,10 +1,11 @@
-<script setup>
+<script setup lang="ts">
 import AttributeRangeSelector from "@ogw_front/components/Viewer/Options/AttributeRangeSelector.vue";
 import ColorMapList from "@ogw_front/components/Viewer/Options/ColorMapList.vue";
 
 import { getPresetsWithCurrentAtTop } from "@ogw_front/utils/colormap";
 import { useGlobalAttributeStyle } from "@ogw_front/composables/global_attribute_style";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { dataId, x, y } = defineProps({
   dataId: { required: false, type: String, default: undefined },
   x: { required: true, type: Number },
@@ -33,7 +34,7 @@ const maximum = computed({
 
 const quickColormapPresets = computed(() => getPresetsWithCurrentAtTop(currentColormap.value));
 
-async function onQuickColormapSelect(preset) {
+async function onQuickColormapSelect(preset: { Name: string }) {
   await applyGlobalColormap(preset.Name);
 }
 </script>

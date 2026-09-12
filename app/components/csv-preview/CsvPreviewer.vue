@@ -1,11 +1,21 @@
-<script setup>
+<script setup lang="ts">
+import type { PropType } from "vue";
 import { useToggle } from "@vueuse/core";
 
 import CsvSettings from "./CsvSettings.vue";
 import CsvTable from "./CsvTable.vue";
 
+interface CsvHeader {
+  title: string;
+  key: string;
+  align: "start" | "end" | "center";
+  sortable: boolean;
+}
+type CsvRow = Record<string, string>;
+
+// oxlint-disable-next-line vue/define-props-declaration
 const { file, modelValue } = defineProps({
-  file: { type: Object, required: true },
+  file: { type: Object as PropType<File>, required: true },
   modelValue: { type: Boolean, default: false },
 });
 
@@ -15,23 +25,24 @@ const MIN_AVG_COUNT = 1.5;
 const MAX_VARIANCE = 0.5;
 const PREVIEW_ROWS_LIMIT = 101;
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["update:modelValue", "confirm"]);
 
 const separator = ref(",");
 const headerRow = ref(0);
 const firstRow = ref(1);
 
-const xColumn = ref(undefined);
-const yColumn = ref(undefined);
-const zColumn = ref(undefined);
+const xColumn = ref<string | undefined>(undefined);
+const yColumn = ref<string | undefined>(undefined);
+const zColumn = ref<string | undefined>(undefined);
 
 const rawContent = ref("");
-const previewRows = ref([]);
-const previewHeaders = ref([]);
+const previewRows = ref<CsvRow[]>([]);
+const previewHeaders = ref<CsvHeader[]>([]);
 const loading = ref(false);
 const toggleLoading = useToggle(loading);
 
-function autoDetectSeparator(content) {
+function autoDetectSeparator(content: string) {
   const lines = content
     .slice(0, MAX_CONTENT_SLICE)
     .split(/\r?\n/u)
@@ -61,7 +72,7 @@ function parseContent() {
 
   const allLines = rawContent.value.split(/\r?\n/u).filter((line) => line.trim() !== "");
 
-  function splitLine(line) {
+  function splitLine(line: string): string[] {
     if (!separator.value) {
       return [line];
     }
@@ -89,16 +100,16 @@ function parseContent() {
   previewHeaders.value = rawHeaders.map((header, index) => ({
     title: header || `Column ${index + 1}`,
     key: `col${index}`,
-    align: "start",
+    align: "start" as const,
     sortable: true,
   }));
 
   const dataLines = allLines.slice(firstRow.value, firstRow.value + PREVIEW_ROWS_LIMIT);
   previewRows.value = dataLines.map((line) => {
     const row = splitLine(line);
-    const obj = {};
+    const obj: CsvRow = {};
     for (let index = 0; index < row.length; index += 1) {
-      obj[`col${index}`] = row[index];
+      obj[`col${index}`] = row[index] ?? "";
     }
     return obj;
   });
@@ -112,7 +123,7 @@ function readAndParse() {
 
   const reader = new FileReader();
   reader.addEventListener("load", (event) => {
-    rawContent.value = event.target.result;
+    rawContent.value = String((event.target as FileReader | null)?.result ?? "");
     if (!separator.value || separator.value === ",") {
       separator.value = autoDetectSeparator(rawContent.value);
     }

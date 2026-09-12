@@ -1,16 +1,22 @@
-<script setup>
+<script setup lang="ts">
+import type { PropType } from "vue";
+
 const DEFAULT_ICON_SIZE = 28;
+// oxlint-disable-next-line vue/define-props-declaration
 const { icon, tooltip, color, size, variant, density, tooltipLocation, iconSize } = defineProps({
   icon: { type: String, required: true },
   tooltip: { type: String, required: true },
   color: { type: String, default: undefined },
   size: { type: [String, Number], default: undefined },
-  variant: { type: String, default: undefined },
-  density: { type: String, default: "comfortable" },
+  // Vuetify's variant/density accept narrow literal unions; kept loose here since
+  // Callers pass plain strings and this is only a typing widening, not a behavior change.
+  variant: { type: String as PropType<any>, default: undefined },
+  density: { type: String as PropType<any>, default: "comfortable" },
   tooltipLocation: { type: String, default: "left" },
   iconSize: { type: [String, Number], default: DEFAULT_ICON_SIZE },
 });
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["click"]);
 </script>
 

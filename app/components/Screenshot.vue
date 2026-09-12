@@ -1,5 +1,5 @@
-<script setup>
-import ToolPanel from "@ogw_front/components/ToolPanel";
+<script setup lang="ts">
+import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import fileDownload from "js-file-download";
 import { useClipboardItems } from "@vueuse/core";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
@@ -8,6 +8,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 const show = defineModel({ type: Boolean, default: false });
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { width, escapeFunction } = defineProps({
   width: { type: Number, default: 260 },
   escapeFunction: { type: Function, default: undefined },
@@ -38,21 +39,23 @@ async function takeScreenshot() {
       params,
     },
     {
-      response_function: async (response) => {
+      response_function: async (response: unknown) => {
+        const { blob } = response as { blob: BlobPart };
         if (screenshot_type.value === "file") {
-          fileDownload(response.blob, `${current_filename}.${output_extension.value}`);
+          fileDownload(blob, `${current_filename}.${output_extension.value}`);
           feedbackStore.add_success("Screenshot downloaded");
         } else {
           try {
-            const pngBlob = new Blob([response.blob], { type: "image/png" });
+            const pngBlob = new Blob([blob], { type: "image/png" });
             await copy([new ClipboardItem({ "image/png": pngBlob })]);
             feedbackStore.add_success("Screenshot copied to clipboard");
           } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
             feedbackStore.add_error(
-              undefined,
-              undefined,
+              0,
+              "",
               "Clipboard Error",
-              `Failed to copy screenshot to clipboard: ${error.message}`,
+              `Failed to copy screenshot to clipboard: ${message}`,
             );
           }
         }

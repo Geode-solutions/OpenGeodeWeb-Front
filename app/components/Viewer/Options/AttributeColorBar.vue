@@ -1,7 +1,8 @@
-<script setup>
+<script setup lang="ts">
 import AttributeRangeSelector from "./AttributeRangeSelector.vue";
 import ColorMapPicker from "./ColorMapPicker.vue";
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["reset"]);
 
 const minimum = defineModel("minimum", { type: Number });
@@ -11,7 +12,11 @@ const colorMap = defineModel("colorMap", { type: String });
 
 <template>
   <div class="attribute-colorbar mt-3">
-    <ColorMapPicker v-model:selected-preset-name="colorMap" :min="minimum" :max="maximum" />
+    <ColorMapPicker
+      v-model:selected-preset-name="colorMap"
+      :min="minimum ?? 0"
+      :max="maximum ?? 0"
+    />
     <AttributeRangeSelector
       v-model:minimum="minimum"
       v-model:maximum="maximum"

@@ -1,6 +1,7 @@
-<script setup>
+<script setup lang="ts">
 import TreeRow from "@ogw_front/components/Viewer/ObjectTree/Base/TreeRow.vue";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { item, itemProps, selection, isSelected, getIndeterminate } = defineProps({
   item: { type: Object, required: true },
   itemProps: { type: Object, required: true },
@@ -9,6 +10,7 @@ const { item, itemProps, selection, isSelected, getIndeterminate } = defineProps
   getIndeterminate: { type: Function, required: true },
 });
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["toggle-open", "toggle-select"]);
 </script>
 

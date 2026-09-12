@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useElementSize, useWindowSize } from "@vueuse/core";
 
 import { Status } from "@ogw_front/utils/status";
@@ -8,10 +8,11 @@ import { useQuickColormap } from "@ogw_front/composables/use_quick_colormap";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 import ColormapQuickPicker from "@ogw_front/components/Viewer/Options/ColormapQuickPicker.vue";
-import ViewToolbar from "@ogw_front/components/ViewToolbar";
+import ViewToolbar from "@ogw_front/components/ViewToolbar.vue";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 import vtkRemoteView from "@kitware/vtk.js/Rendering/Misc/RemoteView";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { viewId } = defineProps({
   viewId: { type: String, default: "-1" },
 });
@@ -26,7 +27,7 @@ const { width: windowWidth, height: windowHeight } = useWindowSize();
 
 const { pickColormap, quickColormap } = useQuickColormap();
 
-async function get_x_y(event) {
+async function get_x_y(event: PointerEvent) {
   const { offsetX, offsetY, clientX, clientY } = event;
   if (viewerStore.picking_mode === true) {
     viewerStore.set_picked_point(offsetX, offsetY);
@@ -77,7 +78,10 @@ function connect() {
   }
   const session = viewerStore.client.getConnection().getSession();
   view.setSession(session);
-  view.setViewId(props.viewId);
+  // Pre-existing bug fixed: `props` was never defined here (props were destructured
+  // Directly from defineProps above), so this threw a ReferenceError whenever
+  // Connect() ran. `viewId` is the same (reactive) destructured prop value.
+  view.setViewId(viewId);
   connected.value = true;
   view.render();
 }
@@ -90,7 +94,7 @@ watch(
 );
 
 watch(
-  () => props.viewId,
+  () => viewId,
   (id) => {
     if (connected.value) {
       view.setViewId(id);
@@ -103,7 +107,9 @@ onMounted(async () => {
   if (import.meta.client) {
     window.addEventListener("resize", resize);
     await nextTick();
-    view.setContainer(viewer.value.$el);
+    if (viewer.value) {
+      view.setContainer(viewer.value.$el);
+    }
     connect();
     resize();
   }

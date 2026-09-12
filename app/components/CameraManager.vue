@@ -1,10 +1,12 @@
-<script setup>
-import List from "@ogw_front/components/CameraManager/List";
-import Saver from "@ogw_front/components/CameraManager/Saver";
-import ToolPanel from "@ogw_front/components/ToolPanel";
+<script setup lang="ts">
+import List from "@ogw_front/components/CameraManager/List.vue";
+import Saver from "@ogw_front/components/CameraManager/Saver.vue";
+import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["close"]);
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { showDialog, width, escapeFunction } = defineProps({
   showDialog: { type: Boolean, required: true },
   width: { type: Number, required: false, default: 260 },

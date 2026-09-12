@@ -1,6 +1,7 @@
-<script setup>
+<script setup lang="ts">
 import GlassCard from "./GlassCard.vue";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { show, item, selectedCount } = defineProps({
   show: {
     type: Boolean,
@@ -16,6 +17,7 @@ const { show, item, selectedCount } = defineProps({
   },
 });
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["update:show", "confirm"]);
 </script>
 

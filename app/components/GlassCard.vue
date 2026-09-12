@@ -1,12 +1,13 @@
-<script setup>
+<script setup lang="ts">
 import { computed, useAttrs } from "vue";
 import { onKeyStroke } from "@vueuse/core";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { variant, rounded, padding, theme, escapeFunction } = defineProps({
   variant: {
     type: String,
     default: "panel",
-    validator: (valid) => ["panel", "ui"].includes(valid),
+    validator: (valid: unknown) => typeof valid === "string" && ["panel", "ui"].includes(valid),
   },
   rounded: { type: String, default: "xl" },
   padding: { type: String, default: "pa-6" },

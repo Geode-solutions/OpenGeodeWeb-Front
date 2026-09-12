@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
@@ -17,7 +17,7 @@ const hybridViewerStore = useHybridViewerStore();
 const dataStore = useDataStore();
 const treeviewStore = useTreeviewStore();
 
-function getBatchComponentIds(currentId) {
+function getBatchComponentIds(currentId: string) {
   const { activeItems } = treeviewStore;
   if (activeItems.includes(currentId) && activeItems.length > 1) {
     return activeItems;
@@ -25,6 +25,7 @@ function getBatchComponentIds(currentId) {
   return [currentId];
 }
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { itemProps } = defineProps({
   itemProps: { type: Object, required: true },
 });
@@ -32,7 +33,7 @@ const { itemProps } = defineProps({
 const modelId = computed(() => itemProps.meta_data.modelId || itemProps.id);
 const componentId = computed(() => itemProps.meta_data.pickedComponentId);
 const selection = computed(() => dataStyleStore.visibleMeshComponents(modelId.value).value || []);
-const componentType = ref(undefined);
+const componentType = ref<string | undefined>(undefined);
 
 watch(
   () => [
@@ -61,7 +62,7 @@ watch(
   { immediate: true },
 );
 
-const targetComponentIds = ref([]);
+const targetComponentIds = ref<string[]>([]);
 watch(
   () => [modelId.value, componentType.value, itemProps.meta_data.targetComponentIds],
   async () => {
@@ -85,6 +86,9 @@ watch(
 const modelVisibility = computed({
   get: () => dataStyleStore.modelVisibility(modelId.value),
   set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
     await dataStyleStore.setModelVisibility(modelId.value, newValue);
     hybridViewerStore.remoteRender();
   },
@@ -96,11 +100,12 @@ const modelComponentsColor = computed({
     await dataStyleStore.mutateStyle(modelId.value, {
       coloring: { constant: color },
     });
+    const activeColoring = dataStyleStore.getModelActiveColoring(modelId.value);
     await dataStyleStore.setModelComponentsColor(
       modelId.value,
       selection.value,
       color,
-      dataStyleStore.getModelActiveColoring(modelId.value),
+      typeof activeColoring === "string" ? activeColoring : undefined,
     );
     hybridViewerStore.remoteRender();
   },
@@ -109,6 +114,9 @@ const modelComponentsColor = computed({
 const modelComponentsActiveColoring = computed({
   get: () => dataStyleStore.getModelActiveColoring(modelId.value),
   set: async (coloringType) => {
+    if (typeof coloringType !== "string") {
+      return;
+    }
     await dataStyleStore.mutateStyle(modelId.value, {
       coloring: { active: coloringType },
     });

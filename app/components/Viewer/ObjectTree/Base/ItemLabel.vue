@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { middleTruncate } from "@ogw_front/utils/string";
 import { useClipboard } from "@vueuse/core";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
@@ -7,11 +7,13 @@ import { useResponsiveMiddleTruncate } from "@ogw_front/composables/responsive_m
 const feedbackStore = useFeedbackStore();
 const { copy } = useClipboard();
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { item, isLeaf } = defineProps({
   item: { type: Object, required: true },
   isLeaf: { type: Boolean, required: false, default: undefined },
 });
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["contextmenu", "mouseenter", "mouseleave"]);
 
 const labelContainer = useTemplateRef("label-container");
@@ -41,7 +43,7 @@ const tooltipDisabled = computed(() => {
   return actualItem.value.children && actualItem.value.children.length > 0;
 });
 
-async function copyToClipboard(text, label) {
+async function copyToClipboard(text: string, label: string) {
   await copy(text);
   feedbackStore.add_success(`${label} copied to clipboard`);
 }

@@ -1,0 +1,225 @@
+// Third party imports
+// oxlint-disable-next-line no-unassigned-import
+import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry";
+import { connectImageStream } from "@kitware/vtk.js/Rendering/Misc/RemoteView";
+import { initWebSocketClient } from "@ogw_internal/utils/ws_client";
+import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json" with { type: "json" };
+import opengeodeweb_viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" };
+
+// Local imports
+import {
+  getWebsocketApiPort,
+  getWebsocketApiProtocol,
+  isCloudMode,
+} from "@ogw_front/utils/stores.js";
+import { Status } from "@ogw_front/utils/status";
+import { useAppStore } from "@ogw_front/stores/app";
+import { useInfraStore } from "@ogw_front/stores/infra";
+import { viewer_call } from "@ogw_internal/utils/viewer_call";
+
+import type { JsonRpcSchema, RequestHandlers } from "#shared/utils/types.js";
+import type { RpcClient } from "#shared/utils/call_raw.js";
+
+interface PickedPoint {
+  x: number | undefined;
+  y: number | undefined;
+  z: number | undefined;
+}
+
+const MS_PER_SECOND = 1000;
+const SECONDS_PER_REQUEST = 10;
+const request_timeout = MS_PER_SECOND * SECONDS_PER_REQUEST;
+export const useViewerStore = defineStore(
+  "viewer",
+  // oxlint-disable-next-line max-lines-per-function, max-statements
+  () => {
+    const infraStore = useInfraStore();
+    const default_local_port = ref("1234");
+    const client = ref<RpcClient>({} as RpcClient);
+    const config = ref<unknown>(undefined);
+    const picking_mode = ref(false);
+    const picked_point = ref<PickedPoint>({
+      x: undefined,
+      y: undefined,
+      z: undefined,
+    });
+    const request_counter = ref(0);
+    const status = ref(Status.NOT_CONNECTED);
+    const version = ref("0.0.0");
+    const protocol = computed(() => getWebsocketApiProtocol());
+    const port = computed(() => getWebsocketApiPort(default_local_port.value));
+    const base_url = computed(() => {
+      let viewer_url = `${protocol.value}://${infraStore.domain_name}:${port.value}`;
+      if (isCloudMode()) {
+        viewer_url += `/viewer`;
+      }
+      viewer_url += "/ws";
+      return viewer_url;
+    });
+    const is_busy = computed(() => request_counter.value > 0);
+    function toggle_picking_mode(value: boolean): void {
+      picking_mode.value = value;
+    }
+    function request(
+      {
+        schema,
+        params = {},
+        timeout = request_timeout,
+      }: { schema: JsonRpcSchema; params?: Record<string, unknown>; timeout?: number },
+      callbacks: RequestHandlers = {},
+    ): Promise<unknown> {
+      const store = useViewerStore();
+      return viewer_call(
+        store,
+        {
+          schema,
+          params,
+          timeout,
+        },
+        {
+          ...callbacks,
+          response_function: async (response: unknown) => {
+            if (callbacks.response_function) {
+              await callbacks.response_function(response);
+            }
+          },
+        },
+      );
+    }
+    async function set_picked_point(x: number, y: number): Promise<void> {
+      const schema = opengeodeweb_viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
+      const params = {
+        x: Math.round(x),
+        y: Math.round(y),
+      };
+      const response = await request({
+        schema,
+        params,
+      });
+      const {
+        x: world_x,
+        y: world_y,
+        z: world_z,
+      } = response as { x: number; y: number; z: number };
+      picked_point.value = {
+        x: world_x,
+        y: world_y,
+        z: world_z,
+      };
+    }
+    function ws_connect() {
+      if (status.value === Status.CONNECTED) {
+        return undefined;
+      }
+      return navigator.locks.request("viewer.ws_connect", async (lock) => {
+        if (status.value === Status.CONNECTED) {
+          return;
+        }
+        try {
+          console.log("VIEWER LOCK GRANTED !", lock);
+          status.value = Status.CONNECTING;
+          client.value = (await initWebSocketClient(base_url.value, client.value, {
+            onConnectionClose: () => {
+              status.value = Status.NOT_CONNECTED;
+            },
+          })) as unknown as RpcClient;
+          connectImageStream(client.value.getConnection().getSession());
+          (client.value as unknown as { endBusy: () => void }).endBusy();
+          const schema = opengeodeweb_viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization;
+          const timeout = undefined;
+          await request({
+            schema,
+            timeout,
+          });
+          status.value = Status.CONNECTED;
+        } catch (error) {
+          console.error("ws_connect error", error);
+          status.value = Status.NOT_CONNECTED;
+          throw error;
+        }
+      });
+    }
+    function start_request(): void {
+      request_counter.value += 1;
+    }
+    function stop_request(): void {
+      request_counter.value -= 1;
+    }
+    function launch(args: { projectFolderPath?: string } = {}) {
+      console.log("[VIEWER] Launching viewer microservice...", {
+        args,
+      });
+      const appStore = useAppStore();
+      const { COMMAND_VIEWER, NUXT_ROOT_PATH } = useRuntimeConfig().public;
+      const schema = opengeodeweb_front_schemas.api.local.app.run_viewer;
+      const params = {
+        COMMAND_VIEWER,
+        NUXT_ROOT_PATH,
+        args,
+      };
+      console.log("[VIEWER] params", params);
+      return appStore.request(
+        {
+          schema,
+          params,
+        },
+        {
+          response_function: (response: unknown) => {
+            const { port: viewerPort } = response as { port: string };
+            console.log(`[VIEWER] Viewer launched on port ${viewerPort}`);
+            default_local_port.value = viewerPort;
+          },
+        },
+      );
+    }
+    async function connect(): Promise<void> {
+      console.log("[VIEWER] Connecting to viewer microservice...");
+      await ws_connect();
+      console.log("[VIEWER] Viewer connected successfully");
+    }
+    function get_version(schema: JsonRpcSchema | undefined) {
+      if (!schema) {
+        return undefined;
+      }
+      return request(
+        {
+          schema,
+        },
+        {
+          response_function: (response: unknown) => {
+            const { microservice_version } = response as { microservice_version: string };
+            version.value = microservice_version;
+          },
+        },
+      );
+    }
+    return {
+      default_local_port,
+      client,
+      config,
+      picking_mode,
+      picked_point,
+      request_counter,
+      status,
+      protocol,
+      port,
+      base_url,
+      is_busy,
+      toggle_picking_mode,
+      set_picked_point,
+      ws_connect,
+      start_request,
+      stop_request,
+      launch,
+      connect,
+      request,
+      version,
+      get_version,
+    };
+  },
+  {
+    share: {
+      omit: ["status", "client"],
+    },
+  },
+);

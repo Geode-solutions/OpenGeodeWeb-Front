@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 const DEFAULT_SIZE = 22;
 const DEFAULT_WIDTH = 3;
 
@@ -6,6 +6,7 @@ const {
   text = "Fetching data...",
   size = DEFAULT_SIZE,
   width = DEFAULT_WIDTH,
+  // oxlint-disable-next-line vue/define-props-declaration
 } = defineProps({
   text: {
     type: String,

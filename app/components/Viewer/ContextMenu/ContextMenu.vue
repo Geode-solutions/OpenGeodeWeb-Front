@@ -1,11 +1,15 @@
-<script setup>
-import CenterButton from "@ogw_front/components/Viewer/ContextMenu/CenterButton";
-import CircularItems from "@ogw_front/components/Viewer/ContextMenu/CircularItems";
-import InfoCard from "@ogw_front/components/Viewer/ContextMenu/InfoCard";
+<script setup lang="ts">
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
+import CenterButton from "@ogw_front/components/Viewer/ContextMenu/CenterButton.vue";
+import CircularItems from "@ogw_front/components/Viewer/ContextMenu/CircularItems.vue";
+import InfoCard from "@ogw_front/components/Viewer/ContextMenu/InfoCard.vue";
 import { useEventListener } from "@vueuse/core";
 import { useMenuStore } from "@ogw_front/stores/menu";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
+import type { Component } from "vue";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { id, x, y, containerWidth, containerHeight } = defineProps({
   id: { type: String, required: true },
   x: { type: Number, required: true },
@@ -36,7 +40,7 @@ const dragStartY = ref(0);
 const menuX = ref(x);
 const menuY = ref(y);
 
-function clampPosition(posX, posY) {
+function clampPosition(posX: number, posY: number) {
   const margin = RADIUS + MARGIN_OFFSET;
   return {
     x: Math.min(Math.max(posX, margin), containerWidth - margin),
@@ -44,13 +48,13 @@ function clampPosition(posX, posY) {
   };
 }
 
-function startDrag(event) {
+function startDrag(event: MouseEvent) {
   isDragging.value = true;
   dragStartX.value = event.clientX - menuX.value;
   dragStartY.value = event.clientY - menuY.value;
 }
 
-function handleDrag(event) {
+function handleDrag(event: MouseEvent) {
   const { x: clampedX, y: clampedY } = clampPosition(
     event.clientX - dragStartX.value,
     event.clientY - dragStartY.value,
@@ -60,7 +64,7 @@ function handleDrag(event) {
   menuStore.setMenuPosition(clampedX, clampedY);
 }
 
-function stopDrag(event) {
+function stopDrag(event: MouseEvent) {
   isDragging.value = false;
   event.stopPropagation();
   menuStore.setMenuPosition(menuX.value, menuY.value);
@@ -73,7 +77,7 @@ watch(show_menu, (newVal) => {
 });
 
 watch(
-  () => [x, y, containerWidth, containerHeight],
+  () => [x, y, containerWidth, containerHeight] as const,
   ([newX, newY]) => {
     const { x: clampedX, y: clampedY } = clampPosition(newX, newY);
     menuX.value = clampedX;
@@ -86,7 +90,7 @@ watch(
 useEventListener(
   globalThis,
   "mousemove",
-  (event) => {
+  (event: MouseEvent) => {
     if (!isDragging.value) {
       return;
     }
@@ -95,14 +99,14 @@ useEventListener(
   { passive: true },
 );
 
-useEventListener(globalThis, "mouseup", (event) => {
+useEventListener(globalThis, "mouseup", (event: MouseEvent) => {
   if (!isDragging.value) {
     return;
   }
   stopDrag(event);
 });
 
-const menu_items = shallowRef([]);
+const menu_items = shallowRef<Component[]>([]);
 watch(
   () => [meta_data.value.viewer_type, meta_data.value.geode_object_type],
   ([viewer_type, geode_object_type]) => {
@@ -147,7 +151,7 @@ const isOverToolbar = computed(() => {
 
 function getMenuStyle() {
   return {
-    position: "fixed",
+    position: "fixed" as const,
     left: `${menuStore.containerLeft + menuX.value - RADIUS}px`,
     top: `${menuStore.containerTop + menuY.value - RADIUS}px`,
   };

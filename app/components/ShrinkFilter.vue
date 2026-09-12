@@ -1,5 +1,5 @@
-<script setup>
-import ToolPanel from "@ogw_front/components/ToolPanel";
+<script setup lang="ts">
+import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDebounceFn } from "@vueuse/core";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -8,6 +8,7 @@ const DEFAULT_SHRINK_VALUE = 0.8;
 const MAX_SHRINK_VALUE = 1;
 const DEBOUNCE_DELAY = 100;
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { escapeFunction } = defineProps({
   escapeFunction: { type: Function, default: undefined },
 });

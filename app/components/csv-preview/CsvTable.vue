@@ -1,10 +1,26 @@
-<script setup>
+<script setup lang="ts">
+import type { PropType } from "vue";
+
+interface CsvHeader {
+  title: string;
+  key: string;
+  align: "start" | "end" | "center";
+  sortable: boolean;
+}
+type CsvRow = Record<string, string>;
+interface CsvCoordinates {
+  x?: string;
+  y?: string;
+  z?: string;
+}
+
+// oxlint-disable-next-line vue/define-props-declaration
 const { headers, rows, loading, coordinates, separator, headerRow, firstRow } = defineProps({
-  headers: { type: Array, required: true },
-  rows: { type: Array, required: true },
+  headers: { type: Array as PropType<CsvHeader[]>, required: true },
+  rows: { type: Array as PropType<CsvRow[]>, required: true },
   loading: { type: Boolean, default: false },
   coordinates: {
-    type: Object,
+    type: Object as PropType<CsvCoordinates>,
     default: () => ({ x: undefined, y: undefined, z: undefined }),
   },
   separator: { type: String, default: "," },
@@ -12,7 +28,7 @@ const { headers, rows, loading, coordinates, separator, headerRow, firstRow } = 
   firstRow: { type: Number, default: 1 },
 });
 
-function getColumnClass(key) {
+function getColumnClass(key: string) {
   if (key === coordinates.x) {
     return "x-col-highlight";
   }

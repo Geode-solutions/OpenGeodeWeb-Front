@@ -1,4 +1,7 @@
-<script setup>
+<script setup lang="ts">
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
+import type { PropType } from "vue";
 import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
@@ -6,10 +9,11 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.jso
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { modelId, surfaceId, targetSurfaceIds } = defineProps({
   modelId: { type: String, required: true },
   surfaceId: { type: String, default: undefined },
-  targetSurfaceIds: { type: Array, required: true },
+  targetSurfaceIds: { type: Array as PropType<string[]>, required: true },
 });
 
 const dataStyleStore = useDataStyleStore();
@@ -25,8 +29,11 @@ const surfacesVisibility = computed({
 });
 
 const surfaceVisibility = computed({
-  get: () => dataStyleStore.modelSurfaceVisibility(modelId, surfaceId),
+  get: () => dataStyleStore.modelSurfaceVisibility(modelId, surfaceId) as boolean | undefined,
   set: async (newValue) => {
+    if (surfaceId === undefined) {
+      return;
+    }
     await dataStyleStore.setModelSurfacesVisibility(modelId, [surfaceId], newValue);
     hybridViewerStore.remoteRender();
   },
@@ -44,6 +51,9 @@ const surfacesColor = computed({
 const surfaceColor = computed({
   get: () => dataStyleStore.modelSurfaceColor(modelId, surfaceId),
   set: async (color) => {
+    if (surfaceId === undefined) {
+      return;
+    }
     await dataStyleStore.setModelSurfacesColor(modelId, [surfaceId], color);
     hybridViewerStore.remoteRender();
   },
@@ -52,6 +62,9 @@ const surfaceColor = computed({
 const surfacesActiveColoring = computed({
   get: () => dataStyleStore.getModelComponentTypeActiveColoring(modelId, "Surface"),
   set: async (coloringType) => {
+    if (typeof coloringType !== "string") {
+      return;
+    }
     await dataStyleStore.setModelSurfacesActiveColoring(modelId, targetSurfaceIds, coloringType);
     hybridViewerStore.remoteRender();
   },
@@ -60,6 +73,9 @@ const surfacesActiveColoring = computed({
 const surfaceActiveColoring = computed({
   get: () => dataStyleStore.modelSurfaceActiveColoring(modelId, surfaceId),
   set: async (coloringType) => {
+    if (surfaceId === undefined || typeof coloringType !== "string") {
+      return;
+    }
     await dataStyleStore.setModelSurfacesActiveColoring(modelId, [surfaceId], coloringType);
     hybridViewerStore.remoteRender();
   },
@@ -69,6 +85,9 @@ const surfaceActiveColoring = computed({
 const surfacesVertexAttributeName = computed({
   get: () => dataStyleStore.modelSurfacesVertexAttributeName(modelId),
   set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
     await dataStyleStore.setModelSurfacesVertexAttributeName(modelId, targetSurfaceIds, newValue);
     hybridViewerStore.remoteRender();
   },
@@ -85,11 +104,15 @@ const surfacesVertexAttributeItem = computed({
 const surfacesVertexAttributeRange = computed({
   get: () => dataStyleStore.modelSurfacesVertexAttributeRange(modelId),
   set: async (newValue) => {
+    const [minimum, maximum] = newValue;
+    if (minimum === undefined || maximum === undefined) {
+      return;
+    }
     await dataStyleStore.setModelSurfacesVertexAttributeRange(
       modelId,
       targetSurfaceIds,
-      newValue[0],
-      newValue[1],
+      minimum,
+      maximum,
     );
     hybridViewerStore.remoteRender();
   },
@@ -122,6 +145,9 @@ const surfacesVertexAttributeNoDataColor = computed({
 const surfacesPolygonAttributeName = computed({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeName(modelId),
   set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
     await dataStyleStore.setModelSurfacesPolygonAttributeName(modelId, targetSurfaceIds, newValue);
     hybridViewerStore.remoteRender();
   },
@@ -138,11 +164,15 @@ const surfacesPolygonAttributeItem = computed({
 const surfacesPolygonAttributeRange = computed({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeRange(modelId),
   set: async (newValue) => {
+    const [minimum, maximum] = newValue;
+    if (minimum === undefined || maximum === undefined) {
+      return;
+    }
     await dataStyleStore.setModelSurfacesPolygonAttributeRange(
       modelId,
       targetSurfaceIds,
-      newValue[0],
-      newValue[1],
+      minimum,
+      maximum,
     );
     hybridViewerStore.remoteRender();
   },
@@ -176,6 +206,9 @@ const surfacesPolygonAttributeNoDataColor = computed({
 const vertexAttributeName = computed({
   get: () => dataStyleStore.modelSurfacesVertexAttributeName(modelId, surfaceId),
   set: async (newValue) => {
+    if (surfaceId === undefined || newValue === undefined) {
+      return;
+    }
     await dataStyleStore.setModelSurfacesVertexAttributeName(modelId, [surfaceId], newValue);
     hybridViewerStore.remoteRender();
   },
@@ -184,6 +217,9 @@ const vertexAttributeName = computed({
 const vertexAttributeItem = computed({
   get: () => dataStyleStore.modelSurfacesVertexAttributeItem(modelId, surfaceId),
   set: async (newValue) => {
+    if (surfaceId === undefined) {
+      return;
+    }
     await dataStyleStore.setModelSurfacesVertexAttributeItem(modelId, [surfaceId], newValue);
     hybridViewerStore.remoteRender();
   },
@@ -192,11 +228,15 @@ const vertexAttributeItem = computed({
 const vertexAttributeRange = computed({
   get: () => dataStyleStore.modelSurfacesVertexAttributeRange(modelId, surfaceId),
   set: async (newValue) => {
+    const [minimum, maximum] = newValue;
+    if (surfaceId === undefined || minimum === undefined || maximum === undefined) {
+      return;
+    }
     await dataStyleStore.setModelSurfacesVertexAttributeRange(
       modelId,
       [surfaceId],
-      newValue[0],
-      newValue[1],
+      minimum,
+      maximum,
     );
     hybridViewerStore.remoteRender();
   },
@@ -205,6 +245,9 @@ const vertexAttributeRange = computed({
 const vertexAttributeColorMap = computed({
   get: () => dataStyleStore.modelSurfacesVertexAttributeColorMap(modelId, surfaceId),
   set: async (newValue) => {
+    if (surfaceId === undefined) {
+      return;
+    }
     await dataStyleStore.setModelSurfacesVertexAttributeColorMap(modelId, [surfaceId], newValue);
     hybridViewerStore.remoteRender();
   },
@@ -213,6 +256,9 @@ const vertexAttributeColorMap = computed({
 const vertexAttributeNoDataColor = computed({
   get: () => dataStyleStore.modelSurfacesVertexAttributeNoDataColor(modelId, surfaceId),
   set: async (newValue) => {
+    if (surfaceId === undefined) {
+      return;
+    }
     await dataStyleStore.setModelSurfacesVertexAttributeNoDataColor(modelId, [surfaceId], newValue);
     hybridViewerStore.remoteRender();
   },
@@ -221,6 +267,9 @@ const vertexAttributeNoDataColor = computed({
 const polygonAttributeName = computed({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeName(modelId, surfaceId),
   set: async (newValue) => {
+    if (surfaceId === undefined || newValue === undefined) {
+      return;
+    }
     await dataStyleStore.setModelSurfacesPolygonAttributeName(modelId, [surfaceId], newValue);
     hybridViewerStore.remoteRender();
   },
@@ -229,6 +278,9 @@ const polygonAttributeName = computed({
 const polygonAttributeItem = computed({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeItem(modelId, surfaceId),
   set: async (newValue) => {
+    if (surfaceId === undefined) {
+      return;
+    }
     await dataStyleStore.setModelSurfacesPolygonAttributeItem(modelId, [surfaceId], newValue);
     hybridViewerStore.remoteRender();
   },
@@ -237,11 +289,15 @@ const polygonAttributeItem = computed({
 const polygonAttributeRange = computed({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeRange(modelId, surfaceId),
   set: async (newValue) => {
+    const [minimum, maximum] = newValue;
+    if (surfaceId === undefined || minimum === undefined || maximum === undefined) {
+      return;
+    }
     await dataStyleStore.setModelSurfacesPolygonAttributeRange(
       modelId,
       [surfaceId],
-      newValue[0],
-      newValue[1],
+      minimum,
+      maximum,
     );
     hybridViewerStore.remoteRender();
   },
@@ -250,6 +306,9 @@ const polygonAttributeRange = computed({
 const polygonAttributeColorMap = computed({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeColorMap(modelId, surfaceId),
   set: async (newValue) => {
+    if (surfaceId === undefined) {
+      return;
+    }
     await dataStyleStore.setModelSurfacesPolygonAttributeColorMap(modelId, [surfaceId], newValue);
     hybridViewerStore.remoteRender();
   },
@@ -258,6 +317,9 @@ const polygonAttributeColorMap = computed({
 const polygonAttributeNoDataColor = computed({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeNoDataColor(modelId, surfaceId),
   set: async (newValue) => {
+    if (surfaceId === undefined) {
+      return;
+    }
     await dataStyleStore.setModelSurfacesPolygonAttributeNoDataColor(
       modelId,
       [surfaceId],
