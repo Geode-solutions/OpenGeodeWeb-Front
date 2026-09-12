@@ -8,10 +8,25 @@ import { useModelBlocksColor } from "./color";
 import { useModelBlocksCommonStyle } from "./common";
 import { useModelBlocksVisibility } from "./visibility";
 
-async function setModelBlocksDefaultStyle(_id) {
+interface ColorGroup {
+  color: unknown;
+  blocks_ids: string[];
+}
+
+interface AttributeGroup {
+  name: string | undefined;
+  item: number | undefined;
+  minimum: number | undefined;
+  maximum: number | undefined;
+  colorMap: string | undefined;
+  blocks_ids: string[];
+}
+
+async function setModelBlocksDefaultStyle(_id: string) {
   // Placeholder
 }
 
+// oxlint-disable-next-line max-lines-per-function
 export function useModelBlocksStyle() {
   const dataStore = useDataStore();
   const modelCommonStyle = useModelBlocksCommonStyle();
@@ -20,8 +35,8 @@ export function useModelBlocksStyle() {
   const modelBlocksVertexAttribute = useModelBlocksVertexAttribute();
   const modelBlocksPolyhedronAttribute = useModelBlocksPolyhedronAttribute();
 
-  function applyModelBlocksVisibilityStyle(modelId, blocks_ids) {
-    const visibilityGroups = {};
+  function applyModelBlocksVisibilityStyle(modelId: string, blocks_ids: string[]) {
+    const visibilityGroups: Record<string, string[]> = {};
     for (const block_id of blocks_ids) {
       const style = modelCommonStyle.modelBlockStyle(modelId, block_id);
       const visibility = String(style.visibility);
@@ -37,21 +52,21 @@ export function useModelBlocksStyle() {
     );
   }
 
-  function applyModelBlocksColoringStyle(modelId, blocks_ids) {
-    const activeColoringGroups = {};
+  function applyModelBlocksColoringStyle(modelId: string, blocks_ids: string[]) {
+    const activeColoringGroups: Record<string, string[]> = {};
     for (const block_id of blocks_ids) {
-      const activeColoring = modelColorStyle.modelBlockActiveColoring(modelId, block_id);
+      const activeColoring = String(modelColorStyle.modelBlockActiveColoring(modelId, block_id));
       if (!activeColoringGroups[activeColoring]) {
         activeColoringGroups[activeColoring] = [];
       }
       activeColoringGroups[activeColoring].push(block_id);
     }
 
-    const coloringPromises = [];
+    const coloringPromises: Promise<unknown>[] = [];
 
     for (const [type, type_blocks_ids] of Object.entries(activeColoringGroups)) {
       if (type === "constant") {
-        const colorGroups = {};
+        const colorGroups: Record<string, ColorGroup> = {};
         for (const block_id of type_blocks_ids) {
           const color = modelColorStyle.modelBlockColor(modelId, block_id);
           const color_key = JSON.stringify(color);
@@ -70,7 +85,7 @@ export function useModelBlocksStyle() {
           modelColorStyle.setModelBlocksColor(modelId, type_blocks_ids, undefined, "random"),
         );
       } else if (type === "vertex") {
-        const vertexGroups = {};
+        const vertexGroups: Record<string, AttributeGroup> = {};
         for (const block_id of type_blocks_ids) {
           const name = modelBlocksVertexAttribute.modelBlocksVertexAttributeName(modelId, block_id);
           const item = modelBlocksVertexAttribute.modelBlocksVertexAttributeItem(modelId, block_id);
@@ -112,7 +127,7 @@ export function useModelBlocksStyle() {
           ),
         );
       } else if (type === "polyhedron") {
-        const polyhedronGroups = {};
+        const polyhedronGroups: Record<string, AttributeGroup> = {};
         for (const block_id of type_blocks_ids) {
           const name = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeName(
             modelId,
@@ -163,7 +178,7 @@ export function useModelBlocksStyle() {
     return Promise.all(coloringPromises);
   }
 
-  async function applyModelBlocksStyle(modelId) {
+  async function applyModelBlocksStyle(modelId: string) {
     const blocks_ids = await dataStore.getBlocksGeodeIds(modelId);
     if (blocks_ids.length === 0) {
       return;

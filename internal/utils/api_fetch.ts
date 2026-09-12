@@ -6,13 +6,16 @@ import type { JsonRpcSchema, RequestHandlersWithValidation } from "@ogw_shared/u
 // The microservice-backed Pinia stores (back/app/...) all expose this shape;
 // only the slice actually used here needs to be declared.
 export interface Microservice {
+  $id: string;
   base_url: string;
   start_request: () => void;
   stop_request: () => void;
 }
 
 interface ApiFetchParams {
-  schema: JsonRpcSchema;
+  // api_fetch always forwards this schema to fetchSchema, which requires the
+  // HTTP-flavored `methods` array (as opposed to the websocket `rpc` field).
+  schema: JsonRpcSchema & { methods: string[] };
   params?: Record<string, unknown>;
   headers?: Record<string, string>;
 }
@@ -58,7 +61,12 @@ export function api_fetch(
       request_error_function(error: unknown) {
         microservice.stop_request();
         const typedError = error as FetchErrorLike;
-        feedbackStore.add_error(typedError.code, schema.$id, typedError.message, typedError.stack);
+        feedbackStore.add_error(
+          typedError.code ?? 0,
+          schema.$id,
+          typedError.message ?? "",
+          typedError.stack ?? "",
+        );
         if (request_error_function) {
           request_error_function(error);
         }
@@ -74,10 +82,10 @@ export function api_fetch(
         microservice.stop_request();
         const typedResponse = response as FetchErrorResponseLike;
         feedbackStore.add_error(
-          typedResponse.status,
+          typedResponse.status ?? 0,
           schema.$id,
-          typedResponse.name,
-          typedResponse.description,
+          typedResponse.name ?? "",
+          typedResponse.description ?? "",
         );
         if (response_error_function) {
           response_error_function(response);
@@ -85,7 +93,7 @@ export function api_fetch(
       },
       validation_error_function({ code, name, error }) {
         microservice.stop_request();
-        feedbackStore.add_error(code, schema.$id, name, error);
+        feedbackStore.add_error(code, schema.$id, name, error ?? "");
       },
     },
   );

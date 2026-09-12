@@ -4,7 +4,9 @@ import type { JsonRpcSchema, RequestHandlers } from "@ogw_shared/utils/types.js"
 import type { Microservice } from "./api_fetch.js";
 
 interface UploadFileParams {
-  schema: JsonRpcSchema;
+  // Always forwarded to fetchRaw via schema.methods, which is only ever set on
+  // HTTP-flavored ("front"/"back") schemas.
+  schema: JsonRpcSchema & { methods: string[] };
   file: File;
   params?: Record<string, string | Blob>;
 }
@@ -54,7 +56,12 @@ function upload_file(
       request_error_function(error: unknown) {
         microservice.stop_request();
         const typedError = error as FetchErrorLike;
-        feedbackStore.add_error(typedError.code, route, typedError.message, typedError.stack);
+        feedbackStore.add_error(
+          typedError.code ?? 0,
+          route,
+          typedError.message ?? "",
+          typedError.stack ?? "",
+        );
         if (request_error_function) {
           request_error_function(error);
         }
@@ -69,10 +76,10 @@ function upload_file(
         microservice.stop_request();
         const typedResponse = response as FetchErrorResponseLike;
         feedbackStore.add_error(
-          typedResponse.status,
+          typedResponse.status ?? 0,
           route,
-          typedResponse.name,
-          typedResponse.description,
+          typedResponse.name ?? "",
+          typedResponse.description ?? "",
         );
         if (response_error_function) {
           response_error_function(response);

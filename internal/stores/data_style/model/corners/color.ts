@@ -1,3 +1,4 @@
+import type { StyleValues } from "../../types";
 import { isModelCornersVertexAttributeValid, useModelCornersVertexAttribute } from "./vertex";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 import { useModelCornersCommonStyle } from "./common";
@@ -10,23 +11,32 @@ export function useModelCornersColor() {
   const modelCornersCommonStyle = useModelCornersCommonStyle();
   const modelCornersVertexAttribute = useModelCornersVertexAttribute();
 
-  function modelCornerColoring(id, corner_id) {
-    return modelCornersCommonStyle.modelCornerStyle(id, corner_id).coloring;
+  function modelCornerColoring(id: string, corner_id?: string): StyleValues {
+    return modelCornersCommonStyle.modelCornerStyle(id, corner_id).coloring as StyleValues;
   }
 
-  function modelCornerColor(id, corner_id) {
+  function modelCornerColor(id: string, corner_id?: string): unknown {
     return modelCornerColoring(id, corner_id).constant;
   }
 
-  function setModelCornersColor(modelId, corners_ids, color, activeColoring = "constant") {
+  function setModelCornersColor(
+    modelId: string,
+    corners_ids: string[],
+    color: unknown,
+    activeColoring = "constant",
+  ) {
     return modelCommonStyle.setModelTypeColor(modelId, corners_ids, color, schema, activeColoring);
   }
 
-  function modelCornerActiveColoring(id, corner_id) {
+  function modelCornerActiveColoring(id: string, corner_id?: string): unknown {
     return modelCornerColoring(id, corner_id).active;
   }
 
-  async function setModelCornersActiveColoring(modelId, corners_ids, activeColoring) {
+  async function setModelCornersActiveColoring(
+    modelId: string,
+    corners_ids: string[],
+    activeColoring: string,
+  ) {
     if (corners_ids.length > 1) {
       modelCornersCommonStyle.mutateModelCornersTypeColoring(modelId, {
         active: activeColoring,

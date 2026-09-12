@@ -45,7 +45,12 @@ export function viewer_call(
       request_error_function(error: unknown) {
         microservice.stop_request();
         const typedError = error as RpcErrorLike;
-        feedbackStore.add_error(typedError.code, schema.$id, typedError.message, typedError.message);
+        feedbackStore.add_error(
+          typedError.code ?? 0,
+          schema.$id,
+          typedError.message ?? "",
+          typedError.message ?? "",
+        );
         if (request_error_function) {
           request_error_function(error);
         }
@@ -63,10 +68,10 @@ export function viewer_call(
         // at runtime); fixed to use `response`, mirroring request_error_function above.
         const typedResponse = response as RpcErrorLike;
         feedbackStore.add_error(
-          typedResponse.code,
+          typedResponse.code ?? 0,
           schema.$id,
-          typedResponse.message,
-          typedResponse.message,
+          typedResponse.message ?? "",
+          typedResponse.message ?? "",
         );
         if (response_error_function) {
           response_error_function(response);
@@ -74,7 +79,7 @@ export function viewer_call(
       },
       validation_error_function({ code, name, error }) {
         microservice.stop_request();
-        feedbackStore.add_error(code, schema.$id, name, error);
+        feedbackStore.add_error(code, schema.$id, name, error ?? "");
       },
     },
   );

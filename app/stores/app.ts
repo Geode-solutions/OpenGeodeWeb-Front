@@ -188,7 +188,7 @@ export const useAppStore = defineStore("app", () => {
       // oxlint-disable-next-line no-inline-comments
       const extensionModule: ExtensionModule = await import(/* @vite-ignore */ finalURL);
       const store = extensionModule.metadata.store();
-      store.$patch({ default_local_port: extensionPort });
+      store.$patch?.({ default_local_port: extensionPort });
 
       if (finalURL !== path && finalURL.startsWith("blob:")) {
         URL.revokeObjectURL(finalURL);
