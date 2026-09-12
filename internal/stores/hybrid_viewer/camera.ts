@@ -82,7 +82,8 @@ function getCameraOptions(camera: vtkCamera | undefined): CameraOptions | undefi
 }
 
 function performSyncRemoteCamera(): void {
-  const { genericRenderWindow, camera_options, remoteRender } = useHybridViewerStore() as unknown as HybridViewerStorePublic;
+  const { genericRenderWindow, camera_options, remoteRender } =
+    useHybridViewerStore() as unknown as HybridViewerStorePublic;
   const viewerStore = useViewerStore();
   const renderer = genericRenderWindow.value!.getRenderer();
   const camera = renderer.getActiveCamera();
@@ -107,7 +108,10 @@ function performSyncRemoteCamera(): void {
   );
 }
 
-function applyCameraOptions(camera: vtkCamera | undefined, options: CameraOptions | undefined): void {
+function applyCameraOptions(
+  camera: vtkCamera | undefined,
+  options: CameraOptions | undefined,
+): void {
   if (camera && camera.set && options) {
     camera.set({
       focalPoint: options.focal_point,
@@ -154,7 +158,8 @@ function performSetCamera(targetCameraOptions: CameraOptions): void {
 }
 
 async function performFocusCameraOnObject(id: string, block_ids: string[] = []): Promise<void> {
-  const { genericRenderWindow, hybridDb } = useHybridViewerStore() as unknown as HybridViewerStorePublic;
+  const { genericRenderWindow, hybridDb } =
+    useHybridViewerStore() as unknown as HybridViewerStorePublic;
   if (!hybridDb[id]) {
     return;
   }
@@ -258,7 +263,10 @@ function useHybridViewerCamera() {
   };
 }
 
-function centerCameraOnPosition(camera: vtkCamera | undefined, pickedPosition: Vector3 | undefined): void {
+function centerCameraOnPosition(
+  camera: vtkCamera | undefined,
+  pickedPosition: Vector3 | undefined,
+): void {
   if (!camera || !pickedPosition) {
     return;
   }

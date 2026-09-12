@@ -70,8 +70,7 @@ debouncedApply = useDebounceFn(() => applyClippingPlanes(), DEBOUNCE_DELAY);
 function addPlane() {
   // Index is always in-bounds (modulo the fixed-size list); the fallbacks only
   // Satisfy noUncheckedIndexedAccess and are never hit at runtime.
-  const normal =
-    DEFAULT_NORMALS[planes.value.length % DEFAULT_NORMALS.length] ??
+  const normal = DEFAULT_NORMALS[planes.value.length % DEFAULT_NORMALS.length] ??
     DEFAULT_NORMALS[0] ?? [1, 0, 0];
   planes.value.push({ origin: getSceneCenter(), normal });
 }

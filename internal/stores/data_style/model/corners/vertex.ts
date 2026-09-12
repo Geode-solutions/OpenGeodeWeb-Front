@@ -141,7 +141,10 @@ function useModelCornersVertexAttribute() {
     const { minimum, maximum } = storedConfig;
     return [minimum, maximum];
   }
-  function modelCornersVertexAttributeColorMap(modelId: string, cornerId?: string): string | undefined {
+  function modelCornersVertexAttributeColorMap(
+    modelId: string,
+    cornerId?: string,
+  ): string | undefined {
     const name = modelCornersVertexAttributeName(modelId, cornerId);
     const item = modelCornersVertexAttributeItem(modelId, cornerId);
     const storedConfig = modelCornersVertexAttributeStoredConfig(modelId, cornerId, name, item);
@@ -150,7 +153,14 @@ function useModelCornersVertexAttribute() {
   async function setModelCornersVertexAttribute(
     modelId: string,
     cornerIds: string[],
-    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR }: AttributeInput,
+    {
+      name,
+      item,
+      minimum,
+      maximum,
+      colorMap,
+      no_data_color = DEFAULT_NO_DATA_COLOR,
+    }: AttributeInput,
   ) {
     mutateModelCornersVertexStyle(modelId, cornerIds, {
       name,

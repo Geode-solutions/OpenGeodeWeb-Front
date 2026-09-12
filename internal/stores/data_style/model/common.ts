@@ -23,7 +23,8 @@ export function useModelCommonStyle() {
   const dataStore = useDataStore();
   const viewerStore = useViewerStore();
   const dataStyleState = useDataStyleState();
-  const model_component_datastyle_db = database.model_component_datastyle as unknown as ComponentTable;
+  const model_component_datastyle_db =
+    database.model_component_datastyle as unknown as ComponentTable;
   const model_component_type_datastyle_db =
     database.model_component_type_datastyle as unknown as ComponentTypeTable;
 
@@ -38,32 +39,53 @@ export function useModelCommonStyle() {
     return model_component_datastyle_db.put(structuredClone(toRaw(entry)));
   }
 
-  async function mutateModelComponentTypeStyle(id_model: string, type: string, values: StyleValues) {
+  async function mutateModelComponentTypeStyle(
+    id_model: string,
+    type: string,
+    values: StyleValues,
+  ) {
     dataStyleState.updateModelComponentTypeStyleCache(id_model, type, values);
-    await (database as unknown as Dexie).transaction("rw", model_component_type_datastyle_db, async () => {
-      const key: [string, string] = [id_model, type];
-      const entry: ModelComponentTypeStyle = (await model_component_type_datastyle_db.get(key)) || {
-        id_model,
-        type,
-      };
-      merge(entry, values);
-      return model_component_type_datastyle_db.put(structuredClone(toRaw(entry)));
-    });
+    await (database as unknown as Dexie).transaction(
+      "rw",
+      model_component_type_datastyle_db,
+      async () => {
+        const key: [string, string] = [id_model, type];
+        const entry: ModelComponentTypeStyle = (await model_component_type_datastyle_db.get(
+          key,
+        )) || {
+          id_model,
+          type,
+        };
+        merge(entry, values);
+        return model_component_type_datastyle_db.put(structuredClone(toRaw(entry)));
+      },
+    );
   }
 
-  async function mutateComponentStyles(id_model: string, id_components: string[], values: StyleValues) {
+  async function mutateComponentStyles(
+    id_model: string,
+    id_components: string[],
+    values: StyleValues,
+  ) {
     dataStyleState.bulkUpdateComponentStylesCache(id_model, id_components, values);
-    await (database as unknown as Dexie).transaction("rw", model_component_datastyle_db, async () => {
-      const keys: [string, string][] = id_components.map((id_component) => [id_model, id_component]);
-      const existing = await model_component_datastyle_db.bulkGet(keys);
-      const updates = id_components.map((id_component, index) => {
-        const style: ModelComponentStyle = existing[index] || { id_model, id_component };
-        merge(style, values);
-        return toRaw(style);
-      });
+    await (database as unknown as Dexie).transaction(
+      "rw",
+      model_component_datastyle_db,
+      async () => {
+        const keys: [string, string][] = id_components.map((id_component) => [
+          id_model,
+          id_component,
+        ]);
+        const existing = await model_component_datastyle_db.bulkGet(keys);
+        const updates = id_components.map((id_component, index) => {
+          const style: ModelComponentStyle = existing[index] || { id_model, id_component };
+          merge(style, values);
+          return toRaw(style);
+        });
 
-      return model_component_datastyle_db.bulkPut(structuredClone(updates));
-    });
+        return model_component_datastyle_db.bulkPut(structuredClone(updates));
+      },
+    );
   }
 
   async function bulkMutateComponentStylesPerComponent(
@@ -71,19 +93,23 @@ export function useModelCommonStyle() {
     component_updates: ComponentStyleUpdate[],
   ) {
     dataStyleState.bulkUpdateComponentStyleCache(id_model, component_updates);
-    await (database as unknown as Dexie).transaction("rw", model_component_datastyle_db, async () => {
-      const keys: [string, string][] = component_updates.map((update) => [
-        id_model,
-        update.id_component,
-      ]);
-      const existing = await model_component_datastyle_db.bulkGet(keys);
-      const updates = component_updates.map(({ id_component, values }, index) => {
-        const style: ModelComponentStyle = existing[index] || { id_model, id_component };
-        merge(style, values);
-        return toRaw(style);
-      });
-      return model_component_datastyle_db.bulkPut(structuredClone(updates));
-    });
+    await (database as unknown as Dexie).transaction(
+      "rw",
+      model_component_datastyle_db,
+      async () => {
+        const keys: [string, string][] = component_updates.map((update) => [
+          id_model,
+          update.id_component,
+        ]);
+        const existing = await model_component_datastyle_db.bulkGet(keys);
+        const updates = component_updates.map(({ id_component, values }, index) => {
+          const style: ModelComponentStyle = existing[index] || { id_model, id_component };
+          merge(style, values);
+          return toRaw(style);
+        });
+        return model_component_datastyle_db.bulkPut(structuredClone(updates));
+      },
+    );
   }
 
   async function setModelTypeColor(

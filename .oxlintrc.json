@@ -115,7 +115,7 @@
       }
     },
     {
-      "files": ["app/plugins/**", "node_scripts/**", "server/**", "*.config.js", "*.config.ts"],
+      "files": ["app/plugins/**", "node_scripts/**", "server/**", "*.config.js"],
       "rules": {
         "import/no-default-export": "off"
       }

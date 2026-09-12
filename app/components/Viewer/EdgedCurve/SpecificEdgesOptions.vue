@@ -58,7 +58,9 @@ const color = computed({
 const vertex_attribute_name = computed({
   get: () => dataStyleStore.meshEdgesVertexAttributeName(id.value),
   set: async (newValue) => {
-    if (newValue === undefined) {return;}
+    if (newValue === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshEdgesVertexAttributeName(targetId, newValue)),
     );
@@ -78,7 +80,9 @@ const vertex_attribute_range = computed({
   get: () => dataStyleStore.meshEdgesVertexAttributeRange(id.value),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
-    if (minimum === undefined || maximum === undefined) {return;}
+    if (minimum === undefined || maximum === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshEdgesVertexAttributeRange(targetId, minimum, maximum)),
     );
@@ -106,7 +110,9 @@ const vertex_attribute_no_data_color = computed({
 const edge_attribute_name = computed({
   get: () => dataStyleStore.meshEdgesEdgeAttributeName(id.value),
   set: async (newValue) => {
-    if (newValue === undefined) {return;}
+    if (newValue === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshEdgesEdgeAttributeName(targetId, newValue)),
     );
@@ -126,7 +132,9 @@ const edge_attribute_range = computed({
   get: () => dataStyleStore.meshEdgesEdgeAttributeRange(id.value),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
-    if (minimum === undefined || maximum === undefined) {return;}
+    if (minimum === undefined || maximum === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshEdgesEdgeAttributeRange(targetId, minimum, maximum)),
     );

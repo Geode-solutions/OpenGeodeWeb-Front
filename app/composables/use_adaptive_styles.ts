@@ -54,11 +54,11 @@ export function useAdaptiveStyles(
   const targetAsRefLike = target as { value?: unknown; x?: unknown } | undefined;
   const isCoordinates = Boolean(
     target &&
-      (typeof target === "function" ||
-        (targetAsRefLike?.value !== undefined &&
-          targetAsRefLike.value !== null &&
-          (targetAsRefLike.value as { x?: unknown }).x !== undefined) ||
-        (targetAsRefLike?.x !== undefined && targetAsRefLike.value === undefined)),
+    (typeof target === "function" ||
+      (targetAsRefLike?.value !== undefined &&
+        targetAsRefLike.value !== null &&
+        (targetAsRefLike.value as { x?: unknown }).x !== undefined) ||
+      (targetAsRefLike?.x !== undefined && targetAsRefLike.value === undefined)),
   );
 
   const bounding = useElementBounding(isCoordinates ? undefined : (target as never));

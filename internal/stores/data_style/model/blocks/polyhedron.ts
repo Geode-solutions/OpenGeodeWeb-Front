@@ -111,7 +111,10 @@ function useModelBlocksPolyhedronAttribute() {
       },
     });
   }
-  function modelBlocksPolyhedronAttributeName(modelId: string, blockId?: string): string | undefined {
+  function modelBlocksPolyhedronAttributeName(
+    modelId: string,
+    blockId?: string,
+  ): string | undefined {
     return modelBlocksPolyhedronAttribute(modelId, blockId).name;
   }
   function modelBlocksPolyhedronAttributeLastItem(
@@ -142,7 +145,10 @@ function useModelBlocksPolyhedronAttribute() {
     const { minimum, maximum } = storedConfig;
     return [minimum, maximum];
   }
-  function modelBlocksPolyhedronAttributeColorMap(modelId: string, blockId?: string): string | undefined {
+  function modelBlocksPolyhedronAttributeColorMap(
+    modelId: string,
+    blockId?: string,
+  ): string | undefined {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockId);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockId);
     const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(modelId, blockId, name, item);
@@ -151,7 +157,14 @@ function useModelBlocksPolyhedronAttribute() {
   async function setModelBlocksPolyhedronAttribute(
     modelId: string,
     blockIds: string[],
-    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR }: AttributeInput,
+    {
+      name,
+      item,
+      minimum,
+      maximum,
+      colorMap,
+      no_data_color = DEFAULT_NO_DATA_COLOR,
+    }: AttributeInput,
   ) {
     mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
       name,
@@ -202,7 +215,11 @@ function useModelBlocksPolyhedronAttribute() {
     }
     return Promise.resolve();
   }
-  function setModelBlocksPolyhedronAttributeName(modelId: string, blockIds: string[], name: string) {
+  function setModelBlocksPolyhedronAttributeName(
+    modelId: string,
+    blockIds: string[],
+    name: string,
+  ) {
     const item = modelBlocksPolyhedronAttributeLastItem(modelId, blockIds[0], name);
     mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
       name,
@@ -210,7 +227,11 @@ function useModelBlocksPolyhedronAttribute() {
     });
     return applyPolyhedronAttribute(modelId, blockIds);
   }
-  function setModelBlocksPolyhedronAttributeItem(modelId: string, blockIds: string[], item: number) {
+  function setModelBlocksPolyhedronAttributeItem(
+    modelId: string,
+    blockIds: string[],
+    item: number,
+  ) {
     mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
       item,
     });

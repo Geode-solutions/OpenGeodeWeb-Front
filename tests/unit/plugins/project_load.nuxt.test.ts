@@ -18,17 +18,21 @@ vi.mock(import("@ogw_internal/utils/viewer_call"), () => ({
     await Promise.resolve();
   }),
 }));
-vi.mock(import("@ogw_front/stores/hybrid_viewer"), () => ({
-  useHybridViewerStore: () => ({
-    $id: "hybridViewer",
-    initHybridViewer: vi.fn(),
-    clear: vi.fn(),
-    addItem: vi.fn(),
-    setZScaling: vi.fn(),
-    save: vi.fn(),
-    load: vi.fn(),
-  }),
-}) as any);
+vi.mock(
+  import("@ogw_front/stores/hybrid_viewer"),
+  () =>
+    ({
+      useHybridViewerStore: () => ({
+        $id: "hybridViewer",
+        initHybridViewer: vi.fn(),
+        clear: vi.fn(),
+        addItem: vi.fn(),
+        setZScaling: vi.fn(),
+        save: vi.fn(),
+        load: vi.fn(),
+      }),
+    }) as any,
+);
 
 describe("project import", () => {
   beforeEach(() => {
@@ -50,18 +54,16 @@ describe("project import", () => {
     // Test, so it still exercises the intended behavior at runtime, but the mismatch with
     // The current store signature suggests this test (and/or the store) may be stale -
     // Flagging for review rather than silently changing behavior during the TS migration.
-    vi.spyOn(stores.dataBase, "importStores").mockImplementation(
-      (async (snapshot: { items: Record<string, unknown>[] }) => {
-        const { items } = snapshot;
-        await Promise.all(items.map((item) => database.data!.put(item)));
-      }) as unknown as typeof stores.dataBase.importStores,
-    );
+    vi.spyOn(stores.dataBase, "importStores").mockImplementation((async (snapshot: {
+      items: Record<string, unknown>[];
+    }) => {
+      const { items } = snapshot;
+      await Promise.all(items.map((item) => database.data!.put(item)));
+    }) as unknown as typeof stores.dataBase.importStores);
 
     const storesArray = Object.values(stores);
     for (const store of storesArray.slice(STORES_SLICE_START)) {
-      stores.app.registerStore(
-        store as unknown as Parameters<typeof stores.app.registerStore>[0],
-      );
+      stores.app.registerStore(store as unknown as Parameters<typeof stores.app.registerStore>[0]);
     }
 
     const snapshot = {

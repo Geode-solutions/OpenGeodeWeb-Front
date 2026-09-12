@@ -69,7 +69,11 @@ export const useAppStore = defineStore("app", () => {
     return app_url;
   });
 
-  function registerGlobalComponent(extensionId: string, componentId: string, component: unknown): void {
+  function registerGlobalComponent(
+    extensionId: string,
+    componentId: string,
+    component: unknown,
+  ): void {
     if (!globalComponents.value.has(extensionId)) {
       globalComponents.value.set(extensionId, new Map());
     }
@@ -95,7 +99,9 @@ export const useAppStore = defineStore("app", () => {
     stores.push(store);
   }
 
-  async function exportStores(params: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
+  async function exportStores(
+    params: Record<string, unknown> = {},
+  ): Promise<Record<string, unknown>> {
     const snapshot: Record<string, unknown> = {};
     let exportCount = 0;
 

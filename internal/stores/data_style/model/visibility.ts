@@ -26,12 +26,10 @@ async function getModelComponentsMap(modelId: string) {
   const results = await Promise.all(
     MESH_COMPONENT_TYPES.map(async (type) => {
       const geodeIds = await dataStore.getMeshComponentGeodeIds(modelId, type);
-      return geodeIds.map(
-        (geode_id): ModelComponent => ({
-          geode_id,
-          type,
-        }),
-      );
+      return geodeIds.map((geode_id): ModelComponent => ({
+        geode_id,
+        type,
+      }));
     }),
   );
   const allComponents = results.flat();

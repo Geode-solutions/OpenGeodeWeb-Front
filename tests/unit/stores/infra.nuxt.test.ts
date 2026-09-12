@@ -10,9 +10,13 @@ import { useBackStore } from "@ogw_front/stores/back";
 import { useInfraStore, type Microservice } from "@ogw_front/stores/infra";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
-vi.mock(import("ofetch"), () => ({
-  $fetch: vi.fn(),
-}) as any);
+vi.mock(
+  import("ofetch"),
+  () =>
+    ({
+      $fetch: vi.fn(),
+    }) as any,
+);
 
 // Mock navigator.locks API
 const mockLockRequest = vi

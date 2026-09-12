@@ -45,8 +45,9 @@ function getTextureCoordinates() {
     { schema, params },
     {
       response_function: (response: unknown) => {
-        textureCoordinates.value = (response as { texture_coordinates: string[] })
-          .texture_coordinates;
+        textureCoordinates.value = (
+          response as { texture_coordinates: string[] }
+        ).texture_coordinates;
       },
     },
   );

@@ -34,8 +34,7 @@ function byteLength(str: string): number {
   return encoder.encode(str).byteLength;
 }
 
-interface NamedChildProcess
-  extends child_process.ChildProcessByStdio<null, Readable, Readable> {
+interface NamedChildProcess extends child_process.ChildProcessByStdio<null, Readable, Readable> {
   name?: string;
 }
 
@@ -153,7 +152,9 @@ function waitForReady(
     }
   });
 }
-async function waitNuxt(nuxtProcess: child_process.ChildProcessWithoutNullStreams): Promise<string> {
+async function waitNuxt(
+  nuxtProcess: child_process.ChildProcessWithoutNullStreams,
+): Promise<string> {
   nuxtProcess.stderr.on("data", (data) => {
     console.log("Nuxt STDERR:", data.toString().trim());
   });

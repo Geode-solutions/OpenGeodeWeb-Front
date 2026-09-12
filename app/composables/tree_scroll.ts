@@ -23,7 +23,7 @@ export function useTreeScroll(
   const virtualScrollRef = ref<ScrollableElement | undefined>(undefined);
 
   function handleScroll(event: Event): void {
-    const {scrollTop} = (event.target as HTMLElement);
+    const { scrollTop } = event.target as HTMLElement;
     internalScrollTop.value = scrollTop;
     emit("update:scrollTop", scrollTop);
   }

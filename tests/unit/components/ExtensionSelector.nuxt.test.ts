@@ -58,9 +58,7 @@ describe("extension selector", () => {
     await v_card[SECOND_INDEX]?.trigger("click");
     expect(wrapper.emitted()).toHaveProperty("update_values");
     expect(wrapper.emitted<unknown[]>().update_values).toHaveLength(EXPECTED_LENGTH);
-    expect(
-      wrapper.emitted<unknown[]>().update_values?.[FIRST_INDEX]?.[FIRST_INDEX],
-    ).toStrictEqual({
+    expect(wrapper.emitted<unknown[]>().update_values?.[FIRST_INDEX]?.[FIRST_INDEX]).toStrictEqual({
       output_geode_object,
       output_extension,
     });

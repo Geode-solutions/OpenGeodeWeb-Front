@@ -138,7 +138,7 @@ export function useOverlappingPicker() {
         },
       },
     );
-    const {pickedResponse} = responseHolder;
+    const { pickedResponse } = responseHolder;
 
     if (!pickedResponse || !pickedResponse.array_ids || pickedResponse.array_ids.length === 0) {
       return result;

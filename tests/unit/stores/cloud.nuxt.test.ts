@@ -8,9 +8,13 @@ import { setupActivePinia } from "@ogw_tests/utils";
 import { useCloudStore } from "@ogw_front/stores/cloud";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
-vi.mock(import("ofetch"), () => ({
-  $fetch: vi.fn(),
-}) as any);
+vi.mock(
+  import("ofetch"),
+  () =>
+    ({
+      $fetch: vi.fn(),
+    }) as any,
+);
 
 const mockedFetch = vi.mocked($fetch);
 

@@ -59,7 +59,9 @@ const color = computed({
 const vertex_attribute_name = computed({
   get: () => dataStyleStore.meshPointsVertexAttributeName(id.value),
   set: async (newValue) => {
-    if (newValue === undefined) {return;}
+    if (newValue === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshPointsVertexAttributeName(targetId, newValue)),
     );
@@ -79,7 +81,9 @@ const vertex_attribute_range = computed({
   get: () => dataStyleStore.meshPointsVertexAttributeRange(id.value),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
-    if (minimum === undefined || maximum === undefined) {return;}
+    if (minimum === undefined || maximum === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshPointsVertexAttributeRange(targetId, minimum, maximum)),
     );

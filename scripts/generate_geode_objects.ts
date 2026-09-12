@@ -12,7 +12,7 @@ if (fs.existsSync(output_file)) {
 const files = fs.readdirSync("assets/img/geode_objects/");
 let imports = "";
 let geode_objects =
-  'interface GeodeObject {\n  tooltip: string;\n  image: string;\n}\n\nconst geode_objects: Record<string, GeodeObject> = {';
+  "interface GeodeObject {\n  tooltip: string;\n  image: string;\n}\n\nconst geode_objects: Record<string, GeodeObject> = {";
 
 for (const file of files) {
   const geode_object = file.replace(".svg", "");

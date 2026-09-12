@@ -120,7 +120,14 @@ function useMeshPolygonsPolygonAttributeStyle() {
   }
   function setMeshPolygonsPolygonAttribute(
     id: string,
-    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR }: AttributeInput,
+    {
+      name,
+      item,
+      minimum,
+      maximum,
+      colorMap,
+      no_data_color = DEFAULT_NO_DATA_COLOR,
+    }: AttributeInput,
   ) {
     mutateMeshPolygonsPolygonStyle(id, {
       name,

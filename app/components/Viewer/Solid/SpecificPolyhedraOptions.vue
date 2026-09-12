@@ -49,7 +49,9 @@ const color = computed({
 const vertex_attribute_name = computed({
   get: () => dataStyleStore.meshPolyhedraVertexAttributeName(id.value),
   set: async (newValue) => {
-    if (newValue === undefined) {return;}
+    if (newValue === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshPolyhedraVertexAttributeName(targetId, newValue)),
     );
@@ -69,9 +71,13 @@ const vertex_attribute_range = computed({
   get: () => dataStyleStore.meshPolyhedraVertexAttributeRange(id.value),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
-    if (minimum === undefined || maximum === undefined) {return;}
+    if (minimum === undefined || maximum === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolyhedraVertexAttributeRange(targetId, minimum, maximum)),
+      Promise.resolve(
+        dataStyleStore.setMeshPolyhedraVertexAttributeRange(targetId, minimum, maximum),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
@@ -97,7 +103,9 @@ const vertex_attribute_no_data_color = computed({
 const polyhedron_attribute_name = computed({
   get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeName(id.value),
   set: async (newValue) => {
-    if (newValue === undefined) {return;}
+    if (newValue === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(targetId, newValue)),
     );
@@ -117,7 +125,9 @@ const polyhedron_attribute_range = computed({
   get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeRange(id.value),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
-    if (minimum === undefined || maximum === undefined) {return;}
+    if (minimum === undefined || maximum === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
       Promise.resolve(
         dataStyleStore.setMeshPolyhedraPolyhedronAttributeRange(targetId, minimum, maximum),
@@ -130,7 +140,9 @@ const polyhedron_attribute_color_map = computed({
   get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeColorMap(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolyhedraPolyhedronAttributeColorMap(targetId, newValue)),
+      Promise.resolve(
+        dataStyleStore.setMeshPolyhedraPolyhedronAttributeColorMap(targetId, newValue),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
