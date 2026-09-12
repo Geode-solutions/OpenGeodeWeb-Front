@@ -65,7 +65,7 @@ export function viewer_call(
       response_error_function(response: unknown) {
         microservice.stop_request();
         // Pre-existing bug: this used an undefined `error` identifier (ReferenceError
-        // at runtime); fixed to use `response`, mirroring request_error_function above.
+        // At runtime); fixed to use `response`, mirroring request_error_function above.
         const typedResponse = response as RpcErrorLike;
         feedbackStore.add_error(
           typedResponse.code ?? 0,

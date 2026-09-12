@@ -42,8 +42,8 @@ function getSharedState(): SharedState {
   const modelComponentTypeDataStyleTable = database.model_component_type_datastyle!;
 
   // Dexie's `liveQuery` returns Dexie's own `Observable` type, structurally distinct
-  // from rxjs's `Observable` that `useObservable` (from @vueuse/rxjs) expects, even
-  // though they're interoperable at runtime (both are plain subscribe-based streams).
+  // From rxjs's `Observable` that `useObservable` (from @vueuse/rxjs) expects, even
+  // Though they're interoperable at runtime (both are plain subscribe-based streams).
   const styles = useObservable<Record<string, ObjectStyle>, Record<string, ObjectStyle>>(
     liveQuery(async () => {
       const objectStyles = (await dataStyleTable.toArray()) as ObjectStyle[];

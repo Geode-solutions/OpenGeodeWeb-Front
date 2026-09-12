@@ -78,8 +78,8 @@ function connect() {
   const session = viewerStore.client.getConnection().getSession();
   view.setSession(session);
   // Pre-existing bug fixed: `props` was never defined here (props were destructured
-  // directly from defineProps above), so this threw a ReferenceError whenever
-  // connect() ran. `viewId` is the same (reactive) destructured prop value.
+  // Directly from defineProps above), so this threw a ReferenceError whenever
+  // Connect() ran. `viewId` is the same (reactive) destructured prop value.
   view.setViewId(viewId);
   connected.value = true;
   view.render();

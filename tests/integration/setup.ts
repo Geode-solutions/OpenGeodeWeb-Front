@@ -42,6 +42,10 @@ async function runMicroservices() {
   console.log("back_port", back_port);
   console.log("viewer_port", viewer_port);
 
+  if (back_port === undefined || viewer_port === undefined) {
+    throw new Error("Failed to start microservices: back_port or viewer_port is undefined");
+  }
+
   await addMicroserviceMetadatas(projectFolderPath, {
     type: "back",
     name: COMMAND_BACK,
@@ -53,15 +57,15 @@ async function runMicroservices() {
     port: viewer_port,
   });
 
-  backStore.default_local_port = back_port;
-  viewerStore.default_local_port = viewer_port;
+  backStore.default_local_port = String(back_port);
+  viewerStore.default_local_port = String(viewer_port);
 
   return {
     projectFolderPath,
   };
 }
 
-async function setupIntegrationTests(file_name, geode_object) {
+async function setupIntegrationTests(file_name: string, geode_object: string) {
   setupActivePinia();
   const viewerStore = useViewerStore();
   const { projectFolderPath } = await runMicroservices();
@@ -82,11 +86,11 @@ vi.stubGlobal("navigator", {
 });
 
 beforeAll(() => {
-  globalThis.WebSocket = WebSocket;
+  globalThis.WebSocket = WebSocket as unknown as typeof globalThis.WebSocket;
 });
 
 afterAll(() => {
-  delete globalThis.WebSocket;
+  Reflect.deleteProperty(globalThis, "WebSocket");
 });
 
 export { beforeAllTimeout, runMicroservices, setupIntegrationTests };

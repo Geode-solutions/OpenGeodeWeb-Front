@@ -120,8 +120,8 @@ export function useOverlappingPicker() {
 
     const result: ViewerIdResult = { id: undefined, viewer_id: undefined };
     // A plain `let` reassigned only from inside the response_function closure
-    // below loses its declared type for TS's control-flow narrowing once
-    // control leaves the closure - wrapping it in an object sidesteps that.
+    // Below loses its declared type for TS's control-flow narrowing once
+    // Control leaves the closure - wrapping it in an object sidesteps that.
     const responseHolder: { pickedResponse: PickedResponse | undefined } = {
       pickedResponse: undefined,
     };
@@ -138,7 +138,7 @@ export function useOverlappingPicker() {
         },
       },
     );
-    const pickedResponse = responseHolder.pickedResponse;
+    const {pickedResponse} = responseHolder;
 
     if (!pickedResponse || !pickedResponse.array_ids || pickedResponse.array_ids.length === 0) {
       return result;

@@ -14,8 +14,8 @@ async function saveCurrentPosition() {
   }
   await cameraManagerStore.saveCameraPosition(
     newPositionName.value,
-    // hybridViewerStore.camera_options is a loosely-typed reactive object (it's
-    // populated dynamically from the viewer's camera state), but is always a
+    // HybridViewerStore.camera_options is a loosely-typed reactive object (it's
+    // Populated dynamically from the viewer's camera state), but is always a
     // CameraOptions shape at runtime once the viewer has synced a camera.
     toRaw(hybridViewerStore.camera_options) as unknown as CameraOptions,
   );

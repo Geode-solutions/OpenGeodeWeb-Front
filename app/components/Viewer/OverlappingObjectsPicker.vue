@@ -1,21 +1,31 @@
 <script setup lang="ts">
+import type { PropType } from "vue";
 import GlassCard from "@ogw_front/components/GlassCard.vue";
 import { formatListId } from "@ogw_front/utils/name_cleaner";
 import geode_objects from "@ogw_front/assets/geode_objects";
 
+// mirrors use_overlapping_picker's (unexported) ProposedItem type.
+interface IntermediateItem {
+  id: string;
+  viewer_id: number;
+  name: string;
+  viewer_type: string | undefined;
+  geode_object_type: string | undefined;
+}
+
 const { displayIntermediate, intermediateItems, menuStyle } = defineProps({
   displayIntermediate: { type: Boolean, required: true },
-  intermediateItems: { type: Array, required: true },
+  intermediateItems: { type: Array as PropType<IntermediateItem[]>, required: true },
   menuStyle: { type: Object, required: true },
 });
 
 const emit = defineEmits(["select", "update:displayIntermediate"]);
 
-function selectItem(item) {
+function selectItem(item: IntermediateItem) {
   emit("select", item);
 }
 
-function handleUpdate(val) {
+function handleUpdate(val: boolean) {
   emit("update:displayIntermediate", val);
 }
 </script>
@@ -55,8 +65,8 @@ function handleUpdate(val) {
         >
           <template #prepend>
             <v-img
-              v-if="geode_objects[item.geode_object_type]?.image"
-              :src="geode_objects[item.geode_object_type].image"
+              v-if="geode_objects[item.geode_object_type ?? '']?.image"
+              :src="geode_objects[item.geode_object_type ?? '']?.image"
               height="24"
               width="24"
               max-width="24"

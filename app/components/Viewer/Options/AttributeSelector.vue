@@ -87,9 +87,9 @@ const componentItems = computed(() => {
 function resetRange() {
   if (currentAttribute.value) {
     const comp = attributeItem.value ?? 0;
-    // getAttributeRange's parameter type (AttributeRangeSource) isn't exported;
+    // GetAttributeRange's parameter type (AttributeRangeSource) isn't exported;
     // AttributeInfo's index signature covers its optional min/max fields at
-    // runtime (they come from the same backend attribute response shape).
+    // Runtime (they come from the same backend attribute response shape).
     const { min, max } = getAttributeRange(
       currentAttribute.value as unknown as Parameters<typeof getAttributeRange>[0],
       comp,

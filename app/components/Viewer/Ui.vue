@@ -53,7 +53,7 @@ const {
   get_viewer_id: trigger_picker,
 } = useOverlappingPicker();
 
-function get_viewer_id(x, y) {
+function get_viewer_id(x: number, y: number) {
   const instance = getCurrentInstance();
   const containerRect = instance?.proxy?.$el
     ?.closest?.('[data-testid="hybridViewer"]')
@@ -82,7 +82,7 @@ defineExpose({ get_viewer_id });
   />
   <ViewerContextMenu
     v-if="displayMenu"
-    :id="menuStore.current_id"
+    :id="menuStore.current_id ?? ''"
     :x="menuStore.menuX"
     :y="menuStore.menuY"
     :container-width="containerWidth"

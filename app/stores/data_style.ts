@@ -23,9 +23,9 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   const modelStyleStore = useModelStyle();
   const dataStore = useDataStore();
   // The database's table map is dynamically assembled at runtime (see
-  // internal/database/database.ts), so `noUncheckedIndexedAccess` sees these as
-  // possibly undefined even though they're always registered before this store
-  // is used; guard defensively rather than asserting.
+  // Internal/database/database.ts), so `noUncheckedIndexedAccess` sees these as
+  // Possibly undefined even though they're always registered before this store
+  // Is used; guard defensively rather than asserting.
   function requireTable<T>(table: T | undefined, name: string): T {
     if (!table) {
       throw new Error(`Database table not initialized: ${name}`);

@@ -25,8 +25,8 @@ export const useCameraManagerStore = defineStore("camera_manager", () => {
 
   function refAllCameraPositions() {
     // Dexie's liveQuery() returns Dexie's own minimal Observable shape, not an
-    // actual rxjs Observable instance (useObservable's declared parameter type);
-    // the two are structurally close enough at runtime (vueuse only calls
+    // Actual rxjs Observable instance (useObservable's declared parameter type);
+    // The two are structurally close enough at runtime (vueuse only calls
     // `.subscribe`) but not identical, hence the cast.
     return useObservable(
       liveQuery(() => camera_positions_db.toArray()) as unknown as Observable<

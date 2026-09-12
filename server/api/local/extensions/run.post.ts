@@ -52,7 +52,7 @@ export default defineEventHandler(async (event) => {
         await addMicroserviceMetadatas(projectFolderPath, {
           type: "back",
           name,
-          // runBack can exhaust its port-conflict retries and return undefined
+          // RunBack can exhaust its port-conflict retries and return undefined
           // (pre-existing bug: addMicroserviceMetadatas/URLs then embed "undefined").
           port: port as number,
         });

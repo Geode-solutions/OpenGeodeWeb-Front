@@ -1,13 +1,19 @@
 <script setup lang="ts">
+import type { PropType } from "vue";
 import ViewerOptionsTextureItem from "@ogw_front/components/Viewer/Options/TextureItem.vue";
 
-const textures = defineModel({ type: Array });
+interface Texture {
+  id: string;
+  texture_name: string;
+}
+
+const textures = defineModel({ type: Array as PropType<Texture[]> });
 
 const { id } = defineProps({
   id: { type: String, required: true },
 });
 
-const internal_textures = ref([]);
+const internal_textures = ref<Texture[]>([]);
 
 onMounted(() => {
   if (textures.value === null || textures.value === undefined || textures.value.length === 0) {
@@ -17,10 +23,14 @@ onMounted(() => {
   }
 });
 
-function update_value_event($event, index) {
-  internal_textures.value[index][$event.key] = $event.value;
+function update_value_event($event: { key: keyof Texture; value: string }, index: number) {
+  const texture = internal_textures.value[index];
+  if (!texture) {
+    return;
+  }
+  texture[$event.key] = $event.value;
   const filtered = internal_textures.value.filter(
-    (texture) => texture.texture_name !== "" && texture.id !== "",
+    (item) => item.texture_name !== "" && item.id !== "",
   );
   if (filtered.length > 0) {
     textures.value = filtered;
@@ -41,8 +51,8 @@ function update_value_event($event, index) {
     </v-col>
     <ViewerOptionsTextureItem
       :id="id"
-      :texture_name="internal_textures[index].texture_name"
-      :texture_id="internal_textures[index].id"
+      :texture-name="texture.texture_name"
+      :texture-id="texture.id"
       @update_value="update_value_event($event, index)"
     />
   </v-row>

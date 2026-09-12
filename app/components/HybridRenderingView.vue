@@ -46,8 +46,8 @@ onMounted(async () => {
   if (import.meta.client) {
     await hybridViewerStore.initHybridViewer();
     await nextTick();
-    // useTemplateRef's inferred type is broader than the { $el: HTMLElement } shape
-    // setContainer expects; this element is only ever a component instance with $el
+    // UseTemplateRef's inferred type is broader than the { $el: HTMLElement } shape
+    // SetContainer expects; this element is only ever a component instance with $el
     // (see the `containerEl.$el` usages below).
     hybridViewerStore.setContainer(container as never);
     debouncedResize();

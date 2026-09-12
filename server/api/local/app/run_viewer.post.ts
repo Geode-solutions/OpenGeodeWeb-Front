@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
     await addMicroserviceMetadatas(args.projectFolderPath, {
       type: "viewer",
       name: COMMAND_VIEWER,
-      // runViewer can exhaust its port-conflict retries and return undefined
+      // RunViewer can exhaust its port-conflict retries and return undefined
       // (pre-existing bug: addMicroserviceMetadatas/URLs then embed "undefined").
       port: port as number,
     });

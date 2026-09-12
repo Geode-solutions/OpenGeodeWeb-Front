@@ -1,5 +1,5 @@
 import { dot } from "@kitware/vtk.js/Common/Core/Math";
-import type { CameraOptions, vtkCamera, Vector3 } from "./vtk_types";
+import type { CameraOptions, Vector3, vtkCamera } from "./vtk_types";
 
 const NEAR_ZERO_THRESHOLD = 1e-10;
 const SLERP_LINEAR_THRESHOLD = 0.9995;
@@ -116,7 +116,7 @@ function animateCamera(options: AnimateCameraOptions): void {
     const dir = slerp(startDir, targetDir, ease, antipodalMid);
     const dist = startDist + (targetDist - startDist) * ease + bump;
     // `index` ranges over startState.focal_point's own length (3), which always
-    // matches targetState.focal_point's length, so the lookup is always in bounds.
+    // Matches targetState.focal_point's length, so the lookup is always in bounds.
     const focalPoint = startState.focal_point.map(
       (startValue, index) => startValue + (targetState.focal_point[index]! - startValue) * ease,
     );

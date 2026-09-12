@@ -8,7 +8,7 @@ const { icon, tooltip, color, size, variant, density, tooltipLocation, iconSize 
   color: { type: String, default: undefined },
   size: { type: [String, Number], default: undefined },
   // Vuetify's variant/density accept narrow literal unions; kept loose here since
-  // callers pass plain strings and this is only a typing widening, not a behavior change.
+  // Callers pass plain strings and this is only a typing widening, not a behavior change.
   variant: { type: String as PropType<any>, default: undefined },
   density: { type: String as PropType<any>, default: "comfortable" },
   tooltipLocation: { type: String, default: "left" },

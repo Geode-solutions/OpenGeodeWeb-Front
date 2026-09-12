@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
     const request = requestConfig(parent, image, email, projectName);
     console.log({ request });
     // @google-cloud/run bundles its own copy of google-auth-library's auth-client types,
-    // which isn't nominally assignable to the AuthClient from our direct dependency.
+    // Which isn't nominally assignable to the AuthClient from our direct dependency.
     const runClient = new ServicesClient({ authClient: authClient as never });
     const [operation] = await runClient.createService(request);
     const [response] = await operation.promise();

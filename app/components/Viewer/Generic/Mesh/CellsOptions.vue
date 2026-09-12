@@ -59,7 +59,7 @@ const textures = computed({
 const vertex_attribute_name = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeName(id.value),
   set: async (newValue) => {
-    if (newValue === undefined) return;
+    if (newValue === undefined) {return;}
     await applyBatchStyle(id.value, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshCellsVertexAttributeName(targetId, newValue)),
     );
@@ -79,7 +79,7 @@ const vertex_attribute_range = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeRange(id.value),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
-    if (minimum === undefined || maximum === undefined) return;
+    if (minimum === undefined || maximum === undefined) {return;}
     await applyBatchStyle(id.value, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshCellsVertexAttributeRange(targetId, minimum, maximum)),
     );
@@ -107,7 +107,7 @@ const vertex_attribute_no_data_color = computed({
 const cell_attribute_name = computed({
   get: () => dataStyleStore.meshCellsCellAttributeName(id.value),
   set: async (newValue) => {
-    if (newValue === undefined) return;
+    if (newValue === undefined) {return;}
     await applyBatchStyle(id.value, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshCellsCellAttributeName(targetId, newValue)),
     );
@@ -127,7 +127,7 @@ const cell_attribute_range = computed({
   get: () => dataStyleStore.meshCellsCellAttributeRange(id.value),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
-    if (minimum === undefined || maximum === undefined) return;
+    if (minimum === undefined || maximum === undefined) {return;}
     await applyBatchStyle(id.value, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshCellsCellAttributeRange(targetId, minimum, maximum)),
     );

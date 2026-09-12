@@ -47,9 +47,9 @@ describe("project import", () => {
     // NOTE: the real `useDataStore().importStores` now expects
     // `{ modelComponents, modelComponentsRelations }` (see app/stores/data.ts), not the
     // `{ items }` shape mocked here. This spy fully replaces the implementation for this
-    // test, so it still exercises the intended behavior at runtime, but the mismatch with
-    // the current store signature suggests this test (and/or the store) may be stale -
-    // flagging for review rather than silently changing behavior during the TS migration.
+    // Test, so it still exercises the intended behavior at runtime, but the mismatch with
+    // The current store signature suggests this test (and/or the store) may be stale -
+    // Flagging for review rather than silently changing behavior during the TS migration.
     vi.spyOn(stores.dataBase, "importStores").mockImplementation(
       (async (snapshot: { items: Record<string, unknown>[] }) => {
         const { items } = snapshot;

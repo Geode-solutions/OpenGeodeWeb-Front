@@ -105,8 +105,8 @@ export const useBackStore = defineStore("back", {
       return api_fetch(
         this,
         // The back store is only ever used with HTTP ("front"/"back") schemas,
-        // which always carry `methods`; the wider JsonRpcSchema param above is
-        // kept as-is to match this action's public signature.
+        // Which always carry `methods`; the wider JsonRpcSchema param above is
+        // Kept as-is to match this action's public signature.
         { schema: schema as JsonRpcSchema & { methods: string[] }, params, headers: {} },
         {
           ...callbacks,

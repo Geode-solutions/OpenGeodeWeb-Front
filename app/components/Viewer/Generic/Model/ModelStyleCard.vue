@@ -85,7 +85,7 @@ watch(
 const modelVisibility = computed({
   get: () => dataStyleStore.modelVisibility(modelId.value),
   set: async (newValue) => {
-    if (newValue === undefined) return;
+    if (newValue === undefined) {return;}
     await dataStyleStore.setModelVisibility(modelId.value, newValue);
     hybridViewerStore.remoteRender();
   },
@@ -111,7 +111,7 @@ const modelComponentsColor = computed({
 const modelComponentsActiveColoring = computed({
   get: () => dataStyleStore.getModelActiveColoring(modelId.value),
   set: async (coloringType) => {
-    if (typeof coloringType !== "string") return;
+    if (typeof coloringType !== "string") {return;}
     await dataStyleStore.mutateStyle(modelId.value, {
       coloring: { active: coloringType },
     });

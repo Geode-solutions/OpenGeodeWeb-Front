@@ -111,8 +111,8 @@ export function useDataCollections() {
 
   function refFormatedCollectionComponents(modelId: string) {
     // Dexie's liveQuery() returns Dexie's own minimal Observable shape, not an
-    // actual rxjs Observable instance (useObservable's declared parameter type);
-    // the two are structurally close enough at runtime (vueuse only calls
+    // Actual rxjs Observable instance (useObservable's declared parameter type);
+    // The two are structurally close enough at runtime (vueuse only calls
     // `.subscribe`) but not identical, hence the cast.
     return useObservable(
       liveQuery(() => formatedCollectionComponents(modelId)) as unknown as Observable<

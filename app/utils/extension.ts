@@ -77,7 +77,7 @@ async function registerRunningExtensions() {
       appStore.registerStore(store);
       console.log("[ExtensionManager] Store registered:", store.$id);
       // Extension-provided stores are expected to satisfy the fuller
-      // microservice contract (connect, etc.) even though the loader's own
+      // Microservice contract (connect, etc.) even though the loader's own
       // RegisterableStore type only models what app.ts itself needs.
       infraStore.register_microservice(store as unknown as Microservice);
       return {

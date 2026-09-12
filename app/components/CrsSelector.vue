@@ -20,7 +20,7 @@ const backStore = useBackStore();
 
 function get_selected_crs(crs_code: unknown) {
   // Pre-existing off-by-one fixed: `i <= length` read one past the end of
-  // crs_list, which would have thrown on `undefined["code"]` at runtime.
+  // Crs_list, which would have thrown on `undefined["code"]` at runtime.
   for (let i = 0; i < crs_list.value.length; i += 1) {
     const crs = crs_list.value[i];
     if (crs && crs["code"] === crs_code) {

@@ -63,8 +63,8 @@ export default defineEventHandler(async (event) => {
   if (!webStream) {
     throw createError({ statusCode: 400, message: "No request body received" });
   }
-  // h3's ReadableStream (lib.dom) and Node's stream/web ReadableStream are structurally
-  // the same at runtime but the two ambient type declarations aren't nominally compatible.
+  // H3's ReadableStream (lib.dom) and Node's stream/web ReadableStream are structurally
+  // The same at runtime but the two ambient type declarations aren't nominally compatible.
   Readable.fromWeb(webStream as unknown as NodeReadableStream).pipe(busboyInstance);
   await finished(busboyInstance);
   if (writePromises.length > 0) {
