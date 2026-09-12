@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { PropType } from "vue";
-import { onMounted, onUnmounted, ref } from "vue";
+import { onMounted, onUnmounted, ref, type PropType } from "vue";
 import DragAndDropInline from "./DragAndDropInternal/DragAndDropInline.vue";
 import DragAndDropOverlay from "./DragAndDropInternal/DragAndDropOverlay.vue";
 

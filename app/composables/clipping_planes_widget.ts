@@ -14,11 +14,13 @@ import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering
 // error at the import site instead.
 // @ts-expect-error -- see comment above; newInstance() below is implicitly `any`.
 import { newInstance as vtkImplicitPlaneWidget } from "@kitware/vtk.js/Widgets/Widgets3D/ImplicitPlaneWidget";
-import { newInstance as vtkWidgetManager } from "@kitware/vtk.js/Widgets/Core/WidgetManager";
+import {
+  newInstance as vtkWidgetManager,
+  type vtkWidgetManager as WidgetManagerInstance,
+} from "@kitware/vtk.js/Widgets/Core/WidgetManager";
 import type { Ref } from "vue";
 import type vtkActor from "@kitware/vtk.js/Rendering/Core/Actor";
 import type { vtkCamera } from "@kitware/vtk.js/Rendering/Core/Camera";
-import type { vtkWidgetManager as WidgetManagerInstance } from "@kitware/vtk.js/Widgets/Core/WidgetManager";
 import type { vtkGenericRenderWindow as GenericRenderWindowInstance } from "@ogw_internal/stores/hybrid_viewer/vtk_types";
 import type { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 

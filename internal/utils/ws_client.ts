@@ -1,8 +1,10 @@
 // Third party imports
-import vtkWSLinkClient, { newInstance } from "@kitware/vtk.js/IO/Core/WSLinkClient";
+import vtkWSLinkClient, {
+  newInstance,
+  type vtkWSLinkClient as VtkWSLinkClient,
+} from "@kitware/vtk.js/IO/Core/WSLinkClient";
 import SmartConnect from "wslink/src/SmartConnect";
 import _ from "lodash";
-import type { vtkWSLinkClient as VtkWSLinkClient } from "@kitware/vtk.js/IO/Core/WSLinkClient";
 
 interface WsClientCallbacks {
   onConnectionClose?: () => void;

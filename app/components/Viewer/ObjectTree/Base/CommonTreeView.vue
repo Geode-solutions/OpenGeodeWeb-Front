@@ -4,8 +4,7 @@ import StickyHeader from "@ogw_front/components/Viewer/ObjectTree/Base/StickyHea
 import TreeRow from "@ogw_front/components/Viewer/ObjectTree/Base/TreeRow.vue";
 import { useTreeKeyboardNav } from "@ogw_front/composables/tree_keyboard_nav";
 import { useTreeScroll } from "@ogw_front/composables/tree_scroll";
-import { useVirtualTree } from "@ogw_front/composables/virtual_tree";
-import type { DisplayItem, EmitFn } from "@ogw_front/composables/virtual_tree";
+import { useVirtualTree, type DisplayItem, type EmitFn } from "@ogw_front/composables/virtual_tree";
 
 // useVirtualTree's own props type (VirtualTreeProps) isn't exported; this
 // component intentionally stays generic over whatever item shape callers use

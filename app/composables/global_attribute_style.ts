@@ -1,11 +1,10 @@
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
-import { computed } from "vue";
+import { computed, type Ref } from "vue";
 
 import { getAttributeRange } from "@ogw_front/utils/attributes";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import type { Ref } from "vue";
 
 interface ComponentNameEntry {
   getterKey: string;

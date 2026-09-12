@@ -6,8 +6,7 @@
 import { isCloudMode } from "@ogw_front/utils/stores";
 import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json" with { type: "json" };
 import { useAppStore } from "@ogw_front/stores/app";
-import { useInfraStore } from "@ogw_front/stores/infra";
-import type { Microservice } from "@ogw_front/stores/infra";
+import { useInfraStore, type Microservice } from "@ogw_front/stores/infra";
 
 interface ExtensionDescriptor {
   id: string;

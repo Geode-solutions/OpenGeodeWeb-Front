@@ -1,6 +1,5 @@
 import { BaseDatabase } from "./base_database";
-import { Dexie } from "dexie";
-import type { Table } from "dexie";
+import { Dexie, type Table } from "dexie";
 import { ExtendedDatabase } from "./extended_database";
 
 interface DatabaseContainer {

@@ -8,10 +8,12 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.jso
 
 // Local imports
 import { addNginxLocation, addSupervisorProgram } from "./cloud.js";
-import { getAvailablePort, waitForReady } from "./scripts.js";
-import type { NamedChildProcess } from "./scripts.js";
-import { microservicesMetadatasPath, projectMicroservices } from "./cleanup.js";
-import type { Microservice } from "./cleanup.js";
+import { getAvailablePort, waitForReady, type NamedChildProcess } from "./scripts.js";
+import {
+  microservicesMetadatasPath,
+  projectMicroservices,
+  type Microservice,
+} from "./cleanup.js";
 import { executablePath } from "./path.js";
 
 interface RunArgs {

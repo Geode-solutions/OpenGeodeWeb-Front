@@ -1,6 +1,5 @@
-import type { Table } from "dexie";
+import { liveQuery, type Table } from "dexie";
 import { database } from "@ogw_internal/database/database.js";
-import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import type { Observable } from "rxjs";
 

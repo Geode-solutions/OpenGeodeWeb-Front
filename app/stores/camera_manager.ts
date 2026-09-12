@@ -1,6 +1,5 @@
 // Third party imports
-import type { Table } from "dexie";
-import { liveQuery } from "dexie";
+import { liveQuery, type Table } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 import type { Observable } from "rxjs";

@@ -1,5 +1,6 @@
-import type { AttributeConfig, RGBAColor } from "./constants";
 import {
+  type AttributeConfig,
+  type RGBAColor,
   CELLS_DEFAULT_COLOR,
   CELLS_DEFAULT_VISIBILITY,
   EDGES_DEFAULT_COLOR,

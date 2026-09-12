@@ -1,5 +1,6 @@
-import type { AttributeConfig, RGBAColor } from "./constants";
 import {
+  type AttributeConfig,
+  type RGBAColor,
   BLOCKS_DEFAULT_ACTIVE_COLORING,
   BLOCKS_DEFAULT_COLOR,
   BLOCKS_DEFAULT_VISIBILITY,

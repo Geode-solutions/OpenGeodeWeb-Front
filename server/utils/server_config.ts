@@ -1,5 +1,4 @@
-import { createServerWsRpcClient } from "./ws_client.js";
-import type { ServerWsRpcClient } from "./ws_client.js";
+import { createServerWsRpcClient, type ServerWsRpcClient } from "./ws_client.js";
 
 const storage = new Map<string, unknown>();
 function getAppBaseUrl(): unknown {
