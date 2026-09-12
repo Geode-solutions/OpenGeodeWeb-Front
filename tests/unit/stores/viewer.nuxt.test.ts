@@ -22,7 +22,7 @@ vi.stubGlobal("navigator", {
 
 describe("viewer store", () => {
   beforeAll(() => {
-    globalThis.WebSocket = WebSocket;
+    globalThis.WebSocket = WebSocket as unknown as typeof globalThis.WebSocket;
   });
 
   beforeEach(() => {
@@ -30,20 +30,21 @@ describe("viewer store", () => {
   });
 
   afterAll(() => {
-    delete globalThis.WebSocket;
+    Reflect.deleteProperty(globalThis, "WebSocket");
   });
 
   describe("state", () => {
     test("initial state", () => {
       const viewerStore = useViewerStore();
       expectTypeOf(viewerStore.default_local_port).toBeString();
-      expectTypeOf(viewerStore.client).toEqualTypeOf({});
+      expect(viewerStore.client).toEqual({});
       expectTypeOf(viewerStore.picking_mode).toBeBoolean();
-      expectTypeOf(viewerStore.picked_point).toEqualTypeOf({
-        x: undefined,
-        y: undefined,
-      });
-      expectTypeOf(viewerStore.picked_point).toBeNumber();
+      expectTypeOf(viewerStore.picked_point).toEqualTypeOf<{
+        x: number | undefined;
+        y: number | undefined;
+        z: number | undefined;
+      }>();
+      expectTypeOf(viewerStore.picked_point.x).toEqualTypeOf<number | undefined>();
       expectTypeOf(viewerStore.status).toBeString();
     });
   });

@@ -15,14 +15,16 @@ describe("upload_file", () => {
   beforeEach(() => {
     setupActivePinia();
     const backStore = useBackStore();
-    backStore.base_url = "";
+    (backStore as { base_url: string }).base_url = "";
   });
 
   test("throw error", async () => {
     const backStore = useBackStore();
     const file = "toto";
 
-    await expect(backStore.upload(file)).rejects.toThrow("file must be an instance of File");
+    await expect(backStore.upload(file as unknown as File)).rejects.toThrow(
+      "file must be an instance of File",
+    );
   });
 
   test("onResponse", async () => {
@@ -35,8 +37,8 @@ describe("upload_file", () => {
     const file = new File(["fake_file"], "fake_file.txt");
     let response_value = "";
     await backStore.upload(file, {
-      response_function: (response: { test: string }) => {
-        response_value = response.test;
+      response_function: (response: unknown) => {
+        response_value = (response as { test: string }).test;
       },
     });
     expect(feedbackStore.feedbacks).toHaveLength(ZERO);

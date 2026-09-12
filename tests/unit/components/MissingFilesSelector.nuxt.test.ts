@@ -8,8 +8,8 @@ import type { HTTPMethod } from "h3";
 
 // Local imports
 import { setupActivePinia, vuetify } from "@ogw_tests/utils";
-import FileUploader from "@ogw_front/components/FileUploader";
-import MissingFilesSelector from "@ogw_front/components/MissingFilesSelector";
+import FileUploader from "@ogw_front/components/FileUploader.vue";
+import MissingFilesSelector from "@ogw_front/components/MissingFilesSelector.vue";
 import { useBackStore } from "@ogw_front/stores/back";
 
 const EXPECTED_LENGTH = 1;
@@ -21,7 +21,7 @@ const upload_file_schema = schemas.opengeodeweb_back.upload_file;
 describe("missing files selector", () => {
   const pinia = setupActivePinia();
   const backStore = useBackStore();
-  backStore.base_url = "/";
+  (backStore as { base_url: string }).base_url = "/";
 
   test("select file", async () => {
     backStore.request = vi.fn(

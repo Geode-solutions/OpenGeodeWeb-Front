@@ -117,7 +117,7 @@ describe("geode store actions", () => {
   describe("ping", () => {
     test("response", async () => {
       const backStore = useBackStore();
-      backStore.base_url = "";
+      (backStore as { base_url: string }).base_url = "";
       getFakeCall.mockReturnValue({});
       await backStore.ping();
       expect(backStore.status).toBe(Status.CONNECTED);
@@ -125,7 +125,7 @@ describe("geode store actions", () => {
 
     test("response_error", async () => {
       const backStore = useBackStore();
-      backStore.base_url = "";
+      (backStore as { base_url: string }).base_url = "";
       getFakeCall.mockImplementation(() => {
         throw createError({ status: STATUS_500 });
       });

@@ -20,7 +20,7 @@ const geode_object = "RegularGrid2D";
 const MINIMUM_RANGE = 10;
 const MAXIMUM_RANGE = 20;
 const ALTERNATE_RANGE_MAX = 100;
-const range = [MINIMUM_RANGE, MAXIMUM_RANGE];
+const range: [number, number] = [MINIMUM_RANGE, MAXIMUM_RANGE];
 const default_vertex_attribute = { name: "points", item: 0, range };
 const default_cell_attribute = { name: "RGB_data", item: 0, range };
 

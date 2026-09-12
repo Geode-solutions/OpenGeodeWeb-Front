@@ -4,7 +4,7 @@ import { mount } from "@vue/test-utils";
 
 // Local imports
 import { setupActivePinia, vuetify } from "@ogw_tests/utils";
-import FeedBackErrorBanner from "@ogw_front/components/FeedBack/ErrorBanner";
+import FeedBackErrorBanner from "@ogw_front/components/FeedBack/ErrorBanner.vue";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 const CALLED_TIMES = 1;

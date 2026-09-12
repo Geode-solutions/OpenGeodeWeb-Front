@@ -5,9 +5,6 @@ import { beforeEach, describe, expect, expectTypeOf, test } from "vitest";
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
-// CONSTANTS
-const STEP_1 = 1;
-
 describe("treeview store state", () => {
   beforeEach(() => {
     setupActivePinia();
@@ -43,19 +40,19 @@ describe("treeview store actions", () => {
       },
     ];
 
-    for (let i = 0; i < testItems.length; i += STEP_1) {
+    for (const testItem of testItems) {
       treeviewStore.addItem(
-        testItems[i].geode_object_type,
-        testItems[i].name,
-        testItems[i].id,
-        testItems[i].viewer_type,
+        testItem.geode_object_type,
+        testItem.name,
+        testItem.id,
+        testItem.viewer_type,
       );
       const itemsCopy = [...treeviewStore.items];
       expect(treeviewStore.items).toStrictEqual(itemsCopy.toSorted());
 
-      for (let j = 0; j < treeviewStore.items.length; j += STEP_1) {
-        const childrenCopy = [...treeviewStore.items[j].children];
-        expect(treeviewStore.items[j].children).toStrictEqual(childrenCopy.toSorted());
+      for (const item of treeviewStore.items) {
+        const childrenCopy = [...item.children];
+        expect(item.children).toStrictEqual(childrenCopy.toSorted());
       }
     }
     expect(treeviewStore.selection).toHaveLength(testItems.length);

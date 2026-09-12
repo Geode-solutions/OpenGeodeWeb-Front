@@ -30,7 +30,7 @@ describe("feedback store", () => {
         const feedbackStore = useFeedbackStore();
         await feedbackStore.add_error(ERROR_500, "/test", "test message", "test description");
         expect(feedbackStore.feedbacks).toHaveLength(1);
-        expect(feedbackStore.feedbacks[0].type).toBe("error");
+        expect(feedbackStore.feedbacks[0]!.type).toBe("error");
       });
 
       test("feedbacks_timeout", async () => {
@@ -49,7 +49,7 @@ describe("feedback store", () => {
         feedbackStore.feedbacks_timeout_miliseconds = 500;
         await feedbackStore.add_success("test description");
         expect(feedbackStore.feedbacks).toHaveLength(1);
-        expect(feedbackStore.feedbacks[0].type).toBe("success");
+        expect(feedbackStore.feedbacks[0]!.type).toBe("success");
         vi.runAllTimers();
         expect(feedbackStore.feedbacks).toHaveLength(0);
       });
@@ -61,7 +61,7 @@ describe("feedback store", () => {
         feedbackStore.feedbacks_timeout_miliseconds = 500;
         await feedbackStore.add_warning("test warning description");
         expect(feedbackStore.feedbacks).toHaveLength(1);
-        expect(feedbackStore.feedbacks[0].type).toBe("warning");
+        expect(feedbackStore.feedbacks[0]!.type).toBe("warning");
         vi.runAllTimers();
         expect(feedbackStore.feedbacks).toHaveLength(0);
       });
@@ -72,7 +72,7 @@ describe("feedback store", () => {
         const feedbackStore = useFeedbackStore();
         await feedbackStore.add_success("test description");
         expect(feedbackStore.feedbacks).toHaveLength(1);
-        const feedbackId = feedbackStore.feedbacks[0].id;
+        const feedbackId = feedbackStore.feedbacks[0]!.id;
         feedbackStore.delete_feedback(feedbackId);
         expect(feedbackStore.feedbacks).toHaveLength(0);
       });

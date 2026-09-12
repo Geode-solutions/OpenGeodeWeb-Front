@@ -8,7 +8,7 @@ import type { HTTPMethod } from "h3";
 
 // Local imports
 import { setupActivePinia, vuetify } from "@ogw_tests/utils";
-import FileUploader from "@ogw_front/components/FileUploader";
+import FileUploader from "@ogw_front/components/FileUploader.vue";
 import { useBackStore } from "@ogw_front/stores/back";
 
 const FIRST_INDEX = 0;
@@ -19,7 +19,7 @@ const upload_file_schema = schemas.opengeodeweb_back.upload_file;
 describe("file uploader", () => {
   const pinia = setupActivePinia();
   const backStore = useBackStore();
-  backStore.base_url = "/";
+  (backStore as { base_url: string }).base_url = "/";
 
   registerEndpoint(upload_file_schema.$id, {
     method: upload_file_schema.methods[FIRST_INDEX] as HTTPMethod,

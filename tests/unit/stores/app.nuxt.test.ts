@@ -132,11 +132,11 @@ describe("app store", () => {
         const appStore = useAppStore();
         const userStore = {
           $id: "userStore",
-          importStores: vi.fn().mockResolvedValue(),
+          importStores: vi.fn().mockResolvedValue(undefined),
         };
         const backStore = {
           $id: "backStore",
-          importStores: vi.fn().mockResolvedValue(),
+          importStores: vi.fn().mockResolvedValue(undefined),
         };
         appStore.registerStore(userStore);
         appStore.registerStore(backStore);
@@ -159,6 +159,7 @@ describe("app store", () => {
         const mock_store_2 = {
           $id: "withoutImport",
           save: vi.fn(),
+          importStores: undefined,
         };
         appStore.registerStore(mock_store_1);
         appStore.registerStore(mock_store_2);
@@ -173,7 +174,7 @@ describe("app store", () => {
 
       test("warn when store not found in snapshot", async () => {
         const appStore = useAppStore();
-        const console_warn_spy = vi.spyOn(console, "warn").mockImplementation();
+        const console_warn_spy = vi.spyOn(console, "warn").mockImplementation(() => undefined);
         const mock_store = {
           $id: "testStore",
           importStores: vi.fn(),

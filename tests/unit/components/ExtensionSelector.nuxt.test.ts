@@ -8,7 +8,7 @@ import type { HTTPMethod } from "h3";
 
 // Local imports
 import { setupActivePinia, vuetify } from "@ogw_tests/utils";
-import ExtensionSelector from "@ogw_front/components/ExtensionSelector";
+import ExtensionSelector from "@ogw_front/components/ExtensionSelector.vue";
 import { useBackStore } from "@ogw_front/stores/back";
 
 const EXPECTED_LENGTH = 1;
@@ -22,7 +22,7 @@ const backStore = useBackStore();
 
 describe("extension selector", () => {
   beforeEach(() => {
-    backStore.base_url = "/";
+    (backStore as { base_url: string }).base_url = "/";
 
     backStore.request = vi.fn(() => {
       const response = {

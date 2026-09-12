@@ -52,15 +52,13 @@ describe("viewer Store", () => {
     describe("request", () => {
       test(
         "request",
-        () => {
+        async () => {
           const schema = opengeodeweb_viewer_schemas.opengeodeweb_viewer.viewer.render;
           const viewerStore = useViewerStore();
           const timeout = 1;
-          expect(() =>
-            viewerStore
-              .request({ schema, timeout })
-              .rejects.toThrow(`${schema.$id}: Timed out after ${timeout}ms, ${schema} ${params}`),
-          ).toBeDefined();
+          await expect(viewerStore.request({ schema, timeout })).rejects.toThrow(
+            `${schema.$id}: Timed out after ${timeout}ms`,
+          );
         },
         CONNECT_TIMEOUT,
       );

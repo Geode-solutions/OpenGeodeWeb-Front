@@ -24,7 +24,7 @@ const MINIMUM_RANGE = 10;
 const MAXIMUM_RANGE = 20;
 const MAX_RANGE_TEST_VALUE = 100;
 
-function sleep(milliseconds) {
+function sleep(milliseconds: number) {
   // oxlint-disable-next-line promise/avoid-new
   return new Promise((resolve) => {
     setTimeout(resolve, milliseconds);
@@ -149,7 +149,7 @@ describe("model surfaces", () => {
         no_data_color: DEFAULT_NO_DATA_COLOR,
       };
       expect(spy).toHaveBeenCalledWith({ schema, params });
-      const [surface_id] = surface_ids;
+      const surface_id = surface_ids[0]!;
       expect(dataStyleStore.modelSurfacesVertexAttributeName(id, surface_id)).toBe(
         vertex_attribute.name,
       );
@@ -160,7 +160,7 @@ describe("model surfaces", () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const [surface_id] = surface_ids;
+      const surface_id = surface_ids[0]!;
 
       await dataStyleStore.setModelSurfacesVertexAttribute(id, surface_ids, {
         name: "points",
@@ -213,6 +213,9 @@ describe("model surfaces", () => {
       await dataStyleStore.setModelSurfacesVertexAttributeColorMap(id, surface_ids, "budaS");
       await sleep(SLEEP_MS);
       const [lastCall] = spy.mock.calls.slice(-1);
+      if (!lastCall) {
+        throw new Error("Expected viewerStore.request to have been called");
+      }
       expect(lastCall[0].schema).toStrictEqual(model_surfaces_schemas.attribute.vertex.attribute);
       expect(lastCall[0].params).toStrictEqual(
         expect.objectContaining({
@@ -231,7 +234,7 @@ describe("model surfaces", () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const [surface_id] = surface_ids;
+      const surface_id = surface_ids[0]!;
       await dataStyleStore.setModelSurfacesVertexAttributeName(id, surface_ids, "points");
       await dataStyleStore.setModelSurfacesVertexAttributeItem(id, surface_ids, 2);
       expect(dataStyleStore.modelSurfacesVertexAttributeName(id, surface_id)).toBe("points");
@@ -242,7 +245,7 @@ describe("model surfaces", () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const [surface_id] = surface_ids;
+      const surface_id = surface_ids[0]!;
       await dataStyleStore.setModelSurfacesVertexAttributeRange(
         id,
         surface_ids,
@@ -262,7 +265,7 @@ describe("model surfaces", () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const [surface_id] = surface_ids;
+      const surface_id = surface_ids[0]!;
       await dataStyleStore.setModelSurfacesVertexAttributeName(id, surface_ids, "unique_vertices");
       await dataStyleStore.setModelSurfacesVertexAttributeItem(id, surface_ids, 0);
       expect(dataStyleStore.modelSurfacesVertexAttributeName(id, surface_id)).toBe(
@@ -275,7 +278,7 @@ describe("model surfaces", () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const [surface_id] = surface_ids;
+      const surface_id = surface_ids[0]!;
       await dataStyleStore.setModelSurfacesVertexAttributeName(id, surface_ids, "points");
       expect(dataStyleStore.modelSurfacesVertexAttributeName(id, surface_id)).toBe("points");
       expect(dataStyleStore.modelSurfacesVertexAttributeItem(id, surface_id)).toBe(2);
@@ -336,7 +339,7 @@ describe("model surfaces", () => {
         no_data_color: DEFAULT_NO_DATA_COLOR,
       };
       expect(spy).toHaveBeenCalledWith({ schema, params });
-      const [surface_id] = surface_ids;
+      const surface_id = surface_ids[0]!;
       expect(dataStyleStore.modelSurfacesPolygonAttributeName(id, surface_id)).toBe(
         polygon_attribute.name,
       );
@@ -347,7 +350,7 @@ describe("model surfaces", () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const [surface_id] = surface_ids;
+      const surface_id = surface_ids[0]!;
 
       await dataStyleStore.setModelSurfacesPolygonAttribute(id, surface_ids, {
         name: "triangle_vertices",
@@ -425,6 +428,9 @@ describe("model surfaces", () => {
       await dataStyleStore.setModelSurfacesPolygonAttributeColorMap(id, surface_ids, "budaS");
       await sleep(SLEEP_MS);
       const [lastCall] = spy.mock.calls.slice(-1);
+      if (!lastCall) {
+        throw new Error("Expected viewerStore.request to have been called");
+      }
       expect(lastCall[0].schema).toStrictEqual(model_surfaces_schemas.attribute.polygon.attribute);
       expect(lastCall[0].params).toStrictEqual(
         expect.objectContaining({
@@ -443,7 +449,7 @@ describe("model surfaces", () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const [surface_id] = surface_ids;
+      const surface_id = surface_ids[0]!;
       await dataStyleStore.setModelSurfacesPolygonAttributeName(
         id,
         surface_ids,
@@ -460,7 +466,7 @@ describe("model surfaces", () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const [surface_id] = surface_ids;
+      const surface_id = surface_ids[0]!;
       await dataStyleStore.setModelSurfacesPolygonAttributeRange(
         id,
         surface_ids,
@@ -480,7 +486,7 @@ describe("model surfaces", () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const [surface_id] = surface_ids;
+      const surface_id = surface_ids[0]!;
       await dataStyleStore.setModelSurfacesPolygonAttributeName(
         id,
         surface_ids,
@@ -497,7 +503,7 @@ describe("model surfaces", () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const [surface_id] = surface_ids;
+      const surface_id = surface_ids[0]!;
       await dataStyleStore.setModelSurfacesPolygonAttributeName(
         id,
         surface_ids,
@@ -532,7 +538,7 @@ describe("model surfaces", () => {
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const [surface_id] = surface_ids;
+      const surface_id = surface_ids[0]!;
       const coloringName = "constant";
       const result = dataStyleStore.setModelComponentActiveColoring(id, surface_id, coloringName);
       expect(result).toBeInstanceOf(Promise);
@@ -546,7 +552,7 @@ describe("model surfaces", () => {
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const [surface_id] = surface_ids;
+      const surface_id = surface_ids[0]!;
       await dataStyleStore.setModelSurfacesVertexAttributeName(id, [surface_id], "points");
       const coloringName = "vertex";
       const result = dataStyleStore.setModelComponentActiveColoring(id, surface_id, coloringName);
@@ -561,7 +567,7 @@ describe("model surfaces", () => {
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const [surface_id] = surface_ids;
+      const surface_id = surface_ids[0]!;
       await dataStyleStore.setModelSurfacesPolygonAttributeName(id, [surface_id], "test_attribute");
       const coloringName = "polygon";
       const result = dataStyleStore.setModelComponentActiveColoring(id, surface_id, coloringName);

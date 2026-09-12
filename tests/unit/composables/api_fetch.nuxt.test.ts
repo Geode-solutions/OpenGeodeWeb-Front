@@ -14,7 +14,7 @@ describe("backStore.request()", () => {
   setupActivePinia();
   const backStore = useBackStore();
   const feedbackStore = useFeedbackStore();
-  backStore.base_url = "";
+  (backStore as { base_url: string }).base_url = "";
 
   const schema = {
     $id: "/test",
@@ -32,7 +32,7 @@ describe("backStore.request()", () => {
   beforeEach(async () => {
     await feedbackStore.$reset();
     await backStore.$reset();
-    backStore.base_url = "";
+    (backStore as { base_url: string }).base_url = "";
   });
 
   test("invalid schema", () => {

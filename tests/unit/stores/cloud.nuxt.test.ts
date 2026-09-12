@@ -10,7 +10,9 @@ import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 vi.mock(import("ofetch"), () => ({
   $fetch: vi.fn(),
-}));
+}) as any);
+
+const mockedFetch = vi.mocked($fetch);
 
 // CONSTANTS
 const PROJECT = "project";
@@ -35,7 +37,7 @@ describe("cloud store", () => {
   describe("actions", () => {
     describe("launch", () => {
       beforeEach(() => {
-        $fetch.mockReset();
+        mockedFetch.mockReset();
       });
 
       test("successful launch", async () => {
@@ -43,12 +45,17 @@ describe("cloud store", () => {
         const cloudStore = useCloudStore();
         const feedbackStore = useFeedbackStore();
 
-        $fetch.mockImplementation((route, options) => {
+        mockedFetch.mockImplementation(((
+          _route: unknown,
+          options: {
+            onResponse?: (context: { response: { ok: boolean; _data: unknown } }) => void;
+          },
+        ) => {
           const data = { url: "test.com" };
           // oxlint-disable-next-line eslint/id-length
           options.onResponse?.({ response: { ok: true, _data: data } });
           return Promise.resolve(data);
-        });
+        }) as unknown as typeof $fetch);
 
         await cloudStore.launch("noreply@example.com");
 
@@ -63,12 +70,19 @@ describe("cloud store", () => {
 
         const error = createError({ statusCode: 500, statusMessage: "500 Internal Server Error" });
 
-        $fetch.mockImplementation((route, options) => {
+        mockedFetch.mockImplementation(((
+          _route: unknown,
+          options: {
+            onResponseError?: (context: {
+              response: { status: number; name: string; description: string };
+            }) => void;
+          },
+        ) => {
           options.onResponseError?.({
             response: { status: 500, name: "Error", description: "500 Internal Server Error" },
           });
           return Promise.reject(error);
-        });
+        }) as unknown as typeof $fetch);
 
         await expect(cloudStore.launch("noreply@example.com")).rejects.toThrow(
           "500 Internal Server Error",

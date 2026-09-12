@@ -12,7 +12,7 @@ import { $fetch } from "ofetch";
 
 vi.mock(import("ofetch"), () => ({
   $fetch: vi.fn(),
-}));
+}) as any);
 
 const mockedFetch = vi.mocked($fetch);
 
@@ -98,35 +98,35 @@ const infraStoreMock = {
   app_mode: appMode.BROWSER,
 };
 const viewerStoreMock = {
-  ws_connect: vi.fn().mockResolvedValue(),
+  ws_connect: vi.fn().mockResolvedValue(undefined),
   base_url: vi.fn(() => ""),
-  request: vi.fn().mockResolvedValue(),
+  request: vi.fn().mockResolvedValue(undefined),
 };
 const treeviewStoreMock = {
   clear: vi.fn(),
-  importStores: vi.fn().mockResolvedValue(),
+  importStores: vi.fn().mockResolvedValue(undefined),
   finalizeImportSelection: vi.fn(),
-  addItem: vi.fn().mockResolvedValue(),
+  addItem: vi.fn().mockResolvedValue(undefined),
 };
 const dataStoreMock = {
   clear: vi.fn(),
-  registerObject: vi.fn().mockResolvedValue(),
-  addItem: vi.fn().mockResolvedValue(),
-  importStores: vi.fn().mockResolvedValue(),
+  registerObject: vi.fn().mockResolvedValue(undefined),
+  addItem: vi.fn().mockResolvedValue(undefined),
+  importStores: vi.fn().mockResolvedValue(undefined),
   isItemViewable: vi.fn().mockReturnValue(true),
 };
 const dataStyleStoreMock = {
-  importStores: vi.fn().mockResolvedValue(),
-  applyAllStylesFromState: vi.fn().mockResolvedValue(),
-  addDataStyle: vi.fn().mockResolvedValue(),
-  applyDefaultStyle: vi.fn().mockResolvedValue(),
+  importStores: vi.fn().mockResolvedValue(undefined),
+  applyAllStylesFromState: vi.fn().mockResolvedValue(undefined),
+  addDataStyle: vi.fn().mockResolvedValue(undefined),
+  applyDefaultStyle: vi.fn().mockResolvedValue(undefined),
 };
 const feedbackStoreMock = {
   add_success: vi.fn(),
   add_error: vi.fn(),
 };
 
-const viewer_call_mock_fn = vi.fn().mockResolvedValue();
+const viewer_call_mock_fn = vi.fn().mockResolvedValue(undefined);
 
 interface HybridViewerSnapshot {
   zScale?: number;
@@ -135,7 +135,7 @@ interface HybridViewerSnapshot {
 
 const hybridViewerStoreMock = {
   clear: vi.fn(),
-  initHybridViewer: vi.fn().mockResolvedValue(),
+  initHybridViewer: vi.fn().mockResolvedValue(undefined),
   importStores: vi.fn((snapshot?: HybridViewerSnapshot) => {
     if (snapshot?.zScale !== undefined) {
       hybridViewerStoreMock.setZScaling(snapshot.zScale);
@@ -148,23 +148,21 @@ const hybridViewerStoreMock = {
       hybridViewerStoreMock.remoteRender();
     }
   }),
-  addItem: vi.fn().mockResolvedValue(),
+  addItem: vi.fn().mockResolvedValue(undefined),
   remoteRender: vi.fn(),
   setZScaling: vi.fn(),
 };
 
 // MOCKS
-mockedFetch.mockImplementation(
-  (
-    _route: unknown,
-    options: { onResponse?: (context: { response: { ok: boolean; _data: unknown } }) => void },
-  ) => {
-    const data = { snapshot: snapshotMock };
-    // oxlint-disable-next-line eslint/id-length
-    options.onResponse?.({ response: { ok: true, _data: data } });
-    return Promise.resolve(data);
-  },
-);
+mockedFetch.mockImplementation(((
+  _route: unknown,
+  options: { onResponse?: (context: { response: { ok: boolean; _data: unknown } }) => void },
+) => {
+  const data = { snapshot: snapshotMock };
+  // oxlint-disable-next-line eslint/id-length
+  options.onResponse?.({ response: { ok: true, _data: data } });
+  return Promise.resolve(data);
+}) as unknown as typeof $fetch);
 vi.mock(import("@ogw_internal/utils/viewer_call"), () => ({
   viewer_call: viewer_call_mock_fn,
 }));
@@ -173,7 +171,7 @@ interface ApiFetchOptions {
   response_function?: (response: unknown) => Promise<void> | void;
 }
 
-vi.mock(import("@ogw_front/composables/api_fetch"), () => ({
+vi.mock(import("@ogw_internal/utils/api_fetch"), () => ({
   api_fetch: vi.fn(async (_req: unknown, options: ApiFetchOptions = {}) => {
     const response = {
       _data: new Blob(["zipcontent"], { type: "application/zip" }),
@@ -186,37 +184,37 @@ vi.mock(import("@ogw_front/composables/api_fetch"), () => ({
     }
     return response;
   }),
-}));
+}) as any);
 vi.mock(import("js-file-download"), () => ({ default: vi.fn() }));
 vi.mock(import("@ogw_front/stores/infra"), () => ({
   useInfraStore: () => infraStoreMock,
-}));
+}) as any);
 vi.mock(import("@ogw_front/stores/viewer"), () => ({
   useViewerStore: () => viewerStoreMock,
-}));
+}) as any);
 vi.mock(import("@ogw_front/stores/treeview"), () => ({
   useTreeviewStore: () => treeviewStoreMock,
-}));
+}) as any);
 vi.mock(import("@ogw_front/stores/data"), () => ({
   useDataStore: () => dataStoreMock,
-}));
+}) as any);
 vi.mock(import("@ogw_front/stores/data_style"), () => ({
   useDataStyleStore: () => dataStyleStoreMock,
-}));
+}) as any);
 vi.mock(import("@ogw_front/stores/hybrid_viewer"), () => ({
   useHybridViewerStore: () => hybridViewerStoreMock,
-}));
+}) as any);
 vi.mock(import("@ogw_front/stores/back"), () => ({
   useBackStore: () => backStoreMock,
-}));
+}) as any);
 vi.mock(import("@ogw_front/stores/feedback"), () => ({
   useFeedbackStore: () => feedbackStoreMock,
-}));
+}) as any);
 vi.mock(import("@ogw_front/stores/app"), () => ({
   useAppStore: () => ({
     exportStores: vi.fn(() => ({ projectName: "mockedProject" })),
   }),
-}));
+}) as any);
 
 vi.stubGlobal("useAppStore", () => ({
   exportStores: vi.fn(() => ({ projectName: "mockedProject" })),
@@ -296,7 +294,7 @@ describe("projectManager composable (compact)", () => {
   });
 
   test("importProjectFile with snapshot - Viewer and Stores", async () => {
-    const file = new Blob(['{"dataBase":{"db":{}}}'], {
+    const file = new File(['{"dataBase":{"db":{}}}'], "project.vease", {
       type: "application/json",
     });
 
@@ -307,7 +305,7 @@ describe("projectManager composable (compact)", () => {
   });
 
   test("importProjectFile with snapshot - Data and Rendering", async () => {
-    const file = new Blob(['{"dataBase":{"db":{}}}'], {
+    const file = new File(['{"dataBase":{"db":{}}}'], "project.vease", {
       type: "application/json",
     });
 

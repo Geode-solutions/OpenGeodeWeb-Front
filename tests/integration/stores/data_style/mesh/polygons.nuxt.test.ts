@@ -17,7 +17,7 @@ const file_name = "test.og_psf3d";
 const geode_object = "PolygonalSurface3D";
 const MINIMUM_RANGE = 10;
 const MAXIMUM_RANGE = 20;
-const range = [MINIMUM_RANGE, MAXIMUM_RANGE];
+const range: [number, number] = [MINIMUM_RANGE, MAXIMUM_RANGE];
 const default_vertex_attribute = { name: "points", item: 0, range };
 const default_polygon_attribute = { name: "test_attribute", item: 0, range };
 

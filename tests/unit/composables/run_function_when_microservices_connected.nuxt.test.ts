@@ -8,6 +8,7 @@ import { runFunctionWhenMicroservicesConnected } from "@ogw_front/composables/ru
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useInfraStore } from "@ogw_front/stores/infra";
+import type { Microservice } from "@ogw_front/stores/infra";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 const dumb_obj = { dumb_method: () => true };
@@ -23,16 +24,8 @@ describe("when_microservices_connected_run_function", () => {
     viewerStore = useViewerStore();
 
     // Register microservices in infra store
-    infraStore.register_microservice(backStore, {
-      request: vi.fn(),
-      connect: vi.fn(),
-      launch: vi.fn(),
-    });
-    infraStore.register_microservice(viewerStore, {
-      request: vi.fn(),
-      connect: vi.fn(),
-      launch: vi.fn(),
-    });
+    infraStore.register_microservice(backStore as unknown as Microservice);
+    infraStore.register_microservice(viewerStore as unknown as Microservice);
 
     backStore.$patch({ status: Status.NOT_CONNECTED });
     viewerStore.$patch({ status: Status.NOT_CONNECTED });

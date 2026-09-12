@@ -28,7 +28,7 @@ vi.mock(import("@ogw_front/stores/hybrid_viewer"), () => ({
     save: vi.fn(),
     load: vi.fn(),
   }),
-}));
+}) as any);
 
 describe("project import", () => {
   beforeEach(() => {
@@ -53,13 +53,15 @@ describe("project import", () => {
     vi.spyOn(stores.dataBase, "importStores").mockImplementation(
       (async (snapshot: { items: Record<string, unknown>[] }) => {
         const { items } = snapshot;
-        await Promise.all(items.map((item) => database.data.put(item)));
-      }) as typeof stores.dataBase.importStores,
+        await Promise.all(items.map((item) => database.data!.put(item)));
+      }) as unknown as typeof stores.dataBase.importStores,
     );
 
     const storesArray = Object.values(stores);
     for (const store of storesArray.slice(STORES_SLICE_START)) {
-      stores.app.registerStore(store as Parameters<typeof stores.app.registerStore>[0]);
+      stores.app.registerStore(
+        store as unknown as Parameters<typeof stores.app.registerStore>[0],
+      );
     }
 
     const snapshot = {
@@ -95,11 +97,11 @@ describe("project import", () => {
 
     await stores.app.importStores(snapshot);
 
-    const item = await database.data.get("abc123");
+    const item = await database.data!.get("abc123");
     expect(item).toBeDefined();
     expect(item?.id).toBe("abc123");
 
-    const style = await database.data_style.get("abc123");
+    const style = await database.data_style!.get("abc123");
     expect(style).toBeDefined();
     expect(style?.id).toBe("abc123");
   });

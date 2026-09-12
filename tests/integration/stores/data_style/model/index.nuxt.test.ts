@@ -16,7 +16,7 @@ const file_name = "test.og_brep";
 const geode_object = "BRep";
 const SLEEP_MS = 200;
 
-function sleep(milliseconds) {
+function sleep(milliseconds: number) {
   // oxlint-disable-next-line promise/avoid-new
   return new Promise((resolve) => {
     setTimeout(resolve, milliseconds);
@@ -66,7 +66,7 @@ describe("model", () => {
       const dataStore = useDataStore();
 
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const [surface_id] = surface_ids;
+      const surface_id = surface_ids[0]!;
 
       const red = { red: 255, green: 0, blue: 0, alpha: 1 };
       const green = { red: 0, green: 255, blue: 0, alpha: 1 };

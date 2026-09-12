@@ -8,8 +8,8 @@ import type { HTTPMethod } from "h3";
 
 // Local imports
 import { setupActivePinia, vuetify } from "@ogw_tests/utils";
-import FileSelector from "@ogw_front/components/FileSelector";
-import FileUploader from "@ogw_front/components/FileUploader";
+import FileSelector from "@ogw_front/components/FileSelector.vue";
+import FileUploader from "@ogw_front/components/FileUploader.vue";
 import { useBackStore } from "@ogw_front/stores/back";
 
 const EXPECTED_LENGTH = 1;
@@ -22,7 +22,7 @@ const upload_file_schema = schemas.opengeodeweb_back.upload_file;
 describe("file selector", () => {
   const pinia = setupActivePinia();
   const backStore = useBackStore();
-  backStore.base_url = "/";
+  (backStore as { base_url: string }).base_url = "/";
 
   test("select file", async () => {
     registerEndpoint(allowed_files_schema.$id, {
@@ -95,7 +95,7 @@ describe("file selector", () => {
       });
 
       await flushPromises();
-      expect(wrapper.componentVM.files).toStrictEqual(files);
+      expect(wrapper.vm.files).toStrictEqual(files);
       expect(wrapper.emitted()).toHaveProperty("update_values");
       expect(wrapper.emitted<unknown[]>().update_values).toHaveLength(EXPECTED_LENGTH);
       expect(

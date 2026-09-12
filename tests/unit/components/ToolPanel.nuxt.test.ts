@@ -3,7 +3,7 @@ import { describe, expect, test, vi } from "vitest";
 import { mountSuspended } from "@nuxt/test-utils/runtime";
 
 // Local imports
-import ToolPanel from "@ogw_front/components/ToolPanel";
+import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import { vuetify } from "@ogw_tests/utils";
 
 const FIRST_INDEX = 0;

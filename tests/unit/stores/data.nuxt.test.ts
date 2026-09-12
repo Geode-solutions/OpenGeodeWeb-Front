@@ -22,11 +22,14 @@ describe("useDataStore - collections", () => {
       id: modelId,
       name: "Test Model",
       viewer_type: "model",
+      geode_object_type: "BRep",
     });
 
     // 2. Add mesh components and collection components (including a custom type like "MyCustomCollection")
     await dataStore.addComponents({
       id: modelId,
+      viewer_type: "model",
+      geode_object_type: "BRep",
       mesh_components: [
         {
           geode_id: "mesh_corner",
@@ -60,9 +63,25 @@ describe("useDataStore - collections", () => {
     // Add component relations
     await dataStore.addComponentRelations({
       id: modelId,
+      viewer_type: "model",
+      geode_object_type: "BRep",
       collection_components: [
-        { geode_id: "fault1", items: ["mesh_surface"] },
-        { geode_id: "custom1", items: [] },
+        {
+          geode_id: "fault1",
+          name: "Fault 1",
+          type: "Fault",
+          viewer_id: 3,
+          is_active: true,
+          items: ["mesh_surface"],
+        },
+        {
+          geode_id: "custom1",
+          name: "Custom 1",
+          type: "MyCustomCollection",
+          viewer_id: 4,
+          is_active: true,
+          items: [],
+        },
       ],
     });
 

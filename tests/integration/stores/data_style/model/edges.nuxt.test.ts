@@ -15,7 +15,7 @@ const file_name = "test.og_brep";
 const geode_object = "BRep";
 const SLEEP_MS = 200;
 
-function sleep(milliseconds) {
+function sleep(milliseconds: number) {
   // oxlint-disable-next-line promise/avoid-new
   return new Promise((resolve) => {
     setTimeout(resolve, milliseconds);

@@ -8,11 +8,12 @@ import { appMode } from "@ogw_shared/app_mode";
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useInfraStore } from "@ogw_front/stores/infra";
+import type { Microservice } from "@ogw_front/stores/infra";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 vi.mock(import("ofetch"), () => ({
   $fetch: vi.fn(),
-}));
+}) as any);
 
 // Mock navigator.locks API
 const mockLockRequest = vi
@@ -77,16 +78,8 @@ describe("infra store", () => {
         const backStore = useBackStore();
         const viewerStore = useViewerStore();
 
-        infraStore.register_microservice(backStore, {
-          request: vi.fn(),
-          connect: vi.fn(),
-          launch: vi.fn(),
-        });
-        infraStore.register_microservice(viewerStore, {
-          request: vi.fn(),
-          connect: vi.fn(),
-          launch: vi.fn(),
-        });
+        infraStore.register_microservice(backStore as unknown as Microservice);
+        infraStore.register_microservice(viewerStore as unknown as Microservice);
 
         backStore.$patch({ status: Status.NOT_CONNECTED });
         viewerStore.$patch({ status: Status.NOT_CONNECTED });
@@ -98,16 +91,8 @@ describe("infra store", () => {
         const backStore = useBackStore();
         const viewerStore = useViewerStore();
 
-        infraStore.register_microservice(backStore, {
-          request: vi.fn(),
-          connect: vi.fn(),
-          launch: vi.fn(),
-        });
-        infraStore.register_microservice(viewerStore, {
-          request: vi.fn(),
-          connect: vi.fn(),
-          launch: vi.fn(),
-        });
+        infraStore.register_microservice(backStore as unknown as Microservice);
+        infraStore.register_microservice(viewerStore as unknown as Microservice);
 
         backStore.$patch({ status: Status.CONNECTED });
         viewerStore.$patch({ status: Status.NOT_CONNECTED });
@@ -119,16 +104,8 @@ describe("infra store", () => {
         const backStore = useBackStore();
         const viewerStore = useViewerStore();
 
-        infraStore.register_microservice(backStore, {
-          request: vi.fn(),
-          connect: vi.fn(),
-          launch: vi.fn(),
-        });
-        infraStore.register_microservice(viewerStore, {
-          request: vi.fn(),
-          connect: vi.fn(),
-          launch: vi.fn(),
-        });
+        infraStore.register_microservice(backStore as unknown as Microservice);
+        infraStore.register_microservice(viewerStore as unknown as Microservice);
 
         backStore.$patch({ status: Status.NOT_CONNECTED });
         viewerStore.$patch({ status: Status.CONNECTED });
@@ -140,16 +117,8 @@ describe("infra store", () => {
         const backStore = useBackStore();
         const viewerStore = useViewerStore();
 
-        infraStore.register_microservice(backStore, {
-          request: vi.fn(),
-          connect: vi.fn(),
-          launch: vi.fn(),
-        });
-        infraStore.register_microservice(viewerStore, {
-          request: vi.fn(),
-          connect: vi.fn(),
-          launch: vi.fn(),
-        });
+        infraStore.register_microservice(backStore as unknown as Microservice);
+        infraStore.register_microservice(viewerStore as unknown as Microservice);
 
         backStore.$patch({ status: Status.CONNECTED });
         viewerStore.$patch({ status: Status.CONNECTED });
@@ -168,16 +137,8 @@ describe("infra store", () => {
         const backStore = useBackStore();
         const viewerStore = useViewerStore();
 
-        infraStore.register_microservice(backStore, {
-          request: vi.fn(),
-          connect: vi.fn(),
-          launch: vi.fn(),
-        });
-        infraStore.register_microservice(viewerStore, {
-          request: vi.fn(),
-          connect: vi.fn(),
-          launch: vi.fn(),
-        });
+        infraStore.register_microservice(backStore as unknown as Microservice);
+        infraStore.register_microservice(viewerStore as unknown as Microservice);
 
         backStore.$patch({ request_counter: 0 });
         viewerStore.$patch({ request_counter: 0 });
@@ -189,16 +150,8 @@ describe("infra store", () => {
         const backStore = useBackStore();
         const viewerStore = useViewerStore();
 
-        infraStore.register_microservice(backStore, {
-          request: vi.fn(),
-          connect: vi.fn(),
-          launch: vi.fn(),
-        });
-        infraStore.register_microservice(viewerStore, {
-          request: vi.fn(),
-          connect: vi.fn(),
-          launch: vi.fn(),
-        });
+        infraStore.register_microservice(backStore as unknown as Microservice);
+        infraStore.register_microservice(viewerStore as unknown as Microservice);
 
         backStore.$patch({ request_counter: 1 });
         viewerStore.$patch({ request_counter: 0 });
@@ -210,16 +163,8 @@ describe("infra store", () => {
         const backStore = useBackStore();
         const viewerStore = useViewerStore();
 
-        infraStore.register_microservice(backStore, {
-          request: vi.fn(),
-          connect: vi.fn(),
-          launch: vi.fn(),
-        });
-        infraStore.register_microservice(viewerStore, {
-          request: vi.fn(),
-          connect: vi.fn(),
-          launch: vi.fn(),
-        });
+        infraStore.register_microservice(backStore as unknown as Microservice);
+        infraStore.register_microservice(viewerStore as unknown as Microservice);
 
         backStore.$patch({ request_counter: 0 });
         viewerStore.$patch({ request_counter: 1 });
@@ -231,16 +176,8 @@ describe("infra store", () => {
         const backStore = useBackStore();
         const viewerStore = useViewerStore();
 
-        infraStore.register_microservice(backStore, {
-          request: vi.fn(),
-          connect: vi.fn(),
-          launch: vi.fn(),
-        });
-        infraStore.register_microservice(viewerStore, {
-          request: vi.fn(),
-          connect: vi.fn(),
-          launch: vi.fn(),
-        });
+        infraStore.register_microservice(backStore as unknown as Microservice);
+        infraStore.register_microservice(viewerStore as unknown as Microservice);
 
         backStore.$patch({ request_counter: 1 });
         viewerStore.$patch({ request_counter: 1 });
@@ -255,14 +192,10 @@ describe("infra store", () => {
         const infraStore = useInfraStore();
         const backStore = useBackStore();
 
-        infraStore.register_microservice(backStore, {
-          request: vi.fn(),
-          connect: vi.fn(),
-          launch: vi.fn(),
-        });
+        infraStore.register_microservice(backStore as unknown as Microservice);
 
         expect(infraStore.microservices).toHaveLength(1);
-        expect(infraStore.microservices[0].$id).toBe("back");
+        expect(infraStore.microservices[0]?.$id).toBe("back");
       });
 
       test("register multiple microservices", () => {
@@ -270,17 +203,9 @@ describe("infra store", () => {
         const backStore = useBackStore();
         const viewerStore = useViewerStore();
 
-        infraStore.register_microservice(backStore, {
-          request: vi.fn(),
-          connect: vi.fn(),
-          launch: vi.fn(),
-        });
+        infraStore.register_microservice(backStore as unknown as Microservice);
 
-        infraStore.register_microservice(viewerStore, {
-          request: vi.fn(),
-          connect: vi.fn(),
-          launch: vi.fn(),
-        });
+        infraStore.register_microservice(viewerStore as unknown as Microservice);
 
         expect(infraStore.microservices).toHaveLength(2);
       });
@@ -295,12 +220,15 @@ describe("infra store", () => {
 
       infraStore.app_mode = appMode.CLOUD;
       const url = "test.com";
-      $fetch.mockImplementation((route, options) => {
+      vi.mocked($fetch).mockImplementation(((
+        _route: unknown,
+        options: { onResponse?: (context: { response: { ok: boolean; _data: unknown } }) => void },
+      ) => {
         const data = { url };
         // oxlint-disable-next-line eslint/id-length
         options.onResponse?.({ response: { ok: true, _data: data } });
         return Promise.resolve(data);
-      });
+      }) as unknown as typeof $fetch);
 
       await infraStore.create_backend("noreply@example.com");
       expect(infraStore.status).toBe(Status.CREATED);
