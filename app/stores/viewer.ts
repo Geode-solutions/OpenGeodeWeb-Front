@@ -122,7 +122,7 @@ export const useViewerStore = defineStore(
             onConnectionClose: () => {
               status.value = Status.NOT_CONNECTED;
             },
-          })) as RpcClient;
+          })) as unknown as RpcClient;
           connectImageStream(client.value.getConnection().getSession());
           (client.value as unknown as { endBusy: () => void }).endBusy();
           const schema = opengeodeweb_viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization;

@@ -9,11 +9,20 @@ import type { HybridViewerStorePublic, Vector3 } from "./vtk_types";
 
 type ContainerRef = Ref<{ $el: HTMLElement } | undefined>;
 
+// The image stream object returned by vtk.js's ImageStream.createViewStream();
+// vtk.js's own vtkViewStream type declares `onImageReady` with a zero-arg
+// callback, which doesn't match how it's actually invoked at runtime (with the
+// decoded image), so this describes the shape as it's actually used here.
+export interface ViewStreamLike {
+  setSize: (width: number, height: number) => void;
+  onImageReady: (callback: (event: { image: unknown }) => void) => void;
+}
+
 async function performResize(width: number, height: number): Promise<void> {
   const hybridViewerStore = useHybridViewerStore();
   const { genericRenderWindow, remoteRender } = hybridViewerStore as unknown as HybridViewerStorePublic;
   const { status, viewStream } = storeToRefs(hybridViewerStore) as unknown as {
-    status: Ref<Status>;
+    status: Ref<string>;
     viewStream: Ref<{ setSize: (width: number, height: number) => void } | undefined>;
   };
   const viewerStore = useViewerStore();
@@ -49,7 +58,8 @@ function performClickPicking(event: MouseEvent, containerElement: HTMLElement): 
       params,
     },
     {
-      response_function: ({ x, y, z }: { x: number; y: number; z: number }) => {
+      response_function: (response: unknown) => {
+        const { x, y, z } = response as { x: number; y: number; z: number };
         const pickedPos: Vector3 = [x, y, z];
         if (pickedPos.some((val) => val !== 0)) {
           const renderer = genericRenderWindow.value!.getRenderer();
@@ -89,7 +99,10 @@ function performSetContainer(container: ContainerRef | undefined): void {
   let has_dragged = false;
   useMousePressed({
     target: container as never,
-    onPressed: (event: MouseEvent) => {
+    onPressed: (event: MouseEvent | TouchEvent | DragEvent) => {
+      if (!(event instanceof MouseEvent)) {
+        return;
+      }
       if (event.button !== 0 && event.button !== 1) {
         return;
       }
@@ -137,7 +150,7 @@ function performSetContainer(container: ContainerRef | undefined): void {
   });
 }
 function useHybridViewerViewport() {
-  const viewStream = ref(undefined);
+  const viewStream = ref<ViewStreamLike | undefined>(undefined);
   function setContainer(container: ContainerRef | undefined): void {
     performSetContainer(container);
   }

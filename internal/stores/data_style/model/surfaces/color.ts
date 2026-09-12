@@ -1,3 +1,4 @@
+import type { StyleValues } from "../../types";
 import { isModelSurfacesPolygonAttributeValid, useModelSurfacesPolygonAttribute } from "./polygon";
 import { isModelSurfacesVertexAttributeValid, useModelSurfacesVertexAttribute } from "./vertex";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
@@ -12,23 +13,32 @@ export function useModelSurfacesColor() {
   const modelSurfacesVertexAttribute = useModelSurfacesVertexAttribute();
   const modelSurfacesPolygonAttribute = useModelSurfacesPolygonAttribute();
 
-  function modelSurfaceColoring(id, surface_id) {
-    return modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id).coloring;
+  function modelSurfaceColoring(id: string, surface_id?: string): StyleValues {
+    return modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id).coloring as StyleValues;
   }
 
-  function modelSurfaceColor(id, surface_id) {
+  function modelSurfaceColor(id: string, surface_id?: string): unknown {
     return modelSurfaceColoring(id, surface_id).constant;
   }
 
-  function setModelSurfacesColor(modelId, surfaces_ids, color, activeColoring = "constant") {
+  function setModelSurfacesColor(
+    modelId: string,
+    surfaces_ids: string[],
+    color: unknown,
+    activeColoring = "constant",
+  ) {
     return modelCommonStyle.setModelTypeColor(modelId, surfaces_ids, color, schema, activeColoring);
   }
 
-  function modelSurfaceActiveColoring(id, surface_id) {
+  function modelSurfaceActiveColoring(id: string, surface_id?: string): unknown {
     return modelSurfaceColoring(id, surface_id).active;
   }
 
-  async function setModelSurfacesActiveColoring(modelId, surfaces_ids, activeColoring) {
+  async function setModelSurfacesActiveColoring(
+    modelId: string,
+    surfaces_ids: string[],
+    activeColoring: string,
+  ) {
     if (surfaces_ids.length > 1) {
       modelSurfacesCommonStyle.mutateModelSurfacesTypeColoring(modelId, {
         active: activeColoring,

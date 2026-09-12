@@ -3,6 +3,7 @@ import { database } from "@ogw_internal/database/database.js";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import type { IndexableType } from "dexie";
 import type { Ref } from "vue";
 import type { HoverComponentInfo, HoverData, HybridViewerStorePublic } from "./vtk_types";
 
@@ -117,15 +118,19 @@ function createHoverHighlight({
       currentHoverId.value = hoverKey;
       let componentInfo: HoverComponentInfo | undefined = undefined;
       let modelName: string | undefined = undefined;
-      const modelRecord = (await database.data.get(response.id as string)) as
+      const modelRecord = (await database.data?.get(response.id as string)) as
         | { name?: string }
         | undefined;
       if (modelRecord) {
         modelName = modelRecord.name;
       }
-      if (response.geode_id) {
-        const components = database.model_components.where("[id+geode_id]");
-        const query = components.equals([response.id, response.geode_id]);
+      const modelComponentsTable = database.model_components;
+      if (response.geode_id && modelComponentsTable) {
+        const components = modelComponentsTable.where("[id+geode_id]");
+        const query = components.equals([
+          response.id as string,
+          response.geode_id,
+        ] as IndexableType);
         const component = (await query.first()) as
           | { name?: string; geode_id?: string; type?: string }
           | undefined;
@@ -138,7 +143,7 @@ function createHoverHighlight({
         }
       }
       const newHoverData: HoverData = {
-        modelId: response.id,
+        modelId: response.id as string,
         modelName,
         blockName: response.geode_id,
         pickedId: response.picked_id,

@@ -1,3 +1,4 @@
+import type { StyleValues } from "../../types";
 import { isModelLinesEdgeAttributeValid, useModelLinesEdgeAttribute } from "./edge";
 import { isModelLinesVertexAttributeValid, useModelLinesVertexAttribute } from "./vertex";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
@@ -12,23 +13,32 @@ export function useModelLinesColor() {
   const modelLinesVertexAttribute = useModelLinesVertexAttribute();
   const modelLinesEdgeAttribute = useModelLinesEdgeAttribute();
 
-  function modelLineColoring(id, line_id) {
-    return modelLinesCommonStyle.modelLineStyle(id, line_id).coloring;
+  function modelLineColoring(id: string, line_id?: string): StyleValues {
+    return modelLinesCommonStyle.modelLineStyle(id, line_id).coloring as StyleValues;
   }
 
-  function modelLineColor(id, line_id) {
+  function modelLineColor(id: string, line_id?: string): unknown {
     return modelLineColoring(id, line_id).constant;
   }
 
-  function setModelLinesColor(modelId, lines_ids, color, activeColoring = "constant") {
+  function setModelLinesColor(
+    modelId: string,
+    lines_ids: string[],
+    color: unknown,
+    activeColoring = "constant",
+  ) {
     return modelCommonStyle.setModelTypeColor(modelId, lines_ids, color, schema, activeColoring);
   }
 
-  function modelLineActiveColoring(id, line_id) {
+  function modelLineActiveColoring(id: string, line_id?: string): unknown {
     return modelLineColoring(id, line_id).active;
   }
 
-  async function setModelLinesActiveColoring(modelId, lines_ids, activeColoring) {
+  async function setModelLinesActiveColoring(
+    modelId: string,
+    lines_ids: string[],
+    activeColoring: string,
+  ) {
     if (lines_ids.length > 1) {
       modelLinesCommonStyle.mutateModelLinesTypeColoring(modelId, {
         active: activeColoring,

@@ -1,5 +1,6 @@
 import type { ModelComponentStyle, ModelComponentTypeStyle, StyleValues } from "../types";
-import type { Table } from "dexie";
+import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
+import type { Dexie, Table } from "dexie";
 import { database } from "@ogw_internal/database/database";
 import merge from "lodash/merge";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -39,7 +40,7 @@ export function useModelCommonStyle() {
 
   async function mutateModelComponentTypeStyle(id_model: string, type: string, values: StyleValues) {
     dataStyleState.updateModelComponentTypeStyleCache(id_model, type, values);
-    await database.transaction("rw", model_component_type_datastyle_db, async () => {
+    await (database as unknown as Dexie).transaction("rw", model_component_type_datastyle_db, async () => {
       const key: [string, string] = [id_model, type];
       const entry: ModelComponentTypeStyle = (await model_component_type_datastyle_db.get(key)) || {
         id_model,
@@ -52,7 +53,7 @@ export function useModelCommonStyle() {
 
   async function mutateComponentStyles(id_model: string, id_components: string[], values: StyleValues) {
     dataStyleState.bulkUpdateComponentStylesCache(id_model, id_components, values);
-    await database.transaction("rw", model_component_datastyle_db, async () => {
+    await (database as unknown as Dexie).transaction("rw", model_component_datastyle_db, async () => {
       const keys: [string, string][] = id_components.map((id_component) => [id_model, id_component]);
       const existing = await model_component_datastyle_db.bulkGet(keys);
       const updates = id_components.map((id_component, index) => {
@@ -70,7 +71,7 @@ export function useModelCommonStyle() {
     component_updates: ComponentStyleUpdate[],
   ) {
     dataStyleState.bulkUpdateComponentStyleCache(id_model, component_updates);
-    await database.transaction("rw", model_component_datastyle_db, async () => {
+    await (database as unknown as Dexie).transaction("rw", model_component_datastyle_db, async () => {
       const keys: [string, string][] = component_updates.map((update) => [
         id_model,
         update.id_component,
@@ -89,7 +90,7 @@ export function useModelCommonStyle() {
     id: string,
     component_ids: string[],
     color: unknown,
-    schema: object,
+    schema: JsonRpcSchema,
     activeColoring = "constant",
   ) {
     if (!component_ids?.length) {
@@ -118,7 +119,8 @@ export function useModelCommonStyle() {
     return viewerStore.request(
       { schema, params },
       {
-        response_function: async (colors: { geode_id: string; color: unknown }[] | undefined) => {
+        response_function: async (response: unknown) => {
+          const colors = response as { geode_id: string; color: unknown }[] | undefined;
           if (activeColoring === "constant") {
             await mutateComponentStyles(id, component_ids, {
               coloring: {
@@ -152,7 +154,7 @@ export function useModelCommonStyle() {
     id: string,
     component_ids: string[],
     visibility: boolean | undefined,
-    schema: object,
+    schema: JsonRpcSchema,
   ) {
     if (!component_ids?.length) {
       return;

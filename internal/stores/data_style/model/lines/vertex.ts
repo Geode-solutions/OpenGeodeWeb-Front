@@ -10,7 +10,36 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
 const attributeSchema = viewer_schemas.opengeodeweb_viewer.model.lines.attribute.vertex.attribute;
-function isModelLinesVertexAttributeValid({ name, item, minimum, maximum, colorMap }) {
+
+interface AttributeStoredConfig {
+  minimum: number | undefined;
+  maximum: number | undefined;
+  colorMap: string | undefined;
+  no_data_color: unknown;
+}
+
+interface AttributeState {
+  name?: string;
+  item?: number;
+  storedConfigs?: Record<string, { lastItem: number } & Record<string, AttributeStoredConfig>>;
+}
+
+interface AttributeInput {
+  name: string | undefined;
+  item: number | undefined;
+  minimum: number | undefined;
+  maximum: number | undefined;
+  colorMap: string | undefined;
+  no_data_color?: unknown;
+}
+
+function isModelLinesVertexAttributeValid({
+  name,
+  item,
+  minimum,
+  maximum,
+  colorMap,
+}: AttributeInput): boolean {
   return (
     name !== undefined &&
     item !== undefined &&
@@ -25,13 +54,24 @@ function useModelLinesVertexAttribute() {
   const dataStore = useDataStore();
   const modelLinesCommonStyle = useModelLinesCommonStyle();
   const viewerStore = useViewerStore();
-  function modelLinesVertexAttribute(modelId, lineId) {
-    return modelLinesCommonStyle.modelLineColoring(modelId, lineId).vertex;
+  function modelLinesVertexAttribute(modelId: string, lineId?: string): AttributeState {
+    return modelLinesCommonStyle.modelLineColoring(modelId, lineId).vertex as AttributeState;
   }
-  function modelLinesVertexAttributeStoredConfig(modelId, lineId, name, item) {
+  function modelLinesVertexAttributeStoredConfig(
+    modelId: string,
+    lineId: string | undefined,
+    name: string | undefined,
+    item: number | undefined,
+  ): AttributeStoredConfig {
     const { storedConfigs } = modelLinesVertexAttribute(modelId, lineId);
-    if (storedConfigs && name in storedConfigs && item in storedConfigs[name]) {
-      return storedConfigs[name][item];
+    if (
+      storedConfigs &&
+      name !== undefined &&
+      name in storedConfigs &&
+      item !== undefined &&
+      item in storedConfigs[name]!
+    ) {
+      return storedConfigs[name]![item]!;
     }
     return {
       minimum: undefined,
@@ -40,7 +80,7 @@ function useModelLinesVertexAttribute() {
       no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
-  function mutateModelLinesVertexStyle(modelId, lineIds, values) {
+  function mutateModelLinesVertexStyle(modelId: string, lineIds: string[], values: Record<string, unknown>) {
     if (lineIds.length > 1) {
       modelLinesCommonStyle.mutateModelLinesTypeColoring(modelId, {
         vertex: values,
@@ -50,50 +90,63 @@ function useModelLinesVertexAttribute() {
       vertex: values,
     });
   }
-  function setModelLinesVertexAttributeStoredConfig(modelId, lineIds, name, item, config) {
+  function setModelLinesVertexAttributeStoredConfig(
+    modelId: string,
+    lineIds: string[],
+    name: string | undefined,
+    item: number | undefined,
+    config: Partial<AttributeStoredConfig>,
+  ) {
     return mutateModelLinesVertexStyle(modelId, lineIds, {
       storedConfigs: {
-        [name]: {
+        [name as string]: {
           lastItem: item,
-          [item]: config,
+          [item as number]: config,
         },
       },
     });
   }
-  function modelLinesVertexAttributeName(modelId, lineId) {
+  function modelLinesVertexAttributeName(modelId: string, lineId?: string): string | undefined {
     return modelLinesVertexAttribute(modelId, lineId).name;
   }
-  function modelLinesVertexAttributeLastItem(modelId, lineId, name) {
+  function modelLinesVertexAttributeLastItem(
+    modelId: string,
+    lineId: string | undefined,
+    name: string | undefined,
+  ): number {
     const { storedConfigs } = modelLinesVertexAttribute(modelId, lineId);
-    if (!(name in storedConfigs)) {
-      return 0;
+    if (storedConfigs && name !== undefined && name in storedConfigs) {
+      return storedConfigs[name]!.lastItem;
     }
-    return storedConfigs[name].lastItem;
+    return 0;
   }
-  function modelLinesVertexAttributeItem(modelId, lineId) {
+  function modelLinesVertexAttributeItem(modelId: string, lineId?: string): number {
     const vertexAttribute = modelLinesVertexAttribute(modelId, lineId);
     return (
       vertexAttribute.item ??
       modelLinesVertexAttributeLastItem(modelId, lineId, vertexAttribute.name)
     );
   }
-  function modelLinesVertexAttributeRange(modelId, lineId) {
+  function modelLinesVertexAttributeRange(
+    modelId: string,
+    lineId?: string,
+  ): [number | undefined, number | undefined] {
     const name = modelLinesVertexAttributeName(modelId, lineId);
     const item = modelLinesVertexAttributeItem(modelId, lineId);
     const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineId, name, item);
     const { minimum, maximum } = storedConfig;
     return [minimum, maximum];
   }
-  function modelLinesVertexAttributeColorMap(modelId, lineId) {
+  function modelLinesVertexAttributeColorMap(modelId: string, lineId?: string): string | undefined {
     const name = modelLinesVertexAttributeName(modelId, lineId);
     const item = modelLinesVertexAttributeItem(modelId, lineId);
     const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineId, name, item);
     return storedConfig.colorMap;
   }
   async function setModelLinesVertexAttribute(
-    modelId,
-    lineIds,
-    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
+    modelId: string,
+    lineIds: string[],
+    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR }: AttributeInput,
   ) {
     mutateModelLinesVertexStyle(modelId, lineIds, {
       name,
@@ -105,7 +158,7 @@ function useModelLinesVertexAttribute() {
       colorMap,
       no_data_color,
     });
-    const points = getRGBPointsFromPreset(colorMap);
+    const points = getRGBPointsFromPreset(colorMap as string);
     const line_viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
     const params = {
       id: modelId,
@@ -122,11 +175,11 @@ function useModelLinesVertexAttribute() {
       params,
     });
   }
-  function applyVertexAttribute(modelId, lineIds) {
+  function applyVertexAttribute(modelId: string, lineIds: string[]) {
     const name = modelLinesVertexAttributeName(modelId, lineIds[0]);
     const item = modelLinesVertexAttributeItem(modelId, lineIds[0]);
     const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineIds[0], name, item);
-    const attribute = {
+    const attribute: AttributeInput = {
       name,
       item,
       minimum: storedConfig.minimum,
@@ -139,7 +192,7 @@ function useModelLinesVertexAttribute() {
     }
     return Promise.resolve();
   }
-  function setModelLinesVertexAttributeName(modelId, lineIds, name) {
+  function setModelLinesVertexAttributeName(modelId: string, lineIds: string[], name: string) {
     const item = modelLinesVertexAttributeLastItem(modelId, lineIds[0], name);
     mutateModelLinesVertexStyle(modelId, lineIds, {
       name,
@@ -147,13 +200,18 @@ function useModelLinesVertexAttribute() {
     });
     return applyVertexAttribute(modelId, lineIds);
   }
-  function setModelLinesVertexAttributeItem(modelId, lineIds, item) {
+  function setModelLinesVertexAttributeItem(modelId: string, lineIds: string[], item: number) {
     mutateModelLinesVertexStyle(modelId, lineIds, {
       item,
     });
     return applyVertexAttribute(modelId, lineIds);
   }
-  function setModelLinesVertexAttributeRange(modelId, lineIds, minimum, maximum) {
+  function setModelLinesVertexAttributeRange(
+    modelId: string,
+    lineIds: string[],
+    minimum: number,
+    maximum: number,
+  ) {
     const name = modelLinesVertexAttributeName(modelId, lineIds[0]);
     const item = modelLinesVertexAttributeItem(modelId, lineIds[0]);
     setModelLinesVertexAttributeStoredConfig(modelId, lineIds, name, item, {
@@ -162,7 +220,11 @@ function useModelLinesVertexAttribute() {
     });
     return applyVertexAttribute(modelId, lineIds);
   }
-  function setModelLinesVertexAttributeColorMap(modelId, lineIds, colorMap) {
+  function setModelLinesVertexAttributeColorMap(
+    modelId: string,
+    lineIds: string[],
+    colorMap: string | undefined,
+  ) {
     const name = modelLinesVertexAttributeName(modelId, lineIds[0]);
     const item = modelLinesVertexAttributeItem(modelId, lineIds[0]);
     setModelLinesVertexAttributeStoredConfig(modelId, lineIds, name, item, {
@@ -170,13 +232,17 @@ function useModelLinesVertexAttribute() {
     });
     return applyVertexAttribute(modelId, lineIds);
   }
-  function modelLinesVertexAttributeNoDataColor(modelId, lineId) {
+  function modelLinesVertexAttributeNoDataColor(modelId: string, lineId?: string): unknown {
     const name = modelLinesVertexAttributeName(modelId, lineId);
     const item = modelLinesVertexAttributeItem(modelId, lineId);
     const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineId, name, item);
     return storedConfig.no_data_color;
   }
-  async function setModelLinesVertexAttributeNoDataColor(modelId, lineIds, no_data_color) {
+  async function setModelLinesVertexAttributeNoDataColor(
+    modelId: string,
+    lineIds: string[],
+    no_data_color: unknown,
+  ) {
     const name = modelLinesVertexAttributeName(modelId, lineIds[0]);
     const item = modelLinesVertexAttributeItem(modelId, lineIds[0]);
     const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineIds[0], name, item);

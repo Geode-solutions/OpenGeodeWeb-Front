@@ -12,11 +12,11 @@ export function useModelPointsVisibilityStyle() {
   const viewerStore = useViewerStore();
   const modelPointsCommonStyle = useModelPointsCommonStyle();
 
-  function modelPointsVisibility(id) {
-    return modelPointsCommonStyle.modelPointsStyle(id).visibility;
+  function modelPointsVisibility(id: string): boolean | undefined {
+    return modelPointsCommonStyle.modelPointsStyle(id).visibility as boolean | undefined;
   }
 
-  function setModelPointsVisibility(id, visibility) {
+  function setModelPointsVisibility(id: string, visibility: boolean | undefined) {
     const params = { id, visibility };
     return viewerStore.request(
       { schema, params },

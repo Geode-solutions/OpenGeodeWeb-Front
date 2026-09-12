@@ -8,11 +8,15 @@ export function useModelLinesVisibility() {
   const modelCommonStyle = useModelCommonStyle();
   const modelLinesCommonStyle = useModelLinesCommonStyle();
 
-  function modelLineVisibility(id, line_id) {
+  function modelLineVisibility(id: string, line_id?: string): unknown {
     return modelLinesCommonStyle.modelLineStyle(id, line_id).visibility;
   }
 
-  function setModelLinesVisibility(modelId, lines_ids, visibility) {
+  function setModelLinesVisibility(
+    modelId: string,
+    lines_ids: string[],
+    visibility: boolean | undefined,
+  ) {
     return modelCommonStyle.setModelTypeVisibility(modelId, lines_ids, visibility, schema);
   }
 

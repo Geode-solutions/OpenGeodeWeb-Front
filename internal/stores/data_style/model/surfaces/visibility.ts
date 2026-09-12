@@ -8,11 +8,15 @@ export function useModelSurfacesVisibility() {
   const modelCommonStyle = useModelCommonStyle();
   const modelSurfacesCommonStyle = useModelSurfacesCommonStyle();
 
-  function modelSurfaceVisibility(id, surface_id) {
+  function modelSurfaceVisibility(id: string, surface_id?: string): unknown {
     return modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id).visibility;
   }
 
-  function setModelSurfacesVisibility(modelId, surfaces_ids, visibility) {
+  function setModelSurfacesVisibility(
+    modelId: string,
+    surfaces_ids: string[],
+    visibility: boolean | undefined,
+  ) {
     return modelCommonStyle.setModelTypeVisibility(modelId, surfaces_ids, visibility, schema);
   }
 

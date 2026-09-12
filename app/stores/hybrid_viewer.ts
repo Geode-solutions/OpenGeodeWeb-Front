@@ -72,11 +72,11 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       viewerStore.client as unknown as { getImageStream: () => any }
     ).getImageStream();
     viewportStore.viewStream.value = imageStream.createViewStream("-1");
-    viewportStore.viewStream.value.onImageReady((event: { image: unknown }) => {
+    viewportStore.viewStream.value?.onImageReady((event: { image: unknown }) => {
       if (is_moving.value) {
         return;
       }
-      brightnessStore.latestImage.value = event.image;
+      brightnessStore.latestImage.value = event.image as typeof brightnessStore.latestImage.value;
       webGLRenderWindow.setBackgroundImage(event.image);
       if (imageStyle) {
         imageStyle.opacity = "1";

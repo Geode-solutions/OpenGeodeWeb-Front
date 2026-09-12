@@ -8,11 +8,15 @@ export function useModelCornersVisibility() {
   const modelCommonStyle = useModelCommonStyle();
   const modelCornersCommonStyle = useModelCornersCommonStyle();
 
-  function modelCornerVisibility(id, corner_id) {
+  function modelCornerVisibility(id: string, corner_id?: string): unknown {
     return modelCornersCommonStyle.modelCornerStyle(id, corner_id).visibility;
   }
 
-  function setModelCornersVisibility(modelId, corners_ids, visibility) {
+  function setModelCornersVisibility(
+    modelId: string,
+    corners_ids: string[],
+    visibility: boolean | undefined,
+  ) {
     return modelCommonStyle.setModelTypeVisibility(modelId, corners_ids, visibility, schema);
   }
 

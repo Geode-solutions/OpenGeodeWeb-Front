@@ -3,6 +3,7 @@ import type { Table } from "dexie";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import type { Observable } from "rxjs";
 
 // Local imports
 import { database } from "@ogw_internal/database/database.js";
@@ -31,8 +32,14 @@ export const useCameraManagerStore = defineStore("camera_manager", () => {
   >;
 
   function refAllCameraPositions() {
+    // Dexie's liveQuery() returns Dexie's own minimal Observable shape, not an
+    // actual rxjs Observable instance (useObservable's declared parameter type);
+    // the two are structurally close enough at runtime (vueuse only calls
+    // `.subscribe`) but not identical, hence the cast.
     return useObservable(
-      liveQuery(() => camera_positions_db.toArray()),
+      liveQuery(() => camera_positions_db.toArray()) as unknown as Observable<
+        CameraPositionRecord[]
+      >,
       { initialValue: [] as CameraPositionRecord[] },
     );
   }

@@ -22,12 +22,30 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   const meshStyleStore = useMeshStyle();
   const modelStyleStore = useModelStyle();
   const dataStore = useDataStore();
-  const data_style_db = database.data_style;
-  const model_component_type_datastyle_db = database.model_component_type_datastyle;
-  const component_datastyle_db = database.model_component_datastyle;
+  // The database's table map is dynamically assembled at runtime (see
+  // internal/database/database.ts), so `noUncheckedIndexedAccess` sees these as
+  // possibly undefined even though they're always registered before this store
+  // is used; guard defensively rather than asserting.
+  function requireTable<T>(table: T | undefined, name: string): T {
+    if (!table) {
+      throw new Error(`Database table not initialized: ${name}`);
+    }
+    return table;
+  }
+  const data_style_db = requireTable(database.data_style, "data_style");
+  const model_component_type_datastyle_db = requireTable(
+    database.model_component_type_datastyle,
+    "model_component_type_datastyle",
+  );
+  const component_datastyle_db = requireTable(
+    database.model_component_datastyle,
+    "model_component_datastyle",
+  );
 
   async function addDataStyle(id: string, geode_object: string): Promise<void> {
-    await data_style_db.put(structuredClone({ id, ...getDefaultStyle(geode_object) }));
+    await data_style_db.put(
+      structuredClone({ id, ...(getDefaultStyle(geode_object) as Record<string, unknown>) }),
+    );
   }
 
   async function setVisibility(id: string, visibility: boolean) {
@@ -80,7 +98,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     await dataStyleState.clear();
 
     const style_promises = Object.entries(stylesSnapshot).map(([id, style]) =>
-      data_style_db.put(structuredClone({ id, ...style })),
+      data_style_db.put(structuredClone({ ...style, id })),
     );
     const component_style_promises = Object.values(componentStylesSnapshot).map((style) =>
       component_datastyle_db.put(structuredClone(style)),

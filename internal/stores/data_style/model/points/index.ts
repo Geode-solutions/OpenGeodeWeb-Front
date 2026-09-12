@@ -8,11 +8,11 @@ export function useModelPointsStyle() {
   const modelPointsVisibilityStyle = useModelPointsVisibilityStyle();
   const modelPointsSizeStyle = useModelPointsSizeStyle();
 
-  function applyModelPointsStyle(id) {
+  function applyModelPointsStyle(id: string) {
     const style = modelPointsCommonStyle.modelPointsStyle(id);
     return Promise.all([
-      modelPointsVisibilityStyle.setModelPointsVisibility(id, style.visibility),
-      modelPointsSizeStyle.setModelPointsSize(id, style.size),
+      modelPointsVisibilityStyle.setModelPointsVisibility(id, style.visibility as boolean | undefined),
+      modelPointsSizeStyle.setModelPointsSize(id, style.size as number | undefined),
     ]);
   }
 

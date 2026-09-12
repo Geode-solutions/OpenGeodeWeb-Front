@@ -12,11 +12,11 @@ export function useModelPointsSizeStyle() {
   const viewerStore = useViewerStore();
   const modelPointsCommonStyle = useModelPointsCommonStyle();
 
-  function modelPointsSize(id) {
-    return modelPointsCommonStyle.modelPointsStyle(id).size;
+  function modelPointsSize(id: string): number | undefined {
+    return modelPointsCommonStyle.modelPointsStyle(id).size as number | undefined;
   }
 
-  function setModelPointsSize(id, size) {
+  function setModelPointsSize(id: string, size: number | undefined) {
     const params = { id, size };
     return viewerStore.request(
       {

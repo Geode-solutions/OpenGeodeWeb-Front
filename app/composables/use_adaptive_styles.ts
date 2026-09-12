@@ -1,4 +1,3 @@
-import { useElementBounding, useThrottleFn } from "@vueuse/core";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
@@ -15,35 +14,58 @@ const MIN_BOOST = 1;
 const MAX_BOOST = 1.2;
 const ADAPTIVE_REFRESH_RATE = 150;
 
-function getValue(val) {
-  if (typeof val === "object" && val !== null && val.value !== undefined) {
-    return val.value;
+// `target` is intentionally duck-typed: callers pass either a coordinates
+// source (a plain object, a Ref/ComputedRef of one, or a getter function
+// returning one) or an element ref/template ref destined for
+// vueuse's useElementBounding - see call sites in Viewer/ContextMenu and
+// Viewer/ObjectTree components.
+type AdaptiveStylesTarget = unknown;
+
+interface AdaptiveStylesOptions {
+  minOpacity?: number;
+  maxOpacity?: number;
+}
+
+function getValue(val: unknown): number {
+  if (typeof val === "object" && val !== null && "value" in val) {
+    const wrapped = (val as { value?: unknown }).value;
+    if (wrapped !== undefined) {
+      return wrapped as number;
+    }
   }
-  return val ?? 0;
+  return (val as number | undefined) ?? 0;
 }
 
 // oxlint-disable max-lines-per-function
-export function useAdaptiveStyles(target, options = {}) {
+export function useAdaptiveStyles(
+  target: AdaptiveStylesTarget,
+  options: AdaptiveStylesOptions = {},
+) {
   const hybridViewerStore = useHybridViewerStore();
   const treeviewStore = useTreeviewStore();
 
-  const isCoordinates =
+  const targetAsRefLike = target as { value?: unknown; x?: unknown } | undefined;
+  const isCoordinates = Boolean(
     target &&
-    (typeof target === "function" ||
-      (target.value !== undefined && target.value !== null && target.value.x !== undefined) ||
-      (target.x !== undefined && target.value === undefined));
+      (typeof target === "function" ||
+        (targetAsRefLike?.value !== undefined &&
+          targetAsRefLike.value !== null &&
+          (targetAsRefLike.value as { x?: unknown }).x !== undefined) ||
+        (targetAsRefLike?.x !== undefined && targetAsRefLike.value === undefined)),
+  );
 
-  const bounding = useElementBounding(isCoordinates ? undefined : target);
+  const bounding = useElementBounding(isCoordinates ? undefined : (target as never));
 
   const unwrapped = computed(() => {
     if (isCoordinates) {
-      let val = undefined;
+      let val: { x?: unknown; y?: unknown; width?: unknown; height?: unknown } | undefined =
+        undefined;
       if (typeof target === "function") {
-        val = target();
-      } else if (target.value === undefined) {
-        val = target;
+        val = (target as () => typeof val)();
+      } else if (targetAsRefLike?.value === undefined) {
+        val = targetAsRefLike;
       } else {
-        val = target.value;
+        val = targetAsRefLike.value as typeof val;
       }
       return {
         x: getValue(val?.x),

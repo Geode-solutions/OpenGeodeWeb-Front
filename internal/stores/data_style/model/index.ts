@@ -31,15 +31,15 @@ function useModelStyle() {
   const modelColorStyle = useModelColorStyle(componentStyleFunctions);
   const modelVisibilityStyle = useModelVisibilityStyle(componentStyleFunctions);
 
-  function visibleMeshComponents(modelId) {
+  function visibleMeshComponents(modelId: string) {
     return useModelSelection(modelId, dataStyleState);
   }
 
-  function applyModelStyle(modelId) {
+  function applyModelStyle(modelId: string) {
     const style = dataStyleState.getStyle(modelId);
 
     return Promise.all([
-      modelVisibilityStyle.setModelVisibility(modelId, style.visibility),
+      modelVisibilityStyle.setModelVisibility(modelId, style.visibility as boolean),
       modelBlocksStyle.applyModelBlocksStyle(modelId),
       modelSurfacesStyle.applyModelSurfacesStyle(modelId),
       modelLinesStyle.applyModelLinesStyle(modelId),
@@ -49,7 +49,7 @@ function useModelStyle() {
     ]);
   }
 
-  async function setModelMeshComponentsDefaultStyle(modelId) {
+  async function setModelMeshComponentsDefaultStyle(modelId: string) {
     const item = await dataStore.item(modelId);
     if (!item) {
       return;

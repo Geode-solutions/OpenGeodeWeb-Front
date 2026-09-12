@@ -4,7 +4,21 @@ import { useModelCornersColor } from "./color";
 import { useModelCornersCommonStyle } from "./common";
 import { useModelCornersVisibility } from "./visibility";
 
-async function setModelCornersDefaultStyle(_id) {
+interface ColorGroup {
+  color: unknown;
+  corners_ids: string[];
+}
+
+interface AttributeGroup {
+  name: string | undefined;
+  item: number | undefined;
+  minimum: number | undefined;
+  maximum: number | undefined;
+  colorMap: string | undefined;
+  corners_ids: string[];
+}
+
+async function setModelCornersDefaultStyle(_id: string) {
   // Placeholder
 }
 
@@ -15,8 +29,8 @@ export function useModelCornersStyle() {
   const modelColorStyle = useModelCornersColor();
   const modelCornersVertexAttribute = useModelCornersVertexAttribute();
 
-  function applyModelCornersVisibilityStyle(modelId, corners_ids) {
-    const visibilityGroups = {};
+  function applyModelCornersVisibilityStyle(modelId: string, corners_ids: string[]) {
+    const visibilityGroups: Record<string, string[]> = {};
     for (const corner_id of corners_ids) {
       const style = modelCommonStyle.modelCornerStyle(modelId, corner_id);
       const visibility = String(style.visibility);
@@ -32,21 +46,21 @@ export function useModelCornersStyle() {
     );
   }
 
-  function applyModelCornersColoringStyle(modelId, corners_ids) {
-    const activeColoringGroups = {};
+  function applyModelCornersColoringStyle(modelId: string, corners_ids: string[]) {
+    const activeColoringGroups: Record<string, string[]> = {};
     for (const corner_id of corners_ids) {
-      const activeColoring = modelColorStyle.modelCornerActiveColoring(modelId, corner_id);
+      const activeColoring = String(modelColorStyle.modelCornerActiveColoring(modelId, corner_id));
       if (!activeColoringGroups[activeColoring]) {
         activeColoringGroups[activeColoring] = [];
       }
       activeColoringGroups[activeColoring].push(corner_id);
     }
 
-    const coloringPromises = [];
+    const coloringPromises: Promise<unknown>[] = [];
 
     for (const [type, type_corners_ids] of Object.entries(activeColoringGroups)) {
       if (type === "constant") {
-        const colorGroups = {};
+        const colorGroups: Record<string, ColorGroup> = {};
         for (const corner_id of type_corners_ids) {
           const color = modelColorStyle.modelCornerColor(modelId, corner_id);
           const color_key = JSON.stringify(color);
@@ -65,7 +79,7 @@ export function useModelCornersStyle() {
           modelColorStyle.setModelCornersColor(modelId, type_corners_ids, undefined, "random"),
         );
       } else if (type === "vertex") {
-        const vertexGroups = {};
+        const vertexGroups: Record<string, AttributeGroup> = {};
         for (const corner_id of type_corners_ids) {
           const name = modelCornersVertexAttribute.modelCornersVertexAttributeName(
             modelId,
@@ -118,7 +132,7 @@ export function useModelCornersStyle() {
     return Promise.all(coloringPromises);
   }
 
-  async function applyModelCornersStyle(modelId) {
+  async function applyModelCornersStyle(modelId: string) {
     const corners_ids = await dataStore.getCornersGeodeIds(modelId);
     if (corners_ids.length === 0) {
       return;

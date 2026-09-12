@@ -214,6 +214,9 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions) {
       return;
     }
     const type = await dataStore.meshComponentType(modelId, componentId);
+    if (type === undefined) {
+      return;
+    }
     const { getName, setName, getRange, setRange, getColorMap, setColorMap } =
       ATTRIBUTE_FUNCTIONS[type]![activeColoring]!;
     const name = getName(modelId, componentId);

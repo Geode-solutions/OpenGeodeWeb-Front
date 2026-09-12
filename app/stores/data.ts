@@ -10,6 +10,7 @@ import { useDataCollections } from "./data_helpers/collections.js";
 import { useDataMesh } from "./data_helpers/mesh.js";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import type { ModelComponentRecord } from "./data_helpers/mesh.js";
+import type { Observable } from "rxjs";
 
 interface DataItem {
   id: string;
@@ -131,14 +132,24 @@ export const useDataStore = defineStore("data", () => {
     return await data_db.toArray();
   }
   function refItem(id: string) {
-    return useObservable(liveQuery(() => data_db.get(id)), {
-      initialValue: {} as DataItem,
-    });
+    // Dexie's liveQuery() returns Dexie's own minimal Observable shape, not an
+    // actual rxjs Observable instance (useObservable's declared parameter type);
+    // the two are structurally close enough at runtime (vueuse only calls
+    // `.subscribe`) but not identical, hence the cast.
+    return useObservable(
+      liveQuery(() => data_db.get(id)) as unknown as Observable<DataItem | undefined>,
+      {
+        initialValue: {} as DataItem,
+      },
+    );
   }
   function refAllItems() {
-    return useObservable(liveQuery(() => data_db.toArray()), {
-      initialValue: [] as DataItem[],
-    });
+    return useObservable(
+      liveQuery(() => data_db.toArray()) as unknown as Observable<DataItem[]>,
+      {
+        initialValue: [] as DataItem[],
+      },
+    );
   }
   async function meshComponentType(modelId: string, geode_id: string): Promise<string | undefined> {
     const component = await model_components_db

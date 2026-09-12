@@ -5,10 +5,25 @@ import { useModelLinesColor } from "./color";
 import { useModelLinesCommonStyle } from "./common";
 import { useModelLinesVisibility } from "./visibility";
 
-async function setModelLinesDefaultStyle(_id) {
+interface ColorGroup {
+  color: unknown;
+  lines_ids: string[];
+}
+
+interface AttributeGroup {
+  name: string | undefined;
+  item: number | undefined;
+  minimum: number | undefined;
+  maximum: number | undefined;
+  colorMap: string | undefined;
+  lines_ids: string[];
+}
+
+async function setModelLinesDefaultStyle(_id: string) {
   // Placeholder
 }
 
+// oxlint-disable-next-line max-lines-per-function
 export function useModelLinesStyle() {
   const dataStore = useDataStore();
   const modelCommonStyle = useModelLinesCommonStyle();
@@ -17,8 +32,8 @@ export function useModelLinesStyle() {
   const modelLinesVertexAttribute = useModelLinesVertexAttribute();
   const modelLinesEdgeAttribute = useModelLinesEdgeAttribute();
 
-  function applyModelLinesVisibilityStyle(modelId, lines_ids) {
-    const visibilityGroups = {};
+  function applyModelLinesVisibilityStyle(modelId: string, lines_ids: string[]) {
+    const visibilityGroups: Record<string, string[]> = {};
     for (const line_id of lines_ids) {
       const style = modelCommonStyle.modelLineStyle(modelId, line_id);
       const visibility = String(style.visibility);
@@ -34,21 +49,21 @@ export function useModelLinesStyle() {
     );
   }
 
-  function applyModelLinesColoringStyle(modelId, lines_ids) {
-    const activeColoringGroups = {};
+  function applyModelLinesColoringStyle(modelId: string, lines_ids: string[]) {
+    const activeColoringGroups: Record<string, string[]> = {};
     for (const line_id of lines_ids) {
-      const activeColoring = modelColorStyle.modelLineActiveColoring(modelId, line_id);
+      const activeColoring = String(modelColorStyle.modelLineActiveColoring(modelId, line_id));
       if (!activeColoringGroups[activeColoring]) {
         activeColoringGroups[activeColoring] = [];
       }
       activeColoringGroups[activeColoring].push(line_id);
     }
 
-    const coloringPromises = [];
+    const coloringPromises: Promise<unknown>[] = [];
 
     for (const [type, type_lines_ids] of Object.entries(activeColoringGroups)) {
       if (type === "constant") {
-        const colorGroups = {};
+        const colorGroups: Record<string, ColorGroup> = {};
         for (const line_id of type_lines_ids) {
           const color = modelColorStyle.modelLineColor(modelId, line_id);
           const color_key = JSON.stringify(color);
@@ -67,7 +82,7 @@ export function useModelLinesStyle() {
           modelColorStyle.setModelLinesColor(modelId, type_lines_ids, undefined, "random"),
         );
       } else if (type === "vertex") {
-        const vertexGroups = {};
+        const vertexGroups: Record<string, AttributeGroup> = {};
         for (const line_id of type_lines_ids) {
           const name = modelLinesVertexAttribute.modelLinesVertexAttributeName(modelId, line_id);
           const item = modelLinesVertexAttribute.modelLinesVertexAttributeItem(modelId, line_id);
@@ -109,7 +124,7 @@ export function useModelLinesStyle() {
           ),
         );
       } else if (type === "edge") {
-        const edgeGroups = {};
+        const edgeGroups: Record<string, AttributeGroup> = {};
         for (const line_id of type_lines_ids) {
           const name = modelLinesEdgeAttribute.modelLinesEdgeAttributeName(modelId, line_id);
           const item = modelLinesEdgeAttribute.modelLinesEdgeAttributeItem(modelId, line_id);
@@ -155,7 +170,7 @@ export function useModelLinesStyle() {
     return Promise.all(coloringPromises);
   }
 
-  async function applyModelLinesStyle(modelId) {
+  async function applyModelLinesStyle(modelId: string) {
     const lines_ids = await dataStore.getLinesGeodeIds(modelId);
     if (lines_ids.length === 0) {
       return;

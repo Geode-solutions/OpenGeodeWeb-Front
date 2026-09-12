@@ -11,11 +11,11 @@ export function useModelEdgesVisibilityStyle() {
   const viewerStore = useViewerStore();
   const modelEdgesCommonStyle = useModelEdgesCommonStyle();
 
-  function modelEdgesVisibility(id) {
-    return modelEdgesCommonStyle.modelEdgesStyle(id).visibility;
+  function modelEdgesVisibility(id: string): boolean | undefined {
+    return modelEdgesCommonStyle.modelEdgesStyle(id).visibility as boolean | undefined;
   }
 
-  function setModelEdgesVisibility(id, visibility) {
+  function setModelEdgesVisibility(id: string, visibility: boolean | undefined) {
     const params = { id, visibility };
     return viewerStore.request(
       { schema, params },
@@ -25,7 +25,7 @@ export function useModelEdgesVisibilityStyle() {
     );
   }
 
-  function applyModelEdgesStyle(id) {
+  function applyModelEdgesStyle(id: string) {
     const visibility = modelEdgesVisibility(id);
     return Promise.resolve([setModelEdgesVisibility(id, visibility)]);
   }

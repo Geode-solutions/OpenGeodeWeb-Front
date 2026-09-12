@@ -302,7 +302,11 @@ export const useAppStore = defineStore("app", () => {
     const store = useAppStore();
     return api_fetch(
       store,
-      { schema, params },
+      // The app store is only ever used with HTTP ("front") schemas, which always
+      // carry `methods`; the wider JsonRpcSchema param above is kept as-is to
+      // match this action's public signature (e.g. relayed from get_version-style
+      // callers that only know about the shared, looser schema shape).
+      { schema: schema as JsonRpcSchema & { methods: string[] }, params },
       {
         ...callbacks,
         response_function: async (response: unknown) => {

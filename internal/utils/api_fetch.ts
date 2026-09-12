@@ -54,7 +54,6 @@ export function api_fetch(
       params,
       baseURL: microservice.base_url,
       headers,
-      max_retry: schema.max_retry,
       timeout,
     },
     {

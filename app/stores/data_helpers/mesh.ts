@@ -2,6 +2,7 @@ import type { Table } from "dexie";
 import { database } from "@ogw_internal/database/database.js";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
+import type { Observable } from "rxjs";
 
 interface ModelComponentRecord {
   id: string;
@@ -71,9 +72,18 @@ export function useDataMesh() {
   }
 
   function refFormatedMeshComponents(modelId: string) {
-    return useObservable(liveQuery(() => formatedMeshComponents(modelId)), {
-      initialValue: undefined,
-    });
+    // Dexie's liveQuery() returns Dexie's own minimal Observable shape, not an
+    // actual rxjs Observable instance (useObservable's declared parameter type);
+    // the two are structurally close enough at runtime (vueuse only calls
+    // `.subscribe`) but not identical, hence the cast.
+    return useObservable(
+      liveQuery(() => formatedMeshComponents(modelId)) as unknown as Observable<
+        FormattedComponentGroup[]
+      >,
+      {
+        initialValue: undefined,
+      },
+    );
   }
 
   async function getMeshComponentsByType(

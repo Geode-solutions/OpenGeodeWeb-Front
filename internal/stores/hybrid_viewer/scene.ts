@@ -6,7 +6,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
 import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper";
 import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLPolyDataReader";
-import type { HybridDb, HybridViewerStorePublic } from "./vtk_types";
+import type { HybridDb, HybridViewerStorePublic, vtkActor as VtkActorInstance } from "./vtk_types";
 
 async function performAddItem(id: string): Promise<void> {
   const { genericRenderWindow, hybridDb } = useHybridViewerStore() as unknown as HybridViewerStorePublic;
@@ -20,7 +20,7 @@ async function performAddItem(id: string): Promise<void> {
   }
   const reader = vtkXMLPolyDataReader();
   await reader.parseAsArrayBuffer(
-    new TextEncoder().encode(value.binary_light_viewable as string),
+    new TextEncoder().encode(value.binary_light_viewable as string).buffer as ArrayBuffer,
   );
   const actor = vtkActor();
   const mapper = vtkMapper();
@@ -71,9 +71,9 @@ async function performSetZScaling(z_scale: number): Promise<void> {
   const { zScale } = storeToRefs(hybridViewerStore) as unknown as { zScale: Ref<number> };
   zScale.value = z_scale;
   const renderer = genericRenderWindow.value!.getRenderer();
-  for (const actor of renderer.getActors()) {
+  for (const actor of renderer.getActors() as VtkActorInstance[]) {
     const scale = actor.getScale();
-    actor.setScale(scale[0], scale[1], z_scale);
+    actor.setScale(scale[0] ?? 1, scale[1] ?? 1, z_scale);
   }
   renderer.resetCamera();
   const renderWindow = genericRenderWindow.value!.getRenderWindow();
