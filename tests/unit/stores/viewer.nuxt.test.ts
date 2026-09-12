@@ -37,7 +37,7 @@ describe("viewer store", () => {
     test("initial state", () => {
       const viewerStore = useViewerStore();
       expectTypeOf(viewerStore.default_local_port).toBeString();
-      expect(viewerStore.client).toEqual({});
+      expect(viewerStore.client).toStrictEqual({});
       expectTypeOf(viewerStore.picking_mode).toBeBoolean();
       expectTypeOf(viewerStore.picked_point).toEqualTypeOf<{
         x: number | undefined;

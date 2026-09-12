@@ -136,11 +136,9 @@ describe("model lines", () => {
       await dataStyleStore.setModelLinesVertexAttributeColorMap(id, line_ids, "budaS");
       await sleep(SLEEP_MS);
       const [lastCall] = spy.mock.calls.slice(-1);
-      if (!lastCall) {
-        throw new Error("Expected viewerStore.request to have been called");
-      }
-      expect(lastCall[0].schema).toStrictEqual(model_lines_schemas.attribute.vertex.attribute);
-      expect(lastCall[0].params).toStrictEqual(
+      expect(lastCall).toBeDefined();
+      expect(lastCall![0].schema).toStrictEqual(model_lines_schemas.attribute.vertex.attribute);
+      expect(lastCall![0].params).toStrictEqual(
         expect.objectContaining({
           id,
           block_ids: lines_viewer_ids,
@@ -250,11 +248,9 @@ describe("model lines", () => {
       await dataStyleStore.setModelLinesEdgeAttributeColorMap(id, line_ids, "budaS");
       await sleep(SLEEP_MS);
       const [lastCall] = spy.mock.calls.slice(-1);
-      if (!lastCall) {
-        throw new Error("Expected viewerStore.request to have been called");
-      }
-      expect(lastCall[0].schema).toStrictEqual(model_lines_schemas.attribute.edge.attribute);
-      expect(lastCall[0].params).toStrictEqual(
+      expect(lastCall).toBeDefined();
+      expect(lastCall![0].schema).toStrictEqual(model_lines_schemas.attribute.edge.attribute);
+      expect(lastCall![0].params).toStrictEqual(
         expect.objectContaining({
           id,
           block_ids: lines_viewer_ids,

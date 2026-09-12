@@ -8,8 +8,8 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.jso
 
 // Local imports
 import { addNginxLocation, addSupervisorProgram } from "./cloud.js";
-import { getAvailablePort, waitForReady, type NamedChildProcess } from "./scripts.js";
-import { microservicesMetadatasPath, projectMicroservices, type Microservice } from "./cleanup.js";
+import { type NamedChildProcess, getAvailablePort, waitForReady } from "./scripts.js";
+import { type Microservice, microservicesMetadatasPath, projectMicroservices } from "./cleanup.js";
 import { executablePath } from "./path.js";
 
 interface RunArgs {
@@ -21,6 +21,7 @@ interface RunArgs {
 const MILLISECONDS_PER_SECOND = 1000;
 const DEFAULT_TIMEOUT_SECONDS = 45;
 const MAX_PORT_RETRIES = 1;
+const DEFAULT_RUN_ARGS: RunArgs = { projectFolderPath: "" };
 async function runScript(
   execPath: string,
   execName: string,
@@ -83,7 +84,7 @@ function backArgs(args: RunArgs, port: number): string[] {
 async function runBack(
   execName: string,
   execPath: string,
-  args: RunArgs = { projectFolderPath: "" },
+  args: RunArgs = DEFAULT_RUN_ARGS,
   attempts = 0,
 ): Promise<number | undefined> {
   let port: number | undefined = undefined;
@@ -110,7 +111,7 @@ async function runBack(
 async function runViewer(
   execName: string,
   execPath: string,
-  args: RunArgs = { projectFolderPath: "" },
+  args: RunArgs = DEFAULT_RUN_ARGS,
   attempts = 0,
 ): Promise<number | undefined> {
   const { projectFolderPath } = args;
@@ -149,7 +150,7 @@ async function runExtension(
   extensionId: string,
   execName: string,
   execPath: string,
-  args: RunArgs = { projectFolderPath: "" },
+  args: RunArgs = DEFAULT_RUN_ARGS,
   attempts = 0,
 ): Promise<number | undefined> {
   let port: number | undefined = undefined;

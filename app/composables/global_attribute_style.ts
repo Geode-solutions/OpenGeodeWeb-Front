@@ -1,5 +1,5 @@
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
-import { computed, type Ref } from "vue";
+import { type Ref, computed } from "vue";
 
 import { getAttributeRange } from "@ogw_front/utils/attributes";
 import { useBackStore } from "@ogw_front/stores/back";

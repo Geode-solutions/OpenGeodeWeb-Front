@@ -1,8 +1,8 @@
 import type { MaybeRefOrGetter } from "vue";
 
-export type TreeItem = Record<string, unknown>;
+type TreeItem = Record<string, unknown>;
 
-export interface ItemPropsConfig {
+interface ItemPropsConfig {
   value: string;
   title: string;
   children: string;
@@ -10,7 +10,7 @@ export interface ItemPropsConfig {
   [key: string]: unknown;
 }
 
-export interface SelectionConfig {
+interface SelectionConfig {
   selectable: boolean;
   strategy: string;
   [key: string]: unknown;
@@ -27,7 +27,7 @@ interface VirtualTreeProps {
   customFilter?: (id: unknown, search: string, context: { raw: TreeItem }) => boolean;
 }
 
-export interface DisplayItem {
+interface DisplayItem {
   raw: TreeItem;
   id: unknown;
   depth: number;
@@ -36,9 +36,9 @@ export interface DisplayItem {
   isLeaf: boolean;
 }
 
-export type EmitFn = (event: string, ...args: unknown[]) => void;
+type EmitFn = (event: string, ...args: unknown[]) => void;
 
-export function useVirtualTree(propsIn: MaybeRefOrGetter<VirtualTreeProps>, emit: EmitFn) {
+function useVirtualTree(propsIn: MaybeRefOrGetter<VirtualTreeProps>, emit: EmitFn) {
   const props = toRef(propsIn);
 
   const actualItemProps = computed<ItemPropsConfig>(() => ({
@@ -234,3 +234,6 @@ export function useVirtualTree(propsIn: MaybeRefOrGetter<VirtualTreeProps>, emit
     getIndeterminate,
   };
 }
+
+export { useVirtualTree };
+export type { TreeItem, ItemPropsConfig, SelectionConfig, DisplayItem, EmitFn };

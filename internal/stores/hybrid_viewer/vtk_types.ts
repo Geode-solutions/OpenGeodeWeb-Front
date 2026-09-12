@@ -7,18 +7,8 @@ import type { vtkOpenGLRenderWindow } from "@kitware/vtk.js/Rendering/OpenGL/Ren
 import type vtkActor from "@kitware/vtk.js/Rendering/Core/Actor";
 import type { Vector3 } from "@kitware/vtk.js/types";
 
-export type {
-  vtkCamera,
-  vtkRenderer,
-  vtkRenderWindow,
-  vtkGenericRenderWindow,
-  vtkOpenGLRenderWindow,
-  vtkActor,
-  Vector3,
-};
-
 // The camera state as exchanged with the viewer microservice (snake_case field names, plain arrays) - distinct from vtk.js's own vtkCamera object.
-export interface CameraOptions {
+interface CameraOptions {
   focal_point: Vector3;
   view_up: Vector3;
   position: Vector3;
@@ -27,21 +17,21 @@ export interface CameraOptions {
   distance: number;
 }
 
-export interface HybridDbEntry {
+interface HybridDbEntry {
   actor: vtkActor;
   polydata: unknown;
   mapper: unknown;
 }
 
-export type HybridDb = Record<string, HybridDbEntry>;
+type HybridDb = Record<string, HybridDbEntry>;
 
-export interface HoverComponentInfo {
+interface HoverComponentInfo {
   name: string;
   id: string;
   type: string;
 }
 
-export interface HoverData {
+interface HoverData {
   modelId: string;
   modelName: string | undefined;
   blockName: string | undefined;
@@ -52,7 +42,7 @@ export interface HoverData {
 }
 
 // The parent Pinia store (app/stores/hybrid_viewer.ts) assembles these composables via `...spread` and is converted/typed separately from this directory, so its exact inferred return type isn't reliable to build on here. This describes just the slice of its returned (already-unwrapped) state and actions that the composables in this folder read or call directly (i.e. not through `storeToRefs`, which callers type separately at each destructuring site).
-export interface HybridViewerStorePublic {
+interface HybridViewerStorePublic {
   genericRenderWindow: { value: vtkGenericRenderWindow | undefined };
   hybridDb: HybridDb;
   camera_options: Record<string, unknown>;
@@ -63,3 +53,19 @@ export interface HybridViewerStorePublic {
   setZScaling: (value: number) => Promise<void>;
   setCamera: (options: CameraOptions) => void;
 }
+
+export type {
+  vtkCamera,
+  vtkRenderer,
+  vtkRenderWindow,
+  vtkGenericRenderWindow,
+  vtkOpenGLRenderWindow,
+  vtkActor,
+  Vector3,
+  CameraOptions,
+  HybridDbEntry,
+  HybridDb,
+  HoverComponentInfo,
+  HoverData,
+  HybridViewerStorePublic,
+};

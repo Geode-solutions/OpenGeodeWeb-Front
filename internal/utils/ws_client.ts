@@ -1,7 +1,7 @@
 // Third party imports
 import vtkWSLinkClient, {
-  newInstance,
   type vtkWSLinkClient as VtkWSLinkClient,
+  newInstance,
 } from "@kitware/vtk.js/IO/Core/WSLinkClient";
 import SmartConnect from "wslink/src/SmartConnect";
 import _ from "lodash";

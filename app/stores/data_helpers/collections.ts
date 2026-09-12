@@ -1,7 +1,7 @@
-import { liveQuery, type Table } from "dexie";
+import { type Table, liveQuery } from "dexie";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import { database } from "@ogw_internal/database/database.js";
-import { useDataMesh, type FormattedComponent, type ModelComponentRecord } from "./mesh.js";
+import { type FormattedComponent, type ModelComponentRecord, useDataMesh } from "./mesh.js";
 import { useObservable } from "@vueuse/rxjs";
 import type { Observable } from "rxjs";
 

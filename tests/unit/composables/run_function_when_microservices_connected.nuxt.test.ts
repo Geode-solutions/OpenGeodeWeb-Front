@@ -7,7 +7,7 @@ import { Status } from "@ogw_front/utils/status";
 import { runFunctionWhenMicroservicesConnected } from "@ogw_front/composables/run_function_when_microservices_connected";
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useBackStore } from "@ogw_front/stores/back";
-import { useInfraStore, type Microservice } from "@ogw_front/stores/infra";
+import { type Microservice, useInfraStore } from "@ogw_front/stores/infra";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 const dumb_obj = { dumb_method: () => true };

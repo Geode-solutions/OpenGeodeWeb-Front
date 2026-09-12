@@ -12,8 +12,8 @@ import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering
 // @ts-expect-error -- see comment above; newInstance() below is implicitly `any`.
 import { newInstance as vtkImplicitPlaneWidget } from "@kitware/vtk.js/Widgets/Widgets3D/ImplicitPlaneWidget";
 import {
-  newInstance as vtkWidgetManager,
   type vtkWidgetManager as WidgetManagerInstance,
+  newInstance as vtkWidgetManager,
 } from "@kitware/vtk.js/Widgets/Core/WidgetManager";
 import type { Ref } from "vue";
 import type vtkActor from "@kitware/vtk.js/Rendering/Core/Actor";
@@ -191,6 +191,8 @@ function useClippingPlanesWidget({
     localRenderWindow?.getRenderWindow().render();
     isLimitingCameraZoom = false;
   }
+  // The `noUncheckedIndexedAccess` compiler option (needed elsewhere in this migration) forces every `focal_point[i]`/`position[i]`/`view_up[i]` access below into its own `?? 0` fallback branch, which is what pushes this pre-existing function's cyclomatic complexity over the limit - the control flow itself is unchanged from the plain-JS version.
+  // oxlint-disable-next-line complexity
   function syncLocalCamera(): void {
     if (!localRenderWindow) {
       return;

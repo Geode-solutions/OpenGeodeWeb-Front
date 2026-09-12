@@ -86,6 +86,14 @@ const sortedAttributes = computed(() => {
   );
 });
 
+function capitalize(val: string) {
+  if (!val) {
+    return "";
+  }
+  const spaced = val.replaceAll("_", " ");
+  return spaced.charAt(0).toUpperCase() + spaced.slice(1);
+}
+
 const fieldTypeLabel = computed(() => {
   const fieldType = hybridViewerStore.hoverData?.fieldType;
   return typeof fieldType === "string" ? capitalize(fieldType.toLowerCase()) : "";
@@ -95,14 +103,6 @@ const coordinates = computed<number[] | undefined>(() => {
   const value = hybridViewerStore.hoverData?.attributes.coordinates;
   return Array.isArray(value) ? (value as number[]) : undefined;
 });
-
-function capitalize(val: string) {
-  if (!val) {
-    return "";
-  }
-  const spaced = val.replaceAll("_", " ");
-  return spaced.charAt(0).toUpperCase() + spaced.slice(1);
-}
 
 function formatAttributeValue(val: unknown) {
   if (Array.isArray(val)) {

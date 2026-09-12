@@ -4,7 +4,7 @@ import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import type { JsonRpcSchema, RequestHandlersWithValidation } from "@ogw_shared/utils/types.js";
 
 // The microservice-backed Pinia stores (back/app/...) all expose this shape; only the slice actually used here needs to be declared.
-export interface Microservice {
+interface Microservice {
   $id: string;
   base_url: string;
   start_request: () => void;
@@ -31,7 +31,7 @@ interface FetchErrorResponseLike {
   description?: string;
 }
 
-export function api_fetch(
+function api_fetch(
   microservice: Microservice,
   { schema, params = {}, headers = {} }: ApiFetchParams,
   {
@@ -95,3 +95,6 @@ export function api_fetch(
     },
   );
 }
+
+export { api_fetch };
+export type { Microservice };

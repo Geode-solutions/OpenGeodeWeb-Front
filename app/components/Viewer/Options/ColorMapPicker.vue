@@ -11,7 +11,7 @@ const { max, min } = defineProps({
 const selectedPresetName = defineModel("selectedPresetName", { type: String, default: "batlow" });
 
 const menuOpen = ref(false);
-const lutCanvas = ref();
+const lutCanvas = ref<HTMLCanvasElement | undefined>(undefined);
 
 const presets = computed(() => getPresetsWithCurrentAtTop(selectedPresetName.value));
 

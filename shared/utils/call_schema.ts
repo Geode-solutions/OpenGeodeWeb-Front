@@ -1,7 +1,7 @@
 // Third party imports
 
 // Local imports
-import { callRaw, type RpcClient } from "./call_raw.js";
+import { type RpcClient, callRaw } from "./call_raw.js";
 import type { JsonRpcSchema, RequestHandlersWithValidation } from "./types.js";
 import { validateSchema } from "./validate_schema.js";
 

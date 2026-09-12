@@ -1,4 +1,4 @@
-import { liveQuery, type Table } from "dexie";
+import { type Table, liveQuery } from "dexie";
 import { database } from "@ogw_internal/database/database.js";
 import { useObservable } from "@vueuse/rxjs";
 import type { Observable } from "rxjs";
@@ -66,7 +66,7 @@ export function useDataMesh() {
       .map((type) => ({
         id: type,
         title: componentTitles[type] ?? type,
-        children: (componentsByType[type] ?? []).map(toFormattedComponent),
+        children: (componentsByType[type] ?? []).map((item) => toFormattedComponent(item)),
       }));
   }
 
@@ -93,12 +93,12 @@ export function useDataMesh() {
       .where("[id+type]")
       .equals([modelId, type])
       .toArray();
-    return components.map(toFormattedComponent);
+    return components.map((item) => toFormattedComponent(item));
   }
 
   async function getAllMeshComponents(modelId: string): Promise<FormattedComponent[]> {
     const items = await model_components_db.where("id").equals(modelId).toArray();
-    return items.map(toFormattedComponent);
+    return items.map((item) => toFormattedComponent(item));
   }
 
   async function fetchAllMeshComponents(

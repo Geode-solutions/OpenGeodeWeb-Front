@@ -16,22 +16,20 @@ interface DataStyleSnapshot {
   modelComponentTypeStyles: Record<string, ModelComponentTypeStyle>;
 }
 
+// The database's table map is dynamically assembled at runtime (see internal/database/database.ts), so `noUncheckedIndexedAccess` sees these as possibly undefined even though they're always registered before this store is used; guard defensively rather than asserting.
+function requireTable<T>(table: T | undefined, name: string): T {
+  if (!table) {
+    throw new Error(`Database table not initialized: ${name}`);
+  }
+  return table;
+}
+
 // oxlint-disable-next-line max-lines-per-function
 export const useDataStyleStore = defineStore("dataStyle", () => {
   const dataStyleState = useDataStyleState();
   const meshStyleStore = useMeshStyle();
   const modelStyleStore = useModelStyle();
   const dataStore = useDataStore();
-  // The database's table map is dynamically assembled at runtime (see
-  // Internal/database/database.ts), so `noUncheckedIndexedAccess` sees these as
-  // Possibly undefined even though they're always registered before this store
-  // Is used; guard defensively rather than asserting.
-  function requireTable<T>(table: T | undefined, name: string): T {
-    if (!table) {
-      throw new Error(`Database table not initialized: ${name}`);
-    }
-    return table;
-  }
   const data_style_db = requireTable(database.data_style, "data_style");
   const model_component_type_datastyle_db = requireTable(
     database.model_component_type_datastyle,

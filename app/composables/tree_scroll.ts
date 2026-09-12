@@ -30,8 +30,7 @@ export function useTreeScroll(
 
   watch(
     () => props.value.scrollTop,
-    (newValIn) => {
-      const newVal = newValIn ?? 0;
+    (newVal = 0) => {
       if (Math.abs(newVal - internalScrollTop.value) > 1) {
         internalScrollTop.value = newVal;
         if (virtualScrollRef.value && virtualScrollRef.value.$el) {

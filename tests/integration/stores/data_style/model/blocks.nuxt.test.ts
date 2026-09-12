@@ -130,11 +130,9 @@ describe("model blocks", () => {
       await dataStyleStore.setModelBlocksVertexAttributeColorMap(id, block_ids, "budaS");
       await sleep(SLEEP_MS);
       const [lastCall] = spy.mock.calls.slice(-1);
-      if (!lastCall) {
-        throw new Error("Expected viewerStore.request to have been called");
-      }
-      expect(lastCall[0].schema).toStrictEqual(model_blocks_schemas.attribute.vertex.attribute);
-      expect(lastCall[0].params).toStrictEqual(
+      expect(lastCall).toBeDefined();
+      expect(lastCall![0].schema).toStrictEqual(model_blocks_schemas.attribute.vertex.attribute);
+      expect(lastCall![0].params).toStrictEqual(
         expect.objectContaining({
           id,
           block_ids: block_viewer_ids,
@@ -250,11 +248,9 @@ describe("model blocks", () => {
       await dataStyleStore.setModelBlocksPolyhedronAttributeColorMap(id, block_ids, "budaS");
       await sleep(SLEEP_MS);
       const [lastCall] = spy.mock.calls.slice(-1);
-      if (!lastCall) {
-        throw new Error("Expected viewerStore.request to have been called");
-      }
-      expect(lastCall[0].schema).toStrictEqual(model_blocks_schemas.attribute.polyhedron.attribute);
-      expect(lastCall[0].params).toStrictEqual(
+      expect(lastCall).toBeDefined();
+      expect(lastCall![0].schema).toStrictEqual(model_blocks_schemas.attribute.polyhedron.attribute);
+      expect(lastCall![0].params).toStrictEqual(
         expect.objectContaining({
           id,
           block_ids: block_viewer_ids,

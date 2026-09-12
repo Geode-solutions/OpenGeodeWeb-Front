@@ -86,7 +86,7 @@ const computedItemStyles = computed(() => {
 });
 
 const is_active = computed(() => menuStore.active_item_index === index);
-const optionsRef = ref(undefined);
+const optionsRef = ref<HTMLElement | undefined>(undefined);
 const { height: optionsHeight } = useElementSize(optionsRef);
 
 const maxCardHeight = computed(() => Math.min(CARD_HEIGHT, menuStore.containerHeight - OFFSET));

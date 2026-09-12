@@ -1,5 +1,5 @@
 // Third party imports
-import { liveQuery, type Table } from "dexie";
+import { type Table, liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 import type { Observable } from "rxjs";
@@ -7,7 +7,7 @@ import type { Observable } from "rxjs";
 // Local imports
 import { database } from "@ogw_internal/database/database.js";
 import { useDataCollections } from "./data_helpers/collections.js";
-import { useDataMesh, type ModelComponentRecord } from "./data_helpers/mesh.js";
+import { type ModelComponentRecord, useDataMesh } from "./data_helpers/mesh.js";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 interface DataItem {

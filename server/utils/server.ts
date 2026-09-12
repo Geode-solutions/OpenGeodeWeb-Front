@@ -17,7 +17,11 @@ async function extractZipArchive(zipFilePath: string, outputDir: string): Promis
     const outputPath = path.join(outputDir, relativePath);
 
     if (zipEntry.dir) {
-      promises.push(fs.promises.mkdir(outputPath, { recursive: true }).then(() => undefined));
+      promises.push(
+        (async () => {
+          await fs.promises.mkdir(outputPath, { recursive: true });
+        })(),
+      );
     } else {
       promises.push(
         (async () => {

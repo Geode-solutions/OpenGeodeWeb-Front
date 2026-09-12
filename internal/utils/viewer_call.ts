@@ -5,7 +5,7 @@ import type { JsonRpcSchema, RequestHandlersWithValidation } from "@ogw_shared/u
 import type { RpcClient } from "@ogw_shared/utils/call_raw.js";
 import type { Microservice } from "./api_fetch.js";
 
-export interface ViewerMicroservice extends Microservice {
+interface ViewerMicroservice extends Microservice {
   client: RpcClient;
 }
 
@@ -21,7 +21,7 @@ interface RpcErrorLike {
   message?: string;
 }
 
-export function viewer_call(
+function viewer_call(
   microservice: ViewerMicroservice,
   { schema, params = {}, timeout }: ViewerCallParams,
   {
@@ -64,8 +64,7 @@ export function viewer_call(
       },
       response_error_function(response: unknown) {
         microservice.stop_request();
-        // Pre-existing bug: this used an undefined `error` identifier (ReferenceError
-        // At runtime); fixed to use `response`, mirroring request_error_function above.
+        // Pre-existing bug: this used an undefined `error` identifier (ReferenceError at runtime); fixed to use `response`, mirroring request_error_function above.
         const typedResponse = response as RpcErrorLike;
         feedbackStore.add_error(
           typedResponse.code ?? 0,
@@ -84,3 +83,6 @@ export function viewer_call(
     },
   );
 }
+
+export { viewer_call };
+export type { ViewerMicroservice };

@@ -174,7 +174,7 @@ describe("app store", () => {
 
       test("warn when store not found in snapshot", async () => {
         const appStore = useAppStore();
-        const console_warn_spy = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+        const console_warn_spy = vi.spyOn(console, "warn").mockReturnValue(undefined);
         const mock_store = {
           $id: "testStore",
           importStores: vi.fn(),

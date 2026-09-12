@@ -3,7 +3,7 @@ import GlobalObjects from "@ogw_front/components/Viewer/ObjectTree/Views/GlobalO
 import ModelCollections from "@ogw_front/components/Viewer/ObjectTree/Views/ModelCollections.vue";
 import ModelComponents from "@ogw_front/components/Viewer/ObjectTree/Views/ModelComponents.vue";
 import ViewerObjectTreeBox from "@ogw_front/components/Viewer/ObjectTree/Box.vue";
-import geode_objects from "@ogw_front/assets/geode_objects";
+import { geode_objects } from "@ogw_front/assets/geode_objects";
 import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 

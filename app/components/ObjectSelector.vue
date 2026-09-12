@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
-import geode_objects from "@ogw_front/assets/geode_objects";
+import { geode_objects } from "@ogw_front/assets/geode_objects";
 import { resolveAllowedObjects } from "@ogw_shared/utils/response_handlers/load.js";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 import { useBackStore } from "@ogw_front/stores/back";

@@ -1,6 +1,5 @@
 import {
   type AttributeConfig,
-  type RGBAColor,
   CELLS_DEFAULT_COLOR,
   CELLS_DEFAULT_VISIBILITY,
   EDGES_DEFAULT_COLOR,
@@ -14,6 +13,7 @@ import {
   POLYGONS_DEFAULT_VISIBILITY,
   POLYHEDRA_DEFAULT_COLOR,
   POLYHEDRA_DEFAULT_VISIBILITY,
+  type RGBAColor,
 } from "./constants";
 
 function emptyAttributeConfig(): AttributeConfig {

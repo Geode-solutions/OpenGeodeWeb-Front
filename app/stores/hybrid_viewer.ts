@@ -11,8 +11,8 @@ import { useHybridViewerRuler } from "@ogw_internal/stores/hybrid_viewer/ruler";
 import { useHybridViewerScene } from "@ogw_internal/stores/hybrid_viewer/scene";
 import { useHybridViewerViewport } from "@ogw_internal/stores/hybrid_viewer/viewport";
 import {
-  newInstance as vtkGenericRenderWindow,
   type vtkGenericRenderWindow as VtkGenericRenderWindow,
+  newInstance as vtkGenericRenderWindow,
 } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 
 import { Status } from "@ogw_front/utils/status";

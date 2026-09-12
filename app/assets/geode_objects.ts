@@ -132,4 +132,4 @@ const geode_objects: Record<string, GeodeObject> = {
   },
 };
 
-export default geode_objects;
+export { geode_objects };
