@@ -40,8 +40,8 @@
     "build": ""
   },
   "dependencies": {
-    "@geode/opengeodeweb-back": "6.13.0-rc.1",
-    "@geode/opengeodeweb-viewer": "1.29.0-rc.1",
+    "@geode/opengeodeweb-back": "0.0.0",
+    "@geode/opengeodeweb-viewer": "0.0.0",
     "@google-cloud/run": "3.2.0",
     "@kitware/vtk.js": "33.3.0",
     "@mdi/font": "7.4.47",
