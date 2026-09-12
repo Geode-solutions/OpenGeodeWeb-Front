@@ -33,7 +33,7 @@ const maximum = computed({
 
 const quickColormapPresets = computed(() => getPresetsWithCurrentAtTop(currentColormap.value));
 
-async function onQuickColormapSelect(preset) {
+async function onQuickColormapSelect(preset: { Name: string }) {
   await applyGlobalColormap(preset.Name);
 }
 </script>

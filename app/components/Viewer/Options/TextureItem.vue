@@ -3,6 +3,9 @@ import FileUploader from "@ogw_front/components/FileUploader.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 import { useBackStore } from "@ogw_front/stores/back";
 
+// Mirrors FileUploader's own (unexported) UploadFile type.
+type UploadFile = File & { isConfigured?: boolean; displayName?: string };
+
 const emit = defineEmits(["update_value"]);
 
 const {
@@ -32,7 +35,7 @@ watch(
   },
 );
 
-const textureCoordinates = ref([]);
+const textureCoordinates = ref<string[]>([]);
 const backStore = useBackStore();
 
 function getTextureCoordinates() {
@@ -41,8 +44,9 @@ function getTextureCoordinates() {
   backStore.request(
     { schema, params },
     {
-      response_function: (response) => {
-        textureCoordinates.value = response.texture_coordinates;
+      response_function: (response: unknown) => {
+        textureCoordinates.value = (response as { texture_coordinates: string[] })
+          .texture_coordinates;
       },
     },
   );
@@ -52,8 +56,8 @@ onMounted(() => {
   getTextureCoordinates();
 });
 
-async function files_uploaded_event(value) {
-  if (value.length > 0) {
+async function files_uploaded_event(value: UploadFile[]) {
+  if (value.length > 0 && value[0]) {
     const schema = back_schemas.opengeodeweb_back.save_viewable_file;
     const params = {
       geode_object_type: "RasterImage2D",
@@ -62,8 +66,8 @@ async function files_uploaded_event(value) {
     await backStore.request(
       { schema, params },
       {
-        response_function: (response) => {
-          textureId.value = response.id;
+        response_function: (response: unknown) => {
+          textureId.value = (response as { id: string }).id;
         },
       },
     );

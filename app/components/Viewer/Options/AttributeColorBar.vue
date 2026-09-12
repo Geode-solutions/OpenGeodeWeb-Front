@@ -11,7 +11,11 @@ const colorMap = defineModel("colorMap", { type: String });
 
 <template>
   <div class="attribute-colorbar mt-3">
-    <ColorMapPicker v-model:selected-preset-name="colorMap" :min="minimum" :max="maximum" />
+    <ColorMapPicker
+      v-model:selected-preset-name="colorMap"
+      :min="minimum ?? 0"
+      :max="maximum ?? 0"
+    />
     <AttributeRangeSelector
       v-model:minimum="minimum"
       v-model:maximum="maximum"

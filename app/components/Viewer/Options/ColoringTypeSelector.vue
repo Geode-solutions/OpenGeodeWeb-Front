@@ -71,14 +71,14 @@ const polygonSchema = schemas.polygon || back_schemas.opengeodeweb_back.polygon_
 const polyhedronSchema =
   schemas.polyhedron || back_schemas.opengeodeweb_back.polyhedron_attribute_names;
 
-function isAvailable(key) {
+function isAvailable(key: string) {
   if (capabilities[key] && capabilities[key].available === false) {
     return false;
   }
   return true;
 }
 
-function hasColorMap(key) {
+function hasColorMap(key: string) {
   if (capabilities[key] && capabilities[key].hasColorMap === false) {
     return false;
   }
@@ -177,7 +177,7 @@ watch(
       polygon: polygon_attribute_name.value,
       polyhedron: polyhedron_attribute_name.value,
     };
-    if (!(key in names) || names[key]) {
+    if (key === undefined || !(key in names) || names[key as keyof typeof names]) {
       coloring_style_key.value = key;
     }
   },
@@ -186,9 +186,12 @@ watch(
 watch(
   coloring_style_key,
   (value) => {
+    if (value === undefined) {
+      return;
+    }
     const index = coloring_styles.value.values.indexOf(value);
     if (index !== -1) {
-      coloring_style_label.value = coloring_styles.value.labels[index];
+      coloring_style_label.value = coloring_styles.value.labels[index] ?? "";
     }
   },
   { immediate: true },

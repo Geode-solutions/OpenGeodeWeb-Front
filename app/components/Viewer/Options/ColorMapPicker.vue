@@ -19,7 +19,7 @@ function drawLutCanvas() {
   drawCanvasForPreset(selectedPresetName.value, lutCanvas.value);
 }
 
-function onSelectPreset(preset) {
+function onSelectPreset(preset: { Name: string }) {
   selectedPresetName.value = preset.Name;
   menuOpen.value = false;
 }

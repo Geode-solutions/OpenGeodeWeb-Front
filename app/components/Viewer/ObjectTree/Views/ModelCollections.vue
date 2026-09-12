@@ -59,7 +59,7 @@ const {
 
 function onUpdateSelection(newSelection: string[]) {
   const finalSelection = applySearchFilter(newSelection, visibleComponents.value);
-  updateVisibility(finalSelection);
+  updateVisibility(finalSelection as string[]);
 }
 
 const visibleSelection = computed(() => applySearchFilter(visibleComponents.value, []));
@@ -69,7 +69,7 @@ const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
     const query = search.value.toLowerCase();
     const result: CollectionTreeItem[] = [];
     for (const type of Object.keys(componentsCache.value)) {
-      const matches = componentsCache.value[type].filter(
+      const matches = (componentsCache.value[type] ?? []).filter(
         (component: { title: string; id: string }) =>
           component.title.toLowerCase().includes(query) ||
           component.id.toLowerCase().includes(query),
@@ -78,7 +78,7 @@ const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
         result.push({
           id: type,
           title: `${type}s (${matches.length})`,
-          children: sortAndFormatItems(matches, sortType.value),
+          children: sortAndFormatItems(matches, sortType.value) as unknown as CollectionTreeItem[],
         });
       }
     }
@@ -87,9 +87,14 @@ const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
 
   const result: CollectionTreeItem[] = [];
   for (const category of filteredCategories.value) {
+    const categoryId = category.id as string;
     result.push({
       ...category,
-      children: sortAndFormatItems(componentsCache.value?.[category.id], sortType.value),
+      id: categoryId,
+      children: sortAndFormatItems(
+        componentsCache.value?.[categoryId],
+        sortType.value,
+      ) as unknown as CollectionTreeItem[],
     });
   }
   return result;
@@ -156,6 +161,15 @@ function getLeafViewerIds(item: CollectionTreeItem) {
   const actualItem = item.raw || item;
   return extractIds(actualItem);
 }
+
+// focusCameraOnObject's block_ids parameter is declared as string[], but this
+// view (like the sibling ModelComponents view) has always focused the camera
+// using the numeric viewer/actor ids collected by extractIds; that pre-dates
+// this typing pass, so the ids are passed through as-is (no Number/String
+// conversion) rather than changed here.
+function getLeafViewerIdsForFocus(item: CollectionTreeItem): string[] {
+  return getLeafViewerIds(item) as unknown as string[];
+}
 </script>
 
 <template>
@@ -209,7 +223,7 @@ function getLeafViewerIds(item: CollectionTreeItem) {
           size="medium"
           variant="text"
           v-tooltip="'Focus camera on object'"
-          @click.stop="hybridViewerStore.focusCameraOnObject(id, getLeafViewerIds(item))"
+          @click.stop="hybridViewerStore.focusCameraOnObject(id, getLeafViewerIdsForFocus(item))"
         />
       </template>
     </CommonTreeView>

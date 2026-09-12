@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import type { PropType } from "vue";
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar.vue";
 import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
 import { getAttributeRange } from "@ogw_front/utils/attributes";
 import { useBackStore } from "@ogw_front/stores/back";
+import type { JsonRpcSchema } from "#shared/utils/types.js";
 
 const backStore = useBackStore();
 
@@ -16,7 +18,7 @@ const attributeNoDataColor = defineModel("attributeNoDataColor", { type: Object 
 const { id, componentIds, schema } = defineProps({
   id: { type: String, required: true },
   componentIds: { type: Array, default: undefined },
-  schema: { type: Object, required: true },
+  schema: { type: Object as PropType<JsonRpcSchema>, required: true },
 });
 
 interface AttributeInfo {
@@ -40,7 +42,10 @@ const rangeMin = computed<number | undefined>({
     const range = attributeRange.value as number[] | undefined;
     return range ? range[0] : undefined;
   },
-  set: (val: number) => {
+  set: (val: number | undefined) => {
+    if (val === undefined) {
+      return;
+    }
     const range = attributeRange.value as number[] | undefined;
     const currentMax = range ? range[1] : undefined;
     let newMin = val;
@@ -55,7 +60,10 @@ const rangeMax = computed<number | undefined>({
     const range = attributeRange.value as number[] | undefined;
     return range ? range[1] : undefined;
   },
-  set: (val: number) => {
+  set: (val: number | undefined) => {
+    if (val === undefined) {
+      return;
+    }
     const range = attributeRange.value as number[] | undefined;
     const currentMin = range ? range[0] : undefined;
     let newMax = val;
@@ -79,7 +87,13 @@ const componentItems = computed(() => {
 function resetRange() {
   if (currentAttribute.value) {
     const comp = attributeItem.value ?? 0;
-    const { min, max } = getAttributeRange(currentAttribute.value, comp);
+    // getAttributeRange's parameter type (AttributeRangeSource) isn't exported;
+    // AttributeInfo's index signature covers its optional min/max fields at
+    // runtime (they come from the same backend attribute response shape).
+    const { min, max } = getAttributeRange(
+      currentAttribute.value as unknown as Parameters<typeof getAttributeRange>[0],
+      comp,
+    );
     attributeRange.value = [min, max];
   }
 }
@@ -89,7 +103,8 @@ function hasSelectedComponent(components: unknown) {
 }
 
 function getAttributes() {
-  const requiresComponent = schema.properties.component_ids !== undefined;
+  const schemaProperties = schema.properties as Record<string, unknown> | undefined;
+  const requiresComponent = schemaProperties?.component_ids !== undefined;
   if (requiresComponent && !hasSelectedComponent(componentIds)) {
     return;
   }
@@ -102,8 +117,8 @@ function getAttributes() {
   backStore.request(
     { schema, params },
     {
-      response_function: (response: { attributes: AttributeInfo[] }) => {
-        attributes.value = response.attributes;
+      response_function: (response: unknown) => {
+        attributes.value = (response as { attributes: AttributeInfo[] }).attributes;
       },
     },
   );

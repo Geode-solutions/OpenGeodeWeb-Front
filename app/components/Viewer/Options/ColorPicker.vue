@@ -7,7 +7,10 @@ defineProps({
   },
 });
 
-const colorPickerRef = useTemplateRef("colorPickerRef");
+// useMousePressed only needs the underlying DOM element (it unwraps a
+// component ref's $el at runtime); typing this as the actual Vuetify
+// component instance produces a union too complex for TS to represent.
+const colorPickerRef = useTemplateRef<HTMLElement>("colorPickerRef");
 const model = defineModel({ type: Object });
 const { pressed } = useMousePressed({ target: colorPickerRef });
 
