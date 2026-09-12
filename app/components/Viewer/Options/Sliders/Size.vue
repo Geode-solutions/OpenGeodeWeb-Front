@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Slider from "./Slider";
+import Slider from "./Slider.vue";
 
 const size = defineModel({ type: Number });
 </script>

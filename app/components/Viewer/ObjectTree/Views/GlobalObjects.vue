@@ -45,7 +45,7 @@ const {
 } = useTreeFilter(() => treeviewStore.items, { recursiveSort: true });
 
 function onUpdateSelection(val: string[]) {
-  treeviewStore.selection = applySearchFilter(val, treeviewStore.selection);
+  treeviewStore.selection = applySearchFilter(val, treeviewStore.selection) as string[];
 }
 
 const visibleSelection = computed(() => applySearchFilter(treeviewStore.selection, []));

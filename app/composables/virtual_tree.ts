@@ -1,7 +1,47 @@
-export function useVirtualTree(propsIn, emit) {
+import type { MaybeRefOrGetter } from "vue";
+
+export type TreeItem = Record<string, unknown>;
+
+export interface ItemPropsConfig {
+  value: string;
+  title: string;
+  children: string;
+  height: number;
+  [key: string]: unknown;
+}
+
+export interface SelectionConfig {
+  selectable: boolean;
+  strategy: string;
+  [key: string]: unknown;
+}
+
+interface VirtualTreeProps {
+  items?: TreeItem[];
+  opened?: unknown[];
+  selected?: unknown[];
+  active?: unknown[];
+  itemProps?: Partial<ItemPropsConfig>;
+  selection?: Partial<SelectionConfig>;
+  search?: string;
+  customFilter?: (id: unknown, search: string, context: { raw: TreeItem }) => boolean;
+}
+
+export interface DisplayItem {
+  raw: TreeItem;
+  id: unknown;
+  depth: number;
+  isOpen: boolean;
+  isActive: boolean;
+  isLeaf: boolean;
+}
+
+export type EmitFn = (event: string, ...args: unknown[]) => void;
+
+export function useVirtualTree(propsIn: MaybeRefOrGetter<VirtualTreeProps>, emit: EmitFn) {
   const props = toRef(propsIn);
 
-  const actualItemProps = computed(() => ({
+  const actualItemProps = computed<ItemPropsConfig>(() => ({
     value: "id",
     title: "title",
     children: "children",
@@ -9,7 +49,7 @@ export function useVirtualTree(propsIn, emit) {
     ...props.value.itemProps,
   }));
 
-  const actualSelection = computed(() => ({
+  const actualSelection = computed<SelectionConfig>(() => ({
     selectable: false,
     strategy: "classic",
     ...props.value.selection,
@@ -19,7 +59,7 @@ export function useVirtualTree(propsIn, emit) {
   const selectedSet = computed(() => new Set(props.value.selected));
   const activeSet = computed(() => new Set(props.value.active || []));
 
-  function toggleOpen(item) {
+  function toggleOpen(item: TreeItem): void {
     const id = item[actualItemProps.value.value];
     const { opened: openedArray = [] } = props.value;
     const newOpened = new Set(openedArray);
@@ -31,8 +71,8 @@ export function useVirtualTree(propsIn, emit) {
     emit("update:opened", [...newOpened]);
   }
 
-  function getLeafChildrenIds(item, ids = []) {
-    const children = item[actualItemProps.value.children];
+  function getLeafChildrenIds(item: TreeItem, ids: unknown[] = []): unknown[] {
+    const children = item[actualItemProps.value.children] as TreeItem[] | undefined;
     if (children) {
       for (const child of children) {
         getLeafChildrenIds(child, ids);
@@ -43,7 +83,7 @@ export function useVirtualTree(propsIn, emit) {
     return ids;
   }
 
-  function isSelected(item) {
+  function isSelected(item: TreeItem): boolean {
     const id = item[actualItemProps.value.value];
     if (selectedSet.value.has(id)) {
       return true;
@@ -57,7 +97,7 @@ export function useVirtualTree(propsIn, emit) {
     return false;
   }
 
-  function getIndeterminate(item) {
+  function getIndeterminate(item: TreeItem): boolean {
     if (actualSelection.value.strategy !== "classic") {
       return false;
     }
@@ -70,7 +110,7 @@ export function useVirtualTree(propsIn, emit) {
     return selectedChildren.length > 0 && selectedChildren.length < childrenIds.length;
   }
 
-  function toggleSelect(item) {
+  function toggleSelect(item: TreeItem): void {
     const id = item[actualItemProps.value.value];
     const { selected: selectedArray = [] } = props.value;
     const newSelected = new Set(selectedArray);
@@ -97,27 +137,32 @@ export function useVirtualTree(propsIn, emit) {
     emit("update:selected", [...newSelected]);
   }
 
-  function flattenTree(itemsList, depth = 0, result = []) {
+  function flattenTree(
+    itemsList: TreeItem[],
+    depth = 0,
+    result: DisplayItem[] = [],
+  ): DisplayItem[] {
     const { search, customFilter } = props.value;
     const lowerSearch = search ? search.toLowerCase() : "";
 
     for (const item of itemsList) {
       const id = item[actualItemProps.value.value];
-      const children = item[actualItemProps.value.children];
-      const hasChildren = children && children.length > 0;
+      const children = item[actualItemProps.value.children] as TreeItem[] | undefined;
+      const hasChildren = Boolean(children && children.length > 0);
 
       const isOpen = openedSet.value.has(id);
       const isActive = activeSet.value.has(id);
 
       if (lowerSearch) {
         const matches = customFilter
-          ? customFilter(id, search, { raw: item })
-          : (item[actualItemProps.value.title] || "").toLowerCase().includes(lowerSearch) ||
-            String(id).toLowerCase().includes(lowerSearch);
+          ? customFilter(id, search as string, { raw: item })
+          : String(item[actualItemProps.value.title] ?? "")
+              .toLowerCase()
+              .includes(lowerSearch) || String(id).toLowerCase().includes(lowerSearch);
 
         if (hasChildren) {
-          const subtree = [];
-          flattenTree(children, depth + 1, subtree);
+          const subtree: DisplayItem[] = [];
+          flattenTree(children ?? [], depth + 1, subtree);
           if (subtree.length === 0 && !matches) {
             continue;
           }
@@ -150,15 +195,15 @@ export function useVirtualTree(propsIn, emit) {
       });
 
       if (isOpen && hasChildren) {
-        flattenTree(children, depth + 1, result);
+        flattenTree(children ?? [], depth + 1, result);
       }
     }
     return result;
   }
 
-  function traverse(itemsList, allIds) {
+  function traverse(itemsList: TreeItem[], allIds: unknown[]): void {
     for (const item of itemsList) {
-      const children = item[actualItemProps.value.children];
+      const children = item[actualItemProps.value.children] as TreeItem[] | undefined;
       if (children && children.length > 0) {
         allIds.push(item[actualItemProps.value.value]);
         traverse(children, allIds);
@@ -172,7 +217,7 @@ export function useVirtualTree(propsIn, emit) {
     () => props.value.search,
     (newSearch, oldSearch) => {
       if (newSearch && !oldSearch) {
-        const allIds = [];
+        const allIds: unknown[] = [];
         traverse(props.value.items || [], allIds);
         emit("update:opened", [...new Set([...(props.value.opened || []), ...allIds])]);
       }

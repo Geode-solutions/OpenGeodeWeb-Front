@@ -8,7 +8,7 @@ import { useQuickColormap } from "@ogw_front/composables/use_quick_colormap";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 import ColormapQuickPicker from "@ogw_front/components/Viewer/Options/ColormapQuickPicker.vue";
-import ViewToolbar from "@ogw_front/components/ViewToolbar";
+import ViewToolbar from "@ogw_front/components/ViewToolbar.vue";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 import vtkRemoteView from "@kitware/vtk.js/Rendering/Misc/RemoteView";
 

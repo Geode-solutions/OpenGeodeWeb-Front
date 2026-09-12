@@ -15,7 +15,7 @@ function calc_margin(index: number) {
 <template>
   <v-snackbar
     v-for="(feedback, index) in feedbackStore.feedbacks"
-    :key="feedback"
+    :key="feedback.id"
     v-model="show"
     :style="{ 'margin-bottom': calc_margin(index) }"
     :color="feedback.type"

@@ -8,8 +8,51 @@ import {
   hasPlaneChanged,
 } from "@ogw_front/utils/clipping_planes";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
+// ImplicitPlaneWidget ships no type declarations at all (unlike most of
+// vtk.js), unlike a module that simply doesn't exist, so it can't be given an
+// ambient `declare module` shim either - suppress the resulting implicit-any
+// error at the import site instead.
+// @ts-expect-error -- see comment above; newInstance() below is implicitly `any`.
 import { newInstance as vtkImplicitPlaneWidget } from "@kitware/vtk.js/Widgets/Widgets3D/ImplicitPlaneWidget";
 import { newInstance as vtkWidgetManager } from "@kitware/vtk.js/Widgets/Core/WidgetManager";
+import type { Ref } from "vue";
+import type vtkActor from "@kitware/vtk.js/Rendering/Core/Actor";
+import type { vtkCamera } from "@kitware/vtk.js/Rendering/Core/Camera";
+import type { vtkWidgetManager as WidgetManagerInstance } from "@kitware/vtk.js/Widgets/Core/WidgetManager";
+import type { vtkGenericRenderWindow as GenericRenderWindowInstance } from "@ogw_internal/stores/hybrid_viewer/vtk_types";
+import type { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+
+interface ClippingPlane {
+  origin?: number[];
+  normal: number[];
+}
+
+interface DataItemLike {
+  id: string;
+}
+
+// vtk.js's plane-widget factory/handle/state objects (from ImplicitPlaneWidget,
+// which ships no type declarations) are kept as `any` here - deep vtk.js
+// widget internals with no typed surface to build on.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type PlaneWidget = any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type WidgetHandle = any;
+
+interface WidgetEntry {
+  planeWidget: PlaneWidget;
+  widgetHandle: WidgetHandle;
+  subscription: { unsubscribe: () => void };
+}
+
+interface ClippingPlanesWidgetParams {
+  planes: Ref<ClippingPlane[]>;
+  targetAllVisible: Ref<boolean>;
+  selectedDatasetIds: Ref<string[]>;
+  allItems: Ref<DataItemLike[]>;
+  hybridViewerStore: ReturnType<typeof useHybridViewerStore>;
+  debouncedApply: (...args: unknown[]) => void;
+}
 
 // oxlint-disable-next-line max-params max-lines-per-function
 function useClippingPlanesWidget({
@@ -19,14 +62,14 @@ function useClippingPlanesWidget({
   allItems,
   hybridViewerStore,
   debouncedApply,
-}) {
-  let localRenderWindow = undefined;
-  let widgetManager = undefined;
-  let widgetEntries = [];
+}: ClippingPlanesWidgetParams) {
+  let localRenderWindow: GenericRenderWindowInstance | undefined = undefined;
+  let widgetManager: WidgetManagerInstance | undefined = undefined;
+  let widgetEntries: WidgetEntry[] = [];
   let fromWidget = false;
   let maxDistance = 0;
   let isLimitingCameraZoom = false;
-  function resolveActiveActors() {
+  function resolveActiveActors(): vtkActor[] {
     const targetIds = targetAllVisible.value
       ? allItems.value.map((item) => item.id)
       : selectedDatasetIds.value;
@@ -35,46 +78,46 @@ function useClippingPlanesWidget({
         const item = hybridViewerStore.hybridDb[id];
         return item ? item.actor : undefined;
       })
-      .filter(Boolean);
+      .filter((actor): actor is vtkActor => Boolean(actor));
     if (targeted.length > 0) {
       return targeted;
     }
     return Object.values(hybridViewerStore.hybridDb)
       .map((entry) => entry && entry.actor)
-      .filter(Boolean);
+      .filter((actor): actor is vtkActor => Boolean(actor));
   }
   function getSceneBoundsInfo() {
     return computeSceneBoundsInfo(resolveActiveActors());
   }
-  function getSceneCenter() {
+  function getSceneCenter(): number[] {
     return getSceneBoundsInfo().center;
   }
-  function createWidgetEntry(planeWidget, widgetHandle, planeIndex) {
+  function createWidgetEntry(
+    planeWidget: PlaneWidget,
+    widgetHandle: WidgetHandle,
+    planeIndex: number,
+  ): WidgetEntry {
     const widgetState = planeWidget.getWidgetState();
     const plane = planes.value[planeIndex];
-    if (plane.origin) {
+    if (plane?.origin) {
       widgetState.setOrigin(plane.origin);
     }
-    widgetState.setNormal(plane.normal);
+    if (plane) {
+      widgetState.setNormal(plane.normal);
+    }
     const subscription = widgetState.onModified(() => {
       if (fromWidget) {
         return;
       }
-      const origin = widgetState.getOrigin().map((val) => Number(val.toFixed(4)));
-      const normal = widgetState.getNormal().map((val) => Number(val.toFixed(4)));
-      if (
-        !hasPlaneChanged(
-          origin,
-          normal,
-          planes.value[planeIndex].origin,
-          planes.value[planeIndex].normal,
-        )
-      ) {
+      const origin: number[] = widgetState.getOrigin().map((val: number) => Number(val.toFixed(4)));
+      const normal: number[] = widgetState.getNormal().map((val: number) => Number(val.toFixed(4)));
+      const currentPlane = planes.value[planeIndex];
+      if (!currentPlane || !hasPlaneChanged(origin, normal, currentPlane.origin, currentPlane.normal)) {
         return;
       }
       fromWidget = true;
-      planes.value[planeIndex].origin = origin;
-      planes.value[planeIndex].normal = normal;
+      currentPlane.origin = origin;
+      currentPlane.normal = normal;
       nextTick(() => {
         fromWidget = false;
       });
@@ -86,19 +129,23 @@ function useClippingPlanesWidget({
       subscription,
     };
   }
-  function syncWidgets() {
+  function syncWidgets(): void {
     if (!widgetManager || !localRenderWindow) {
       return;
     }
     while (widgetEntries.length > planes.value.length) {
       const entry = widgetEntries.pop();
+      if (!entry) {
+        continue;
+      }
       entry.subscription.unsubscribe();
       widgetManager.removeWidget(entry.planeWidget);
       entry.planeWidget.delete();
     }
     const { cubicBounds } = getSceneBoundsInfo();
     for (const [idx, plane] of planes.value.entries()) {
-      const rgb = PLANE_COLORS[idx % PLANE_COLORS.length];
+      // Modulo guarantees this index is within bounds of the non-empty PLANE_COLORS array.
+      const rgb = PLANE_COLORS[idx % PLANE_COLORS.length]!;
       if (!widgetEntries[idx]) {
         const planeWidget = vtkImplicitPlaneWidget();
         const widgetHandle = widgetManager.addWidget(planeWidget);
@@ -107,6 +154,9 @@ function useClippingPlanesWidget({
         widgetEntries.push(createWidgetEntry(planeWidget, widgetHandle, idx));
       }
       const entry = widgetEntries[idx];
+      if (!entry) {
+        continue;
+      }
       entry.widgetHandle.setRepresentationStyle(getPlaneStyle(rgb));
       fromWidget = true;
       entry.widgetHandle.placeWidget(cubicBounds);
@@ -121,7 +171,7 @@ function useClippingPlanesWidget({
     }
     localRenderWindow.getRenderWindow().render();
   }
-  function limitCameraZoomOut(camera) {
+  function limitCameraZoomOut(camera: vtkCamera): void {
     if (maxDistance <= 0 || isLimitingCameraZoom) {
       return;
     }
@@ -138,43 +188,49 @@ function useClippingPlanesWidget({
       focal[1] + (pos[1] - focal[1]) * ratio,
       focal[2] + (pos[2] - focal[2]) * ratio,
     );
-    localRenderWindow.getRenderWindow().render();
+    localRenderWindow?.getRenderWindow().render();
     isLimitingCameraZoom = false;
   }
-  function syncLocalCamera() {
+  function syncLocalCamera(): void {
     if (!localRenderWindow) {
       return;
     }
     const renderer = localRenderWindow.getRenderer();
     const camera = renderer.getActiveCamera();
-    const mainCam = hybridViewerStore.camera_options;
+    const mainCam = hybridViewerStore.camera_options as {
+      focal_point?: number[];
+      position?: number[];
+      view_up?: number[];
+    };
     const { center, cubicBounds } = getSceneBoundsInfo();
-    renderer.resetCamera(cubicBounds);
+    renderer.resetCamera(cubicBounds as [number, number, number, number, number, number]);
     if (mainCam && mainCam.focal_point && mainCam.position) {
+      const { focal_point, position } = mainCam;
       const dir = [
-        mainCam.position[0] - mainCam.focal_point[0],
-        mainCam.position[1] - mainCam.focal_point[1],
-        mainCam.position[2] - mainCam.focal_point[2],
+        (position[0] ?? 0) - (focal_point[0] ?? 0),
+        (position[1] ?? 0) - (focal_point[1] ?? 0),
+        (position[2] ?? 0) - (focal_point[2] ?? 0),
       ];
       const dirLen = Math.hypot(...dir);
       if (dirLen > 0) {
         const distance = camera.getDistance();
         const normDir = dir.map((component) => component / dirLen);
-        camera.setFocalPoint(...center);
+        camera.setFocalPoint(center[0] ?? 0, center[1] ?? 0, center[2] ?? 0);
         camera.setPosition(
-          center[0] + normDir[0] * distance,
-          center[1] + normDir[1] * distance,
-          center[2] + normDir[2] * distance,
+          (center[0] ?? 0) + (normDir[0] ?? 0) * distance,
+          (center[1] ?? 0) + (normDir[1] ?? 0) * distance,
+          (center[2] ?? 0) + (normDir[2] ?? 0) * distance,
         );
         if (mainCam.view_up) {
-          camera.setViewUp(...mainCam.view_up);
+          const [viewUpX = 0, viewUpY = 0, viewUpZ = 0] = mainCam.view_up;
+          camera.setViewUp(viewUpX, viewUpY, viewUpZ);
         }
       }
     }
     limitCameraZoomOut(camera);
     localRenderWindow.getRenderWindow().render();
   }
-  function cleanupLocalWidget() {
+  function cleanupLocalWidget(): void {
     maxDistance = 0;
     isLimitingCameraZoom = false;
     for (const entry of widgetEntries) {
@@ -191,7 +247,7 @@ function useClippingPlanesWidget({
       widgetManager = undefined;
     }
   }
-  function updateWidgetPlacement({ isReset = false } = {}) {
+  function updateWidgetPlacement({ isReset = false } = {}): void {
     if (!widgetManager || !localRenderWindow) {
       return;
     }
@@ -211,7 +267,7 @@ function useClippingPlanesWidget({
     }
   }
 
-  function initLocalWidget(container) {
+  function initLocalWidget(container: HTMLElement): void {
     cleanupLocalWidget();
     container.addEventListener("wheel", (event) => event.stopPropagation(), { passive: true });
     localRenderWindow = vtkGenericRenderWindow({
@@ -221,7 +277,11 @@ function useClippingPlanesWidget({
     localRenderWindow.setContainer(container);
     const camera = localRenderWindow.getRenderer().getActiveCamera();
     camera.onModified(() => limitCameraZoomOut(camera));
-    const canvas = localRenderWindow.getApiSpecificRenderWindow().getCanvas();
+    const canvas = (
+      localRenderWindow.getApiSpecificRenderWindow() as unknown as {
+        getCanvas: () => HTMLCanvasElement;
+      }
+    ).getCanvas();
     Object.assign(canvas.style, { width: "100%", height: "100%", background: "transparent" });
     localRenderWindow.resize();
     widgetManager = vtkWidgetManager();
@@ -229,10 +289,10 @@ function useClippingPlanesWidget({
     updateWidgetPlacement();
   }
 
-  function isFromWidget() {
+  function isFromWidget(): boolean {
     return fromWidget;
   }
-  function setFromWidget(value) {
+  function setFromWidget(value: boolean): void {
     fromWidget = value;
   }
   return {

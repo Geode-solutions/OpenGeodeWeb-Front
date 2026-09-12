@@ -5,13 +5,49 @@ import { getAttributeRange } from "@ogw_front/utils/attributes";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import type { Ref } from "vue";
 
-export function useGlobalAttributeStyle(dataIdRef) {
+interface ComponentNameEntry {
+  getterKey: string;
+  setterKey: string;
+  key: string;
+}
+
+interface ActiveComponent extends ComponentNameEntry {
+  activeColoring: string;
+  attributeType: string;
+}
+
+// This composable resolves a batch of dynamically-named getter/setter methods
+// on the data style store (e.g. "meshPointsVertexAttributeRange",
+// "setMeshPointsVertexAttributeRange", ...) - the store's real, fully-typed
+// surface has no index signature for this, so dynamic lookups are cast through
+// this loosely-typed view of it, matching how these methods are actually
+// shaped (getters take an id and return a value, setters take an id plus
+// arbitrary arguments).
+type DynamicStore = Record<string, ((...args: unknown[]) => unknown) | undefined>;
+
+interface AttributeStyleComponent {
+  coloring?: { active?: string };
+}
+
+interface AttributeResponse {
+  attributes?: {
+    attribute_name?: string;
+    min_values?: number[];
+    max_values?: number[];
+    min_value?: number;
+    max_value?: number;
+  }[];
+}
+
+export function useGlobalAttributeStyle(dataIdRef: Ref<string | undefined>) {
   const dataStyleStore = useDataStyleStore();
+  const dynamicDataStyleStore = dataStyleStore as unknown as DynamicStore;
   const hybridViewerStore = useHybridViewerStore();
   const backStore = useBackStore();
 
-  const componentNames = [
+  const componentNames: ComponentNameEntry[] = [
     { getterKey: "meshPoints", setterKey: "MeshPoints", key: "points" },
     { getterKey: "meshEdges", setterKey: "MeshEdges", key: "edges" },
     { getterKey: "meshPolygons", setterKey: "MeshPolygons", key: "polygons" },
@@ -19,24 +55,31 @@ export function useGlobalAttributeStyle(dataIdRef) {
     { getterKey: "meshPolyhedra", setterKey: "MeshPolyhedra", key: "polyhedra" },
   ];
 
-  function getActiveComponents(targetId) {
-    const style = dataStyleStore.getStyle(targetId);
-    const activeComponents = [];
+  function getActiveComponents(targetId: string): ActiveComponent[] {
+    const style = dataStyleStore.getStyle(targetId) as unknown as Record<
+      string,
+      AttributeStyleComponent | undefined
+    >;
+    const activeComponents: ActiveComponent[] = [];
     if (!style) {
       return activeComponents;
     }
     for (const { key, getterKey, setterKey } of componentNames) {
-      if (!style[key] || !style[key].coloring) {
+      const componentStyle = style[key];
+      if (!componentStyle || !componentStyle.coloring) {
         continue;
       }
 
-      const activeColoring = style[key].coloring.active;
-      if (!["vertex", "edge", "polygon", "cell", "polyhedron"].includes(activeColoring)) {
+      const activeColoring = componentStyle.coloring.active;
+      if (
+        !activeColoring ||
+        !["vertex", "edge", "polygon", "cell", "polyhedron"].includes(activeColoring)
+      ) {
         continue;
       }
 
       const attributeType = `${activeColoring.charAt(0).toUpperCase()}${activeColoring.slice(1)}Attribute`;
-      activeComponents.push({ activeColoring, attributeType, getterKey, setterKey });
+      activeComponents.push({ activeColoring, attributeType, getterKey, setterKey, key });
     }
     return activeComponents;
   }
@@ -49,11 +92,11 @@ export function useGlobalAttributeStyle(dataIdRef) {
 
     for (const comp of getActiveComponents(targetId)) {
       const getterName = `${comp.getterKey}${comp.attributeType}ColorMap`;
-      const getter = dataStyleStore[getterName];
+      const getter = dynamicDataStyleStore[getterName];
       if (getter) {
         const colorMap = getter(targetId);
         if (colorMap) {
-          return colorMap;
+          return colorMap as string;
         }
       }
     }
@@ -61,7 +104,7 @@ export function useGlobalAttributeStyle(dataIdRef) {
     return "batlow";
   });
 
-  const currentRange = computed({
+  const currentRange = computed<[number, number]>({
     get() {
       const targetId = dataIdRef.value;
       if (!targetId) {
@@ -70,11 +113,11 @@ export function useGlobalAttributeStyle(dataIdRef) {
 
       for (const comp of getActiveComponents(targetId)) {
         const getterName = `${comp.getterKey}${comp.attributeType}Range`;
-        const getter = dataStyleStore[getterName];
+        const getter = dynamicDataStyleStore[getterName];
         if (getter) {
-          const range = getter(targetId);
+          const range = getter(targetId) as number[] | undefined;
           if (range && range.length === 2) {
-            return range;
+            return [range[0] ?? 0, range[1] ?? 1];
           }
         }
       }
@@ -89,7 +132,7 @@ export function useGlobalAttributeStyle(dataIdRef) {
       let updated = false;
       for (const comp of getActiveComponents(targetId)) {
         const setterName = `set${comp.setterKey}${comp.attributeType}Range`;
-        const setter = dataStyleStore[setterName];
+        const setter = dynamicDataStyleStore[setterName];
         if (setter) {
           setter(targetId, newValue[0], newValue[1]);
           updated = true;
@@ -101,20 +144,20 @@ export function useGlobalAttributeStyle(dataIdRef) {
     },
   });
 
-  async function applyGlobalColormap(newMap) {
+  async function applyGlobalColormap(newMap: string): Promise<void> {
     const targetId = dataIdRef.value;
     if (!targetId) {
       return;
     }
 
-    const promises = [];
+    const promises: Promise<unknown>[] = [];
 
     for (const comp of getActiveComponents(targetId)) {
       const setterName = `set${comp.setterKey}${comp.attributeType}ColorMap`;
-      const setter = dataStyleStore[setterName];
+      const setter = dynamicDataStyleStore[setterName];
 
       if (setter) {
-        promises.push(setter(targetId, newMap));
+        promises.push(Promise.resolve(setter(targetId, newMap)));
       }
     }
 
@@ -122,7 +165,7 @@ export function useGlobalAttributeStyle(dataIdRef) {
     hybridViewerStore.remoteRender();
   }
 
-  function resetGlobalRange() {
+  function resetGlobalRange(): void {
     const targetId = dataIdRef.value;
     if (!targetId) {
       return;
@@ -131,36 +174,37 @@ export function useGlobalAttributeStyle(dataIdRef) {
     for (const comp of getActiveComponents(targetId)) {
       const { activeColoring, attributeType, getterKey, setterKey } = comp;
 
-      const nameGetter = dataStyleStore[`${getterKey}${attributeType}Name`];
-      const itemGetter = dataStyleStore[`${getterKey}${attributeType}Item`];
+      const nameGetter = dynamicDataStyleStore[`${getterKey}${attributeType}Name`];
+      const itemGetter = dynamicDataStyleStore[`${getterKey}${attributeType}Item`];
       if (!nameGetter || !itemGetter) {
         continue;
       }
 
-      const attrName = nameGetter(targetId);
-      const attrItem = itemGetter(targetId) ?? 0;
+      const attrName = nameGetter(targetId) as string | undefined;
+      const attrItem = (itemGetter(targetId) as number | undefined) ?? 0;
 
       if (!attrName) {
         continue;
       }
 
       const schemaName = `${activeColoring}_attribute_names`;
-      const schema = back_schemas.opengeodeweb_back[schemaName];
+      const backSchemas = back_schemas.opengeodeweb_back as Record<string, unknown>;
+      const schema = backSchemas[schemaName];
       if (!schema) {
         continue;
       }
 
       backStore.request(
-        { schema, params: { id: targetId } },
+        { schema: schema as Parameters<typeof backStore.request>[0]["schema"], params: { id: targetId } },
         {
-          response_function: (response) => {
-            const attributes = response.attributes || [];
+          response_function: (response: unknown) => {
+            const attributes = (response as AttributeResponse).attributes || [];
             const currentAttribute = attributes.find((attr) => attr.attribute_name === attrName);
             if (currentAttribute) {
               const { min, max } = getAttributeRange(currentAttribute, attrItem);
 
               const setterName = `set${setterKey}${attributeType}Range`;
-              const setter = dataStyleStore[setterName];
+              const setter = dynamicDataStyleStore[setterName];
               if (setter) {
                 setter(targetId, min, max);
                 hybridViewerStore.remoteRender();

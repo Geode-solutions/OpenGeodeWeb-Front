@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Grid2D_Cells from "@ogw_front/assets/viewer_svgs/grid_2d_cells.svg";
-import ViewerGenericMeshCellsOptions from "@ogw_front/components/Viewer/Generic/Mesh/CellsOptions";
+import ViewerGenericMeshCellsOptions from "@ogw_front/components/Viewer/Generic/Mesh/CellsOptions.vue";
 
 const { itemProps } = defineProps({
   itemProps: { type: Object, required: true },

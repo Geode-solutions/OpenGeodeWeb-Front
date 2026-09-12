@@ -1,19 +1,37 @@
-export function useTreeScroll(propsIn, emit, displayItems, actualItemProps) {
+import type { MaybeRefOrGetter, Ref } from "vue";
+import type { DisplayItem, EmitFn, ItemPropsConfig } from "./virtual_tree";
+
+interface TreeScrollProps {
+  scrollTop?: number;
+}
+
+interface ScrollableElement {
+  $el: { scrollTop: number; clientHeight: number };
+}
+
+export function useTreeScroll(
+  propsIn: MaybeRefOrGetter<TreeScrollProps>,
+  emit: EmitFn,
+  displayItems: Ref<DisplayItem[]>,
+  actualItemProps: Ref<ItemPropsConfig>,
+) {
   const SCROLL_STICKY_THRESHOLD = 10;
   const DEFAULT_ITEM_HEIGHT = 28;
 
   const props = toRef(propsIn);
   const internalScrollTop = ref(props.value.scrollTop || 0);
-  const virtualScrollRef = ref(undefined);
+  const virtualScrollRef = ref<ScrollableElement | undefined>(undefined);
 
-  function handleScroll(event) {
-    internalScrollTop.value = event.target.scrollTop;
-    emit("update:scrollTop", event.target.scrollTop);
+  function handleScroll(event: Event): void {
+    const scrollTop = (event.target as HTMLElement).scrollTop;
+    internalScrollTop.value = scrollTop;
+    emit("update:scrollTop", scrollTop);
   }
 
   watch(
     () => props.value.scrollTop,
-    (newVal) => {
+    (newValIn) => {
+      const newVal = newValIn ?? 0;
       if (Math.abs(newVal - internalScrollTop.value) > 1) {
         internalScrollTop.value = newVal;
         if (virtualScrollRef.value && virtualScrollRef.value.$el) {
@@ -56,7 +74,7 @@ export function useTreeScroll(propsIn, emit, displayItems, actualItemProps) {
     return undefined;
   });
 
-  function scrollToIndex(index) {
+  function scrollToIndex(index: number): void {
     if (index === -1 || !virtualScrollRef.value) {
       return;
     }

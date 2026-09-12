@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ToolPanel from "@ogw_front/components/ToolPanel";
+import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 const { escapeFunction } = defineProps({

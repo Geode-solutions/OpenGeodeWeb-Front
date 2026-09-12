@@ -2,8 +2,8 @@
 import type { PropType } from "vue";
 import { useBackStore } from "@ogw_front/stores/back";
 
-import CsvPreviewer from "@ogw_front/components/csv-preview/CsvPreviewer";
-import DragAndDrop from "@ogw_front/components/DragAndDrop";
+import CsvPreviewer from "@ogw_front/components/csv-preview/CsvPreviewer.vue";
+import DragAndDrop from "@ogw_front/components/DragAndDrop.vue";
 
 // Files carry extra app-specific bookkeeping fields once picked up here.
 type UploadFile = File & { isConfigured?: boolean; displayName?: string };
@@ -12,7 +12,7 @@ const emit = defineEmits(["files_uploaded", "decrement_step", "reset_values"]);
 
 const { multiple, accept, files, autoUpload, showOverlay, mini } = defineProps({
   multiple: { type: Boolean, default: false },
-  accept: { type: [String, Array], default: "" },
+  accept: { type: [String, Array] as PropType<string | string[]>, default: "" },
   files: { type: Array as PropType<UploadFile[]>, default: () => [] },
   autoUpload: { type: Boolean, default: true },
   showOverlay: { type: Boolean, default: false },

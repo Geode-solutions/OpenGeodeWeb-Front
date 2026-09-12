@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import GlassCard from "@ogw_front/components/GlassCard";
+import GlassCard from "@ogw_front/components/GlassCard.vue";
 
 const { isDragging, loading, texts, accept, showExtensions } = defineProps({
   isDragging: { type: Boolean, required: true },

@@ -1,5 +1,8 @@
-export function useStepperTree(steps, initial_state = {}) {
-  const initial_state_unref = {};
+export function useStepperTree(
+  steps: unknown[],
+  initial_state: Record<string, unknown> = {},
+) {
+  const initial_state_unref: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(initial_state)) {
     const unref_val = unref(value);
     if (Array.isArray(unref_val)) {
@@ -8,7 +11,7 @@ export function useStepperTree(steps, initial_state = {}) {
       initial_state_unref[key] = unref_val;
     }
   }
-  const state = reactive({
+  const state = reactive<Record<string, unknown>>({
     current_step_index: 0,
     navigating_back: false,
     steps,
@@ -16,7 +19,7 @@ export function useStepperTree(steps, initial_state = {}) {
   });
 
   watch(
-    () => state.current_step_index,
+    () => state.current_step_index as number,
     (newVal, oldVal) => {
       if (newVal < oldVal) {
         state.navigating_back = true;
@@ -24,21 +27,21 @@ export function useStepperTree(steps, initial_state = {}) {
     },
   );
 
-  function update_values(keys_values_object) {
+  function update_values(keys_values_object: Record<string, unknown>): void {
     for (const [key, value] of Object.entries(keys_values_object)) {
       state[key] = value;
     }
   }
 
-  function increment_step() {
-    state.current_step_index += 1;
+  function increment_step(): void {
+    (state.current_step_index as number) += 1;
   }
 
-  function decrement_step() {
-    state.current_step_index -= 1;
+  function decrement_step(): void {
+    (state.current_step_index as number) -= 1;
   }
 
-  function reset_values() {
+  function reset_values(): void {
     state.current_step_index = 0;
     state.navigating_back = false;
     for (const [key, initial_val] of Object.entries(initial_state_unref)) {

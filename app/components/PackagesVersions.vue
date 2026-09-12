@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import type { PropType } from "vue";
 import { Status } from "@ogw_front/utils/status";
 import { useBackStore } from "@ogw_front/stores/back";
+import type { JsonRpcSchema } from "#shared/utils/types.js";
 
 const { schema } = defineProps({
-  schema: { type: Object, required: true },
+  schema: { type: Object as PropType<JsonRpcSchema>, required: true },
 });
 
 type PackageVersion = { package: string; version: string };
@@ -15,8 +17,8 @@ async function get_packages_versions() {
   await backStore.request(
     { schema },
     {
-      response_function: (response: { versions: PackageVersion[] }) => {
-        packages_versions.value = response.versions;
+      response_function: (response: unknown) => {
+        packages_versions.value = (response as { versions: PackageVersion[] }).versions;
       },
     },
   );

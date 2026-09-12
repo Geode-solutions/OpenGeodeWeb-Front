@@ -1,6 +1,6 @@
 import { useInfraStore } from "@ogw_front/stores/infra";
 
-export function runFunctionWhenMicroservicesConnected(functionToRun) {
+export function runFunctionWhenMicroservicesConnected(functionToRun: () => void): void {
   const infraStore = useInfraStore();
   const { microservices_connected } = storeToRefs(infraStore);
   console.log("inside microservices_connected", microservices_connected.value);

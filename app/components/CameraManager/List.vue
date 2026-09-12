@@ -7,10 +7,10 @@ const hybridViewerStore = useHybridViewerStore();
 
 const savedPositions = cameraManagerStore.refAllCameraPositions();
 
-const editingId = ref<string | undefined>(undefined);
+const editingId = ref<number | undefined>(undefined);
 const editingName = ref("");
 
-async function restorePosition(positionId: string) {
+async function restorePosition(positionId: number) {
   const position = await cameraManagerStore.getCameraPosition(positionId);
   if (position) {
     if (hybridViewerStore.genericRenderWindow) {
@@ -21,17 +21,17 @@ async function restorePosition(positionId: string) {
   }
 }
 
-async function deletePosition(positionId: string) {
+async function deletePosition(positionId: number) {
   await cameraManagerStore.deleteCameraPosition(positionId);
 }
 
-function startEditing(position: { id?: string; name?: string }) {
+function startEditing(position: { id?: number; name?: string }) {
   editingId.value = position.id;
   editingName.value = position.name ?? "";
 }
 
 async function saveRename() {
-  if (editingName.value) {
+  if (editingName.value && editingId.value !== undefined) {
     await cameraManagerStore.renameCameraPosition(editingId.value, editingName.value);
   }
   editingId.value = undefined;
@@ -55,7 +55,7 @@ async function saveRename() {
           size="x-small"
           class="mr-1"
           :data-testid="`restoreCameraPosition${position.name}Button`"
-          @click="restorePosition(position.id)"
+          @click="restorePosition(position.id!)"
         >
           <v-icon size="14">mdi-play</v-icon>
           <v-tooltip activator="parent" location="top">Restore</v-tooltip>
@@ -94,7 +94,7 @@ async function saveRename() {
             variant="text"
             size="x-small"
             color="error"
-            @click="deletePosition(position.id)"
+            @click="deletePosition(position.id!)"
           >
             <v-icon size="14">mdi-delete</v-icon>
             <v-tooltip activator="parent" location="top">Delete</v-tooltip>

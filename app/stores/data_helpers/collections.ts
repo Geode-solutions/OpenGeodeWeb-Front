@@ -132,3 +132,5 @@ export function useDataCollections() {
     refFormatedCollectionComponents,
   };
 }
+
+export type { CollectionComponent, CollectionComponentGroup, ModelComponentRelationRecord };

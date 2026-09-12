@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import FileUploader from "@ogw_front/components/FileUploader";
+import FileUploader from "@ogw_front/components/FileUploader.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 import { useBackStore } from "@ogw_front/stores/back";
 

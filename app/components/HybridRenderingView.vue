@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ColormapQuickPicker from "@ogw_front/components/Viewer/Options/ColormapQuickPicker.vue";
-import HybridViewerTooltip from "@ogw_front/components/HybridViewerTooltip";
-import ViewToolbar from "@ogw_front/components/ViewToolbar";
+import HybridViewerTooltip from "@ogw_front/components/HybridViewerTooltip.vue";
+import ViewToolbar from "@ogw_front/components/ViewToolbar.vue";
 
 import { useDataStore } from "@ogw_front/stores/data";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -46,7 +46,10 @@ onMounted(async () => {
   if (import.meta.client) {
     await hybridViewerStore.initHybridViewer();
     await nextTick();
-    hybridViewerStore.setContainer(container);
+    // useTemplateRef's inferred type is broader than the { $el: HTMLElement } shape
+    // setContainer expects; this element is only ever a component instance with $el
+    // (see the `containerEl.$el` usages below).
+    hybridViewerStore.setContainer(container as never);
     debouncedResize();
   }
 });

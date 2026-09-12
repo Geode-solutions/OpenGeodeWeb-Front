@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ViewerSpecificPolygonsOptions from "@ogw_front/components/Viewer/Surface/PolygonsOptions";
+import ViewerSpecificPolygonsOptions from "@ogw_front/components/Viewer/Surface/PolygonsOptions.vue";
 
 const { itemProps } = defineProps({
   itemProps: { type: Object, required: true },

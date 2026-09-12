@@ -26,6 +26,13 @@ interface AdaptiveStylesOptions {
   maxOpacity?: number;
 }
 
+interface CoordinatesLike {
+  x?: unknown;
+  y?: unknown;
+  width?: unknown;
+  height?: unknown;
+}
+
 function getValue(val: unknown): number {
   if (typeof val === "object" && val !== null && "value" in val) {
     const wrapped = (val as { value?: unknown }).value;
@@ -58,14 +65,13 @@ export function useAdaptiveStyles(
 
   const unwrapped = computed(() => {
     if (isCoordinates) {
-      let val: { x?: unknown; y?: unknown; width?: unknown; height?: unknown } | undefined =
-        undefined;
+      let val: CoordinatesLike | undefined = undefined;
       if (typeof target === "function") {
-        val = (target as () => typeof val)();
+        val = (target as () => CoordinatesLike | undefined)();
       } else if (targetAsRefLike?.value === undefined) {
         val = targetAsRefLike;
       } else {
-        val = targetAsRefLike.value as typeof val;
+        val = targetAsRefLike.value as CoordinatesLike | undefined;
       }
       return {
         x: getValue(val?.x),

@@ -20,16 +20,16 @@ const treeviewBox = useTemplateRef("treeview-box");
 const { adaptiveStyles } = useAdaptiveStyles(treeviewBox);
 
 let isApplyingScroll = false;
-let resizeObserver = undefined;
+let resizeObserver: ResizeObserver | undefined = undefined;
 
-function handleScroll(event) {
+function handleScroll(event: Event) {
   if (isApplyingScroll) {
     return;
   }
-  emit("update:scrollTop", event.target.scrollTop);
+  emit("update:scrollTop", (event.target as HTMLElement).scrollTop);
 }
 
-function applyScrollTop(val) {
+function applyScrollTop(val: number) {
   if (scrollContainer.value) {
     isApplyingScroll = true;
     scrollContainer.value.scrollTop = val;

@@ -40,7 +40,7 @@ const emailRules = [
 
 function submit() {
   const infraStore = useInfraStore();
-  return infraStore.create_backend(name.value, email.value, launch.value);
+  return infraStore.create_backend(email.value);
 }
 </script>
 
@@ -61,7 +61,7 @@ function submit() {
           </VRow>
           <VRow>
             <VCol>
-              <VCheckbox label="Load the app" v-model="load" />
+              <VCheckbox label="Load the app" v-model="launch" />
             </VCol>
           </VRow>
         </VContainer>

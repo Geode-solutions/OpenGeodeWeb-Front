@@ -2,15 +2,19 @@ import { compareSelections } from "@ogw_front/utils/treeview";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import type {
+  CollectionComponent,
+  CollectionComponentGroup,
+} from "@ogw_front/stores/data_helpers/collections";
 
-export function useModelCollections(viewId) {
+export function useModelCollections(viewId: string) {
   const dataStore = useDataStore();
   const dataStyleStore = useDataStyleStore();
   const hybridViewerStore = useHybridViewerStore();
 
   const items = dataStore.refFormatedCollectionComponents(viewId);
-  const collectionsCache = ref(undefined);
-  const localCategories = ref([]);
+  const collectionsCache = ref<Record<string, CollectionComponent[]> | undefined>(undefined);
+  const localCategories = ref<CollectionComponentGroup[]>([]);
 
   onMounted(async () => {
     const data = await dataStore.fetchAllCollectionComponents(viewId);
@@ -45,7 +49,7 @@ export function useModelCollections(viewId) {
 
   const selection = dataStyleStore.visibleMeshComponents(viewId);
 
-  async function updateVisibility(current) {
+  async function updateVisibility(current: string[]) {
     const previous = selection.value;
     const { added, removed } = compareSelections(current, previous);
 

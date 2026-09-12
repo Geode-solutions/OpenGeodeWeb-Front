@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import TetrahedralSolidTriangles from "@ogw_front/assets/viewer_svgs/solid_facets.svg";
-import ViewerGenericMeshPolygonsOptions from "@ogw_front/components/Viewer/Generic/Mesh/PolygonsOptions";
+import ViewerGenericMeshPolygonsOptions from "@ogw_front/components/Viewer/Generic/Mesh/PolygonsOptions.vue";
 
 const { itemProps } = defineProps({
   itemProps: { type: Object, required: true },

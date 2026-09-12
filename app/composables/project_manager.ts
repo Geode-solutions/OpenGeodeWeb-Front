@@ -34,7 +34,7 @@ async function exportProject() {
   return { result };
 }
 
-async function importProject(file) {
+async function importProject(file: File): Promise<void> {
   const backStore = useBackStore();
   const dataStyleStore = useDataStyleStore();
   const viewerStore = useViewerStore();

@@ -15,7 +15,7 @@ const emit = defineEmits(["toggle-open", "toggle-select", "hover-eye-enter", "ho
 
 const INDENT_STEP = 10;
 
-function triggerHorizonStackModal(rawItem) {
+function triggerHorizonStackModal(rawItem: unknown) {
   globalThis.dispatchEvent(new CustomEvent("open-horizon-stack-modal", { detail: rawItem }));
 }
 const isHorizonStack = computed(() => item.raw.geode_object_type === "HorizonStack3D");
@@ -24,7 +24,7 @@ const showEyeButton = computed(
   () => !isHorizonStack.value && item.raw.title !== "HorizonStack3D" && isViewable.value,
 );
 
-function handleRowClick(event) {
+function handleRowClick(event: MouseEvent) {
   if (isHorizonStack.value) {
     if (!item.isLeaf) {
       return;

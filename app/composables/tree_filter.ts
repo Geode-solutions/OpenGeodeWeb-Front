@@ -1,4 +1,25 @@
-function customFilter(value, searchQuery, item) {
+import type { MaybeRefOrGetter } from "vue";
+
+// This composable filters/sorts different flavors of "category with children"
+// trees (treeview groups, model component/collection groups, ...); this shape
+// captures just the fields it reads/writes, generically, across all of them.
+export interface FilterableItem {
+  id: unknown;
+  title?: string;
+  children?: FilterableItem[];
+}
+
+interface FilterContext {
+  raw?: FilterableItem;
+}
+
+interface TreeFilterOptions {
+  recursiveSort?: boolean;
+  defaultSort?: string;
+  defaultFilters?: Record<string, boolean>;
+}
+
+function customFilter(value: unknown, searchQuery: string | undefined, item: FilterContext): boolean {
   if (!searchQuery) {
     return true;
   }
@@ -10,12 +31,16 @@ function customFilter(value, searchQuery, item) {
   return [title, id].some((field) => String(field).toLowerCase().includes(query));
 }
 
-function sortAndFormatItems(itemList, sortType, options = {}) {
+function sortAndFormatItems(
+  itemList: FilterableItem[] | undefined | null,
+  sortType: string,
+  options: TreeFilterOptions = {},
+): FilterableItem[] {
   if (!itemList || !Array.isArray(itemList)) {
     return [];
   }
-  const field = sortType === "name" ? "title" : "id";
-  const localeOptions = { numeric: true, sensitivity: "base" };
+  const field: "title" | "id" = sortType === "name" ? "title" : "id";
+  const localeOptions: Intl.CollatorOptions = { numeric: true, sensitivity: "base" };
 
   const sorted = itemList
     .filter((item) => item !== null && item !== undefined)
@@ -39,17 +64,17 @@ function sortAndFormatItems(itemList, sortType, options = {}) {
   return sorted;
 }
 
-function useTreeFilter(itemsIn, options = {}) {
+function useTreeFilter(itemsIn: MaybeRefOrGetter<FilterableItem[]>, options: TreeFilterOptions = {}) {
   const rawItems = typeof itemsIn === "function" ? computed(itemsIn) : toRef(itemsIn);
   const search = ref("");
   const sortType = ref(options.defaultSort || "name");
-  const filterOptions = ref(options.defaultFilters || {});
+  const filterOptions = ref<Record<string, boolean>>(options.defaultFilters || {});
 
   const availableFilterOptions = computed(() => {
     if (!rawItems.value) {
       return [];
     }
-    return rawItems.value.map((category) => category.title || category.id);
+    return rawItems.value.map((category) => String(category.title || category.id));
   });
 
   watch(
@@ -69,7 +94,7 @@ function useTreeFilter(itemsIn, options = {}) {
       return [];
     }
     const filteredByCategory = rawItems.value.filter((category) => {
-      const key = category.title || category.id;
+      const key = String(category.title || category.id);
       return filterOptions.value[key] !== false;
     });
 
@@ -79,7 +104,7 @@ function useTreeFilter(itemsIn, options = {}) {
       return sorted;
     }
 
-    const result = [];
+    const result: FilterableItem[] = [];
     for (const category of sorted) {
       const children = (category.children || []).filter((child) =>
         customFilter(child.id, search.value, { raw: child }),
@@ -91,13 +116,13 @@ function useTreeFilter(itemsIn, options = {}) {
     return result;
   });
 
-  function toggleSort() {
+  function toggleSort(): void {
     sortType.value = sortType.value === "name" ? "id" : "name";
   }
 
   const allItems = computed(() => {
-    const map = new Map();
-    function traverse(items) {
+    const map = new Map<unknown, FilterableItem>();
+    function traverse(items: FilterableItem[]): void {
       for (const item of items) {
         map.set(item.id, item);
         if (item.children) {
@@ -109,14 +134,14 @@ function useTreeFilter(itemsIn, options = {}) {
     return map;
   });
 
-  function applySearchFilter(newSelection, previousSelection = []) {
+  function applySearchFilter(newSelection: unknown[], previousSelection: unknown[] = []): unknown[] {
     if (!search.value) {
       return newSelection;
     }
     const allItemsMap = allItems.value;
-    function matches(id) {
+    function matches(id: unknown): boolean {
       const item = allItemsMap.get(id);
-      return item && customFilter(id, search.value, { raw: item });
+      return Boolean(item && customFilter(id, search.value, { raw: item }));
     }
     const hidden = previousSelection.filter((id) => !matches(id));
     const visible = newSelection.filter((id) => matches(id));

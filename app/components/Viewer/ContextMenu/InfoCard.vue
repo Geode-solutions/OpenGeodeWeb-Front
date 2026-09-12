@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import GlassCard from "@ogw_front/components/GlassCard";
+import GlassCard from "@ogw_front/components/GlassCard.vue";
 import { middleTruncate } from "@ogw_front/utils/string";
 import { useClipboard } from "@vueuse/core";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -39,6 +39,10 @@ interface MeshComponentInfo {
 const componentName = ref("");
 const componentItem = ref<MeshComponentInfo | undefined>(undefined);
 
+function asString(value: unknown): string | undefined {
+  return typeof value === "string" ? value : undefined;
+}
+
 watch(
   () => menuStore.current_meta_data,
   async (newMeta) => {
@@ -48,7 +52,7 @@ watch(
       return;
     }
 
-    const modelId = newMeta.modelId || newMeta.id;
+    const modelId = asString(newMeta.modelId) ?? asString(newMeta.id);
     if (newMeta.pickedComponentId && modelId) {
       const components = await dataStore.getAllMeshComponents(modelId);
       const comp = components.find(
@@ -71,7 +75,7 @@ const cleanName = computed(() => {
   if (componentName.value && meta.viewer_type === "model_component") {
     return componentName.value;
   }
-  return meta.name || "Unnamed Object";
+  return asString(meta.name) ?? "Unnamed Object";
 });
 
 const displayTitle = computed(() => {

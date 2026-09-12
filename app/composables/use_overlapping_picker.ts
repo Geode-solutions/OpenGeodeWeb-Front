@@ -4,6 +4,38 @@ import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
+interface PickedItem {
+  id: string;
+  viewer_id: number;
+}
+
+interface ProposedItem {
+  id: string;
+  viewer_id: number;
+  name: string;
+  viewer_type: string | undefined;
+  geode_object_type: string | undefined;
+}
+
+interface PickedResponse {
+  array_ids: string[];
+  viewer_id: number;
+  picked_data?: PickedItem[];
+}
+
+interface ViewerIdResult {
+  id: string | undefined;
+  viewer_id: number | undefined;
+}
+
+interface GetViewerIdParams {
+  x: number;
+  y: number;
+  containerWidth: number;
+  containerHeight: number;
+  containerRect: { left: number; top: number };
+}
+
 export function useOverlappingPicker() {
   const dataStore = useDataStore();
   const dataStyleStore = useDataStyleStore();
@@ -11,12 +43,12 @@ export function useOverlappingPicker() {
   const dataItems = dataStore.refAllItems();
 
   const displayIntermediate = ref(false);
-  const intermediateItems = ref([]);
+  const intermediateItems = ref<ProposedItem[]>([]);
   const intermediateMenuX = ref(0);
   const intermediateMenuY = ref(0);
-  let resolveIntermediate = undefined;
+  let resolveIntermediate: ((item: ProposedItem | undefined) => void) | undefined = undefined;
 
-  function fetchProposedItems(pickedList) {
+  function fetchProposedItems(pickedList: PickedItem[]): Promise<ProposedItem[]> {
     return Promise.all(
       pickedList.map(async (pick) => {
         try {
@@ -49,21 +81,27 @@ export function useOverlappingPicker() {
     };
   }
 
-  function selectIntermediateItem(item) {
+  function selectIntermediateItem(item: ProposedItem | undefined): void {
     if (resolveIntermediate) {
       resolveIntermediate(item);
       resolveIntermediate = undefined;
     }
   }
 
-  function handleIntermediateMenuUpdate(val) {
+  function handleIntermediateMenuUpdate(val: boolean): void {
     if (!val && resolveIntermediate) {
       resolveIntermediate(undefined);
       resolveIntermediate = undefined;
     }
   }
 
-  async function get_viewer_id({ x, y, containerWidth, containerHeight, containerRect }) {
+  async function get_viewer_id({
+    x,
+    y,
+    containerWidth,
+    containerHeight,
+    containerRect,
+  }: GetViewerIdParams): Promise<ViewerIdResult> {
     const activeIds = new Set(dataItems.value.map((i) => i.id));
     const visibleStyleIds = Object.keys(dataStyleStore.styles).filter(
       (styleId) => activeIds.has(styleId) && dataStyleStore.objectVisibility(styleId),
@@ -78,10 +116,15 @@ export function useOverlappingPicker() {
         }
       }),
     );
-    const ids = viewableChecks.filter(Boolean);
+    const ids = viewableChecks.filter((id): id is string => Boolean(id));
 
-    const result = { id: undefined, viewer_id: undefined };
-    let pickedResponse = undefined;
+    const result: ViewerIdResult = { id: undefined, viewer_id: undefined };
+    // A plain `let` reassigned only from inside the response_function closure
+    // below loses its declared type for TS's control-flow narrowing once
+    // control leaves the closure - wrapping it in an object sidesteps that.
+    const responseHolder: { pickedResponse: PickedResponse | undefined } = {
+      pickedResponse: undefined,
+    };
     const schema = viewer_schemas.opengeodeweb_viewer.viewer.picked_ids;
     const params = { x, y, ids };
     await viewerStore.request(
@@ -90,11 +133,12 @@ export function useOverlappingPicker() {
         params,
       },
       {
-        response_function: (response) => {
-          pickedResponse = response;
+        response_function: (response: unknown) => {
+          responseHolder.pickedResponse = response as PickedResponse;
         },
       },
     );
+    const pickedResponse = responseHolder.pickedResponse;
 
     if (!pickedResponse || !pickedResponse.array_ids || pickedResponse.array_ids.length === 0) {
       return result;
@@ -102,7 +146,7 @@ export function useOverlappingPicker() {
 
     const { array_ids, viewer_id, picked_data } = pickedResponse;
 
-    const pickedList = [];
+    const pickedList: PickedItem[] = [];
     if (picked_data && picked_data.length > 0) {
       pickedList.push(...picked_data);
     } else {
@@ -144,7 +188,7 @@ export function useOverlappingPicker() {
     displayIntermediate.value = true;
 
     /* eslint-disable-next-line promise/avoid-new */
-    return new Promise((resolve) => {
+    return new Promise<ViewerIdResult>((resolve) => {
       resolveIntermediate = (chosenResult) => {
         displayIntermediate.value = false;
         resolve(

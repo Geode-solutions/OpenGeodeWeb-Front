@@ -4,14 +4,22 @@ import vtk_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.
 
 const HOVER_DELAY = 200;
 
+type HighlightType = "mesh" | "model";
+type BlockIdsProvider = number[] | (() => number[] | Promise<number[]>);
+
 export function useHoverhighlight() {
   const viewerStore = useViewerStore();
   const dataStore = useDataStore();
-  let timer = undefined;
-  let currentId = undefined;
-  let currentType = undefined;
+  let timer: ReturnType<typeof setTimeout> | undefined = undefined;
+  let currentId: string | undefined = undefined;
+  let currentType: HighlightType | undefined = undefined;
 
-  function onHoverEnter(id, block_ids_provider = [], type = "model", immediate = false) {
+  function onHoverEnter(
+    id: string,
+    block_ids_provider: BlockIdsProvider = [],
+    type: HighlightType = "model",
+    immediate = false,
+  ): void {
     if (timer) {
       clearTimeout(timer);
       timer = undefined;
@@ -26,7 +34,7 @@ export function useHoverhighlight() {
         return;
       }
 
-      let block_ids = [];
+      let block_ids: number[];
       if (typeof block_ids_provider === "function") {
         block_ids = await block_ids_provider();
       } else {
@@ -60,12 +68,12 @@ export function useHoverhighlight() {
     }
   }
 
-  function onHoverLeave(id) {
+  function onHoverLeave(id: string): void {
     if (timer) {
       clearTimeout(timer);
       timer = undefined;
     }
-    if (currentId === id) {
+    if (currentId === id && currentType) {
       const schema = vtk_schemas.opengeodeweb_viewer[currentType].highlight;
       const params = {
         id,

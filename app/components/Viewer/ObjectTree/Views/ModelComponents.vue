@@ -59,7 +59,7 @@ const {
 
 function onUpdateSelection(newSelection: string[]) {
   const finalSelection = applySearchFilter(newSelection, visibleComponents.value);
-  updateVisibility(finalSelection);
+  updateVisibility(finalSelection as string[]);
 }
 
 const visibleSelection = computed(() => applySearchFilter(visibleComponents.value, []));
@@ -69,7 +69,7 @@ const itemsForTreeView = computed<TreeViewItem[]>(() => {
     const query = search.value.toLowerCase();
     const result: TreeViewItem[] = [];
     for (const type of Object.keys(componentsCache.value)) {
-      const matches = componentsCache.value[type].filter(
+      const matches = (componentsCache.value[type] ?? []).filter(
         (component: { title: string; id: string }) =>
           component.title.toLowerCase().includes(query) ||
           component.id.toLowerCase().includes(query),
@@ -78,7 +78,7 @@ const itemsForTreeView = computed<TreeViewItem[]>(() => {
         result.push({
           id: type,
           title: `${type}s (${matches.length})`,
-          children: sortAndFormatItems(matches, sortType.value),
+          children: sortAndFormatItems(matches, sortType.value) as unknown as TreeViewItem[],
         });
       }
     }
@@ -87,9 +87,14 @@ const itemsForTreeView = computed<TreeViewItem[]>(() => {
 
   const result: TreeViewItem[] = [];
   for (const category of filteredCategories.value) {
+    const categoryId = category.id as string;
     result.push({
       ...category,
-      children: sortAndFormatItems(componentsCache.value?.[category.id], sortType.value),
+      id: categoryId,
+      children: sortAndFormatItems(
+        componentsCache.value?.[categoryId],
+        sortType.value,
+      ) as unknown as TreeViewItem[],
     });
   }
   return result;
@@ -129,8 +134,8 @@ function handleHoverEnter({
     id,
     () =>
       actualItem.category
-        ? [actualItem.viewer_id]
-        : (actualItem.children ?? []).map((child) => child.viewer_id),
+        ? [Number(actualItem.viewer_id)]
+        : (actualItem.children ?? []).map((child) => Number(child.viewer_id)),
     "model",
     immediate,
   );

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { DEBOUNCE_DELAY, DEFAULT_NORMALS } from "@ogw_front/utils/clipping_planes";
-import ClippingPlaneCard from "@ogw_front/components/ClippingPlaneCard";
-import ToolPanel from "@ogw_front/components/ToolPanel";
+import ClippingPlaneCard from "@ogw_front/components/ClippingPlaneCard.vue";
+import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import { useClippingPlanesWidget } from "@ogw_front/composables/clipping_planes_widget";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDebounceFn } from "@vueuse/core";

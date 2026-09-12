@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem";
-import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector";
-import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch";
-import ViewerOptionsWidthSlider from "@ogw_front/components/Viewer/Options/Sliders/Width";
+import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
+import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
+import ViewerOptionsWidthSlider from "@ogw_front/components/Viewer/Options/Sliders/Width.vue";
 
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -59,8 +59,9 @@ const color = computed({
 const vertex_attribute_name = computed({
   get: () => dataStyleStore.meshEdgesVertexAttributeName(id.value),
   set: async (newValue) => {
+    if (newValue === undefined) return;
     await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshEdgesVertexAttributeName(targetId, newValue),
+      Promise.resolve(dataStyleStore.setMeshEdgesVertexAttributeName(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -69,7 +70,7 @@ const vertex_attribute_item = computed({
   get: () => dataStyleStore.meshEdgesVertexAttributeItem(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshEdgesVertexAttributeItem(targetId, newValue),
+      Promise.resolve(dataStyleStore.setMeshEdgesVertexAttributeItem(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -77,8 +78,10 @@ const vertex_attribute_item = computed({
 const vertex_attribute_range = computed({
   get: () => dataStyleStore.meshEdgesVertexAttributeRange(id.value),
   set: async (newValue) => {
+    const [minimum, maximum] = newValue;
+    if (minimum === undefined || maximum === undefined) return;
     await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshEdgesVertexAttributeRange(targetId, newValue[0], newValue[1]),
+      Promise.resolve(dataStyleStore.setMeshEdgesVertexAttributeRange(targetId, minimum, maximum)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -87,7 +90,7 @@ const vertex_attribute_color_map = computed({
   get: () => dataStyleStore.meshEdgesVertexAttributeColorMap(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshEdgesVertexAttributeColorMap(targetId, newValue),
+      Promise.resolve(dataStyleStore.setMeshEdgesVertexAttributeColorMap(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -104,8 +107,9 @@ const vertex_attribute_no_data_color = computed({
 const edge_attribute_name = computed({
   get: () => dataStyleStore.meshEdgesEdgeAttributeName(id.value),
   set: async (newValue) => {
+    if (newValue === undefined) return;
     await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshEdgesEdgeAttributeName(targetId, newValue),
+      Promise.resolve(dataStyleStore.setMeshEdgesEdgeAttributeName(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -114,7 +118,7 @@ const edge_attribute_item = computed({
   get: () => dataStyleStore.meshEdgesEdgeAttributeItem(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshEdgesEdgeAttributeItem(targetId, newValue),
+      Promise.resolve(dataStyleStore.setMeshEdgesEdgeAttributeItem(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -122,8 +126,10 @@ const edge_attribute_item = computed({
 const edge_attribute_range = computed({
   get: () => dataStyleStore.meshEdgesEdgeAttributeRange(id.value),
   set: async (newValue) => {
+    const [minimum, maximum] = newValue;
+    if (minimum === undefined || maximum === undefined) return;
     await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshEdgesEdgeAttributeRange(targetId, newValue[0], newValue[1]),
+      Promise.resolve(dataStyleStore.setMeshEdgesEdgeAttributeRange(targetId, minimum, maximum)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -132,7 +138,7 @@ const edge_attribute_color_map = computed({
   get: () => dataStyleStore.meshEdgesEdgeAttributeColorMap(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshEdgesEdgeAttributeColorMap(targetId, newValue),
+      Promise.resolve(dataStyleStore.setMeshEdgesEdgeAttributeColorMap(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -151,6 +157,7 @@ const edge_attribute_no_data_color = computed({
 <template>
   <ViewerContextMenuItem
     data-testid="meshEdgesMenu"
+    :index="itemProps.index"
     :itemProps="itemProps"
     :tooltip="tooltip"
     :btnImage="btnImage"

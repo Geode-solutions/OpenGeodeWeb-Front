@@ -1,12 +1,13 @@
 <script setup lang="ts">
+import type { PropType } from "vue";
 import ActionButton from "@ogw_front/components/ActionButton.vue";
 import SearchBar from "@ogw_front/components/SearchBar.vue";
 
 const { search, sortType, filterOptions, availableFilterOptions, isCollapsed } = defineProps({
   search: { type: String, required: true },
   sortType: { type: String, required: true },
-  filterOptions: { type: Object, required: true },
-  availableFilterOptions: { type: Array, required: true },
+  filterOptions: { type: Object as PropType<Record<string, boolean>>, required: true },
+  availableFilterOptions: { type: Array as PropType<string[]>, required: true },
   isCollapsed: { type: Boolean, required: false, default: false },
 });
 

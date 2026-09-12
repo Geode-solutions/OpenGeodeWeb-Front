@@ -53,7 +53,7 @@ watch(
   (newLength) => {
     if (newLength > 0 && rowHeights.value.length !== newLength) {
       treeviewStore.setRowHeights(
-        Array.from<number>({ length: newLength }, () => PERCENT_100 / newLength),
+        Array.from({ length: newLength }, () => PERCENT_100 / newLength),
       );
     }
   },

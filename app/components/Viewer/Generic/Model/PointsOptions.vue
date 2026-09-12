@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import SurfacePoints from "@ogw_front/assets/viewer_svgs/surface_points.svg";
-import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem";
-import ViewerOptionsSizeSlider from "@ogw_front/components/Viewer/Options/Sliders/Size";
-import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch";
+import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import ViewerOptionsSizeSlider from "@ogw_front/components/Viewer/Options/Sliders/Size.vue";
+import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -41,6 +41,7 @@ const size = computed({
 <template>
   <ViewerContextMenuItem
     data-testid="modelPointsMenu"
+    :index="itemProps.index"
     :itemProps="itemProps"
     tooltip="Points options"
     :btnImage="SurfacePoints"

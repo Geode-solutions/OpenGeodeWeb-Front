@@ -8,15 +8,7 @@ import type { Observable } from "rxjs";
 // Local imports
 import { database } from "@ogw_internal/database/database.js";
 import { useViewerStore } from "@ogw_front/stores/viewer";
-
-interface CameraOptions {
-  focal_point: number[];
-  view_up: number[];
-  position: number[];
-  view_angle: number;
-  clipping_range: number[];
-  distance: number;
-}
+import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types.js";
 
 interface CameraPositionRecord {
   id?: number;

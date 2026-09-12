@@ -5,7 +5,7 @@ import { setAppBaseUrl } from "#shared/scripts";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useCloudStore } from "@ogw_front/stores/cloud";
 
-interface Microservice {
+export interface Microservice {
   $id: string;
   status?: string;
   is_busy?: boolean;
@@ -47,7 +47,7 @@ export const useInfraStore = defineStore("infra", {
       );
       console.log("[INFRA] Microservice unregistered:", microserviceId);
     },
-    create_backend(email: string) {
+    create_backend(email?: string) {
       console.log("[INFRA] Starting create_backend - Mode:", this.app_mode);
       console.log(
         "[INFRA] Registered microservices:",
@@ -64,7 +64,7 @@ export const useInfraStore = defineStore("infra", {
         console.log("[INFRA] Lock granted for create_backend");
         if (this.app_mode === appMode.CLOUD) {
           const cloudStore = useCloudStore();
-          await cloudStore.launch(email);
+          await cloudStore.launch(email ?? "");
         } else {
           const appStore = useAppStore();
           await appStore.createProjectFolder();

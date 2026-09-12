@@ -19,7 +19,7 @@ const ANGLE_315 = 315;
 
 const menuStore = useMenuStore();
 
-function getItemStyle(index) {
+function getItemStyle(index: number) {
   const angle = (index / menuItemCount) * 2 * Math.PI;
   return {
     transform: `translate(${Math.cos(angle) * RADIUS}px, ${Math.sin(angle) * RADIUS}px)`,
@@ -29,7 +29,7 @@ function getItemStyle(index) {
   };
 }
 
-function getTooltipLocation(index) {
+function getTooltipLocation(index: number) {
   const angle = (index / menuItemCount) * FULL_ANGLE;
   if (angle < ANGLE_45 || angle >= ANGLE_315) {
     return "right";
@@ -43,7 +43,7 @@ function getTooltipLocation(index) {
   return "bottom";
 }
 
-function getTooltipOrigin(index) {
+function getTooltipOrigin(index: number) {
   const angle = (index / menuItemCount) * FULL_ANGLE;
   if (angle < ANGLE_45 || angle >= ANGLE_315) {
     return "left";

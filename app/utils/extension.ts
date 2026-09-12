@@ -7,6 +7,7 @@ import { isCloudMode } from "@ogw_front/utils/stores";
 import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json" with { type: "json" };
 import { useAppStore } from "@ogw_front/stores/app";
 import { useInfraStore } from "@ogw_front/stores/infra";
+import type { Microservice } from "@ogw_front/stores/infra";
 
 interface ExtensionDescriptor {
   id: string;
@@ -75,7 +76,10 @@ async function registerRunningExtensions() {
       const store = storeFactory();
       appStore.registerStore(store);
       console.log("[ExtensionManager] Store registered:", store.$id);
-      infraStore.register_microservice(store);
+      // Extension-provided stores are expected to satisfy the fuller
+      // microservice contract (connect, etc.) even though the loader's own
+      // RegisterableStore type only models what app.ts itself needs.
+      infraStore.register_microservice(store as unknown as Microservice);
       return {
         name,
         version,

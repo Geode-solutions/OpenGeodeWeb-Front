@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ViewerOptionsTextureItem from "@ogw_front/components/Viewer/Options/TextureItem";
+import ViewerOptionsTextureItem from "@ogw_front/components/Viewer/Options/TextureItem.vue";
 
 const textures = defineModel({ type: Array });
 

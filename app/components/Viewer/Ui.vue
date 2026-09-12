@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import OverlappingObjectsPicker from "@ogw_front/components/Viewer/OverlappingObjectsPicker";
-import ViewerContextMenu from "@ogw_front/components/Viewer/ContextMenu/ContextMenu";
-import ViewerObjectTreeLayout from "@ogw_front/components/Viewer/ObjectTree/Layout";
+import OverlappingObjectsPicker from "@ogw_front/components/Viewer/OverlappingObjectsPicker.vue";
+import ViewerContextMenu from "@ogw_front/components/Viewer/ContextMenu/ContextMenu.vue";
+import ViewerObjectTreeLayout from "@ogw_front/components/Viewer/ObjectTree/Layout.vue";
 import { getCurrentInstance } from "vue";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useMenuStore } from "@ogw_front/stores/menu";

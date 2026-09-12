@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { PropType } from "vue";
 import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
@@ -9,7 +10,7 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 const { modelId, cornerId, targetCornerIds } = defineProps({
   modelId: { type: String, required: true },
   cornerId: { type: String, default: undefined },
-  targetCornerIds: { type: Array, required: true },
+  targetCornerIds: { type: Array as PropType<string[]>, required: true },
 });
 
 const dataStyleStore = useDataStyleStore();
@@ -25,8 +26,9 @@ const cornersVisibility = computed({
 });
 
 const cornerVisibility = computed({
-  get: () => dataStyleStore.modelCornerVisibility(modelId, cornerId),
+  get: () => dataStyleStore.modelCornerVisibility(modelId, cornerId) as boolean | undefined,
   set: async (newValue) => {
+    if (cornerId === undefined) return;
     await dataStyleStore.setModelCornersVisibility(modelId, [cornerId], newValue);
     hybridViewerStore.remoteRender();
   },

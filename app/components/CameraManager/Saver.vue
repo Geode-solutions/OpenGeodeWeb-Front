@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useCameraManagerStore } from "@ogw_front/stores/camera_manager";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types.js";
 
 const cameraManagerStore = useCameraManagerStore();
 const hybridViewerStore = useHybridViewerStore();
@@ -13,7 +14,10 @@ async function saveCurrentPosition() {
   }
   await cameraManagerStore.saveCameraPosition(
     newPositionName.value,
-    toRaw(hybridViewerStore.camera_options),
+    // hybridViewerStore.camera_options is a loosely-typed reactive object (it's
+    // populated dynamically from the viewer's camera state), but is always a
+    // CameraOptions shape at runtime once the viewer has synced a camera.
+    toRaw(hybridViewerStore.camera_options) as unknown as CameraOptions,
   );
   newPositionName.value = "";
 }

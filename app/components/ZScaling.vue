@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ToolPanel from "@ogw_front/components/ToolPanel";
+import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 
 const zScale = defineModel({ type: Number, default: 1 });
 const show = defineModel("show", { type: Boolean, default: false });

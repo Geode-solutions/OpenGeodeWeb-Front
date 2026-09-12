@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import ToolPanel from "@ogw_front/components/ToolPanel";
+import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import { applyCameraOptions } from "@ogw_internal/stores/hybrid_viewer/camera";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types.js";
 import { newInstance as vtkAnnotatedCubeActor } from "@kitware/vtk.js/Rendering/Core/AnnotatedCubeActor";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 
@@ -101,7 +102,7 @@ function initVTK() {
     edgeColor: "rgba(255, 255, 255, 0.4)",
     edgeThickness: 0.1,
     resolution: 400,
-    fontSizeScale: (resolution) => resolution / 4,
+    fontSizeScale: (resolution: number) => resolution / 4,
   });
 
   for (const orientation of orientations) {
@@ -125,7 +126,7 @@ function syncCubeCamera() {
     return;
   }
   const camera = genericRenderWindow.getRenderer().getActiveCamera();
-  applyCameraOptions(camera, options);
+  applyCameraOptions(camera, options as unknown as CameraOptions);
   genericRenderWindow.getRenderer().resetCamera();
   genericRenderWindow.getRenderWindow().render();
 }

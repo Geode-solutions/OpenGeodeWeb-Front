@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import type { PropType } from "vue";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 
-import FetchingData from "@ogw_front/components/FetchingData";
+import FetchingData from "@ogw_front/components/FetchingData.vue";
 import { useBackStore } from "@ogw_front/stores/back";
 
 const schema = schemas.opengeodeweb_back.geode_objects_and_output_extensions;
@@ -9,7 +10,7 @@ const emit = defineEmits(["update_values", "increment_step", "decrement_step"]);
 
 const { geodeObjectType, filenames } = defineProps({
   geodeObjectType: { type: String, required: true },
-  filenames: { type: Array, required: true },
+  filenames: { type: Array as PropType<string[]>, required: true },
 });
 type OutputExtensions = Record<string, { is_saveable: boolean }>;
 
@@ -22,11 +23,12 @@ async function get_output_file_extensions() {
   toggle_loading();
   geode_objects_and_output_extensions.value = {};
   const backStore = useBackStore();
-  const values: OutputExtensions[] = await Promise.all(
-    filenames.map(async (filename): Promise<OutputExtensions> => {
+  const values: Record<string, OutputExtensions>[] = await Promise.all(
+    filenames.map(async (filename): Promise<Record<string, OutputExtensions>> => {
       const params = { geode_object_type: geodeObjectType, filename };
       const response = await backStore.request({ schema, params });
-      return response.geode_objects_and_output_extensions;
+      return (response as { geode_objects_and_output_extensions: Record<string, OutputExtensions> })
+        .geode_objects_and_output_extensions;
     }),
   );
   const all_keys = [...new Set(values.flatMap((value) => Object.keys(value)))];
@@ -35,9 +37,13 @@ async function get_output_file_extensions() {
   for (const key of common_keys) {
     final_object[key] = {};
     for (const value of values) {
-      for (const extension of Object.keys(value[key])) {
+      const extensions = value[key];
+      if (!extensions) {
+        continue;
+      }
+      for (const extension of Object.keys(extensions)) {
         final_object[key][extension] = {
-          is_saveable: value[key][extension].is_saveable,
+          is_saveable: extensions[extension]!.is_saveable,
         };
       }
     }
@@ -69,7 +75,7 @@ await get_output_file_extensions();
       class="justify-left"
     >
       <v-card class="card ma-2 pa-2" width="100%">
-        <v-card-title v-tooltip:bottom="`Export as a ${output_geode_object}`" v-bind="props">
+        <v-card-title v-tooltip:bottom="`Export as a ${output_geode_object}`">
           {{ output_geode_object }}
         </v-card-title>
         <v-card-text>

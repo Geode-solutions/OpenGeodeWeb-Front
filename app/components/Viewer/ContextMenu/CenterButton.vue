@@ -46,14 +46,14 @@ let dragMoved = false;
 let dragStartClientX = 0;
 let dragStartClientY = 0;
 
-function onMouseDown(event) {
+function onMouseDown(event: MouseEvent) {
   dragMoved = false;
   dragStartClientX = event.clientX;
   dragStartClientY = event.clientY;
   emit("drag", event);
 }
 
-function onMouseUp(event) {
+function onMouseUp(event: MouseEvent) {
   const deltaX = event.clientX - dragStartClientX;
   const deltaY = event.clientY - dragStartClientY;
   if (Math.hypot(deltaX, deltaY) > dragThreshold) {
@@ -61,7 +61,7 @@ function onMouseUp(event) {
   }
 }
 
-function onCenterClick(event) {
+function onCenterClick(event: MouseEvent) {
   event.stopPropagation();
   if (!dragMoved) {
     emit("click", event);

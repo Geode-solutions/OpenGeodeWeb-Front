@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import TriangulatedSurfaceEdgesPoints from "@ogw_front/assets/viewer_svgs/surface_points.svg";
-import ViewerGenericMeshPointsOptions from "@ogw_front/components/Viewer/Generic/Mesh/PointsOptions";
+import ViewerGenericMeshPointsOptions from "@ogw_front/components/Viewer/Generic/Mesh/PointsOptions.vue";
 
 const { itemProps } = defineProps({
   itemProps: { type: Object, required: true },

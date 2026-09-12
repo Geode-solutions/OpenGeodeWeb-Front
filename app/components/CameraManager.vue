@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import List from "@ogw_front/components/CameraManager/List";
-import Saver from "@ogw_front/components/CameraManager/Saver";
-import ToolPanel from "@ogw_front/components/ToolPanel";
+import List from "@ogw_front/components/CameraManager/List.vue";
+import Saver from "@ogw_front/components/CameraManager/Saver.vue";
+import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 
 const emit = defineEmits(["close"]);
 

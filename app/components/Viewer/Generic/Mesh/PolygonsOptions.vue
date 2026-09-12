@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem";
-import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector";
-import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch";
+import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
+import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -60,8 +60,9 @@ const textures = computed({
 const vertex_attribute_name = computed({
   get: () => dataStyleStore.meshPolygonsVertexAttributeName(id.value),
   set: async (newValue) => {
+    if (newValue === undefined) return;
     await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshPolygonsVertexAttributeName(targetId, newValue),
+      Promise.resolve(dataStyleStore.setMeshPolygonsVertexAttributeName(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -70,7 +71,7 @@ const vertex_attribute_item = computed({
   get: () => dataStyleStore.meshPolygonsVertexAttributeItem(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshPolygonsVertexAttributeItem(targetId, newValue),
+      Promise.resolve(dataStyleStore.setMeshPolygonsVertexAttributeItem(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -78,8 +79,10 @@ const vertex_attribute_item = computed({
 const vertex_attribute_range = computed({
   get: () => dataStyleStore.meshPolygonsVertexAttributeRange(id.value),
   set: async (newValue) => {
+    const [minimum, maximum] = newValue;
+    if (minimum === undefined || maximum === undefined) return;
     await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshPolygonsVertexAttributeRange(targetId, newValue[0], newValue[1]),
+      Promise.resolve(dataStyleStore.setMeshPolygonsVertexAttributeRange(targetId, minimum, maximum)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -88,7 +91,7 @@ const vertex_attribute_color_map = computed({
   get: () => dataStyleStore.meshPolygonsVertexAttributeColorMap(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshPolygonsVertexAttributeColorMap(targetId, newValue),
+      Promise.resolve(dataStyleStore.setMeshPolygonsVertexAttributeColorMap(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -105,8 +108,9 @@ const vertex_attribute_no_data_color = computed({
 const polygon_attribute_name = computed({
   get: () => dataStyleStore.meshPolygonsPolygonAttributeName(id.value),
   set: async (newValue) => {
+    if (newValue === undefined) return;
     await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshPolygonsPolygonAttributeName(targetId, newValue),
+      Promise.resolve(dataStyleStore.setMeshPolygonsPolygonAttributeName(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -115,7 +119,7 @@ const polygon_attribute_item = computed({
   get: () => dataStyleStore.meshPolygonsPolygonAttributeItem(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshPolygonsPolygonAttributeItem(targetId, newValue),
+      Promise.resolve(dataStyleStore.setMeshPolygonsPolygonAttributeItem(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -123,8 +127,10 @@ const polygon_attribute_item = computed({
 const polygon_attribute_range = computed({
   get: () => dataStyleStore.meshPolygonsPolygonAttributeRange(id.value),
   set: async (newValue) => {
+    const [minimum, maximum] = newValue;
+    if (minimum === undefined || maximum === undefined) return;
     await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshPolygonsPolygonAttributeRange(targetId, newValue[0], newValue[1]),
+      Promise.resolve(dataStyleStore.setMeshPolygonsPolygonAttributeRange(targetId, minimum, maximum)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -133,7 +139,7 @@ const polygon_attribute_color_map = computed({
   get: () => dataStyleStore.meshPolygonsPolygonAttributeColorMap(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshPolygonsPolygonAttributeColorMap(targetId, newValue),
+      Promise.resolve(dataStyleStore.setMeshPolygonsPolygonAttributeColorMap(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -152,6 +158,7 @@ const polygon_attribute_no_data_color = computed({
 <template>
   <ViewerContextMenuItem
     data-testid="meshPolygonsMenu"
+    :index="itemProps.index"
     :itemProps="itemProps"
     :tooltip="tooltip"
     :btnImage="btnImage"

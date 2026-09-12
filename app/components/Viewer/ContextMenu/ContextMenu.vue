@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import CenterButton from "@ogw_front/components/Viewer/ContextMenu/CenterButton";
-import CircularItems from "@ogw_front/components/Viewer/ContextMenu/CircularItems";
-import InfoCard from "@ogw_front/components/Viewer/ContextMenu/InfoCard";
+import CenterButton from "@ogw_front/components/Viewer/ContextMenu/CenterButton.vue";
+import CircularItems from "@ogw_front/components/Viewer/ContextMenu/CircularItems.vue";
+import InfoCard from "@ogw_front/components/Viewer/ContextMenu/InfoCard.vue";
 import { useEventListener } from "@vueuse/core";
 import { useMenuStore } from "@ogw_front/stores/menu";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
+import type { Component } from "vue";
 
 const { id, x, y, containerWidth, containerHeight } = defineProps({
   id: { type: String, required: true },
@@ -102,7 +103,7 @@ useEventListener(globalThis, "mouseup", (event: MouseEvent) => {
   stopDrag(event);
 });
 
-const menu_items = shallowRef([]);
+const menu_items = shallowRef<Component[]>([]);
 watch(
   () => [meta_data.value.viewer_type, meta_data.value.geode_object_type],
   ([viewer_type, geode_object_type]) => {

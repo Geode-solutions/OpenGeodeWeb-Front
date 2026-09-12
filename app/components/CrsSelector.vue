@@ -44,8 +44,8 @@ async function get_crs_table() {
   await backStore.request(
     { schema, params },
     {
-      response_function: (response: { crs_list: Record<string, unknown>[] }) => {
-        crs_list.value = response.crs_list;
+      response_function: (response: unknown) => {
+        crs_list.value = (response as { crs_list: Record<string, unknown>[] }).crs_list;
       },
     },
   );

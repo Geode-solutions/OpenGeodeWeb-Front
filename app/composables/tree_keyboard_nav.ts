@@ -1,4 +1,23 @@
-function getBaseIndex(currentIndex, lastIndex, bounds, key) {
+import type { Ref } from "vue";
+import type { DisplayItem, EmitFn } from "./virtual_tree";
+
+interface VisibleBounds {
+  firstVisible: number;
+  lastVisible: number;
+}
+
+interface ScrollInfo {
+  scrollTop: number;
+  containerHeight: number;
+  itemHeight: number;
+}
+
+function getBaseIndex(
+  currentIndex: number,
+  lastIndex: number,
+  bounds: VisibleBounds | undefined,
+  key: string,
+): number {
   if (currentIndex < 0 || currentIndex > lastIndex) {
     if (bounds) {
       return key === "End" ? lastIndex : bounds.firstVisible;
@@ -17,26 +36,27 @@ function getBaseIndex(currentIndex, lastIndex, bounds, key) {
 }
 
 export function useTreeKeyboardNav(
-  displayItems,
-  emit,
-  scrollToIndex,
-  toggleOpen,
-  handleItemClick,
-  getScrollInfo,
-  externalFocusedIndex,
+  displayItems: Ref<DisplayItem[]>,
+  emit: EmitFn,
+  scrollToIndex: (index: number) => void,
+  toggleOpen: (raw: Record<string, unknown>) => void,
+  handleItemClick: (item: DisplayItem, index: number) => void,
+  getScrollInfo: (() => ScrollInfo | undefined) | undefined,
+  externalFocusedIndex: Ref<number> | undefined,
 ) {
   const focusedIndex = externalFocusedIndex || ref(-1);
 
-  function findParentIndex(item, currentIndex) {
+  function findParentIndex(item: DisplayItem, currentIndex: number): number {
     for (let index = currentIndex - 1; index >= 0; index -= 1) {
-      if (displayItems.value[index] && displayItems.value[index].depth < item.depth) {
+      const candidate = displayItems.value[index];
+      if (candidate && candidate.depth < item.depth) {
         return index;
       }
     }
     return -1;
   }
 
-  function getVisibleBounds() {
+  function getVisibleBounds(): VisibleBounds | undefined {
     if (!getScrollInfo) {
       return undefined;
     }
@@ -51,7 +71,11 @@ export function useTreeKeyboardNav(
     return { firstVisible, lastVisible };
   }
 
-  function handleExpandOrNext(item, currentIndex, lastIndex) {
+  function handleExpandOrNext(
+    item: DisplayItem | undefined,
+    currentIndex: number,
+    lastIndex: number,
+  ): number {
     if (item && !item.isLeaf && !item.isOpen) {
       toggleOpen(item.raw);
       return currentIndex;
@@ -59,7 +83,7 @@ export function useTreeKeyboardNav(
     return Math.min(currentIndex + 1, lastIndex);
   }
 
-  function handleCollapseOrParent(item, currentIndex) {
+  function handleCollapseOrParent(item: DisplayItem | undefined, currentIndex: number): number {
     if (item && !item.isLeaf && item.isOpen) {
       toggleOpen(item.raw);
       return currentIndex;
@@ -71,7 +95,7 @@ export function useTreeKeyboardNav(
     return currentIndex;
   }
 
-  function getNextIndex(key) {
+  function getNextIndex(key: string): number {
     const total = displayItems.value.length;
     if (total === 0) {
       return -1;
@@ -103,7 +127,7 @@ export function useTreeKeyboardNav(
     return currentIndex;
   }
 
-  function handleKeyDown(event) {
+  function handleKeyDown(event: KeyboardEvent): void {
     if (displayItems.value.length === 0) {
       return;
     }
@@ -129,7 +153,9 @@ export function useTreeKeyboardNav(
       event.preventDefault();
       if (focusedIndex.value >= 0 && focusedIndex.value < displayItems.value.length) {
         const item = displayItems.value[focusedIndex.value];
-        handleItemClick(item, focusedIndex.value);
+        if (item) {
+          handleItemClick(item, focusedIndex.value);
+        }
       }
     }
   }

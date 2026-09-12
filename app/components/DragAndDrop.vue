@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { PropType } from "vue";
 import { onMounted, onUnmounted, ref } from "vue";
 import DragAndDropInline from "./DragAndDropInternal/DragAndDropInline.vue";
 import DragAndDropOverlay from "./DragAndDropInternal/DragAndDropOverlay.vue";
@@ -6,7 +7,7 @@ import DragAndDropOverlay from "./DragAndDropInternal/DragAndDropOverlay.vue";
 const { multiple, accept, loading, showExtensions, fullscreen, inline, showOverlay, texts } =
   defineProps({
     multiple: { type: Boolean, default: false },
-    accept: { type: [String, Array], default: "" },
+    accept: { type: [String, Array] as PropType<string | string[]>, default: "" },
     loading: { type: Boolean, default: false },
     showExtensions: { type: Boolean, default: true },
     fullscreen: { type: Boolean, default: false },

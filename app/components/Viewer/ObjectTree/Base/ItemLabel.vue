@@ -41,7 +41,7 @@ const tooltipDisabled = computed(() => {
   return actualItem.value.children && actualItem.value.children.length > 0;
 });
 
-async function copyToClipboard(text, label) {
+async function copyToClipboard(text: string, label: string) {
   await copy(text);
   feedbackStore.add_success(`${label} copied to clipboard`);
 }
