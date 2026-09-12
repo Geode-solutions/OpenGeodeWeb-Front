@@ -1,6 +1,6 @@
 import { Status } from "@ogw_front/utils/status";
-import { fetchSchema } from "@ogw_shared/utils/fetch_schema";
-import { setAppBaseUrl } from "@ogw_shared/scripts";
+import { fetchSchema } from "#shared/utils/fetch_schema";
+import { setAppBaseUrl } from "#shared/scripts";
 import { useAppStore } from "./app";
 import { useFeedbackStore } from "./feedback";
 import { useInfraStore } from "./infra";
@@ -12,7 +12,7 @@ export const useCloudStore = defineStore("cloud", {
     status: Status.NOT_CONNECTED,
   }),
   actions: {
-    launch(email) {
+    launch(email: string) {
       this.status = Status.CONNECTING;
       console.log("[CLOUD] Launching cloud backend...");
       const schema = opengeodeweb_front_schemas.api.serverless.run_cloud;
@@ -27,13 +27,14 @@ export const useCloudStore = defineStore("cloud", {
             feedbackStore.$patch({ server_error: true });
             this.status = Status.NOT_CONNECTED;
           },
-          response_function: (response) => {
+          response_function: (response: unknown) => {
+            const { url } = response as { url: string };
             feedbackStore.$patch({ server_error: false });
-            console.log(`[CLOUD] Cloud launched on ${response.url}`);
+            console.log(`[CLOUD] Cloud launched on ${url}`);
             this.status = Status.CONNECTED;
             const infraStore = useInfraStore();
             infraStore.$patch({
-              domain_name: response.url,
+              domain_name: url,
             });
             setAppBaseUrl(appStore.base_url);
             appStore.$patch({

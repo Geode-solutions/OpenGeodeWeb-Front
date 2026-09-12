@@ -1,23 +1,24 @@
+import type { StyleValues } from "../../types";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 
 export function useMeshPolyhedraCommonStyle() {
   const dataStyleState = useDataStyleState();
 
-  function mutateMeshPolyhedraStyle(id, values) {
+  function mutateMeshPolyhedraStyle(id: string, values: StyleValues) {
     return dataStyleState.mutateStyle(id, {
       polyhedra: values,
     });
   }
 
-  function meshPolyhedraStyle(id) {
-    return dataStyleState.getStyle(id).polyhedra;
+  function meshPolyhedraStyle(id: string): StyleValues {
+    return dataStyleState.getStyle(id).polyhedra as StyleValues;
   }
 
-  function meshPolyhedraColoring(id) {
-    return meshPolyhedraStyle(id).coloring;
+  function meshPolyhedraColoring(id: string): StyleValues {
+    return meshPolyhedraStyle(id).coloring as StyleValues;
   }
 
-  function mutateMeshPolyhedraColoring(id, values) {
+  function mutateMeshPolyhedraColoring(id: string, values: StyleValues) {
     return mutateMeshPolyhedraStyle(id, {
       coloring: values,
     });

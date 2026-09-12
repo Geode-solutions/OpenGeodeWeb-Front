@@ -42,7 +42,7 @@ describe("tool panel", () => {
     await wrapper.vm.$nextTick();
 
     expect(wrapper.emitted()).toHaveProperty("update:modelValue");
-    expect(wrapper.emitted("update:modelValue")[FIRST_INDEX]).toStrictEqual([false]);
+    expect(wrapper.emitted("update:modelValue")?.[FIRST_INDEX]).toStrictEqual([false]);
   });
 
   test("calls escapeFunction prop when Escape key is pressed", async () => {

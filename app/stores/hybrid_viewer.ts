@@ -11,20 +11,25 @@ import { useHybridViewerRuler } from "@ogw_internal/stores/hybrid_viewer/ruler";
 import { useHybridViewerScene } from "@ogw_internal/stores/hybrid_viewer/scene";
 import { useHybridViewerViewport } from "@ogw_internal/stores/hybrid_viewer/viewport";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
+import type { vtkGenericRenderWindow as VtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 
 import { Status } from "@ogw_front/utils/status";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
+interface GenericRenderWindowHolder {
+  value?: VtkGenericRenderWindow;
+}
+
 // oxlint-disable max-lines-per-function, max-statements
 export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const viewerStore = useViewerStore();
-  const genericRenderWindow = reactive({});
+  const genericRenderWindow = reactive<GenericRenderWindowHolder>({});
   const status = ref(Status.NOT_CREATED);
   const is_moving = ref(false);
   const is_picking = ref(false);
-  let imageStyle = undefined;
+  let imageStyle: CSSStyleDeclaration | undefined = undefined;
 
   const brightnessStore = useHybridViewerBrightness();
   const sceneStore = useHybridViewerScene();
@@ -41,13 +46,13 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       return;
     }
     const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
-    const canvas = webGLRenderWindow.getCanvas();
+    const canvas = (webGLRenderWindow as unknown as { getCanvas: () => HTMLCanvasElement }).getCanvas();
     if (canvas && canvas.parentElement) {
       canvas.parentElement.style.cursor = value ? "crosshair" : "default";
     }
   });
 
-  async function initHybridViewer() {
+  async function initHybridViewer(): Promise<void> {
     if (status.value !== Status.NOT_CREATED) {
       return;
     }
@@ -56,19 +61,26 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       background: BACKGROUND_COLOR,
       listenWindowResize: false,
     });
-    const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
+    const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow() as unknown as {
+      getReferenceByName: (name: string) => { style: CSSStyleDeclaration };
+      setBackgroundImage: (image: unknown) => void;
+    };
     imageStyle = webGLRenderWindow.getReferenceByName("bgImage").style;
     Object.assign(imageStyle, { transition: "opacity 0.1s ease-in", zIndex: 1 });
     await viewerStore.ws_connect();
-    const imageStream = viewerStore.client.getImageStream();
+    const imageStream = (
+      viewerStore.client as unknown as { getImageStream: () => any }
+    ).getImageStream();
     viewportStore.viewStream.value = imageStream.createViewStream("-1");
-    viewportStore.viewStream.value.onImageReady((event) => {
+    viewportStore.viewStream.value.onImageReady((event: { image: unknown }) => {
       if (is_moving.value) {
         return;
       }
       brightnessStore.latestImage.value = event.image;
       webGLRenderWindow.setBackgroundImage(event.image);
-      imageStyle.opacity = 1;
+      if (imageStyle) {
+        imageStyle.opacity = "1";
+      }
     });
     const renderer = genericRenderWindow.value.getRenderer();
     const camera = renderer.getActiveCamera();
@@ -79,10 +91,10 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     status.value = Status.CREATED;
   }
 
-  let renderPromise = undefined;
+  let renderPromise: Promise<void> | undefined = undefined;
   let renderPending = false;
 
-  function remoteRender() {
+  function remoteRender(): Promise<void> {
     if (renderPromise) {
       renderPending = true;
       return renderPromise;
@@ -104,11 +116,11 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   }
 
   function exportStores() {
-    const renderer = genericRenderWindow.value.getRenderer();
-    const camera = renderer.getActiveCamera();
+    const renderer = genericRenderWindow.value?.getRenderer();
+    const camera = renderer?.getActiveCamera();
     return {
       zScale: sceneStore.zScale.value,
-      camera_options: getCameraOptions(camera) || cameraStore.camera_options,
+      camera_options: (camera ? getCameraOptions(camera) : undefined) || cameraStore.camera_options,
     };
   }
 

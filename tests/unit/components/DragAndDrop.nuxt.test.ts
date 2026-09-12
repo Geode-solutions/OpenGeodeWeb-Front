@@ -57,7 +57,7 @@ describe("drag and drop", () => {
     await flushPromises();
 
     expect(wrapper.emitted("files-selected")).toBeDefined();
-    expect(wrapper.emitted("files-selected")[0][0]).toStrictEqual([validFile]);
+    expect(wrapper.emitted("files-selected")?.[0]?.[0]).toStrictEqual([validFile]);
   });
 
   test("accepts general files but excludes .vext when accept prop is empty", async () => {
@@ -84,6 +84,6 @@ describe("drag and drop", () => {
     await flushPromises();
 
     expect(wrapper.emitted("files-selected")).toBeDefined();
-    expect(wrapper.emitted("files-selected")[0][0]).toStrictEqual([dataFile]);
+    expect(wrapper.emitted("files-selected")?.[0]?.[0]).toStrictEqual([dataFile]);
   });
 });

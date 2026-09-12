@@ -9,9 +9,13 @@ import {
   generateProjectFolderPath,
 } from "@geode/opengeodeweb-front/server/utils/path.js";
 
+interface ProjectFolderPathBody {
+  PROJECT: string;
+}
+
 export default defineEventHandler(async (event) => {
   try {
-    const { PROJECT } = await readBody(event);
+    const { PROJECT } = await readBody<ProjectFolderPathBody>(event);
     const projectFolderPath = generateProjectFolderPath(PROJECT);
     await createPath(projectFolderPath);
 
@@ -23,7 +27,7 @@ export default defineEventHandler(async (event) => {
     console.log(error);
     throw createError({
       statusCode: 500,
-      statusMessage: error.message,
+      statusMessage: (error as Error).message,
     });
   }
 });

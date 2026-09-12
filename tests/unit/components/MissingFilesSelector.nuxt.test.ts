@@ -4,6 +4,7 @@ import { describe, expect, test, vi } from "vitest";
 import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime";
 import { flushPromises } from "@vue/test-utils";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import type { HTTPMethod } from "h3";
 
 // Local imports
 import { setupActivePinia, vuetify } from "@ogw_tests/utils";
@@ -23,18 +24,20 @@ describe("missing files selector", () => {
   backStore.base_url = "/";
 
   test("select file", async () => {
-    backStore.request = vi.fn((request, callbacks) => {
-      callbacks?.response_function?.({
-        has_missing_files: true,
-        mandatory_files: ["fake_file.txt"],
-        additional_files: ["fake_file_2.txt"],
-      });
-      return Promise.resolve({
-        has_missing_files: true,
-        mandatory_files: ["fake_file.txt"],
-        additional_files: ["fake_file_2.txt"],
-      });
-    });
+    backStore.request = vi.fn(
+      (_request: unknown, callbacks: { response_function?: (response: unknown) => void }) => {
+        callbacks?.response_function?.({
+          has_missing_files: true,
+          mandatory_files: ["fake_file.txt"],
+          additional_files: ["fake_file_2.txt"],
+        });
+        return Promise.resolve({
+          has_missing_files: true,
+          mandatory_files: ["fake_file.txt"],
+          additional_files: ["fake_file_2.txt"],
+        });
+      },
+    );
 
     const wrapper = await mountSuspended(MissingFilesSelector, {
       global: {
@@ -61,15 +64,17 @@ describe("missing files selector", () => {
     const v_btn = file_uploader.findComponent(components.VBtn);
 
     registerEndpoint(upload_file_schema.$id, {
-      method: upload_file_schema.methods[SECOND_INDEX],
+      method: upload_file_schema.methods[SECOND_INDEX] as HTTPMethod,
       handler: () => ({}),
     });
     await v_btn.trigger("click");
     await flushPromises();
     await flushPromises();
     expect(wrapper.emitted()).toHaveProperty("update_values");
-    expect(wrapper.emitted().update_values).toHaveLength(EXPECTED_LENGTH);
-    expect(wrapper.emitted().update_values[FIRST_INDEX][FIRST_INDEX]).toStrictEqual({
+    expect(wrapper.emitted<unknown[]>().update_values).toHaveLength(EXPECTED_LENGTH);
+    expect(
+      wrapper.emitted<unknown[]>().update_values?.[FIRST_INDEX]?.[FIRST_INDEX],
+    ).toStrictEqual({
       additional_files: files,
     });
     expect(wrapper.emitted().increment_step).toHaveLength(EXPECTED_LENGTH);

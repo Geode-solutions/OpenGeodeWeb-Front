@@ -36,7 +36,7 @@ const dragStartY = ref(0);
 const menuX = ref(x);
 const menuY = ref(y);
 
-function clampPosition(posX, posY) {
+function clampPosition(posX: number, posY: number) {
   const margin = RADIUS + MARGIN_OFFSET;
   return {
     x: Math.min(Math.max(posX, margin), containerWidth - margin),
@@ -44,13 +44,13 @@ function clampPosition(posX, posY) {
   };
 }
 
-function startDrag(event) {
+function startDrag(event: MouseEvent) {
   isDragging.value = true;
   dragStartX.value = event.clientX - menuX.value;
   dragStartY.value = event.clientY - menuY.value;
 }
 
-function handleDrag(event) {
+function handleDrag(event: MouseEvent) {
   const { x: clampedX, y: clampedY } = clampPosition(
     event.clientX - dragStartX.value,
     event.clientY - dragStartY.value,
@@ -60,7 +60,7 @@ function handleDrag(event) {
   menuStore.setMenuPosition(clampedX, clampedY);
 }
 
-function stopDrag(event) {
+function stopDrag(event: MouseEvent) {
   isDragging.value = false;
   event.stopPropagation();
   menuStore.setMenuPosition(menuX.value, menuY.value);
@@ -73,7 +73,7 @@ watch(show_menu, (newVal) => {
 });
 
 watch(
-  () => [x, y, containerWidth, containerHeight],
+  () => [x, y, containerWidth, containerHeight] as const,
   ([newX, newY]) => {
     const { x: clampedX, y: clampedY } = clampPosition(newX, newY);
     menuX.value = clampedX;
@@ -86,7 +86,7 @@ watch(
 useEventListener(
   globalThis,
   "mousemove",
-  (event) => {
+  (event: MouseEvent) => {
     if (!isDragging.value) {
       return;
     }
@@ -95,7 +95,7 @@ useEventListener(
   { passive: true },
 );
 
-useEventListener(globalThis, "mouseup", (event) => {
+useEventListener(globalThis, "mouseup", (event: MouseEvent) => {
   if (!isDragging.value) {
     return;
   }
@@ -147,7 +147,7 @@ const isOverToolbar = computed(() => {
 
 function getMenuStyle() {
   return {
-    position: "fixed",
+    position: "fixed" as const,
     left: `${menuStore.containerLeft + menuX.value - RADIUS}px`,
     top: `${menuStore.containerTop + menuY.value - RADIUS}px`,
   };

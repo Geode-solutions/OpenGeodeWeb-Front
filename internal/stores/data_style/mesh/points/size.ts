@@ -12,10 +12,10 @@ export function useMeshPointsSizeStyle() {
   const viewerStore = useViewerStore();
   const meshPointsCommonStyle = useMeshPointsCommonStyle();
 
-  function meshPointsSize(id) {
-    return meshPointsCommonStyle.meshPointsStyle(id).size;
+  function meshPointsSize(id: string): number | undefined {
+    return meshPointsCommonStyle.meshPointsStyle(id).size as number | undefined;
   }
-  function setMeshPointsSize(id, size) {
+  function setMeshPointsSize(id: string, size: number | undefined) {
     const params = { id, size };
     return viewerStore.request(
       {

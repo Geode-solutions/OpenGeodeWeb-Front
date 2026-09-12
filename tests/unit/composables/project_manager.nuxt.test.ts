@@ -14,6 +14,8 @@ vi.mock(import("ofetch"), () => ({
   $fetch: vi.fn(),
 }));
 
+const mockedFetch = vi.mocked($fetch);
+
 // Constants
 const PANEL_WIDTH = 300;
 const Z_SCALE = 1.5;
@@ -126,10 +128,15 @@ const feedbackStoreMock = {
 
 const viewer_call_mock_fn = vi.fn().mockResolvedValue();
 
+interface HybridViewerSnapshot {
+  zScale?: number;
+  camera_options?: Record<string, unknown>;
+}
+
 const hybridViewerStoreMock = {
   clear: vi.fn(),
   initHybridViewer: vi.fn().mockResolvedValue(),
-  importStores: vi.fn((snapshot) => {
+  importStores: vi.fn((snapshot?: HybridViewerSnapshot) => {
     if (snapshot?.zScale !== undefined) {
       hybridViewerStoreMock.setZScaling(snapshot.zScale);
     }
@@ -147,22 +154,31 @@ const hybridViewerStoreMock = {
 };
 
 // MOCKS
-$fetch.mockImplementation((route, options) => {
-  const data = { snapshot: snapshotMock };
-  // oxlint-disable-next-line eslint/id-length
-  options.onResponse?.({ response: { ok: true, _data: data } });
-  return Promise.resolve(data);
-});
+mockedFetch.mockImplementation(
+  (
+    _route: unknown,
+    options: { onResponse?: (context: { response: { ok: boolean; _data: unknown } }) => void },
+  ) => {
+    const data = { snapshot: snapshotMock };
+    // oxlint-disable-next-line eslint/id-length
+    options.onResponse?.({ response: { ok: true, _data: data } });
+    return Promise.resolve(data);
+  },
+);
 vi.mock(import("@ogw_internal/utils/viewer_call"), () => ({
   viewer_call: viewer_call_mock_fn,
 }));
 
+interface ApiFetchOptions {
+  response_function?: (response: unknown) => Promise<void> | void;
+}
+
 vi.mock(import("@ogw_front/composables/api_fetch"), () => ({
-  api_fetch: vi.fn(async (_req, options = {}) => {
+  api_fetch: vi.fn(async (_req: unknown, options: ApiFetchOptions = {}) => {
     const response = {
       _data: new Blob(["zipcontent"], { type: "application/zip" }),
       headers: {
-        get: (k) => (k === "new-file-name" ? "project_123.vease" : undefined),
+        get: (k: string) => (k === "new-file-name" ? "project_123.vease" : undefined),
       },
     };
     if (options.response_function) {
@@ -206,7 +222,11 @@ vi.stubGlobal("useAppStore", () => ({
   exportStores: vi.fn(() => ({ projectName: "mockedProject" })),
 }));
 
-const mockLockRequest = vi.fn().mockImplementation(async (name, task) => await task({ name }));
+const mockLockRequest = vi
+  .fn()
+  .mockImplementation(
+    async (name: string, task: (lock: { name: string }) => unknown) => await task({ name }),
+  );
 
 vi.stubGlobal("navigator", {
   ...navigator,
@@ -247,7 +267,7 @@ function verifyRemaining() {
 describe("projectManager composable (compact)", () => {
   beforeEach(() => {
     setupActivePinia();
-    const storesList = [
+    const storesList: Record<string, ReturnType<typeof vi.fn>>[] = [
       viewerStoreMock,
       treeviewStoreMock,
       dataStoreMock,

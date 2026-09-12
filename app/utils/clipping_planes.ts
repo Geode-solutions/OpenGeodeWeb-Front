@@ -1,3 +1,6 @@
+import type { Bounds } from "@kitware/vtk.js/types";
+import type vtkActor from "@kitware/vtk.js/Rendering/Core/Actor";
+
 const AXIS_SCALE = 0.45;
 const SIZE_RATIO = 0.1;
 const DEBOUNCE_DELAY = 200;
@@ -16,22 +19,28 @@ const NORMAL_Z = [0, 0, 1];
 const DEFAULT_NORMALS = [NORMAL_X, NORMAL_Y, NORMAL_Z];
 const RGB_MAX_VALUE = 255;
 
-function getPlaneCssColor(index) {
-  const rgb = PLANE_COLORS[index % PLANE_COLORS.length];
+function getPlaneCssColor(index: number): string {
+  // Modulo guarantees this index is within bounds of the non-empty PLANE_COLORS array.
+  const rgb = PLANE_COLORS[index % PLANE_COLORS.length]!;
   return `rgb(${rgb.map((channel) => Math.round(channel * RGB_MAX_VALUE)).join(",")})`;
 }
 
-function hasPlaneChanged(origin, normal, currentOrigin, currentNormal) {
+function hasPlaneChanged(
+  origin: number[],
+  normal: number[],
+  currentOrigin: number[] | undefined,
+  currentNormal: number[] | undefined,
+): boolean {
   if (!currentOrigin) {
     return true;
   }
   return (
-    origin.some((val, idx) => Math.abs(val - currentOrigin[idx]) > CHANGE_THRESHOLD) ||
-    normal.some((val, idx) => Math.abs(val - currentNormal[idx]) > CHANGE_THRESHOLD)
+    origin.some((val, idx) => Math.abs(val - (currentOrigin[idx] ?? 0)) > CHANGE_THRESHOLD) ||
+    normal.some((val, idx) => Math.abs(val - (currentNormal?.[idx] ?? 0)) > CHANGE_THRESHOLD)
   );
 }
 
-function getPlaneStyle(rgb) {
+function getPlaneStyle(rgb: number[]) {
   return {
     active: {
       plane: { opacity: 1, color: rgb },
@@ -50,8 +59,8 @@ function getPlaneStyle(rgb) {
   };
 }
 
-function computeSceneBounds(actors) {
-  let bounds = [Infinity, -Infinity, Infinity, -Infinity, Infinity, -Infinity];
+function computeSceneBounds(actors: vtkActor[]): Bounds {
+  let bounds: Bounds = [Infinity, -Infinity, Infinity, -Infinity, Infinity, -Infinity];
   for (const actor of actors) {
     const boundsOfActor = actor.getBounds();
     bounds = [
@@ -66,7 +75,12 @@ function computeSceneBounds(actors) {
   return bounds;
 }
 
-function computeSceneBoundsInfo(actors) {
+interface SceneBoundsInfo {
+  center: number[];
+  cubicBounds: number[];
+}
+
+function computeSceneBoundsInfo(actors: vtkActor[]): SceneBoundsInfo {
   if (!actors || actors.length === 0) {
     return { center: [0, 0, 0], cubicBounds: [-1, 1, -1, 1, -1, 1] };
   }
@@ -84,13 +98,14 @@ function computeSceneBoundsInfo(actors) {
     }),
   );
   const halfExtent = maxActorExtent / 2;
+  const [centerX, centerY, centerZ] = center as [number, number, number];
   const cubicBounds = [
-    center[0] - halfExtent,
-    center[0] + halfExtent,
-    center[1] - halfExtent,
-    center[1] + halfExtent,
-    center[2] - halfExtent,
-    center[2] + halfExtent,
+    centerX - halfExtent,
+    centerX + halfExtent,
+    centerY - halfExtent,
+    centerY + halfExtent,
+    centerZ - halfExtent,
+    centerZ + halfExtent,
   ];
   return { center, cubicBounds };
 }

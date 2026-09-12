@@ -4,6 +4,7 @@ import { describe, expect, test } from "vitest";
 import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime";
 import { flushPromises } from "@vue/test-utils";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import type { HTTPMethod } from "h3";
 
 // Local imports
 import { setupActivePinia, vuetify } from "@ogw_tests/utils";
@@ -21,11 +22,11 @@ describe("file uploader", () => {
   backStore.base_url = "/";
 
   registerEndpoint(upload_file_schema.$id, {
-    method: upload_file_schema.methods[FIRST_INDEX],
+    method: upload_file_schema.methods[FIRST_INDEX] as HTTPMethod,
     handler: () => ({}),
   });
   registerEndpoint(upload_file_schema.$id, {
-    method: upload_file_schema.methods[SECOND_INDEX],
+    method: upload_file_schema.methods[SECOND_INDEX] as HTTPMethod,
     handler: () => ({}),
   });
 
@@ -52,7 +53,9 @@ describe("file uploader", () => {
       await v_btn.trigger("click");
       await flushPromises();
       await flushPromises();
-      expect(wrapper.emitted().files_uploaded[FIRST_INDEX][FIRST_INDEX]).toStrictEqual(files);
+      expect(
+        wrapper.emitted<unknown[]>().files_uploaded?.[FIRST_INDEX]?.[FIRST_INDEX],
+      ).toStrictEqual(files);
     });
 
     test(`prop autoUpload true`, async () => {
@@ -63,7 +66,9 @@ describe("file uploader", () => {
         props: { multiple: false, accept: "*.txt", files, autoUpload: true },
       });
       await flushPromises();
-      expect(wrapper.emitted().files_uploaded[FIRST_INDEX][FIRST_INDEX]).toStrictEqual(files);
+      expect(
+        wrapper.emitted<unknown[]>().files_uploaded?.[FIRST_INDEX]?.[FIRST_INDEX],
+      ).toStrictEqual(files);
     });
   });
 });

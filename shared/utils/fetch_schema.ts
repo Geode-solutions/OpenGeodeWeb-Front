@@ -8,7 +8,7 @@ import { validateSchema } from "./validate_schema.js";
 const ERROR_400 = 400;
 
 interface FetchSchemaOptions {
-  schema: JsonRpcSchema;
+  schema: JsonRpcSchema & { methods: string[] };
   params?: unknown;
   baseURL?: string;
   headers?: Record<string, string>;

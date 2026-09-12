@@ -21,7 +21,7 @@ const id = computed(() => itemProps.meta_data.modelId || itemProps.id);
 const visibility = computed({
   get: () => dataStyleStore.modelPointsVisibility(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
+    await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setModelPointsVisibility(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -30,7 +30,7 @@ const visibility = computed({
 const size = computed({
   get: () => dataStyleStore.modelPointsSize(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
+    await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setModelPointsSize(targetId, newValue),
     );
     hybridViewerStore.remoteRender();

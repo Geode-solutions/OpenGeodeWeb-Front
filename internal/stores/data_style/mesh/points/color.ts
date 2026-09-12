@@ -12,10 +12,10 @@ export function useMeshPointsColorStyle() {
   const viewerStore = useViewerStore();
   const meshPointsCommonStyle = useMeshPointsCommonStyle();
 
-  function meshPointsColor(id) {
+  function meshPointsColor(id: string): unknown {
     return meshPointsCommonStyle.meshPointsColoring(id).constant;
   }
-  function setMeshPointsColor(id, color) {
+  function setMeshPointsColor(id: string, color: unknown) {
     const params = { id, color };
     return viewerStore.request(
       {

@@ -13,9 +13,15 @@ import {
 import { extensionFolderPath } from "@geode/opengeodeweb-front/server/utils/path.js";
 import { removeExtensionFromConf } from "@geode/opengeodeweb-front/server/utils/app_config.js";
 
+interface KillExtensionBody {
+  projectFolderPath: string;
+  projectName: string;
+  extensionId: string;
+}
+
 export default defineEventHandler(async (event) => {
   try {
-    const body = await readBody(event);
+    const body = await readBody<KillExtensionBody>(event);
     const { projectFolderPath, projectName, extensionId } = body;
 
     console.log({ projectFolderPath, projectName, extensionId });
@@ -27,7 +33,7 @@ export default defineEventHandler(async (event) => {
     }
 
     await removeExtensionFromConf(projectName, extensionId);
-    await killMicroservice(microservice, microservices);
+    await killMicroservice(microservice);
     await deleteFolderRecursive(extensionFolderPath(projectFolderPath, extensionId));
 
     return {
@@ -37,7 +43,7 @@ export default defineEventHandler(async (event) => {
     console.error("Error killing extension:", error);
     throw createError({
       statusCode: 500,
-      statusMessage: error.message,
+      statusMessage: (error as Error).message,
     });
   }
 });

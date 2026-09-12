@@ -65,12 +65,13 @@ const orientations = [
   },
 ];
 
-const hoveredFace = ref(undefined);
+const hoveredFace = ref<string | undefined>(undefined);
 const hybridViewerStore = useHybridViewerStore();
 const cubeContainer = useTemplateRef("cubeContainer");
 
-let genericRenderWindow = undefined;
-let cubeActor = undefined;
+// VTK.js objects have no usable type declarations here; `any` is the pragmatic choice.
+let genericRenderWindow: any = undefined;
+let cubeActor: any = undefined;
 let isInteracting = false;
 
 function initVTK() {
@@ -151,7 +152,7 @@ watch(hoveredFace, (newFace, oldFace) => {
   if (!cubeActor) {
     return;
   }
-  function updateFace(face, active) {
+  function updateFace(face: string | undefined, active: boolean) {
     const config = orientations.find((orientation) => orientation.face === face);
     if (config) {
       cubeActor[`set${config.vtkKey}FaceProperty`]({

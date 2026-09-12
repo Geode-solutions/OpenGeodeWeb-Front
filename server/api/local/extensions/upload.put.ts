@@ -1,6 +1,8 @@
+/// <reference path="../../../types/vendor.d.ts" />
 // Node imports
 import { finished, pipeline } from "node:stream/promises";
 import { Readable } from "node:stream";
+import type { ReadableStream as NodeReadableStream } from "node:stream/web";
 import fs from "node:fs";
 
 // Third party imports
@@ -19,8 +21,8 @@ const MAX_FILE_MEGABYTES = 500;
 const FILE_SIZE_LIMIT = MAX_FILE_MEGABYTES * BYTES_PER_KIBIBYTE * BYTES_PER_KIBIBYTE;
 
 export default defineEventHandler(async (event) => {
-  const writePromises = [];
-  const savedFiles = [];
+  const writePromises: Promise<void>[] = [];
+  const savedFiles: string[] = [];
 
   const busboyInstance = busboy({
     headers: getRequestHeaders(event),
@@ -58,7 +60,12 @@ export default defineEventHandler(async (event) => {
   busboyInstance.on("partsLimit", () => busboyInstance.destroy(new Error("Too many parts")));
 
   const webStream = getRequestWebStream(event);
-  Readable.fromWeb(webStream).pipe(busboyInstance);
+  if (!webStream) {
+    throw createError({ statusCode: 400, message: "No request body received" });
+  }
+  // h3's ReadableStream (lib.dom) and Node's stream/web ReadableStream are structurally
+  // the same at runtime but the two ambient type declarations aren't nominally compatible.
+  Readable.fromWeb(webStream as unknown as NodeReadableStream).pipe(busboyInstance);
   await finished(busboyInstance);
   if (writePromises.length > 0) {
     await Promise.all(writePromises);

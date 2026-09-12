@@ -8,11 +8,11 @@ export function useModelBlocksVisibility() {
   const modelCommonStyle = useModelCommonStyle();
   const modelBlocksCommonStyle = useModelBlocksCommonStyle();
 
-  function modelBlockVisibility(id, block_id) {
+  function modelBlockVisibility(id: string, block_id?: string): unknown {
     return modelBlocksCommonStyle.modelBlockStyle(id, block_id).visibility;
   }
 
-  function setModelBlocksVisibility(modelId, blocks_ids, visibility) {
+  function setModelBlocksVisibility(modelId: string, blocks_ids: string[], visibility: boolean | undefined) {
     return modelCommonStyle.setModelTypeVisibility(modelId, blocks_ids, visibility, schema);
   }
 

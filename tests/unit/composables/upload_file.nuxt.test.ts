@@ -35,7 +35,7 @@ describe("upload_file", () => {
     const file = new File(["fake_file"], "fake_file.txt");
     let response_value = "";
     await backStore.upload(file, {
-      response_function: (response) => {
+      response_function: (response: { test: string }) => {
         response_value = response.test;
       },
     });

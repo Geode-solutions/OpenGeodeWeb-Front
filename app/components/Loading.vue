@@ -22,7 +22,7 @@ const extensionStores = computed(() =>
 const show = ref(false);
 const progress = ref(0);
 
-let progressInterval = undefined;
+let progressInterval: ReturnType<typeof setInterval> | undefined;
 
 const PROGRESS_THRESHOLD = 90;
 const MAX_PROGRESS = 99;

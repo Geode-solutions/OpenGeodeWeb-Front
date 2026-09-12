@@ -1,15 +1,19 @@
 <script setup lang="ts">
+import type { PropType } from "vue";
 import { useBackStore } from "@ogw_front/stores/back";
 
 import CsvPreviewer from "@ogw_front/components/csv-preview/CsvPreviewer";
 import DragAndDrop from "@ogw_front/components/DragAndDrop";
+
+// Files carry extra app-specific bookkeeping fields once picked up here.
+type UploadFile = File & { isConfigured?: boolean; displayName?: string };
 
 const emit = defineEmits(["files_uploaded", "decrement_step", "reset_values"]);
 
 const { multiple, accept, files, autoUpload, showOverlay, mini } = defineProps({
   multiple: { type: Boolean, default: false },
   accept: { type: [String, Array], default: "" },
-  files: { type: Array, default: () => [] },
+  files: { type: Array as PropType<UploadFile[]>, default: () => [] },
   autoUpload: { type: Boolean, default: true },
   showOverlay: { type: Boolean, default: false },
   mini: { type: Boolean, default: false },
@@ -19,28 +23,30 @@ const backStore = useBackStore();
 const internal_files = ref(files);
 const dragAndDropRef = useTemplateRef("dragAndDropRef");
 const csv_dialog = ref(false);
-const current_csv_file = ref(undefined);
+const current_csv_file = ref<UploadFile | undefined>(undefined);
 const current_csv_index = ref(-1);
 const loading = ref(false);
 const files_uploaded = ref(false);
 const toggle_loading = useToggle(loading);
 
-function isCsv(file) {
+function isCsv(file: UploadFile) {
   return file.name.toLowerCase().endsWith(".csv");
 }
 
-function openCsvPreviewer(file, index) {
+function openCsvPreviewer(file: UploadFile, index: number) {
   current_csv_file.value = file;
   current_csv_index.value = index;
   csv_dialog.value = true;
 }
 
-async function onCsvConfirm(result) {
+async function onCsvConfirm(result: unknown) {
+  // Only reachable while the CsvPreviewer dialog (gated on current_csv_file) is open.
+  const currentFile = current_csv_file.value;
+  if (!currentFile) {
+    return;
+  }
   const json_content = JSON.stringify(result, undefined, 2);
-  const base_name = current_csv_file.value.name.slice(
-    0,
-    current_csv_file.value.name.lastIndexOf("."),
-  );
+  const base_name = currentFile.name.slice(0, currentFile.name.lastIndexOf("."));
   const json_filename = `${base_name}.json`;
 
   const blob = new Blob([json_content], { type: "application/json" });
@@ -48,21 +54,24 @@ async function onCsvConfirm(result) {
     type: "application/json",
   });
 
-  current_csv_file.value.isConfigured = true;
+  currentFile.isConfigured = true;
   await backStore.upload(json_file);
   internal_files.value = [...internal_files.value];
   csv_dialog.value = false;
 }
 
-function processSelectedFiles(selected_files) {
+function processSelectedFiles(selected_files: UploadFile[]) {
   if (multiple) {
     internal_files.value = [...internal_files.value, ...selected_files];
   } else {
-    internal_files.value = [selected_files[0]];
+    const [firstFile] = selected_files;
+    if (firstFile) {
+      internal_files.value = [firstFile];
+    }
   }
 }
 
-function removeFile(index) {
+function removeFile(index: number) {
   internal_files.value.splice(index, 1);
   if (internal_files.value.length === 0) {
     files_uploaded.value = false;

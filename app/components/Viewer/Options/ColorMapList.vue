@@ -11,28 +11,40 @@ const { presets, selectedPresetName } = defineProps({
 
 const emit = defineEmits(["select"]);
 
+interface ColorMapPreset {
+  Name: string;
+  Children?: ColorMapPreset[];
+  [key: string]: unknown;
+}
+
+interface CanvasRefEntry {
+  element: HTMLCanvasElement;
+  presetName: string;
+}
+
 const filterText = ref("");
-const canvasRefs = ref({});
+const canvasRefs = ref<Record<string, CanvasRefEntry>>({});
 const loading = ref(true);
 const renderJobId = ref(0);
-const openedGroups = ref([]);
+const openedGroups = ref<string[]>([]);
 
-function setCanvasRef(presetName, element, id) {
+function setCanvasRef(presetName: string, element: Element | null, id: string) {
   if (element) {
-    canvasRefs.value[id] = { element, presetName };
+    canvasRefs.value[id] = { element: element as HTMLCanvasElement, presetName };
   } else {
     delete canvasRefs.value[id];
   }
 }
 
-const filteredPresets = computed(() => {
+const filteredPresets = computed<ColorMapPreset[]>(() => {
+  const allPresets = presets as ColorMapPreset[];
   if (!filterText.value) {
-    return presets;
+    return allPresets;
   }
   const term = filterText.value.toLowerCase();
 
-  const result = [];
-  for (const item of presets) {
+  const result: ColorMapPreset[] = [];
+  for (const item of allPresets) {
     if (item.Children) {
       const children = item.Children.filter((child) => child.Name.toLowerCase().includes(term));
       if (children.length > 0) {
@@ -55,7 +67,7 @@ watch(filterText, (newFilterText) => {
   }
 });
 
-function processChunk(entries, index, jobId) {
+function processChunk(entries: [string, CanvasRefEntry][], index: number, jobId: number) {
   if (jobId !== renderJobId.value || index >= entries.length) {
     if (jobId === renderJobId.value) {
       loading.value = false;
@@ -65,7 +77,11 @@ function processChunk(entries, index, jobId) {
 
   const end = Math.min(index + CHUNK_SIZE, entries.length);
   for (let i = index; i < end; i += 1) {
-    const [unusedKey, refValue] = entries[i];
+    const entry = entries[i];
+    if (!entry) {
+      continue;
+    }
+    const [, refValue] = entry;
     drawCanvasForPreset(refValue.presetName, refValue.element);
   }
   const ZERO = 0;
@@ -139,7 +155,7 @@ watch(filteredPresets, drawAllCanvases);
             <div class="d-flex flex-column py-1">
               <span class="text-caption text-grey-lighten-1 mb-1">{{ child.Name }}</span>
               <canvas
-                :ref="(element) => setCanvasRef(child.Name, element, `g-${itemIdx}-${childIdx}`)"
+                :ref="(element: Element | null) => setCanvasRef(child.Name, element, `g-${itemIdx}-${childIdx}`)"
                 width="200"
                 height="18"
                 class="w-100 rounded-xs border-thin"
@@ -159,7 +175,7 @@ watch(filteredPresets, drawAllCanvases);
           <div class="d-flex flex-column py-1">
             <span class="text-caption text-grey-lighten-1 mb-1">{{ item.Name }}</span>
             <canvas
-              :ref="(element) => setCanvasRef(item.Name, element, `s-${itemIdx}`)"
+              :ref="(element: Element | null) => setCanvasRef(item.Name, element, `s-${itemIdx}`)"
               width="200"
               height="18"
               class="w-100 rounded-xs border-thin"

@@ -4,6 +4,17 @@ import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useMeshStyle } from "@ogw_internal/stores/data_style/mesh/index";
 import { useModelStyle } from "@ogw_internal/stores/data_style/model/index";
+import type {
+  ModelComponentStyle,
+  ModelComponentTypeStyle,
+  ObjectStyle,
+} from "@ogw_internal/stores/data_style/types";
+
+interface DataStyleSnapshot {
+  styles: Record<string, ObjectStyle>;
+  componentStyles: Record<string, ModelComponentStyle>;
+  modelComponentTypeStyles: Record<string, ModelComponentTypeStyle>;
+}
 
 // oxlint-disable-next-line max-lines-per-function
 export const useDataStyleStore = defineStore("dataStyle", () => {
@@ -15,11 +26,11 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   const model_component_type_datastyle_db = database.model_component_type_datastyle;
   const component_datastyle_db = database.model_component_datastyle;
 
-  async function addDataStyle(id, geode_object) {
+  async function addDataStyle(id: string, geode_object: string): Promise<void> {
     await data_style_db.put(structuredClone({ id, ...getDefaultStyle(geode_object) }));
   }
 
-  async function setVisibility(id, visibility) {
+  async function setVisibility(id: string, visibility: boolean) {
     const item = await dataStore.item(id);
     if (!(await dataStore.isItemViewable(item))) {
       return dataStyleState.mutateStyle(id, { visibility });
@@ -36,7 +47,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     throw new Error("Unknown viewer_type");
   }
 
-  async function applyDefaultStyle(id) {
+  async function applyDefaultStyle(id: string) {
     const item = await dataStore.item(id);
     if (!(await dataStore.isItemViewable(item))) {
       throw new Error(`applyDefaultStyle called for non-viewable item: ${id}`);
@@ -53,7 +64,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     throw new Error(`Unknown viewer_type: ${viewer_type}`);
   }
 
-  function exportStores() {
+  function exportStores(): DataStyleSnapshot {
     return {
       styles: dataStyleState.styles.value,
       componentStyles: dataStyleState.componentStyles.value,
@@ -61,7 +72,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     };
   }
 
-  async function importStores(snapshot) {
+  async function importStores(snapshot: DataStyleSnapshot): Promise<void> {
     const stylesSnapshot = snapshot.styles;
     const componentStylesSnapshot = snapshot.componentStyles;
     const modelComponentTypeStylesSnapshot = snapshot.modelComponentTypeStyles;

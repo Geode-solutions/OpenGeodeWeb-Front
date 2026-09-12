@@ -16,17 +16,17 @@ export function useMeshCellsStyle() {
   const meshCellsColorStyle = useMeshCellsColorStyle();
   const meshCellsTexturesStore = useMeshCellsTexturesStyle();
 
-  function meshCellsColoring(id) {
+  function meshCellsColoring(id: string) {
     return meshCellsCommonStyle.meshCellsColoring(id);
   }
   const meshCellsVertexAttributeStyle = useMeshCellsVertexAttributeStyle();
   const meshCellsCellAttributeStyle = useMeshCellsCellAttributeStyle();
 
-  function meshCellsActiveColoring(id) {
-    return meshCellsColoring(id).active;
+  function meshCellsActiveColoring(id: string): string | undefined {
+    return meshCellsColoring(id).active as string | undefined;
   }
 
-  async function setMeshCellsActiveColoring(id, type) {
+  async function setMeshCellsActiveColoring(id: string, type: string | undefined) {
     await meshCellsCommonStyle.mutateMeshCellsStyle(id, {
       coloring: { active: type },
     });
@@ -59,7 +59,7 @@ export function useMeshCellsStyle() {
     throw new Error(`Unknown mesh cells coloring type: ${type}`);
   }
 
-  function applyMeshCellsStyle(id) {
+  function applyMeshCellsStyle(id: string) {
     return Promise.all([
       meshCellsVisibility.setMeshCellsVisibility(id, meshCellsVisibility.meshCellsVisibility(id)),
       setMeshCellsActiveColoring(id, meshCellsActiveColoring(id)),

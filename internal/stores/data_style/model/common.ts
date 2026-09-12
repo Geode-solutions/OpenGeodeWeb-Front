@@ -1,42 +1,62 @@
+import type { ModelComponentStyle, ModelComponentTypeStyle, StyleValues } from "../types";
+import type { Table } from "dexie";
 import { database } from "@ogw_internal/database/database";
 import merge from "lodash/merge";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
+// The underlying dexie tables use compound array keys ([id_model, id_component] /
+// [id_model, type]) but the shared `database` proxy types every table as
+// Table<Record<string, unknown>, string>. Cast locally to the real key shape.
+type ComponentTable = Table<ModelComponentStyle, [string, string]>;
+type ComponentTypeTable = Table<ModelComponentTypeStyle, [string, string]>;
+
+interface ComponentStyleUpdate {
+  id_component: string;
+  values: StyleValues;
+}
+
 // oxlint-disable-next-line max-lines-per-function
 export function useModelCommonStyle() {
   const dataStore = useDataStore();
   const viewerStore = useViewerStore();
   const dataStyleState = useDataStyleState();
-  const model_component_datastyle_db = database.model_component_datastyle;
-  const model_component_type_datastyle_db = database.model_component_type_datastyle;
+  const model_component_datastyle_db = database.model_component_datastyle as unknown as ComponentTable;
+  const model_component_type_datastyle_db =
+    database.model_component_type_datastyle as unknown as ComponentTypeTable;
 
-  async function mutateComponentStyle(id_model, id_component, values) {
+  async function mutateComponentStyle(id_model: string, id_component: string, values: StyleValues) {
     dataStyleState.updateComponentStyleCache(id_model, id_component, values);
-    const key = [id_model, id_component];
-    const entry = (await model_component_datastyle_db.get(key)) || { id_model, id_component };
+    const key: [string, string] = [id_model, id_component];
+    const entry: ModelComponentStyle = (await model_component_datastyle_db.get(key)) || {
+      id_model,
+      id_component,
+    };
     merge(entry, values);
     return model_component_datastyle_db.put(structuredClone(toRaw(entry)));
   }
 
-  async function mutateModelComponentTypeStyle(id_model, type, values) {
+  async function mutateModelComponentTypeStyle(id_model: string, type: string, values: StyleValues) {
     dataStyleState.updateModelComponentTypeStyleCache(id_model, type, values);
     await database.transaction("rw", model_component_type_datastyle_db, async () => {
-      const key = [id_model, type];
-      const entry = (await model_component_type_datastyle_db.get(key)) || { id_model, type };
+      const key: [string, string] = [id_model, type];
+      const entry: ModelComponentTypeStyle = (await model_component_type_datastyle_db.get(key)) || {
+        id_model,
+        type,
+      };
       merge(entry, values);
       return model_component_type_datastyle_db.put(structuredClone(toRaw(entry)));
     });
   }
 
-  async function mutateComponentStyles(id_model, id_components, values) {
+  async function mutateComponentStyles(id_model: string, id_components: string[], values: StyleValues) {
     dataStyleState.bulkUpdateComponentStylesCache(id_model, id_components, values);
     await database.transaction("rw", model_component_datastyle_db, async () => {
-      const keys = id_components.map((id_component) => [id_model, id_component]);
+      const keys: [string, string][] = id_components.map((id_component) => [id_model, id_component]);
       const existing = await model_component_datastyle_db.bulkGet(keys);
       const updates = id_components.map((id_component, index) => {
-        const style = existing[index] || { id_model, id_component };
+        const style: ModelComponentStyle = existing[index] || { id_model, id_component };
         merge(style, values);
         return toRaw(style);
       });
@@ -45,13 +65,19 @@ export function useModelCommonStyle() {
     });
   }
 
-  async function bulkMutateComponentStylesPerComponent(id_model, component_updates) {
+  async function bulkMutateComponentStylesPerComponent(
+    id_model: string,
+    component_updates: ComponentStyleUpdate[],
+  ) {
     dataStyleState.bulkUpdateComponentStyleCache(id_model, component_updates);
     await database.transaction("rw", model_component_datastyle_db, async () => {
-      const keys = component_updates.map((update) => [id_model, update.id_component]);
+      const keys: [string, string][] = component_updates.map((update) => [
+        id_model,
+        update.id_component,
+      ]);
       const existing = await model_component_datastyle_db.bulkGet(keys);
       const updates = component_updates.map(({ id_component, values }, index) => {
-        const style = existing[index] || { id_model, id_component };
+        const style: ModelComponentStyle = existing[index] || { id_model, id_component };
         merge(style, values);
         return toRaw(style);
       });
@@ -59,7 +85,13 @@ export function useModelCommonStyle() {
     });
   }
 
-  async function setModelTypeColor(id, component_ids, color, schema, activeColoring = "constant") {
+  async function setModelTypeColor(
+    id: string,
+    component_ids: string[],
+    color: unknown,
+    schema: object,
+    activeColoring = "constant",
+  ) {
     if (!component_ids?.length) {
       return;
     }
@@ -69,7 +101,11 @@ export function useModelCommonStyle() {
       return;
     }
 
-    const params = { id, block_ids: viewer_ids, color_mode: activeColoring };
+    const params: Record<string, unknown> = {
+      id,
+      block_ids: viewer_ids,
+      color_mode: activeColoring,
+    };
     if (activeColoring === "constant") {
       await mutateComponentStyles(id, component_ids, {
         coloring: {
@@ -82,7 +118,7 @@ export function useModelCommonStyle() {
     return viewerStore.request(
       { schema, params },
       {
-        response_function: async (colors) => {
+        response_function: async (colors: { geode_id: string; color: unknown }[] | undefined) => {
           if (activeColoring === "constant") {
             await mutateComponentStyles(id, component_ids, {
               coloring: {
@@ -112,7 +148,12 @@ export function useModelCommonStyle() {
     );
   }
 
-  async function setModelTypeVisibility(id, component_ids, visibility, schema) {
+  async function setModelTypeVisibility(
+    id: string,
+    component_ids: string[],
+    visibility: boolean | undefined,
+    schema: object,
+  ) {
     if (!component_ids?.length) {
       return;
     }

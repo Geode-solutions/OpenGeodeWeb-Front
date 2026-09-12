@@ -9,6 +9,9 @@ import { createError } from "h3";
 import { extensionFrontendPath } from "@geode/opengeodeweb-front/server/utils/path.js";
 
 interface ExtensionMetadata {
+  id: string;
+  name: string;
+  version: string;
   frontendFile: string;
   backendExecutable: string;
   [key: string]: unknown;

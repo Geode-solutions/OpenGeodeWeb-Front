@@ -10,8 +10,8 @@ import { useBackStore } from "@ogw_front/stores/back";
 const EXPECTED_LENGTH = 1;
 const FIRST_INDEX = 0;
 
-let pinia = undefined;
-let backStore = undefined;
+let pinia: ReturnType<typeof setupActivePinia>;
+let backStore: ReturnType<typeof useBackStore>;
 
 describe("crs selector", () => {
   beforeEach(() => {
@@ -30,10 +30,12 @@ describe("crs selector", () => {
     ];
 
     // Mock backStore.request instead of registerEndpoint
-    backStore.request = vi.fn((request, callbacks) => {
-      callbacks.response_function({ crs_list });
-      return Promise.resolve({ crs_list });
-    });
+    backStore.request = vi.fn(
+      (_request: unknown, callbacks: { response_function?: (response: unknown) => void }) => {
+        callbacks.response_function?.({ crs_list });
+        return Promise.resolve({ crs_list });
+      },
+    );
 
     const key_to_update = "key";
     const wrapper = await mountSuspended(CrsSelector, {
@@ -47,8 +49,8 @@ describe("crs selector", () => {
     const input = await td_wrapper.find("input");
     await input.trigger("click");
     expect(wrapper.emitted()).toHaveProperty("update_values");
-    expect(wrapper.emitted().update_values).toHaveLength(EXPECTED_LENGTH);
-    expect(wrapper.emitted().update_values[FIRST_INDEX][FIRST_INDEX]).toStrictEqual({
+    expect(wrapper.emitted<unknown[]>().update_values).toHaveLength(EXPECTED_LENGTH);
+    expect(wrapper.emitted<unknown[]>().update_values?.[FIRST_INDEX]?.[FIRST_INDEX]).toStrictEqual({
       [key_to_update]: crs_list[FIRST_INDEX],
     });
   });

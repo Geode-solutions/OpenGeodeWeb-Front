@@ -10,9 +10,15 @@ import {
   targetExtensionFilePath,
 } from "@geode/opengeodeweb-front/server/utils/app_config.js";
 
+interface DownloadExtensionBody {
+  projectName: string;
+  url: string;
+  extensionFileName: string;
+}
+
 export default defineEventHandler(async (event) => {
   try {
-    const body = await readBody(event);
+    const body = await readBody<DownloadExtensionBody>(event);
     const { projectName, url, extensionFileName } = body;
     console.log({ projectName, url, extensionFileName });
     const fileBuffer = await fetch(url).then((file) => file.arrayBuffer());
@@ -26,7 +32,7 @@ export default defineEventHandler(async (event) => {
     console.error("Error downloading extension:", error);
     throw createError({
       statusCode: 500,
-      statusMessage: error.message,
+      statusMessage: (error as Error).message,
     });
   }
 });

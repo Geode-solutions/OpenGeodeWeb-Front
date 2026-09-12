@@ -26,7 +26,7 @@ const { width: windowWidth, height: windowHeight } = useWindowSize();
 
 const { pickColormap, quickColormap } = useQuickColormap();
 
-async function get_x_y(event) {
+async function get_x_y(event: PointerEvent) {
   const { offsetX, offsetY, clientX, clientY } = event;
   if (viewerStore.picking_mode === true) {
     viewerStore.set_picked_point(offsetX, offsetY);
@@ -77,7 +77,10 @@ function connect() {
   }
   const session = viewerStore.client.getConnection().getSession();
   view.setSession(session);
-  view.setViewId(props.viewId);
+  // Pre-existing bug fixed: `props` was never defined here (props were destructured
+  // directly from defineProps above), so this threw a ReferenceError whenever
+  // connect() ran. `viewId` is the same (reactive) destructured prop value.
+  view.setViewId(viewId);
   connected.value = true;
   view.render();
 }
@@ -90,7 +93,7 @@ watch(
 );
 
 watch(
-  () => props.viewId,
+  () => viewId,
   (id) => {
     if (connected.value) {
       view.setViewId(id);
@@ -103,7 +106,9 @@ onMounted(async () => {
   if (import.meta.client) {
     window.addEventListener("resize", resize);
     await nextTick();
-    view.setContainer(viewer.value.$el);
+    if (viewer.value) {
+      view.setContainer(viewer.value.$el);
+    }
     connect();
     resize();
   }

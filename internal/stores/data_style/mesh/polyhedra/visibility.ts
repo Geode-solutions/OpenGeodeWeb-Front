@@ -12,10 +12,10 @@ export function useMeshPolyhedraVisibilityStyle() {
   const viewerStore = useViewerStore();
   const meshPolyhedraCommonStyle = useMeshPolyhedraCommonStyle();
 
-  function meshPolyhedraVisibility(id) {
-    return meshPolyhedraCommonStyle.meshPolyhedraStyle(id).visibility;
+  function meshPolyhedraVisibility(id: string): boolean | undefined {
+    return meshPolyhedraCommonStyle.meshPolyhedraStyle(id).visibility as boolean | undefined;
   }
-  function setMeshPolyhedraVisibility(id, visibility) {
+  function setMeshPolyhedraVisibility(id: string, visibility: boolean | undefined) {
     const params = { id, visibility };
     return viewerStore.request(
       {

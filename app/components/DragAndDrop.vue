@@ -27,11 +27,11 @@ const emit = defineEmits(["files-selected"]);
 const isDragging = ref(false);
 const isInternalDrag = ref(false);
 const dragCounter = ref(0);
-const fileInput = ref(undefined);
+const fileInput = ref<HTMLInputElement | undefined>(undefined);
 
 const WILDCARD_SUFFIX_LENGTH = 2;
 
-function isFileAccepted(file, acceptValue) {
+function isFileAccepted(file: File, acceptValue: string | string[] | undefined) {
   const fileName = (file.name || "").toLowerCase();
   const fileType = (file.type || "").toLowerCase();
   const isVext = fileName.endsWith(".vext");
@@ -39,7 +39,7 @@ function isFileAccepted(file, acceptValue) {
   if (!acceptValue) {
     return !isVext;
   }
-  let rules = [];
+  let rules: string[] = [];
   if (Array.isArray(acceptValue)) {
     rules = acceptValue;
   } else if (typeof acceptValue === "string") {
@@ -79,8 +79,8 @@ function triggerFileDialog() {
   fileInput.value?.click();
 }
 
-function onDragEnter(event) {
-  if (!isInternalDrag.value && event.dataTransfer.types.includes("Files")) {
+function onDragEnter(event: DragEvent) {
+  if (!isInternalDrag.value && event.dataTransfer?.types.includes("Files")) {
     dragCounter.value += 1;
     isDragging.value = true;
   }
@@ -94,23 +94,25 @@ function onDragLeave() {
   }
 }
 
-function onDragOver(event) {
-  if (!isInternalDrag.value && event.dataTransfer.types.includes("Files")) {
+function onDragOver(event: DragEvent) {
+  if (!isInternalDrag.value && event.dataTransfer?.types.includes("Files")) {
     event.preventDefault();
   }
 }
 
-function onDrop(event) {
+function onDrop(event: DragEvent) {
   event.preventDefault();
   dragCounter.value = 0;
   isDragging.value = false;
-  const files = [...event.dataTransfer.files].filter((file) => isFileAccepted(file, accept));
+  const files = [...(event.dataTransfer?.files ?? [])].filter((file) =>
+    isFileAccepted(file, accept),
+  );
   if (files.length > 0) {
     emit("files-selected", files);
   }
 }
 
-function onKeyDown(event) {
+function onKeyDown(event: KeyboardEvent) {
   if (event.key === "Escape") {
     event.preventDefault();
     event.stopPropagation();
@@ -119,12 +121,13 @@ function onKeyDown(event) {
   }
 }
 
-function handleFileSelect(event) {
-  const files = [...event.target.files];
+function handleFileSelect(event: Event) {
+  const target = event.target as HTMLInputElement;
+  const files = [...(target.files ?? [])];
   if (files.length > 0) {
     emit("files-selected", files);
   }
-  event.target.value = "";
+  target.value = "";
 }
 
 function onInternalDragStart() {

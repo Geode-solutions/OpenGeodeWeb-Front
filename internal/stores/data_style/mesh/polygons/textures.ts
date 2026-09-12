@@ -6,16 +6,16 @@ import { useMeshPolygonsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const schema = viewer_schemas.opengeodeweb_viewer.mesh.polygons.apply_textures;
+const schema = viewer_schemas.opengeodeweb_viewer.mesh.apply_textures;
 
 export function useMeshPolygonsTexturesStyle() {
   const viewerStore = useViewerStore();
   const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle();
 
-  function meshPolygonsTextures(id) {
+  function meshPolygonsTextures(id: string): unknown {
     return meshPolygonsCommonStyle.meshPolygonsColoring(id).textures;
   }
-  function setMeshPolygonsTextures(id, textures) {
+  function setMeshPolygonsTextures(id: string, textures: unknown) {
     const params = { id, textures };
     return viewerStore.request(
       {

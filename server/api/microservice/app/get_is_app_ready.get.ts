@@ -11,9 +11,10 @@ export default defineEventHandler(async () => {
     return { statusCode: 200, isReady };
   } catch (error) {
     console.log(error);
+    const err = error as { statusCode?: number; statusMessage?: string; message?: string };
     throw createError({
-      statusCode: error.statusCode,
-      statusMessage: error.statusMessage ?? error.message,
+      statusCode: err.statusCode,
+      statusMessage: err.statusMessage ?? err.message,
     });
   }
 });

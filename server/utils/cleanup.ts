@@ -1,3 +1,4 @@
+/// <reference path="../types/vendor.d.ts" />
 // Node imports
 import fs from "node:fs";
 import path from "node:path";
@@ -185,3 +186,4 @@ export {
   projectMicroservices,
   getMicroserviceByName,
 };
+export type { Microservice };

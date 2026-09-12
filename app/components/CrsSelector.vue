@@ -13,15 +13,18 @@ const { geodeObjectType, keyToUpdate } = defineProps({
 
 const search = ref("");
 const data_table_loading = ref(false);
-const crs_list = ref([]);
-const selected_crs = ref([]);
+const crs_list = ref<Record<string, unknown>[]>([]);
+const selected_crs = ref<unknown[]>([]);
 const toggle_loading = useToggle(data_table_loading);
 const backStore = useBackStore();
 
-function get_selected_crs(crs_code) {
-  for (let i = 0; i <= crs_list.value.length; i += 1) {
-    if (crs_list.value[i]["code"] === crs_code) {
-      return crs_list.value[i];
+function get_selected_crs(crs_code: unknown) {
+  // Pre-existing off-by-one fixed: `i <= length` read one past the end of
+  // crs_list, which would have thrown on `undefined["code"]` at runtime.
+  for (let i = 0; i < crs_list.value.length; i += 1) {
+    const crs = crs_list.value[i];
+    if (crs && crs["code"] === crs_code) {
+      return crs;
     }
   }
 }
@@ -41,7 +44,7 @@ async function get_crs_table() {
   await backStore.request(
     { schema, params },
     {
-      response_function: (response) => {
+      response_function: (response: { crs_list: Record<string, unknown>[] }) => {
         crs_list.value = response.crs_list;
       },
     },
@@ -58,7 +61,7 @@ const headers = [
   },
   { title: "Code", align: "end", key: "code" },
   { title: "Name", align: "end", key: "name" },
-];
+] as const;
 
 // oxlint-disable-next-line no-top-level-await
 await get_crs_table();

@@ -15,14 +15,16 @@ const show = defineModel("show", { type: Boolean, default: false });
 const dataStore = useDataStore();
 const hybridViewerStore = useHybridViewerStore();
 const targetAllVisible = ref(true);
-const selectedDatasetIds = ref([]);
-const planes = ref([{ origin: undefined, normal: [1, 0, 0] }]);
+const selectedDatasetIds = ref<string[]>([]);
+const planes = ref<{ origin?: number[]; normal: number[] }[]>([
+  { origin: undefined, normal: [1, 0, 0] },
+]);
 const allItems = dataStore.refAllItems();
 const availableDatasets = computed(() =>
   allItems.value.map((item) => ({ title: item.name || item.id, value: item.id })),
 );
 const widgetContainer = useTemplateRef("widgetContainer");
-let debouncedApply = undefined;
+let debouncedApply: ((...args: unknown[]) => void) | undefined = undefined;
 
 const {
   getSceneCenter,
@@ -39,7 +41,7 @@ const {
   selectedDatasetIds,
   allItems,
   hybridViewerStore,
-  debouncedApply: (...args) => debouncedApply?.(...args),
+  debouncedApply: (...args: unknown[]) => debouncedApply?.(...args),
 });
 
 async function applyClippingPlanes() {
@@ -66,15 +68,19 @@ async function applyClippingPlanes() {
 debouncedApply = useDebounceFn(() => applyClippingPlanes(), DEBOUNCE_DELAY);
 
 function addPlane() {
-  const normal = DEFAULT_NORMALS[planes.value.length % DEFAULT_NORMALS.length];
+  // Index is always in-bounds (modulo the fixed-size list); the fallbacks only
+  // satisfy noUncheckedIndexedAccess and are never hit at runtime.
+  const normal =
+    DEFAULT_NORMALS[planes.value.length % DEFAULT_NORMALS.length] ??
+    DEFAULT_NORMALS[0] ?? [1, 0, 0];
   planes.value.push({ origin: getSceneCenter(), normal });
 }
 
-function removePlane(index) {
+function removePlane(index: number) {
   planes.value.splice(index, 1);
 }
 
-function flipNormal(plane) {
+function flipNormal(plane: { normal: number[] }) {
   plane.normal = plane.normal.map((component) => -component);
   syncWidgets();
   applyClippingPlanes();

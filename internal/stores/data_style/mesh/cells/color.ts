@@ -12,10 +12,10 @@ export function useMeshCellsColorStyle() {
   const viewerStore = useViewerStore();
   const meshCellsCommonStyle = useMeshCellsCommonStyle();
 
-  function meshCellsColor(id) {
+  function meshCellsColor(id: string): unknown {
     return meshCellsCommonStyle.meshCellsColoring(id).constant;
   }
-  function setMeshCellsColor(id, color) {
+  function setMeshCellsColor(id: string, color: unknown) {
     const params = { id, color };
     return viewerStore.request(
       {

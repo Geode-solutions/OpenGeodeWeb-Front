@@ -14,6 +14,16 @@ const { id, viewId } = defineProps({
   viewId: { type: String, required: false, default: undefined },
 });
 const actualViewId = viewId || id;
+
+interface CollectionTreeItem {
+  raw?: CollectionTreeItem;
+  id: string;
+  category?: string;
+  children?: CollectionTreeItem[];
+  viewer_id?: number;
+  title?: string;
+}
+
 const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 const hybridViewerStore = useHybridViewerStore();
 const emit = defineEmits(["show-menu"]);
@@ -47,20 +57,20 @@ const {
   applySearchFilter,
 } = useTreeFilter(localCategories);
 
-function onUpdateSelection(newSelection) {
+function onUpdateSelection(newSelection: string[]) {
   const finalSelection = applySearchFilter(newSelection, visibleComponents.value);
   updateVisibility(finalSelection);
 }
 
 const visibleSelection = computed(() => applySearchFilter(visibleComponents.value, []));
 
-const itemsForTreeView = computed(() => {
+const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
   if (search.value && componentsCache.value) {
     const query = search.value.toLowerCase();
-    const result = [];
+    const result: CollectionTreeItem[] = [];
     for (const type of Object.keys(componentsCache.value)) {
       const matches = componentsCache.value[type].filter(
-        (component) =>
+        (component: { title: string; id: string }) =>
           component.title.toLowerCase().includes(query) ||
           component.id.toLowerCase().includes(query),
       );
@@ -75,7 +85,7 @@ const itemsForTreeView = computed(() => {
     return result;
   }
 
-  const result = [];
+  const result: CollectionTreeItem[] = [];
   for (const category of filteredCategories.value) {
     result.push({
       ...category,
@@ -85,7 +95,7 @@ const itemsForTreeView = computed(() => {
   return result;
 });
 
-function showContextMenu(event, item) {
+function showContextMenu(event: unknown, item: CollectionTreeItem) {
   const actualItem = item.raw || item;
   emit("show-menu", {
     event,
@@ -96,17 +106,23 @@ function showContextMenu(event, item) {
   });
 }
 
-function extractIds(node) {
+function extractIds(node: CollectionTreeItem): number[] {
   if (node.children) {
     return node.children.flatMap((child) => extractIds(child));
   }
   if (Number.isInteger(node.viewer_id)) {
-    return [node.viewer_id];
+    return [node.viewer_id as number];
   }
   return [];
 }
 
-function handleHoverEnter({ item, immediate = false }) {
+function handleHoverEnter({
+  item,
+  immediate = false,
+}: {
+  item: CollectionTreeItem;
+  immediate?: boolean;
+}) {
   const actualItem = item.raw || item;
 
   if (!actualItem.category && (!actualItem.children || actualItem.children.length === 0)) {
@@ -123,8 +139,8 @@ function handleHoverLeave() {
 }
 
 function expandAll() {
-  const allIds = [];
-  function traverse(itemsList) {
+  const allIds: string[] = [];
+  function traverse(itemsList: CollectionTreeItem[]) {
     for (const item of itemsList) {
       if (item.children && item.children.length > 0) {
         allIds.push(item.id);
@@ -136,7 +152,7 @@ function expandAll() {
   opened.value = allIds;
 }
 
-function getLeafViewerIds(item) {
+function getLeafViewerIds(item: CollectionTreeItem) {
   const actualItem = item.raw || item;
   return extractIds(actualItem);
 }

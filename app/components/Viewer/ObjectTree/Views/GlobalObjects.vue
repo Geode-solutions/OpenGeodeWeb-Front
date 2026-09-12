@@ -18,10 +18,19 @@ const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 
 const emit = defineEmits(["show-menu"]);
 
+interface TreeGroupItem {
+  raw?: TreeGroupItem;
+  id: string;
+  title?: string;
+  viewer_type?: string;
+  geode_object_type?: string;
+  children?: TreeGroupItem[];
+}
+
 const mainView = computed(() => treeviewStore.opened_views[0]);
 const opened = computed({
   get: () => mainView.value?.opened || [],
-  set: (val) => treeviewStore.setOpened(mainView.value.id, val),
+  set: (val) => treeviewStore.setOpened(mainView.value?.id ?? "", val),
 });
 
 const {
@@ -35,7 +44,7 @@ const {
   applySearchFilter,
 } = useTreeFilter(() => treeviewStore.items, { recursiveSort: true });
 
-function onUpdateSelection(val) {
+function onUpdateSelection(val: string[]) {
   treeviewStore.selection = applySearchFilter(val, treeviewStore.selection);
 }
 
@@ -68,14 +77,15 @@ watch(
   },
 );
 
-function isModel(item) {
+function isModel(item: TreeGroupItem) {
   const actualItem = item.raw || item;
   return (
-    actualItem.viewer_type === "model" || ["BRep", "Section"].includes(actualItem.geode_object_type)
+    actualItem.viewer_type === "model" ||
+    ["BRep", "Section"].includes(actualItem.geode_object_type ?? "")
   );
 }
 
-const hasCollectionsMap = reactive({});
+const hasCollectionsMap = reactive<Record<string, boolean>>({});
 
 watch(
   () => treeviewStore.items,
@@ -100,7 +110,13 @@ watch(
   { immediate: true, deep: true },
 );
 
-function handleHoverEnter({ item, immediate = false }) {
+function handleHoverEnter({
+  item,
+  immediate = false,
+}: {
+  item: TreeGroupItem;
+  immediate?: boolean;
+}) {
   const actualItem = item.raw || item;
 
   if (!actualItem.viewer_type) {
@@ -117,7 +133,7 @@ function handleHoverEnter({ item, immediate = false }) {
   );
 }
 
-function handleHoverLeave({ item }) {
+function handleHoverLeave({ item }: { item: TreeGroupItem }) {
   const actualItem = item.raw || item;
   if (!actualItem.viewer_type) {
     return;
@@ -126,8 +142,8 @@ function handleHoverLeave({ item }) {
 }
 
 function expandAll() {
-  const allIds = [];
-  function traverse(itemsList) {
+  const allIds: string[] = [];
+  function traverse(itemsList: TreeGroupItem[]) {
     for (const item of itemsList) {
       if (item.children && item.children.length > 0) {
         allIds.push(item.id);
@@ -166,7 +182,7 @@ function expandAll() {
       :scroll-top="mainView?.scrollTop || 0"
       class="transparent-treeview virtual-tree-height"
       @update:selected="onUpdateSelection"
-      @update:scroll-top="treeviewStore.setScrollTop(mainView.id, $event)"
+      @update:scroll-top="treeviewStore.setScrollTop(mainView?.id ?? '', $event)"
       @hover:enter="handleHoverEnter"
       @hover:leave="handleHoverLeave"
       @contextmenu="emit('show-menu', { event: $event.event, itemId: $event.item.id })"

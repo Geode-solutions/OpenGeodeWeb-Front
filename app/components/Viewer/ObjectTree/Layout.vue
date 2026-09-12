@@ -42,17 +42,19 @@ const totalWidth = computed(() => {
   return `${firstColWidth + secondColWidth + gap}px`;
 });
 
-const rowHeights = computed({
+const rowHeights = computed<number[]>({
   get: () => treeviewStore.rowHeights,
   set: (val) => treeviewStore.setRowHeights(val),
 });
-const draggedIndex = ref(undefined);
+const draggedIndex = ref<number | undefined>(undefined);
 
 watch(
   () => additionalViews.value.length,
   (newLength) => {
     if (newLength > 0 && rowHeights.value.length !== newLength) {
-      treeviewStore.setRowHeights(Array.from({ length: newLength }).fill(PERCENT_100 / newLength));
+      treeviewStore.setRowHeights(
+        Array.from<number>({ length: newLength }, () => PERCENT_100 / newLength),
+      );
     }
   },
   { immediate: true },
@@ -80,25 +82,25 @@ watch([maxWidth, () => additionalViews.value.length], ([newMax]) => {
   }
 });
 
-function onDragStart(index) {
+function onDragStart(index: number) {
   draggedIndex.value = index;
 }
 
-function onDragOver(event) {
+function onDragOver(event: DragEvent) {
   event.preventDefault();
 }
 
-function onDrop(targetIndex) {
+function onDrop(targetIndex: number) {
   if (draggedIndex.value !== undefined && draggedIndex.value !== targetIndex) {
     treeviewStore.moveView(draggedIndex.value, targetIndex);
   }
   draggedIndex.value = undefined;
 }
 
-function onResizeStart(event) {
+function onResizeStart(event: MouseEvent) {
   const startWidth = treeviewStore.panelWidth;
   const startX = event.clientX;
-  function resize(move_event) {
+  function resize(move_event: MouseEvent) {
     const deltaX = move_event.clientX - startX;
     let newWidth = startWidth + deltaX;
     const hasAdditional = additionalViews.value.length > 0;
@@ -126,15 +128,18 @@ function onResizeStart(event) {
   document.addEventListener("mouseup", stopResize);
 }
 
-function onAdditionalResizeStart(event) {
+function onAdditionalResizeStart(event: MouseEvent) {
   const startWidth = treeviewStore.additionalPanelWidth;
   const startX = event.clientX;
-  function resize(move_event) {
+  function resize(move_event: MouseEvent) {
     const deltaX = move_event.clientX - startX;
     const newWidth = startWidth + deltaX;
     const currentTotalWidth = treeviewStore.panelWidth + newWidth + GAP_WIDTH;
     if (newWidth < AUTO_CLOSE_THRESHOLD) {
-      treeviewStore.closeView(additionalViews.value.at(-1).id);
+      const lastAdditionalView = additionalViews.value.at(-1);
+      if (lastAdditionalView) {
+        treeviewStore.closeView(lastAdditionalView.id);
+      }
       return;
     }
 
@@ -150,13 +155,13 @@ function onAdditionalResizeStart(event) {
   document.addEventListener("mouseup", stopResize);
 }
 
-function onVerticalResizeStart(event, index) {
+function onVerticalResizeStart(event: MouseEvent, index: number) {
   const startY = event.clientY;
-  const startHeight1 = rowHeights.value[index];
-  const startHeight2 = rowHeights.value[index + 1];
-  const containerHeight = event.currentTarget.parentElement.offsetHeight;
+  const startHeight1 = rowHeights.value[index] ?? 0;
+  const startHeight2 = rowHeights.value[index + 1] ?? 0;
+  const containerHeight = (event.currentTarget as HTMLElement).parentElement?.offsetHeight ?? 0;
 
-  function resize(move_event) {
+  function resize(move_event: MouseEvent) {
     const deltaY = move_event.clientY - startY;
     const deltaPercent = (deltaY / containerHeight) * PERCENT_100;
     const minHeightPercent = (HEIGHT_MIN / containerHeight) * PERCENT_100;
@@ -262,7 +267,7 @@ function onVerticalResizeStart(event, index) {
           >
             <ViewerObjectTreeBox
               :title="view.title"
-              :icon="geode_objects[view.geode_object_type]?.image"
+              :icon="geode_objects[view.geode_object_type ?? '']?.image"
               :scroll-top="view.scrollTop"
               closable
               :border-radius="`0 ${index === 0 ? '16px' : '0'} ${index === additionalViews.length - 1 ? '16px' : '0'} 0`"

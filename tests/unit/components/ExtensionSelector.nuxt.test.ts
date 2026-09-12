@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime";
 import { nextTick } from "vue";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import type { HTTPMethod } from "h3";
 
 // Local imports
 import { setupActivePinia, vuetify } from "@ogw_tests/utils";
@@ -38,7 +39,7 @@ describe("extension selector", () => {
     const output_extension = "msh";
 
     registerEndpoint(schema.$id, {
-      method: schema.methods[FIRST_INDEX],
+      method: schema.methods[FIRST_INDEX] as HTTPMethod,
       handler: () => ({
         geode_objects_and_output_extensions: {
           BRep: { msh: { is_saveable: true } },
@@ -54,10 +55,12 @@ describe("extension selector", () => {
     await nextTick();
     expect(wrapper.exists()).toBe(true);
     const v_card = await wrapper.findAllComponents(components.VCard);
-    await v_card[SECOND_INDEX].trigger("click");
+    await v_card[SECOND_INDEX]?.trigger("click");
     expect(wrapper.emitted()).toHaveProperty("update_values");
-    expect(wrapper.emitted().update_values).toHaveLength(EXPECTED_LENGTH);
-    expect(wrapper.emitted().update_values[FIRST_INDEX][FIRST_INDEX]).toStrictEqual({
+    expect(wrapper.emitted<unknown[]>().update_values).toHaveLength(EXPECTED_LENGTH);
+    expect(
+      wrapper.emitted<unknown[]>().update_values?.[FIRST_INDEX]?.[FIRST_INDEX],
+    ).toStrictEqual({
       output_geode_object,
       output_extension,
     });

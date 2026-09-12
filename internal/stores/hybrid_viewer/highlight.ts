@@ -3,9 +3,24 @@ import { database } from "@ogw_internal/database/database.js";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import type { Ref } from "vue";
+import type { HoverComponentInfo, HoverData, HybridViewerStorePublic } from "./vtk_types";
 
-function createClearHoverData(hoverTimeoutRef, hoverData, currentHoverId) {
-  return function clearHoverData() {
+// The dynamic/RPC-shaped payload of the viewer's "highlight" schema response.
+interface HighlightResponse {
+  id?: string;
+  picked_id?: number;
+  field_type?: string;
+  geode_id?: string;
+  attributes?: Record<string, unknown>;
+}
+
+function createClearHoverData(
+  hoverTimeoutRef: Ref<ReturnType<typeof setTimeout> | undefined>,
+  hoverData: Ref<HoverData | undefined>,
+  currentHoverId: Ref<string | undefined>,
+) {
+  return function clearHoverData(): void {
     if (hoverTimeoutRef.value) {
       clearTimeout(hoverTimeoutRef.value);
       hoverTimeoutRef.value = undefined;
@@ -15,10 +30,15 @@ function createClearHoverData(hoverTimeoutRef, hoverData, currentHoverId) {
   };
 }
 
-function performHoverHighlight(event, onResponse) {
+function performHoverHighlight(
+  event: MouseEvent,
+  onResponse: (response: unknown) => void | Promise<void>,
+): void {
   const hybridViewerStore = useHybridViewerStore();
-  const { genericRenderWindow, hybridDb } = hybridViewerStore;
-  const { is_hover_highlight, hover_highlight_field_type } = storeToRefs(hybridViewerStore);
+  const { genericRenderWindow, hybridDb } = hybridViewerStore as unknown as HybridViewerStorePublic;
+  const { is_hover_highlight, hover_highlight_field_type } = storeToRefs(
+    hybridViewerStore,
+  ) as unknown as { is_hover_highlight: Ref<boolean>; hover_highlight_field_type: Ref<string> };
   if (!is_hover_highlight.value) {
     return;
   }
@@ -45,11 +65,28 @@ function performHoverHighlight(event, onResponse) {
     },
   );
 }
-function createHoverHighlight({ hoverTimeoutRef, currentHoverId, clearHoverData }) {
-  return useDebounceFn((event) => {
+
+interface CreateHoverHighlightParams {
+  hoverTimeoutRef: Ref<ReturnType<typeof setTimeout> | undefined>;
+  currentHoverId: Ref<string | undefined>;
+  clearHoverData: () => void;
+}
+
+function createHoverHighlight({
+  hoverTimeoutRef,
+  currentHoverId,
+  clearHoverData,
+}: CreateHoverHighlightParams) {
+  return useDebounceFn((event: MouseEvent) => {
     const hybridViewerStore = useHybridViewerStore();
-    const { genericRenderWindow } = hybridViewerStore;
-    const { is_hover_highlight, hoverData, hoverPosition } = storeToRefs(hybridViewerStore);
+    const { genericRenderWindow } = hybridViewerStore as unknown as HybridViewerStorePublic;
+    const { is_hover_highlight, hoverData, hoverPosition } = storeToRefs(
+      hybridViewerStore,
+    ) as unknown as {
+      is_hover_highlight: Ref<boolean>;
+      hoverData: Ref<HoverData | undefined>;
+      hoverPosition: Ref<{ x: number; y: number }>;
+    };
     const containerElement = genericRenderWindow.value?.getContainer();
     const relativeMousePosition = containerElement
       ? {
@@ -60,7 +97,8 @@ function createHoverHighlight({ hoverTimeoutRef, currentHoverId, clearHoverData 
           x: event.clientX,
           y: event.clientY,
         };
-    performHoverHighlight(event, async (response) => {
+    performHoverHighlight(event, async (rawResponse: unknown) => {
+      const response = rawResponse as HighlightResponse | undefined;
       const isResponseValid =
         response && response.id && response.picked_id !== undefined && response.picked_id !== -1;
       if (!is_hover_highlight.value || !isResponseValid) {
@@ -77,25 +115,29 @@ function createHoverHighlight({ hoverTimeoutRef, currentHoverId, clearHoverData 
       }
       hoverData.value = undefined;
       currentHoverId.value = hoverKey;
-      let componentInfo = undefined;
-      let modelName = undefined;
-      const modelRecord = await database.data.get(response.id);
+      let componentInfo: HoverComponentInfo | undefined = undefined;
+      let modelName: string | undefined = undefined;
+      const modelRecord = (await database.data.get(response.id as string)) as
+        | { name?: string }
+        | undefined;
       if (modelRecord) {
         modelName = modelRecord.name;
       }
       if (response.geode_id) {
         const components = database.model_components.where("[id+geode_id]");
         const query = components.equals([response.id, response.geode_id]);
-        const component = await query.first();
+        const component = (await query.first()) as
+          | { name?: string; geode_id?: string; type?: string }
+          | undefined;
         if (component) {
           componentInfo = {
-            name: component.name,
-            id: component.geode_id,
-            type: component.type,
+            name: component.name ?? "",
+            id: component.geode_id ?? "",
+            type: component.type ?? "",
           };
         }
       }
-      const newHoverData = {
+      const newHoverData: HoverData = {
         modelId: response.id,
         modelName,
         blockName: response.geode_id,
@@ -112,9 +154,12 @@ function createHoverHighlight({ hoverTimeoutRef, currentHoverId, clearHoverData 
     });
   }, HOVER_DEBOUNCE_MS);
 }
-function performClearHoverHighlight() {
-  const { hybridDb } = useHybridViewerStore();
-  const { hover_highlight_field_type } = storeToRefs(useHybridViewerStore());
+function performClearHoverHighlight(): void {
+  const hybridViewerStore = useHybridViewerStore();
+  const { hybridDb } = hybridViewerStore as unknown as HybridViewerStorePublic;
+  const { hover_highlight_field_type } = storeToRefs(hybridViewerStore) as unknown as {
+    hover_highlight_field_type: Ref<string>;
+  };
   const viewerStore = useViewerStore();
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.highlight;
   const params = {
@@ -132,13 +177,13 @@ function performClearHoverHighlight() {
 function useHybridViewerHighlight() {
   const is_hover_highlight = ref(false);
   const hover_highlight_field_type = ref("CELL");
-  const hoverData = ref(undefined);
+  const hoverData = ref<HoverData | undefined>(undefined);
   const hoverPosition = ref({
     x: 0,
     y: 0,
   });
-  const hoverTimeoutRef = ref(undefined);
-  const currentHoverId = ref(undefined);
+  const hoverTimeoutRef = ref<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const currentHoverId = ref<string | undefined>(undefined);
   const clearHoverData = createClearHoverData(hoverTimeoutRef, hoverData, currentHoverId);
   const hoverHighlight = createHoverHighlight({
     hoverTimeoutRef,
@@ -146,7 +191,7 @@ function useHybridViewerHighlight() {
     clearHoverData,
   });
 
-  function clearHoverHighlight() {
+  function clearHoverHighlight(): void {
     clearHoverData();
     performClearHoverHighlight();
   }

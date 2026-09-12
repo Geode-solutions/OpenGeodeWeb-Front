@@ -86,7 +86,7 @@ const sortedAttributes = computed(() => {
   );
 });
 
-function capitalize(val) {
+function capitalize(val: string) {
   if (!val) {
     return "";
   }
@@ -94,7 +94,7 @@ function capitalize(val) {
   return spaced.charAt(0).toUpperCase() + spaced.slice(1);
 }
 
-function formatAttributeValue(val) {
+function formatAttributeValue(val: unknown) {
   if (Array.isArray(val)) {
     const formattedValues = val.map((value) => {
       if (typeof value === "number") {

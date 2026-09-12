@@ -22,9 +22,9 @@ const dataStore = useDataStore();
 const { width: elementWidth, height: elementHeight } = useElementSize(container);
 const { width: windowWidth, height: windowHeight } = useWindowSize();
 
-function debounce(func, wait) {
-  let timeout = undefined;
-  return function executedFunction(...args) {
+function debounce<T extends (...args: unknown[]) => void>(func: T, wait: number) {
+  let timeout: ReturnType<typeof setTimeout> | undefined;
+  return function executedFunction(...args: Parameters<T>) {
     function later() {
       clearTimeout(timeout);
       func(...args);
@@ -53,10 +53,16 @@ onMounted(async () => {
 
 const { pickColormap, quickColormap } = useQuickColormap();
 
-async function handleClick(event) {
+async function handleClick(event: PointerEvent) {
   const { offsetX, offsetY, clientX, clientY } = event;
+  // Only ever fired from the pointerup handler bound to this same element.
+  const containerEl = container.value;
+  if (!containerEl) {
+    return;
+  }
+
   if (hybridViewerStore.is_ruler_active) {
-    const rect = container.value.$el.getBoundingClientRect();
+    const rect = containerEl.$el.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = elementHeight.value - (event.clientY - rect.top);
     await hybridViewerStore.handleRulerClick(x, y);
@@ -64,7 +70,7 @@ async function handleClick(event) {
   }
 
   if (viewerStore.picking_mode) {
-    const rect = container.value.$el.getBoundingClientRect();
+    const rect = containerEl.$el.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = elementHeight.value - (event.clientY - rect.top);
     await viewerStore.set_picked_point(x, y);

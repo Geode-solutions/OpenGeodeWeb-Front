@@ -1,9 +1,14 @@
 <script setup lang="ts">
+import type { PropType } from "vue";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 
 import FetchingData from "@ogw_front/components/FetchingData";
 import FileUploader from "@ogw_front/components/FileUploader";
 import { useBackStore } from "@ogw_front/stores/back";
+
+// Files carry extra app-specific bookkeeping fields once picked up here.
+type UploadFile = File & { isConfigured?: boolean };
+type FilePlan = { has_missing_files: boolean; mandatory_files: string[]; additional_files: string[] };
 
 const schema = schemas.opengeodeweb_back.missing_files;
 
@@ -12,23 +17,23 @@ const emit = defineEmits(["update_values", "increment_step", "decrement_step"]);
 const { multiple, geodeObjectType, filenames, files } = defineProps({
   multiple: { type: Boolean, required: true },
   geodeObjectType: { type: String, required: true },
-  filenames: { type: Array, required: true },
-  files: { type: Array, required: false, default: () => [] },
+  filenames: { type: Array as PropType<string[]>, required: true },
+  files: { type: Array as PropType<UploadFile[]>, required: false, default: () => [] },
 });
 
 const accept = ref("");
 const loading = ref(false);
 const has_missing_files = ref(false);
-const mandatory_files = ref([]);
-const additional_files = ref([]);
+const mandatory_files = ref<string[]>([]);
+const additional_files = ref<string[]>([]);
 const toggle_loading = useToggle(loading);
 
-function files_uploaded_event(value) {
+function files_uploaded_event(value: UploadFile[]) {
   emit("update_values", { additional_files: value });
   emit("increment_step");
 }
 
-function isCsvFile(filename) {
+function isCsvFile(filename: string) {
   return filename.toLowerCase().endsWith(".csv") || filename.toLowerCase().endsWith(".csv.json");
 }
 
@@ -39,7 +44,7 @@ async function missing_files() {
   additional_files.value = [];
   const backStore = useBackStore();
 
-  const promise_array = filenames.map((filename) => {
+  const promise_array: Promise<FilePlan>[] = filenames.map((filename): Promise<FilePlan> => {
     if (isCsvFile(filename)) {
       return Promise.resolve({
         has_missing_files: false,

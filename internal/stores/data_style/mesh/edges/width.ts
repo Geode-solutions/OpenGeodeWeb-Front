@@ -11,10 +11,10 @@ export function useMeshEdgesWidthStyle() {
   const viewerStore = useViewerStore();
   const meshEdgesCommonStyle = useMeshEdgesCommonStyle();
 
-  function meshEdgesWidth(id) {
-    return meshEdgesCommonStyle.meshEdgesStyle(id).width;
+  function meshEdgesWidth(id: string): number | undefined {
+    return meshEdgesCommonStyle.meshEdgesStyle(id).width as number | undefined;
   }
-  function setMeshEdgesWidth(id, width) {
+  function setMeshEdgesWidth(id: string, width: number | undefined) {
     const params = { id, width };
     return viewerStore.request(
       {

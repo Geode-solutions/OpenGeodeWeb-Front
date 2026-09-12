@@ -23,7 +23,7 @@ describe("feedback error banner", () => {
     await feedbackStore.$patch({ server_error: true });
     expect(feedbackStore.server_error).toBe(true);
     const v_btn = wrapper.findAll(".v-btn");
-    await v_btn[0].trigger("click");
+    await v_btn[0]?.trigger("click");
     expect(reload_spy).toHaveBeenCalledTimes(CALLED_TIMES);
   });
 
@@ -35,7 +35,7 @@ describe("feedback error banner", () => {
     });
     const feedbackStore = useFeedbackStore();
     const v_btn = wrapper.findAll(".v-btn");
-    await v_btn[1].trigger("click");
+    await v_btn[1]?.trigger("click");
     expect(feedbackStore.server_error).toBe(false);
   });
 });

@@ -1,19 +1,20 @@
 import { computed, ref, shallowRef } from "vue";
 import { describe, expect, test } from "vitest";
-import { mountSuspended } from "@nuxt/test-utils/runtime";
-import { useStepperTree } from "@ogw_front/composables/stepper_tree.js";
-import { vuetify } from "@ogw_tests/utils";
+import ResizeObserver from "resize-observer-polyfill";
+import { mount } from "@vue/test-utils";
 
 import ObjectSelector from "@ogw_front/components/ObjectSelector";
-import ResizeObserver from "resize-observer-polyfill";
-import Stepper from "@ogw_front/components/Stepper";
+import Step from "@ogw_front/components/Step";
+import { useStepperTree } from "@ogw_front/composables/stepper_tree.js";
+
+import { vuetify } from "@ogw_tests/utils";
 
 globalThis.ResizeObserver = ResizeObserver;
 
-describe("stepper", () => {
-  test("mount", async () => {
+describe("step", () => {
+  test("brep", () => {
     const geode_object_type = ref("BRep");
-    const files = ref([]);
+    const files = ref<File[]>([]);
     const stepper_tree = useStepperTree(
       [
         {
@@ -30,12 +31,21 @@ describe("stepper", () => {
       ],
       { geode_object_type },
     );
-    const wrapper = await mountSuspended(Stepper, {
-      global: {
-        plugins: [vuetify],
+    const wrapper = mount(
+      {
+        components: { Step },
+        template:
+          '<v-stepper-vertical><Step :stepIndex="0" :stepperTree="stepperTree" /></v-stepper-vertical>',
+        setup() {
+          return { stepperTree: stepper_tree };
+        },
       },
-      props: { stepperTree: stepper_tree },
-    });
+      {
+        global: {
+          plugins: [vuetify],
+        },
+      },
+    );
     expect(wrapper.exists()).toBe(true);
   });
 });

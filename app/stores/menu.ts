@@ -38,6 +38,16 @@ import ModelEdgesOptions from "@ogw_front/components/Viewer/Generic/Model/EdgesO
 import ModelPointsOptions from "@ogw_front/components/Viewer/Generic/Model/PointsOptions";
 import ModelStyleOptions from "@ogw_front/components/Viewer/Generic/Model/ModelStyleOptions";
 
+import type { Component } from "vue";
+
+type MenuItems = Component[];
+
+interface MenuMetaData {
+  viewer_type?: string;
+  geode_object_type?: string;
+  [key: string]: unknown;
+}
+
 const PointSet_menu = [PointSetPointsOptions];
 
 const EdgedCurve_menu = [EdgedCurvePointsOptions, EdgedCurveEdgesOptions];
@@ -85,7 +95,7 @@ const StructuralModel_menu = [ModelEdgesOptions, ModelPointsOptions, ModelStyleO
 
 const ModelComponent_menu = [ModelEdgesOptions, ModelPointsOptions, ModelStyleOptions];
 
-const menusData = {
+const menusData: Record<string, Record<string, MenuItems>> = {
   mesh: {
     EdgedCurve2D: EdgedCurve_menu,
     EdgedCurve3D: EdgedCurve_menu,
@@ -122,24 +132,27 @@ const menusData = {
 export const useMenuStore = defineStore("menu", () => {
   const menus = shallowRef(menusData);
   const display_menu = ref(false);
-  const current_id = ref(undefined);
+  const current_id = ref<string | undefined>(undefined);
   const menuX = ref(0);
   const menuY = ref(0);
   const containerWidth = ref(window.innerWidth);
   const containerHeight = ref(window.innerHeight);
   const containerTop = ref(0);
   const containerLeft = ref(0);
-  const active_item_index = ref(undefined);
-  const current_meta_data = ref({});
+  const active_item_index = ref<number | undefined>(undefined);
+  const current_meta_data = ref<MenuMetaData>({});
 
-  function getMenuItems(objectType, geodeObject) {
+  function getMenuItems(
+    objectType: string | undefined,
+    geodeObject: string | undefined,
+  ): MenuItems {
     if (!objectType || !geodeObject || !menus.value[objectType]) {
       return [];
     }
-    return menus.value[objectType][geodeObject] || [];
+    return menus.value[objectType]?.[geodeObject] || [];
   }
 
-  function closeMenu() {
+  function closeMenu(): void {
     active_item_index.value = undefined;
     current_id.value = undefined;
     current_meta_data.value = {};
@@ -148,7 +161,16 @@ export const useMenuStore = defineStore("menu", () => {
     display_menu.value = false;
   }
 
-  async function openMenu(id, x, y, width, height, top, left, meta_data) {
+  async function openMenu(
+    id: string,
+    x: number | undefined,
+    y: number | undefined,
+    width: number,
+    height: number,
+    top: number,
+    left: number,
+    meta_data: MenuMetaData | undefined,
+  ): Promise<void> {
     await closeMenu();
 
     if (meta_data) {
@@ -174,12 +196,12 @@ export const useMenuStore = defineStore("menu", () => {
     display_menu.value = true;
   }
 
-  function setMenuPosition(x, y) {
+  function setMenuPosition(x: number, y: number): void {
     menuX.value = x;
     menuY.value = y;
   }
 
-  function toggleItemOptions(index) {
+  function toggleItemOptions(index: number): void {
     if (active_item_index.value === index) {
       active_item_index.value = undefined;
     } else {

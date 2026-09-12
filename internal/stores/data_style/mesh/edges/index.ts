@@ -18,15 +18,15 @@ export function useMeshEdgesStyle() {
   const meshEdgesEdgeAttributeStyle = useMeshEdgesEdgeAttributeStyle();
   const meshEdgesCommonStyle = useMeshEdgesCommonStyle();
 
-  function meshEdgesColoring(id) {
+  function meshEdgesColoring(id: string) {
     return meshEdgesCommonStyle.meshEdgesColoring(id);
   }
 
-  function meshEdgesActiveColoring(id) {
-    return meshEdgesColoring(id).active;
+  function meshEdgesActiveColoring(id: string): string | undefined {
+    return meshEdgesColoring(id).active as string | undefined;
   }
 
-  async function setMeshEdgesActiveColoring(id, type) {
+  async function setMeshEdgesActiveColoring(id: string, type: string | undefined) {
     await meshEdgesCommonStyle.mutateMeshEdgesStyle(id, {
       coloring: { active: type },
     });
@@ -58,7 +58,7 @@ export function useMeshEdgesStyle() {
     throw new Error(`Unknown mesh edges coloring type: ${type}`);
   }
 
-  function applyMeshEdgesStyle(id) {
+  function applyMeshEdgesStyle(id: string) {
     return Promise.all([
       meshEdgesVisibility.setMeshEdgesVisibility(id, meshEdgesVisibility.meshEdgesVisibility(id)),
       meshEdgesWidthStyle.setMeshEdgesWidth(id, meshEdgesWidthStyle.meshEdgesWidth(id)),
@@ -67,7 +67,6 @@ export function useMeshEdgesStyle() {
   }
 
   return {
-    meshEdgesColoring,
     meshEdgesActiveColoring,
     setMeshEdgesActiveColoring,
     applyMeshEdgesStyle,

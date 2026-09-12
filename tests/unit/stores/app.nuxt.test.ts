@@ -61,8 +61,8 @@ describe("app store", () => {
         appStore.registerStore(mock_store_2);
 
         expect(appStore.stores).toHaveLength(MULTIPLE_STORES_LENGTH);
-        expect(appStore.stores[FIRST_INDEX].$id).toBe("userStore");
-        expect(appStore.stores[SECOND_INDEX].$id).toBe("backStore");
+        expect(appStore.stores[FIRST_INDEX]?.$id).toBe("userStore");
+        expect(appStore.stores[SECOND_INDEX]?.$id).toBe("backStore");
       });
     });
 

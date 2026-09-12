@@ -1,4 +1,5 @@
 // Third party imports
+import type { Table } from "dexie";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
@@ -8,9 +9,59 @@ import { database } from "@ogw_internal/database/database.js";
 import { useDataCollections } from "./data_helpers/collections.js";
 import { useDataMesh } from "./data_helpers/mesh.js";
 import { useViewerStore } from "@ogw_front/stores/viewer";
+import type { ModelComponentRecord } from "./data_helpers/mesh.js";
+
+interface DataItem {
+  id: string;
+  name: string;
+  viewer_type: string;
+  geode_object_type: string;
+  visible: boolean;
+  created_at: string;
+  is_viewable?: boolean;
+  binary_light_viewable?: string;
+}
+
+interface ModelComponentInput {
+  geode_id: string;
+  type: string;
+  viewer_id: string | number;
+  name: string;
+  is_active: boolean;
+  boundaries?: string[];
+  internals?: string[];
+  items?: string[];
+}
+
+interface NewDataItem {
+  id: string;
+  name?: string;
+  viewer_type: string;
+  geode_object_type: string;
+  is_viewable?: boolean;
+  binary_light_viewable?: string;
+  mesh_components?: ModelComponentInput[];
+  collection_components?: ModelComponentInput[];
+  nb_vertices?: number;
+}
+
+interface ModelComponentRelationRecord {
+  id: string;
+  parent: string;
+  child: string;
+  type: string;
+}
+
+interface ViewableItemLike {
+  is_viewable?: boolean;
+  binary_light_viewable?: string;
+  geode_object_type?: string;
+  id?: string;
+  title?: string;
+}
 
 const viewer_generic_schemas = viewer_schemas.opengeodeweb_viewer.generic;
-function checkItemViewable(item) {
+function checkItemViewable(item: ViewableItemLike | undefined | null): boolean {
   if (!item || typeof item !== "object") {
     return false;
   }
@@ -29,9 +80,11 @@ function checkItemViewable(item) {
   }
   return true;
 }
-function isItemViewable(itemOrId) {
+function isItemViewable(itemOrId: string | ViewableItemLike): boolean | Promise<boolean> {
   if (typeof itemOrId === "string") {
-    return database.data.get(itemOrId).then(checkItemViewable);
+    return (database.data as unknown as Table<DataItem, string>)
+      .get(itemOrId)
+      .then(checkItemViewable);
   }
   return checkItemViewable(itemOrId);
 }
@@ -39,9 +92,15 @@ function isItemViewable(itemOrId) {
 // oxlint-disable-next-line max-lines-per-function, max-statements
 export const useDataStore = defineStore("data", () => {
   const viewerStore = useViewerStore();
-  const data_db = database.data;
-  const model_components_db = database.model_components;
-  const model_components_relation_db = database.model_components_relation;
+  const data_db = database.data as unknown as Table<DataItem, string>;
+  const model_components_db = database.model_components as unknown as Table<
+    ModelComponentRecord,
+    string
+  >;
+  const model_components_relation_db = database.model_components_relation as unknown as Table<
+    ModelComponentRelationRecord,
+    string
+  >;
   const {
     formatedMeshComponents,
     refFormatedMeshComponents,
@@ -61,40 +120,34 @@ export const useDataStore = defineStore("data", () => {
     formatedCollectionComponents,
     refFormatedCollectionComponents,
   } = useDataCollections();
-  async function item(id) {
+  async function item(id: string): Promise<DataItem> {
     const data_item = await data_db.get(id);
     if (!data_item) {
       throw new Error(`Item not found: ${id}`);
     }
     return data_item;
   }
-  async function allItems() {
+  async function allItems(): Promise<DataItem[]> {
     return await data_db.toArray();
   }
-  function refItem(id) {
-    return useObservable(
-      liveQuery(() => data_db.get(id)),
-      {
-        initialValue: {},
-      },
-    );
+  function refItem(id: string) {
+    return useObservable(liveQuery(() => data_db.get(id)), {
+      initialValue: {} as DataItem,
+    });
   }
   function refAllItems() {
-    return useObservable(
-      liveQuery(() => data_db.toArray()),
-      {
-        initialValue: [],
-      },
-    );
+    return useObservable(liveQuery(() => data_db.toArray()), {
+      initialValue: [] as DataItem[],
+    });
   }
-  async function meshComponentType(modelId, geode_id) {
+  async function meshComponentType(modelId: string, geode_id: string): Promise<string | undefined> {
     const component = await model_components_db
       .where("[id+geode_id]")
       .equals([modelId, geode_id])
       .first();
     return component?.type;
   }
-  async function registerObject(id, name) {
+  async function registerObject(id: string, name: string) {
     const schema = viewer_generic_schemas.register;
     const params = {
       id,
@@ -106,7 +159,7 @@ export const useDataStore = defineStore("data", () => {
       timeout: 0,
     });
   }
-  async function deregisterObject(id) {
+  async function deregisterObject(id: string) {
     const schema = viewer_generic_schemas.deregister;
     const params = {
       id,
@@ -116,8 +169,8 @@ export const useDataStore = defineStore("data", () => {
       params,
     });
   }
-  function addItem(new_item) {
-    const itemData = {
+  function addItem(new_item: NewDataItem) {
+    const itemData: DataItem = {
       id: new_item.id,
       name: new_item.name || new_item.id,
       viewer_type: new_item.viewer_type,
@@ -131,9 +184,9 @@ export const useDataStore = defineStore("data", () => {
     }
     return data_db.put(itemData);
   }
-  function addComponents(new_item) {
-    const allComponents = [];
-    function addModelComponents(components) {
+  function addComponents(new_item: NewDataItem) {
+    const allComponents: ModelComponentRecord[] = [];
+    function addModelComponents(components: ModelComponentInput[]) {
       for (const component of components) {
         allComponents.push({
           id: new_item.id,
@@ -153,9 +206,9 @@ export const useDataStore = defineStore("data", () => {
     }
     return model_components_db.bulkPut(allComponents);
   }
-  function addComponentRelations(new_item) {
-    const relations = [];
-    function addModelComponentRelations(components, parent, type) {
+  function addComponentRelations(new_item: NewDataItem) {
+    const relations: ModelComponentRelationRecord[] = [];
+    function addModelComponentRelations(components: string[], parent: string, type: string) {
       for (const child of components) {
         relations.push({
           id: new_item.id,
@@ -184,7 +237,7 @@ export const useDataStore = defineStore("data", () => {
     }
     return model_components_relation_db.bulkPut(relations);
   }
-  async function getComponentByViewerId(modelId, viewer_id) {
+  async function getComponentByViewerId(modelId: string, viewer_id: string | number) {
     const component = await model_components_db
       .where("viewer_id")
       .equals(Number(viewer_id))
@@ -192,25 +245,28 @@ export const useDataStore = defineStore("data", () => {
       .first();
     return component;
   }
-  async function deleteModelComponents(modelId) {
+  async function deleteModelComponents(modelId: string): Promise<void> {
     await model_components_db.where("id").equals(modelId).delete();
-    await database.model_components_relation.where("id").equals(modelId).delete();
+    await model_components_relation_db.where("id").equals(modelId).delete();
   }
 
-  async function deleteItem(id) {
+  async function deleteItem(id: string): Promise<void> {
     await data_db.delete(id);
     await deleteModelComponents(id);
   }
 
-  async function updateItem(id, changes) {
+  async function updateItem(id: string, changes: Partial<DataItem>): Promise<void> {
     await data_db.update(id, changes);
   }
 
-  async function getAllModelComponentsViewerIds(modelId) {
+  async function getAllModelComponentsViewerIds(modelId: string): Promise<number[]> {
     const components = await model_components_db.where("id").equals(modelId).toArray();
     return components.map((component) => Math.trunc(Number(component.viewer_id)));
   }
-  async function getMeshComponentsViewerIds(modelId, meshComponentGeodeIds) {
+  async function getMeshComponentsViewerIds(
+    modelId: string,
+    meshComponentGeodeIds: string[],
+  ): Promise<number[]> {
     const components = await model_components_db
       .where("[id+geode_id]")
       .anyOf(meshComponentGeodeIds.map((geode_id) => [modelId, geode_id]))
@@ -228,13 +284,16 @@ export const useDataStore = defineStore("data", () => {
     };
   }
 
-  async function clear() {
+  async function clear(): Promise<void> {
     await data_db.clear();
     await model_components_db.clear();
     await model_components_relation_db.clear();
   }
 
-  async function importStores(snapshot) {
+  async function importStores(snapshot: {
+    modelComponents: ModelComponentRecord[];
+    modelComponentsRelations: ModelComponentRelationRecord[];
+  }): Promise<void> {
     await clear();
     await model_components_db.bulkPut(snapshot.modelComponents);
     await model_components_relation_db.bulkPut(snapshot.modelComponentsRelations);
@@ -276,3 +335,5 @@ export const useDataStore = defineStore("data", () => {
     refFormatedCollectionComponents,
   };
 });
+
+export type { DataItem, NewDataItem, ModelComponentInput, ModelComponentRelationRecord };

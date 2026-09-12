@@ -15,6 +15,7 @@ import { useMeshPolyhedraStyle } from "./polyhedra";
 // Local constants
 const meshSchemas = viewer_schemas.opengeodeweb_viewer.mesh;
 
+// oxlint-disable-next-line max-lines-per-function
 export function useMeshStyle() {
   const hybridViewerStore = useHybridViewerStore();
   const viewerStore = useViewerStore();
@@ -25,10 +26,10 @@ export function useMeshStyle() {
   const meshPolygonsStyle = useMeshPolygonsStyle();
   const meshPolyhedraStyle = useMeshPolyhedraStyle();
 
-  function meshVisibility(id) {
+  function meshVisibility(id: string): boolean | undefined {
     return dataStyleState.getStyle(id).visibility;
   }
-  function setMeshVisibility(id, visibility) {
+  function setMeshVisibility(id: string, visibility: boolean | undefined) {
     const schema = meshSchemas.visibility;
     const params = { id, visibility };
     return viewerStore.request(
@@ -38,18 +39,18 @@ export function useMeshStyle() {
       },
       {
         response_function: async () => {
-          await hybridViewerStore.setVisibility(id, visibility);
+          await hybridViewerStore.setVisibility(id, visibility as boolean);
           return dataStyleState.mutateStyle(id, { visibility });
         },
       },
     );
   }
 
-  function meshColor(id) {
+  function meshColor(id: string): unknown {
     return dataStyleState.getStyle(id).color;
   }
 
-  function setMeshColor(id, color) {
+  function setMeshColor(id: string, color: unknown) {
     const schema = meshSchemas.color;
     const params = { id, color };
     return viewerStore.request(
@@ -63,12 +64,12 @@ export function useMeshStyle() {
     );
   }
 
-  function applyMeshStyle(id) {
+  function applyMeshStyle(id: string) {
     const style = dataStyleState.getStyle(id);
-    const promise_array = [];
+    const promise_array: unknown[] = [];
     for (const [key, value] of Object.entries(style)) {
       if (key === "visibility") {
-        promise_array.push(setMeshVisibility(id, value));
+        promise_array.push(setMeshVisibility(id, value as boolean | undefined));
       } else if (key === "color") {
         promise_array.push(setMeshColor(id, value));
       } else if (key === "points") {

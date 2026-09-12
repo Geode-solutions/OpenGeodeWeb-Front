@@ -45,8 +45,9 @@ function default_styles() {
   };
 }
 
-function getDefaultStyle(type) {
-  return default_styles()[type];
+function getDefaultStyle(type: string) {
+  const styles: Record<string, unknown> = default_styles();
+  return styles[type];
 }
 
 export { DEFAULT_MODEL_COMPONENT_TYPE_STYLES } from "./models";

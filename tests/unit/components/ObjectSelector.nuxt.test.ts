@@ -6,6 +6,7 @@ import { flushPromises } from "@vue/test-utils";
 import { setupActivePinia, vuetify } from "@ogw_tests/utils";
 import ObjectSelector from "@ogw_front/components/ObjectSelector";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import type { HTTPMethod } from "h3";
 import { useBackStore } from "@ogw_front/stores/back";
 
 const EXPECTED_LENGTH = 1;
@@ -13,6 +14,14 @@ const FIRST_INDEX = 0;
 const LOADABLE_SCORE = 1;
 const PRIORITY_1 = 1;
 const PRIORITY_2 = 2;
+
+interface AllowedObjectInfo {
+  is_loadable: boolean | number;
+  object_priority?: number;
+}
+interface AllowedObjectsResponse {
+  allowed_objects: Record<string, AllowedObjectInfo>;
+}
 
 const { allowed_objects } = schemas.opengeodeweb_back;
 
@@ -22,13 +31,13 @@ describe("object selector", () => {
   backStore.base_url = "/";
 
   test("loadable with one class", async () => {
-    const response = {
+    const response: AllowedObjectsResponse = {
       allowed_objects: {},
     };
     const geode_object_1 = "BRep";
     response["allowed_objects"][geode_object_1] = { is_loadable: true };
     registerEndpoint(allowed_objects.$id, {
-      method: allowed_objects.methods[FIRST_INDEX],
+      method: allowed_objects.methods[FIRST_INDEX] as HTTPMethod,
       handler: () => response,
     });
     const wrapper = await mountSuspended(ObjectSelector, {
@@ -39,18 +48,18 @@ describe("object selector", () => {
     });
     const v_card = wrapper.findComponent(components.VCard);
     const v_img = v_card.findComponent(components.VImg);
-    const emitted = wrapper.emitted();
+    const emitted = wrapper.emitted<unknown[]>();
     wrapper.unmount();
     expect(v_img.vm.src).toContain(`${geode_object_1}.svg`);
     expect(emitted).toHaveProperty("update_values");
     expect(emitted.update_values).toHaveLength(EXPECTED_LENGTH);
-    expect(emitted.update_values[FIRST_INDEX][FIRST_INDEX]).toStrictEqual({
+    expect(emitted.update_values?.[FIRST_INDEX]?.[FIRST_INDEX]).toStrictEqual({
       geode_object_type: geode_object_1,
     });
   });
 
   test("loadable with multiple classes", async () => {
-    const response = {
+    const response: AllowedObjectsResponse = {
       allowed_objects: {},
     };
     const geode_object_1 = "BRep";
@@ -58,7 +67,7 @@ describe("object selector", () => {
     response["allowed_objects"][geode_object_1] = { is_loadable: true };
     response["allowed_objects"][geode_object_2] = { is_loadable: true };
     registerEndpoint(allowed_objects.$id, {
-      method: allowed_objects.methods[FIRST_INDEX],
+      method: allowed_objects.methods[FIRST_INDEX] as HTTPMethod,
       handler: () => response,
     });
     const wrapper = await mountSuspended(ObjectSelector, {
@@ -73,18 +82,18 @@ describe("object selector", () => {
     await flushPromises();
     await v_card.trigger("click");
     await flushPromises();
-    const emitted = wrapper.emitted();
+    const emitted = wrapper.emitted<unknown[]>();
     wrapper.unmount();
     expect(v_img.vm.src).toContain(`${geode_object_1}.svg`);
     expect(emitted).toHaveProperty("update_values");
     expect(emitted.update_values).toHaveLength(EXPECTED_LENGTH);
-    expect(emitted.update_values[FIRST_INDEX][FIRST_INDEX]).toStrictEqual({
+    expect(emitted.update_values?.[FIRST_INDEX]?.[FIRST_INDEX]).toStrictEqual({
       geode_object_type: geode_object_1,
     });
   });
 
   test("object_priority when is_loadable scores equal", async () => {
-    const response = { allowed_objects: {} };
+    const response: AllowedObjectsResponse = { allowed_objects: {} };
     const geode_object_1 = "BRep";
     const geode_object_2 = "EdgedCurve3D";
     response["allowed_objects"][geode_object_1] = {
@@ -96,7 +105,7 @@ describe("object selector", () => {
       object_priority: PRIORITY_1,
     };
     registerEndpoint(allowed_objects.$id, {
-      method: allowed_objects.methods[FIRST_INDEX],
+      method: allowed_objects.methods[FIRST_INDEX] as HTTPMethod,
       handler: () => response,
     });
     const wrapper = await mountSuspended(ObjectSelector, {
@@ -107,11 +116,11 @@ describe("object selector", () => {
     });
 
     await flushPromises();
-    const emitted = wrapper.emitted();
+    const emitted = wrapper.emitted<unknown[]>();
     wrapper.unmount();
     expect(emitted).toHaveProperty("update_values");
     expect(emitted.update_values).toHaveLength(EXPECTED_LENGTH);
-    expect(emitted.update_values[FIRST_INDEX][FIRST_INDEX]).toStrictEqual({
+    expect(emitted.update_values?.[FIRST_INDEX]?.[FIRST_INDEX]).toStrictEqual({
       geode_object_type: geode_object_1,
     });
   });

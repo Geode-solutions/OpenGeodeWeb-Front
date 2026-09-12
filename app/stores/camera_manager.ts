@@ -1,4 +1,5 @@
 // Third party imports
+import type { Table } from "dexie";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
@@ -7,29 +8,47 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import { database } from "@ogw_internal/database/database.js";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
+interface CameraOptions {
+  focal_point: number[];
+  view_up: number[];
+  position: number[];
+  view_angle: number;
+  clipping_range: number[];
+  distance: number;
+}
+
+interface CameraPositionRecord {
+  id?: number;
+  name: string;
+  camera_options: CameraOptions;
+}
+
 export const useCameraManagerStore = defineStore("camera_manager", () => {
   const viewerStore = useViewerStore();
-  const camera_positions_db = database.camera_positions;
+  const camera_positions_db = database.camera_positions as unknown as Table<
+    CameraPositionRecord,
+    number
+  >;
 
   function refAllCameraPositions() {
     return useObservable(
       liveQuery(() => camera_positions_db.toArray()),
-      { initialValue: [] },
+      { initialValue: [] as CameraPositionRecord[] },
     );
   }
 
-  async function getCameraPosition(id) {
+  async function getCameraPosition(id: number) {
     return await camera_positions_db.get(id);
   }
 
-  async function saveCameraPosition(name, camera_options) {
+  async function saveCameraPosition(name: string, camera_options: CameraOptions) {
     await camera_positions_db.put({
       name,
       camera_options,
-    });
+    } as CameraPositionRecord);
   }
 
-  async function restoreCameraPosition(id) {
+  async function restoreCameraPosition(id: number) {
     const position = await camera_positions_db.get(id);
     if (position) {
       const schema = viewer_schemas.opengeodeweb_viewer.viewer.update_camera;
@@ -38,11 +57,11 @@ export const useCameraManagerStore = defineStore("camera_manager", () => {
     }
   }
 
-  async function deleteCameraPosition(id) {
+  async function deleteCameraPosition(id: number) {
     await camera_positions_db.delete(id);
   }
 
-  async function renameCameraPosition(id, newName) {
+  async function renameCameraPosition(id: number, newName: string) {
     await camera_positions_db.update(id, { name: newName });
   }
 

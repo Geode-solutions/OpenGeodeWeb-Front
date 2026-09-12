@@ -3,6 +3,7 @@ import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 // Local imports
+import type { StyleValues } from "../../types";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { useMeshPolyhedraCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -10,7 +11,36 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 // Local constants
 const meshPolyhedraPolyhedronAttributeSchemas =
   viewer_schemas.opengeodeweb_viewer.mesh.polyhedra.attribute.polyhedron;
-function isMeshPolyhedraPolyhedronAttributeValid({ name, item, minimum, maximum, colorMap }) {
+
+interface AttributeStoredConfig {
+  minimum: number | undefined;
+  maximum: number | undefined;
+  colorMap: string | undefined;
+  no_data_color: unknown;
+}
+
+interface AttributeState {
+  name?: string;
+  item?: number;
+  storedConfigs?: Record<string, { lastItem: number } & Record<string, AttributeStoredConfig>>;
+}
+
+interface AttributeInput {
+  name: string | undefined;
+  item: number | undefined;
+  minimum: number | undefined;
+  maximum: number | undefined;
+  colorMap: string | undefined;
+  no_data_color?: unknown;
+}
+
+function isMeshPolyhedraPolyhedronAttributeValid({
+  name,
+  item,
+  minimum,
+  maximum,
+  colorMap,
+}: AttributeInput): boolean {
   return (
     name !== undefined &&
     item !== undefined &&
@@ -24,16 +54,26 @@ function isMeshPolyhedraPolyhedronAttributeValid({ name, item, minimum, maximum,
 function useMeshPolyhedraPolyhedronAttributeStyle() {
   const viewerStore = useViewerStore();
   const meshPolyhedraCommonStyle = useMeshPolyhedraCommonStyle();
-  function meshPolyhedraColoring(id) {
-    return meshPolyhedraCommonStyle.meshPolyhedraStyle(id).coloring;
+  function meshPolyhedraColoring(id: string): StyleValues {
+    return meshPolyhedraCommonStyle.meshPolyhedraStyle(id).coloring as StyleValues;
   }
-  function meshPolyhedraPolyhedronAttribute(id) {
-    return meshPolyhedraColoring(id).polyhedron;
+  function meshPolyhedraPolyhedronAttribute(id: string): AttributeState {
+    return meshPolyhedraColoring(id).polyhedron as AttributeState;
   }
-  function meshPolyhedraPolyhedronAttributeStoredConfig(id, name, item) {
+  function meshPolyhedraPolyhedronAttributeStoredConfig(
+    id: string,
+    name: string | undefined,
+    item: number | undefined,
+  ): AttributeStoredConfig {
     const { storedConfigs } = meshPolyhedraPolyhedronAttribute(id);
-    if (storedConfigs && name in storedConfigs && item in storedConfigs[name]) {
-      return storedConfigs[name][item];
+    if (
+      storedConfigs &&
+      name !== undefined &&
+      name in storedConfigs &&
+      item !== undefined &&
+      item in storedConfigs[name]!
+    ) {
+      return storedConfigs[name]![item]!;
     }
     return {
       minimum: undefined,
@@ -42,40 +82,45 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
       no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
-  function mutateMeshPolyhedraPolyhedronStyle(id, values) {
+  function mutateMeshPolyhedraPolyhedronStyle(id: string, values: Record<string, unknown>) {
     return meshPolyhedraCommonStyle.mutateMeshPolyhedraStyle(id, {
       coloring: {
         polyhedron: values,
       },
     });
   }
-  function setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, item, config) {
+  function setMeshPolyhedraPolyhedronAttributeStoredConfig(
+    id: string,
+    name: string | undefined,
+    item: number | undefined,
+    config: Partial<AttributeStoredConfig>,
+  ) {
     return mutateMeshPolyhedraPolyhedronStyle(id, {
       storedConfigs: {
-        [name]: {
+        [name as string]: {
           lastItem: item,
-          [item]: config,
+          [item as number]: config,
         },
       },
     });
   }
-  function meshPolyhedraPolyhedronAttributeName(id) {
+  function meshPolyhedraPolyhedronAttributeName(id: string): string | undefined {
     return meshPolyhedraPolyhedronAttribute(id).name;
   }
-  function meshPolyhedraPolyhedronAttributeLastItem(id, name) {
+  function meshPolyhedraPolyhedronAttributeLastItem(id: string, name: string | undefined): number {
     const { storedConfigs } = meshPolyhedraPolyhedronAttribute(id);
-    if (storedConfigs && name in storedConfigs) {
-      return storedConfigs[name].lastItem;
+    if (storedConfigs && name !== undefined && name in storedConfigs) {
+      return storedConfigs[name]!.lastItem;
     }
     return 0;
   }
-  function meshPolyhedraPolyhedronAttributeItem(id) {
+  function meshPolyhedraPolyhedronAttributeItem(id: string): number {
     const { item, name } = meshPolyhedraPolyhedronAttribute(id);
     return item ?? meshPolyhedraPolyhedronAttributeLastItem(id, name);
   }
   function setMeshPolyhedraPolyhedronAttribute(
-    id,
-    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR },
+    id: string,
+    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR }: AttributeInput,
   ) {
     mutateMeshPolyhedraPolyhedronStyle(id, {
       name,
@@ -87,7 +132,7 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
       colorMap,
       no_data_color,
     });
-    const points = getRGBPointsFromPreset(colorMap);
+    const points = getRGBPointsFromPreset(colorMap as string);
     const schema = meshPolyhedraPolyhedronAttributeSchemas.attribute;
     const params = {
       id,
@@ -103,7 +148,7 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
       params,
     });
   }
-  function applyPolyhedronAttribute(id) {
+  function applyPolyhedronAttribute(id: string) {
     const name = meshPolyhedraPolyhedronAttributeName(id);
     const item = meshPolyhedraPolyhedronAttributeItem(id);
     const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name, item);
@@ -119,7 +164,7 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
       return setMeshPolyhedraPolyhedronAttribute(id, attribute);
     }
   }
-  function setMeshPolyhedraPolyhedronAttributeName(id, name) {
+  function setMeshPolyhedraPolyhedronAttributeName(id: string, name: string) {
     const item = meshPolyhedraPolyhedronAttributeLastItem(id, name);
     mutateMeshPolyhedraPolyhedronStyle(id, {
       name,
@@ -127,19 +172,19 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
     });
     return applyPolyhedronAttribute(id);
   }
-  function setMeshPolyhedraPolyhedronAttributeItem(id, item) {
+  function setMeshPolyhedraPolyhedronAttributeItem(id: string, item: number) {
     mutateMeshPolyhedraPolyhedronStyle(id, {
       item,
     });
     return applyPolyhedronAttribute(id);
   }
-  function meshPolyhedraPolyhedronAttributeRange(id) {
+  function meshPolyhedraPolyhedronAttributeRange(id: string): [number | undefined, number | undefined] {
     const name = meshPolyhedraPolyhedronAttributeName(id);
     const item = meshPolyhedraPolyhedronAttributeItem(id);
     const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name, item);
     return [storedConfig.minimum, storedConfig.maximum];
   }
-  function setMeshPolyhedraPolyhedronAttributeRange(id, minimum, maximum) {
+  function setMeshPolyhedraPolyhedronAttributeRange(id: string, minimum: number, maximum: number) {
     const name = meshPolyhedraPolyhedronAttributeName(id);
     const item = meshPolyhedraPolyhedronAttributeItem(id);
     setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, item, {
@@ -148,13 +193,13 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
     });
     return applyPolyhedronAttribute(id);
   }
-  function meshPolyhedraPolyhedronAttributeColorMap(id) {
+  function meshPolyhedraPolyhedronAttributeColorMap(id: string): string | undefined {
     const name = meshPolyhedraPolyhedronAttributeName(id);
     const item = meshPolyhedraPolyhedronAttributeItem(id);
     const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name, item);
     return storedConfig.colorMap;
   }
-  function setMeshPolyhedraPolyhedronAttributeColorMap(id, colorMap) {
+  function setMeshPolyhedraPolyhedronAttributeColorMap(id: string, colorMap: string | undefined) {
     const name = meshPolyhedraPolyhedronAttributeName(id);
     const item = meshPolyhedraPolyhedronAttributeItem(id);
     setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, item, {
@@ -162,13 +207,13 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
     });
     return applyPolyhedronAttribute(id);
   }
-  function meshPolyhedraPolyhedronAttributeNoDataColor(id) {
+  function meshPolyhedraPolyhedronAttributeNoDataColor(id: string): unknown {
     const name = meshPolyhedraPolyhedronAttributeName(id);
     const item = meshPolyhedraPolyhedronAttributeItem(id);
     const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name, item);
     return storedConfig.no_data_color;
   }
-  async function setMeshPolyhedraPolyhedronAttributeNoDataColor(id, no_data_color) {
+  async function setMeshPolyhedraPolyhedronAttributeNoDataColor(id: string, no_data_color: unknown) {
     const name = meshPolyhedraPolyhedronAttributeName(id);
     const item = meshPolyhedraPolyhedronAttributeItem(id);
     const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name, item);

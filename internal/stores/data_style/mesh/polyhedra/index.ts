@@ -20,17 +20,17 @@ export function useMeshPolyhedraStyle() {
   const meshPolyhedraVisibility = useMeshPolyhedraVisibilityStyle();
   const meshPolyhedraColorStyle = useMeshPolyhedraColorStyle();
 
-  function meshPolyhedraColoring(id) {
+  function meshPolyhedraColoring(id: string) {
     return meshPolyhedraCommonStyle.meshPolyhedraColoring(id);
   }
   const meshPolyhedraVertexAttributeStyle = useMeshPolyhedraVertexAttributeStyle();
   const meshPolyhedraPolyhedronAttributeStyle = useMeshPolyhedraPolyhedronAttributeStyle();
 
-  function meshPolyhedraActiveColoring(id) {
-    return meshPolyhedraColoring(id).active;
+  function meshPolyhedraActiveColoring(id: string): string | undefined {
+    return meshPolyhedraColoring(id).active as string | undefined;
   }
 
-  async function setMeshPolyhedraActiveColoring(id, type) {
+  async function setMeshPolyhedraActiveColoring(id: string, type: string | undefined) {
     await meshPolyhedraCommonStyle.mutateMeshPolyhedraStyle(id, {
       coloring: { active: type },
     });
@@ -74,7 +74,7 @@ export function useMeshPolyhedraStyle() {
     throw new Error(`Unknown mesh polyhedra coloring type: ${type}`);
   }
 
-  function applyMeshPolyhedraStyle(id) {
+  function applyMeshPolyhedraStyle(id: string) {
     return Promise.all([
       meshPolyhedraVisibility.setMeshPolyhedraVisibility(
         id,

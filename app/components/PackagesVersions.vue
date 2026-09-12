@@ -6,14 +6,16 @@ const { schema } = defineProps({
   schema: { type: Object, required: true },
 });
 
+type PackageVersion = { package: string; version: string };
+
 const backStore = useBackStore();
-const packages_versions = ref([]);
+const packages_versions = ref<PackageVersion[]>([]);
 
 async function get_packages_versions() {
   await backStore.request(
     { schema },
     {
-      response_function: (response) => {
+      response_function: (response: { versions: PackageVersion[] }) => {
         packages_versions.value = response.versions;
       },
     },

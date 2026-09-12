@@ -1,79 +1,74 @@
-// vtk.js does not ship first-class TypeScript types for the classes used across the
-// hybrid viewer store, so these interfaces only describe the subset of methods and
-// properties this codebase actually calls on each object - they are not meant to be
-// exhaustive wrappers around the real vtk.js classes.
+// Re-exports of vtk.js's own (real, shipped) TypeScript types for the objects the
+// hybrid viewer store composables interact with, plus the handful of shapes that
+// are specific to this codebase (CameraOptions' snake_case wire format, the local
+// hybridDb map, hover highlight data, ...).
+import type { vtkCamera } from "@kitware/vtk.js/Rendering/Core/Camera";
+import type { vtkRenderer } from "@kitware/vtk.js/Rendering/Core/Renderer";
+import type { vtkRenderWindow } from "@kitware/vtk.js/Rendering/Core/RenderWindow";
+import type { vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
+import type { vtkOpenGLRenderWindow } from "@kitware/vtk.js/Rendering/OpenGL/RenderWindow";
+import type vtkActor from "@kitware/vtk.js/Rendering/Core/Actor";
+import type { Vector3 } from "@kitware/vtk.js/types";
 
-export type Vector3 = [number, number, number];
+export type {
+  vtkCamera,
+  vtkRenderer,
+  vtkRenderWindow,
+  vtkGenericRenderWindow,
+  vtkOpenGLRenderWindow,
+  vtkActor,
+  Vector3,
+};
 
+// The camera state as exchanged with the viewer microservice (snake_case field
+// names, plain arrays) - distinct from vtk.js's own vtkCamera object.
 export interface CameraOptions {
-  focal_point: number[];
-  view_up: number[];
-  position: number[];
+  focal_point: Vector3;
+  view_up: Vector3;
+  position: Vector3;
   view_angle: number;
-  clipping_range: number[];
+  clipping_range: [number, number];
   distance: number;
 }
 
-export interface VtkCamera {
-  getFocalPoint: () => Vector3;
-  getViewUp: () => Vector3;
-  getPosition: () => Vector3;
-  getViewAngle: () => number;
-  getClippingRange: () => [number, number];
-  getDistance: () => number;
-  getDirectionOfProjection: () => Vector3;
-  setFocalPoint: (x: number, y: number, z: number) => void;
-  setPosition: (x: number, y: number, z: number) => void;
-  set: (options: Record<string, unknown>) => void;
-  onModified: (callback: () => void) => void;
-}
-
-export interface VtkActor {
-  getProperty: () => { setColor: (color: Vector3) => void };
-  setMapper: (mapper: unknown) => void;
-  getScale: () => Vector3;
-  setScale: (x: number, y: number, z: number) => void;
-  setVisibility: (visible: boolean) => void;
-  getBounds: () => number[];
-}
-
-export interface VtkRenderer {
-  getActiveCamera: () => VtkCamera;
-  resetCamera: (bounds?: number[]) => void;
-  resetCameraClippingRange: () => void;
-  removeActor: (actor: VtkActor) => void;
-  addActor: (actor: VtkActor) => void;
-  getActors: () => VtkActor[];
-}
-
-export interface VtkRenderWindow {
-  render: () => void;
-}
-
-export interface VtkStyleReference {
-  style: CSSStyleDeclaration;
-}
-
-export interface VtkWebGLRenderWindow {
-  getCanvas: () => HTMLCanvasElement | undefined;
-  getContainer: () => HTMLElement | undefined;
-  getReferenceByName: (name: string) => VtkStyleReference | undefined;
-  setBackgroundImage: (image: unknown) => void;
-  setUseBackgroundImage: (value: boolean) => void;
-  setSize: (width: number, height: number) => void;
-}
-
-export interface GenericRenderWindow {
-  getRenderer: () => VtkRenderer;
-  getRenderWindow: () => VtkRenderWindow;
-  getApiSpecificRenderWindow: () => VtkWebGLRenderWindow;
-  setContainer: (el: HTMLElement) => void;
-}
-
 export interface HybridDbEntry {
-  actor: VtkActor;
+  actor: vtkActor;
   polydata: unknown;
   mapper: unknown;
 }
 
 export type HybridDb = Record<string, HybridDbEntry>;
+
+export interface HoverComponentInfo {
+  name: string;
+  id: string;
+  type: string;
+}
+
+export interface HoverData {
+  modelId: string;
+  modelName: string | undefined;
+  blockName: string | undefined;
+  pickedId: unknown;
+  fieldType: unknown;
+  component: HoverComponentInfo | undefined;
+  attributes: Record<string, unknown>;
+}
+
+// The parent Pinia store (app/stores/hybrid_viewer.ts) assembles these composables
+// via `...spread` and is converted/typed separately from this directory, so its
+// exact inferred return type isn't reliable to build on here. This describes just
+// the slice of its returned (already-unwrapped) state and actions that the
+// composables in this folder read or call directly (i.e. not through
+// `storeToRefs`, which callers type separately at each destructuring site).
+export interface HybridViewerStorePublic {
+  genericRenderWindow: { value: vtkGenericRenderWindow | undefined };
+  hybridDb: HybridDb;
+  camera_options: Record<string, unknown>;
+  remoteRender: () => Promise<void> | void;
+  clearHoverHighlight: () => void;
+  syncRemoteCamera: () => void;
+  hoverHighlight: (event: MouseEvent) => void;
+  setZScaling: (value: number) => Promise<void>;
+  setCamera: (options: CameraOptions) => void;
+}

@@ -5,7 +5,7 @@ export function useBatchStyle() {
   const treeviewStore = useTreeviewStore();
   const dataStore = useDataStore();
 
-  async function applyBatchStyle(id, action) {
+  async function applyBatchStyle(id: string, action: (id: string) => Promise<unknown>): Promise<void> {
     const isActive = treeviewStore.activeItems.includes(id);
     if (!isActive || treeviewStore.activeItems.length <= 1) {
       await action(id);

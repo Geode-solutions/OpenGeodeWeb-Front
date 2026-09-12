@@ -14,15 +14,15 @@ function useMeshPointsColoringStyle() {
   const meshPointsColorStyle = useMeshPointsColorStyle();
   const meshPointsVertexAttributeStyle = useMeshPointsVertexAttributeStyle();
 
-  function meshPointsColoring(id) {
+  function meshPointsColoring(id: string) {
     return meshPointsCommonStyle.meshPointsColoring(id);
   }
 
-  function meshPointsActiveColoring(id) {
-    return meshPointsColoring(id).active;
+  function meshPointsActiveColoring(id: string): string | undefined {
+    return meshPointsColoring(id).active as string | undefined;
   }
 
-  async function setMeshPointsActiveColoring(id, type) {
+  async function setMeshPointsActiveColoring(id: string, type: string | undefined) {
     await meshPointsCommonStyle.mutateMeshPointsStyle(id, {
       coloring: { active: type },
     });
@@ -58,7 +58,7 @@ export function useMeshPointsStyle() {
   const meshPointsSizeStyle = useMeshPointsSizeStyle();
   const meshPointsColoringStyle = useMeshPointsColoringStyle();
 
-  function applyMeshPointsStyle(id) {
+  function applyMeshPointsStyle(id: string) {
     return Promise.all([
       meshPointsVisibility.setMeshPointsVisibility(
         id,

@@ -1,28 +1,37 @@
 import { Status } from "@ogw_front/utils/status";
-import { appMode } from "@ogw_shared/app_mode";
+import { appMode } from "#shared/app_mode";
 import { registerRunningExtensions } from "@ogw_front/utils/extension";
-import { setAppBaseUrl } from "@ogw_shared/scripts";
+import { setAppBaseUrl } from "#shared/scripts";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useCloudStore } from "@ogw_front/stores/cloud";
+
+interface Microservice {
+  $id: string;
+  status?: string;
+  is_busy?: boolean;
+  launch?: (params: Record<string, unknown>) => Promise<unknown>;
+  connect: () => Promise<void>;
+  [key: string]: unknown;
+}
 
 export const useInfraStore = defineStore("infra", {
   state: () => ({
     app_mode: useRuntimeConfig().public.MODE,
     status: Status.NOT_CREATED,
-    microservices: [],
+    microservices: [] as Microservice[],
     domain_name: globalThis.location.hostname,
   }),
   getters: {
-    microservices_connected() {
+    microservices_connected(): boolean {
       console.log("microservices", this.microservices);
       return this.microservices.every((store) => store.status === Status.CONNECTED);
     },
-    microservices_busy() {
+    microservices_busy(): boolean {
       return this.microservices.some((store) => store.is_busy === true);
     },
   },
   actions: {
-    register_microservice(store) {
+    register_microservice(store: Microservice) {
       const store_name = store.$id;
       console.log("[INFRA] Registering microservice:", store_name);
 
@@ -31,14 +40,14 @@ export const useInfraStore = defineStore("infra", {
         console.log("[INFRA] Microservice registered:", store_name);
       }
     },
-    unregister_microservice(microserviceId) {
+    unregister_microservice(microserviceId: string) {
       console.log("[INFRA] Unregistering microservice:", microserviceId);
       this.microservices = this.microservices.filter(
         (microservice) => microservice.$id !== microserviceId,
       );
       console.log("[INFRA] Microservice unregistered:", microserviceId);
     },
-    create_backend(email) {
+    create_backend(email: string) {
       console.log("[INFRA] Starting create_backend - Mode:", this.app_mode);
       console.log(
         "[INFRA] Registered microservices:",
@@ -60,14 +69,14 @@ export const useInfraStore = defineStore("infra", {
           const appStore = useAppStore();
           await appStore.createProjectFolder();
           if (this.app_mode === appMode.DESKTOP) {
-            globalThis.electronAPI.project_folder_path({
+            (globalThis as any).electronAPI.project_folder_path({
               projectFolderPath: appStore.projectFolderPath,
             });
           }
           await setAppBaseUrl(appStore.base_url);
           const microservices_with_launch = this.microservices.filter((store) => store.launch);
           const launch_promises = microservices_with_launch.map((store) =>
-            store.launch({ projectFolderPath: appStore.projectFolderPath }),
+            store.launch!({ projectFolderPath: appStore.projectFolderPath }),
           );
           launch_promises.push(registerRunningExtensions());
           await Promise.all(launch_promises);

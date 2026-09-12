@@ -7,7 +7,7 @@ const FIRST_SNACKER_MARGIN = 8;
 const feedbackStore = useFeedbackStore();
 const show = ref(true);
 
-function calc_margin(index) {
+function calc_margin(index: number) {
   return `${index * MARGIN_BETWEEN_SNACKERS + FIRST_SNACKER_MARGIN}px`;
 }
 </script>

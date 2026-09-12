@@ -8,14 +8,18 @@ import { ServicesClient } from "@google-cloud/run";
 // Local imports
 import { artifactImage, requestConfig } from "@geode/opengeodeweb-front/server/utils/cloud.js";
 
+interface RunCloudBody {
+  email: string;
+}
+
 export default defineEventHandler(async (event) => {
   try {
-    const { email } = await readBody(event);
+    const { email } = await readBody<RunCloudBody>(event);
     console.log("[RUN CLOUD] Received request to create backend for email:", email);
-    const credentials = JSON.parse(process.env.GOOGLE_CLOUD_KEY);
+    const credentials = JSON.parse(process.env.GOOGLE_CLOUD_KEY as string);
     const location = "europe-west9";
     const projectId = process.env.GOOGLE_CLOUD_PROJECT;
-    const projectName = process.env.PROJECT;
+    const projectName = process.env.PROJECT as string;
     const parent = `projects/${projectId}/locations/${location}`;
     console.log({ parent });
     const auth = new GoogleAuth({
@@ -26,19 +30,21 @@ export default defineEventHandler(async (event) => {
     const image = await artifactImage(parent, authClient);
     const request = requestConfig(parent, image, email, projectName);
     console.log({ request });
-    const runClient = new ServicesClient({ authClient });
+    // @google-cloud/run bundles its own copy of google-auth-library's auth-client types,
+    // which isn't nominally assignable to the AuthClient from our direct dependency.
+    const runClient = new ServicesClient({ authClient: authClient as never });
     const [operation] = await runClient.createService(request);
     const [response] = await operation.promise();
     console.log("Service URL created:", response.uri);
     return {
       statusCode: 200,
-      url: response.uri.replace(/^https?:\/\//iu, ""),
+      url: (response.uri as string).replace(/^https?:\/\//iu, ""),
     };
   } catch (error) {
     console.log(error);
     throw createError({
       statusCode: 500,
-      statusMessage: error.message,
+      statusMessage: (error as Error).message,
     });
   }
 });

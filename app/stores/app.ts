@@ -7,11 +7,23 @@ import { upload_file } from "@ogw_internal/utils/upload_file.js";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
 import type { JsonRpcSchema, RequestHandlers } from "#shared/utils/types.js";
+import type { StateTree } from "pinia";
 
 import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json" with { type: "json" };
 
+// The `share` defineStore option (used by every store in this codebase) is
+// implemented by a runtime pinia plugin outside this package's type surface;
+// this augmentation only teaches the type checker about the option shape
+// already used at each defineStore call site.
+declare module "pinia" {
+  interface DefineStoreOptionsBase<S extends StateTree, Store> {
+    share?: { omit?: string[] };
+  }
+}
+
 interface RegisterableStore {
   $id: string;
+  $patch?: (partial: Record<string, unknown>) => void;
   exportStores?: (params?: Record<string, unknown>) => Promise<unknown>;
   importStores?: (snapshot: unknown) => Promise<void> | void;
   [key: string]: unknown;
@@ -37,10 +49,6 @@ interface ExtensionData {
   loadedAt: string;
   metadata: ExtensionMetadata;
   enabled: boolean;
-}
-
-interface AppRequestHandlers extends RequestHandlers {
-  response_function?: (response: any) => void | Promise<void>;
 }
 
 // oxlint-disable-next-line max-lines-per-function, max-statements
@@ -267,7 +275,7 @@ export const useAppStore = defineStore("app", () => {
     return getExtension(extensionId)?.enabled ?? false;
   }
 
-  function upload(file: File, callbacks: AppRequestHandlers = {}) {
+  function upload(file: File, callbacks: RequestHandlers = {}) {
     const store = useAppStore();
     const schema = opengeodeweb_front_schemas.api.local.extensions.upload;
     const { PROJECT: projectName } = useRuntimeConfig().public;
@@ -277,7 +285,7 @@ export const useAppStore = defineStore("app", () => {
       { schema, file, params },
       {
         ...callbacks,
-        response_function: async (response: any) => {
+        response_function: async (response: unknown) => {
           console.log("[APP] Request completed:", schema.$id);
           if (callbacks.response_function) {
             await callbacks.response_function(response);
@@ -289,7 +297,7 @@ export const useAppStore = defineStore("app", () => {
 
   function request(
     { schema, params }: { schema: JsonRpcSchema; params?: Record<string, unknown> },
-    callbacks: AppRequestHandlers = {},
+    callbacks: RequestHandlers = {},
   ) {
     const store = useAppStore();
     return api_fetch(
@@ -297,7 +305,7 @@ export const useAppStore = defineStore("app", () => {
       { schema, params },
       {
         ...callbacks,
-        response_function: async (response: any) => {
+        response_function: async (response: unknown) => {
           if (callbacks.response_function) {
             await callbacks.response_function(response);
           }
@@ -324,9 +332,12 @@ export const useAppStore = defineStore("app", () => {
     return request(
       { schema, params },
       {
-        response_function: (response: any) => {
-          console.log(`[APP] ${response.projectFolderPath} created`);
-          projectFolderPath.value = response.projectFolderPath;
+        response_function: (response: unknown) => {
+          const { projectFolderPath: newProjectFolderPath } = response as {
+            projectFolderPath: string;
+          };
+          console.log(`[APP] ${newProjectFolderPath} created`);
+          projectFolderPath.value = newProjectFolderPath;
         },
       },
     );

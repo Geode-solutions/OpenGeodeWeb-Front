@@ -24,13 +24,13 @@ const email = ref("");
 const launch = ref(false);
 const valid = ref(false);
 const emailRules = [
-  (value) => {
+  (value: string) => {
     if (value) {
       return true;
     }
     return "E-mail is required.";
   },
-  (value) => {
+  (value: string) => {
     if (/.+@.+\..+/u.test(value)) {
       return true;
     }

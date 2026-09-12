@@ -12,10 +12,10 @@ export function useMeshPointsVisibilityStyle() {
   const viewerStore = useViewerStore();
   const meshPointsCommonStyle = useMeshPointsCommonStyle();
 
-  function meshPointsVisibility(id) {
-    return meshPointsCommonStyle.meshPointsStyle(id).visibility;
+  function meshPointsVisibility(id: string): boolean | undefined {
+    return meshPointsCommonStyle.meshPointsStyle(id).visibility as boolean | undefined;
   }
-  function setMeshPointsVisibility(id, visibility) {
+  function setMeshPointsVisibility(id: string, visibility: boolean | undefined) {
     const params = { id, visibility };
     return viewerStore.request(
       {
@@ -23,8 +23,10 @@ export function useMeshPointsVisibilityStyle() {
         params,
       },
       {
-        response_function(response) {
-          return meshPointsCommonStyle.mutateMeshPointsVisibility(response);
+        response_function(response: unknown) {
+          return meshPointsCommonStyle.mutateMeshPointsVisibility(
+            response as { id: string; visibility: boolean },
+          );
         },
       },
     );

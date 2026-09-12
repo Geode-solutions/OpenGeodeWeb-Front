@@ -44,14 +44,22 @@ describe("project import", () => {
       hybrid: useHybridViewerStore(),
     };
 
-    vi.spyOn(stores.dataBase, "importStores").mockImplementation(async (snapshot) => {
-      const { items } = snapshot;
-      await Promise.all(items.map((item) => database.data.put(item)));
-    });
+    // NOTE: the real `useDataStore().importStores` now expects
+    // `{ modelComponents, modelComponentsRelations }` (see app/stores/data.ts), not the
+    // `{ items }` shape mocked here. This spy fully replaces the implementation for this
+    // test, so it still exercises the intended behavior at runtime, but the mismatch with
+    // the current store signature suggests this test (and/or the store) may be stale -
+    // flagging for review rather than silently changing behavior during the TS migration.
+    vi.spyOn(stores.dataBase, "importStores").mockImplementation(
+      (async (snapshot: { items: Record<string, unknown>[] }) => {
+        const { items } = snapshot;
+        await Promise.all(items.map((item) => database.data.put(item)));
+      }) as typeof stores.dataBase.importStores,
+    );
 
     const storesArray = Object.values(stores);
     for (const store of storesArray.slice(STORES_SLICE_START)) {
-      stores.app.registerStore(store);
+      stores.app.registerStore(store as Parameters<typeof stores.app.registerStore>[0]);
     }
 
     const snapshot = {
@@ -89,10 +97,10 @@ describe("project import", () => {
 
     const item = await database.data.get("abc123");
     expect(item).toBeDefined();
-    expect(item.id).toBe("abc123");
+    expect(item?.id).toBe("abc123");
 
     const style = await database.data_style.get("abc123");
     expect(style).toBeDefined();
-    expect(style.id).toBe("abc123");
+    expect(style?.id).toBe("abc123");
   });
 });

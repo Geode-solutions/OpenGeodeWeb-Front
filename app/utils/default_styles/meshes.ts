@@ -1,3 +1,4 @@
+import type { AttributeConfig, RGBAColor } from "./constants";
 import {
   CELLS_DEFAULT_COLOR,
   CELLS_DEFAULT_VISIBILITY,
@@ -14,74 +15,63 @@ import {
   POLYHEDRA_DEFAULT_VISIBILITY,
 } from "./constants";
 
+function emptyAttributeConfig(): AttributeConfig {
+  return { name: undefined, storedConfigs: {} };
+}
+
 function meshPointsDefaultStyle(
-  visibility = POINTS_DEFAULT_VISIBILITY,
-  size = POINTS_DEFAULT_SIZE,
-  constant = POINTS_DEFAULT_COLOR,
+  visibility: boolean = POINTS_DEFAULT_VISIBILITY,
+  size: number = POINTS_DEFAULT_SIZE,
+  constant: RGBAColor = POINTS_DEFAULT_COLOR,
 ) {
   return {
     visibility,
     coloring: {
       active: MESH_DEFAULT_ACTIVE_COLORING,
       constant,
-      vertex: {
-        name: undefined,
-        storedConfigs: {},
-      },
+      vertex: emptyAttributeConfig(),
     },
     size,
   };
 }
 
 function meshEdgesDefaultStyle(
-  visibility = EDGES_DEFAULT_VISIBILITY,
-  width = EDGES_DEFAULT_WIDTH,
-  constant = EDGES_DEFAULT_COLOR,
+  visibility: boolean = EDGES_DEFAULT_VISIBILITY,
+  width: number = EDGES_DEFAULT_WIDTH,
+  constant: RGBAColor = EDGES_DEFAULT_COLOR,
 ) {
   return {
     visibility,
     coloring: {
       active: MESH_DEFAULT_ACTIVE_COLORING,
       constant,
-      edge: {
-        name: undefined,
-        storedConfigs: {},
-      },
-      vertex: {
-        name: undefined,
-        storedConfigs: {},
-      },
+      edge: emptyAttributeConfig(),
+      vertex: emptyAttributeConfig(),
     },
     width,
   };
 }
 
 function meshCellsDefaultStyle(
-  visibility = CELLS_DEFAULT_VISIBILITY,
-  constant = CELLS_DEFAULT_COLOR,
+  visibility: boolean = CELLS_DEFAULT_VISIBILITY,
+  constant: RGBAColor = CELLS_DEFAULT_COLOR,
 ) {
   return {
     visibility,
     coloring: {
       active: MESH_DEFAULT_ACTIVE_COLORING,
-      cell: {
-        name: undefined,
-        storedConfigs: {},
-      },
+      cell: emptyAttributeConfig(),
       constant,
       // oxlint-disable-next-line unicorn/no-null
       textures: null,
-      vertex: {
-        name: undefined,
-        storedConfigs: {},
-      },
+      vertex: emptyAttributeConfig(),
     },
   };
 }
 
 function meshPolygonsDefaultStyle(
-  visibility = POLYGONS_DEFAULT_VISIBILITY,
-  constant = POLYGONS_DEFAULT_COLOR,
+  visibility: boolean = POLYGONS_DEFAULT_VISIBILITY,
+  constant: RGBAColor = POLYGONS_DEFAULT_COLOR,
 ) {
   return {
     visibility,
@@ -90,35 +80,23 @@ function meshPolygonsDefaultStyle(
       constant,
       // oxlint-disable-next-line unicorn/no-null
       textures: null,
-      polygon: {
-        name: undefined,
-        storedConfigs: {},
-      },
-      vertex: {
-        name: undefined,
-        storedConfigs: {},
-      },
+      polygon: emptyAttributeConfig(),
+      vertex: emptyAttributeConfig(),
     },
   };
 }
 
 function meshPolyhedraDefaultStyle(
-  visibility = POLYHEDRA_DEFAULT_VISIBILITY,
-  constant = POLYHEDRA_DEFAULT_COLOR,
+  visibility: boolean = POLYHEDRA_DEFAULT_VISIBILITY,
+  constant: RGBAColor = POLYHEDRA_DEFAULT_COLOR,
 ) {
   return {
     visibility,
     coloring: {
       active: MESH_DEFAULT_ACTIVE_COLORING,
       constant,
-      polyhedron: {
-        name: undefined,
-        storedConfigs: {},
-      },
-      vertex: {
-        name: undefined,
-        storedConfigs: {},
-      },
+      polyhedron: emptyAttributeConfig(),
+      vertex: emptyAttributeConfig(),
     },
   };
 }

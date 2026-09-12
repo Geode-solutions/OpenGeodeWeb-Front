@@ -4,6 +4,7 @@ import { describe, expect, test, vi } from "vitest";
 import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime";
 import { flushPromises } from "@vue/test-utils";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import type { HTTPMethod } from "h3";
 
 // Local imports
 import { setupActivePinia, vuetify } from "@ogw_tests/utils";
@@ -25,7 +26,7 @@ describe("file selector", () => {
 
   test("select file", async () => {
     registerEndpoint(allowed_files_schema.$id, {
-      method: allowed_files_schema.methods[FIRST_INDEX],
+      method: allowed_files_schema.methods[FIRST_INDEX] as HTTPMethod,
       handler: () => ({
         extensions: ["1", "2", "3"],
       }),
@@ -40,7 +41,7 @@ describe("file selector", () => {
     const file_uploader = wrapper.findComponent(FileUploader);
 
     registerEndpoint(upload_file_schema.$id, {
-      method: upload_file_schema.methods[SECOND_INDEX],
+      method: upload_file_schema.methods[SECOND_INDEX] as HTTPMethod,
       handler: () => ({}),
     });
 
@@ -58,8 +59,10 @@ describe("file selector", () => {
     await flushPromises();
     await flushPromises();
     expect(wrapper.emitted()).toHaveProperty("update_values");
-    expect(wrapper.emitted().update_values).toHaveLength(EXPECTED_LENGTH);
-    expect(wrapper.emitted().update_values[FIRST_INDEX][FIRST_INDEX]).toStrictEqual({
+    expect(wrapper.emitted<unknown[]>().update_values).toHaveLength(EXPECTED_LENGTH);
+    expect(
+      wrapper.emitted<unknown[]>().update_values?.[FIRST_INDEX]?.[FIRST_INDEX],
+    ).toStrictEqual({
       files,
       autoUpload,
     });
@@ -67,14 +70,14 @@ describe("file selector", () => {
 
   describe("file selector", () => {
     registerEndpoint(allowed_files_schema.$id, {
-      method: allowed_files_schema.methods[FIRST_INDEX],
+      method: allowed_files_schema.methods[FIRST_INDEX] as HTTPMethod,
       handler: () => ({
         extensions: ["1", "2", "3"],
       }),
     });
 
     registerEndpoint(upload_file_schema.$id, {
-      method: upload_file_schema.methods[SECOND_INDEX],
+      method: upload_file_schema.methods[SECOND_INDEX] as HTTPMethod,
       handler: () => ({}),
     });
     const files = [new File(["fake_file"], "fake_file.txt")];
@@ -94,8 +97,10 @@ describe("file selector", () => {
       await flushPromises();
       expect(wrapper.componentVM.files).toStrictEqual(files);
       expect(wrapper.emitted()).toHaveProperty("update_values");
-      expect(wrapper.emitted().update_values).toHaveLength(EXPECTED_LENGTH);
-      expect(wrapper.emitted().update_values[FIRST_INDEX][FIRST_INDEX]).toStrictEqual({
+      expect(wrapper.emitted<unknown[]>().update_values).toHaveLength(EXPECTED_LENGTH);
+      expect(
+        wrapper.emitted<unknown[]>().update_values?.[FIRST_INDEX]?.[FIRST_INDEX],
+      ).toStrictEqual({
         files,
         autoUpload: false,
       });

@@ -11,9 +11,9 @@ import { useInfraStore } from "@ogw_front/stores/infra";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 const dumb_obj = { dumb_method: () => true };
-let infraStore = undefined;
-let backStore = undefined;
-let viewerStore = undefined;
+let infraStore: ReturnType<typeof useInfraStore>;
+let backStore: ReturnType<typeof useBackStore>;
+let viewerStore: ReturnType<typeof useViewerStore>;
 
 describe("when_microservices_connected_run_function", () => {
   beforeEach(() => {

@@ -1,5 +1,4 @@
 // Third party imports
-import _ from "lodash";
 // oxlint-disable-next-line no-unassigned-import
 import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry";
 import { connectImageStream } from "@kitware/vtk.js/Rendering/Misc/RemoteView";
@@ -18,6 +17,15 @@ import { useAppStore } from "@ogw_front/stores/app";
 import { useInfraStore } from "@ogw_front/stores/infra";
 import { viewer_call } from "@ogw_internal/utils/viewer_call";
 
+import type { JsonRpcSchema, RequestHandlers } from "#shared/utils/types.js";
+import type { RpcClient } from "#shared/utils/call_raw.js";
+
+interface PickedPoint {
+  x: number | undefined;
+  y: number | undefined;
+  z: number | undefined;
+}
+
 const MS_PER_SECOND = 1000;
 const SECONDS_PER_REQUEST = 10;
 const request_timeout = MS_PER_SECOND * SECONDS_PER_REQUEST;
@@ -27,10 +35,10 @@ export const useViewerStore = defineStore(
   () => {
     const infraStore = useInfraStore();
     const default_local_port = ref("1234");
-    const client = ref({});
-    const config = ref(undefined);
+    const client = ref<RpcClient>({} as RpcClient);
+    const config = ref<unknown>(undefined);
     const picking_mode = ref(false);
-    const picked_point = ref({
+    const picked_point = ref<PickedPoint>({
       x: undefined,
       y: undefined,
       z: undefined,
@@ -49,10 +57,17 @@ export const useViewerStore = defineStore(
       return viewer_url;
     });
     const is_busy = computed(() => request_counter.value > 0);
-    function toggle_picking_mode(value) {
+    function toggle_picking_mode(value: boolean): void {
       picking_mode.value = value;
     }
-    function request({ schema, params = {}, timeout = request_timeout }, callbacks = {}) {
+    function request(
+      {
+        schema,
+        params = {},
+        timeout = request_timeout,
+      }: { schema: JsonRpcSchema; params?: Record<string, unknown>; timeout?: number },
+      callbacks: RequestHandlers = {},
+    ): Promise<unknown> {
       const store = useViewerStore();
       return viewer_call(
         store,
@@ -63,7 +78,7 @@ export const useViewerStore = defineStore(
         },
         {
           ...callbacks,
-          response_function: async (response) => {
+          response_function: async (response: unknown) => {
             if (callbacks.response_function) {
               await callbacks.response_function(response);
             }
@@ -71,7 +86,7 @@ export const useViewerStore = defineStore(
         },
       );
     }
-    async function set_picked_point(x, y) {
+    async function set_picked_point(x: number, y: number): Promise<void> {
       const schema = opengeodeweb_viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
       const params = {
         x: Math.round(x),
@@ -81,7 +96,11 @@ export const useViewerStore = defineStore(
         schema,
         params,
       });
-      const { x: world_x, y: world_y, z: world_z } = response;
+      const {
+        x: world_x,
+        y: world_y,
+        z: world_z,
+      } = response as { x: number; y: number; z: number };
       picked_point.value = {
         x: world_x,
         y: world_y,
@@ -90,7 +109,7 @@ export const useViewerStore = defineStore(
     }
     function ws_connect() {
       if (status.value === Status.CONNECTED) {
-        return;
+        return undefined;
       }
       return navigator.locks.request("viewer.ws_connect", async (lock) => {
         if (status.value === Status.CONNECTED) {
@@ -99,13 +118,13 @@ export const useViewerStore = defineStore(
         try {
           console.log("VIEWER LOCK GRANTED !", lock);
           status.value = Status.CONNECTING;
-          client.value = await initWebSocketClient(base_url.value, client.value, {
+          client.value = (await initWebSocketClient(base_url.value, client.value, {
             onConnectionClose: () => {
               status.value = Status.NOT_CONNECTED;
             },
-          });
+          })) as RpcClient;
           connectImageStream(client.value.getConnection().getSession());
-          client.value.endBusy();
+          (client.value as unknown as { endBusy: () => void }).endBusy();
           const schema = opengeodeweb_viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization;
           const timeout = undefined;
           await request({
@@ -120,13 +139,13 @@ export const useViewerStore = defineStore(
         }
       });
     }
-    function start_request() {
+    function start_request(): void {
       request_counter.value += 1;
     }
-    function stop_request() {
+    function stop_request(): void {
       request_counter.value -= 1;
     }
-    function launch(args = ({ projectFolderPath } = {})) {
+    function launch(args: { projectFolderPath?: string } = {}) {
       console.log("[VIEWER] Launching viewer microservice...", {
         args,
       });
@@ -145,29 +164,31 @@ export const useViewerStore = defineStore(
           params,
         },
         {
-          response_function: (response) => {
-            console.log(`[VIEWER] Viewer launched on port ${response.port}`);
-            default_local_port.value = response.port;
+          response_function: (response: unknown) => {
+            const { port: viewerPort } = response as { port: string };
+            console.log(`[VIEWER] Viewer launched on port ${viewerPort}`);
+            default_local_port.value = viewerPort;
           },
         },
       );
     }
-    async function connect() {
+    async function connect(): Promise<void> {
       console.log("[VIEWER] Connecting to viewer microservice...");
       await ws_connect();
       console.log("[VIEWER] Viewer connected successfully");
     }
-    function get_version(schema) {
+    function get_version(schema: JsonRpcSchema | undefined) {
       if (!schema) {
-        return;
+        return undefined;
       }
       return request(
         {
           schema,
         },
         {
-          response_function: (response) => {
-            version.value = response.microservice_version;
+          response_function: (response: unknown) => {
+            const { microservice_version } = response as { microservice_version: string };
+            version.value = microservice_version;
           },
         },
       );

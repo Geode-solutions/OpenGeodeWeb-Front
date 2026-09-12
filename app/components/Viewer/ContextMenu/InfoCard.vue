@@ -23,15 +23,21 @@ const TRUNCATE_END_CHARS = 7;
 const { copy, copied } = useClipboard({ copiedDuring: COPIED_TIMEOUT });
 const copiedId = ref("");
 
-function isCopied(id) {
+function isCopied(id: string | undefined) {
   return copied.value && copiedId.value === id;
 }
 
 const menuStore = useMenuStore();
 const dataStore = useDataStore();
 
+interface MeshComponentInfo {
+  id?: string;
+  title?: string;
+  category?: string;
+}
+
 const componentName = ref("");
-const componentItem = ref(undefined);
+const componentItem = ref<MeshComponentInfo | undefined>(undefined);
 
 watch(
   () => menuStore.current_meta_data,
@@ -45,7 +51,9 @@ watch(
     const modelId = newMeta.modelId || newMeta.id;
     if (newMeta.pickedComponentId && modelId) {
       const components = await dataStore.getAllMeshComponents(modelId);
-      const comp = components.find((component) => component.id === newMeta.pickedComponentId);
+      const comp = components.find(
+        (component: MeshComponentInfo) => component.id === newMeta.pickedComponentId,
+      );
       if (comp) {
         componentName.value = comp.title;
         componentItem.value = comp;
@@ -86,7 +94,7 @@ const displayComponentTitle = computed(() => {
   );
 });
 
-async function copyId(targetId) {
+async function copyId(targetId: string | undefined) {
   if (!targetId) {
     return;
   }
@@ -98,7 +106,7 @@ async function copyId(targetId) {
   }
 }
 
-function formatId(id) {
+function formatId(id: string | undefined) {
   if (!id) {
     return "";
   }

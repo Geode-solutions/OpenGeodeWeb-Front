@@ -12,10 +12,10 @@ export function useMeshCellsVisibilityStyle() {
   const viewerStore = useViewerStore();
   const meshCellsCommonStyle = useMeshCellsCommonStyle();
 
-  function meshCellsVisibility(id) {
-    return meshCellsCommonStyle.meshCellsStyle(id).visibility;
+  function meshCellsVisibility(id: string): boolean | undefined {
+    return meshCellsCommonStyle.meshCellsStyle(id).visibility as boolean | undefined;
   }
-  function setMeshCellsVisibility(id, visibility) {
+  function setMeshCellsVisibility(id: string, visibility: boolean | undefined) {
     const params = { id, visibility };
     return viewerStore.request(
       {

@@ -8,16 +8,16 @@ import { extract as extractTar } from "tar";
 
 const TAR_ARCHIVE_PATTERN = /\.(?<ext>tar\.gz|tgz|tar)$/u;
 
-async function extractZipArchive(zipFilePath, outputDir) {
+async function extractZipArchive(zipFilePath: string, outputDir: string): Promise<void> {
   const data = await fs.promises.readFile(zipFilePath);
   const zip = await JSZip.loadAsync(data);
-  const promises = [];
+  const promises: Promise<void>[] = [];
 
   for (const [relativePath, zipEntry] of Object.entries(zip.files)) {
     const outputPath = path.join(outputDir, relativePath);
 
     if (zipEntry.dir) {
-      promises.push(fs.promises.mkdir(outputPath, { recursive: true }));
+      promises.push(fs.promises.mkdir(outputPath, { recursive: true }).then(() => undefined));
     } else {
       promises.push(
         (async () => {
@@ -34,11 +34,14 @@ async function extractZipArchive(zipFilePath, outputDir) {
   await Promise.all(promises);
 }
 
-async function extractTarArchive(archivePath, outputDir) {
+async function extractTarArchive(archivePath: string, outputDir: string): Promise<void> {
   await extractTar({ file: archivePath, cwd: outputDir });
 }
 
-async function unzipFile(zipFilePath, outputDir = zipFilePath.replace(/\.[^/.]+$/u, "")) {
+async function unzipFile(
+  zipFilePath: string,
+  outputDir: string = zipFilePath.replace(/\.[^/.]+$/u, ""),
+): Promise<string> {
   console.log("Unzipping file...", zipFilePath, outputDir);
   try {
     await fs.promises.mkdir(outputDir, { recursive: true });

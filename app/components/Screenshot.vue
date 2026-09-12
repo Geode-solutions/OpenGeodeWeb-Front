@@ -38,7 +38,7 @@ async function takeScreenshot() {
       params,
     },
     {
-      response_function: async (response) => {
+      response_function: async (response: { blob: BlobPart }) => {
         if (screenshot_type.value === "file") {
           fileDownload(response.blob, `${current_filename}.${output_extension.value}`);
           feedbackStore.add_success("Screenshot downloaded");
@@ -48,11 +48,12 @@ async function takeScreenshot() {
             await copy([new ClipboardItem({ "image/png": pngBlob })]);
             feedbackStore.add_success("Screenshot copied to clipboard");
           } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
             feedbackStore.add_error(
               undefined,
               undefined,
               "Clipboard Error",
-              `Failed to copy screenshot to clipboard: ${error.message}`,
+              `Failed to copy screenshot to clipboard: ${message}`,
             );
           }
         }

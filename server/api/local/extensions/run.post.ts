@@ -20,14 +20,20 @@ import {
 import { extensionsConf } from "@geode/opengeodeweb-front/server/utils/app_config.js";
 import { unzipFile } from "@geode/opengeodeweb-front/server/utils/server.js";
 
+interface RunExtensionsBody {
+  projectFolderPath: string;
+  projectName: string;
+}
+
 export default defineEventHandler(async (event) => {
   try {
     console.log("NITRO: runExtensions", event);
-    const { projectFolderPath, projectName } = await readBody(event);
+    const { projectFolderPath, projectName } = await readBody<RunExtensionsBody>(event);
     const extensionsConfig = extensionsConf(projectName);
     const extensionsArray = await Promise.all(
       Object.keys(extensionsConfig).map(async (extensionId) => {
-        const extensionPath = extensionsConfig[extensionId].path;
+        // Safe: extensionId comes from Object.keys(extensionsConfig) itself.
+        const extensionPath = extensionsConfig[extensionId]!.path;
         const unzippedExtensionPath = await unzipFile(
           extensionPath,
           extensionFolderPath(projectFolderPath, extensionId),
@@ -46,7 +52,9 @@ export default defineEventHandler(async (event) => {
         await addMicroserviceMetadatas(projectFolderPath, {
           type: "back",
           name,
-          port,
+          // runBack can exhaust its port-conflict retries and return undefined
+          // (pre-existing bug: addMicroserviceMetadatas/URLs then embed "undefined").
+          port: port as number,
         });
         return {
           id,
@@ -66,7 +74,7 @@ export default defineEventHandler(async (event) => {
     console.error("Error running extensions:", error);
     throw createError({
       statusCode: 500,
-      statusMessage: error.message,
+      statusMessage: (error as Error).message,
     });
   }
 });

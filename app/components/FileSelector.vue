@@ -37,7 +37,7 @@ watch(
 
 const toggle_loading = useToggle(loading);
 
-function files_uploaded_event(value) {
+function files_uploaded_event(value: unknown[]) {
   if (value.length > 0) {
     emit("update_values", { files: value, autoUpload: false });
     emit("increment_step");

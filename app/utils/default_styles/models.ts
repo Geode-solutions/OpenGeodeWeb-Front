@@ -1,3 +1,4 @@
+import type { AttributeConfig, RGBAColor } from "./constants";
 import {
   BLOCKS_DEFAULT_ACTIVE_COLORING,
   BLOCKS_DEFAULT_COLOR,
@@ -19,96 +20,79 @@ import {
   SURFACES_DEFAULT_VISIBILITY,
 } from "./constants";
 
+function emptyAttributeConfig(): AttributeConfig {
+  return { name: undefined, storedConfigs: {} };
+}
+
 function modelCornersDefaultStyle(
-  visibility = CORNERS_DEFAULT_VISIBILITY,
-  constant = CORNERS_DEFAULT_COLOR,
+  visibility: boolean = CORNERS_DEFAULT_VISIBILITY,
+  constant: RGBAColor = CORNERS_DEFAULT_COLOR,
 ) {
   return {
     visibility,
     coloring: {
       active: CORNERS_DEFAULT_ACTIVE_COLORING,
       constant,
-      vertex: {
-        name: undefined,
-        storedConfigs: {},
-      },
+      vertex: emptyAttributeConfig(),
     },
   };
 }
 
 function modelLinesDefaultStyle(
-  visibility = LINES_DEFAULT_VISIBILITY,
-  constant = LINES_DEFAULT_COLOR,
+  visibility: boolean = LINES_DEFAULT_VISIBILITY,
+  constant: RGBAColor = LINES_DEFAULT_COLOR,
 ) {
   return {
     visibility,
     coloring: {
       active: LINES_DEFAULT_ACTIVE_COLORING,
       constant,
-      vertex: {
-        name: undefined,
-        storedConfigs: {},
-      },
-      edge: {
-        name: undefined,
-        storedConfigs: {},
-      },
+      vertex: emptyAttributeConfig(),
+      edge: emptyAttributeConfig(),
     },
   };
 }
 
 function modelSurfacesDefaultStyle(
-  visibility = SURFACES_DEFAULT_VISIBILITY,
-  constant = SURFACES_DEFAULT_COLOR,
+  visibility: boolean = SURFACES_DEFAULT_VISIBILITY,
+  constant: RGBAColor = SURFACES_DEFAULT_COLOR,
 ) {
   return {
     visibility,
     coloring: {
       active: SURFACES_DEFAULT_ACTIVE_COLORING,
       constant,
-      vertex: {
-        name: undefined,
-        storedConfigs: {},
-      },
-      polygon: {
-        name: undefined,
-        storedConfigs: {},
-      },
+      vertex: emptyAttributeConfig(),
+      polygon: emptyAttributeConfig(),
     },
   };
 }
 
 function modelBlocksDefaultStyle(
-  visibility = BLOCKS_DEFAULT_VISIBILITY,
-  constant = BLOCKS_DEFAULT_COLOR,
+  visibility: boolean = BLOCKS_DEFAULT_VISIBILITY,
+  constant: RGBAColor = BLOCKS_DEFAULT_COLOR,
 ) {
   return {
     visibility,
     coloring: {
       active: BLOCKS_DEFAULT_ACTIVE_COLORING,
       constant,
-      vertex: {
-        name: undefined,
-        storedConfigs: {},
-      },
-      polyhedron: {
-        name: undefined,
-        storedConfigs: {},
-      },
+      vertex: emptyAttributeConfig(),
+      polyhedron: emptyAttributeConfig(),
     },
   };
 }
 
 function modelPointsDefaultStyle(
-  visibility = POINTS_DEFAULT_VISIBILITY,
-  size = POINTS_DEFAULT_SIZE,
+  visibility: boolean = POINTS_DEFAULT_VISIBILITY,
+  size: number = POINTS_DEFAULT_SIZE,
 ) {
   return { visibility, size };
 }
 
 function modelEdgesDefaultStyle(
-  visibility = EDGES_DEFAULT_VISIBILITY,
-  width = EDGES_DEFAULT_WIDTH,
+  visibility: boolean = EDGES_DEFAULT_VISIBILITY,
+  width: number = EDGES_DEFAULT_WIDTH,
 ) {
   return { visibility, width };
 }

@@ -5,12 +5,15 @@ import path from "node:path";
 
 // Third party imports
 import { google } from "googleapis";
-import type { GoogleAuth } from "google-auth-library";
 import type { protos } from "@google-cloud/run";
 
 // Local imports
 
-type GoogleAuthClient = Awaited<ReturnType<GoogleAuth["getClient"]>>;
+// googleapis' per-API-version `auth` option types don't line up with the concrete
+// client returned by `GoogleAuth.getClient()` (they're structurally close but not
+// nominally assignable). `any` matches how googleapis treats it at runtime (duck typed).
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type GoogleAuthClient = any;
 type CreateServiceRequest = protos.google.cloud.run.v2.ICreateServiceRequest;
 
 const LOCATIONS_DIR = "/etc/nginx/locations";

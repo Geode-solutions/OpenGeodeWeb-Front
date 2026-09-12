@@ -1,4 +1,5 @@
 import { dot } from "@kitware/vtk.js/Common/Core/Math";
+import type { CameraOptions, vtkCamera, Vector3 } from "./vtk_types";
 
 const NEAR_ZERO_THRESHOLD = 1e-10;
 const SLERP_LINEAR_THRESHOLD = 0.9995;
@@ -6,15 +7,15 @@ const LONG_ANIMATION_DURATION = 1000;
 const SHORT_ANIMATION_DURATION = 500;
 const MID_ANIMATION_RATIO = 0.5;
 
-function vecSub(vector, other) {
+function vecSub(vector: Vector3, other: Vector3): Vector3 {
   return [vector[0] - other[0], vector[1] - other[1], vector[2] - other[2]];
 }
 
-function vecLength(vector) {
+function vecLength(vector: Vector3): number {
   return Math.hypot(vector[0], vector[1], vector[2]);
 }
 
-function vecNormalize(vector) {
+function vecNormalize(vector: Vector3): Vector3 {
   const len = vecLength(vector);
   if (len < NEAR_ZERO_THRESHOLD) {
     return [0, 0, 1];
@@ -22,7 +23,7 @@ function vecNormalize(vector) {
   return [vector[0] / len, vector[1] / len, vector[2] / len];
 }
 
-function slerp(from, target, ratio, mid) {
+function slerp(from: Vector3, target: Vector3, ratio: number, mid?: Vector3): Vector3 {
   const normFrom = vecNormalize(from);
   const normTarget = vecNormalize(target);
   let dotProduct =
@@ -51,7 +52,7 @@ function slerp(from, target, ratio, mid) {
   ];
 }
 
-function computeAnimationDuration(startState, targetState) {
+function computeAnimationDuration(startState: CameraOptions, targetState: CameraOptions): number {
   const startDir = vecNormalize(vecSub(startState.position, startState.focal_point));
   const targetDir = vecNormalize(vecSub(targetState.position, targetState.focal_point));
   const dotProduct = Math.max(-1, Math.min(1, dot(startDir, targetDir)));
@@ -62,7 +63,18 @@ function computeAnimationDuration(startState, targetState) {
   );
 }
 
-function animateCamera(options) {
+interface AnimateCameraOptions {
+  camera: vtkCamera;
+  startState: CameraOptions;
+  targetState: CameraOptions;
+  duration: number;
+  bumpMultiplier: number;
+  easeExponent: number;
+  onUpdate: () => void;
+  onEnd: () => void;
+}
+
+function animateCamera(options: AnimateCameraOptions): void {
   const {
     camera,
     startState,
@@ -83,7 +95,7 @@ function animateCamera(options) {
   const startTargetDot =
     normStart[0] * normTarget[0] + normStart[1] * normTarget[1] + normStart[2] * normTarget[2];
 
-  let antipodalMid = undefined;
+  let antipodalMid: Vector3 | undefined = undefined;
   if (startTargetDot < -SLERP_LINEAR_THRESHOLD) {
     const normUp = vecNormalize(startState.view_up);
     antipodalMid = vecNormalize([
@@ -94,7 +106,7 @@ function animateCamera(options) {
   }
 
   const startTime = performance.now();
-  function animate(currentTime) {
+  function animate(currentTime: number): void {
     const progress = Math.min((currentTime - startTime) / duration, 1);
     const ease =
       duration > SHORT_ANIMATION_DURATION
@@ -103,12 +115,15 @@ function animateCamera(options) {
     const bump = bumpMultiplier * Math.sin(Math.PI * progress);
     const dir = slerp(startDir, targetDir, ease, antipodalMid);
     const dist = startDist + (targetDist - startDist) * ease + bump;
+    // `index` ranges over startState.focal_point's own length (3), which always
+    // matches targetState.focal_point's length, so the lookup is always in bounds.
     const focalPoint = startState.focal_point.map(
-      (startValue, index) => startValue + (targetState.focal_point[index] - startValue) * ease,
+      (startValue, index) => startValue + (targetState.focal_point[index]! - startValue) * ease,
     );
     const viewUp = slerp(startState.view_up, targetState.view_up, ease);
     camera.set({
-      position: focalPoint.map((focalCoord, index) => focalCoord + dir[index] * dist),
+      // Same reasoning: `index` ranges over focalPoint's length, matching `dir`'s length (3).
+      position: focalPoint.map((focalCoord, index) => focalCoord + dir[index]! * dist),
       viewUp,
       focalPoint,
     });

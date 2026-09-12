@@ -22,7 +22,7 @@ const id = toRef(() => itemProps.id);
 const visibility = computed({
   get: () => dataStyleStore.meshCellsVisibility(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
+    await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshCellsVisibility(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -31,7 +31,7 @@ const visibility = computed({
 const coloring_style_key = computed({
   get: () => dataStyleStore.meshCellsActiveColoring(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
+    await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshCellsActiveColoring(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -40,7 +40,7 @@ const coloring_style_key = computed({
 const color = computed({
   get: () => dataStyleStore.meshCellsColor(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
+    await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshCellsColor(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -49,7 +49,7 @@ const color = computed({
 const textures = computed({
   get: () => dataStyleStore.meshCellsTextures(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
+    await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshCellsTextures(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -59,7 +59,7 @@ const textures = computed({
 const vertex_attribute_name = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeName(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
+    await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshCellsVertexAttributeName(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -68,7 +68,7 @@ const vertex_attribute_name = computed({
 const vertex_attribute_item = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeItem(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
+    await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshCellsVertexAttributeItem(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -77,7 +77,7 @@ const vertex_attribute_item = computed({
 const vertex_attribute_range = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeRange(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
+    await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshCellsVertexAttributeRange(targetId, newValue[0], newValue[1]),
     );
     hybridViewerStore.remoteRender();
@@ -86,7 +86,7 @@ const vertex_attribute_range = computed({
 const vertex_attribute_color_map = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeColorMap(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
+    await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshCellsVertexAttributeColorMap(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -95,7 +95,7 @@ const vertex_attribute_color_map = computed({
 const vertex_attribute_no_data_color = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeNoDataColor(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
+    await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshCellsVertexAttributeNoDataColor(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -104,7 +104,7 @@ const vertex_attribute_no_data_color = computed({
 const cell_attribute_name = computed({
   get: () => dataStyleStore.meshCellsCellAttributeName(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
+    await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshCellsCellAttributeName(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -113,7 +113,7 @@ const cell_attribute_name = computed({
 const cell_attribute_item = computed({
   get: () => dataStyleStore.meshCellsCellAttributeItem(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
+    await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshCellsCellAttributeItem(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -122,7 +122,7 @@ const cell_attribute_item = computed({
 const cell_attribute_range = computed({
   get: () => dataStyleStore.meshCellsCellAttributeRange(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
+    await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshCellsCellAttributeRange(targetId, newValue[0], newValue[1]),
     );
     hybridViewerStore.remoteRender();
@@ -131,7 +131,7 @@ const cell_attribute_range = computed({
 const cell_attribute_color_map = computed({
   get: () => dataStyleStore.meshCellsCellAttributeColorMap(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
+    await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshCellsCellAttributeColorMap(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -140,7 +140,7 @@ const cell_attribute_color_map = computed({
 const cell_attribute_no_data_color = computed({
   get: () => dataStyleStore.meshCellsCellAttributeNoDataColor(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
+    await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshCellsCellAttributeNoDataColor(targetId, newValue),
     );
     hybridViewerStore.remoteRender();

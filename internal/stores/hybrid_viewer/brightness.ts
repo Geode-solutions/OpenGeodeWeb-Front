@@ -1,10 +1,30 @@
 import { BACKGROUND_GREY_VALUE, RGB_MAX } from "./constants";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import type { Ref } from "vue";
+import type { HybridViewerStorePublic } from "./vtk_types";
 
 const RGBA_CHANNELS = 4;
 const SAMPLE_SIZE = 10;
 const TOTAL_CHANNELS = 400;
-function mapRect(rect, latestImage, canvasRect) {
+
+interface Rect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+// The decoded background image handed to us by the viewer's image stream (see
+// app/stores/hybrid_viewer.ts's onImageReady) - draw-able onto a 2D canvas.
+type DrawableImage = CanvasImageSource & { width: number; height: number };
+
+interface BrightnessOptions {
+  latestImage: DrawableImage | undefined;
+  offscreenCtx: CanvasRenderingContext2D | undefined;
+  offscreenCanvas: HTMLCanvasElement | undefined;
+}
+
+function mapRect(rect: Rect, latestImage: DrawableImage, canvasRect: DOMRect) {
   const scaleX = latestImage.width / canvasRect.width;
   const scaleY = latestImage.height / canvasRect.height;
   return {
@@ -14,9 +34,9 @@ function mapRect(rect, latestImage, canvasRect) {
     relH: rect.height * scaleY,
   };
 }
-function computeAverageBrightness(rect, options) {
+function computeAverageBrightness(rect: Rect, options: BrightnessOptions): number {
   const { latestImage, offscreenCtx, offscreenCanvas } = options;
-  const { genericRenderWindow } = useHybridViewerStore();
+  const { genericRenderWindow } = useHybridViewerStore() as unknown as HybridViewerStorePublic;
   if (!latestImage || !offscreenCtx || !offscreenCanvas || !genericRenderWindow.value) {
     return BACKGROUND_GREY_VALUE / RGB_MAX;
   }
@@ -48,7 +68,7 @@ function computeAverageBrightness(rect, options) {
     const { data } = offscreenCtx.getImageData(0, 0, SAMPLE_SIZE, SAMPLE_SIZE);
     let minBrightness = 1;
     for (let i = 0; i < TOTAL_CHANNELS; i += RGBA_CHANNELS) {
-      const brightness = (data[i] + data[i + 1] + data[i + 2]) / (3 * RGB_MAX);
+      const brightness = (data[i]! + data[i + 1]! + data[i + 2]!) / (3 * RGB_MAX);
       if (brightness < minBrightness) {
         minBrightness = brightness;
       }
@@ -58,16 +78,19 @@ function computeAverageBrightness(rect, options) {
     return BACKGROUND_GREY_VALUE / RGB_MAX;
   }
 }
-function useHybridViewerBrightness() {
-  const latestImage = ref(undefined);
-  const offscreenCanvas =
+function useHybridViewerBrightness(): {
+  latestImage: Ref<DrawableImage | undefined>;
+  getAverageBrightness: (rect: Rect) => number;
+} {
+  const latestImage = ref<DrawableImage | undefined>(undefined);
+  const offscreenCanvas: HTMLCanvasElement | undefined =
     typeof document === "undefined" ? undefined : document.createElement("canvas");
-  const offscreenCtx = offscreenCanvas
-    ? offscreenCanvas.getContext("2d", {
+  const offscreenCtx: CanvasRenderingContext2D | undefined = offscreenCanvas
+    ? (offscreenCanvas.getContext("2d", {
         willReadFrequently: true,
-      })
+      }) ?? undefined)
     : undefined;
-  function getAverageBrightness(rect) {
+  function getAverageBrightness(rect: Rect): number {
     return computeAverageBrightness(rect, {
       latestImage: latestImage.value,
       offscreenCtx,

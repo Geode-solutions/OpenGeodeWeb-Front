@@ -1,29 +1,30 @@
+import type { StyleValues } from "../../types";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 
 export function useMeshCellsCommonStyle() {
   const dataStyleState = useDataStyleState();
 
-  function mutateMeshCellsStyle(id, values) {
+  function mutateMeshCellsStyle(id: string, values: StyleValues) {
     return dataStyleState.mutateStyle(id, {
       cells: values,
     });
   }
 
-  function meshCellsStyle(id) {
-    return dataStyleState.getStyle(id).cells;
+  function meshCellsStyle(id: string): StyleValues {
+    return dataStyleState.getStyle(id).cells as StyleValues;
   }
 
-  function meshCellsColoring(id) {
-    return meshCellsStyle(id).coloring;
+  function meshCellsColoring(id: string): StyleValues {
+    return meshCellsStyle(id).coloring as StyleValues;
   }
 
-  function mutateMeshCellsColoring(id, values) {
+  function mutateMeshCellsColoring(id: string, values: StyleValues) {
     return mutateMeshCellsStyle(id, {
       coloring: values,
     });
   }
 
-  function mutateMeshCellsCellStyle(id, values) {
+  function mutateMeshCellsCellStyle(id: string, values: StyleValues) {
     return mutateMeshCellsColoring(id, {
       cell: values,
     });

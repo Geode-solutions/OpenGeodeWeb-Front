@@ -1,23 +1,24 @@
+import type { StyleValues } from "../../types";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 
 export function useMeshEdgesCommonStyle() {
   const dataStyleState = useDataStyleState();
 
-  function mutateMeshEdgesStyle(id, values) {
+  function mutateMeshEdgesStyle(id: string, values: StyleValues) {
     return dataStyleState.mutateStyle(id, {
       edges: values,
     });
   }
 
-  function meshEdgesStyle(id) {
-    return dataStyleState.getStyle(id).edges;
+  function meshEdgesStyle(id: string): StyleValues {
+    return dataStyleState.getStyle(id).edges as StyleValues;
   }
 
-  function meshEdgesColoring(id) {
-    return meshEdgesStyle(id).coloring;
+  function meshEdgesColoring(id: string): StyleValues {
+    return meshEdgesStyle(id).coloring as StyleValues;
   }
 
-  function mutateMeshEdgesColoring(id, values) {
+  function mutateMeshEdgesColoring(id: string, values: StyleValues) {
     return mutateMeshEdgesStyle(id, {
       coloring: values,
     });

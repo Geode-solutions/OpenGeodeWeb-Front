@@ -12,10 +12,10 @@ export function useMeshPolygonsVisibilityStyle() {
   const viewerStore = useViewerStore();
   const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle();
 
-  function meshPolygonsVisibility(id) {
-    return meshPolygonsCommonStyle.meshPolygonsStyle(id).visibility;
+  function meshPolygonsVisibility(id: string): boolean | undefined {
+    return meshPolygonsCommonStyle.meshPolygonsStyle(id).visibility as boolean | undefined;
   }
-  function setMeshPolygonsVisibility(id, visibility) {
+  function setMeshPolygonsVisibility(id: string, visibility: boolean | undefined) {
     const params = { id, visibility };
     return viewerStore.request(
       {

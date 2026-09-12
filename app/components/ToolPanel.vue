@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import GlassCard from "@ogw_front/components/GlassCard.vue";
+import GlassCard from "@ogw_front/components/GlassCard";
 
 const { title, width, closeLabel, actionLabel, clickOutside, escapeFunction } = defineProps({
   title: { type: String, default: "" },

@@ -20,15 +20,15 @@ function useMeshPolygonsColoringStyle() {
   const meshPolygonsVertexAttributeStyle = useMeshPolygonsVertexAttributeStyle();
   const meshPolygonsPolygonAttributeStyle = useMeshPolygonsPolygonAttributeStyle();
 
-  function meshPolygonsColoring(id) {
+  function meshPolygonsColoring(id: string) {
     return meshPolygonsCommonStyle.meshPolygonsColoring(id);
   }
 
-  function meshPolygonsActiveColoring(id) {
-    return meshPolygonsColoring(id).active;
+  function meshPolygonsActiveColoring(id: string): string | undefined {
+    return meshPolygonsColoring(id).active as string | undefined;
   }
 
-  async function setMeshPolygonsActiveColoring(id, type) {
+  async function setMeshPolygonsActiveColoring(id: string, type: string | undefined) {
     await meshPolygonsCommonStyle.mutateMeshPolygonsStyle(id, {
       coloring: { active: type },
     });
@@ -88,7 +88,7 @@ export function useMeshPolygonsStyle() {
   const meshPolygonsVisibility = useMeshPolygonsVisibilityStyle();
   const coloringStyle = useMeshPolygonsColoringStyle();
 
-  function applyMeshPolygonsStyle(id) {
+  function applyMeshPolygonsStyle(id: string) {
     return Promise.all([
       meshPolygonsVisibility.setMeshPolygonsVisibility(
         id,

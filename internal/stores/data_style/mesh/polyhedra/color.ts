@@ -12,10 +12,10 @@ export function useMeshPolyhedraColorStyle() {
   const viewerStore = useViewerStore();
   const meshPolyhedraCommonStyle = useMeshPolyhedraCommonStyle();
 
-  function meshPolyhedraColor(id) {
+  function meshPolyhedraColor(id: string): unknown {
     return meshPolyhedraCommonStyle.meshPolyhedraColoring(id).constant;
   }
-  function setMeshPolyhedraColor(id, color) {
+  function setMeshPolyhedraColor(id: string, color: unknown) {
     const params = { id, color };
     return viewerStore.request(
       {

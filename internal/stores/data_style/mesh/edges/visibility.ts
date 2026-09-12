@@ -11,10 +11,10 @@ export function useMeshEdgesVisibilityStyle() {
   const viewerStore = useViewerStore();
   const meshEdgesCommonStyle = useMeshEdgesCommonStyle();
 
-  function meshEdgesVisibility(id) {
-    return meshEdgesCommonStyle.meshEdgesStyle(id).visibility;
+  function meshEdgesVisibility(id: string): boolean | undefined {
+    return meshEdgesCommonStyle.meshEdgesStyle(id).visibility as boolean | undefined;
   }
-  function setMeshEdgesVisibility(id, visibility) {
+  function setMeshEdgesVisibility(id: string, visibility: boolean | undefined) {
     const params = { id, visibility };
     return viewerStore.request(
       {

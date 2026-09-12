@@ -11,7 +11,9 @@ const { geodeObjectType, filenames } = defineProps({
   geodeObjectType: { type: String, required: true },
   filenames: { type: Array, required: true },
 });
-const geode_objects_and_output_extensions = ref({});
+type OutputExtensions = Record<string, { is_saveable: boolean }>;
+
+const geode_objects_and_output_extensions = ref<Record<string, OutputExtensions>>({});
 const loading = ref(false);
 
 const toggle_loading = useToggle(loading);
@@ -20,8 +22,8 @@ async function get_output_file_extensions() {
   toggle_loading();
   geode_objects_and_output_extensions.value = {};
   const backStore = useBackStore();
-  const values = await Promise.all(
-    filenames.map(async (filename) => {
+  const values: OutputExtensions[] = await Promise.all(
+    filenames.map(async (filename): Promise<OutputExtensions> => {
       const params = { geode_object_type: geodeObjectType, filename };
       const response = await backStore.request({ schema, params });
       return response.geode_objects_and_output_extensions;
@@ -29,7 +31,7 @@ async function get_output_file_extensions() {
   );
   const all_keys = [...new Set(values.flatMap((value) => Object.keys(value)))];
   const common_keys = all_keys.filter((i) => !values.some((j) => !Object.keys(j).includes(i)));
-  const final_object = {};
+  const final_object: Record<string, OutputExtensions> = {};
   for (const key of common_keys) {
     final_object[key] = {};
     for (const value of values) {
@@ -44,7 +46,7 @@ async function get_output_file_extensions() {
   toggle_loading();
 }
 
-function update_values(output_geode_object, output_extension) {
+function update_values(output_geode_object: string, output_extension: string) {
   if (output_geode_object !== "" && output_extension !== "") {
     emit("update_values", {
       output_geode_object,

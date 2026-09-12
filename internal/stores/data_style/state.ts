@@ -1,47 +1,77 @@
+import type { ModelComponentStyle, ModelComponentTypeStyle, ObjectStyle, StyleValues } from "./types";
 import { database } from "@ogw_internal/database/database";
 import { liveQuery } from "dexie";
 import merge from "lodash/merge";
 import { useObservable } from "@vueuse/rxjs";
+import type { Ref } from "vue";
+import type { Observable as RxObservable } from "rxjs";
 
-let sharedState = undefined;
+interface SharedState {
+  styles: Ref<Record<string, ObjectStyle>>;
+  modelComponentTypeStyles: Ref<Record<string, ModelComponentTypeStyle>>;
+  componentStyles: Ref<Record<string, ModelComponentStyle>>;
+  loadFromDatabase: () => Promise<void>;
+  updateComponentStyleCache: (modelId: string, componentId: string, styleValues: StyleValues) => void;
+  bulkUpdateComponentStyleCache: (
+    modelId: string,
+    componentStyleUpdates: { id_component: string; values: StyleValues }[],
+  ) => void;
+  bulkUpdateComponentStylesCache: (
+    modelId: string,
+    componentIds: string[],
+    styleValues: StyleValues,
+  ) => void;
+  updateModelComponentTypeStyleCache: (
+    modelId: string,
+    componentType: string,
+    styleValues: StyleValues,
+  ) => void;
+  updateStyleCache: (objectId: string, styleValues: StyleValues) => void;
+}
 
-function getSharedState() {
+let sharedState: SharedState | undefined = undefined;
+
+// oxlint-disable-next-line max-lines-per-function
+function getSharedState(): SharedState {
   if (sharedState) {
     return sharedState;
   }
 
-  const dataStyleTable = database.data_style;
-  const modelComponentDataStyleTable = database.model_component_datastyle;
-  const modelComponentTypeDataStyleTable = database.model_component_type_datastyle;
+  const dataStyleTable = database.data_style!;
+  const modelComponentDataStyleTable = database.model_component_datastyle!;
+  const modelComponentTypeDataStyleTable = database.model_component_type_datastyle!;
 
-  const styles = useObservable(
+  // Dexie's `liveQuery` returns Dexie's own `Observable` type, structurally distinct
+  // from rxjs's `Observable` that `useObservable` (from @vueuse/rxjs) expects, even
+  // though they're interoperable at runtime (both are plain subscribe-based streams).
+  const styles = useObservable<Record<string, ObjectStyle>, Record<string, ObjectStyle>>(
     liveQuery(async () => {
-      const objectStyles = await dataStyleTable.toArray();
-      const stylesByObjectId = {};
+      const objectStyles = (await dataStyleTable.toArray()) as ObjectStyle[];
+      const stylesByObjectId: Record<string, ObjectStyle> = {};
       for (const objectStyle of objectStyles) {
         stylesByObjectId[objectStyle.id] = objectStyle;
       }
       return stylesByObjectId;
-    }),
+    }) as unknown as RxObservable<Record<string, ObjectStyle>>,
     { initialValue: {} },
-  );
+  ) as Ref<Record<string, ObjectStyle>>;
 
-  const modelComponentTypeStyles = ref({});
-  const componentStyles = ref({});
+  const modelComponentTypeStyles = ref<Record<string, ModelComponentTypeStyle>>({});
+  const componentStyles = ref<Record<string, ModelComponentStyle>>({});
 
   async function loadFromDatabase() {
     const [fetchedTypeStyles, fetchedComponentStyles] = await Promise.all([
-      modelComponentTypeDataStyleTable.toArray(),
-      modelComponentDataStyleTable.toArray(),
+      modelComponentTypeDataStyleTable.toArray() as unknown as Promise<ModelComponentTypeStyle[]>,
+      modelComponentDataStyleTable.toArray() as unknown as Promise<ModelComponentStyle[]>,
     ]);
-    const typeStylesMap = {};
+    const typeStylesMap: Record<string, ModelComponentTypeStyle> = {};
     for (const typeStyle of fetchedTypeStyles) {
       const cacheKey = `${typeStyle.id_model}_${typeStyle.type}`;
       typeStylesMap[cacheKey] = typeStyle;
     }
     modelComponentTypeStyles.value = typeStylesMap;
 
-    const componentStylesMap = {};
+    const componentStylesMap: Record<string, ModelComponentStyle> = {};
     for (const componentStyle of fetchedComponentStyles) {
       const cacheKey = `${componentStyle.id_model}_${componentStyle.id_component}`;
       componentStylesMap[cacheKey] = componentStyle;
@@ -51,7 +81,7 @@ function getSharedState() {
 
   loadFromDatabase();
 
-  function updateComponentStyleCache(modelId, componentId, styleValues) {
+  function updateComponentStyleCache(modelId: string, componentId: string, styleValues: StyleValues) {
     const cacheKey = `${modelId}_${componentId}`;
     const existingStyle = componentStyles.value[cacheKey];
     if (existingStyle) {
@@ -64,13 +94,16 @@ function getSharedState() {
     }
   }
 
-  function bulkUpdateComponentStyleCache(modelId, componentStyleUpdates) {
+  function bulkUpdateComponentStyleCache(
+    modelId: string,
+    componentStyleUpdates: { id_component: string; values: StyleValues }[],
+  ) {
     const updatedComponentStyles = { ...componentStyles.value };
     for (const { id_component: componentId, values: styleValues } of componentStyleUpdates) {
       const cacheKey = `${modelId}_${componentId}`;
       const existingStyle = updatedComponentStyles[cacheKey];
       if (existingStyle) {
-        updatedComponentStyles[cacheKey] = merge({}, existingStyle, styleValues);
+        updatedComponentStyles[cacheKey] = merge({}, existingStyle, styleValues) as ModelComponentStyle;
       } else {
         updatedComponentStyles[cacheKey] = merge(
           { id_model: modelId, id_component: componentId },
@@ -81,13 +114,13 @@ function getSharedState() {
     componentStyles.value = updatedComponentStyles;
   }
 
-  function bulkUpdateComponentStylesCache(modelId, componentIds, styleValues) {
+  function bulkUpdateComponentStylesCache(modelId: string, componentIds: string[], styleValues: StyleValues) {
     const updatedComponentStyles = { ...componentStyles.value };
     for (const componentId of componentIds) {
       const cacheKey = `${modelId}_${componentId}`;
       const existingStyle = updatedComponentStyles[cacheKey];
       if (existingStyle) {
-        updatedComponentStyles[cacheKey] = merge({}, existingStyle, styleValues);
+        updatedComponentStyles[cacheKey] = merge({}, existingStyle, styleValues) as ModelComponentStyle;
       } else {
         updatedComponentStyles[cacheKey] = merge(
           { id_model: modelId, id_component: componentId },
@@ -98,7 +131,11 @@ function getSharedState() {
     componentStyles.value = updatedComponentStyles;
   }
 
-  function updateModelComponentTypeStyleCache(modelId, componentType, styleValues) {
+  function updateModelComponentTypeStyleCache(
+    modelId: string,
+    componentType: string,
+    styleValues: StyleValues,
+  ) {
     const cacheKey = `${modelId}_${componentType}`;
     if (!modelComponentTypeStyles.value[cacheKey]) {
       modelComponentTypeStyles.value[cacheKey] = { id_model: modelId, type: componentType };
@@ -106,7 +143,7 @@ function getSharedState() {
     merge(modelComponentTypeStyles.value[cacheKey], styleValues);
   }
 
-  function updateStyleCache(objectId, styleValues) {
+  function updateStyleCache(objectId: string, styleValues: StyleValues) {
     if (!styles.value[objectId]) {
       styles.value[objectId] = { id: objectId };
     }
@@ -128,23 +165,25 @@ function getSharedState() {
   return sharedState;
 }
 
+// oxlint-disable-next-line max-lines-per-function
 export function useDataStyleState() {
-  const dataStyleTable = database.data_style;
-  const modelComponentDataStyleTable = database.model_component_datastyle;
-  const modelComponentTypeDataStyleTable = database.model_component_type_datastyle;
+  const dataStyleTable = database.data_style!;
+  const modelComponentDataStyleTable = database.model_component_datastyle!;
+  const modelComponentTypeDataStyleTable = database.model_component_type_datastyle!;
 
   const state = getSharedState();
   const { styles, modelComponentTypeStyles, componentStyles } = state;
 
-  const objectVisibility = computed(() => (objectId) => {
-    if (styles.value[objectId]) {
-      return styles.value[objectId].visibility;
+  const objectVisibility = computed(() => (objectId: string): boolean | undefined => {
+    const style = styles.value[objectId];
+    if (style) {
+      return style.visibility;
     }
     return false;
   });
 
-  const selectedObjects = computed(() => {
-    const visibleObjectIds = [];
+  const selectedObjects = computed((): string[] => {
+    const visibleObjectIds: string[] = [];
     for (const [objectId, objectStyle] of Object.entries(styles.value)) {
       if (objectStyle.visibility === true) {
         visibleObjectIds.push(objectId);
@@ -153,28 +192,28 @@ export function useDataStyleState() {
     return visibleObjectIds;
   });
 
-  function getStyle(objectId) {
-    return { ...toRaw(styles.value[objectId]) };
+  function getStyle(objectId: string): ObjectStyle {
+    return { ...toRaw(styles.value[objectId]) } as ObjectStyle;
   }
 
-  function mutateStyle(objectId, styleValues) {
+  function mutateStyle(objectId: string, styleValues: StyleValues) {
     state.updateStyleCache(objectId, styleValues);
     const currentStyle = getStyle(objectId);
     merge(currentStyle, styleValues);
-    return dataStyleTable.put(structuredClone({ id: objectId, ...toRaw(currentStyle) }));
+    return dataStyleTable.put(structuredClone({ ...toRaw(currentStyle), id: objectId }));
   }
 
-  function getComponentStyle(modelId, componentId) {
+  function getComponentStyle(modelId: string, componentId: string): ModelComponentStyle {
     const cacheKey = `${modelId}_${componentId}`;
-    return merge({ coloring: {} }, componentStyles.value[cacheKey]);
+    return merge({ coloring: {} }, componentStyles.value[cacheKey]) as ModelComponentStyle;
   }
 
-  function getModelComponentTypeStyle(modelId, componentType) {
+  function getModelComponentTypeStyle(modelId: string, componentType: string): ModelComponentTypeStyle {
     const cacheKey = `${modelId}_${componentType}`;
-    return merge({ coloring: {} }, modelComponentTypeStyles.value[cacheKey]);
+    return merge({ coloring: {} }, modelComponentTypeStyles.value[cacheKey]) as ModelComponentTypeStyle;
   }
 
-  async function clear() {
+  async function clear(): Promise<void> {
     await Promise.all([
       dataStyleTable.clear(),
       modelComponentDataStyleTable.clear(),

@@ -1,10 +1,29 @@
+import type { Table } from "dexie";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import { database } from "@ogw_internal/database/database.js";
 import { liveQuery } from "dexie";
 import { useDataMesh } from "./mesh.js";
 import { useObservable } from "@vueuse/rxjs";
+import type { FormattedComponent, ModelComponentRecord } from "./mesh.js";
 
-function pluralize(type) {
+interface ModelComponentRelationRecord {
+  id: string;
+  parent: string;
+  child: string;
+  type: string;
+}
+
+interface CollectionComponent extends FormattedComponent {
+  children: FormattedComponent[];
+}
+
+interface CollectionComponentGroup {
+  id: string;
+  title: string;
+  children: CollectionComponent[];
+}
+
+function pluralize(type: string): string {
   if (type.endsWith("y")) {
     return `${type.slice(0, -1)}ies`;
   }
@@ -12,11 +31,17 @@ function pluralize(type) {
 }
 
 export function useDataCollections() {
-  const model_components_db = database.model_components;
-  const model_components_relation_db = database.model_components_relation;
+  const model_components_db = database.model_components as unknown as Table<
+    ModelComponentRecord,
+    string
+  >;
+  const model_components_relation_db = database.model_components_relation as unknown as Table<
+    ModelComponentRelationRecord,
+    string
+  >;
   const { getAllMeshComponents } = useDataMesh();
 
-  async function hasCollectionComponents(modelId) {
+  async function hasCollectionComponents(modelId: string): Promise<boolean> {
     const count = await model_components_db
       .where("id")
       .equals(modelId)
@@ -25,7 +50,7 @@ export function useDataCollections() {
     return count > 0;
   }
 
-  async function getAllCollectionComponents(modelId) {
+  async function getAllCollectionComponents(modelId: string): Promise<FormattedComponent[]> {
     const items = await model_components_db.where("id").equals(modelId).toArray();
     return items
       .filter((component) => !MESH_COMPONENT_TYPES.includes(component.type))
@@ -38,16 +63,18 @@ export function useDataCollections() {
       }));
   }
 
-  async function fetchAllCollectionComponents(modelId) {
+  async function fetchAllCollectionComponents(
+    modelId: string,
+  ): Promise<Record<string, CollectionComponent[]>> {
     const components = await getAllCollectionComponents(modelId);
     const relations = await model_components_relation_db.where("id").equals(modelId).toArray();
     const allMeshComponents = await getAllMeshComponents(modelId);
-    const meshComponentsById = {};
+    const meshComponentsById: Record<string, FormattedComponent> = {};
     for (const meshComponent of allMeshComponents) {
       meshComponentsById[meshComponent.id] = meshComponent;
     }
 
-    const byType = {};
+    const byType: Record<string, CollectionComponent[]> = {};
     for (const component of components) {
       if (!byType[component.category]) {
         byType[component.category] = [];
@@ -57,8 +84,8 @@ export function useDataCollections() {
       );
       const children = itemRelations
         .map((relation) => meshComponentsById[relation.child])
-        .filter(Boolean);
-      byType[component.category].push({
+        .filter((child): child is FormattedComponent => Boolean(child));
+      byType[component.category]?.push({
         ...component,
         children,
       });
@@ -66,24 +93,25 @@ export function useDataCollections() {
     return byType;
   }
 
-  async function formatedCollectionComponents(modelId) {
+  async function formatedCollectionComponents(
+    modelId: string,
+  ): Promise<CollectionComponentGroup[]> {
     const byType = await fetchAllCollectionComponents(modelId);
     const collectionTypes = Object.keys(byType);
 
     return collectionTypes
-      .filter((type) => byType[type] && byType[type].length > 0)
+      .filter((type) => byType[type] && (byType[type]?.length ?? 0) > 0)
       .map((type) => ({
         id: type,
         title: pluralize(type),
-        children: byType[type],
+        children: byType[type] ?? [],
       }));
   }
 
-  function refFormatedCollectionComponents(modelId) {
-    return useObservable(
-      liveQuery(() => formatedCollectionComponents(modelId)),
-      { initialValue: undefined },
-    );
+  function refFormatedCollectionComponents(modelId: string) {
+    return useObservable(liveQuery(() => formatedCollectionComponents(modelId)), {
+      initialValue: undefined,
+    });
   }
 
   return {

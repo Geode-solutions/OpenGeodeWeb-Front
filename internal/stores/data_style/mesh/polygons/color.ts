@@ -12,10 +12,10 @@ export function useMeshPolygonsColorStyle() {
   const viewerStore = useViewerStore();
   const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle();
 
-  function meshPolygonsColor(id) {
+  function meshPolygonsColor(id: string): unknown {
     return meshPolygonsCommonStyle.meshPolygonsColoring(id).constant;
   }
-  function setMeshPolygonsColor(id, color) {
+  function setMeshPolygonsColor(id: string, color: unknown) {
     const params = { id, color };
     return viewerStore.request(
       {

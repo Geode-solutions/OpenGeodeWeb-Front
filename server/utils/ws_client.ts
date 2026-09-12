@@ -1,3 +1,4 @@
+/// <reference path="../types/vendor.d.ts" />
 // Third party imports
 import { WebSocket } from "ws";
 import { v4 as uuidv4 } from "uuid";
@@ -7,15 +8,35 @@ import { v4 as uuidv4 } from "uuid";
 const HELLO_ID = "system:hello";
 const HELLO_SECRET = "wslink-secret";
 
+interface PendingCall {
+  resolve: (value: unknown) => void;
+  reject: (reason?: unknown) => void;
+}
+
+interface WsRpcMessage {
+  id?: string;
+  error?: { message?: string };
+  result?: unknown;
+}
+
+interface ServerWsRpcClient {
+  call: (rpc: string, params?: Record<string, unknown>) => Promise<unknown>;
+  close: () => void;
+  isOpen: () => boolean;
+  onConnectionClose: (callback: () => void) => void;
+  onConnectionError: (callback: (error: unknown) => void) => void;
+  ready: Promise<void>;
+}
+
 //oxlint-disable-next-line max-lines-per-function
-function createServerWsRpcClient(baseUrl) {
+function createServerWsRpcClient(baseUrl: string): ServerWsRpcClient {
   const socket = new WebSocket(baseUrl);
-  const pending = new Map();
-  let onCloseCallback = undefined;
-  let onErrorCallback = undefined;
+  const pending = new Map<string, PendingCall>();
+  let onCloseCallback: (() => void) | undefined = undefined;
+  let onErrorCallback: ((error: unknown) => void) | undefined = undefined;
 
   //oxlint-disable-next-line promise/avoid-new
-  const ready = new Promise((resolve, reject) => {
+  const ready = new Promise<void>((resolve, reject) => {
     socket.on("open", () => {
       socket.send(
         JSON.stringify({
@@ -28,9 +49,9 @@ function createServerWsRpcClient(baseUrl) {
 
     socket.on("message", (raw) => {
       console.log("RAW WS MESSAGE:", raw.toString());
-      let message = undefined;
+      let message: WsRpcMessage | undefined = undefined;
       try {
-        message = JSON.parse(raw.toString());
+        message = JSON.parse(raw.toString()) as WsRpcMessage;
       } catch {
         return;
       }
@@ -44,8 +65,8 @@ function createServerWsRpcClient(baseUrl) {
         return;
       }
 
-      const entry = pending.get(message.id);
-      if (!entry) {
+      const entry = message.id === undefined ? undefined : pending.get(message.id);
+      if (!entry || message.id === undefined) {
         return;
       }
       pending.delete(message.id);
@@ -70,7 +91,7 @@ function createServerWsRpcClient(baseUrl) {
     });
   });
 
-  async function call(rpc, params = {}) {
+  async function call(rpc: string, params: Record<string, unknown> = {}): Promise<unknown> {
     await ready;
     const id = uuidv4();
     //oxlint-disable-next-line promise/avoid-new
@@ -88,21 +109,21 @@ function createServerWsRpcClient(baseUrl) {
     });
   }
 
-  function close() {
+  function close(): void {
     socket.close();
   }
 
-  function isOpen() {
+  function isOpen(): boolean {
     return socket.readyState === WebSocket.OPEN;
   }
 
   //oxlint-disable-next-line promise/prefer-await-to-callbacks
-  function onConnectionClose(callback) {
+  function onConnectionClose(callback: () => void): void {
     onCloseCallback = callback;
   }
 
   //oxlint-disable-next-line promise/prefer-await-to-callbacks
-  function onConnectionError(callback) {
+  function onConnectionError(callback: (error: unknown) => void): void {
     onErrorCallback = callback;
   }
 
@@ -110,3 +131,4 @@ function createServerWsRpcClient(baseUrl) {
 }
 
 export { createServerWsRpcClient };
+export type { ServerWsRpcClient };

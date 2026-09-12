@@ -1,3 +1,4 @@
+import type { StyleValues } from "../../types";
 import {
   isModelBlocksPolyhedronAttributeValid,
   useModelBlocksPolyhedronAttribute,
@@ -15,23 +16,32 @@ export function useModelBlocksColor() {
   const modelBlocksVertexAttribute = useModelBlocksVertexAttribute();
   const modelBlocksPolyhedronAttribute = useModelBlocksPolyhedronAttribute();
 
-  function modelBlockColoring(id, block_id) {
-    return modelBlocksCommonStyle.modelBlockStyle(id, block_id).coloring;
+  function modelBlockColoring(id: string, block_id?: string): StyleValues {
+    return modelBlocksCommonStyle.modelBlockStyle(id, block_id).coloring as StyleValues;
   }
 
-  function modelBlockColor(id, block_id) {
+  function modelBlockColor(id: string, block_id?: string): unknown {
     return modelBlockColoring(id, block_id).constant;
   }
 
-  function setModelBlocksColor(modelId, blocks_ids, color, activeColoring = "constant") {
+  function setModelBlocksColor(
+    modelId: string,
+    blocks_ids: string[],
+    color: unknown,
+    activeColoring = "constant",
+  ) {
     return modelCommonStyle.setModelTypeColor(modelId, blocks_ids, color, schema, activeColoring);
   }
 
-  function modelBlockActiveColoring(id, block_id) {
+  function modelBlockActiveColoring(id: string, block_id?: string): unknown {
     return modelBlockColoring(id, block_id).active;
   }
 
-  async function setModelBlocksActiveColoring(modelId, blocks_ids, activeColoring) {
+  async function setModelBlocksActiveColoring(
+    modelId: string,
+    blocks_ids: string[],
+    activeColoring: string,
+  ) {
     if (blocks_ids.length > 1) {
       modelBlocksCommonStyle.mutateModelBlocksTypeColoring(modelId, {
         active: activeColoring,

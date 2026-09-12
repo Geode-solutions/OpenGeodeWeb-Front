@@ -26,7 +26,14 @@ const ecoMessages = computed(() => [
 
 const MESSAGE_INTERVAL_MS = 5000;
 const currentMessage = ref(0);
-let interval = undefined;
+let interval: ReturnType<typeof setInterval> | undefined;
+
+// Fallback only guards against noUncheckedIndexedAccess; currentMessage is always
+// kept in range by the modulo below, so it is never actually used.
+const FALLBACK_ECO_MESSAGE = { icon: "", title: "", message: "" };
+const currentEcoMessage = computed(
+  () => ecoMessages.value[currentMessage.value] ?? FALLBACK_ECO_MESSAGE,
+);
 
 onMounted(() => {
   interval = setInterval(() => {
@@ -54,18 +61,18 @@ onUnmounted(() => {
           class="d-flex align-center ga-3 pa-0 mb-2 mb-sm-3 text-body-1 text-sm-subtitle-1 font-weight-bold text-white text-wrap"
         >
           <v-icon
-            :icon="ecoMessages[currentMessage].icon"
+            :icon="currentEcoMessage.icon"
             color="white"
             size="22"
             style="filter: drop-shadow(0 0 6px rgba(var(--v-theme-primary), 0.6))"
           />
-          {{ ecoMessages[currentMessage].title }}
+          {{ currentEcoMessage.title }}
         </v-card-title>
         <v-card-text
           class="pa-0 text-body-2 text-white text-left"
           style="opacity: 0.85; line-height: 1.7"
         >
-          {{ ecoMessages[currentMessage].message }}
+          {{ currentEcoMessage.message }}
         </v-card-text>
       </v-card>
     </v-scroll-y-reverse-transition>

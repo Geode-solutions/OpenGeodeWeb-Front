@@ -9,24 +9,32 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.jso
 // Local imports
 import { addNginxLocation, addSupervisorProgram } from "./cloud.js";
 import { getAvailablePort, waitForReady } from "./scripts.js";
+import type { NamedChildProcess } from "./scripts.js";
 import { microservicesMetadatasPath, projectMicroservices } from "./cleanup.js";
+import type { Microservice } from "./cleanup.js";
 import { executablePath } from "./path.js";
+
+interface RunArgs {
+  projectFolderPath: string;
+  uploadFolderPath?: string;
+  [key: string]: unknown;
+}
 
 const MILLISECONDS_PER_SECOND = 1000;
 const DEFAULT_TIMEOUT_SECONDS = 45;
 const MAX_PORT_RETRIES = 1;
 async function runScript(
-  execPath,
-  execName,
-  args,
-  expectedResponse,
+  execPath: string,
+  execName: string,
+  args: string[],
+  expectedResponse: string,
   timeoutSeconds = DEFAULT_TIMEOUT_SECONDS,
-) {
+): Promise<NamedChildProcess> {
   const command = executablePath(execPath, execName);
   console.log("runScript", command, args);
   const child = child_process.spawn(command, args, {
     stdio: ["ignore", "pipe", "pipe"],
-  });
+  }) as NamedChildProcess;
   child.name = command.replace(/^.*[\\/]/u, "");
   child.on("spawn", () => {
     console.log(`[${child.name}] spawned, pid=${child.pid}`);
@@ -46,11 +54,11 @@ async function runScript(
     throw error;
   }
 }
-function isPortInUseError(errorMessage) {
-  return /EADDRINUSE|address already in use|port already in use/iu.test(errorMessage);
+function isPortInUseError(error: unknown): boolean {
+  return /EADDRINUSE|address already in use|port already in use/iu.test(String(error));
 }
 
-function backArgs(args, port) {
+function backArgs(args: RunArgs, port: number): string[] {
   const { projectFolderPath } = args;
   if (!projectFolderPath) {
     throw new Error("projectFolderPath is required");
@@ -74,8 +82,13 @@ function backArgs(args, port) {
   return executableArgs;
 }
 
-async function runBack(execName, execPath, args = {}, attempts = 0) {
-  let port = undefined;
+async function runBack(
+  execName: string,
+  execPath: string,
+  args: RunArgs = { projectFolderPath: "" },
+  attempts = 0,
+): Promise<number | undefined> {
+  let port: number | undefined = undefined;
   try {
     port = await getAvailablePort();
     const executableArgs = backArgs(args, port);
@@ -93,14 +106,20 @@ async function runBack(execName, execPath, args = {}, attempts = 0) {
       return newPort;
     }
   }
+  return undefined;
 }
 
-async function runViewer(execName, execPath, args = {}, attempts = 0) {
+async function runViewer(
+  execName: string,
+  execPath: string,
+  args: RunArgs = { projectFolderPath: "" },
+  attempts = 0,
+): Promise<number | undefined> {
   const { projectFolderPath } = args;
   if (!projectFolderPath) {
     throw new Error("projectFolderPath is required");
   }
-  let port = undefined;
+  let port: number | undefined = undefined;
   try {
     port = await getAvailablePort();
     const viewerArgs = [
@@ -125,10 +144,17 @@ async function runViewer(execName, execPath, args = {}, attempts = 0) {
       return newPort;
     }
   }
+  return undefined;
 }
 
-async function runExtension(extensionId, execName, execPath, args = {}, attempts = 0) {
-  let port = undefined;
+async function runExtension(
+  extensionId: string,
+  execName: string,
+  execPath: string,
+  args: RunArgs = { projectFolderPath: "" },
+  attempts = 0,
+): Promise<number | undefined> {
+  let port: number | undefined = undefined;
   try {
     port = await getAvailablePort();
     const executableArgs = backArgs(args, port);
@@ -148,8 +174,9 @@ async function runExtension(extensionId, execName, execPath, args = {}, attempts
       return newPort;
     }
   }
+  return undefined;
 }
-function addMicroserviceMetadatas(projectFolderPath, serviceObj) {
+function addMicroserviceMetadatas(projectFolderPath: string, serviceObj: Microservice): void {
   const microservices = projectMicroservices(projectFolderPath);
   if (serviceObj.type === "back") {
     const schema = back_schemas.opengeodeweb_back.kill;

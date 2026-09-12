@@ -7,6 +7,8 @@ import { useAppStore } from "@ogw_front/stores/app";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
+import type { JsonRpcSchema, RequestHandlers } from "#shared/utils/types.js";
+
 import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json" with { type: "json" };
 
 const MILLISECONDS_IN_SECOND = 1000;
@@ -20,13 +22,13 @@ export const useBackStore = defineStore("back", {
     version: "0.0.0",
   }),
   getters: {
-    protocol() {
+    protocol(): string {
       return getRestApiProtocol();
     },
-    port() {
+    port(): string {
       return getRestApiPort(this.default_local_port);
     },
-    base_url() {
+    base_url(): string {
       const infraStore = useInfraStore();
       let back_url = `${this.protocol}://${infraStore.domain_name}:${this.port}`;
       if (isCloudMode()) {
@@ -34,7 +36,7 @@ export const useBackStore = defineStore("back", {
       }
       return back_url;
     },
-    is_busy() {
+    is_busy(): boolean {
       return this.request_counter > 0;
     },
   },
@@ -72,7 +74,7 @@ export const useBackStore = defineStore("back", {
     stop_request() {
       this.request_counter -= 1;
     },
-    launch(args) {
+    launch(args: Record<string, unknown>) {
       console.log("[GEODE] Launching back microservice...", { args });
       const appStore = useAppStore();
       const { COMMAND_BACK, NUXT_ROOT_PATH } = useRuntimeConfig().public;
@@ -83,9 +85,10 @@ export const useBackStore = defineStore("back", {
       return appStore.request(
         { schema, params },
         {
-          response_function: (response) => {
-            console.log(`[GEODE] Back launched on port ${response.port}`);
-            this.default_local_port = response.port;
+          response_function: (response: unknown) => {
+            const { port } = response as { port: string };
+            console.log(`[GEODE] Back launched on port ${port}`);
+            this.default_local_port = port;
           },
         },
       );
@@ -95,13 +98,16 @@ export const useBackStore = defineStore("back", {
       this.set_ping();
       return Promise.resolve();
     },
-    request({ schema, params = {} }, callbacks = {}) {
+    request(
+      { schema, params = {} }: { schema: JsonRpcSchema; params?: Record<string, unknown> },
+      callbacks: RequestHandlers = {},
+    ) {
       return api_fetch(
         this,
         { schema, params, headers: {} },
         {
           ...callbacks,
-          response_function: async (response) => {
+          response_function: async (response: unknown) => {
             if (callbacks.response_function) {
               await callbacks.response_function(response);
             }
@@ -109,7 +115,7 @@ export const useBackStore = defineStore("back", {
         },
       );
     },
-    upload(file, callbacks = {}) {
+    upload(file: File, callbacks: RequestHandlers = {}) {
       const schema = back_schemas.opengeodeweb_back.upload_file;
       return upload_file(
         this,
@@ -119,7 +125,7 @@ export const useBackStore = defineStore("back", {
         },
         {
           ...callbacks,
-          response_function: async (response) => {
+          response_function: async (response: unknown) => {
             if (callbacks.response_function) {
               await callbacks.response_function(response);
             }
@@ -127,15 +133,16 @@ export const useBackStore = defineStore("back", {
         },
       );
     },
-    get_version(schema) {
+    get_version(schema: JsonRpcSchema | undefined) {
       if (!schema) {
         return;
       }
       return this.request(
         { schema },
         {
-          response_function: (response) => {
-            this.version = response.microservice_version;
+          response_function: (response: unknown) => {
+            const { microservice_version } = response as { microservice_version: string };
+            this.version = microservice_version;
           },
         },
       );

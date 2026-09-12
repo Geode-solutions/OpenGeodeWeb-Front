@@ -19,7 +19,14 @@ const { id, componentIds, schema } = defineProps({
   schema: { type: Object, required: true },
 });
 
-const attributes = ref([]);
+interface AttributeInfo {
+  attribute_name: string;
+  nb_items: number;
+  no_data?: boolean;
+  [key: string]: unknown;
+}
+
+const attributes = ref<AttributeInfo[]>([]);
 
 const currentAttribute = computed(() =>
   attributes.value.find((attr) => attr.attribute_name === attributeName.value),
@@ -28,23 +35,31 @@ const cssNoDataColor = computed(() => {
   const { red, green, blue, alpha } = attributeNoDataColor.value ?? DEFAULT_NO_DATA_COLOR;
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 });
-const rangeMin = computed({
-  get: () => (attributeRange.value ? attributeRange.value[0] : undefined),
-  set: (val) => {
-    const currentMax = attributeRange.value ? attributeRange.value[1] : undefined;
+const rangeMin = computed<number | undefined>({
+  get: () => {
+    const range = attributeRange.value as number[] | undefined;
+    return range ? range[0] : undefined;
+  },
+  set: (val: number) => {
+    const range = attributeRange.value as number[] | undefined;
+    const currentMax = range ? range[1] : undefined;
     let newMin = val;
-    if (currentMax !== undefined && val > currentMax) {
+    if (typeof currentMax === "number" && val > currentMax) {
       newMin = currentMax;
     }
     attributeRange.value = [newMin, currentMax];
   },
 });
-const rangeMax = computed({
-  get: () => (attributeRange.value ? attributeRange.value[1] : undefined),
-  set: (val) => {
-    const currentMin = attributeRange.value ? attributeRange.value[0] : undefined;
+const rangeMax = computed<number | undefined>({
+  get: () => {
+    const range = attributeRange.value as number[] | undefined;
+    return range ? range[1] : undefined;
+  },
+  set: (val: number) => {
+    const range = attributeRange.value as number[] | undefined;
+    const currentMin = range ? range[0] : undefined;
     let newMax = val;
-    if (currentMin !== undefined && val < currentMin) {
+    if (typeof currentMin === "number" && val < currentMin) {
       newMax = currentMin;
     }
     attributeRange.value = [currentMin, newMax];
@@ -69,7 +84,7 @@ function resetRange() {
   }
 }
 
-function hasSelectedComponent(components) {
+function hasSelectedComponent(components: unknown) {
   return Array.isArray(components) && components.length > 0;
 }
 
@@ -79,7 +94,7 @@ function getAttributes() {
     return;
   }
 
-  const params = { id };
+  const params: { id: string; component_ids?: unknown } = { id };
   if (requiresComponent) {
     params.component_ids = componentIds;
   }
@@ -87,7 +102,7 @@ function getAttributes() {
   backStore.request(
     { schema, params },
     {
-      response_function: (response) => {
+      response_function: (response: { attributes: AttributeInfo[] }) => {
         attributes.value = response.attributes;
       },
     },

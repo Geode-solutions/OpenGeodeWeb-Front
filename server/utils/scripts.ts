@@ -189,3 +189,4 @@ async function runBrowser(scriptName: string): Promise<number> {
   return port;
 }
 export { commandExistsSync, getAvailablePort, runBrowser, waitForReady };
+export type { NamedChildProcess };

@@ -6,7 +6,7 @@ const { variant, rounded, padding, theme, escapeFunction } = defineProps({
   variant: {
     type: String,
     default: "panel",
-    validator: (valid) => ["panel", "ui"].includes(valid),
+    validator: (valid: unknown) => typeof valid === "string" && ["panel", "ui"].includes(valid),
   },
   rounded: { type: String, default: "xl" },
   padding: { type: String, default: "pa-6" },

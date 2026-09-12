@@ -9,14 +9,22 @@ import {
   runBack,
 } from "@geode/opengeodeweb-front/server/utils/microservices.js";
 
+interface RunBackBody {
+  COMMAND_BACK: string;
+  NUXT_ROOT_PATH: string;
+  args: { projectFolderPath: string; [key: string]: unknown };
+}
+
 export default defineEventHandler(async (event) => {
   try {
-    const { COMMAND_BACK, NUXT_ROOT_PATH, args } = await readBody(event);
+    const { COMMAND_BACK, NUXT_ROOT_PATH, args } = await readBody<RunBackBody>(event);
     const port = await runBack(COMMAND_BACK, NUXT_ROOT_PATH, args);
     await addMicroserviceMetadatas(args.projectFolderPath, {
       type: "back",
       name: COMMAND_BACK,
-      port,
+      // runBack can exhaust its port-conflict retries and return undefined
+      // (pre-existing bug: addMicroserviceMetadatas/URLs then embed "undefined").
+      port: port as number,
     });
 
     return {
@@ -27,7 +35,7 @@ export default defineEventHandler(async (event) => {
     console.log(error);
     throw createError({
       statusCode: 500,
-      statusMessage: error.message,
+      statusMessage: (error as Error).message,
     });
   }
 });
