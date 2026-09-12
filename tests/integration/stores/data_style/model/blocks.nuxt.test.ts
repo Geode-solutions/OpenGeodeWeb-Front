@@ -249,7 +249,9 @@ describe("model blocks", () => {
       await sleep(SLEEP_MS);
       const [lastCall] = spy.mock.calls.slice(-1);
       expect(lastCall).toBeDefined();
-      expect(lastCall![0].schema).toStrictEqual(model_blocks_schemas.attribute.polyhedron.attribute);
+      expect(lastCall![0].schema).toStrictEqual(
+        model_blocks_schemas.attribute.polyhedron.attribute,
+      );
       expect(lastCall![0].params).toStrictEqual(
         expect.objectContaining({
           id,
