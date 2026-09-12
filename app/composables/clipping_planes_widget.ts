@@ -8,10 +8,7 @@ import {
   hasPlaneChanged,
 } from "@ogw_front/utils/clipping_planes";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
-// ImplicitPlaneWidget ships no type declarations at all (unlike most of
-// vtk.js), unlike a module that simply doesn't exist, so it can't be given an
-// ambient `declare module` shim either - suppress the resulting implicit-any
-// error at the import site instead.
+// ImplicitPlaneWidget ships no type declarations at all (unlike most of vtk.js), unlike a module that simply doesn't exist, so it can't be given an ambient `declare module` shim either - suppress the resulting implicit-any error at the import site instead.
 // @ts-expect-error -- see comment above; newInstance() below is implicitly `any`.
 import { newInstance as vtkImplicitPlaneWidget } from "@kitware/vtk.js/Widgets/Widgets3D/ImplicitPlaneWidget";
 import {
@@ -33,9 +30,7 @@ interface DataItemLike {
   id: string;
 }
 
-// vtk.js's plane-widget factory/handle/state objects (from ImplicitPlaneWidget,
-// which ships no type declarations) are kept as `any` here - deep vtk.js
-// widget internals with no typed surface to build on.
+// Vtk.js's plane-widget factory/handle/state objects (from ImplicitPlaneWidget, which ships no type declarations) are kept as `any` here - deep vtk.js widget internals with no typed surface to build on.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type PlaneWidget = any;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

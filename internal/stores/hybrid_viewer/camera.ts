@@ -47,10 +47,7 @@ const ORIENTATIONS: Record<string, OrientationConfig> = {
   },
 };
 
-// `genericRenderWindow.value` and its vtk objects are only ever read from these
-// functions after the viewer has been initialized (see app/stores/hybrid_viewer.ts's
-// initHybridViewer), so the non-null assertions below reflect that existing
-// invariant rather than a new assumption.
+// `genericRenderWindow.value` and its vtk objects are only ever read from these functions after the viewer has been initialized (see app/stores/hybrid_viewer.ts's initHybridViewer), so the non-null assertions below reflect that existing invariant rather than a new assumption.
 
 function getImageStyle(): unknown {
   const { genericRenderWindow } = useHybridViewerStore() as unknown as HybridViewerStorePublic;
@@ -67,8 +64,7 @@ function getImageStyle(): unknown {
 
 function getCameraOptions(camera: vtkCamera | undefined): CameraOptions | undefined {
   if (!camera || !camera.getFocalPoint) {
-    // Dead branch in practice (a real vtkCamera always has getFocalPoint); kept for
-    // parity with the original defensive check.
+    // Dead branch in practice (a real vtkCamera always has getFocalPoint); kept for parity with the original defensive check.
     return camera as CameraOptions | undefined;
   }
   return {

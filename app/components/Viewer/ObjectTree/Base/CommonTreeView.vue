@@ -6,10 +6,7 @@ import { useTreeKeyboardNav } from "@ogw_front/composables/tree_keyboard_nav";
 import { useTreeScroll } from "@ogw_front/composables/tree_scroll";
 import { useVirtualTree, type DisplayItem, type EmitFn } from "@ogw_front/composables/virtual_tree";
 
-// useVirtualTree's own props type (VirtualTreeProps) isn't exported; this
-// component intentionally stays generic over whatever item shape callers use
-// (plain treeview groups, model component groups, ...), so it is extracted
-// from the composable's signature instead of re-declared here.
+// The useVirtualTree composable's own props type (VirtualTreeProps) isn't exported; this component intentionally stays generic over whatever item shape callers use (plain treeview groups, model component groups, ...), so it is extracted from the composable's signature instead of re-declared here.
 type UnwrapMaybeRefOrGetter<T> = T extends () => infer R
   ? R
   : T extends { value: infer R }

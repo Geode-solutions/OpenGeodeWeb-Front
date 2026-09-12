@@ -33,7 +33,7 @@
     "build:microservices": "concurrently \"npm run build:back\" \"npm run build:viewer\"",
     "json": "npx opengeodeweb-microservice-generate --startDir server/api --key route --separator / --prefix api",
     "test": "npm run test:unit",
-    "tests": "vitest --config ./tests/vitest.config.ts",
+    "tests": "nuxt prepare && vitest --config ./tests/vitest.config.ts",
     "test:unit": "npm run tests -- --project unit",
     "test:integration": "npm run tests -- --project integration",
     "geode_objects": "tsx scripts/generate_geode_objects.ts && prettier ./assets/geode_objects.ts --write",

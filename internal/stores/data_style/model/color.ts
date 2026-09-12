@@ -1,14 +1,10 @@
-import type { StyleValues } from "../types";
+import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { dispatchToComponentTypes } from "./visibility";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 
-// The four per-component-type style composables (Surface/Line/Block/Corner) each expose a
-// different, large set of methods (color, visibility, per-attribute-kind getters/setters...).
-// This module only cares about looking a handful of them up dynamically by name (built into
-// ATTRIBUTE_FUNCTIONS below), so a precise structural type for componentStyleFunctions isn't
-// worth modelling here; `any` keeps the dynamic dispatch table honest about that.
+// The four per-component-type style composables (Surface/Line/Block/Corner) each expose a different, large set of methods (color, visibility, per-attribute-kind getters/setters...). This module only cares about looking a handful of them up dynamically by name (built into ATTRIBUTE_FUNCTIONS below), so a precise structural type for componentStyleFunctions isn't worth modelling here; `any` keeps the dynamic dispatch table honest about that.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ComponentStyleFunctions = Record<"Surface" | "Line" | "Block" | "Corner", any>;
 

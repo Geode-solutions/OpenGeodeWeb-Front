@@ -1,6 +1,4 @@
-// Minimal ambient typings for third-party packages used under server/ that ship no
-// types of their own and have no @types/* package installed. Only the members this
-// codebase actually uses are declared.
+// Minimal ambient typings for third-party packages used under server/ that ship no types of their own and have no @types/* package installed. Only the members this codebase actually uses are declared.
 
 declare module "ws" {
   type RawData = string | Buffer | ArrayBuffer | Buffer[];

@@ -7,11 +7,7 @@ import { useModelSelection } from "./selection";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-// The four per-component-type style composables (Surface/Line/Block/Corner) each expose a
-// different, large set of methods (color, visibility, per-attribute-kind getters/setters...).
-// This module only cares about looking a handful of them up dynamically by name, so a precise
-// structural type for componentStyleFunctions isn't worth modelling here; `any` keeps the
-// dynamic dispatch table honest about that.
+// The four per-component-type style composables (Surface/Line/Block/Corner) each expose a different, large set of methods (color, visibility, per-attribute-kind getters/setters...). This module only cares about looking a handful of them up dynamically by name, so a precise structural type for componentStyleFunctions isn't worth modelling here; `any` keeps the dynamic dispatch table honest about that.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ComponentStyleFunctions = Record<"Surface" | "Line" | "Block" | "Corner", any>;
 

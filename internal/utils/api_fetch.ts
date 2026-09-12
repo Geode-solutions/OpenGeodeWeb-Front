@@ -3,8 +3,7 @@ import { fetchSchema } from "@ogw_shared/utils/fetch_schema";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import type { JsonRpcSchema, RequestHandlersWithValidation } from "@ogw_shared/utils/types.js";
 
-// The microservice-backed Pinia stores (back/app/...) all expose this shape;
-// only the slice actually used here needs to be declared.
+// The microservice-backed Pinia stores (back/app/...) all expose this shape; only the slice actually used here needs to be declared.
 export interface Microservice {
   $id: string;
   base_url: string;
@@ -13,8 +12,7 @@ export interface Microservice {
 }
 
 interface ApiFetchParams {
-  // api_fetch always forwards this schema to fetchSchema, which requires the
-  // HTTP-flavored `methods` array (as opposed to the websocket `rpc` field).
+  // This function always forwards this schema to fetchSchema, which requires the HTTP-flavored `methods` array (as opposed to the websocket `rpc` field).
   schema: JsonRpcSchema & { methods: string[] };
   params?: Record<string, unknown>;
   headers?: Record<string, string>;

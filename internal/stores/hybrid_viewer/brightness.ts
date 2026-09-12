@@ -14,8 +14,7 @@ interface Rect {
   height: number;
 }
 
-// The decoded background image handed to us by the viewer's image stream (see
-// app/stores/hybrid_viewer.ts's onImageReady) - draw-able onto a 2D canvas.
+// The decoded background image handed to us by the viewer's image stream (see app/stores/hybrid_viewer.ts's onImageReady) - draw-able onto a 2D canvas.
 type DrawableImage = CanvasImageSource & { width: number; height: number };
 
 interface BrightnessOptions {

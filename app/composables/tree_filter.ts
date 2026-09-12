@@ -1,8 +1,6 @@
 import type { MaybeRefOrGetter } from "vue";
 
-// This composable filters/sorts different flavors of "category with children"
-// trees (treeview groups, model component/collection groups, ...); this shape
-// captures just the fields it reads/writes, generically, across all of them.
+// This composable filters/sorts different flavors of "category with children" trees (treeview groups, model component/collection groups, ...); this shape captures just the fields it reads/writes, generically, across all of them.
 export interface FilterableItem {
   id: unknown;
   title?: string;

@@ -69,10 +69,7 @@ await Dexie.delete("Database");
 databaseContainer.instance = new Database();
 (databaseContainer.instance as Database).clear();
 
-// The set of tables is assembled dynamically at runtime (Database.addTable/addTables
-// add stores on the fly), so fully modelling this with Dexie's row generics isn't
-// worth it here: the proxy target is typed loosely as "any table name maps to a
-// Dexie Table of loosely-typed rows".
+// The set of tables is assembled dynamically at runtime (Database.addTable/addTables add stores on the fly), so fully modelling this with Dexie's row generics isn't worth it here: the proxy target is typed loosely as "any table name maps to a Dexie Table of loosely-typed rows".
 interface DatabaseTables {
   [tableName: string]: Table<Record<string, unknown>, string>;
 }

@@ -17,13 +17,7 @@ interface ActiveComponent extends ComponentNameEntry {
   attributeType: string;
 }
 
-// This composable resolves a batch of dynamically-named getter/setter methods
-// on the data style store (e.g. "meshPointsVertexAttributeRange",
-// "setMeshPointsVertexAttributeRange", ...) - the store's real, fully-typed
-// surface has no index signature for this, so dynamic lookups are cast through
-// this loosely-typed view of it, matching how these methods are actually
-// shaped (getters take an id and return a value, setters take an id plus
-// arbitrary arguments).
+// This composable resolves a batch of dynamically-named getter/setter methods on the data style store (e.g. "meshPointsVertexAttributeRange", "setMeshPointsVertexAttributeRange", ...) - the store's real, fully-typed surface has no index signature for this, so dynamic lookups are cast through this loosely-typed view of it, matching how these methods are actually shaped (getters take an id and return a value, setters take an id plus arbitrary arguments).
 type DynamicStore = Record<string, ((...args: unknown[]) => unknown) | undefined>;
 
 interface AttributeStyleComponent {

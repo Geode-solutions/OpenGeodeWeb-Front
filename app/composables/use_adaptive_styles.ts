@@ -14,11 +14,7 @@ const MIN_BOOST = 1;
 const MAX_BOOST = 1.2;
 const ADAPTIVE_REFRESH_RATE = 150;
 
-// `target` is intentionally duck-typed: callers pass either a coordinates
-// source (a plain object, a Ref/ComputedRef of one, or a getter function
-// returning one) or an element ref/template ref destined for
-// vueuse's useElementBounding - see call sites in Viewer/ContextMenu and
-// Viewer/ObjectTree components.
+// `target` is intentionally duck-typed: callers pass either a coordinates source (a plain object, a Ref/ComputedRef of one, or a getter function returning one) or an element ref/template ref destined for vueuse's useElementBounding - see call sites in Viewer/ContextMenu and Viewer/ObjectTree components.
 type AdaptiveStylesTarget = unknown;
 
 interface AdaptiveStylesOptions {

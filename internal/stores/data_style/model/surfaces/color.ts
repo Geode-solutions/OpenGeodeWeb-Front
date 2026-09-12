@@ -1,4 +1,4 @@
-import type { StyleValues } from "../../types";
+import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { isModelSurfacesPolygonAttributeValid, useModelSurfacesPolygonAttribute } from "./polygon";
 import { isModelSurfacesVertexAttributeValid, useModelSurfacesVertexAttribute } from "./vertex";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";

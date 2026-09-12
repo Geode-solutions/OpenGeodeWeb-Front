@@ -28,8 +28,7 @@ const MESSAGE_INTERVAL_MS = 5000;
 const currentMessage = ref(0);
 let interval: ReturnType<typeof setInterval> | undefined;
 
-// Fallback only guards against noUncheckedIndexedAccess; currentMessage is always
-// kept in range by the modulo below, so it is never actually used.
+// Fallback only guards against noUncheckedIndexedAccess; currentMessage is always kept in range by the modulo below, so it is never actually used.
 const FALLBACK_ECO_MESSAGE = { icon: "", title: "", message: "" };
 const currentEcoMessage = computed(
   () => ecoMessages.value[currentMessage.value] ?? FALLBACK_ECO_MESSAGE,

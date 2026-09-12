@@ -9,10 +9,7 @@ import type { HybridViewerStorePublic, Vector3 } from "./vtk_types";
 
 type ContainerRef = Ref<{ $el: HTMLElement } | undefined>;
 
-// The image stream object returned by vtk.js's ImageStream.createViewStream();
-// vtk.js's own vtkViewStream type declares `onImageReady` with a zero-arg
-// callback, which doesn't match how it's actually invoked at runtime (with the
-// decoded image), so this describes the shape as it's actually used here.
+// The image stream object returned by vtk.js's ImageStream.createViewStream(); vtk.js's own vtkViewStream type declares `onImageReady` with a zero-arg callback, which doesn't match how it's actually invoked at runtime (with the decoded image), so this describes the shape as it's actually used here.
 export interface ViewStreamLike {
   setSize: (width: number, height: number) => void;
   onImageReady: (callback: (event: { image: unknown }) => void) => void;

@@ -15,11 +15,7 @@ const { versionsSchema, appName } = defineProps({
   appName: { type: String, required: true },
 });
 
-// Pre-existing gap (not introduced by this typing pass): this component never
-// received an actual list of import steps, so `<Stepper>` was being rendered
-// without its required `stepperTree` prop and would have thrown at runtime.
-// Instantiating an (empty) stepper tree here keeps the component from crashing
-// without inventing step content it isn't given.
+// Pre-existing gap (not introduced by this typing pass): this component never received an actual list of import steps, so `<Stepper>` was being rendered without its required `stepperTree` prop and would have thrown at runtime. Instantiating an (empty) stepper tree here keeps the component from crashing without inventing step content it isn't given.
 const stepperTree = useStepperTree([]);
 </script>
 

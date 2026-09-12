@@ -1,4 +1,4 @@
-import type { ModelComponentStyle, ModelComponentTypeStyle, StyleValues } from "../types";
+import type { ModelComponentStyle, ModelComponentTypeStyle, StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import { database } from "@ogw_internal/database/database";
 import type { Table } from "dexie";

@@ -1,4 +1,4 @@
-import type { StyleValues } from "../../types";
+import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { isModelLinesEdgeAttributeValid, useModelLinesEdgeAttribute } from "./edge";
 import { isModelLinesVertexAttributeValid, useModelLinesVertexAttribute } from "./vertex";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";

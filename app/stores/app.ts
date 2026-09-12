@@ -11,10 +11,7 @@ import type { StateTree } from "pinia";
 
 import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json" with { type: "json" };
 
-// The `share` defineStore option (used by every store in this codebase) is
-// implemented by a runtime pinia plugin outside this package's type surface;
-// this augmentation only teaches the type checker about the option shape
-// already used at each defineStore call site.
+// The `share` defineStore option (used by every store in this codebase) is implemented by a runtime pinia plugin outside this package's type surface; this augmentation only teaches the type checker about the option shape already used at each defineStore call site.
 declare module "pinia" {
   interface DefineStoreOptionsBase<S extends StateTree, Store> {
     share?: { omit?: string[] };
@@ -302,10 +299,7 @@ export const useAppStore = defineStore("app", () => {
     const store = useAppStore();
     return api_fetch(
       store,
-      // The app store is only ever used with HTTP ("front") schemas, which always
-      // carry `methods`; the wider JsonRpcSchema param above is kept as-is to
-      // match this action's public signature (e.g. relayed from get_version-style
-      // callers that only know about the shared, looser schema shape).
+      // The app store is only ever used with HTTP ("front") schemas, which always carry `methods`; the wider JsonRpcSchema param above is kept as-is to match this action's public signature (e.g. relayed from get_version-style callers that only know about the shared, looser schema shape).
       { schema: schema as JsonRpcSchema & { methods: string[] }, params },
       {
         ...callbacks,

@@ -162,11 +162,7 @@ function getLeafViewerIds(item: CollectionTreeItem) {
   return extractIds(actualItem);
 }
 
-// focusCameraOnObject's block_ids parameter is declared as string[], but this
-// view (like the sibling ModelComponents view) has always focused the camera
-// using the numeric viewer/actor ids collected by extractIds; that pre-dates
-// this typing pass, so the ids are passed through as-is (no Number/String
-// conversion) rather than changed here.
+// The focusCameraOnObject composable's block_ids parameter is declared as string[], but this view (like the sibling ModelComponents view) has always focused the camera using the numeric viewer/actor ids collected by extractIds; that pre-dates this typing pass, so the ids are passed through as-is (no Number/String conversion) rather than changed here.
 function getLeafViewerIdsForFocus(item: CollectionTreeItem): string[] {
   return getLeafViewerIds(item) as unknown as string[];
 }

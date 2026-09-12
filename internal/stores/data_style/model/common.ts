@@ -1,4 +1,4 @@
-import type { ModelComponentStyle, ModelComponentTypeStyle, StyleValues } from "../types";
+import type { ModelComponentStyle, ModelComponentTypeStyle, StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
 import type { Dexie, Table } from "dexie";
 import { database } from "@ogw_internal/database/database";

@@ -4,7 +4,7 @@ import GlassCard from "@ogw_front/components/GlassCard.vue";
 import { formatListId } from "@ogw_front/utils/name_cleaner";
 import geode_objects from "@ogw_front/assets/geode_objects";
 
-// mirrors use_overlapping_picker's (unexported) ProposedItem type.
+// Mirrors the use_overlapping_picker composable's (unexported) ProposedItem type.
 interface IntermediateItem {
   id: string;
   viewer_id: number;

@@ -1,7 +1,4 @@
-// Re-exports of vtk.js's own (real, shipped) TypeScript types for the objects the
-// hybrid viewer store composables interact with, plus the handful of shapes that
-// are specific to this codebase (CameraOptions' snake_case wire format, the local
-// hybridDb map, hover highlight data, ...).
+// Re-exports of vtk.js's own (real, shipped) TypeScript types for the objects the hybrid viewer store composables interact with, plus the handful of shapes that are specific to this codebase (CameraOptions' snake_case wire format, the local hybridDb map, hover highlight data, ...).
 import type { vtkCamera } from "@kitware/vtk.js/Rendering/Core/Camera";
 import type { vtkRenderer } from "@kitware/vtk.js/Rendering/Core/Renderer";
 import type { vtkRenderWindow } from "@kitware/vtk.js/Rendering/Core/RenderWindow";
@@ -20,8 +17,7 @@ export type {
   Vector3,
 };
 
-// The camera state as exchanged with the viewer microservice (snake_case field
-// names, plain arrays) - distinct from vtk.js's own vtkCamera object.
+// The camera state as exchanged with the viewer microservice (snake_case field names, plain arrays) - distinct from vtk.js's own vtkCamera object.
 export interface CameraOptions {
   focal_point: Vector3;
   view_up: Vector3;
@@ -55,12 +51,7 @@ export interface HoverData {
   attributes: Record<string, unknown>;
 }
 
-// The parent Pinia store (app/stores/hybrid_viewer.ts) assembles these composables
-// via `...spread` and is converted/typed separately from this directory, so its
-// exact inferred return type isn't reliable to build on here. This describes just
-// the slice of its returned (already-unwrapped) state and actions that the
-// composables in this folder read or call directly (i.e. not through
-// `storeToRefs`, which callers type separately at each destructuring site).
+// The parent Pinia store (app/stores/hybrid_viewer.ts) assembles these composables via `...spread` and is converted/typed separately from this directory, so its exact inferred return type isn't reliable to build on here. This describes just the slice of its returned (already-unwrapped) state and actions that the composables in this folder read or call directly (i.e. not through `storeToRefs`, which callers type separately at each destructuring site).
 export interface HybridViewerStorePublic {
   genericRenderWindow: { value: vtkGenericRenderWindow | undefined };
   hybridDb: HybridDb;

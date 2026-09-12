@@ -41,8 +41,7 @@ function setGeodeObject(geode_object_type: string | undefined) {
   }
 }
 
-// geode_objects is a fixed lookup keyed by known object type names; a missing
-// entry only happens if the backend reports a type this table doesn't know about.
+// The geode_objects lookup is fixed and keyed by known object type names; a missing entry only happens if the backend reports a type this table doesn't know about.
 function geodeObjectTooltip(key: string, isLoadable: boolean) {
   return isLoadable
     ? (geode_objects[key]?.tooltip ?? key)
