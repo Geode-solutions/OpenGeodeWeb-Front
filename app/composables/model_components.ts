@@ -2,7 +2,10 @@ import { compareSelections } from "@ogw_front/utils/treeview";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import type { FormattedComponent, FormattedComponentGroup } from "@ogw_front/stores/data_helpers/mesh";
+import type {
+  FormattedComponent,
+  FormattedComponentGroup,
+} from "@ogw_front/stores/data_helpers/mesh";
 
 export function useModelComponents(viewId: string) {
   const dataStore = useDataStore();

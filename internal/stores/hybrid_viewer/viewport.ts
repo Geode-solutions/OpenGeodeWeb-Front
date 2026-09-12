@@ -17,7 +17,8 @@ export interface ViewStreamLike {
 
 async function performResize(width: number, height: number): Promise<void> {
   const hybridViewerStore = useHybridViewerStore();
-  const { genericRenderWindow, remoteRender } = hybridViewerStore as unknown as HybridViewerStorePublic;
+  const { genericRenderWindow, remoteRender } =
+    hybridViewerStore as unknown as HybridViewerStorePublic;
   const { status, viewStream } = storeToRefs(hybridViewerStore) as unknown as {
     status: Ref<string>;
     viewStream: Ref<{ setSize: (width: number, height: number) => void } | undefined>;
@@ -41,7 +42,8 @@ async function performResize(width: number, height: number): Promise<void> {
 }
 
 function performClickPicking(event: MouseEvent, containerElement: HTMLElement): void {
-  const { genericRenderWindow, syncRemoteCamera } = useHybridViewerStore() as unknown as HybridViewerStorePublic;
+  const { genericRenderWindow, syncRemoteCamera } =
+    useHybridViewerStore() as unknown as HybridViewerStorePublic;
   const viewerStore = useViewerStore();
   const rect = containerElement.getBoundingClientRect();
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;

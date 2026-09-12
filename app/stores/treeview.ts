@@ -146,13 +146,13 @@ export const useTreeviewStore = defineStore("treeview", () => {
     }
   }
 
-  function addItem(
-    geodeObjectType: string,
-    name: string,
-    id: string,
-    viewer_type: string,
-  ): void {
-    const child: TreeviewChild = { title: name, id, viewer_type, geode_object_type: geodeObjectType };
+  function addItem(geodeObjectType: string, name: string, id: string, viewer_type: string): void {
+    const child: TreeviewChild = {
+      title: name,
+      id,
+      viewer_type,
+      geode_object_type: geodeObjectType,
+    };
     let found = false;
     for (const item of items.value) {
       if (item.title === geodeObjectType) {

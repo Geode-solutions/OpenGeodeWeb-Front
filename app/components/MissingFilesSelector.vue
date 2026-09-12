@@ -8,7 +8,11 @@ import { useBackStore } from "@ogw_front/stores/back";
 
 // Files carry extra app-specific bookkeeping fields once picked up here.
 type UploadFile = File & { isConfigured?: boolean };
-type FilePlan = { has_missing_files: boolean; mandatory_files: string[]; additional_files: string[] };
+type FilePlan = {
+  has_missing_files: boolean;
+  mandatory_files: string[];
+  additional_files: string[];
+};
 
 const schema = schemas.opengeodeweb_back.missing_files;
 

@@ -90,19 +90,25 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions) {
     },
   };
   function getModelComponentColor(modelId: string, componentId: string): unknown {
-    return (dataStyleState.getComponentStyle(modelId, componentId).coloring as StyleValues | undefined)
-      ?.constant;
+    return (
+      dataStyleState.getComponentStyle(modelId, componentId).coloring as StyleValues | undefined
+    )?.constant;
   }
   function modelComponentTypeColor(modelId: string, type: string): unknown {
     return (
       (dataStyleState.getModelComponentTypeStyle(modelId, type).coloring as StyleValues | undefined)
         ?.constant ||
       (
-        (dataStyleState.getStyle(modelId)[`${type.toLowerCase()}s`] as StyleValues).coloring as StyleValues
+        (dataStyleState.getStyle(modelId)[`${type.toLowerCase()}s`] as StyleValues)
+          .coloring as StyleValues
       ).constant
     );
   }
-  function getModelComponentEffectiveColor(modelId: string, componentId: string, type: string): unknown {
+  function getModelComponentEffectiveColor(
+    modelId: string,
+    componentId: string,
+    type: string,
+  ): unknown {
     const individualColor = getModelComponentColor(modelId, componentId);
     if (individualColor !== undefined) {
       return individualColor;
@@ -110,15 +116,18 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions) {
     return modelComponentTypeColor(modelId, type);
   }
   function getModelComponentActiveColoring(modelId: string, componentId: string): unknown {
-    return (dataStyleState.getComponentStyle(modelId, componentId).coloring as StyleValues | undefined)
-      ?.active;
+    return (
+      dataStyleState.getComponentStyle(modelId, componentId).coloring as StyleValues | undefined
+    )?.active;
   }
   function getModelComponentTypeActiveColoring(modelId: string, type: string): unknown {
     return (
       (dataStyleState.getModelComponentTypeStyle(modelId, type).coloring as StyleValues | undefined)
         ?.active ||
-      ((dataStyleState.getStyle(modelId)[`${type.toLowerCase()}s`] as StyleValues).coloring as StyleValues)
-        .active
+      (
+        (dataStyleState.getStyle(modelId)[`${type.toLowerCase()}s`] as StyleValues)
+          .coloring as StyleValues
+      ).active
     );
   }
   async function setModelComponentsColor(

@@ -48,7 +48,9 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       return;
     }
     const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
-    const canvas = (webGLRenderWindow as unknown as { getCanvas: () => HTMLCanvasElement }).getCanvas();
+    const canvas = (
+      webGLRenderWindow as unknown as { getCanvas: () => HTMLCanvasElement }
+    ).getCanvas();
     if (canvas && canvas.parentElement) {
       canvas.parentElement.style.cursor = value ? "crosshair" : "default";
     }

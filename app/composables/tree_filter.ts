@@ -17,7 +17,11 @@ interface TreeFilterOptions {
   defaultFilters?: Record<string, boolean>;
 }
 
-function customFilter(value: unknown, searchQuery: string | undefined, item: FilterContext): boolean {
+function customFilter(
+  value: unknown,
+  searchQuery: string | undefined,
+  item: FilterContext,
+): boolean {
   if (!searchQuery) {
     return true;
   }
@@ -62,7 +66,10 @@ function sortAndFormatItems(
   return sorted;
 }
 
-function useTreeFilter(itemsIn: MaybeRefOrGetter<FilterableItem[]>, options: TreeFilterOptions = {}) {
+function useTreeFilter(
+  itemsIn: MaybeRefOrGetter<FilterableItem[]>,
+  options: TreeFilterOptions = {},
+) {
   const rawItems = typeof itemsIn === "function" ? computed(itemsIn) : toRef(itemsIn);
   const search = ref("");
   const sortType = ref(options.defaultSort || "name");
@@ -132,7 +139,10 @@ function useTreeFilter(itemsIn: MaybeRefOrGetter<FilterableItem[]>, options: Tre
     return map;
   });
 
-  function applySearchFilter(newSelection: unknown[], previousSelection: unknown[] = []): unknown[] {
+  function applySearchFilter(
+    newSelection: unknown[],
+    previousSelection: unknown[] = [],
+  ): unknown[] {
     if (!search.value) {
       return newSelection;
     }

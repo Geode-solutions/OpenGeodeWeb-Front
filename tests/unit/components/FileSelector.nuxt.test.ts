@@ -60,9 +60,7 @@ describe("file selector", () => {
     await flushPromises();
     expect(wrapper.emitted()).toHaveProperty("update_values");
     expect(wrapper.emitted<unknown[]>().update_values).toHaveLength(EXPECTED_LENGTH);
-    expect(
-      wrapper.emitted<unknown[]>().update_values?.[FIRST_INDEX]?.[FIRST_INDEX],
-    ).toStrictEqual({
+    expect(wrapper.emitted<unknown[]>().update_values?.[FIRST_INDEX]?.[FIRST_INDEX]).toStrictEqual({
       files,
       autoUpload,
     });

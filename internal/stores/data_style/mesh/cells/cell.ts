@@ -8,8 +8,7 @@ import { useMeshCellsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const meshCellsCellAttributeSchemas =
-  viewer_schemas.opengeodeweb_viewer.mesh.cells.attribute.cell;
+const meshCellsCellAttributeSchemas = viewer_schemas.opengeodeweb_viewer.mesh.cells.attribute.cell;
 
 interface AttributeStoredConfig {
   minimum: number | undefined;
@@ -116,7 +115,14 @@ function useMeshCellsCellAttributeStyle() {
   }
   function setMeshCellsCellAttribute(
     id: string,
-    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR }: AttributeInput,
+    {
+      name,
+      item,
+      minimum,
+      maximum,
+      colorMap,
+      no_data_color = DEFAULT_NO_DATA_COLOR,
+    }: AttributeInput,
   ) {
     mutateMeshCellsCellStyle(id, {
       name,

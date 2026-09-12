@@ -10,9 +10,13 @@ import { setupActivePinia } from "@ogw_tests/utils";
 
 import { $fetch } from "ofetch";
 
-vi.mock(import("ofetch"), () => ({
-  $fetch: vi.fn(),
-}) as any);
+vi.mock(
+  import("ofetch"),
+  () =>
+    ({
+      $fetch: vi.fn(),
+    }) as any,
+);
 
 const mockedFetch = vi.mocked($fetch);
 
@@ -171,50 +175,90 @@ interface ApiFetchOptions {
   response_function?: (response: unknown) => Promise<void> | void;
 }
 
-vi.mock(import("@ogw_internal/utils/api_fetch"), () => ({
-  api_fetch: vi.fn(async (_req: unknown, options: ApiFetchOptions = {}) => {
-    const response = {
-      _data: new Blob(["zipcontent"], { type: "application/zip" }),
-      headers: {
-        get: (k: string) => (k === "new-file-name" ? "project_123.vease" : undefined),
-      },
-    };
-    if (options.response_function) {
-      await options.response_function(response);
-    }
-    return response;
-  }),
-}) as any);
+vi.mock(
+  import("@ogw_internal/utils/api_fetch"),
+  () =>
+    ({
+      api_fetch: vi.fn(async (_req: unknown, options: ApiFetchOptions = {}) => {
+        const response = {
+          _data: new Blob(["zipcontent"], { type: "application/zip" }),
+          headers: {
+            get: (k: string) => (k === "new-file-name" ? "project_123.vease" : undefined),
+          },
+        };
+        if (options.response_function) {
+          await options.response_function(response);
+        }
+        return response;
+      }),
+    }) as any,
+);
 vi.mock(import("js-file-download"), () => ({ default: vi.fn() }));
-vi.mock(import("@ogw_front/stores/infra"), () => ({
-  useInfraStore: () => infraStoreMock,
-}) as any);
-vi.mock(import("@ogw_front/stores/viewer"), () => ({
-  useViewerStore: () => viewerStoreMock,
-}) as any);
-vi.mock(import("@ogw_front/stores/treeview"), () => ({
-  useTreeviewStore: () => treeviewStoreMock,
-}) as any);
-vi.mock(import("@ogw_front/stores/data"), () => ({
-  useDataStore: () => dataStoreMock,
-}) as any);
-vi.mock(import("@ogw_front/stores/data_style"), () => ({
-  useDataStyleStore: () => dataStyleStoreMock,
-}) as any);
-vi.mock(import("@ogw_front/stores/hybrid_viewer"), () => ({
-  useHybridViewerStore: () => hybridViewerStoreMock,
-}) as any);
-vi.mock(import("@ogw_front/stores/back"), () => ({
-  useBackStore: () => backStoreMock,
-}) as any);
-vi.mock(import("@ogw_front/stores/feedback"), () => ({
-  useFeedbackStore: () => feedbackStoreMock,
-}) as any);
-vi.mock(import("@ogw_front/stores/app"), () => ({
-  useAppStore: () => ({
-    exportStores: vi.fn(() => ({ projectName: "mockedProject" })),
-  }),
-}) as any);
+vi.mock(
+  import("@ogw_front/stores/infra"),
+  () =>
+    ({
+      useInfraStore: () => infraStoreMock,
+    }) as any,
+);
+vi.mock(
+  import("@ogw_front/stores/viewer"),
+  () =>
+    ({
+      useViewerStore: () => viewerStoreMock,
+    }) as any,
+);
+vi.mock(
+  import("@ogw_front/stores/treeview"),
+  () =>
+    ({
+      useTreeviewStore: () => treeviewStoreMock,
+    }) as any,
+);
+vi.mock(
+  import("@ogw_front/stores/data"),
+  () =>
+    ({
+      useDataStore: () => dataStoreMock,
+    }) as any,
+);
+vi.mock(
+  import("@ogw_front/stores/data_style"),
+  () =>
+    ({
+      useDataStyleStore: () => dataStyleStoreMock,
+    }) as any,
+);
+vi.mock(
+  import("@ogw_front/stores/hybrid_viewer"),
+  () =>
+    ({
+      useHybridViewerStore: () => hybridViewerStoreMock,
+    }) as any,
+);
+vi.mock(
+  import("@ogw_front/stores/back"),
+  () =>
+    ({
+      useBackStore: () => backStoreMock,
+    }) as any,
+);
+vi.mock(
+  import("@ogw_front/stores/feedback"),
+  () =>
+    ({
+      useFeedbackStore: () => feedbackStoreMock,
+    }) as any,
+);
+vi.mock(
+  import("@ogw_front/stores/app"),
+  () =>
+    ({
+      useAppStore: () => ({
+        exportStores: vi.fn(() => ({ projectName: "mockedProject" })),
+      }),
+    }) as any,
+);
 
 vi.stubGlobal("useAppStore", () => ({
   exportStores: vi.fn(() => ({ projectName: "mockedProject" })),

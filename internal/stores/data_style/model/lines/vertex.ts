@@ -80,7 +80,11 @@ function useModelLinesVertexAttribute() {
       no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
-  function mutateModelLinesVertexStyle(modelId: string, lineIds: string[], values: Record<string, unknown>) {
+  function mutateModelLinesVertexStyle(
+    modelId: string,
+    lineIds: string[],
+    values: Record<string, unknown>,
+  ) {
     if (lineIds.length > 1) {
       modelLinesCommonStyle.mutateModelLinesTypeColoring(modelId, {
         vertex: values,
@@ -146,7 +150,14 @@ function useModelLinesVertexAttribute() {
   async function setModelLinesVertexAttribute(
     modelId: string,
     lineIds: string[],
-    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR }: AttributeInput,
+    {
+      name,
+      item,
+      minimum,
+      maximum,
+      colorMap,
+      no_data_color = DEFAULT_NO_DATA_COLOR,
+    }: AttributeInput,
   ) {
     mutateModelLinesVertexStyle(modelId, lineIds, {
       name,

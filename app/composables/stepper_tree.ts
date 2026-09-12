@@ -1,7 +1,4 @@
-export function useStepperTree(
-  steps: unknown[],
-  initial_state: Record<string, unknown> = {},
-) {
+export function useStepperTree(steps: unknown[], initial_state: Record<string, unknown> = {}) {
   const initial_state_unref: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(initial_state)) {
     const unref_val = unref(value);

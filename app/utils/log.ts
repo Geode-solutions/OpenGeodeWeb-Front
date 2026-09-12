@@ -10,7 +10,11 @@ function startRequestLog(microservice: Loggable, schema: JsonRpcSchema): Date {
   return requestStartingTime;
 }
 
-function endRequestLog(microservice: Loggable, schema: JsonRpcSchema, requestStartingTime: Date): void {
+function endRequestLog(
+  microservice: Loggable,
+  schema: JsonRpcSchema,
+  requestStartingTime: Date,
+): void {
   const requestEndingTime = new Date(Date.now());
   console.log(
     `[${microservice.$id}] Request completed:`,

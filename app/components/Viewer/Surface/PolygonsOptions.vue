@@ -58,7 +58,9 @@ const textures = computed({
 const vertex_attribute_name = computed({
   get: () => dataStyleStore.meshPolygonsVertexAttributeName(id.value),
   set: async (newValue) => {
-    if (newValue === undefined) {return;}
+    if (newValue === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshPolygonsVertexAttributeName(targetId, newValue)),
     );
@@ -78,9 +80,13 @@ const vertex_attribute_range = computed({
   get: () => dataStyleStore.meshPolygonsVertexAttributeRange(id.value),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
-    if (minimum === undefined || maximum === undefined) {return;}
+    if (minimum === undefined || maximum === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolygonsVertexAttributeRange(targetId, minimum, maximum)),
+      Promise.resolve(
+        dataStyleStore.setMeshPolygonsVertexAttributeRange(targetId, minimum, maximum),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
@@ -106,7 +112,9 @@ const vertex_attribute_no_data_color = computed({
 const polygon_attribute_name = computed({
   get: () => dataStyleStore.meshPolygonsPolygonAttributeName(id.value),
   set: async (newValue) => {
-    if (newValue === undefined) {return;}
+    if (newValue === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshPolygonsPolygonAttributeName(targetId, newValue)),
     );
@@ -126,9 +134,13 @@ const polygon_attribute_range = computed({
   get: () => dataStyleStore.meshPolygonsPolygonAttributeRange(id.value),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
-    if (minimum === undefined || maximum === undefined) {return;}
+    if (minimum === undefined || maximum === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolygonsPolygonAttributeRange(targetId, minimum, maximum)),
+      Promise.resolve(
+        dataStyleStore.setMeshPolygonsPolygonAttributeRange(targetId, minimum, maximum),
+      ),
     );
     hybridViewerStore.remoteRender();
   },

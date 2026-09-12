@@ -109,7 +109,10 @@ function useClippingPlanesWidget({
       const origin: number[] = widgetState.getOrigin().map((val: number) => Number(val.toFixed(4)));
       const normal: number[] = widgetState.getNormal().map((val: number) => Number(val.toFixed(4)));
       const currentPlane = planes.value[planeIndex];
-      if (!currentPlane || !hasPlaneChanged(origin, normal, currentPlane.origin, currentPlane.normal)) {
+      if (
+        !currentPlane ||
+        !hasPlaneChanged(origin, normal, currentPlane.origin, currentPlane.normal)
+      ) {
         return;
       }
       fromWidget = true;

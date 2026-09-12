@@ -72,9 +72,7 @@ describe("missing files selector", () => {
     await flushPromises();
     expect(wrapper.emitted()).toHaveProperty("update_values");
     expect(wrapper.emitted<unknown[]>().update_values).toHaveLength(EXPECTED_LENGTH);
-    expect(
-      wrapper.emitted<unknown[]>().update_values?.[FIRST_INDEX]?.[FIRST_INDEX],
-    ).toStrictEqual({
+    expect(wrapper.emitted<unknown[]>().update_values?.[FIRST_INDEX]?.[FIRST_INDEX]).toStrictEqual({
       additional_files: files,
     });
     expect(wrapper.emitted().increment_step).toHaveLength(EXPECTED_LENGTH);

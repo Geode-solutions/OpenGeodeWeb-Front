@@ -155,7 +155,10 @@ watch(filteredPresets, drawAllCanvases);
             <div class="d-flex flex-column py-1">
               <span class="text-caption text-grey-lighten-1 mb-1">{{ child.Name }}</span>
               <canvas
-                :ref="(element: Element | null) => setCanvasRef(child.Name, element, `g-${itemIdx}-${childIdx}`)"
+                :ref="
+                  (element: Element | null) =>
+                    setCanvasRef(child.Name, element, `g-${itemIdx}-${childIdx}`)
+                "
                 width="200"
                 height="18"
                 class="w-100 rounded-xs border-thin"

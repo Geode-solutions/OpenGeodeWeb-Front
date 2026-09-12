@@ -80,7 +80,11 @@ function useModelLinesEdgeAttribute() {
       no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
-  function mutateModelLinesEdgeStyle(modelId: string, lineIds: string[], values: Record<string, unknown>) {
+  function mutateModelLinesEdgeStyle(
+    modelId: string,
+    lineIds: string[],
+    values: Record<string, unknown>,
+  ) {
     if (lineIds.length > 1) {
       modelLinesCommonStyle.mutateModelLinesTypeColoring(modelId, {
         edge: values,
@@ -145,7 +149,14 @@ function useModelLinesEdgeAttribute() {
   async function setModelLinesEdgeAttribute(
     modelId: string,
     lineIds: string[],
-    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR }: AttributeInput,
+    {
+      name,
+      item,
+      minimum,
+      maximum,
+      colorMap,
+      no_data_color = DEFAULT_NO_DATA_COLOR,
+    }: AttributeInput,
   ) {
     mutateModelLinesEdgeStyle(modelId, lineIds, {
       name,

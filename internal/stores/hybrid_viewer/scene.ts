@@ -9,7 +9,8 @@ import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLP
 import type { HybridDb, HybridViewerStorePublic, vtkActor as VtkActorInstance } from "./vtk_types";
 
 async function performAddItem(id: string): Promise<void> {
-  const { genericRenderWindow, hybridDb } = useHybridViewerStore() as unknown as HybridViewerStorePublic;
+  const { genericRenderWindow, hybridDb } =
+    useHybridViewerStore() as unknown as HybridViewerStorePublic;
   if (!genericRenderWindow.value) {
     return;
   }
@@ -46,7 +47,8 @@ async function performAddItem(id: string): Promise<void> {
   };
 }
 function performRemoveItem(id: string): void {
-  const { genericRenderWindow, hybridDb } = useHybridViewerStore() as unknown as HybridViewerStorePublic;
+  const { genericRenderWindow, hybridDb } =
+    useHybridViewerStore() as unknown as HybridViewerStorePublic;
   if (!hybridDb[id]) {
     return;
   }
@@ -57,7 +59,8 @@ function performRemoveItem(id: string): void {
   delete hybridDb[id];
 }
 function performSetVisibility(id: string, visibility: boolean): void {
-  const { genericRenderWindow, hybridDb } = useHybridViewerStore() as unknown as HybridViewerStorePublic;
+  const { genericRenderWindow, hybridDb } =
+    useHybridViewerStore() as unknown as HybridViewerStorePublic;
   if (!hybridDb[id]) {
     return;
   }
@@ -67,7 +70,8 @@ function performSetVisibility(id: string, visibility: boolean): void {
 }
 async function performSetZScaling(z_scale: number): Promise<void> {
   const hybridViewerStore = useHybridViewerStore();
-  const { genericRenderWindow, remoteRender } = hybridViewerStore as unknown as HybridViewerStorePublic;
+  const { genericRenderWindow, remoteRender } =
+    hybridViewerStore as unknown as HybridViewerStorePublic;
   const { zScale } = storeToRefs(hybridViewerStore) as unknown as { zScale: Ref<number> };
   zScale.value = z_scale;
   const renderer = genericRenderWindow.value!.getRenderer();
@@ -90,7 +94,8 @@ async function performSetZScaling(z_scale: number): Promise<void> {
   await remoteRender();
 }
 function performClear(): void {
-  const { genericRenderWindow, hybridDb } = useHybridViewerStore() as unknown as HybridViewerStorePublic;
+  const { genericRenderWindow, hybridDb } =
+    useHybridViewerStore() as unknown as HybridViewerStorePublic;
   const renderer = genericRenderWindow.value!.getRenderer();
   for (const actor of renderer.getActors()) {
     renderer.removeActor(actor);

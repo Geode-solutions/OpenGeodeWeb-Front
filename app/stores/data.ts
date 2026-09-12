@@ -142,12 +142,9 @@ export const useDataStore = defineStore("data", () => {
     );
   }
   function refAllItems() {
-    return useObservable(
-      liveQuery(() => data_db.toArray()) as unknown as Observable<DataItem[]>,
-      {
-        initialValue: [] as DataItem[],
-      },
-    );
+    return useObservable(liveQuery(() => data_db.toArray()) as unknown as Observable<DataItem[]>, {
+      initialValue: [] as DataItem[],
+    });
   }
   async function meshComponentType(modelId: string, geode_id: string): Promise<string | undefined> {
     const component = await model_components_db

@@ -9,8 +9,7 @@ import { useMeshEdgesCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const meshEdgesEdgeAttributeSchemas =
-  viewer_schemas.opengeodeweb_viewer.mesh.edges.attribute.edge;
+const meshEdgesEdgeAttributeSchemas = viewer_schemas.opengeodeweb_viewer.mesh.edges.attribute.edge;
 
 interface AttributeStoredConfig {
   minimum: number | undefined;
@@ -120,7 +119,14 @@ function useMeshEdgesEdgeAttributeStyle() {
   }
   function setMeshEdgesEdgeAttribute(
     id: string,
-    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR }: AttributeInput,
+    {
+      name,
+      item,
+      minimum,
+      maximum,
+      colorMap,
+      no_data_color = DEFAULT_NO_DATA_COLOR,
+    }: AttributeInput,
   ) {
     mutateMeshEdgesEdgeStyle(id, {
       name,

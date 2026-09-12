@@ -188,7 +188,10 @@ export function useGlobalAttributeStyle(dataIdRef: Ref<string | undefined>) {
       }
 
       backStore.request(
-        { schema: schema as Parameters<typeof backStore.request>[0]["schema"], params: { id: targetId } },
+        {
+          schema: schema as Parameters<typeof backStore.request>[0]["schema"],
+          params: { id: targetId },
+        },
         {
           response_function: (response: unknown) => {
             const attributes = (response as AttributeResponse).attributes || [];

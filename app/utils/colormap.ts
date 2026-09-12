@@ -20,7 +20,10 @@ function getPresetsWithCurrentAtTop(presetName: string) {
   return [currentPreset, ...colormaps].filter(Boolean);
 }
 
-function drawCanvasForPreset(presetName: string, canvas: HTMLCanvasElement | undefined | null): void {
+function drawCanvasForPreset(
+  presetName: string,
+  canvas: HTMLCanvasElement | undefined | null,
+): void {
   if (!canvas) {
     return;
   }

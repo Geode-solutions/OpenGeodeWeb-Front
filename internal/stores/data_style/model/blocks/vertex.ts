@@ -80,7 +80,11 @@ function useModelBlocksVertexAttribute() {
       no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
-  function mutateModelBlocksVertexStyle(modelId: string, blockIds: string[], values: Record<string, unknown>) {
+  function mutateModelBlocksVertexStyle(
+    modelId: string,
+    blockIds: string[],
+    values: Record<string, unknown>,
+  ) {
     if (blockIds.length > 1) {
       modelBlocksCommonStyle.mutateModelBlocksTypeColoring(modelId, {
         vertex: values,
@@ -137,7 +141,10 @@ function useModelBlocksVertexAttribute() {
     const { minimum, maximum } = storedConfig;
     return [minimum, maximum];
   }
-  function modelBlocksVertexAttributeColorMap(modelId: string, blockId?: string): string | undefined {
+  function modelBlocksVertexAttributeColorMap(
+    modelId: string,
+    blockId?: string,
+  ): string | undefined {
     const name = modelBlocksVertexAttributeName(modelId, blockId);
     const item = modelBlocksVertexAttributeItem(modelId, blockId);
     const storedConfig = modelBlocksVertexAttributeStoredConfig(modelId, blockId, name, item);
@@ -146,7 +153,14 @@ function useModelBlocksVertexAttribute() {
   async function setModelBlocksVertexAttribute(
     modelId: string,
     blockIds: string[],
-    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR }: AttributeInput,
+    {
+      name,
+      item,
+      minimum,
+      maximum,
+      colorMap,
+      no_data_color = DEFAULT_NO_DATA_COLOR,
+    }: AttributeInput,
   ) {
     mutateModelBlocksVertexStyle(modelId, blockIds, {
       name,

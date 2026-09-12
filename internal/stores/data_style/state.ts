@@ -1,4 +1,9 @@
-import type { ModelComponentStyle, ModelComponentTypeStyle, ObjectStyle, StyleValues } from "./types";
+import type {
+  ModelComponentStyle,
+  ModelComponentTypeStyle,
+  ObjectStyle,
+  StyleValues,
+} from "./types";
 import { database } from "@ogw_internal/database/database";
 import { liveQuery } from "dexie";
 import merge from "lodash/merge";
@@ -11,7 +16,11 @@ interface SharedState {
   modelComponentTypeStyles: Ref<Record<string, ModelComponentTypeStyle>>;
   componentStyles: Ref<Record<string, ModelComponentStyle>>;
   loadFromDatabase: () => Promise<void>;
-  updateComponentStyleCache: (modelId: string, componentId: string, styleValues: StyleValues) => void;
+  updateComponentStyleCache: (
+    modelId: string,
+    componentId: string,
+    styleValues: StyleValues,
+  ) => void;
   bulkUpdateComponentStyleCache: (
     modelId: string,
     componentStyleUpdates: { id_component: string; values: StyleValues }[],
@@ -81,7 +90,11 @@ function getSharedState(): SharedState {
 
   loadFromDatabase();
 
-  function updateComponentStyleCache(modelId: string, componentId: string, styleValues: StyleValues) {
+  function updateComponentStyleCache(
+    modelId: string,
+    componentId: string,
+    styleValues: StyleValues,
+  ) {
     const cacheKey = `${modelId}_${componentId}`;
     const existingStyle = componentStyles.value[cacheKey];
     if (existingStyle) {
@@ -103,7 +116,11 @@ function getSharedState(): SharedState {
       const cacheKey = `${modelId}_${componentId}`;
       const existingStyle = updatedComponentStyles[cacheKey];
       if (existingStyle) {
-        updatedComponentStyles[cacheKey] = merge({}, existingStyle, styleValues) as ModelComponentStyle;
+        updatedComponentStyles[cacheKey] = merge(
+          {},
+          existingStyle,
+          styleValues,
+        ) as ModelComponentStyle;
       } else {
         updatedComponentStyles[cacheKey] = merge(
           { id_model: modelId, id_component: componentId },
@@ -114,13 +131,21 @@ function getSharedState(): SharedState {
     componentStyles.value = updatedComponentStyles;
   }
 
-  function bulkUpdateComponentStylesCache(modelId: string, componentIds: string[], styleValues: StyleValues) {
+  function bulkUpdateComponentStylesCache(
+    modelId: string,
+    componentIds: string[],
+    styleValues: StyleValues,
+  ) {
     const updatedComponentStyles = { ...componentStyles.value };
     for (const componentId of componentIds) {
       const cacheKey = `${modelId}_${componentId}`;
       const existingStyle = updatedComponentStyles[cacheKey];
       if (existingStyle) {
-        updatedComponentStyles[cacheKey] = merge({}, existingStyle, styleValues) as ModelComponentStyle;
+        updatedComponentStyles[cacheKey] = merge(
+          {},
+          existingStyle,
+          styleValues,
+        ) as ModelComponentStyle;
       } else {
         updatedComponentStyles[cacheKey] = merge(
           { id_model: modelId, id_component: componentId },
@@ -208,9 +233,15 @@ export function useDataStyleState() {
     return merge({ coloring: {} }, componentStyles.value[cacheKey]) as ModelComponentStyle;
   }
 
-  function getModelComponentTypeStyle(modelId: string, componentType: string): ModelComponentTypeStyle {
+  function getModelComponentTypeStyle(
+    modelId: string,
+    componentType: string,
+  ): ModelComponentTypeStyle {
     const cacheKey = `${modelId}_${componentType}`;
-    return merge({ coloring: {} }, modelComponentTypeStyles.value[cacheKey]) as ModelComponentTypeStyle;
+    return merge(
+      { coloring: {} },
+      modelComponentTypeStyles.value[cacheKey],
+    ) as ModelComponentTypeStyle;
   }
 
   async function clear(): Promise<void> {
