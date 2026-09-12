@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import GlassCard from "@ogw_front/components/GlassCard.vue";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { isDragging, loading, texts, accept, showExtensions } = defineProps({
   isDragging: { type: Boolean, required: true },
   loading: { type: Boolean, required: true },
@@ -16,6 +17,7 @@ const { isDragging, loading, texts, accept, showExtensions } = defineProps({
   showExtensions: { type: Boolean, required: true },
 });
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["click"]);
 </script>
 

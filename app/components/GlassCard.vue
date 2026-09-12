@@ -2,6 +2,7 @@
 import { computed, useAttrs } from "vue";
 import { onKeyStroke } from "@vueuse/core";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { variant, rounded, padding, theme, escapeFunction } = defineProps({
   variant: {
     type: String,

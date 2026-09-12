@@ -1,9 +1,12 @@
 <script setup lang="ts">
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
 import type { PropType } from "vue";
 import { Status } from "@ogw_front/utils/status";
 import { useBackStore } from "@ogw_front/stores/back";
 import type { JsonRpcSchema } from "#shared/utils/types.js";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { schema } = defineProps({
   schema: { type: Object as PropType<JsonRpcSchema>, required: true },
 });

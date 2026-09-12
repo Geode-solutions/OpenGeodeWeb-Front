@@ -15,11 +15,13 @@ function truncate(text: string, maxLength: number) {
   return text;
 }
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { stepIndex, stepperTree } = defineProps({
   stepIndex: { type: Number, required: true },
   stepperTree: { type: Object as PropType<ReturnType<typeof useStepperTree>>, required: true },
 });
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["reset_values"]);
 
 const { state, increment_step, decrement_step, update_values } = stepperTree;

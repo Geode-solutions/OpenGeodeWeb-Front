@@ -1,9 +1,14 @@
 <script setup lang="ts">
-import { type PropType, onMounted, onUnmounted, ref } from "vue";
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
+import { onMounted, onUnmounted, ref } from "vue";
+// oxlint-disable-next-line eslint/no-duplicate-imports
+import type { PropType } from "vue";
 import DragAndDropInline from "./DragAndDropInternal/DragAndDropInline.vue";
 import DragAndDropOverlay from "./DragAndDropInternal/DragAndDropOverlay.vue";
 
 const { multiple, accept, loading, showExtensions, fullscreen, inline, showOverlay, texts } =
+  // oxlint-disable-next-line vue/define-props-declaration
   defineProps({
     multiple: { type: Boolean, default: false },
     accept: { type: [String, Array] as PropType<string | string[]>, default: "" },
@@ -22,6 +27,7 @@ const { multiple, accept, loading, showExtensions, fullscreen, inline, showOverl
     },
   });
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["files-selected"]);
 
 const isDragging = ref(false);

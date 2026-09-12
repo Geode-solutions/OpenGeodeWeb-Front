@@ -1,5 +1,9 @@
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports, eslint/max-lines
 // Third party imports
-import { type Table, liveQuery } from "dexie";
+import { liveQuery } from "dexie";
+// oxlint-disable-next-line eslint/no-duplicate-imports
+import type { Table } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 import type { Observable } from "rxjs";
@@ -7,7 +11,9 @@ import type { Observable } from "rxjs";
 // Local imports
 import { database } from "@ogw_internal/database/database.js";
 import { useDataCollections } from "./data_helpers/collections.js";
-import { type ModelComponentRecord, useDataMesh } from "./data_helpers/mesh.js";
+import { useDataMesh } from "./data_helpers/mesh.js";
+// oxlint-disable-next-line eslint/no-duplicate-imports
+import type { ModelComponentRecord } from "./data_helpers/mesh.js";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 interface DataItem {

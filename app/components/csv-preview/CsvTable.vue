@@ -14,6 +14,7 @@ interface CsvCoordinates {
   z?: string;
 }
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { headers, rows, loading, coordinates, separator, headerRow, firstRow } = defineProps({
   headers: { type: Array as PropType<CsvHeader[]>, required: true },
   rows: { type: Array as PropType<CsvRow[]>, required: true },

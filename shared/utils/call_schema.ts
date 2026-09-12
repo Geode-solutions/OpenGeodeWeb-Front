@@ -1,7 +1,11 @@
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
 // Third party imports
 
 // Local imports
-import { type RpcClient, callRaw } from "./call_raw.js";
+import { callRaw } from "./call_raw.js";
+// oxlint-disable-next-line eslint/no-duplicate-imports
+import type { RpcClient } from "./call_raw.js";
 import type { JsonRpcSchema, RequestHandlersWithValidation } from "./types.js";
 import { validateSchema } from "./validate_schema.js";
 

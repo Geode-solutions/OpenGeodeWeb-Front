@@ -15,6 +15,7 @@ const menuStore = useMenuStore();
 const theme = useTheme();
 const primaryColor = computed(() => theme.current.value.colors.primary);
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { index, itemProps, tooltip, btnImage } = defineProps({
   index: { type: Number, required: true },
   itemProps: { type: Object, required: true },

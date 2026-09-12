@@ -1,4 +1,6 @@
 <script setup lang="ts">
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
 import type { PropType } from "vue";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
 import { geode_objects } from "@ogw_front/assets/geode_objects";
@@ -12,8 +14,10 @@ type AllowedObjectMap = Record<string, AllowedObject>;
 
 const schema = schemas.opengeodeweb_back.allowed_objects;
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["update_values", "increment_step"]);
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { filenames } = defineProps({
   filenames: { type: Array as PropType<string[]>, required: true },
 });

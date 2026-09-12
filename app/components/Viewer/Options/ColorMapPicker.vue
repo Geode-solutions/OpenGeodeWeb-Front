@@ -3,6 +3,7 @@ import { drawCanvasForPreset, getPresetsWithCurrentAtTop } from "@ogw_front/util
 import ColorMapList from "./ColorMapList.vue";
 import GlassCard from "@ogw_front/components/GlassCard.vue";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { max, min } = defineProps({
   min: { type: Number, required: true },
   max: { type: Number, required: true },

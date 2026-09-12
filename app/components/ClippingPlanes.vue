@@ -7,6 +7,7 @@ import { useDataStore } from "@ogw_front/stores/data";
 import { useDebounceFn } from "@vueuse/core";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { escapeFunction } = defineProps({
   escapeFunction: { type: Function, default: undefined },
 });

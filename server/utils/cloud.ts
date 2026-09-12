@@ -12,6 +12,8 @@ import type { protos } from "@google-cloud/run";
 // The googleapis package's per-API-version `auth` option types don't line up with the concrete client returned by `GoogleAuth.getClient()` (they're structurally close but not nominally assignable). `any` matches how googleapis treats it at runtime (duck typed).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type GoogleAuthClient = any;
+// `v2` is a namespace segment in the `@google-cloud/run` package's own generated protobuf types, not a name this codebase declares.
+// oxlint-disable-next-line eslint/id-length
 type CreateServiceRequest = protos.google.cloud.run.v2.ICreateServiceRequest;
 
 const LOCATIONS_DIR = "/etc/nginx/locations";

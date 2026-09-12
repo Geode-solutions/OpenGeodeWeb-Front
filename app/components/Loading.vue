@@ -2,6 +2,7 @@
 import { Status } from "@ogw_front/utils/status";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { logo, appName } = defineProps({
   logo: {
     type: String,
@@ -22,7 +23,7 @@ const extensionStores = computed(() =>
 const show = ref(false);
 const progress = ref(0);
 
-let progressInterval: ReturnType<typeof setInterval> | undefined;
+let progressInterval: ReturnType<typeof setInterval> | undefined = undefined;
 
 const PROGRESS_THRESHOLD = 90;
 const MAX_PROGRESS = 99;

@@ -1,5 +1,4 @@
 import {
-  type AttributeConfig,
   BLOCKS_DEFAULT_ACTIVE_COLORING,
   BLOCKS_DEFAULT_COLOR,
   BLOCKS_DEFAULT_VISIBILITY,
@@ -15,11 +14,12 @@ import {
   MODEL_DEFAULT_COLOR,
   POINTS_DEFAULT_SIZE,
   POINTS_DEFAULT_VISIBILITY,
-  type RGBAColor,
   SURFACES_DEFAULT_ACTIVE_COLORING,
   SURFACES_DEFAULT_COLOR,
   SURFACES_DEFAULT_VISIBILITY,
 } from "./constants";
+// oxlint-disable-next-line eslint/no-duplicate-imports
+import type { AttributeConfig, RGBAColor } from "./constants";
 
 function emptyAttributeConfig(): AttributeConfig {
   return { name: undefined, storedConfigs: {} };

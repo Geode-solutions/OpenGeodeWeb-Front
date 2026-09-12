@@ -4,12 +4,19 @@ import StickyHeader from "@ogw_front/components/Viewer/ObjectTree/Base/StickyHea
 import TreeRow from "@ogw_front/components/Viewer/ObjectTree/Base/TreeRow.vue";
 import { useTreeKeyboardNav } from "@ogw_front/composables/tree_keyboard_nav";
 import { useTreeScroll } from "@ogw_front/composables/tree_scroll";
-import { type DisplayItem, type EmitFn, useVirtualTree } from "@ogw_front/composables/virtual_tree";
+import { useVirtualTree } from "@ogw_front/composables/virtual_tree";
+// oxlint-disable-next-line eslint/no-duplicate-imports
+import type { DisplayItem, EmitFn } from "@ogw_front/composables/virtual_tree";
 
 // The useVirtualTree composable's own props type (VirtualTreeProps) isn't exported; this component intentionally stays generic over whatever item shape callers use (plain treeview groups, model component groups, ...), so it is extracted from the composable's signature instead of re-declared here.
-type UnwrapMaybeRefOrGetter<T> = T extends () => infer R ? R : T extends { value: infer R } ? R : T;
+type UnwrapMaybeRefOrGetter<Source> = Source extends () => infer Result
+  ? Result
+  : Source extends { value: infer Result }
+    ? Result
+    : Source;
 type VirtualTreeProps = UnwrapMaybeRefOrGetter<Parameters<typeof useVirtualTree>[0]>;
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { items, opened, selected, active, scrollTop, options } = defineProps({
   items: { type: Array, required: true },
   opened: { type: Array as PropType<unknown[]>, required: false, default: () => [] },
@@ -25,6 +32,7 @@ const { items, opened, selected, active, scrollTop, options } = defineProps({
 
 const treeWrapper = ref<HTMLDivElement | undefined>(undefined);
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits([
   "update:opened",
   "update:selected",

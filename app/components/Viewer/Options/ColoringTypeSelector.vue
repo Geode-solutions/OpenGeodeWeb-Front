@@ -47,6 +47,7 @@ const polyhedron_attribute_no_data_color = defineModel("polyhedron_attribute_no_
   type: Object,
 });
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { id, componentIds, capabilities, schemas, allowRandom } = defineProps({
   id: { type: String, required: true },
   componentIds: { type: Array, default: undefined },

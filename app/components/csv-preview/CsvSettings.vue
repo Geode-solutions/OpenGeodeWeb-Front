@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// oxlint-disable-next-line vue/define-props-declaration
 const { separator, headerRow, firstRow, xColumn, yColumn, zColumn, headers } = defineProps({
   separator: { type: String, required: true },
   headerRow: { type: Number, required: true },
@@ -9,6 +10,7 @@ const { separator, headerRow, firstRow, xColumn, yColumn, zColumn, headers } = d
   headers: { type: Array, default: () => [] },
 });
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits([
   "update:separator",
   "update:headerRow",

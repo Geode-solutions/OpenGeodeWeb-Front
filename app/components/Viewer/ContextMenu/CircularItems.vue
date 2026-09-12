@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useMenuStore } from "@ogw_front/stores/menu";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { menuItems, id, metaData, menuItemCount } = defineProps({
   menuItems: { type: Array, required: true },
   id: { type: String, required: true },

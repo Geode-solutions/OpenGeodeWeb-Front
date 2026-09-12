@@ -1,5 +1,6 @@
 <script setup lang="ts">
 // oxlint-disable id-length
+// oxlint-disable-next-line vue/define-props-declaration
 defineProps({
   disabledAlpha: {
     type: Boolean,

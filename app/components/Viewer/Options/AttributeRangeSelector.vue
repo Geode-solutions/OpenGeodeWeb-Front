@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["reset"]);
 
 const minimum = defineModel("minimum", { type: Number });

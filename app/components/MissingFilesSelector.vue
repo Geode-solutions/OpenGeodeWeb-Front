@@ -16,8 +16,10 @@ type FilePlan = {
 
 const schema = schemas.opengeodeweb_back.missing_files;
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["update_values", "increment_step", "decrement_step"]);
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { multiple, geodeObjectType, filenames, files } = defineProps({
   multiple: { type: Boolean, required: true },
   geodeObjectType: { type: String, required: true },

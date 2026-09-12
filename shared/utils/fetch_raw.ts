@@ -1,3 +1,5 @@
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
 // Third party imports
 import { $fetch } from "ofetch";
 import _ from "lodash";
@@ -57,6 +59,7 @@ function fetchRaw(
           request_error_function(error);
         }
       },
+      // oxlint-disable-next-line eslint/id-length -- mirrors the real ofetch/vitest API field name (`ok`/`fn`)
       onResponse({ response }: { response: { ok: boolean; _data: unknown } }) {
         if (response.ok && response_function) {
           response_function(response._data);

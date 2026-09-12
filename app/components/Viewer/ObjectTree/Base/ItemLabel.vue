@@ -7,11 +7,13 @@ import { useResponsiveMiddleTruncate } from "@ogw_front/composables/responsive_m
 const feedbackStore = useFeedbackStore();
 const { copy } = useClipboard();
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { item, isLeaf } = defineProps({
   item: { type: Object, required: true },
   isLeaf: { type: Boolean, required: false, default: undefined },
 });
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["contextmenu", "mouseenter", "mouseleave"]);
 
 const labelContainer = useTemplateRef("label-container");

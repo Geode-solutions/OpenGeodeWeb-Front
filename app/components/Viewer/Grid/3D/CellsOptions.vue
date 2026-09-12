@@ -2,6 +2,7 @@
 import Grid3DCells from "@ogw_front/assets/viewer_svgs/grid_3d_cells.svg";
 import ViewerGenericMeshCellsOptions from "@ogw_front/components/Viewer/Generic/Mesh/CellsOptions.vue";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { itemProps } = defineProps({
   itemProps: { type: Object, required: true },
 });

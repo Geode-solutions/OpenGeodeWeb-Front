@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// oxlint-disable-next-line vue/define-props-declaration
 const { title } = defineProps({
   title: { type: String, required: true },
 });

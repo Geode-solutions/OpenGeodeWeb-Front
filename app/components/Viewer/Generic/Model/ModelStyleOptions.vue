@@ -3,6 +3,7 @@ import ModelColor from "@ogw_front/assets/viewer_svgs/model_component_color.svg"
 import ModelStyleCard from "./ModelStyleCard.vue";
 import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { itemProps } = defineProps({
   itemProps: { type: Object, required: true },
 });

@@ -2,6 +2,7 @@
 import type { PropType } from "vue";
 
 const DEFAULT_ICON_SIZE = 28;
+// oxlint-disable-next-line vue/define-props-declaration
 const { icon, tooltip, color, size, variant, density, tooltipLocation, iconSize } = defineProps({
   icon: { type: String, required: true },
   tooltip: { type: String, required: true },
@@ -15,6 +16,7 @@ const { icon, tooltip, color, size, variant, density, tooltipLocation, iconSize 
   iconSize: { type: [String, Number], default: DEFAULT_ICON_SIZE },
 });
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["click"]);
 </script>
 

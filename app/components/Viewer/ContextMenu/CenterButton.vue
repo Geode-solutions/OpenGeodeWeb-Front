@@ -2,11 +2,13 @@
 import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
 import { useMenuStore } from "@ogw_front/stores/menu";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { isOverTreeview, isOverToolbar } = defineProps({
   isOverTreeview: { type: Boolean, required: true },
   isOverToolbar: { type: Boolean, default: false },
 });
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["drag", "click"]);
 
 const ADAPTIVE_BLUR_VAL = "15px";

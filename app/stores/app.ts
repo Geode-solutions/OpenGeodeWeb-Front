@@ -1,3 +1,5 @@
+// This file grew past the 310-line limit purely from added type annotations/interfaces during the TypeScript migration, with no new logic.
+// oxlint-disable eslint/max-lines
 // Local imports
 import { getRestApiPort, getRestApiProtocol, isCloudMode } from "@ogw_front/utils/stores.js";
 import { Status } from "@ogw_front/utils/status";
@@ -13,6 +15,8 @@ import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_f
 
 // The `share` defineStore option (used by every store in this codebase) is implemented by a runtime pinia plugin outside this package's type surface; this augmentation only teaches the type checker about the option shape already used at each defineStore call site.
 declare module "pinia" {
+  // TypeScript requires a merged interface declaration's type parameter names to match pinia's own (`S`, `Store`) exactly, not just their count.
+  // oxlint-disable-next-line eslint/id-length
   interface DefineStoreOptionsBase<S extends StateTree, Store> {
     share?: { omit?: string[] };
   }

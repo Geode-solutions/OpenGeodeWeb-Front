@@ -3,6 +3,7 @@ import { useDataStore } from "@ogw_front/stores/data";
 
 const dataStore = useDataStore();
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { item, itemProps, selection, isSelected, getIndeterminate } = defineProps({
   item: { type: Object, required: true },
   itemProps: { type: Object, required: true },
@@ -11,6 +12,7 @@ const { item, itemProps, selection, isSelected, getIndeterminate } = defineProps
   getIndeterminate: { type: Function, required: true },
 });
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["toggle-open", "toggle-select", "hover-eye-enter", "hover-eye-leave"]);
 
 const INDENT_STEP = 10;

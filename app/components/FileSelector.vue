@@ -8,8 +8,10 @@ import { useBackStore } from "@ogw_front/stores/back";
 
 const schema = schemas.opengeodeweb_back.allowed_files;
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["update_values", "increment_step", "decrement_step"]);
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { multiple, files, autoUpload, showOverlay } = defineProps({
   multiple: { type: Boolean, required: true },
   files: { type: Array as PropType<File[]>, default: () => [] },

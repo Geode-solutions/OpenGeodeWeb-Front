@@ -12,6 +12,7 @@ const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const { applyBatchStyle } = useBatchStyle();
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { itemProps, btnImage, tooltip } = defineProps({
   itemProps: { type: Object, required: true },
   btnImage: { type: String, required: true },

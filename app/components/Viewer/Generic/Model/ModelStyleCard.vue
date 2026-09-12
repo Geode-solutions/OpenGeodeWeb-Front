@@ -25,6 +25,7 @@ function getBatchComponentIds(currentId: string) {
   return [currentId];
 }
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { itemProps } = defineProps({
   itemProps: { type: Object, required: true },
 });

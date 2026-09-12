@@ -11,6 +11,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 const DEFAULT_ELEMENT_HEIGHT = 100;
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["click"]);
 
 const container = useTemplateRef("viewer");
@@ -22,9 +23,9 @@ const dataStore = useDataStore();
 const { width: elementWidth, height: elementHeight } = useElementSize(container);
 const { width: windowWidth, height: windowHeight } = useWindowSize();
 
-function debounce<T extends (...args: unknown[]) => void>(func: T, wait: number) {
-  let timeout: ReturnType<typeof setTimeout> | undefined;
-  return function executedFunction(...args: Parameters<T>) {
+function debounce<Callback extends (...args: unknown[]) => void>(func: Callback, wait: number) {
+  let timeout: ReturnType<typeof setTimeout> | undefined = undefined;
+  return function executedFunction(...args: Parameters<Callback>) {
     function later() {
       clearTimeout(timeout);
       func(...args);

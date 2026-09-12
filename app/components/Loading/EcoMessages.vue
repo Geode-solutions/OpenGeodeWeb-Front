@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// oxlint-disable-next-line vue/define-props-declaration
 const { appName } = defineProps({
   appName: {
     type: String,
@@ -26,7 +27,7 @@ const ecoMessages = computed(() => [
 
 const MESSAGE_INTERVAL_MS = 5000;
 const currentMessage = ref(0);
-let interval: ReturnType<typeof setInterval> | undefined;
+let interval: ReturnType<typeof setInterval> | undefined = undefined;
 
 // Fallback only guards against noUncheckedIndexedAccess; currentMessage is always kept in range by the modulo below, so it is never actually used.
 const FALLBACK_ECO_MESSAGE = { icon: "", title: "", message: "" };

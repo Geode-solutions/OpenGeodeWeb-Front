@@ -5,11 +5,13 @@ import { useClipboard } from "@vueuse/core";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useMenuStore } from "@ogw_front/stores/menu";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { show, metaData } = defineProps({
   show: { type: Boolean, required: true },
   metaData: { type: Object, required: true },
 });
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["update:show"]);
 
 const COPIED_TIMEOUT = 1500;

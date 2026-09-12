@@ -8,12 +8,14 @@ import { useMenuStore } from "@ogw_front/stores/menu";
 import { useOverlappingPicker } from "@ogw_front/composables/use_overlapping_picker";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { displayMenu, containerWidth, containerHeight } = defineProps({
   displayMenu: { type: Boolean, required: true },
   containerWidth: { type: Number, required: true },
   containerHeight: { type: Number, required: true },
 });
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["show-menu"]);
 const menuStore = useMenuStore();
 const viewerStore = useViewerStore();

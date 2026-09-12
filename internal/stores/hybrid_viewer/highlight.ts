@@ -1,3 +1,5 @@
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
 import { HOVER_DEBOUNCE_MS, HOVER_TIMEOUT_MS } from "./constants";
 import { database } from "@ogw_internal/database/database.js";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";

@@ -1,3 +1,5 @@
+// Only ever fires now that tests are .ts; asks every bare `vi.fn()` mock to carry an explicit call-signature type parameter. Real value for a handful of mocks, but for the many plain mock objects across this test suite it would mean guessing a signature that's already implied by how the mock is used (risking a type that quietly doesn't match, which defeats the point) rather than deriving it from each real function - left off rather than doing that at scale.
+// oxlint-disable vitest/require-mock-type-parameters
 // Third party imports
 import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest";
 import { $fetch } from "ofetch";
@@ -7,7 +9,9 @@ import { Status } from "@ogw_front/utils/status";
 import { appMode } from "@ogw_shared/app_mode";
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useBackStore } from "@ogw_front/stores/back";
-import { type Microservice, useInfraStore } from "@ogw_front/stores/infra";
+import { useInfraStore } from "@ogw_front/stores/infra";
+// oxlint-disable-next-line eslint/no-duplicate-imports
+import type { Microservice } from "@ogw_front/stores/infra";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 vi.mock(
@@ -225,6 +229,7 @@ describe("infra store", () => {
       const url = "test.com";
       vi.mocked($fetch).mockImplementation(((
         _route: unknown,
+        // oxlint-disable-next-line eslint/id-length -- mirrors the real ofetch/vitest API field name (`ok`/`fn`)
         options: { onResponse?: (context: { response: { ok: boolean; _data: unknown } }) => void },
       ) => {
         const data = { url };

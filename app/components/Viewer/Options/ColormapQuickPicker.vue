@@ -5,6 +5,7 @@ import ColorMapList from "@ogw_front/components/Viewer/Options/ColorMapList.vue"
 import { getPresetsWithCurrentAtTop } from "@ogw_front/utils/colormap";
 import { useGlobalAttributeStyle } from "@ogw_front/composables/global_attribute_style";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { dataId, x, y } = defineProps({
   dataId: { required: false, type: String, default: undefined },
   x: { required: true, type: Number },

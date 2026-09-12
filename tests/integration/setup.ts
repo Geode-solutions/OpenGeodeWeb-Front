@@ -1,4 +1,4 @@
-// oxlint-disable vitest/require-top-level-describe
+// oxlint-disable vitest/require-top-level-describe, vitest/require-mock-type-parameters
 
 // Node.js imports
 import { WebSocket } from "ws";

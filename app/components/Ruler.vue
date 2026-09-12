@@ -2,6 +2,7 @@
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { escapeFunction } = defineProps({
   escapeFunction: { type: Function, default: undefined },
 });

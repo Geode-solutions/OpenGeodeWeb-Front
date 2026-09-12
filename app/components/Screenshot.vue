@@ -8,6 +8,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 const show = defineModel({ type: Boolean, default: false });
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { width, escapeFunction } = defineProps({
   width: { type: Number, default: 260 },
   escapeFunction: { type: Function, default: undefined },

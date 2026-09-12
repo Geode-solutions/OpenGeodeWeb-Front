@@ -8,8 +8,10 @@ import DragAndDrop from "@ogw_front/components/DragAndDrop.vue";
 // Files carry extra app-specific bookkeeping fields once picked up here.
 type UploadFile = File & { isConfigured?: boolean; displayName?: string };
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["files_uploaded", "decrement_step", "reset_values"]);
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { multiple, accept, files, autoUpload, showOverlay, mini } = defineProps({
   multiple: { type: Boolean, default: false },
   accept: { type: [String, Array] as PropType<string | string[]>, default: "" },

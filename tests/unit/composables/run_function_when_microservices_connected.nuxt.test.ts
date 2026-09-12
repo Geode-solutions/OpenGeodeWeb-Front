@@ -7,12 +7,18 @@ import { Status } from "@ogw_front/utils/status";
 import { runFunctionWhenMicroservicesConnected } from "@ogw_front/composables/run_function_when_microservices_connected";
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useBackStore } from "@ogw_front/stores/back";
-import { type Microservice, useInfraStore } from "@ogw_front/stores/infra";
+import { useInfraStore } from "@ogw_front/stores/infra";
+// oxlint-disable-next-line eslint/no-duplicate-imports
+import type { Microservice } from "@ogw_front/stores/infra";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 const dumb_obj = { dumb_method: () => true };
+// These are assigned in beforeEach (a real defined value by the time any test runs) rather than at declaration, so a `| undefined` type would just force needless narrowing at every call site below.
+// oxlint-disable-next-line eslint/init-declarations
 let infraStore: ReturnType<typeof useInfraStore>;
+// oxlint-disable-next-line eslint/init-declarations
 let backStore: ReturnType<typeof useBackStore>;
+// oxlint-disable-next-line eslint/init-declarations
 let viewerStore: ReturnType<typeof useViewerStore>;
 
 describe("when_microservices_connected_run_function", () => {

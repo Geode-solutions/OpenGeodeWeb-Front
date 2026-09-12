@@ -4,8 +4,10 @@ import { useBackStore } from "@ogw_front/stores/back";
 
 const schema = schemas.opengeodeweb_back.geographic_coordinate_systems;
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["update_values", "increment_step", "decrement_step"]);
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { geodeObjectType, keyToUpdate } = defineProps({
   geodeObjectType: { type: String, required: true },
   keyToUpdate: { type: String, required: true },

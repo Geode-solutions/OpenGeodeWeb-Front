@@ -2,6 +2,7 @@
 import AttributeRangeSelector from "./AttributeRangeSelector.vue";
 import ColorMapPicker from "./ColorMapPicker.vue";
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["reset"]);
 
 const minimum = defineModel("minimum", { type: Number });

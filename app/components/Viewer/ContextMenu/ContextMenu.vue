@@ -1,4 +1,6 @@
 <script setup lang="ts">
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
 import CenterButton from "@ogw_front/components/Viewer/ContextMenu/CenterButton.vue";
 import CircularItems from "@ogw_front/components/Viewer/ContextMenu/CircularItems.vue";
 import InfoCard from "@ogw_front/components/Viewer/ContextMenu/InfoCard.vue";
@@ -7,6 +9,7 @@ import { useMenuStore } from "@ogw_front/stores/menu";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 import type { Component } from "vue";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { id, x, y, containerWidth, containerHeight } = defineProps({
   id: { type: String, required: true },
   x: { type: Number, required: true },

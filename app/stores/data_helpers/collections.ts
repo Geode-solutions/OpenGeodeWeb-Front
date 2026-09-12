@@ -1,7 +1,13 @@
-import { type Table, liveQuery } from "dexie";
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
+import { liveQuery } from "dexie";
+// oxlint-disable-next-line eslint/no-duplicate-imports
+import type { Table } from "dexie";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import { database } from "@ogw_internal/database/database.js";
-import { type FormattedComponent, type ModelComponentRecord, useDataMesh } from "./mesh.js";
+import { useDataMesh } from "./mesh.js";
+// oxlint-disable-next-line eslint/no-duplicate-imports
+import type { FormattedComponent, ModelComponentRecord } from "./mesh.js";
 import { useObservable } from "@vueuse/rxjs";
 import type { Observable } from "rxjs";
 

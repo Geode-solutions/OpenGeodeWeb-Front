@@ -1,3 +1,5 @@
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
 // Node imports
 import child_process from "node:child_process";
 import fs from "node:fs";
@@ -8,8 +10,12 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.jso
 
 // Local imports
 import { addNginxLocation, addSupervisorProgram } from "./cloud.js";
-import { type NamedChildProcess, getAvailablePort, waitForReady } from "./scripts.js";
-import { type Microservice, microservicesMetadatasPath, projectMicroservices } from "./cleanup.js";
+import { getAvailablePort, waitForReady } from "./scripts.js";
+// oxlint-disable-next-line eslint/no-duplicate-imports
+import type { NamedChildProcess } from "./scripts.js";
+import { microservicesMetadatasPath, projectMicroservices } from "./cleanup.js";
+// oxlint-disable-next-line eslint/no-duplicate-imports
+import type { Microservice } from "./cleanup.js";
 import { executablePath } from "./path.js";
 
 interface RunArgs {

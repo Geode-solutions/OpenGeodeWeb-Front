@@ -4,6 +4,7 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 const TOOLTIP_SCREEN_MARGIN = 10;
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { containerWidth, containerHeight } = defineProps({
   containerWidth: {
     type: Number,

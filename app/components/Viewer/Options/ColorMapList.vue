@@ -4,11 +4,13 @@ import { drawCanvasForPreset } from "@ogw_front/utils/colormap";
 
 const CHUNK_SIZE = 5;
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { presets, selectedPresetName } = defineProps({
   presets: { type: Array, required: true },
   selectedPresetName: { type: String, default: "" },
 });
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["select"]);
 
 interface ColorMapPreset {

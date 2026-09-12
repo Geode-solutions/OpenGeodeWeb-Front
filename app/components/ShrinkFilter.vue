@@ -8,6 +8,7 @@ const DEFAULT_SHRINK_VALUE = 0.8;
 const MAX_SHRINK_VALUE = 1;
 const DEBOUNCE_DELAY = 100;
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { escapeFunction } = defineProps({
   escapeFunction: { type: Function, default: undefined },
 });

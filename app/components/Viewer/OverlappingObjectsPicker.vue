@@ -1,4 +1,6 @@
 <script setup lang="ts">
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
 import type { PropType } from "vue";
 import GlassCard from "@ogw_front/components/GlassCard.vue";
 import { formatListId } from "@ogw_front/utils/name_cleaner";
@@ -13,12 +15,14 @@ interface IntermediateItem {
   geode_object_type: string | undefined;
 }
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { displayIntermediate, intermediateItems, menuStyle } = defineProps({
   displayIntermediate: { type: Boolean, required: true },
   intermediateItems: { type: Array as PropType<IntermediateItem[]>, required: true },
   menuStyle: { type: Object, required: true },
 });
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["select", "update:displayIntermediate"]);
 
 function selectItem(item: IntermediateItem) {

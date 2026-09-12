@@ -13,6 +13,7 @@ interface CsvHeader {
 }
 type CsvRow = Record<string, string>;
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { file, modelValue } = defineProps({
   file: { type: Object as PropType<File>, required: true },
   modelValue: { type: Boolean, default: false },
@@ -24,6 +25,7 @@ const MIN_AVG_COUNT = 1.5;
 const MAX_VARIANCE = 0.5;
 const PREVIEW_ROWS_LIMIT = 101;
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["update:modelValue", "confirm"]);
 
 const separator = ref(",");

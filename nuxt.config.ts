@@ -9,6 +9,8 @@ import package_json from "./package.json";
 
 const __dirname = import.meta.dirname;
 
+// Nuxt requires this file's config object as the default export; the shared org lint config's no-default-export override only lists *.config.js, not *.config.ts, since this file predates the TypeScript migration.
+// oxlint-disable-next-line import/no-default-export
 export default defineNuxtConfig({
   runtimeConfig: {
     public: {

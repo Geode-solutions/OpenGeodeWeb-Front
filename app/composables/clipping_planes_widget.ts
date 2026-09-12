@@ -1,3 +1,5 @@
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
 import {
   AXIS_SCALE,
   CHANGE_THRESHOLD,
@@ -11,10 +13,9 @@ import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering
 // ImplicitPlaneWidget ships no type declarations at all (unlike most of vtk.js), unlike a module that simply doesn't exist, so it can't be given an ambient `declare module` shim either - suppress the resulting implicit-any error at the import site instead.
 // @ts-expect-error -- see comment above; newInstance() below is implicitly `any`.
 import { newInstance as vtkImplicitPlaneWidget } from "@kitware/vtk.js/Widgets/Widgets3D/ImplicitPlaneWidget";
-import {
-  type vtkWidgetManager as WidgetManagerInstance,
-  newInstance as vtkWidgetManager,
-} from "@kitware/vtk.js/Widgets/Core/WidgetManager";
+import { newInstance as vtkWidgetManager } from "@kitware/vtk.js/Widgets/Core/WidgetManager";
+// oxlint-disable-next-line eslint/no-duplicate-imports
+import type { vtkWidgetManager as WidgetManagerInstance } from "@kitware/vtk.js/Widgets/Core/WidgetManager";
 import type { Ref } from "vue";
 import type vtkActor from "@kitware/vtk.js/Rendering/Core/Actor";
 import type { vtkCamera } from "@kitware/vtk.js/Rendering/Core/Camera";

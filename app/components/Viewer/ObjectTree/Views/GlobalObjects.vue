@@ -16,6 +16,7 @@ const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["show-menu"]);
 
 interface TreeGroupItem {

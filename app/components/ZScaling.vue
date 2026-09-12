@@ -4,11 +4,13 @@ import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 const zScale = defineModel({ type: Number, default: 1 });
 const show = defineModel("show", { type: Boolean, default: false });
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { width, escapeFunction } = defineProps({
   width: { type: Number, default: 260 },
   escapeFunction: { type: Function, default: undefined },
 });
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["apply"]);
 
 function apply() {

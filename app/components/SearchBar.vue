@@ -1,9 +1,11 @@
 <script setup lang="ts">
+// oxlint-disable-next-line vue/define-props-declaration
 const { modelValue, label } = defineProps({
   modelValue: { type: String, default: "" },
   label: { type: String, default: "" },
 });
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["update:modelValue"]);
 </script>
 

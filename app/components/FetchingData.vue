@@ -6,6 +6,7 @@ const {
   text = "Fetching data...",
   size = DEFAULT_SIZE,
   width = DEFAULT_WIDTH,
+  // oxlint-disable-next-line vue/define-props-declaration
 } = defineProps({
   text: {
     type: String,

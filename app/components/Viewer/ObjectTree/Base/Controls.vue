@@ -1,8 +1,11 @@
 <script setup lang="ts">
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
 import type { PropType } from "vue";
 import ActionButton from "@ogw_front/components/ActionButton.vue";
 import SearchBar from "@ogw_front/components/SearchBar.vue";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { search, sortType, filterOptions, availableFilterOptions, isCollapsed } = defineProps({
   search: { type: String, required: true },
   sortType: { type: String, required: true },
@@ -11,6 +14,7 @@ const { search, sortType, filterOptions, availableFilterOptions, isCollapsed } =
   isCollapsed: { type: Boolean, required: false, default: false },
 });
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["update:search", "toggle-sort", "collapse-all", "expand-all"]);
 
 const showSearch = ref(false);

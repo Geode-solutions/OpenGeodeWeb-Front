@@ -3,7 +3,9 @@ import type { PropType, Ref } from "vue";
 import Step from "@ogw_front/components/Step.vue";
 import type { useStepperTree } from "@ogw_front/composables/stepper_tree";
 
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["reset_values", "close"]);
+// oxlint-disable-next-line vue/define-props-declaration
 const { stepperTree } = defineProps({
   stepperTree: { type: Object as PropType<ReturnType<typeof useStepperTree>>, required: true },
 });

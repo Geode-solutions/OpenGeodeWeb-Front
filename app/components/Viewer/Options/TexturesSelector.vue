@@ -9,6 +9,7 @@ interface Texture {
 
 const textures = defineModel({ type: Array as PropType<Texture[]> });
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { id } = defineProps({
   id: { type: String, required: true },
 });

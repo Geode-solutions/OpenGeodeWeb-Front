@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useInfraStore } from "@ogw_front/stores/infra";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { buttonLabel, buttonColor, color } = defineProps({
   buttonLabel: {
     type: String,

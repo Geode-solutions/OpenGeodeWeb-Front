@@ -1,3 +1,5 @@
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
 import { database } from "@ogw_internal/database/database.js";
 import { getDefaultStyle } from "@ogw_front/utils/default_styles";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -17,7 +19,7 @@ interface DataStyleSnapshot {
 }
 
 // The database's table map is dynamically assembled at runtime (see internal/database/database.ts), so `noUncheckedIndexedAccess` sees these as possibly undefined even though they're always registered before this store is used; guard defensively rather than asserting.
-function requireTable<T>(table: T | undefined, name: string): T {
+function requireTable<Table>(table: Table | undefined, name: string): Table {
   if (!table) {
     throw new Error(`Database table not initialized: ${name}`);
   }

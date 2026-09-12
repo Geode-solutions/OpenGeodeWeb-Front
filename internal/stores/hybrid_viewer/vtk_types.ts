@@ -1,3 +1,6 @@
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// This file's imported vtk.js types are also used locally (CameraOptions, HybridDbEntry, HybridViewerStorePublic reference them directly), not just re-exported, so they can't become pure `export ... from "...";` re-exports without losing the local binding these interfaces need.
+// oxlint-disable eslint/sort-imports, unicorn/prefer-export-from
 // Re-exports of vtk.js's own (real, shipped) TypeScript types for the objects the hybrid viewer store composables interact with, plus the handful of shapes that are specific to this codebase (CameraOptions' snake_case wire format, the local hybridDb map, hover highlight data, ...).
 import type { vtkCamera } from "@kitware/vtk.js/Rendering/Core/Camera";
 import type { vtkRenderer } from "@kitware/vtk.js/Rendering/Core/Renderer";

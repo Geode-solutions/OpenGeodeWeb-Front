@@ -1,4 +1,6 @@
-import { type ServerWsRpcClient, createServerWsRpcClient } from "./ws_client.js";
+import { createServerWsRpcClient } from "./ws_client.js";
+// oxlint-disable-next-line eslint/no-duplicate-imports
+import type { ServerWsRpcClient } from "./ws_client.js";
 
 const storage = new Map<string, unknown>();
 function getAppBaseUrl(): unknown {

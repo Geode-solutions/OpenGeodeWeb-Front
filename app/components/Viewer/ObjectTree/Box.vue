@@ -3,6 +3,7 @@ import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
 
 const SCROLL_SYNC_DELAY = 50;
 const SCROLL_THRESHOLD = 1;
+// oxlint-disable-next-line vue/define-props-declaration
 const { title, closable, icon, mdiIcon, scrollTop, borderRadius } = defineProps({
   title: { type: String, required: true },
   closable: { type: Boolean, required: false, default: false },
@@ -12,6 +13,7 @@ const { title, closable, icon, mdiIcon, scrollTop, borderRadius } = defineProps(
   borderRadius: { type: String, required: false, default: "16px" },
   borderLeft: { type: Boolean, required: false, default: true },
 });
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["close", "dragstart", "update:scrollTop"]);
 
 const scrollContainer = useTemplateRef("scroll-container");

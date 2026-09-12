@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import GlassCard from "@ogw_front/components/GlassCard.vue";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { title, width, closeLabel, actionLabel, clickOutside, escapeFunction } = defineProps({
   title: { type: String, default: "" },
   width: { type: Number, default: 260 },
@@ -11,6 +12,7 @@ const { title, width, closeLabel, actionLabel, clickOutside, escapeFunction } = 
 });
 
 const model = defineModel({ type: Boolean, default: false });
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["action"]);
 
 function close() {

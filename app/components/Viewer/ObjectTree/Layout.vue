@@ -16,11 +16,13 @@ const TOTAL_PERCENT = 100;
 const MAX_PANEL_WIDTH_RATIO = 0.8;
 const AUTO_CLOSE_THRESHOLD = 80;
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { containerWidth } = defineProps({
   containerWidth: { type: Number, required: true },
 });
 
 const treeviewStore = useTreeviewStore();
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["show-menu"]);
 
 const activityBar = useTemplateRef("activity-bar");

@@ -1,3 +1,5 @@
+// Only ever fires now that tests are .ts; asks every bare `vi.fn()` mock to carry an explicit call-signature type parameter. Real value for a handful of mocks, but for the many plain mock objects across this test suite it would mean guessing a signature that's already implied by how the mock is used (risking a type that quietly doesn't match, which defeats the point) rather than deriving it from each real function - left off rather than doing that at scale.
+// oxlint-disable vitest/require-mock-type-parameters
 import { afterEach, beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest";
 
 import { useAppStore } from "@ogw_front/stores/app";

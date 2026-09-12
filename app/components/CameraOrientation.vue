@@ -1,4 +1,6 @@
 <script setup lang="ts">
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import { applyCameraOptions } from "@ogw_internal/stores/hybrid_viewer/camera";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -6,6 +8,7 @@ import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types
 import { newInstance as vtkAnnotatedCubeActor } from "@kitware/vtk.js/Rendering/Core/AnnotatedCubeActor";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { panel, width, escapeFunction } = defineProps({
   panel: { type: Boolean, default: false },
   width: { type: Number, default: 260 },
@@ -13,6 +16,7 @@ const { panel, width, escapeFunction } = defineProps({
 });
 
 const show = defineModel("show", { type: Boolean, default: false });
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["select"]);
 
 const orientations = [

@@ -9,6 +9,7 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useModelComponents } from "@ogw_front/composables/model_components";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { id, viewId } = defineProps({
   id: { type: String, required: true },
   viewId: { type: String, required: false, default: undefined },
@@ -26,6 +27,7 @@ interface TreeViewItem {
 
 const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 const hybridViewerStore = useHybridViewerStore();
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["show-menu"]);
 
 const treeviewStore = useTreeviewStore();

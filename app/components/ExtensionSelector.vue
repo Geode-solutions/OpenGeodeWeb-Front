@@ -6,8 +6,10 @@ import FetchingData from "@ogw_front/components/FetchingData.vue";
 import { useBackStore } from "@ogw_front/stores/back";
 
 const schema = schemas.opengeodeweb_back.geode_objects_and_output_extensions;
+// oxlint-disable-next-line vue/define-emits-declaration
 const emit = defineEmits(["update_values", "increment_step", "decrement_step"]);
 
+// oxlint-disable-next-line vue/define-props-declaration
 const { geodeObjectType, filenames } = defineProps({
   geodeObjectType: { type: String, required: true },
   filenames: { type: Array as PropType<string[]>, required: true },
