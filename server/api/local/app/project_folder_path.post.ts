@@ -4,7 +4,10 @@
 import { createError, defineEventHandler, readBody } from "h3";
 
 // Local imports
-import { createPath, generateProjectFolderPath } from "@geode/opengeodeweb-front/server/utils/path.ts";
+import {
+  createPath,
+  generateProjectFolderPath,
+} from "@geode/opengeodeweb-front/server/utils/path.ts";
 
 interface ProjectFolderPathBody {
   PROJECT: string;
