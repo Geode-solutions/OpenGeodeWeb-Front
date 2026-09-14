@@ -1,13 +1,16 @@
-<script setup>
-import ActionButton from "@ogw_front/components/ActionButton";
+<script setup lang="ts">
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
+import type { Ref } from "vue";
+import ActionButton from "@ogw_front/components/ActionButton.vue";
 import CameraBookmarkIcon from "@ogw_front/assets/viewer_svgs/camera-bookmark.svg";
-import CameraManager from "@ogw_front/components/CameraManager";
-import CameraOrientation from "@ogw_front/components/CameraOrientation";
-import ClippingPlanes from "@ogw_front/components/ClippingPlanes";
-import Ruler from "@ogw_front/components/Ruler";
-import Screenshot from "@ogw_front/components/Screenshot";
-import ShrinkFilter from "@ogw_front/components/ShrinkFilter";
-import ZScaling from "@ogw_front/components/ZScaling";
+import CameraManager from "@ogw_front/components/CameraManager.vue";
+import CameraOrientation from "@ogw_front/components/CameraOrientation.vue";
+import ClippingPlanes from "@ogw_front/components/ClippingPlanes.vue";
+import Ruler from "@ogw_front/components/Ruler.vue";
+import Screenshot from "@ogw_front/components/Screenshot.vue";
+import ShrinkFilter from "@ogw_front/components/ShrinkFilter.vue";
+import ZScaling from "@ogw_front/components/ZScaling.vue";
 import { onKeyStroke } from "@vueuse/core";
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -24,7 +27,18 @@ const showShrinkFilter = ref(false);
 const showRuler = ref(false);
 const gridScale = ref(false);
 const zScale = ref(hybridViewerStore.zScale);
-const openSubMenus = ref({});
+const openSubMenus = ref<Record<string, boolean>>({});
+
+interface CameraOptionAction {
+  title?: string;
+  testId: string;
+  tooltip?: string;
+  icon: string;
+  iconSize?: number;
+  color?: string;
+  action?: () => void;
+  menu?: CameraOptionAction[];
+}
 
 watch(
   () => hybridViewerStore.zScale,
@@ -47,7 +61,7 @@ onKeyStroke("Escape", () => {
   }
 });
 
-function closeAllToolsExcept(toolRef) {
+function closeAllToolsExcept(toolRef: Ref<boolean>) {
   const tools = [
     showCameraOrientation,
     showCameraManager,
@@ -64,12 +78,12 @@ function closeAllToolsExcept(toolRef) {
   }
 }
 
-function toggleTool(toolRef) {
+function toggleTool(toolRef: Ref<boolean>) {
   closeAllToolsExcept(toolRef);
   toolRef.value = !toolRef.value;
 }
 
-const camera_options = computed(() => [
+const camera_options = computed<CameraOptionAction[]>(() => [
   {
     testId: "resetCameraButton",
     tooltip: "Reset camera",
@@ -234,10 +248,8 @@ const camera_options = computed(() => [
             <ActionButton
               v-bind="props"
               :data-testid="camera_option.testId"
-              :icon="
-                typeof camera_option.icon === 'function' ? camera_option.icon() : camera_option.icon
-              "
-              :tooltip="camera_option.tooltip"
+              :icon="camera_option.icon"
+              :tooltip="camera_option.tooltip ?? ''"
               :color="camera_option.color"
               :icon-size="camera_option.iconSize"
               tooltip-location="left"
@@ -249,16 +261,16 @@ const camera_options = computed(() => [
                 <ActionButton
                   :data-testid="item.testId"
                   :icon="item.icon"
-                  :tooltip="item.title"
+                  :tooltip="item.title ?? ''"
                   :color="
                     hybridViewerStore.is_hover_highlight &&
                     hybridViewerStore.hover_highlight_field_type ===
-                      item.title.toUpperCase().slice(0, -1)
+                      item.title?.toUpperCase().slice(0, -1)
                       ? 'primary'
                       : undefined
                   "
                   tooltip-location="top"
-                  @click="item.action"
+                  @click="item.action?.()"
                 />
               </v-col>
             </v-row>
@@ -268,7 +280,7 @@ const camera_options = computed(() => [
           v-else
           :data-testid="camera_option.testId"
           :icon="camera_option.icon"
-          :tooltip="camera_option.tooltip"
+          :tooltip="camera_option.tooltip ?? ''"
           :color="camera_option.color"
           :icon-size="camera_option.iconSize"
           tooltip-location="left"

@@ -1,18 +1,31 @@
-<script setup>
-import ToolPanel from "@ogw_front/components/ToolPanel";
+<script setup lang="ts">
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
+import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import { applyCameraOptions } from "@ogw_internal/stores/hybrid_viewer/camera";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types.js";
 import { newInstance as vtkAnnotatedCubeActor } from "@kitware/vtk.js/Rendering/Core/AnnotatedCubeActor";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 
-const { panel, width, escapeFunction } = defineProps({
-  panel: { type: Boolean, default: false },
-  width: { type: Number, default: 260 },
-  escapeFunction: { type: Function, default: undefined },
-});
+const DEFAULT_PANEL_WIDTH = 260;
 
-const show = defineModel("show", { type: Boolean, default: false });
-const emit = defineEmits(["select"]);
+interface Props {
+  panel?: boolean;
+  width?: number;
+  escapeFunction?: () => void;
+}
+
+const {
+  panel = false,
+  width = DEFAULT_PANEL_WIDTH,
+  escapeFunction = undefined,
+} = defineProps<Props>();
+
+const show = defineModel<boolean>("show", { default: false });
+const emit = defineEmits<{
+  select: [value: string];
+}>();
 
 const orientations = [
   {
@@ -65,12 +78,13 @@ const orientations = [
   },
 ];
 
-const hoveredFace = ref(undefined);
+const hoveredFace = ref<string | undefined>(undefined);
 const hybridViewerStore = useHybridViewerStore();
 const cubeContainer = useTemplateRef("cubeContainer");
 
-let genericRenderWindow = undefined;
-let cubeActor = undefined;
+// VTK.js objects have no usable type declarations here; `any` is the pragmatic choice.
+let genericRenderWindow: any = undefined;
+let cubeActor: any = undefined;
 let isInteracting = false;
 
 function initVTK() {
@@ -100,7 +114,7 @@ function initVTK() {
     edgeColor: "rgba(255, 255, 255, 0.4)",
     edgeThickness: 0.1,
     resolution: 400,
-    fontSizeScale: (resolution) => resolution / 4,
+    fontSizeScale: (resolution: number) => resolution / 4,
   });
 
   for (const orientation of orientations) {
@@ -124,7 +138,7 @@ function syncCubeCamera() {
     return;
   }
   const camera = genericRenderWindow.getRenderer().getActiveCamera();
-  applyCameraOptions(camera, options);
+  applyCameraOptions(camera, options as unknown as CameraOptions);
   genericRenderWindow.getRenderer().resetCamera();
   genericRenderWindow.getRenderWindow().render();
 }
@@ -151,7 +165,7 @@ watch(hoveredFace, (newFace, oldFace) => {
   if (!cubeActor) {
     return;
   }
-  function updateFace(face, active) {
+  function updateFace(face: string | undefined, active: boolean) {
     const config = orientations.find((orientation) => orientation.face === face);
     if (config) {
       cubeActor[`set${config.vtkKey}FaceProperty`]({

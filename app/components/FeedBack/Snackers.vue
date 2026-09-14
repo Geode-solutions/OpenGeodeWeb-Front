@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 const MARGIN_BETWEEN_SNACKERS = 60;
@@ -7,7 +7,7 @@ const FIRST_SNACKER_MARGIN = 8;
 const feedbackStore = useFeedbackStore();
 const show = ref(true);
 
-function calc_margin(index) {
+function calc_margin(index: number) {
   return `${index * MARGIN_BETWEEN_SNACKERS + FIRST_SNACKER_MARGIN}px`;
 }
 </script>
@@ -15,7 +15,7 @@ function calc_margin(index) {
 <template>
   <v-snackbar
     v-for="(feedback, index) in feedbackStore.feedbacks"
-    :key="feedback"
+    :key="feedback.id"
     v-model="show"
     :style="{ 'margin-bottom': calc_margin(index) }"
     :color="feedback.type"

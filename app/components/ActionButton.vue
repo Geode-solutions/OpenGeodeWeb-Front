@@ -1,17 +1,33 @@
-<script setup>
+<script setup lang="ts">
 const DEFAULT_ICON_SIZE = 28;
-const { icon, tooltip, color, size, variant, density, tooltipLocation, iconSize } = defineProps({
-  icon: { type: String, required: true },
-  tooltip: { type: String, required: true },
-  color: { type: String, default: undefined },
-  size: { type: [String, Number], default: undefined },
-  variant: { type: String, default: undefined },
-  density: { type: String, default: "comfortable" },
-  tooltipLocation: { type: String, default: "left" },
-  iconSize: { type: [String, Number], default: DEFAULT_ICON_SIZE },
-});
 
-const emit = defineEmits(["click"]);
+interface Props {
+  icon: string;
+  tooltip: string;
+  color?: string;
+  size?: string | number;
+  // Vuetify's variant/density accept narrow literal unions; kept loose here since
+  // Callers pass plain strings and this is only a typing widening, not a behavior change.
+  variant?: any;
+  density?: any;
+  tooltipLocation?: string;
+  iconSize?: string | number;
+}
+
+const {
+  icon,
+  tooltip,
+  color = undefined,
+  size = undefined,
+  variant = undefined,
+  density = "comfortable",
+  tooltipLocation = "left",
+  iconSize = DEFAULT_ICON_SIZE,
+} = defineProps<Props>();
+
+const emit = defineEmits<{
+  click: [event: MouseEvent];
+}>();
 </script>
 
 <template>

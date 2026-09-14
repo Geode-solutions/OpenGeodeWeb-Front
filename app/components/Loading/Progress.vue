@@ -1,10 +1,9 @@
-<script setup>
-const { progress } = defineProps({
-  progress: {
-    type: Number,
-    required: true,
-  },
-});
+<script setup lang="ts">
+interface Props {
+  progress: number;
+}
+
+const { progress } = defineProps<Props>();
 </script>
 
 <template>

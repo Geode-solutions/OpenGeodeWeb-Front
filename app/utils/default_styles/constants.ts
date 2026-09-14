@@ -1,0 +1,88 @@
+interface RGBAColor {
+  red: number;
+  green: number;
+  blue: number;
+  alpha: number;
+}
+
+interface AttributeConfig {
+  name: string | undefined;
+  storedConfigs: Record<string, unknown>;
+}
+
+// Mesh
+const MESH_DEFAULT_ACTIVE_COLORING = "constant";
+const POINTS_DEFAULT_VISIBILITY = true;
+const POINTS_DEFAULT_SIZE = 10;
+const POINTS_DEFAULT_COLOR: RGBAColor = { red: 20, green: 20, blue: 20, alpha: 1 };
+const EDGES_DEFAULT_VISIBILITY = true;
+const EDGES_DEFAULT_WIDTH = 2;
+const EDGES_DEFAULT_COLOR: RGBAColor = { red: 20, green: 20, blue: 20, alpha: 1 };
+const CELLS_DEFAULT_VISIBILITY = true;
+const CELLS_DEFAULT_COLOR: RGBAColor = { red: 255, green: 255, blue: 255, alpha: 1 };
+const POLYGONS_DEFAULT_VISIBILITY = true;
+const POLYGONS_DEFAULT_COLOR: RGBAColor = { red: 255, green: 255, blue: 255, alpha: 1 };
+const POLYHEDRA_DEFAULT_VISIBILITY = true;
+const POLYHEDRA_DEFAULT_COLOR: RGBAColor = { red: 255, green: 255, blue: 255, alpha: 1 };
+
+// Model
+const MODEL_DEFAULT_COLOR: RGBAColor = { red: 255, green: 255, blue: 255, alpha: 1 };
+const MODEL_DEFAULT_ACTIVE_COLORING = "constant";
+
+const CORNERS_DEFAULT_VISIBILITY = true;
+const CORNERS_DEFAULT_COLOR: RGBAColor = { red: 20, green: 20, blue: 20, alpha: 1 };
+const CORNERS_DEFAULT_ACTIVE_COLORING = "constant";
+const LINES_DEFAULT_VISIBILITY = true;
+const LINES_DEFAULT_COLOR: RGBAColor = { red: 20, green: 20, blue: 20, alpha: 1 };
+const LINES_DEFAULT_ACTIVE_COLORING = "constant";
+const SURFACES_DEFAULT_VISIBILITY = true;
+const SURFACES_DEFAULT_COLOR: RGBAColor = { red: 255, green: 255, blue: 255, alpha: 1 };
+const SURFACES_DEFAULT_ACTIVE_COLORING = "constant";
+const BLOCKS_DEFAULT_VISIBILITY = true;
+const BLOCKS_DEFAULT_COLOR: RGBAColor = { red: 255, green: 255, blue: 255, alpha: 1 };
+const BLOCKS_DEFAULT_ACTIVE_COLORING = "constant";
+
+const MESH_COMPONENT_TYPES = ["Corner", "Line", "Surface", "Block"];
+
+const DEFAULT_MODEL_COMPONENT_TYPE_COLORS: Record<string, RGBAColor> = {
+  Corner: CORNERS_DEFAULT_COLOR,
+  Line: LINES_DEFAULT_COLOR,
+  Surface: SURFACES_DEFAULT_COLOR,
+  Block: BLOCKS_DEFAULT_COLOR,
+};
+
+const DEFAULT_NO_DATA_COLOR: RGBAColor = { red: 128, green: 128, blue: 128, alpha: 1 };
+
+export type { RGBAColor, AttributeConfig };
+export {
+  POINTS_DEFAULT_VISIBILITY,
+  POINTS_DEFAULT_SIZE,
+  POINTS_DEFAULT_COLOR,
+  EDGES_DEFAULT_VISIBILITY,
+  EDGES_DEFAULT_WIDTH,
+  EDGES_DEFAULT_COLOR,
+  CELLS_DEFAULT_VISIBILITY,
+  CELLS_DEFAULT_COLOR,
+  POLYGONS_DEFAULT_VISIBILITY,
+  POLYGONS_DEFAULT_COLOR,
+  POLYHEDRA_DEFAULT_VISIBILITY,
+  POLYHEDRA_DEFAULT_COLOR,
+  CORNERS_DEFAULT_VISIBILITY,
+  CORNERS_DEFAULT_COLOR,
+  CORNERS_DEFAULT_ACTIVE_COLORING,
+  LINES_DEFAULT_VISIBILITY,
+  LINES_DEFAULT_COLOR,
+  LINES_DEFAULT_ACTIVE_COLORING,
+  SURFACES_DEFAULT_VISIBILITY,
+  SURFACES_DEFAULT_COLOR,
+  SURFACES_DEFAULT_ACTIVE_COLORING,
+  BLOCKS_DEFAULT_VISIBILITY,
+  BLOCKS_DEFAULT_COLOR,
+  BLOCKS_DEFAULT_ACTIVE_COLORING,
+  MESH_COMPONENT_TYPES,
+  DEFAULT_MODEL_COMPONENT_TYPE_COLORS,
+  MODEL_DEFAULT_COLOR,
+  MESH_DEFAULT_ACTIVE_COLORING,
+  MODEL_DEFAULT_ACTIVE_COLORING,
+  DEFAULT_NO_DATA_COLOR,
+};
