@@ -1,10 +1,13 @@
-<script setup>
+<script setup lang="ts">
+import type { ItemProps } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import SurfaceEdges from "@ogw_front/assets/viewer_svgs/surface_edges.svg";
-import ViewerGenericMeshEdgesOptions from "@ogw_front/components/Viewer/Generic/Mesh/EdgesOptions";
+import ViewerGenericMeshEdgesOptions from "@ogw_front/components/Viewer/Generic/Mesh/EdgesOptions.vue";
 
-const { itemProps } = defineProps({
-  itemProps: { type: Object, required: true },
-});
+interface Props {
+  itemProps: ItemProps & { index?: number };
+}
+
+const { itemProps } = defineProps<Props>();
 </script>
 
 <template>

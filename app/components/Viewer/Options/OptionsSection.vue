@@ -1,7 +1,9 @@
-<script setup>
-const { title } = defineProps({
-  title: { type: String, required: true },
-});
+<script setup lang="ts">
+interface Props {
+  title: string;
+}
+
+const { title } = defineProps<Props>();
 
 const isCollapsed = ref(false);
 </script>

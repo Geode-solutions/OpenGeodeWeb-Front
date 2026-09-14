@@ -1,12 +1,14 @@
-<script setup>
-import ToolPanel from "@ogw_front/components/ToolPanel";
+<script setup lang="ts">
+import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
-const { escapeFunction } = defineProps({
-  escapeFunction: { type: Function, default: undefined },
-});
+interface Props {
+  escapeFunction?: () => void;
+}
 
-const show = defineModel("show", { type: Boolean, default: false });
+const { escapeFunction = undefined } = defineProps<Props>();
+
+const show = defineModel<boolean>("show", { default: false });
 const hybridViewerStore = useHybridViewerStore();
 
 const localPoint1 = ref([0, 0, 0]);

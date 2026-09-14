@@ -1,8 +1,11 @@
-<script setup>
+<script setup lang="ts">
 import SurfacePoints from "@ogw_front/assets/viewer_svgs/surface_points.svg";
-import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem";
-import ViewerOptionsSizeSlider from "@ogw_front/components/Viewer/Options/Sliders/Size";
-import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch";
+// oxlint-disable import/consistent-type-specifier-style -- combining the default import with the type import avoids a duplicate-imports violation on this same module; using disable-next-line here is fragile because a formatter can re-wrap the import onto multiple lines and shift the flagged line
+import ViewerContextMenuItem, {
+  type ItemProps,
+} from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import ViewerOptionsSizeSlider from "@ogw_front/components/Viewer/Options/Sliders/Size.vue";
+import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -12,16 +15,18 @@ const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const { applyBatchStyle } = useBatchStyle();
 
-const { itemProps } = defineProps({
-  itemProps: { type: Object, required: true },
-});
+interface Props {
+  itemProps: ItemProps & { index: number };
+}
 
-const id = computed(() => itemProps.meta_data.modelId || itemProps.id);
+const { itemProps } = defineProps<Props>();
+
+const id = computed(() => (itemProps.meta_data.modelId as string | undefined) || itemProps.id);
 
 const visibility = computed({
   get: () => dataStyleStore.modelPointsVisibility(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
+    await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setModelPointsVisibility(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -30,7 +35,7 @@ const visibility = computed({
 const size = computed({
   get: () => dataStyleStore.modelPointsSize(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
+    await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setModelPointsSize(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -41,6 +46,7 @@ const size = computed({
 <template>
   <ViewerContextMenuItem
     data-testid="modelPointsMenu"
+    :index="itemProps.index"
     :itemProps="itemProps"
     tooltip="Points options"
     :btnImage="SurfacePoints"

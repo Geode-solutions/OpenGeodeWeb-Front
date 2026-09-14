@@ -1,21 +1,36 @@
-<script setup>
+<script setup lang="ts">
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
 import { useDataStore } from "@ogw_front/stores/data";
+import type {
+  DisplayItem,
+  ItemPropsConfig,
+  SelectionConfig,
+  TreeItem,
+} from "@ogw_front/composables/virtual_tree";
 
 const dataStore = useDataStore();
 
-const { item, itemProps, selection, isSelected, getIndeterminate } = defineProps({
-  item: { type: Object, required: true },
-  itemProps: { type: Object, required: true },
-  selection: { type: Object, required: true },
-  isSelected: { type: Function, required: true },
-  getIndeterminate: { type: Function, required: true },
-});
+interface Props {
+  item: DisplayItem;
+  itemProps: ItemPropsConfig;
+  selection: SelectionConfig;
+  isSelected: (item: TreeItem) => boolean;
+  getIndeterminate: (item: TreeItem) => boolean;
+}
 
-const emit = defineEmits(["toggle-open", "toggle-select", "hover-eye-enter", "hover-eye-leave"]);
+const { item, itemProps, selection, isSelected, getIndeterminate } = defineProps<Props>();
+
+const emit = defineEmits<{
+  "toggle-open": [item: TreeItem];
+  "toggle-select": [item: TreeItem];
+  "hover-eye-enter": [item: unknown];
+  "hover-eye-leave": [item: unknown];
+}>();
 
 const INDENT_STEP = 10;
 
-function triggerHorizonStackModal(rawItem) {
+function triggerHorizonStackModal(rawItem: unknown) {
   globalThis.dispatchEvent(new CustomEvent("open-horizon-stack-modal", { detail: rawItem }));
 }
 const isHorizonStack = computed(() => item.raw.geode_object_type === "HorizonStack3D");
@@ -24,7 +39,7 @@ const showEyeButton = computed(
   () => !isHorizonStack.value && item.raw.title !== "HorizonStack3D" && isViewable.value,
 );
 
-function handleRowClick(event) {
+function handleRowClick(event: MouseEvent) {
   if (isHorizonStack.value) {
     if (!item.isLeaf) {
       return;

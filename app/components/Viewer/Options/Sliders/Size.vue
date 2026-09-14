@@ -1,7 +1,7 @@
-<script setup>
-import Slider from "./Slider";
+<script setup lang="ts">
+import Slider from "./Slider.vue";
 
-const size = defineModel({ type: Number });
+const size = defineModel<number>();
 </script>
 
 <template>

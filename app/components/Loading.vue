@@ -1,17 +1,13 @@
-<script setup>
+<script setup lang="ts">
 import { Status } from "@ogw_front/utils/status";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
-const { logo, appName } = defineProps({
-  logo: {
-    type: String,
-    default: "",
-  },
-  appName: {
-    type: String,
-    required: true,
-  },
-});
+interface Props {
+  logo?: string;
+  appName: string;
+}
+
+const { logo = "", appName } = defineProps<Props>();
 
 const infraStore = useInfraStore();
 
@@ -22,7 +18,7 @@ const extensionStores = computed(() =>
 const show = ref(false);
 const progress = ref(0);
 
-let progressInterval = undefined;
+let progressInterval: ReturnType<typeof setInterval> | undefined = undefined;
 
 const PROGRESS_THRESHOLD = 90;
 const MAX_PROGRESS = 99;

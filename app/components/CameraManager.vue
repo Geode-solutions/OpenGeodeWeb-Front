@@ -1,15 +1,25 @@
-<script setup>
-import List from "@ogw_front/components/CameraManager/List";
-import Saver from "@ogw_front/components/CameraManager/Saver";
-import ToolPanel from "@ogw_front/components/ToolPanel";
+<script setup lang="ts">
+import List from "@ogw_front/components/CameraManager/List.vue";
+import Saver from "@ogw_front/components/CameraManager/Saver.vue";
+import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 
-const emit = defineEmits(["close"]);
+const DEFAULT_PANEL_WIDTH = 260;
 
-const { showDialog, width, escapeFunction } = defineProps({
-  showDialog: { type: Boolean, required: true },
-  width: { type: Number, required: false, default: 260 },
-  escapeFunction: { type: Function, default: undefined },
-});
+const emit = defineEmits<{
+  close: [];
+}>();
+
+interface Props {
+  showDialog: boolean;
+  width?: number;
+  escapeFunction?: () => void;
+}
+
+const {
+  showDialog,
+  width = DEFAULT_PANEL_WIDTH,
+  escapeFunction = undefined,
+} = defineProps<Props>();
 
 function handleClose() {
   if (escapeFunction) {

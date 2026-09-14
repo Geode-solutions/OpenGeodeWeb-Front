@@ -1,23 +1,40 @@
-<script setup>
+<script setup lang="ts">
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
 import { middleTruncate } from "@ogw_front/utils/string";
 import { useClipboard } from "@vueuse/core";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useResponsiveMiddleTruncate } from "@ogw_front/composables/responsive_middle_truncate";
+import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 
 const feedbackStore = useFeedbackStore();
 const { copy } = useClipboard();
 
-const { item, isLeaf } = defineProps({
-  item: { type: Object, required: true },
-  isLeaf: { type: Boolean, required: false, default: undefined },
-});
+interface Props {
+  item: DisplayItem;
+  isLeaf?: boolean;
+}
 
-const emit = defineEmits(["contextmenu", "mouseenter", "mouseleave"]);
+const { item, isLeaf } = defineProps<Props>();
+
+const emit = defineEmits<{
+  contextmenu: [event: MouseEvent];
+  mouseenter: [];
+  mouseleave: [];
+}>();
 
 const labelContainer = useTemplateRef("label-container");
 const { width: containerWidth } = useElementSize(labelContainer);
 
-const actualItem = computed(() => item.raw || item);
+// The item prop can be either a DisplayItem wrapper (with a `.raw` domain object) or the domain object itself when this component is used outside CommonTreeView's slot machinery; the domain object always carries an id/title at runtime.
+interface LabeledItem {
+  id: string;
+  title?: string;
+  is_active?: boolean;
+  children?: unknown[];
+}
+
+const actualItem = computed(() => (item.raw || item) as unknown as LabeledItem);
 
 const TOOLTIP_NAME_MAX_LENGTH = 40;
 const TOOLTIP_NAME_START_CHARS = 10;
@@ -41,7 +58,7 @@ const tooltipDisabled = computed(() => {
   return actualItem.value.children && actualItem.value.children.length > 0;
 });
 
-async function copyToClipboard(text, label) {
+async function copyToClipboard(text: string, label: string) {
   await copy(text);
   feedbackStore.add_success(`${label} copied to clipboard`);
 }

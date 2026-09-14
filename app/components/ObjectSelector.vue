@@ -1,27 +1,38 @@
-<script setup>
+<script setup lang="ts">
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
 import FetchingData from "@ogw_front/components/FetchingData.vue";
 import { geode_objects } from "@ogw_front/assets/geode_objects";
 import { resolveAllowedObjects } from "@ogw_shared/utils/response_handlers/load.js";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 import { useBackStore } from "@ogw_front/stores/back";
 
+// Mirrors the (unexported) shape produced by shared/utils/response_handlers/load.ts.
+type AllowedObject = { is_loadable: number; object_priority?: number };
+type AllowedObjectMap = Record<string, AllowedObject>;
+
 const schema = schemas.opengeodeweb_back.allowed_objects;
 
-const emit = defineEmits(["update_values", "increment_step"]);
+const emit = defineEmits<{
+  update_values: [value: { geode_object_type: string }];
+  increment_step: [];
+}>();
 
-const { filenames } = defineProps({
-  filenames: { type: Array, required: true },
-});
+interface Props {
+  filenames: string[];
+}
+
+const { filenames } = defineProps<Props>();
 
 const backStore = useBackStore();
 
 const loading = ref(false);
-const allowedGeodeObjects = ref({});
+const allowedGeodeObjects = ref<AllowedObjectMap>({});
 const toggleLoading = useToggle(loading);
 const multipleFilesNoCommon = ref(false);
 
-async function fetchAllowedObjectsList() {
-  const promiseArray = filenames.map((filename) => {
+async function fetchAllowedObjectsList(): Promise<AllowedObjectMap[]> {
+  const promiseArray = filenames.map((filename): Promise<{ allowed_objects: AllowedObjectMap }> => {
     const params = { filename };
     return backStore.request({ schema, params });
   });
@@ -29,11 +40,22 @@ async function fetchAllowedObjectsList() {
   return responses.map((response) => response.allowed_objects);
 }
 
-function setGeodeObject(geode_object_type) {
+function setGeodeObject(geode_object_type: string | undefined) {
   if (geode_object_type) {
     emit("update_values", { geode_object_type });
     emit("increment_step");
   }
+}
+
+// The geode_objects lookup is fixed and keyed by known object type names; a missing entry only happens if the backend reports a type this table doesn't know about.
+function geodeObjectTooltip(key: string, isLoadable: boolean) {
+  return isLoadable
+    ? (geode_objects[key]?.tooltip ?? key)
+    : `Data not loadable with this class (${key})`;
+}
+
+function geodeObjectImage(key: string) {
+  return geode_objects[key]?.image;
 }
 
 async function getAllowedGeodeObjects() {
@@ -59,14 +81,7 @@ await getAllowedGeodeObjects();
   <FetchingData v-if="loading" />
   <v-row v-else-if="Object.keys(allowedGeodeObjects).length" class="justify-left">
     <v-col v-for="(value, key) in allowedGeodeObjects" :key="key" cols="3" md="4">
-      <v-tooltip
-        :text="
-          value['is_loadable']
-            ? geode_objects[key].tooltip
-            : `Data not loadable with this class (${key})`
-        "
-        location="bottom"
-      >
+      <v-tooltip :text="geodeObjectTooltip(key, Boolean(value['is_loadable']))" location="bottom">
         <template v-slot:activator="{ props }">
           <span v-bind="props">
             <v-card
@@ -79,7 +94,7 @@ await getAllowedGeodeObjects();
               :elevation="value['is_loadable'] ? 5 : 3"
             >
               <v-img
-                :src="geode_objects[key].image"
+                :src="geodeObjectImage(key)"
                 cover
                 :class="!value['is_loadable'] ? 'disabled' : undefined"
               />

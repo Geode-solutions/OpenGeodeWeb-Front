@@ -1,17 +1,19 @@
-<script setup>
+<script setup lang="ts">
 import AttributeRangeSelector from "@ogw_front/components/Viewer/Options/AttributeRangeSelector.vue";
 import ColorMapList from "@ogw_front/components/Viewer/Options/ColorMapList.vue";
 
 import { getPresetsWithCurrentAtTop } from "@ogw_front/utils/colormap";
 import { useGlobalAttributeStyle } from "@ogw_front/composables/global_attribute_style";
 
-const { dataId, x, y } = defineProps({
-  dataId: { required: false, type: String, default: undefined },
-  x: { required: true, type: Number },
-  y: { required: true, type: Number },
-});
+interface Props {
+  dataId?: string;
+  x: number;
+  y: number;
+}
 
-const show = defineModel("show", { type: Boolean, default: false });
+const { dataId = undefined, x, y } = defineProps<Props>();
+
+const show = defineModel<boolean>("show", { default: false });
 
 const dataIdRef = computed(() => dataId);
 const { currentColormap, currentRange, applyGlobalColormap, resetGlobalRange } =
@@ -33,7 +35,7 @@ const maximum = computed({
 
 const quickColormapPresets = computed(() => getPresetsWithCurrentAtTop(currentColormap.value));
 
-async function onQuickColormapSelect(preset) {
+async function onQuickColormapSelect(preset: { Name: string }) {
   await applyGlobalColormap(preset.Name);
 }
 </script>

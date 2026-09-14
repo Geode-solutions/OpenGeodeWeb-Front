@@ -1,0 +1,76 @@
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
+// Third party imports
+import * as components from "vuetify/components";
+import { describe, expect, test } from "vitest";
+import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime";
+import { flushPromises } from "@vue/test-utils";
+import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import type { HTTPMethod } from "h3";
+
+// Local imports
+import { setupActivePinia, vuetify } from "@ogw_tests/utils";
+import FileUploader from "@ogw_front/components/FileUploader.vue";
+import { useBackStore } from "@ogw_front/stores/back";
+
+const FIRST_INDEX = 0;
+const SECOND_INDEX = 1;
+
+const upload_file_schema = schemas.opengeodeweb_back.upload_file;
+
+describe("file uploader", () => {
+  const pinia = setupActivePinia();
+  const backStore = useBackStore();
+  (backStore as { base_url: string }).base_url = "/";
+
+  registerEndpoint(upload_file_schema.$id, {
+    method: upload_file_schema.methods[FIRST_INDEX] as HTTPMethod,
+    handler: () => ({}),
+  });
+  registerEndpoint(upload_file_schema.$id, {
+    method: upload_file_schema.methods[SECOND_INDEX] as HTTPMethod,
+    handler: () => ({}),
+  });
+
+  const files = [new File(["fake_file"], "fake_file.txt")];
+
+  describe("upload file", () => {
+    test("prop autoUpload false", async () => {
+      const wrapper = await mountSuspended(FileUploader, {
+        global: {
+          plugins: [vuetify, pinia],
+        },
+        props: { multiple: false, accept: "*.txt", autoUpload: false },
+      });
+
+      const v_file_input = wrapper.find('input[type="file"]');
+      Object.defineProperty(v_file_input.element, "files", {
+        value: files,
+        writable: true,
+      });
+      await v_file_input.trigger("change");
+      await flushPromises();
+      const v_btn = wrapper.findComponent(components.VBtn);
+
+      await v_btn.trigger("click");
+      await flushPromises();
+      await flushPromises();
+      expect(
+        wrapper.emitted<unknown[]>().files_uploaded?.[FIRST_INDEX]?.[FIRST_INDEX],
+      ).toStrictEqual(files);
+    });
+
+    test(`prop autoUpload true`, async () => {
+      const wrapper = await mountSuspended(FileUploader, {
+        global: {
+          plugins: [vuetify, pinia],
+        },
+        props: { multiple: false, accept: "*.txt", files, autoUpload: true },
+      });
+      await flushPromises();
+      expect(
+        wrapper.emitted<unknown[]>().files_uploaded?.[FIRST_INDEX]?.[FIRST_INDEX],
+      ).toStrictEqual(files);
+    });
+  });
+});

@@ -1,0 +1,365 @@
+// Only ever fires now that tests are .ts; asks every bare `vi.fn()` mock to carry an explicit call-signature type parameter. Real value for a handful of mocks, but for the many plain mock objects across this test suite it would mean guessing a signature that's already implied by how the mock is used (risking a type that quietly doesn't match, which defeats the point) rather than deriving it from each real function - left off rather than doing that at scale.
+// oxlint-disable vitest/require-mock-type-parameters, eslint/max-lines
+// oxlint-disable vitest/expect-expect
+// oxlint-disable jest/prefer-ending-with-an-expect
+
+// Third party imports
+import { beforeEach, describe, expect, test, vi } from "vitest";
+
+import { exportProject, importProject } from "@ogw_front/composables/project_manager";
+import { appMode } from "@ogw_shared/app_mode";
+import { setupActivePinia } from "@ogw_tests/utils";
+
+import { $fetch } from "ofetch";
+
+vi.mock(
+  import("ofetch"),
+  () =>
+    ({
+      $fetch: vi.fn(),
+    }) as any,
+);
+
+const mockedFetch = vi.mocked($fetch);
+
+// Constants
+const PANEL_WIDTH = 300;
+const Z_SCALE = 1.5;
+const FOCAL_POINT1 = 1;
+const FOCAL_POINT2 = 2;
+const FOCAL_POINT3 = 3;
+const FOCAL_POINT = [FOCAL_POINT1, FOCAL_POINT2, FOCAL_POINT3];
+const VIEW_UP1 = 0;
+const VIEW_UP2 = 1;
+const VIEW_UP3 = 0;
+const VIEW_UP = [VIEW_UP1, VIEW_UP2, VIEW_UP3];
+const POSITION1 = 10;
+const POSITION2 = 11;
+const POSITION3 = 12;
+const POSITION = [POSITION1, POSITION2, POSITION3];
+const VIEW_ANGLE = 30;
+const CLIPPING_RANGE1 = 0.1;
+const CLIPPING_RANGE2 = 1000;
+const CLIPPING_RANGE = [CLIPPING_RANGE1, CLIPPING_RANGE2];
+const POINT_SIZE = 2;
+const VIEWER_CALL_COUNT = 1;
+
+// Snapshot
+const snapshotMock = {
+  data: {
+    items: [
+      {
+        id: "abc123",
+        viewer_type: "mesh",
+        geode_object_type: "PointSet2D",
+        native_file: "native.ext",
+        viewable_file: "viewable.ext",
+        name: "My Data",
+        binary_light_viewable: "VGxpZ2h0RGF0YQ==",
+      },
+    ],
+  },
+  treeview: {
+    isAdditionnalTreeDisplayed: false,
+    panelWidth: PANEL_WIDTH,
+    model_id: "",
+    isTreeCollection: false,
+    selectedTree: undefined,
+    selectionIds: [],
+  },
+  dataStyle: {
+    styles: {
+      abc123: {
+        points: {
+          visibility: true,
+          coloring: {
+            active: "color",
+            color: { red: 255, green: 255, blue: 255, alpha: 1 },
+            vertex: undefined,
+          },
+          size: POINT_SIZE,
+        },
+      },
+    },
+  },
+  hybridViewer: {
+    zScale: Z_SCALE,
+    camera_options: {
+      focal_point: FOCAL_POINT,
+      view_up: VIEW_UP,
+      position: POSITION,
+      view_angle: VIEW_ANGLE,
+      clipping_range: CLIPPING_RANGE,
+    },
+  },
+};
+
+const backStoreMock = {
+  start_request: vi.fn(),
+  stop_request: vi.fn(),
+  base_url: vi.fn(() => ""),
+  $reset: vi.fn(),
+};
+const infraStoreMock = {
+  app_mode: appMode.BROWSER,
+};
+const viewerStoreMock = {
+  ws_connect: vi.fn().mockResolvedValue(undefined),
+  base_url: vi.fn(() => ""),
+  request: vi.fn().mockResolvedValue(undefined),
+};
+const treeviewStoreMock = {
+  clear: vi.fn(),
+  importStores: vi.fn().mockResolvedValue(undefined),
+  finalizeImportSelection: vi.fn(),
+  addItem: vi.fn().mockResolvedValue(undefined),
+};
+const dataStoreMock = {
+  clear: vi.fn(),
+  registerObject: vi.fn().mockResolvedValue(undefined),
+  addItem: vi.fn().mockResolvedValue(undefined),
+  importStores: vi.fn().mockResolvedValue(undefined),
+  isItemViewable: vi.fn().mockReturnValue(true),
+};
+const dataStyleStoreMock = {
+  importStores: vi.fn().mockResolvedValue(undefined),
+  applyAllStylesFromState: vi.fn().mockResolvedValue(undefined),
+  addDataStyle: vi.fn().mockResolvedValue(undefined),
+  applyDefaultStyle: vi.fn().mockResolvedValue(undefined),
+};
+const feedbackStoreMock = {
+  add_success: vi.fn(),
+  add_error: vi.fn(),
+};
+
+const viewer_call_mock_fn = vi.fn().mockResolvedValue(undefined);
+
+interface HybridViewerSnapshot {
+  zScale?: number;
+  camera_options?: Record<string, unknown>;
+}
+
+const hybridViewerStoreMock = {
+  clear: vi.fn(),
+  initHybridViewer: vi.fn().mockResolvedValue(undefined),
+  importStores: vi.fn((snapshot?: HybridViewerSnapshot) => {
+    if (snapshot?.zScale !== undefined) {
+      hybridViewerStoreMock.setZScaling(snapshot.zScale);
+    }
+    if (snapshot?.camera_options) {
+      viewer_call_mock_fn({
+        schema: { $id: "opengeodeweb_viewer.viewer.update_camera" },
+        params: { camera_options: snapshot.camera_options },
+      });
+      hybridViewerStoreMock.remoteRender();
+    }
+  }),
+  addItem: vi.fn().mockResolvedValue(undefined),
+  remoteRender: vi.fn(),
+  setZScaling: vi.fn(),
+};
+
+// MOCKS
+mockedFetch.mockImplementation(((
+  _route: unknown,
+  // oxlint-disable-next-line eslint/id-length -- mirrors the real ofetch/vitest API field name (`ok`/`fn`)
+  options: { onResponse?: (context: { response: { ok: boolean; _data: unknown } }) => void },
+) => {
+  const data = { snapshot: snapshotMock };
+  // oxlint-disable-next-line eslint/id-length
+  options.onResponse?.({ response: { ok: true, _data: data } });
+  return Promise.resolve(data);
+}) as unknown as typeof $fetch);
+vi.mock(import("@ogw_internal/utils/viewer_call"), () => ({
+  viewer_call: viewer_call_mock_fn,
+}));
+
+interface ApiFetchOptions {
+  response_function?: (response: unknown) => Promise<void> | void;
+}
+
+vi.mock(
+  import("@ogw_internal/utils/api_fetch"),
+  () =>
+    ({
+      api_fetch: vi.fn(async (_req: unknown, options: ApiFetchOptions = {}) => {
+        const response = {
+          _data: new Blob(["zipcontent"], { type: "application/zip" }),
+          headers: {
+            get: (k: string) => (k === "new-file-name" ? "project_123.vease" : undefined),
+          },
+        };
+        if (options.response_function) {
+          await options.response_function(response);
+        }
+        return response;
+      }),
+    }) as any,
+);
+vi.mock(import("js-file-download"), () => ({ default: vi.fn() }));
+vi.mock(
+  import("@ogw_front/stores/infra"),
+  () =>
+    ({
+      useInfraStore: () => infraStoreMock,
+    }) as any,
+);
+vi.mock(
+  import("@ogw_front/stores/viewer"),
+  () =>
+    ({
+      useViewerStore: () => viewerStoreMock,
+    }) as any,
+);
+vi.mock(
+  import("@ogw_front/stores/treeview"),
+  () =>
+    ({
+      useTreeviewStore: () => treeviewStoreMock,
+    }) as any,
+);
+vi.mock(
+  import("@ogw_front/stores/data"),
+  () =>
+    ({
+      useDataStore: () => dataStoreMock,
+    }) as any,
+);
+vi.mock(
+  import("@ogw_front/stores/data_style"),
+  () =>
+    ({
+      useDataStyleStore: () => dataStyleStoreMock,
+    }) as any,
+);
+vi.mock(
+  import("@ogw_front/stores/hybrid_viewer"),
+  () =>
+    ({
+      useHybridViewerStore: () => hybridViewerStoreMock,
+    }) as any,
+);
+vi.mock(
+  import("@ogw_front/stores/back"),
+  () =>
+    ({
+      useBackStore: () => backStoreMock,
+    }) as any,
+);
+vi.mock(
+  import("@ogw_front/stores/feedback"),
+  () =>
+    ({
+      useFeedbackStore: () => feedbackStoreMock,
+    }) as any,
+);
+vi.mock(
+  import("@ogw_front/stores/app"),
+  () =>
+    ({
+      useAppStore: () => ({
+        exportStores: vi.fn(() => ({ projectName: "mockedProject" })),
+      }),
+    }) as any,
+);
+
+vi.stubGlobal("useAppStore", () => ({
+  exportStores: vi.fn(() => ({ projectName: "mockedProject" })),
+}));
+
+const mockLockRequest = vi
+  .fn()
+  .mockImplementation(
+    async (name: string, task: (lock: { name: string }) => unknown) => await task({ name }),
+  );
+
+vi.stubGlobal("navigator", {
+  ...navigator,
+  locks: {
+    request: mockLockRequest,
+  },
+});
+
+function verifyViewerCalls() {
+  expect(viewerStoreMock.ws_connect).toHaveBeenCalledWith();
+  expect(viewer_call_mock_fn).toHaveBeenCalledTimes(VIEWER_CALL_COUNT);
+}
+
+function verifyStoreImports() {
+  expect(treeviewStoreMock.importStores).toHaveBeenCalledWith(snapshotMock.treeview);
+  expect(dataStoreMock.importStores).toHaveBeenCalledWith(snapshotMock.data);
+  expect(hybridViewerStoreMock.initHybridViewer).toHaveBeenCalledWith();
+  expect(hybridViewerStoreMock.importStores).toHaveBeenCalledWith(snapshotMock.hybridViewer);
+  expect(hybridViewerStoreMock.setZScaling).toHaveBeenCalledWith(Z_SCALE);
+}
+
+function verifyDataManagement() {
+  expect(dataStyleStoreMock.importStores).toHaveBeenCalledWith(snapshotMock.dataStyle);
+  expect(dataStyleStoreMock.applyAllStylesFromState).toHaveBeenCalledWith();
+  expect(dataStoreMock.registerObject).toHaveBeenCalledWith("abc123", "My Data");
+  expect(dataStoreMock.addItem).toHaveBeenCalledWith(snapshotMock.data.items[0]);
+  expect(treeviewStoreMock.addItem).toHaveBeenCalledWith("PointSet2D", "My Data", "abc123", "mesh");
+}
+
+function verifyRemaining() {
+  expect(hybridViewerStoreMock.addItem).toHaveBeenCalledWith("abc123");
+  expect(dataStyleStoreMock.addDataStyle).toHaveBeenCalledWith("abc123", "PointSet2D");
+  expect(dataStyleStoreMock.applyDefaultStyle).toHaveBeenCalledWith("abc123");
+  expect(hybridViewerStoreMock.remoteRender).toHaveBeenCalledWith();
+  expect(feedbackStoreMock.add_success).toHaveBeenCalledWith("Project imported successfully");
+}
+
+describe("projectManager composable (compact)", () => {
+  beforeEach(() => {
+    setupActivePinia();
+    // oxlint-disable-next-line eslint/id-length -- mirrors the real ofetch/vitest API field name (`ok`/`fn`)
+    const storesList: Record<string, ReturnType<typeof vi.fn>>[] = [
+      viewerStoreMock,
+      treeviewStoreMock,
+      dataStoreMock,
+      dataStyleStoreMock,
+      hybridViewerStoreMock,
+      feedbackStoreMock,
+    ];
+    for (const store of storesList) {
+      const values = Object.values(store);
+      for (const value of values) {
+        if (typeof value === "function" && value.mockClear) {
+          value.mockClear();
+        }
+      }
+    }
+    viewer_call_mock_fn.mockClear();
+  });
+
+  test("exportProject", async () => {
+    const { default: fileDownload } = await import("js-file-download");
+
+    await exportProject();
+
+    expect(fileDownload).toHaveBeenCalledWith({ snapshot: snapshotMock }, "project.vease");
+    expect(feedbackStoreMock.add_success).toHaveBeenCalledWith("Project exported successfully");
+  });
+
+  test("importProjectFile with snapshot - Viewer and Stores", async () => {
+    const file = new File(['{"dataBase":{"db":{}}}'], "project.vease", {
+      type: "application/json",
+    });
+
+    await importProject(file);
+
+    verifyViewerCalls();
+    verifyStoreImports();
+  });
+
+  test("importProjectFile with snapshot - Data and Rendering", async () => {
+    const file = new File(['{"dataBase":{"db":{}}}'], "project.vease", {
+      type: "application/json",
+    });
+
+    await importProject(file);
+
+    verifyDataManagement();
+    verifyRemaining();
+  });
+});
