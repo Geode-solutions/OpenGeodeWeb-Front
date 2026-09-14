@@ -219,8 +219,9 @@ function expandAll() {
           <v-btn
             v-if="isModel(item as unknown as TreeGroupItem)"
             data-testid="expandModelComponentsButton"
-            icon="mdi-magnify-expand"
+            icon
             size="medium"
+            style="height: 23px; width: 23px"
             class="ml-2"
             variant="text"
             v-tooltip="'Model\'s mesh components'"
@@ -232,7 +233,9 @@ function expandAll() {
                 'model_components',
               )
             "
-          />
+          >
+            <v-icon size="18">mdi-magnify-expand</v-icon>
+          </v-btn>
           <v-btn
             v-if="isModel(item as unknown as TreeGroupItem) && hasCollectionsMap[item.id as string]"
             data-testid="expandModelCollectionsButton"
