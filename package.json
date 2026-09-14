@@ -22,6 +22,17 @@
     ".": "./nuxt.config.ts",
     "./*": "./*"
   },
+  "files": [
+    "app",
+    "internal",
+    "server",
+    "shared",
+    "nuxt.config.ts",
+    "opengeodeweb_front_schemas.json",
+    "COPYLEFT",
+    "LICENSE",
+    "README.md"
+  ],
   "publishConfig": {
     "access": "public"
   },
