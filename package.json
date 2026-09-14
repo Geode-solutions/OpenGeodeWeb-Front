@@ -23,6 +23,7 @@
     "shared",
     "nuxt.config.ts",
     "opengeodeweb_front_schemas.json",
+    "opengeodeweb_front_schemas.js",
     "COPYLEFT",
     "LICENSE",
     "README.md"
