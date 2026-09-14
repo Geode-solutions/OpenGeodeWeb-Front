@@ -5,10 +5,7 @@ import { promises as fs } from "node:fs";
 import { createError, defineEventHandler, readBody } from "h3";
 
 // Local imports
-import {
-  registerExtensionFile,
-  targetExtensionFilePath,
-} from "@ogw_server/utils/app_config";
+import { registerExtensionFile, targetExtensionFilePath } from "@ogw_server/utils/app_config";
 
 interface DownloadExtensionBody {
   projectName: string;

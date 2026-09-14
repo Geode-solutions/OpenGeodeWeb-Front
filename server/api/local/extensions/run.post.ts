@@ -5,18 +5,9 @@ import fs from "node:fs";
 import { createError, defineEventHandler, readBody } from "h3";
 
 // Local imports
-import {
-  addMicroserviceMetadatas,
-  runBack,
-} from "@ogw_server/utils/microservices";
-import {
-  extensionBackendPath,
-  extensionFolderPath,
-} from "@ogw_server/utils/path";
-import {
-  readExtensionFrontend,
-  readExtensionMetadata,
-} from "@ogw_server/utils/extension";
+import { addMicroserviceMetadatas, runBack } from "@ogw_server/utils/microservices";
+import { extensionBackendPath, extensionFolderPath } from "@ogw_server/utils/path";
+import { readExtensionFrontend, readExtensionMetadata } from "@ogw_server/utils/extension";
 import { extensionsConf } from "@ogw_server/utils/app_config";
 import { unzipFile } from "@ogw_server/utils/server";
 

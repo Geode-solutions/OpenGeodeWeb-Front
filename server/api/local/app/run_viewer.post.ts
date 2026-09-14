@@ -4,10 +4,7 @@
 import { createError, defineEventHandler, readBody } from "h3";
 
 // Local imports
-import {
-  addMicroserviceMetadatas,
-  runViewer,
-} from "@ogw_server/utils/microservices";
+import { addMicroserviceMetadatas, runViewer } from "@ogw_server/utils/microservices";
 
 interface RunViewerBody {
   COMMAND_VIEWER: string;

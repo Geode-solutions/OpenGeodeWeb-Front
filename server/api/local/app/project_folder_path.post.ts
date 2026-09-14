@@ -4,10 +4,7 @@
 import { createError, defineEventHandler, readBody } from "h3";
 
 // Local imports
-import {
-  createPath,
-  generateProjectFolderPath,
-} from "@ogw_server/utils/path";
+import { createPath, generateProjectFolderPath } from "@ogw_server/utils/path";
 
 interface ProjectFolderPathBody {
   PROJECT: string;

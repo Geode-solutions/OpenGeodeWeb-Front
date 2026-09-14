@@ -4,10 +4,7 @@
 import { createError, defineEventHandler, readBody } from "h3";
 
 // Local imports
-import {
-  addMicroserviceMetadatas,
-  runBack,
-} from "@ogw_server/utils/microservices";
+import { addMicroserviceMetadatas, runBack } from "@ogw_server/utils/microservices";
 
 interface RunBackBody {
   COMMAND_BACK: string;

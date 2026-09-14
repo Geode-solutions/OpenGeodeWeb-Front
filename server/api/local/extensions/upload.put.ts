@@ -12,10 +12,7 @@ import { createError, defineEventHandler, getRequestHeaders, getRequestWebStream
 import busboy from "busboy";
 
 // Local imports
-import {
-  registerExtensionFile,
-  targetExtensionFilePath,
-} from "@ogw_server/utils/app_config";
+import { registerExtensionFile, targetExtensionFilePath } from "@ogw_server/utils/app_config";
 
 const CODE_201 = 201;
 const BYTES_PER_KIBIBYTE = 1024;
