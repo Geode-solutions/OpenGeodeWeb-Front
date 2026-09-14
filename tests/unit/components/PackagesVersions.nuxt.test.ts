@@ -3,7 +3,7 @@ import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime";
 import type { HTTPMethod } from "h3";
 
 import { setupActivePinia, vuetify } from "@ogw_tests/utils";
-import PackagesVersions from "@ogw_front/components/PackagesVersions.vue";
+import PackagesVersions from "@ogw_front/components/PackagesVersions";
 import { useBackStore } from "@ogw_front/stores/back";
 
 const FIRST_INDEX = 0;

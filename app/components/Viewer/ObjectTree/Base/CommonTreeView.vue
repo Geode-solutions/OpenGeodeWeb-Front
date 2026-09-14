@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import StickyHeader from "@ogw_front/components/Viewer/ObjectTree/Base/StickyHeader.vue";
-import TreeRow from "@ogw_front/components/Viewer/ObjectTree/Base/TreeRow.vue";
+import StickyHeader from "@ogw_front/components/Viewer/ObjectTree/Base/StickyHeader";
+import TreeRow from "@ogw_front/components/Viewer/ObjectTree/Base/TreeRow";
 import { useTreeKeyboardNav } from "@ogw_front/composables/tree_keyboard_nav";
 import { useTreeScroll } from "@ogw_front/composables/tree_scroll";
 import { useVirtualTree } from "@ogw_front/composables/virtual_tree";
@@ -13,7 +13,9 @@ type UnwrapMaybeRefOrGetter<Source> = Source extends () => infer Result
   : Source extends { value: infer Result }
     ? Result
     : Source;
-type VirtualTreeProps = UnwrapMaybeRefOrGetter<Parameters<typeof useVirtualTree>[0]>;
+type VirtualTreeProps = UnwrapMaybeRefOrGetter<
+  Parameters<typeof useVirtualTree>[0]
+>;
 
 interface Props {
   items: unknown[];
@@ -68,13 +70,18 @@ const {
   emit as EmitFn,
 );
 
-const { virtualScrollRef, stickyHeader, handleScroll, scrollToIndex, getScrollInfo } =
-  useTreeScroll(
-    computed(() => ({ scrollTop })),
-    emit as EmitFn,
-    displayItems,
-    actualItemProps,
-  );
+const {
+  virtualScrollRef,
+  stickyHeader,
+  handleScroll,
+  scrollToIndex,
+  getScrollInfo,
+} = useTreeScroll(
+  computed(() => ({ scrollTop })),
+  emit as EmitFn,
+  displayItems,
+  actualItemProps,
+);
 
 const focusedIndex = ref(-1);
 const lastActiveIndex = ref(-1);

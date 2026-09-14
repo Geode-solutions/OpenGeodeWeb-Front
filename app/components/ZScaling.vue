@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ToolPanel from "@ogw_front/components/ToolPanel.vue";
+import ToolPanel from "@ogw_front/components/ToolPanel";
 
 const zScale = defineModel<number>({ default: 1 });
 const show = defineModel<boolean>("show", { default: false });
@@ -11,7 +11,8 @@ interface Props {
   escapeFunction?: () => void;
 }
 
-const { width = DEFAULT_PANEL_WIDTH, escapeFunction = undefined } = defineProps<Props>();
+const { width = DEFAULT_PANEL_WIDTH, escapeFunction = undefined } =
+  defineProps<Props>();
 
 const emit = defineEmits<{
   apply: [];

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Loading from "@ogw_front/components/Loading.vue";
-import Recaptcha from "@ogw_front/components/Recaptcha.vue";
+import Loading from "@ogw_front/components/Loading";
+import Recaptcha from "@ogw_front/components/Recaptcha";
 import { Status } from "@ogw_front/utils/status";
 import { appMode } from "@ogw_shared/app_mode";
 import { useInfraStore } from "@ogw_front/stores/infra";
@@ -12,7 +12,12 @@ interface Props {
   logo?: string;
 }
 
-const { appName, email = undefined, isUserAuthenticated = false, logo = "" } = defineProps<Props>();
+const {
+  appName,
+  email = undefined,
+  isUserAuthenticated = false,
+  logo = "",
+} = defineProps<Props>();
 
 const infraStore = useInfraStore();
 if (infraStore.app_mode !== appMode.CLOUD) {

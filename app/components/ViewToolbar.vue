@@ -2,15 +2,15 @@
 // Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
 // oxlint-disable eslint/sort-imports
 import type { Ref } from "vue";
-import ActionButton from "@ogw_front/components/ActionButton.vue";
+import ActionButton from "@ogw_front/components/ActionButton";
 import CameraBookmarkIcon from "@ogw_front/assets/viewer_svgs/camera-bookmark.svg";
-import CameraManager from "@ogw_front/components/CameraManager.vue";
-import CameraOrientation from "@ogw_front/components/CameraOrientation.vue";
-import ClippingPlanes from "@ogw_front/components/ClippingPlanes.vue";
-import Ruler from "@ogw_front/components/Ruler.vue";
-import Screenshot from "@ogw_front/components/Screenshot.vue";
-import ShrinkFilter from "@ogw_front/components/ShrinkFilter.vue";
-import ZScaling from "@ogw_front/components/ZScaling.vue";
+import CameraManager from "@ogw_front/components/CameraManager";
+import CameraOrientation from "@ogw_front/components/CameraOrientation";
+import ClippingPlanes from "@ogw_front/components/ClippingPlanes";
+import Ruler from "@ogw_front/components/Ruler";
+import Screenshot from "@ogw_front/components/Screenshot";
+import ShrinkFilter from "@ogw_front/components/ShrinkFilter";
+import ZScaling from "@ogw_front/components/ZScaling";
 import { onKeyStroke } from "@vueuse/core";
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -53,7 +53,9 @@ async function handleZScalingClose() {
 }
 
 onKeyStroke("Escape", () => {
-  const openMenuKeys = Object.keys(openSubMenus.value).filter((key) => openSubMenus.value[key]);
+  const openMenuKeys = Object.keys(openSubMenus.value).filter(
+    (key) => openSubMenus.value[key],
+  );
   if (openMenuKeys.length > 0) {
     for (const key of openMenuKeys) {
       openSubMenus.value[key] = false;
@@ -235,8 +237,15 @@ const camera_options = computed<CameraOptionAction[]>(() => [
 </script>
 
 <template>
-  <v-container :class="[$style.floatToolbar, 'pa-0', 'view-toolbar']" width="auto">
-    <v-row v-for="camera_option in camera_options" :key="camera_option.testId" dense>
+  <v-container
+    :class="[$style.floatToolbar, 'pa-0', 'view-toolbar']"
+    width="auto"
+  >
+    <v-row
+      v-for="camera_option in camera_options"
+      :key="camera_option.testId"
+      dense
+    >
       <v-col>
         <v-menu
           v-if="camera_option.menu && !camera_option.action"
@@ -294,8 +303,14 @@ const camera_options = computed<CameraOptionAction[]>(() => [
     panel
     @select="hybridViewerStore.setCameraOrientation"
   />
-  <Screenshot v-model="showScreenshot" :escapeFunction="() => (showScreenshot = false)" />
-  <CameraManager :showDialog="showCameraManager" @close="showCameraManager = false" />
+  <Screenshot
+    v-model="showScreenshot"
+    :escapeFunction="() => (showScreenshot = false)"
+  />
+  <CameraManager
+    :showDialog="showCameraManager"
+    @close="showCameraManager = false"
+  />
   <ZScaling
     v-model:show="showZScaling"
     v-model="zScale"

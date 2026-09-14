@@ -1,9 +1,9 @@
 <script setup lang="ts">
 // Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
 // oxlint-disable eslint/sort-imports
-import CenterButton from "@ogw_front/components/Viewer/ContextMenu/CenterButton.vue";
-import CircularItems from "@ogw_front/components/Viewer/ContextMenu/CircularItems.vue";
-import InfoCard from "@ogw_front/components/Viewer/ContextMenu/InfoCard.vue";
+import CenterButton from "@ogw_front/components/Viewer/ContextMenu/CenterButton";
+import CircularItems from "@ogw_front/components/Viewer/ContextMenu/CircularItems";
+import InfoCard from "@ogw_front/components/Viewer/ContextMenu/InfoCard";
 import { useEventListener } from "@vueuse/core";
 import { useMenuStore } from "@ogw_front/stores/menu";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
@@ -119,7 +119,9 @@ watch(
 const menuItemCount = computed(() => menu_items.value.length);
 
 const isOverTreeview = computed(() => {
-  const hasAdditional = treeviewStore.opened_views.some((view) => view.id !== "main");
+  const hasAdditional = treeviewStore.opened_views.some(
+    (view) => view.id !== "main",
+  );
   const hasMain = treeviewStore.opened_views.some((view) => view.id === "main");
   const firstColWidth = hasMain ? treeviewStore.panelWidth : 0;
   const secondColWidth = hasAdditional ? treeviewStore.additionalPanelWidth : 0;

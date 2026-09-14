@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import GlassCard from "@ogw_front/components/GlassCard.vue";
+import GlassCard from "@ogw_front/components/GlassCard";
 
 const DEFAULT_PANEL_WIDTH = 260;
 

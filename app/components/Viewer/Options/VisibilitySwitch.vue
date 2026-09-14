@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import BasicSwitch from "@ogw_front/components/Basic/Switch.vue";
+import BasicSwitch from "@ogw_front/components/Basic/Switch";
 
 const visibility = defineModel<boolean>();
 </script>

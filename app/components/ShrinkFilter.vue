@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ToolPanel from "@ogw_front/components/ToolPanel.vue";
+import ToolPanel from "@ogw_front/components/ToolPanel";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDebounceFn } from "@vueuse/core";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -87,7 +87,10 @@ watch(allItems, () => {
 });
 
 watch(
-  () => Object.values(hybridViewerStore.hybridDb).filter((entry) => entry && entry.actor).length,
+  () =>
+    Object.values(hybridViewerStore.hybridDb).filter(
+      (entry) => entry && entry.actor,
+    ).length,
   (actorCount) => {
     if (show.value && actorCount > 0) {
       applyShrink();
@@ -104,7 +107,9 @@ watch(
     :click-outside="false"
     :escapeFunction="escapeFunction"
   >
-    <v-card-text class="pa-3 max-panel-height overflow-y-auto overflow-x-hidden">
+    <v-card-text
+      class="pa-3 max-panel-height overflow-y-auto overflow-x-hidden"
+    >
       <v-switch
         v-model="targetAllVisible"
         data-testid="shrinkTargetAllVisibleSwitch"

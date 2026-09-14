@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Ref } from "vue";
-import Step from "@ogw_front/components/Step.vue";
+import Step from "@ogw_front/components/Step";
 import type { useStepperTree } from "@ogw_front/composables/stepper_tree";
 
 const emit = defineEmits<{
@@ -24,10 +24,16 @@ const { steps, current_step_index } = toRefs(state) as unknown as {
   <v-card-item class="flex-shrink-0 pa-0">
     <div class="px-8 pt-8 pb-4">
       <div class="d-flex align-center mb-2">
-        <v-icon icon="mdi-file-upload-outline" class="mr-3 title-text" size="32" />
+        <v-icon
+          icon="mdi-file-upload-outline"
+          class="mr-3 title-text"
+          size="32"
+        />
         <h2 class="title-text">Import Data</h2>
       </div>
-      <p class="text-white text-body-1">Select and configure your files for a seamless import.</p>
+      <p class="text-white text-body-1">
+        Select and configure your files for a seamless import.
+      </p>
     </div>
   </v-card-item>
 

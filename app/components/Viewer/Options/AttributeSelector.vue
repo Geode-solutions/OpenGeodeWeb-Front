@@ -2,8 +2,8 @@
 // Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
 // oxlint-disable eslint/sort-imports
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
-import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar.vue";
-import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
+import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar";
+import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker";
 import { getAttributeRange } from "@ogw_front/utils/attributes";
 import { useBackStore } from "@ogw_front/stores/back";
 import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
@@ -14,7 +14,9 @@ const attributeName = defineModel<string>("attributeName");
 const attributeItem = defineModel<number>("attributeItem");
 const attributeRange = defineModel<(number | undefined)[]>("attributeRange");
 const attributeColorMap = defineModel<string>("attributeColorMap");
-const attributeNoDataColor = defineModel<typeof DEFAULT_NO_DATA_COLOR>("attributeNoDataColor");
+const attributeNoDataColor = defineModel<typeof DEFAULT_NO_DATA_COLOR>(
+  "attributeNoDataColor",
+);
 
 interface Props {
   id: string;
@@ -37,7 +39,8 @@ const currentAttribute = computed(() =>
   attributes.value.find((attr) => attr.attribute_name === attributeName.value),
 );
 const cssNoDataColor = computed(() => {
-  const { red, green, blue, alpha } = attributeNoDataColor.value ?? DEFAULT_NO_DATA_COLOR;
+  const { red, green, blue, alpha } =
+    attributeNoDataColor.value ?? DEFAULT_NO_DATA_COLOR;
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 });
 const rangeMin = computed<number | undefined>({
@@ -81,10 +84,13 @@ const componentItems = computed(() => {
   if (!currentAttribute.value) {
     return [];
   }
-  return Array.from({ length: currentAttribute.value.nb_items }, (_, index) => ({
-    title: `Item ${index + 1}`,
-    value: index,
-  }));
+  return Array.from(
+    { length: currentAttribute.value.nb_items },
+    (_, index) => ({
+      title: `Item ${index + 1}`,
+      value: index,
+    }),
+  );
 });
 
 function resetRange() {
@@ -94,7 +100,9 @@ function resetRange() {
     // AttributeInfo's index signature covers its optional min/max fields at
     // Runtime (they come from the same backend attribute response shape).
     const { min, max } = getAttributeRange(
-      currentAttribute.value as unknown as Parameters<typeof getAttributeRange>[0],
+      currentAttribute.value as unknown as Parameters<
+        typeof getAttributeRange
+      >[0],
       comp,
     );
     attributeRange.value = [min, max];
@@ -106,7 +114,9 @@ function hasSelectedComponent(components: unknown) {
 }
 
 function getAttributes() {
-  const schemaProperties = schema.properties as Record<string, unknown> | undefined;
+  const schemaProperties = schema.properties as
+    | Record<string, unknown>
+    | undefined;
   const requiresComponent = schemaProperties?.component_ids !== undefined;
   if (requiresComponent && !hasSelectedComponent(componentIds)) {
     return;
@@ -121,7 +131,9 @@ function getAttributes() {
     { schema, params },
     {
       response_function: (response: unknown) => {
-        attributes.value = (response as { attributes: AttributeInfo[] }).attributes;
+        attributes.value = (
+          response as { attributes: AttributeInfo[] }
+        ).attributes;
       },
     },
   );
@@ -193,7 +205,10 @@ watch([attributeName, attributeItem, currentAttribute], () => {
         />
       </template>
       <v-card class="pa-2">
-        <ViewerOptionsColorPicker v-model="attributeNoDataColor" disabled-alpha />
+        <ViewerOptionsColorPicker
+          v-model="attributeNoDataColor"
+          disabled-alpha
+        />
       </v-card>
     </v-menu>
   </div>

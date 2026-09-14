@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useToggle } from "@vueuse/core";
 
-import CsvSettings from "./CsvSettings.vue";
-import CsvTable from "./CsvTable.vue";
+import CsvSettings from "./CsvSettings";
+import CsvTable from "./CsvTable";
 
 interface CsvHeader {
   title: string;
@@ -63,11 +63,17 @@ function autoDetectSeparator(content: string) {
 
   for (const candidate of candidates) {
     const counts = lines.map((line) => line.split(candidate).length);
-    const average = counts.reduce((total, count) => total + count, 0) / counts.length;
+    const average =
+      counts.reduce((total, count) => total + count, 0) / counts.length;
     const variance =
-      counts.reduce((total, count) => total + (count - average) ** 2, 0) / counts.length;
+      counts.reduce((total, count) => total + (count - average) ** 2, 0) /
+      counts.length;
 
-    if (average > MIN_AVG_COUNT && variance < MAX_VARIANCE && average > maxCount) {
+    if (
+      average > MIN_AVG_COUNT &&
+      variance < MAX_VARIANCE &&
+      average > maxCount
+    ) {
       maxCount = average;
       best = candidate;
     }
@@ -80,7 +86,9 @@ function parseContent() {
     return;
   }
 
-  const allLines = rawContent.value.split(/\r?\n/u).filter((line) => line.trim() !== "");
+  const allLines = rawContent.value
+    .split(/\r?\n/u)
+    .filter((line) => line.trim() !== "");
 
   function splitLine(line: string): string[] {
     if (!separator.value) {
@@ -114,7 +122,10 @@ function parseContent() {
     sortable: true,
   }));
 
-  const dataLines = allLines.slice(firstRow.value, firstRow.value + PREVIEW_ROWS_LIMIT);
+  const dataLines = allLines.slice(
+    firstRow.value,
+    firstRow.value + PREVIEW_ROWS_LIMIT,
+  );
   previewRows.value = dataLines.map((line) => {
     const row = splitLine(line);
     const obj: CsvRow = {};
@@ -133,7 +144,9 @@ function readAndParse() {
 
   const reader = new FileReader();
   reader.addEventListener("load", (event) => {
-    rawContent.value = String((event.target as FileReader | null)?.result ?? "");
+    rawContent.value = String(
+      (event.target as FileReader | null)?.result ?? "",
+    );
     if (!separator.value || separator.value === ",") {
       separator.value = autoDetectSeparator(rawContent.value);
     }
@@ -146,9 +159,15 @@ function readAndParse() {
   reader.readAsText(file, "utf8");
 }
 const computedResult = computed(() => {
-  const xIndex = previewHeaders.value.findIndex((header) => header.key === xColumn.value);
-  const yIndex = previewHeaders.value.findIndex((header) => header.key === yColumn.value);
-  const zIndex = previewHeaders.value.findIndex((header) => header.key === zColumn.value);
+  const xIndex = previewHeaders.value.findIndex(
+    (header) => header.key === xColumn.value,
+  );
+  const yIndex = previewHeaders.value.findIndex(
+    (header) => header.key === yColumn.value,
+  );
+  const zIndex = previewHeaders.value.findIndex(
+    (header) => header.key === zColumn.value,
+  );
 
   return {
     firstRow: firstRow.value,
@@ -209,7 +228,10 @@ function onConfirm() {
     @update:model-value="emit('update:modelValue', $event)"
     max-width="1200px"
   >
-    <v-card class="glass-ui rounded-xl overflow-hidden border-opacity-10" color="grey-darken-4">
+    <v-card
+      class="glass-ui rounded-xl overflow-hidden border-opacity-10"
+      color="grey-darken-4"
+    >
       <v-toolbar color="transparent" flat class="px-4">
         <v-icon icon="mdi-file-table" size="32" color="primary" class="ml-1" />
         <v-toolbar-title class="text-h6 font-weight-bold text-white">

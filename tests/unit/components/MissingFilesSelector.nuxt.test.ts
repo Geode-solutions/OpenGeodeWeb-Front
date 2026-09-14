@@ -12,8 +12,8 @@ import type { HTTPMethod } from "h3";
 
 // Local imports
 import { setupActivePinia, vuetify } from "@ogw_tests/utils";
-import FileUploader from "@ogw_front/components/FileUploader.vue";
-import MissingFilesSelector from "@ogw_front/components/MissingFilesSelector.vue";
+import FileUploader from "@ogw_front/components/FileUploader";
+import MissingFilesSelector from "@ogw_front/components/MissingFilesSelector";
 import { useBackStore } from "@ogw_front/stores/back";
 
 const EXPECTED_LENGTH = 1;

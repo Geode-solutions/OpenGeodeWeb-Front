@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import FileUploader from "@ogw_front/components/FileUploader.vue";
+import FileUploader from "@ogw_front/components/FileUploader";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 import { useBackStore } from "@ogw_front/stores/back";
 
@@ -16,7 +16,11 @@ interface Props {
   textureName: string;
 }
 
-const { id, textureId: propTextureId, textureName: propTextureName } = defineProps<Props>();
+const {
+  id,
+  textureId: propTextureId,
+  textureName: propTextureName,
+} = defineProps<Props>();
 
 const textureName = ref(propTextureName);
 const textureId = ref(propTextureId);
@@ -101,7 +105,14 @@ watch(textureId, (value) => {
     />
   </v-col>
   <v-col cols="1" class="ma-1 d-flex justify-center align-center">
-    <v-badge :model-value="textureId !== ''" color="white" floating dot offset-x="10" offset-y="10">
+    <v-badge
+      :model-value="textureId !== ''"
+      color="white"
+      floating
+      dot
+      offset-x="10"
+      offset-y="10"
+    >
       <FileUploader
         @files_uploaded="files_uploaded_event($event)"
         :accept="['image/png', 'image/jpeg', 'image/bmp']"
@@ -113,6 +124,10 @@ watch(textureId, (value) => {
     </v-badge>
   </v-col>
   <v-col v-if="textureName === '' || textureId === ''" cols="1">
-    <v-icon size="20" icon="mdi-close-circle" v-tooltip:bottom="'Invalid texture'" />
+    <v-icon
+      size="20"
+      icon="mdi-close-circle"
+      v-tooltip:bottom="'Invalid texture'"
+    />
   </v-col>
 </template>

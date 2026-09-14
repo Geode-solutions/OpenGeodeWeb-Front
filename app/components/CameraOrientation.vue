@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
 // oxlint-disable eslint/sort-imports
-import ToolPanel from "@ogw_front/components/ToolPanel.vue";
+import ToolPanel from "@ogw_front/components/ToolPanel";
 import { applyCameraOptions } from "@ogw_internal/stores/hybrid_viewer/camera";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types.js";
@@ -166,7 +166,9 @@ watch(hoveredFace, (newFace, oldFace) => {
     return;
   }
   function updateFace(face: string | undefined, active: boolean) {
-    const config = orientations.find((orientation) => orientation.face === face);
+    const config = orientations.find(
+      (orientation) => orientation.face === face,
+    );
     if (config) {
       cubeActor[`set${config.vtkKey}FaceProperty`]({
         faceColor: active ? "rgba(255, 255, 255, 0.95)" : "rgba(60, 60, 60, 1)",
@@ -193,10 +195,17 @@ watch(hoveredFace, (newFace, oldFace) => {
       class="pa-0 overflow-hidden position-relative"
       style="
         height: 220px;
-        background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05), transparent 70%);
+        background: radial-gradient(
+          circle at center,
+          rgba(255, 255, 255, 0.05),
+          transparent 70%
+        );
       "
     >
-      <svg class="position-absolute fill-height w-100" style="pointer-events: none">
+      <svg
+        class="position-absolute fill-height w-100"
+        style="pointer-events: none"
+      >
         <line
           v-for="orientation in orientations"
           :key="orientation.value"
@@ -204,7 +213,9 @@ watch(hoveredFace, (newFace, oldFace) => {
           y1="50%"
           :x2="orientation.position.left"
           :y2="orientation.position.top"
-          :stroke="hoveredFace === orientation.face ? 'white' : 'rgba(255,255,255,0.1)'"
+          :stroke="
+            hoveredFace === orientation.face ? 'white' : 'rgba(255,255,255,0.1)'
+          "
           :stroke-width="hoveredFace === orientation.face ? 2 : 1"
           class="transition-all"
           style="filter: drop-shadow(0 0 3px white)"
@@ -215,7 +226,10 @@ watch(hoveredFace, (newFace, oldFace) => {
         class="position-absolute d-flex align-center justify-center"
         style="top: 50%; left: 50%; transform: translate(-50%, -50%)"
       >
-        <div ref="cubeContainer" style="width: 70px; height: 70px; pointer-events: none" />
+        <div
+          ref="cubeContainer"
+          style="width: 70px; height: 70px; pointer-events: none"
+        />
       </div>
 
       <v-btn
@@ -231,21 +245,34 @@ watch(hoveredFace, (newFace, oldFace) => {
         @mouseleave="hoveredFace = undefined"
         @click.stop="emit('select', orientation.value)"
       >
-        <v-tooltip activator="parent" location="top">{{ orientation.value }} View</v-tooltip>
-        <span class="text-caption font-weight-black" style="font-size: 0.7rem !important">{{
-          orientation.label
-        }}</span>
+        <v-tooltip activator="parent" location="top"
+          >{{ orientation.value }} View</v-tooltip
+        >
+        <span
+          class="text-caption font-weight-black"
+          style="font-size: 0.7rem !important"
+          >{{ orientation.label }}</span
+        >
       </v-btn>
     </div>
   </ToolPanel>
 
-  <v-list v-else density="compact" class="pa-4 orientation-menu rounded-lg" elevation="8">
+  <v-list
+    v-else
+    density="compact"
+    class="pa-4 orientation-menu rounded-lg"
+    elevation="8"
+  >
     <div class="d-flex flex-column align-center" style="gap: 16px">
       <div
         class="d-flex align-center justify-center"
         style="width: 60px; height: 60px; border-radius: 8px; overflow: hidden"
       >
-        <div ref="cubeContainer" class="w-100 h-100" style="pointer-events: none" />
+        <div
+          ref="cubeContainer"
+          class="w-100 h-100"
+          style="pointer-events: none"
+        />
       </div>
       <v-divider class="w-100" />
       <div class="d-flex flex-wrap justify-center" style="max-width: 140px">
@@ -261,8 +288,12 @@ watch(hoveredFace, (newFace, oldFace) => {
           @mouseleave="hoveredFace = undefined"
           @click.stop="emit('select', orientation.value)"
         >
-          <v-tooltip activator="parent" location="top">{{ orientation.label }}</v-tooltip>
-          <span class="text-caption font-weight-black">{{ orientation.label }}</span>
+          <v-tooltip activator="parent" location="top">{{
+            orientation.label
+          }}</v-tooltip>
+          <span class="text-caption font-weight-black">{{
+            orientation.label
+          }}</span>
         </v-btn>
       </div>
     </div>

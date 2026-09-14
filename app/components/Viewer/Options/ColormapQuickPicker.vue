@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import AttributeRangeSelector from "@ogw_front/components/Viewer/Options/AttributeRangeSelector.vue";
-import ColorMapList from "@ogw_front/components/Viewer/Options/ColorMapList.vue";
+import AttributeRangeSelector from "@ogw_front/components/Viewer/Options/AttributeRangeSelector";
+import ColorMapList from "@ogw_front/components/Viewer/Options/ColorMapList";
 
 import { getPresetsWithCurrentAtTop } from "@ogw_front/utils/colormap";
 import { useGlobalAttributeStyle } from "@ogw_front/composables/global_attribute_style";
@@ -33,7 +33,9 @@ const maximum = computed({
   },
 });
 
-const quickColormapPresets = computed(() => getPresetsWithCurrentAtTop(currentColormap.value));
+const quickColormapPresets = computed(() =>
+  getPresetsWithCurrentAtTop(currentColormap.value),
+);
 
 async function onQuickColormapSelect(preset: { Name: string }) {
   await applyGlobalColormap(preset.Name);

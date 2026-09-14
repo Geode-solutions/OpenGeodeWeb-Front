@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import BasicSlider from "@ogw_front/components/Basic/Slider.vue";
+import BasicSlider from "@ogw_front/components/Basic/Slider";
 
 const model = defineModel<number>();
 

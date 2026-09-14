@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import AttributeRangeSelector from "./AttributeRangeSelector.vue";
-import ColorMapPicker from "./ColorMapPicker.vue";
+import AttributeRangeSelector from "./AttributeRangeSelector";
+import ColorMapPicker from "./ColorMapPicker";
 
 const emit = defineEmits<{
   reset: [];

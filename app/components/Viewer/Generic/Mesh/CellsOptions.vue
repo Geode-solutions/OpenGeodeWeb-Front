@@ -4,9 +4,9 @@
 // oxlint-disable import/consistent-type-specifier-style -- combining the default import with the type import avoids a duplicate-imports violation on this same module; using disable-next-line here is fragile because a formatter can re-wrap the import onto multiple lines and shift the flagged line
 import ViewerContextMenuItem, {
   type ItemProps,
-} from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
-import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
-import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
+} from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem";
+import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector";
+import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch";
 
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -60,7 +60,8 @@ const color = computed<RGBAColor | undefined>({
   },
 });
 const textures = computed<Texture[] | undefined>({
-  get: () => dataStyleStore.meshCellsTextures(id.value) as Texture[] | undefined,
+  get: () =>
+    dataStyleStore.meshCellsTextures(id.value) as Texture[] | undefined,
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshCellsTextures(targetId, newValue),
@@ -76,7 +77,9 @@ const vertex_attribute_name = computed({
       return;
     }
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshCellsVertexAttributeName(targetId, newValue)),
+      Promise.resolve(
+        dataStyleStore.setMeshCellsVertexAttributeName(targetId, newValue),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
@@ -85,7 +88,9 @@ const vertex_attribute_item = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeItem(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshCellsVertexAttributeItem(targetId, newValue)),
+      Promise.resolve(
+        dataStyleStore.setMeshCellsVertexAttributeItem(targetId, newValue),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
@@ -98,7 +103,13 @@ const vertex_attribute_range = computed({
       return;
     }
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshCellsVertexAttributeRange(targetId, minimum, maximum)),
+      Promise.resolve(
+        dataStyleStore.setMeshCellsVertexAttributeRange(
+          targetId,
+          minimum,
+          maximum,
+        ),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
@@ -107,13 +118,18 @@ const vertex_attribute_color_map = computed({
   get: () => dataStyleStore.meshCellsVertexAttributeColorMap(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshCellsVertexAttributeColorMap(targetId, newValue)),
+      Promise.resolve(
+        dataStyleStore.setMeshCellsVertexAttributeColorMap(targetId, newValue),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_no_data_color = computed<RGBAColor | undefined>({
-  get: () => dataStyleStore.meshCellsVertexAttributeNoDataColor(id.value) as RGBAColor | undefined,
+  get: () =>
+    dataStyleStore.meshCellsVertexAttributeNoDataColor(id.value) as
+      | RGBAColor
+      | undefined,
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshCellsVertexAttributeNoDataColor(targetId, newValue),
@@ -128,7 +144,9 @@ const cell_attribute_name = computed({
       return;
     }
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshCellsCellAttributeName(targetId, newValue)),
+      Promise.resolve(
+        dataStyleStore.setMeshCellsCellAttributeName(targetId, newValue),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
@@ -137,7 +155,9 @@ const cell_attribute_item = computed({
   get: () => dataStyleStore.meshCellsCellAttributeItem(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshCellsCellAttributeItem(targetId, newValue)),
+      Promise.resolve(
+        dataStyleStore.setMeshCellsCellAttributeItem(targetId, newValue),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
@@ -150,7 +170,13 @@ const cell_attribute_range = computed({
       return;
     }
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshCellsCellAttributeRange(targetId, minimum, maximum)),
+      Promise.resolve(
+        dataStyleStore.setMeshCellsCellAttributeRange(
+          targetId,
+          minimum,
+          maximum,
+        ),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
@@ -159,13 +185,18 @@ const cell_attribute_color_map = computed({
   get: () => dataStyleStore.meshCellsCellAttributeColorMap(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshCellsCellAttributeColorMap(targetId, newValue)),
+      Promise.resolve(
+        dataStyleStore.setMeshCellsCellAttributeColorMap(targetId, newValue),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const cell_attribute_no_data_color = computed<RGBAColor | undefined>({
-  get: () => dataStyleStore.meshCellsCellAttributeNoDataColor(id.value) as RGBAColor | undefined,
+  get: () =>
+    dataStyleStore.meshCellsCellAttributeNoDataColor(id.value) as
+      | RGBAColor
+      | undefined,
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshCellsCellAttributeNoDataColor(targetId, newValue),
@@ -184,7 +215,10 @@ const cell_attribute_no_data_color = computed<RGBAColor | undefined>({
     :btnImage="btnImage"
   >
     <template #options>
-      <ViewerOptionsVisibilitySwitch data-testid="meshCellsVisibilitySwitch" v-model="visibility" />
+      <ViewerOptionsVisibilitySwitch
+        data-testid="meshCellsVisibilitySwitch"
+        v-model="visibility"
+      />
       <template v-if="visibility">
         <v-divider />
         <ViewerOptionsColoringTypeSelector
@@ -196,7 +230,9 @@ const cell_attribute_no_data_color = computed<RGBAColor | undefined>({
           v-model:vertex_attribute_item="vertex_attribute_item"
           v-model:vertex_attribute_range="vertex_attribute_range"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
-          v-model:vertex_attribute_no_data_color="vertex_attribute_no_data_color"
+          v-model:vertex_attribute_no_data_color="
+            vertex_attribute_no_data_color
+          "
           v-model:cell_attribute_name="cell_attribute_name"
           v-model:cell_attribute_item="cell_attribute_item"
           v-model:cell_attribute_range="cell_attribute_range"
