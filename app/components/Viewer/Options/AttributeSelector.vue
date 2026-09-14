@@ -6,7 +6,7 @@ import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options
 import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
 import { getAttributeRange } from "@ogw_front/utils/attributes";
 import { useBackStore } from "@ogw_front/stores/back";
-import type { JsonRpcSchema } from "#shared/utils/types.js";
+import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
 
 const backStore = useBackStore();
 

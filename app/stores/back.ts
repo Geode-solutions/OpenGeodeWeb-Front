@@ -7,7 +7,7 @@ import { useAppStore } from "@ogw_front/stores/app";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
-import type { JsonRpcSchema, RequestHandlers } from "#shared/utils/types.js";
+import type { JsonRpcSchema, RequestHandlers } from "@ogw_shared/utils/types.js";
 
 import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json" with { type: "json" };
 

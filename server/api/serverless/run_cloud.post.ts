@@ -6,7 +6,7 @@ import { GoogleAuth } from "google-auth-library";
 import { ServicesClient } from "@google-cloud/run";
 
 // Local imports
-import { artifactImage, requestConfig } from "@geode/opengeodeweb-front/server/utils/cloud.js";
+import { artifactImage, requestConfig } from "@ogw_server/utils/cloud";
 
 interface RunCloudBody {
   email: string;

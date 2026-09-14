@@ -3,7 +3,7 @@
 // oxlint-disable eslint/sort-imports
 import { Status } from "@ogw_front/utils/status";
 import { useBackStore } from "@ogw_front/stores/back";
-import type { JsonRpcSchema } from "#shared/utils/types.js";
+import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
 
 interface Props {
   schema: JsonRpcSchema;

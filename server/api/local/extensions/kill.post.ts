@@ -9,9 +9,9 @@ import {
   getMicroserviceByName,
   killMicroservice,
   projectMicroservices,
-} from "@geode/opengeodeweb-front/server/utils/cleanup.js";
-import { extensionFolderPath } from "@geode/opengeodeweb-front/server/utils/path.js";
-import { removeExtensionFromConf } from "@geode/opengeodeweb-front/server/utils/app_config.js";
+} from "@ogw_server/utils/cleanup";
+import { extensionFolderPath } from "@ogw_server/utils/path";
+import { removeExtensionFromConf } from "@ogw_server/utils/app_config";
 
 interface KillExtensionBody {
   projectFolderPath: string;

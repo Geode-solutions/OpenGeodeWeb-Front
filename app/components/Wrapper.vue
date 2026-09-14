@@ -7,7 +7,7 @@ import Stepper from "@ogw_front/components/Stepper.vue";
 
 import { useInfraStore } from "@ogw_front/stores/infra";
 import { useStepperTree } from "@ogw_front/composables/stepper_tree";
-import type { JsonRpcSchema } from "#shared/utils/types.js";
+import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
 
 const infraStore = useInfraStore();
 

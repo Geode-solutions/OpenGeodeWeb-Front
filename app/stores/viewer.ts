@@ -17,8 +17,8 @@ import { useAppStore } from "@ogw_front/stores/app";
 import { useInfraStore } from "@ogw_front/stores/infra";
 import { viewer_call } from "@ogw_internal/utils/viewer_call";
 
-import type { JsonRpcSchema, RequestHandlers } from "#shared/utils/types.js";
-import type { RpcClient } from "#shared/utils/call_raw.js";
+import type { JsonRpcSchema, RequestHandlers } from "@ogw_shared/utils/types.js";
+import type { RpcClient } from "@ogw_shared/utils/call_raw.js";
 
 interface PickedPoint {
   x: number | undefined;

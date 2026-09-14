@@ -8,7 +8,7 @@ import { killExtension } from "@ogw_front/utils/extension.js";
 import { upload_file } from "@ogw_internal/utils/upload_file.js";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
-import type { JsonRpcSchema, RequestHandlers } from "#shared/utils/types.js";
+import type { JsonRpcSchema, RequestHandlers } from "@ogw_shared/utils/types.js";
 import type { StateTree } from "pinia";
 
 import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json" with { type: "json" };

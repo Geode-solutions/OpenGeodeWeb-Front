@@ -7,7 +7,7 @@ import { createError, defineEventHandler, readBody } from "h3";
 import {
   createPath,
   generateProjectFolderPath,
-} from "@geode/opengeodeweb-front/server/utils/path.js";
+} from "@ogw_server/utils/path";
 
 interface ProjectFolderPathBody {
   PROJECT: string;

@@ -7,7 +7,7 @@ import { createError, defineEventHandler, readBody } from "h3";
 import {
   addMicroserviceMetadatas,
   runBack,
-} from "@geode/opengeodeweb-front/server/utils/microservices.js";
+} from "@ogw_server/utils/microservices";
 
 interface RunBackBody {
   COMMAND_BACK: string;

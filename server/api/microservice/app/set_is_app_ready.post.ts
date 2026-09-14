@@ -2,7 +2,7 @@
 import { createError, defineEventHandler, readBody } from "h3";
 
 // Local imports
-import { setIsAppReady } from "@geode/opengeodeweb-front/server/utils/server_config.js";
+import { setIsAppReady } from "@ogw_server/utils/server_config";
 
 interface SetIsAppReadyBody {
   isReady: boolean;

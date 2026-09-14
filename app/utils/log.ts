@@ -1,4 +1,4 @@
-import type { JsonRpcSchema } from "#shared/utils/types.js";
+import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
 
 interface Loggable {
   $id: string;

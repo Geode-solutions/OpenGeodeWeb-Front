@@ -1,7 +1,7 @@
 import { Status } from "@ogw_front/utils/status";
-import { appMode } from "#shared/app_mode";
+import { appMode } from "@ogw_shared/app_mode";
 import { registerRunningExtensions } from "@ogw_front/utils/extension";
-import { setAppBaseUrl } from "#shared/scripts";
+import { setAppBaseUrl } from "@ogw_shared/scripts";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useCloudStore } from "@ogw_front/stores/cloud";
 

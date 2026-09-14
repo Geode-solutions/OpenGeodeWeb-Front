@@ -7,7 +7,7 @@ import { createError, defineEventHandler, readBody } from "h3";
 import {
   addMicroserviceMetadatas,
   runViewer,
-} from "@geode/opengeodeweb-front/server/utils/microservices.js";
+} from "@ogw_server/utils/microservices";
 
 interface RunViewerBody {
   COMMAND_VIEWER: string;

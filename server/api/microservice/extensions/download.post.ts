@@ -8,7 +8,7 @@ import { createError, defineEventHandler, readBody } from "h3";
 import {
   registerExtensionFile,
   targetExtensionFilePath,
-} from "@geode/opengeodeweb-front/server/utils/app_config.js";
+} from "@ogw_server/utils/app_config";
 
 interface DownloadExtensionBody {
   projectName: string;

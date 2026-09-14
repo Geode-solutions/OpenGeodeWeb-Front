@@ -2,7 +2,7 @@
 import { createError, defineEventHandler } from "h3";
 
 // Local imports
-import { getIsAppReady } from "@geode/opengeodeweb-front/server/utils/server_config.js";
+import { getIsAppReady } from "@ogw_server/utils/server_config";
 
 export default defineEventHandler(async () => {
   try {

@@ -15,7 +15,7 @@ import busboy from "busboy";
 import {
   registerExtensionFile,
   targetExtensionFilePath,
-} from "@geode/opengeodeweb-front/server/utils/app_config.js";
+} from "@ogw_server/utils/app_config";
 
 const CODE_201 = 201;
 const BYTES_PER_KIBIBYTE = 1024;

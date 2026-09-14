@@ -12,8 +12,8 @@ import type { Readable } from "node:stream";
 import { getPort } from "get-port-please";
 
 // Local imports
-import { appMode } from "@geode/opengeodeweb-front/shared/app_mode.js";
-import { setAppBaseUrl } from "@geode/opengeodeweb-front/shared/scripts.js";
+import { appMode } from "@ogw_shared/app_mode";
+import { setAppBaseUrl } from "@ogw_shared/scripts";
 
 const BYTES_PER_KIBIBYTE = 1024;
 const MAX_ERROR_BUFFER_KIBIBYTES = 64;

@@ -1,6 +1,6 @@
 import { Status } from "@ogw_front/utils/status";
-import { fetchSchema } from "#shared/utils/fetch_schema";
-import { setAppBaseUrl } from "#shared/scripts";
+import { fetchSchema } from "@ogw_shared/utils/fetch_schema";
+import { setAppBaseUrl } from "@ogw_shared/scripts";
 import { useAppStore } from "./app";
 import { useFeedbackStore } from "./feedback";
 import { useInfraStore } from "./infra";

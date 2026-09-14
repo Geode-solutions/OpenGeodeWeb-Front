@@ -8,17 +8,17 @@ import { createError, defineEventHandler, readBody } from "h3";
 import {
   addMicroserviceMetadatas,
   runExtension,
-} from "@geode/opengeodeweb-front/server/utils/microservices.js";
+} from "@ogw_server/utils/microservices";
 import {
   extensionBackendPath,
   extensionFolderPath,
-} from "@geode/opengeodeweb-front/server/utils/path.js";
+} from "@ogw_server/utils/path";
 import {
   readExtensionFrontend,
   readExtensionMetadata,
-} from "@geode/opengeodeweb-front/server/utils/extension.js";
-import { extensionsConf } from "@geode/opengeodeweb-front/server/utils/app_config.js";
-import { unzipFile } from "@geode/opengeodeweb-front/server/utils/server.js";
+} from "@ogw_server/utils/extension";
+import { extensionsConf } from "@ogw_server/utils/app_config";
+import { unzipFile } from "@ogw_server/utils/server";
 
 interface RunExtensionsBody {
   projectFolderPath: string;
