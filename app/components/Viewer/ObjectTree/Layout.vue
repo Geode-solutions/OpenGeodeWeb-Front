@@ -28,14 +28,11 @@ const emit = defineEmits<{
 }>();
 
 const activityBar = useTemplateRef("activity-bar");
-const { adaptiveStyles: activityBarAdaptiveStyles } =
-  useAdaptiveStyles(activityBar);
+const { adaptiveStyles: activityBarAdaptiveStyles } = useAdaptiveStyles(activityBar);
 
 const maxWidth = computed(() => containerWidth * MAX_PANEL_WIDTH_RATIO);
 
-const mainView = computed(() =>
-  treeviewStore.opened_views.find((view) => view.id === "main"),
-);
+const mainView = computed(() => treeviewStore.opened_views.find((view) => view.id === "main"));
 const additionalViews = computed(() =>
   treeviewStore.opened_views.filter((view) => view.id !== "main"),
 );
@@ -59,9 +56,7 @@ watch(
   () => additionalViews.value.length,
   (newLength) => {
     if (newLength > 0 && rowHeights.value.length !== newLength) {
-      treeviewStore.setRowHeights(
-        Array.from({ length: newLength }, () => PERCENT_100 / newLength),
-      );
+      treeviewStore.setRowHeights(Array.from({ length: newLength }, () => PERCENT_100 / newLength));
     }
   },
   { immediate: true },
@@ -71,9 +66,7 @@ watch([maxWidth, () => additionalViews.value.length], ([newMax]) => {
   const hasAdditional = additionalViews.value.length > 0;
   const gap = hasAdditional ? GAP_WIDTH : 0;
   const total =
-    treeviewStore.panelWidth +
-    (hasAdditional ? treeviewStore.additionalPanelWidth : 0) +
-    gap;
+    treeviewStore.panelWidth + (hasAdditional ? treeviewStore.additionalPanelWidth : 0) + gap;
 
   if (total > newMax) {
     if (hasAdditional) {
@@ -117,10 +110,7 @@ function onResizeStart(event: MouseEvent) {
     const currentTotalWidth =
       newWidth + (hasAdditional ? treeviewStore.additionalPanelWidth : 0) + gap;
     if (currentTotalWidth > maxWidth.value) {
-      newWidth =
-        maxWidth.value -
-        (hasAdditional ? treeviewStore.additionalPanelWidth : 0) -
-        gap;
+      newWidth = maxWidth.value - (hasAdditional ? treeviewStore.additionalPanelWidth : 0) - gap;
     }
 
     if (newWidth < AUTO_CLOSE_THRESHOLD) {
@@ -171,8 +161,7 @@ function onVerticalResizeStart(event: MouseEvent, index: number) {
   const startY = event.clientY;
   const startHeight1 = rowHeights.value[index] ?? 0;
   const startHeight2 = rowHeights.value[index + 1] ?? 0;
-  const containerHeight =
-    (event.currentTarget as HTMLElement).parentElement?.offsetHeight ?? 0;
+  const containerHeight = (event.currentTarget as HTMLElement).parentElement?.offsetHeight ?? 0;
 
   function resize(move_event: MouseEvent) {
     const deltaY = move_event.clientY - startY;
@@ -249,14 +238,9 @@ function onVerticalResizeStart(event: MouseEvent, index: number) {
           :border-radius="additionalViews.length > 0 ? '0' : '0 16px 16px 0'"
           :border-left="false"
           @close="treeviewStore.closeView('main')"
-          @update:scroll-top="
-            mainView && treeviewStore.setScrollTop(mainView.id, $event)
-          "
+          @update:scroll-top="mainView && treeviewStore.setScrollTop(mainView.id, $event)"
         >
-          <GlobalObjects
-            data-testid="mainObjectTree"
-            @show-menu="emit('show-menu', $event)"
-          />
+          <GlobalObjects data-testid="mainObjectTree" @show-menu="emit('show-menu', $event)" />
         </ViewerObjectTreeBox>
       </div>
 
@@ -277,8 +261,7 @@ function onVerticalResizeStart(event: MouseEvent, index: number) {
           <div
             class="view-wrapper"
             :class="{
-              'drag-over':
-                draggedIndex !== undefined && draggedIndex !== index + 1,
+              'drag-over': draggedIndex !== undefined && draggedIndex !== index + 1,
             }"
             :style="{ flex: `0 0 ${rowHeights[index]}%` }"
             @dragover="onDragOver"
@@ -296,11 +279,7 @@ function onVerticalResizeStart(event: MouseEvent, index: number) {
               @update:scroll-top="treeviewStore.setScrollTop(view.id, $event)"
             >
               <component
-                :is="
-                  view.viewType === 'model_collections'
-                    ? ModelCollections
-                    : ModelComponents
-                "
+                :is="view.viewType === 'model_collections' ? ModelCollections : ModelComponents"
                 data-testid="modelComponentsObjectTree"
                 :id="view.modelId || view.id"
                 :view-id="view.id"
@@ -356,10 +335,8 @@ function onVerticalResizeStart(event: MouseEvent, index: number) {
   position: absolute;
   inset: 0;
   background: rgba(255, 255, 255, var(--adaptive-opacity));
-  backdrop-filter: blur(var(--adaptive-blur))
-    brightness(var(--adaptive-brightness));
-  -webkit-backdrop-filter: blur(var(--adaptive-blur))
-    brightness(var(--adaptive-brightness));
+  backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
+  -webkit-backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
   mix-blend-mode: lighten;
   z-index: 0;
   pointer-events: none;

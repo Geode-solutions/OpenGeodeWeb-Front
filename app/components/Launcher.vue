@@ -12,12 +12,7 @@ interface Props {
   logo?: string;
 }
 
-const {
-  appName,
-  email = undefined,
-  isUserAuthenticated = false,
-  logo = "",
-} = defineProps<Props>();
+const { appName, email = undefined, isUserAuthenticated = false, logo = "" } = defineProps<Props>();
 
 const infraStore = useInfraStore();
 if (infraStore.app_mode !== appMode.CLOUD) {

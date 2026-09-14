@@ -14,8 +14,7 @@ const { containerWidth, containerHeight } = defineProps<Props>();
 const hybridViewerStore = useHybridViewerStore();
 
 const tooltipRef = useTemplateRef("tooltip");
-const { width: tooltipWidth, height: tooltipHeight } =
-  useElementSize(tooltipRef);
+const { width: tooltipWidth, height: tooltipHeight } = useElementSize(tooltipRef);
 
 const tooltipStyle = computed(() => {
   if (!hybridViewerStore.hoverData) {
@@ -93,9 +92,7 @@ function capitalize(val: string) {
 
 const fieldTypeLabel = computed(() => {
   const fieldType = hybridViewerStore.hoverData?.fieldType;
-  return typeof fieldType === "string"
-    ? capitalize(fieldType.toLowerCase())
-    : "";
+  return typeof fieldType === "string" ? capitalize(fieldType.toLowerCase()) : "";
 });
 
 const coordinates = computed<number[] | undefined>(() => {
@@ -150,10 +147,7 @@ function formatAttributeValue(val: unknown) {
         <v-col>
           <span class="tooltip-label">Id:</span>
           <span class="tooltip-value-dim font-mono">
-            {{
-              hybridViewerStore.hoverData.component?.id ||
-              hybridViewerStore.hoverData.modelId
-            }}
+            {{ hybridViewerStore.hoverData.component?.id || hybridViewerStore.hoverData.modelId }}
           </span>
         </v-col>
         <v-col v-if="originalIndex !== undefined">
@@ -175,8 +169,7 @@ function formatAttributeValue(val: unknown) {
           <v-col v-if="coordinates" class="d-flex justify-space-between ga-3">
             <span class="tooltip-label">Position:</span>
             <span class="tooltip-value font-mono">
-              [ {{ Number(coordinates[0]).toFixed(3) }},
-              {{ Number(coordinates[1]).toFixed(3) }},
+              [ {{ Number(coordinates[0]).toFixed(3) }}, {{ Number(coordinates[1]).toFixed(3) }},
               {{ Number(coordinates[2]).toFixed(3) }} ]
             </span>
           </v-col>

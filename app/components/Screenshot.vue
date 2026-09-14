@@ -15,12 +15,10 @@ interface Props {
   escapeFunction?: () => void;
 }
 
-const { width = DEFAULT_PANEL_WIDTH, escapeFunction = undefined } =
-  defineProps<Props>();
+const { width = DEFAULT_PANEL_WIDTH, escapeFunction = undefined } = defineProps<Props>();
 
 const output_extensions =
-  viewer_schemas.opengeodeweb_viewer.viewer.take_screenshot.properties
-    .output_extension.enum;
+  viewer_schemas.opengeodeweb_viewer.viewer.take_screenshot.properties.output_extension.enum;
 const filename = ref("");
 const output_extension = ref("png");
 const include_background = ref(true);
@@ -31,8 +29,7 @@ const { copy } = useClipboardItems();
 async function takeScreenshot() {
   const viewerStore = useViewerStore();
   const feedbackStore = useFeedbackStore();
-  const current_filename =
-    screenshot_type.value === "file" ? filename.value : "screenshot";
+  const current_filename = screenshot_type.value === "file" ? filename.value : "screenshot";
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.take_screenshot;
   const params = {
     filename: current_filename,
@@ -56,8 +53,7 @@ async function takeScreenshot() {
             await copy([new ClipboardItem({ "image/png": pngBlob })]);
             feedbackStore.add_success("Screenshot copied to clipboard");
           } catch (error) {
-            const message =
-              error instanceof Error ? error.message : String(error);
+            const message = error instanceof Error ? error.message : String(error);
             feedbackStore.add_error(
               0,
               "",
@@ -195,9 +191,7 @@ function handleClose() {
           variant="outlined"
           size="small"
           class="text-caption text-none"
-          :disabled="
-            (screenshot_type === 'file' && !filename) || !output_extension
-          "
+          :disabled="(screenshot_type === 'file' && !filename) || !output_extension"
           color="white"
           @click="takeScreenshot()"
         >

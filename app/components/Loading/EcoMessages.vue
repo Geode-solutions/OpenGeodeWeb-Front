@@ -14,8 +14,7 @@ const ecoMessages = computed(() => [
   {
     icon: "mdi-lightning-bolt-outline",
     title: "Lower carbon footprint",
-    message:
-      "On-demand computing uses up to 70% less energy than always-on servers.",
+    message: "On-demand computing uses up to 70% less energy than always-on servers.",
   },
   {
     icon: "mdi-earth",
@@ -36,8 +35,7 @@ const currentEcoMessage = computed(
 
 onMounted(() => {
   interval = setInterval(() => {
-    currentMessage.value =
-      (currentMessage.value + 1) % ecoMessages.value.length;
+    currentMessage.value = (currentMessage.value + 1) % ecoMessages.value.length;
   }, MESSAGE_INTERVAL_MS);
 });
 
@@ -47,11 +45,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <v-sheet
-    color="transparent"
-    min-height="160"
-    class="position-relative overflow-visible mb-4"
-  >
+  <v-sheet color="transparent" min-height="160" class="position-relative overflow-visible mb-4">
     <v-scroll-y-reverse-transition mode="out-in">
       <v-card
         :key="currentMessage"
@@ -68,9 +62,7 @@ onUnmounted(() => {
             :icon="currentEcoMessage.icon"
             color="white"
             size="22"
-            style="
-              filter: drop-shadow(0 0 6px rgba(var(--v-theme-primary), 0.6));
-            "
+            style="filter: drop-shadow(0 0 6px rgba(var(--v-theme-primary), 0.6))"
           />
           {{ currentEcoMessage.title }}
         </v-card-title>

@@ -62,9 +62,7 @@ function get_viewer_id(x: number, y: number) {
   const containerRect = instance?.proxy?.$el
     ?.closest?.('[data-testid="hybridViewer"]')
     ?.getBoundingClientRect() ||
-    document
-      .querySelector('[data-testid="hybridViewer"]')
-      ?.getBoundingClientRect() || {
+    document.querySelector('[data-testid="hybridViewer"]')?.getBoundingClientRect() || {
       left: 0,
       top: 0,
     };
@@ -142,9 +140,7 @@ defineExpose({ get_viewer_id });
         @click="stopHoverHighlight"
       >
         Highlight active ({{
-          hybridViewerStore.hover_highlight_field_type === "CELL"
-            ? "Cells"
-            : "Points"
+          hybridViewerStore.hover_highlight_field_type === "CELL" ? "Cells" : "Points"
         }}) &middot; Esc to stop
         <v-divider vertical class="mx-2 my-1" opacity="0.3" />
         <v-icon icon="mdi-close" size="small" />

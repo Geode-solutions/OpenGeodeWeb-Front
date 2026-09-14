@@ -33,60 +33,34 @@ const textures = defineModel<Texture[]>("textures");
 
 const vertex_attribute_name = defineModel<string>("vertex_attribute_name");
 const vertex_attribute_item = defineModel<number>("vertex_attribute_item");
-const vertex_attribute_range =
-  defineModel<(number | undefined)[]>("vertex_attribute_range");
-const vertex_attribute_color_map = defineModel<string>(
-  "vertex_attribute_color_map",
-);
-const vertex_attribute_no_data_color = defineModel<RGBAColor>(
-  "vertex_attribute_no_data_color",
-);
+const vertex_attribute_range = defineModel<(number | undefined)[]>("vertex_attribute_range");
+const vertex_attribute_color_map = defineModel<string>("vertex_attribute_color_map");
+const vertex_attribute_no_data_color = defineModel<RGBAColor>("vertex_attribute_no_data_color");
 
 const edge_attribute_name = defineModel<string>("edge_attribute_name");
 const edge_attribute_item = defineModel<number>("edge_attribute_item");
-const edge_attribute_range =
-  defineModel<(number | undefined)[]>("edge_attribute_range");
-const edge_attribute_color_map = defineModel<string>(
-  "edge_attribute_color_map",
-);
-const edge_attribute_no_data_color = defineModel<RGBAColor>(
-  "edge_attribute_no_data_color",
-);
+const edge_attribute_range = defineModel<(number | undefined)[]>("edge_attribute_range");
+const edge_attribute_color_map = defineModel<string>("edge_attribute_color_map");
+const edge_attribute_no_data_color = defineModel<RGBAColor>("edge_attribute_no_data_color");
 
 const cell_attribute_name = defineModel<string>("cell_attribute_name");
 const cell_attribute_item = defineModel<number>("cell_attribute_item");
-const cell_attribute_range =
-  defineModel<(number | undefined)[]>("cell_attribute_range");
-const cell_attribute_color_map = defineModel<string>(
-  "cell_attribute_color_map",
-);
-const cell_attribute_no_data_color = defineModel<RGBAColor>(
-  "cell_attribute_no_data_color",
-);
+const cell_attribute_range = defineModel<(number | undefined)[]>("cell_attribute_range");
+const cell_attribute_color_map = defineModel<string>("cell_attribute_color_map");
+const cell_attribute_no_data_color = defineModel<RGBAColor>("cell_attribute_no_data_color");
 
 const polygon_attribute_name = defineModel<string>("polygon_attribute_name");
 const polygon_attribute_item = defineModel<number>("polygon_attribute_item");
-const polygon_attribute_range =
-  defineModel<(number | undefined)[]>("polygon_attribute_range");
-const polygon_attribute_color_map = defineModel<string>(
-  "polygon_attribute_color_map",
-);
-const polygon_attribute_no_data_color = defineModel<RGBAColor>(
-  "polygon_attribute_no_data_color",
-);
+const polygon_attribute_range = defineModel<(number | undefined)[]>("polygon_attribute_range");
+const polygon_attribute_color_map = defineModel<string>("polygon_attribute_color_map");
+const polygon_attribute_no_data_color = defineModel<RGBAColor>("polygon_attribute_no_data_color");
 
-const polyhedron_attribute_name = defineModel<string>(
-  "polyhedron_attribute_name",
-);
-const polyhedron_attribute_item = defineModel<number>(
-  "polyhedron_attribute_item",
-);
+const polyhedron_attribute_name = defineModel<string>("polyhedron_attribute_name");
+const polyhedron_attribute_item = defineModel<number>("polyhedron_attribute_item");
 const polyhedron_attribute_range = defineModel<(number | undefined)[]>(
   "polyhedron_attribute_range",
 );
-const polyhedron_attribute_color_map = defineModel<string>(
-  "polyhedron_attribute_color_map",
-);
+const polyhedron_attribute_color_map = defineModel<string>("polyhedron_attribute_color_map");
 const polyhedron_attribute_no_data_color = defineModel<RGBAColor>(
   "polyhedron_attribute_no_data_color",
 );
@@ -107,17 +81,12 @@ const {
   allowRandom = false,
 } = defineProps<Props>();
 
-const vertexSchema =
-  schemas.vertex || back_schemas.opengeodeweb_back.vertex_attribute_names;
-const edgeSchema =
-  schemas.edge || back_schemas.opengeodeweb_back.edge_attribute_names;
-const cellSchema =
-  schemas.cell || back_schemas.opengeodeweb_back.cell_attribute_names;
-const polygonSchema =
-  schemas.polygon || back_schemas.opengeodeweb_back.polygon_attribute_names;
+const vertexSchema = schemas.vertex || back_schemas.opengeodeweb_back.vertex_attribute_names;
+const edgeSchema = schemas.edge || back_schemas.opengeodeweb_back.edge_attribute_names;
+const cellSchema = schemas.cell || back_schemas.opengeodeweb_back.cell_attribute_names;
+const polygonSchema = schemas.polygon || back_schemas.opengeodeweb_back.polygon_attribute_names;
 const polyhedronSchema =
-  schemas.polyhedron ||
-  back_schemas.opengeodeweb_back.polyhedron_attribute_names;
+  schemas.polyhedron || back_schemas.opengeodeweb_back.polyhedron_attribute_names;
 
 function isAvailable(key: string) {
   if (capabilities[key] && capabilities[key].available === false) {
@@ -133,35 +102,21 @@ function hasColorMap(key: string) {
   return true;
 }
 
-const has_color = computed(
-  () => color.value !== undefined && isAvailable("color"),
-);
-const has_textures = computed(
-  () => textures.value !== undefined && isAvailable("textures"),
-);
+const has_color = computed(() => color.value !== undefined && isAvailable("color"));
+const has_textures = computed(() => textures.value !== undefined && isAvailable("textures"));
 const has_vertex = computed(
   () =>
-    vertex_attribute_range.value !== undefined &&
-    isAvailable("vertex") &&
-    hasColorMap("vertex"),
+    vertex_attribute_range.value !== undefined && isAvailable("vertex") && hasColorMap("vertex"),
 );
 const has_edge = computed(
-  () =>
-    edge_attribute_range.value !== undefined &&
-    isAvailable("edge") &&
-    hasColorMap("edge"),
+  () => edge_attribute_range.value !== undefined && isAvailable("edge") && hasColorMap("edge"),
 );
 const has_cells = computed(
-  () =>
-    cell_attribute_range.value !== undefined &&
-    isAvailable("cell") &&
-    hasColorMap("cell"),
+  () => cell_attribute_range.value !== undefined && isAvailable("cell") && hasColorMap("cell"),
 );
 const has_polygons = computed(
   () =>
-    polygon_attribute_range.value !== undefined &&
-    isAvailable("polygon") &&
-    hasColorMap("polygon"),
+    polygon_attribute_range.value !== undefined && isAvailable("polygon") && hasColorMap("polygon"),
 );
 const has_polyhedra = computed(
   () =>
@@ -217,12 +172,8 @@ const coloring_styles = computed(() => {
 const coloring_style_label = ref("");
 
 const active_key = computed(() => {
-  const index = coloring_styles.value.labels.indexOf(
-    coloring_style_label.value,
-  );
-  return index === -1
-    ? coloring_style_key.value
-    : coloring_styles.value.values[index];
+  const index = coloring_styles.value.labels.indexOf(coloring_style_label.value);
+  return index === -1 ? coloring_style_key.value : coloring_styles.value.values[index];
 });
 
 watch(
@@ -243,11 +194,7 @@ watch(
       polygon: polygon_attribute_name.value,
       polyhedron: polyhedron_attribute_name.value,
     };
-    if (
-      key === undefined ||
-      !(key in names) ||
-      names[key as keyof typeof names]
-    ) {
+    if (key === undefined || !(key in names) || names[key as keyof typeof names]) {
       coloring_style_key.value = key;
     }
   },
@@ -271,11 +218,7 @@ watch(
   <v-divider class="my-2 mx-2" />
   <v-row justify="center" align="center" no-gutters class="px-2">
     <v-col cols="auto" class="mr-2">
-      <v-icon
-        size="18"
-        icon="mdi-format-color-fill"
-        v-tooltip:left="'Coloring'"
-      />
+      <v-icon size="18" icon="mdi-format-color-fill" v-tooltip:left="'Coloring'" />
     </v-col>
     <v-col>
       <v-select
@@ -296,9 +239,7 @@ watch(
       <template v-if="active_key === textures_dict['value']">
         <ViewerOptionsTexturesSelector v-model="textures" :id="id" />
       </template>
-      <template
-        v-if="active_key === vertex_dict['value'] && hasColorMap('vertex')"
-      >
+      <template v-if="active_key === vertex_dict['value'] && hasColorMap('vertex')">
         <ViewerOptionsAttributeSelector
           v-model:attributeName="vertex_attribute_name"
           v-model:attributeItem="vertex_attribute_item"
@@ -334,9 +275,7 @@ watch(
           :schema="cellSchema"
         />
       </template>
-      <template
-        v-if="active_key === polygon_dict['value'] && hasColorMap('polygon')"
-      >
+      <template v-if="active_key === polygon_dict['value'] && hasColorMap('polygon')">
         <ViewerOptionsAttributeSelector
           v-model:attributeName="polygon_attribute_name"
           v-model:attributeItem="polygon_attribute_item"
@@ -348,11 +287,7 @@ watch(
           :schema="polygonSchema"
         />
       </template>
-      <template
-        v-if="
-          active_key === polyhedron_dict['value'] && hasColorMap('polyhedron')
-        "
-      >
+      <template v-if="active_key === polyhedron_dict['value'] && hasColorMap('polyhedron')">
         <ViewerOptionsAttributeSelector
           v-model:attributeName="polyhedron_attribute_name"
           v-model:attributeItem="polyhedron_attribute_item"

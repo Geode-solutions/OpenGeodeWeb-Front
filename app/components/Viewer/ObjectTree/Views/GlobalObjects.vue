@@ -188,12 +188,8 @@ function expandAll() {
       class="transparent-treeview virtual-tree-height"
       @update:selected="(val) => onUpdateSelection(val as string[])"
       @update:scroll-top="treeviewStore.setScrollTop(mainView?.id ?? '', $event)"
-      @hover:enter="
-        ({ item }) => handleHoverEnter({ item: item as unknown as TreeGroupItem })
-      "
-      @hover:leave="
-        ({ item }) => handleHoverLeave({ item: item as unknown as TreeGroupItem })
-      "
+      @hover:enter="({ item }) => handleHoverEnter({ item: item as unknown as TreeGroupItem })"
+      @hover:leave="({ item }) => handleHoverLeave({ item: item as unknown as TreeGroupItem })"
       @contextmenu="
         emit('show-menu', {
           event: $event.event,
@@ -205,9 +201,7 @@ function expandAll() {
         <ObjectTreeItemLabel
           :item="item as unknown as DisplayItem"
           :is-leaf="isLeaf"
-          @contextmenu="
-            emit('show-menu', { event: $event, itemId: item.id as string })
-          "
+          @contextmenu="emit('show-menu', { event: $event, itemId: item.id as string })"
         />
       </template>
 
@@ -240,10 +234,7 @@ function expandAll() {
             "
           />
           <v-btn
-            v-if="
-              isModel(item as unknown as TreeGroupItem) &&
-              hasCollectionsMap[item.id as string]
-            "
+            v-if="isModel(item as unknown as TreeGroupItem) && hasCollectionsMap[item.id as string]"
             data-testid="expandModelCollectionsButton"
             icon="mdi-format-list-group"
             size="medium"

@@ -16,11 +16,7 @@ interface Props {
   textureName: string;
 }
 
-const {
-  id,
-  textureId: propTextureId,
-  textureName: propTextureName,
-} = defineProps<Props>();
+const { id, textureId: propTextureId, textureName: propTextureName } = defineProps<Props>();
 
 const textureName = ref(propTextureName);
 const textureId = ref(propTextureId);

@@ -10,8 +10,5 @@ const { itemProps } = defineProps<Props>();
 </script>
 
 <template>
-  <ViewerSpecificPolygonsOptions
-    :itemProps="itemProps"
-    tooltip="Triangles options"
-  />
+  <ViewerSpecificPolygonsOptions :itemProps="itemProps" tooltip="Triangles options" />
 </template>

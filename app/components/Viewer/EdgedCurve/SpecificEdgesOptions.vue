@@ -3,7 +3,9 @@
 // oxlint-disable eslint/sort-imports
 import EdgedCurveEdges from "@ogw_front/assets/viewer_svgs/edged_curve_edges.svg";
 // oxlint-disable-next-line import/consistent-type-specifier-style -- combining the default import with the type import avoids a duplicate-imports violation on this same module
-import ViewerContextMenuItem, { type ItemProps } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import ViewerContextMenuItem, {
+  type ItemProps,
+} from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import ViewerOptionsWidthSlider from "@ogw_front/components/Viewer/Options/Sliders/Width.vue";
@@ -68,9 +70,7 @@ const vertex_attribute_name = computed({
       return;
     }
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(
-        dataStyleStore.setMeshEdgesVertexAttributeName(targetId, newValue),
-      ),
+      Promise.resolve(dataStyleStore.setMeshEdgesVertexAttributeName(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -79,9 +79,7 @@ const vertex_attribute_item = computed({
   get: () => dataStyleStore.meshEdgesVertexAttributeItem(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(
-        dataStyleStore.setMeshEdgesVertexAttributeItem(targetId, newValue),
-      ),
+      Promise.resolve(dataStyleStore.setMeshEdgesVertexAttributeItem(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -94,13 +92,7 @@ const vertex_attribute_range = computed({
       return;
     }
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(
-        dataStyleStore.setMeshEdgesVertexAttributeRange(
-          targetId,
-          minimum,
-          maximum,
-        ),
-      ),
+      Promise.resolve(dataStyleStore.setMeshEdgesVertexAttributeRange(targetId, minimum, maximum)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -109,18 +101,13 @@ const vertex_attribute_color_map = computed({
   get: () => dataStyleStore.meshEdgesVertexAttributeColorMap(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(
-        dataStyleStore.setMeshEdgesVertexAttributeColorMap(targetId, newValue),
-      ),
+      Promise.resolve(dataStyleStore.setMeshEdgesVertexAttributeColorMap(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_no_data_color = computed<RGBAColor | undefined>({
-  get: () =>
-    dataStyleStore.meshEdgesVertexAttributeNoDataColor(id.value) as
-      | RGBAColor
-      | undefined,
+  get: () => dataStyleStore.meshEdgesVertexAttributeNoDataColor(id.value) as RGBAColor | undefined,
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshEdgesVertexAttributeNoDataColor(targetId, newValue),
@@ -135,9 +122,7 @@ const edge_attribute_name = computed({
       return;
     }
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(
-        dataStyleStore.setMeshEdgesEdgeAttributeName(targetId, newValue),
-      ),
+      Promise.resolve(dataStyleStore.setMeshEdgesEdgeAttributeName(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -146,9 +131,7 @@ const edge_attribute_item = computed({
   get: () => dataStyleStore.meshEdgesEdgeAttributeItem(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(
-        dataStyleStore.setMeshEdgesEdgeAttributeItem(targetId, newValue),
-      ),
+      Promise.resolve(dataStyleStore.setMeshEdgesEdgeAttributeItem(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -161,13 +144,7 @@ const edge_attribute_range = computed({
       return;
     }
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(
-        dataStyleStore.setMeshEdgesEdgeAttributeRange(
-          targetId,
-          minimum,
-          maximum,
-        ),
-      ),
+      Promise.resolve(dataStyleStore.setMeshEdgesEdgeAttributeRange(targetId, minimum, maximum)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -176,18 +153,13 @@ const edge_attribute_color_map = computed({
   get: () => dataStyleStore.meshEdgesEdgeAttributeColorMap(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(
-        dataStyleStore.setMeshEdgesEdgeAttributeColorMap(targetId, newValue),
-      ),
+      Promise.resolve(dataStyleStore.setMeshEdgesEdgeAttributeColorMap(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const edge_attribute_no_data_color = computed<RGBAColor | undefined>({
-  get: () =>
-    dataStyleStore.meshEdgesEdgeAttributeNoDataColor(id.value) as
-      | RGBAColor
-      | undefined,
+  get: () => dataStyleStore.meshEdgesEdgeAttributeNoDataColor(id.value) as RGBAColor | undefined,
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshEdgesEdgeAttributeNoDataColor(targetId, newValue),
@@ -206,16 +178,10 @@ const edge_attribute_no_data_color = computed<RGBAColor | undefined>({
     tooltip="Edges options"
   >
     <template #options>
-      <ViewerOptionsVisibilitySwitch
-        data-testid="meshEdgesVisibilitySwitch"
-        v-model="visibility"
-      />
+      <ViewerOptionsVisibilitySwitch data-testid="meshEdgesVisibilitySwitch" v-model="visibility" />
       <template v-if="visibility">
         <v-divider class="my-2" />
-        <ViewerOptionsWidthSlider
-          data-testid="meshEdgesWidthSlider"
-          v-model="width"
-        />
+        <ViewerOptionsWidthSlider data-testid="meshEdgesWidthSlider" v-model="width" />
         <ViewerOptionsColoringTypeSelector
           :id="id"
           v-model:coloring_style_key="coloring_style_key"
@@ -224,9 +190,7 @@ const edge_attribute_no_data_color = computed<RGBAColor | undefined>({
           v-model:vertex_attribute_item="vertex_attribute_item"
           v-model:vertex_attribute_range="vertex_attribute_range"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
-          v-model:vertex_attribute_no_data_color="
-            vertex_attribute_no_data_color
-          "
+          v-model:vertex_attribute_no_data_color="vertex_attribute_no_data_color"
           v-model:edge_attribute_name="edge_attribute_name"
           v-model:edge_attribute_item="edge_attribute_item"
           v-model:edge_attribute_range="edge_attribute_range"

@@ -11,8 +11,5 @@ const { itemProps } = defineProps<Props>();
 </script>
 
 <template>
-  <ViewerGenericMeshEdgesOptions
-    :itemProps="itemProps"
-    :btnImage="SolidEdges"
-  />
+  <ViewerGenericMeshEdgesOptions :itemProps="itemProps" :btnImage="SolidEdges" />
 </template>

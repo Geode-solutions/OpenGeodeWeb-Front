@@ -13,9 +13,7 @@ type UnwrapMaybeRefOrGetter<Source> = Source extends () => infer Result
   : Source extends { value: infer Result }
     ? Result
     : Source;
-type VirtualTreeProps = UnwrapMaybeRefOrGetter<
-  Parameters<typeof useVirtualTree>[0]
->;
+type VirtualTreeProps = UnwrapMaybeRefOrGetter<Parameters<typeof useVirtualTree>[0]>;
 
 interface Props {
   items: unknown[];
@@ -70,18 +68,13 @@ const {
   emit as EmitFn,
 );
 
-const {
-  virtualScrollRef,
-  stickyHeader,
-  handleScroll,
-  scrollToIndex,
-  getScrollInfo,
-} = useTreeScroll(
-  computed(() => ({ scrollTop })),
-  emit as EmitFn,
-  displayItems,
-  actualItemProps,
-);
+const { virtualScrollRef, stickyHeader, handleScroll, scrollToIndex, getScrollInfo } =
+  useTreeScroll(
+    computed(() => ({ scrollTop })),
+    emit as EmitFn,
+    displayItems,
+    actualItemProps,
+  );
 
 const focusedIndex = ref(-1);
 const lastActiveIndex = ref(-1);

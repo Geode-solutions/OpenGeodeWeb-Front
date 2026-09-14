@@ -11,8 +11,5 @@ const { itemProps } = defineProps<Props>();
 </script>
 
 <template>
-  <ViewerGenericMeshPointsOptions
-    :itemProps="itemProps"
-    :btnImage="Grid3D_Points"
-  />
+  <ViewerGenericMeshPointsOptions :itemProps="itemProps" :btnImage="Grid3D_Points" />
 </template>

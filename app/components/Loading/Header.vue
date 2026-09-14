@@ -15,23 +15,14 @@ const { logo = "" } = defineProps<Props>();
     />
   </v-row>
 
-  <v-card
-    color="transparent"
-    elevation="0"
-    class="mb-4 mb-sm-8 overflow-visible"
-  >
+  <v-card color="transparent" elevation="0" class="mb-4 mb-sm-8 overflow-visible">
     <v-card-title
       class="font-weight-black text-white text-wrap pa-0 d-block responsive-title"
       style="text-shadow: 0 0 20px rgba(255, 255, 255, 0.3)"
     >
       STARTING UP
     </v-card-title>
-    <v-divider
-      thickness="3"
-      class="border-opacity-100 mx-auto my-4"
-      color="primary"
-      width="60"
-    />
+    <v-divider thickness="3" class="border-opacity-100 mx-auto my-4" color="primary" width="60" />
     <v-card-subtitle
       class="text-subtitle-2 font-weight-bold text-white ls-widest pa-0 text-wrap"
       style="opacity: 0.9"
