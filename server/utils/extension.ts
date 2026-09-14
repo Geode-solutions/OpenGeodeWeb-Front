@@ -6,7 +6,7 @@ import path from "node:path";
 import { createError } from "h3";
 
 // Local imports
-import { extensionFrontendPath } from "@ogw_server/utils/path";
+import { extensionFrontendPath } from "@geode/opengeodeweb-front/server/utils/path.ts";
 
 interface ExtensionMetadata {
   id: string;

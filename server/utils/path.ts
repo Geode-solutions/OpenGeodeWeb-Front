@@ -8,7 +8,7 @@ import { setTimeout } from "node:timers/promises";
 import { v4 as uuidv4 } from "uuid";
 
 // Local imports
-import { appMode } from "@ogw_shared/app_mode";
+import { appMode } from "@geode/opengeodeweb-front/shared/app_mode.ts";
 import { commandExistsSync } from "./scripts.js";
 
 function executableName(execName: string): string {

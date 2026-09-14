@@ -2,7 +2,7 @@
 import { createError, defineEventHandler, readBody } from "h3";
 
 // Local imports
-import { setAppBaseUrl } from "@ogw_server/utils/server_config";
+import { setAppBaseUrl } from "@geode/opengeodeweb-front/server/utils/server_config.ts";
 
 interface SetAppBaseUrlBody {
   baseUrl: string;

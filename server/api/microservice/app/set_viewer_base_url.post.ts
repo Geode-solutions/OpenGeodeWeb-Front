@@ -2,7 +2,7 @@
 import { createError, defineEventHandler, readBody } from "h3";
 
 // Local imports
-import { setViewerBaseUrl } from "@ogw_server/utils/server_config";
+import { setViewerBaseUrl } from "@geode/opengeodeweb-front/server/utils/server_config.ts";
 
 interface SetViewerBaseUrlBody {
   baseUrl: string;

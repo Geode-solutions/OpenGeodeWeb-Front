@@ -5,7 +5,7 @@ import { promises as fs } from "node:fs";
 import { createError, defineEventHandler, readBody } from "h3";
 
 // Local imports
-import { registerExtensionFile, targetExtensionFilePath } from "@ogw_server/utils/app_config";
+import { registerExtensionFile, targetExtensionFilePath } from "@geode/opengeodeweb-front/server/utils/app_config.ts";
 
 interface DownloadExtensionBody {
   projectName: string;

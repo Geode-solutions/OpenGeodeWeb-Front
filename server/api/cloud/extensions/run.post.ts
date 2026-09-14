@@ -5,11 +5,11 @@ import fs from "node:fs";
 import { createError, defineEventHandler, readBody } from "h3";
 
 // Local imports
-import { addMicroserviceMetadatas, runExtension } from "@ogw_server/utils/microservices";
-import { extensionBackendPath, extensionFolderPath } from "@ogw_server/utils/path";
-import { readExtensionFrontend, readExtensionMetadata } from "@ogw_server/utils/extension";
-import { extensionsConf } from "@ogw_server/utils/app_config";
-import { unzipFile } from "@ogw_server/utils/server";
+import { addMicroserviceMetadatas, runExtension } from "@geode/opengeodeweb-front/server/utils/microservices.ts";
+import { extensionBackendPath, extensionFolderPath } from "@geode/opengeodeweb-front/server/utils/path.ts";
+import { readExtensionFrontend, readExtensionMetadata } from "@geode/opengeodeweb-front/server/utils/extension.ts";
+import { extensionsConf } from "@geode/opengeodeweb-front/server/utils/app_config.ts";
+import { unzipFile } from "@geode/opengeodeweb-front/server/utils/server.ts";
 
 interface RunExtensionsBody {
   projectFolderPath: string;
