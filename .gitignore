@@ -35,3 +35,8 @@ pnpm-lock.yaml
 /opengeodeweb-viewer
 VTK.txt
 *.nuxtrc
+
+# Compiled Node-safe siblings of server/utils/ and shared/ (see scripts/build_node_utils.ts)
+/server/**/*.js
+/shared/**/*.js
+/opengeodeweb_front_schemas.js

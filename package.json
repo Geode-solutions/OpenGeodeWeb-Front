@@ -37,7 +37,8 @@
     "test:unit": "npm run tests -- --project unit",
     "test:integration": "npm run tests -- --project integration",
     "geode_objects": "tsx scripts/generate_geode_objects.ts && prettier ./assets/geode_objects.ts --write",
-    "build": ""
+    "build": "tsx scripts/build_node_utils.ts",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@geode/opengeodeweb-back": "0.0.0",
@@ -60,8 +61,10 @@
     "googleapis": "171.4.0",
     "js-file-download": "0.4.12",
     "jszip": "3.10.1",
+    "lodash": "4.18.1",
     "node-stream-zip": "1.15.0",
     "nuxt": "4.5.1",
+    "ofetch": "1.5.1",
     "p-timeout": "7.0.1",
     "pinia": "4.0.2",
     "rimraf": "6.1.3",
@@ -88,6 +91,7 @@
     "playwright-core": "1.52.0",
     "prettier": "3.8.1",
     "resize-observer-polyfill": "1.5.1",
+    "rolldown": "1.2.8",
     "tsx": "4.23.13",
     "typescript": "5.9.3",
     "unplugin-auto-import": "20.0.0",
