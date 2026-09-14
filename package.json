@@ -48,7 +48,7 @@
     "test:unit": "npm run tests -- --project unit",
     "test:integration": "npm run tests -- --project integration",
     "geode_objects": "tsx scripts/generate_geode_objects.ts && prettier ./assets/geode_objects.ts --write",
-    "build": "nuxt prepare && tsx scripts/build_node_utils.ts",
+    "build": "nuxt prepare && rolldown -c rolldown.config.ts",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {

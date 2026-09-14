@@ -1,8 +1,7 @@
-// oxlint-disable no-console
 import fs from "node:fs";
 import path from "node:path";
 
-import { rolldown } from "rolldown";
+import { defineConfig } from "rolldown";
 
 // Server/utils/extension.ts relies on Nitro's "#imports" auto-import alias and cannot run outside a Nitro server, so it is excluded from this build.
 const EXCLUDED_FILES = new Set(["server/utils/extension.ts"]);
@@ -21,7 +20,9 @@ function collectTsFiles(dir: string): string[] {
   return files;
 }
 
-function isExternal(id: string, ownPackageName: string): boolean {
+const ownPackageName = JSON.parse(fs.readFileSync("package.json", "utf8")).name as string;
+
+function isExternal(id: string): boolean {
   if (id.startsWith(".") || path.isAbsolute(id)) {
     return false;
   }
@@ -31,23 +32,15 @@ function isExternal(id: string, ownPackageName: string): boolean {
   return true;
 }
 
-const input = [...collectTsFiles("server/utils"), ...collectTsFiles("shared")];
-const ownPackageName = JSON.parse(fs.readFileSync("package.json", "utf8")).name as string;
-
-// oxlint-disable-next-line no-top-level-await
-const bundle = await rolldown({
-  input,
+// oxlint-disable-next-line import/no-default-export
+export default defineConfig({
+  input: [...collectTsFiles("server/utils"), ...collectTsFiles("shared")],
   platform: "node",
-  external: (id: string) => isExternal(id, ownPackageName),
+  external: isExternal,
+  output: {
+    dir: ".",
+    format: "esm",
+    preserveModules: true,
+    preserveModulesRoot: ".",
+  },
 });
-// oxlint-disable-next-line no-top-level-await
-await bundle.write({
-  dir: ".",
-  format: "esm",
-  preserveModules: true,
-  preserveModulesRoot: ".",
-});
-// oxlint-disable-next-line no-top-level-await
-await bundle.close();
-
-console.log(`[build_node_utils] built ${input.length} files from server/utils/ and shared/`);
