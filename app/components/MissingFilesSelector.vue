@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 
-import FetchingData from "@ogw_front/components/FetchingData";
-import FileUploader from "@ogw_front/components/FileUploader";
+import FetchingData from "@ogw_front/components/FetchingData.vue";
+import FileUploader from "@ogw_front/components/FileUploader.vue";
 import { useBackStore } from "@ogw_front/stores/back";
 
 // Files carry extra app-specific bookkeeping fields once picked up here.
@@ -28,12 +28,7 @@ interface Props {
   files?: UploadFile[];
 }
 
-const {
-  multiple,
-  geodeObjectType,
-  filenames,
-  files = [],
-} = defineProps<Props>();
+const { multiple, geodeObjectType, filenames, files = [] } = defineProps<Props>();
 
 const accept = ref("");
 const loading = ref(false);
@@ -48,10 +43,7 @@ function files_uploaded_event(value: UploadFile[]) {
 }
 
 function isCsvFile(filename: string) {
-  return (
-    filename.toLowerCase().endsWith(".csv") ||
-    filename.toLowerCase().endsWith(".csv.json")
-  );
+  return filename.toLowerCase().endsWith(".csv") || filename.toLowerCase().endsWith(".csv.json");
 }
 
 async function missing_files() {
@@ -61,36 +53,26 @@ async function missing_files() {
   additional_files.value = [];
   const backStore = useBackStore();
 
-  const promise_array: Promise<FilePlan>[] = filenames.map(
-    (filename): Promise<FilePlan> => {
-      if (isCsvFile(filename)) {
-        return Promise.resolve({
-          has_missing_files: false,
-          mandatory_files: [],
-          additional_files: [],
-        });
-      }
-      const params = { geode_object_type: geodeObjectType, filename };
-      return backStore.request({ schema, params });
-    },
-  );
+  const promise_array: Promise<FilePlan>[] = filenames.map((filename): Promise<FilePlan> => {
+    if (isCsvFile(filename)) {
+      return Promise.resolve({
+        has_missing_files: false,
+        mandatory_files: [],
+        additional_files: [],
+      });
+    }
+    const params = { geode_object_type: geodeObjectType, filename };
+    return backStore.request({ schema, params });
+  });
   const values = await Promise.all(promise_array);
   for (const value of values) {
     if (value.has_missing_files) {
       has_missing_files.value = true;
     }
-    mandatory_files.value = [
-      ...mandatory_files.value,
-      ...value.mandatory_files,
-    ];
-    additional_files.value = [
-      ...additional_files.value,
-      ...value.additional_files,
-    ];
+    mandatory_files.value = [...mandatory_files.value, ...value.mandatory_files];
+    additional_files.value = [...additional_files.value, ...value.additional_files];
   }
-  const unconfigured_csvs = files.filter(
-    (file) => isCsvFile(file.name) && !file.isConfigured,
-  );
+  const unconfigured_csvs = files.filter((file) => isCsvFile(file.name) && !file.isConfigured);
   if (unconfigured_csvs.length > 0) {
     has_missing_files.value = true;
     if (accept.value === "") {
@@ -125,11 +107,7 @@ await missing_files();
         <v-icon color="accent" icon="mdi-file-document-plus-outline" />
       </v-col>
       <p class="pa-1">Additional files:</p>
-      <v-col
-        v-for="additional_file in additional_files"
-        cols="auto"
-        class="pa-0"
-      >
+      <v-col v-for="additional_file in additional_files" cols="auto" class="pa-0">
         <v-chip>{{ additional_file }}</v-chip>
       </v-col>
     </v-row>
@@ -142,10 +120,7 @@ await missing_files();
       </v-col>
     </v-row>
     <v-row>
-      <v-col
-        v-if="mandatory_files.length === 0 && additional_files.length > 0"
-        cols="auto"
-      >
+      <v-col v-if="mandatory_files.length === 0 && additional_files.length > 0" cols="auto">
         <v-btn @click="emit('increment_step')" color="warning">Skip step</v-btn>
       </v-col>
     </v-row>

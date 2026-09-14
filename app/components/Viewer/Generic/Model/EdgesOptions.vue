@@ -3,8 +3,8 @@ import SurfaceEdges from "@ogw_front/assets/viewer_svgs/surface_edges.svg";
 // oxlint-disable import/consistent-type-specifier-style -- combining the default import with the type import avoids a duplicate-imports violation on this same module; using disable-next-line here is fragile because a formatter can re-wrap the import onto multiple lines and shift the flagged line
 import ViewerContextMenuItem, {
   type ItemProps,
-} from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem";
-import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch";
+} from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -20,9 +20,7 @@ interface Props {
 
 const { itemProps } = defineProps<Props>();
 
-const id = computed(
-  () => (itemProps.meta_data.modelId as string | undefined) || itemProps.id,
-);
+const id = computed(() => (itemProps.meta_data.modelId as string | undefined) || itemProps.id);
 
 const visibility = computed({
   get: () => dataStyleStore.modelEdgesVisibility(id.value),

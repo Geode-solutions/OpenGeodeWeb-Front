@@ -5,7 +5,7 @@ import { mount } from "@vue/test-utils";
 
 // Local imports
 import { setupActivePinia, vuetify } from "@ogw_tests/utils";
-import FeedBackSnackers from "@ogw_front/components/FeedBack/Snackers";
+import FeedBackSnackers from "@ogw_front/components/FeedBack/Snackers.vue";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 vi.stubGlobal("visualViewport", new EventTarget());

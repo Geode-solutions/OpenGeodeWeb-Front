@@ -1,9 +1,9 @@
 <script setup lang="ts">
 // Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
 // oxlint-disable eslint/sort-imports
-import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView";
-import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls";
-import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel";
+import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
+import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
+import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import { compareSelections } from "@ogw_front/utils/treeview";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -50,15 +50,10 @@ const {
 } = useTreeFilter(() => treeviewStore.items, { recursiveSort: true });
 
 function onUpdateSelection(val: string[]) {
-  treeviewStore.selection = applySearchFilter(
-    val,
-    treeviewStore.selection,
-  ) as string[];
+  treeviewStore.selection = applySearchFilter(val, treeviewStore.selection) as string[];
 }
 
-const visibleSelection = computed(() =>
-  applySearchFilter(treeviewStore.selection, []),
-);
+const visibleSelection = computed(() => applySearchFilter(treeviewStore.selection, []));
 
 watch(
   () => treeviewStore.selection,
@@ -71,9 +66,7 @@ watch(
     const { added, removed } = compareSelections(current, previous);
 
     const allObjectIds = new Set(
-      treeviewStore.items.flatMap((group) =>
-        group.children.map((child) => child.id),
-      ),
+      treeviewStore.items.flatMap((group) => group.children.map((child) => child.id)),
     );
 
     const updates = [
@@ -109,9 +102,7 @@ watch(
       if (hasCollectionsMap[model.id] === undefined) {
         hasCollectionsMap[model.id] = false;
         try {
-          const hasCollections = await dataStore.hasCollectionComponents(
-            model.id,
-          );
+          const hasCollections = await dataStore.hasCollectionComponents(model.id);
           hasCollectionsMap[model.id] = hasCollections;
         } catch (error) {
           console.error("Failed to check collections", error);
@@ -141,10 +132,7 @@ function handleHoverEnter({
 
   onHoverEnter(
     actualItem.id,
-    async () =>
-      is_model
-        ? await dataStore.getAllModelComponentsViewerIds(actualItem.id)
-        : [],
+    async () => (is_model ? await dataStore.getAllModelComponentsViewerIds(actualItem.id) : []),
     is_model ? "model" : "mesh",
     immediate,
   );
@@ -199,17 +187,9 @@ function expandAll() {
       :scroll-top="mainView?.scrollTop || 0"
       class="transparent-treeview virtual-tree-height"
       @update:selected="(val) => onUpdateSelection(val as string[])"
-      @update:scroll-top="
-        treeviewStore.setScrollTop(mainView?.id ?? '', $event)
-      "
-      @hover:enter="
-        ({ item }) =>
-          handleHoverEnter({ item: item as unknown as TreeGroupItem })
-      "
-      @hover:leave="
-        ({ item }) =>
-          handleHoverLeave({ item: item as unknown as TreeGroupItem })
-      "
+      @update:scroll-top="treeviewStore.setScrollTop(mainView?.id ?? '', $event)"
+      @hover:enter="({ item }) => handleHoverEnter({ item: item as unknown as TreeGroupItem })"
+      @hover:leave="({ item }) => handleHoverLeave({ item: item as unknown as TreeGroupItem })"
       @contextmenu="
         emit('show-menu', {
           event: $event.event,
@@ -221,9 +201,7 @@ function expandAll() {
         <ObjectTreeItemLabel
           :item="item as unknown as DisplayItem"
           :is-leaf="isLeaf"
-          @contextmenu="
-            emit('show-menu', { event: $event, itemId: item.id as string })
-          "
+          @contextmenu="emit('show-menu', { event: $event, itemId: item.id as string })"
         />
       </template>
 
@@ -236,9 +214,7 @@ function expandAll() {
             size="medium"
             variant="text"
             v-tooltip="'Focus camera on object'"
-            @click.stop="
-              hybridViewerStore.focusCameraOnObject(item.id as string)
-            "
+            @click.stop="hybridViewerStore.focusCameraOnObject(item.id as string)"
           />
           <v-btn
             v-if="isModel(item as unknown as TreeGroupItem)"
@@ -261,10 +237,7 @@ function expandAll() {
             <v-icon size="18">mdi-magnify-expand</v-icon>
           </v-btn>
           <v-btn
-            v-if="
-              isModel(item as unknown as TreeGroupItem) &&
-              hasCollectionsMap[item.id as string]
-            "
+            v-if="isModel(item as unknown as TreeGroupItem) && hasCollectionsMap[item.id as string]"
             data-testid="expandModelCollectionsButton"
             icon="mdi-format-list-group"
             size="medium"

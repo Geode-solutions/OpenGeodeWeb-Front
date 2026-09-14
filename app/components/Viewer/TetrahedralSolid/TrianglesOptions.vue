@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { ItemProps } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem";
+import type { ItemProps } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import TetrahedralSolidTriangles from "@ogw_front/assets/viewer_svgs/solid_facets.svg";
-import ViewerGenericMeshPolygonsOptions from "@ogw_front/components/Viewer/Generic/Mesh/PolygonsOptions";
+import ViewerGenericMeshPolygonsOptions from "@ogw_front/components/Viewer/Generic/Mesh/PolygonsOptions.vue";
 
 interface Props {
   itemProps: ItemProps & { index?: number };

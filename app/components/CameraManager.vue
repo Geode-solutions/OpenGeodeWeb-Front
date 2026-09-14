@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import List from "@ogw_front/components/CameraManager/List";
-import Saver from "@ogw_front/components/CameraManager/Saver";
-import ToolPanel from "@ogw_front/components/ToolPanel";
+import List from "@ogw_front/components/CameraManager/List.vue";
+import Saver from "@ogw_front/components/CameraManager/Saver.vue";
+import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 
 const DEFAULT_PANEL_WIDTH = 260;
 
@@ -40,12 +40,7 @@ const show = computed({
 </script>
 
 <template>
-  <ToolPanel
-    v-model="show"
-    title="Camera Positions"
-    :width="width"
-    :escapeFunction="handleClose"
-  >
+  <ToolPanel v-model="show" title="Camera Positions" :width="width" :escapeFunction="handleClose">
     <v-card-text class="pa-0">
       <Saver />
       <v-divider />

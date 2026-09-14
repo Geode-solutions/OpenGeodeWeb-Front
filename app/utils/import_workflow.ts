@@ -91,8 +91,7 @@ async function importWorkflow(files: FileToImport[]): Promise<string[]> {
     }
     const chunk = chunks[chunkIndex] ?? [];
     const chunk_results = await Promise.all(
-      chunk.map(async ({ filename, geode_object_type }) => 
-         await importFile(filename, geode_object_type)
+      chunk.map(async ({ filename, geode_object_type }) =>  await importFile(filename, geode_object_type)
       ),
     );
     results.push(...chunk_results);

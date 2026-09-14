@@ -4,9 +4,9 @@ import { mountSuspended } from "@nuxt/test-utils/runtime";
 import { useStepperTree } from "@ogw_front/composables/stepper_tree.js";
 import { vuetify } from "@ogw_tests/utils";
 
-import ObjectSelector from "@ogw_front/components/ObjectSelector";
+import ObjectSelector from "@ogw_front/components/ObjectSelector.vue";
 import ResizeObserver from "resize-observer-polyfill";
-import Stepper from "@ogw_front/components/Stepper";
+import Stepper from "@ogw_front/components/Stepper.vue";
 
 globalThis.ResizeObserver = ResizeObserver;
 

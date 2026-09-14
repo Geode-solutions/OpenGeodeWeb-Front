@@ -1,42 +1,42 @@
 // PointSet components
-import PointSetPointsOptions from "@ogw_front/components/Viewer/PointSet/SpecificPointsOptions";
+import PointSetPointsOptions from "@ogw_front/components/Viewer/PointSet/SpecificPointsOptions.vue";
 
 // EdgedCurve components
-import EdgedCurveEdgesOptions from "@ogw_front/components/Viewer/EdgedCurve/SpecificEdgesOptions";
-import EdgedCurvePointsOptions from "@ogw_front/components/Viewer/EdgedCurve/PointsOptions";
+import EdgedCurveEdgesOptions from "@ogw_front/components/Viewer/EdgedCurve/SpecificEdgesOptions.vue";
+import EdgedCurvePointsOptions from "@ogw_front/components/Viewer/EdgedCurve/PointsOptions.vue";
 
 // Surface components
-import SurfaceEdgesOptions from "@ogw_front/components/Viewer/Surface/EdgesOptions";
-import SurfacePointsOptions from "@ogw_front/components/Viewer/Surface/PointsOptions";
-import SurfacePolygonsOptions from "@ogw_front/components/Viewer/Surface/PolygonsOptions";
+import SurfaceEdgesOptions from "@ogw_front/components/Viewer/Surface/EdgesOptions.vue";
+import SurfacePointsOptions from "@ogw_front/components/Viewer/Surface/PointsOptions.vue";
+import SurfacePolygonsOptions from "@ogw_front/components/Viewer/Surface/PolygonsOptions.vue";
 
 // TriangulatedSurface components
-import TriangulatedSurfaceTrianglesOptions from "@ogw_front/components/Viewer/Surface/Triangulated/TrianglesOptions";
+import TriangulatedSurfaceTrianglesOptions from "@ogw_front/components/Viewer/Surface/Triangulated/TrianglesOptions.vue";
 
 // Grid 2D components
-import Grid2DCellsOptions from "@ogw_front/components/Viewer/Grid/2D/CellsOptions";
-import Grid2DEdgesOptions from "@ogw_front/components/Viewer/Grid/2D/EdgesOptions";
-import Grid2DPointsOptions from "@ogw_front/components/Viewer/Grid/2D/PointsOptions";
+import Grid2DCellsOptions from "@ogw_front/components/Viewer/Grid/2D/CellsOptions.vue";
+import Grid2DEdgesOptions from "@ogw_front/components/Viewer/Grid/2D/EdgesOptions.vue";
+import Grid2DPointsOptions from "@ogw_front/components/Viewer/Grid/2D/PointsOptions.vue";
 
 // Grid 3D components
-import Grid3DCellsOptions from "@ogw_front/components/Viewer/Grid/3D/CellsOptions";
-import Grid3DEdgesOptions from "@ogw_front/components/Viewer/Grid/3D/EdgesOptions";
-import Grid3DPointsOptions from "@ogw_front/components/Viewer/Grid/3D/PointsOptions";
+import Grid3DCellsOptions from "@ogw_front/components/Viewer/Grid/3D/CellsOptions.vue";
+import Grid3DEdgesOptions from "@ogw_front/components/Viewer/Grid/3D/EdgesOptions.vue";
+import Grid3DPointsOptions from "@ogw_front/components/Viewer/Grid/3D/PointsOptions.vue";
 
 // Solid components
-import SolidEdgesOptions from "@ogw_front/components/Viewer/Solid/EdgesOptions";
-import SolidPointsOptions from "@ogw_front/components/Viewer/Solid/PointsOptions";
-import SolidPolygonsOptions from "@ogw_front/components/Viewer/Solid/PolygonsOptions";
-import SolidPolyhedraOptions from "@ogw_front/components/Viewer/Solid/SpecificPolyhedraOptions";
+import SolidEdgesOptions from "@ogw_front/components/Viewer/Solid/EdgesOptions.vue";
+import SolidPointsOptions from "@ogw_front/components/Viewer/Solid/PointsOptions.vue";
+import SolidPolygonsOptions from "@ogw_front/components/Viewer/Solid/PolygonsOptions.vue";
+import SolidPolyhedraOptions from "@ogw_front/components/Viewer/Solid/SpecificPolyhedraOptions.vue";
 
 // TetrahedralSolid components
-import TetrahedralSolidTetrahedraOptions from "@ogw_front/components/Viewer/TetrahedralSolid/TetrahedraOptions";
-import TetrahedralSolidTrianglesOptions from "@ogw_front/components/Viewer/TetrahedralSolid/TrianglesOptions";
+import TetrahedralSolidTetrahedraOptions from "@ogw_front/components/Viewer/TetrahedralSolid/TetrahedraOptions.vue";
+import TetrahedralSolidTrianglesOptions from "@ogw_front/components/Viewer/TetrahedralSolid/TrianglesOptions.vue";
 
 // Model components
-import ModelEdgesOptions from "@ogw_front/components/Viewer/Generic/Model/EdgesOptions";
-import ModelPointsOptions from "@ogw_front/components/Viewer/Generic/Model/PointsOptions";
-import ModelStyleOptions from "@ogw_front/components/Viewer/Generic/Model/ModelStyleOptions";
+import ModelEdgesOptions from "@ogw_front/components/Viewer/Generic/Model/EdgesOptions.vue";
+import ModelPointsOptions from "@ogw_front/components/Viewer/Generic/Model/PointsOptions.vue";
+import ModelStyleOptions from "@ogw_front/components/Viewer/Generic/Model/ModelStyleOptions.vue";
 
 import type { Component } from "vue";
 

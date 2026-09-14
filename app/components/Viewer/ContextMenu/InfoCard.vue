@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import GlassCard from "@ogw_front/components/GlassCard";
+import GlassCard from "@ogw_front/components/GlassCard.vue";
 import { middleTruncate } from "@ogw_front/utils/string";
 import { useClipboard } from "@vueuse/core";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -61,8 +61,7 @@ watch(
     if (newMeta.pickedComponentId && modelId) {
       const components = await dataStore.getAllMeshComponents(modelId);
       const comp = components.find(
-        (component: MeshComponentInfo) =>
-          component.id === newMeta.pickedComponentId,
+        (component: MeshComponentInfo) => component.id === newMeta.pickedComponentId,
       );
       if (comp) {
         componentName.value = comp.title;
@@ -89,12 +88,7 @@ const displayTitle = computed(() => {
   if (!name) {
     return "";
   }
-  return middleTruncate(
-    name,
-    TRUNCATE_MAX_LENGTH,
-    TRUNCATE_START_CHARS,
-    TRUNCATE_END_CHARS,
-  );
+  return middleTruncate(name, TRUNCATE_MAX_LENGTH, TRUNCATE_START_CHARS, TRUNCATE_END_CHARS);
 });
 
 const displayComponentTitle = computed(() => {
@@ -136,12 +130,7 @@ const formattedId = computed(() => formatId(metaData.id));
 
 <template>
   <v-fade-transition>
-    <v-sheet
-      v-if="show"
-      class="object-name-popover bg-transparent"
-      @mousedown.stop
-      @click.stop
-    >
+    <v-sheet v-if="show" class="object-name-popover bg-transparent" @mousedown.stop @click.stop>
       <GlassCard
         variant="panel"
         padding="pa-2 px-3"
@@ -200,16 +189,10 @@ const formattedId = computed(() => formatId(metaData.id));
               @click.stop="copyId(componentItem.id)"
             >
               <span class="id-text">
-                {{
-                  isCopied(componentItem.id)
-                    ? "COPIED!"
-                    : formatId(componentItem.id)
-                }}
+                {{ isCopied(componentItem.id) ? "COPIED!" : formatId(componentItem.id) }}
               </span>
               <v-icon
-                :icon="
-                  isCopied(componentItem.id) ? 'mdi-check' : 'mdi-content-copy'
-                "
+                :icon="isCopied(componentItem.id) ? 'mdi-check' : 'mdi-content-copy'"
                 size="10"
                 :color="isCopied(componentItem.id) ? 'success' : 'white'"
                 class="ml-1"

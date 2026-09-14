@@ -5,7 +5,7 @@ import { mountSuspended } from "@nuxt/test-utils/runtime";
 
 // Local imports
 import { setupActivePinia, vuetify } from "@ogw_tests/utils";
-import DragAndDrop from "@ogw_front/components/DragAndDrop";
+import DragAndDrop from "@ogw_front/components/DragAndDrop.vue";
 
 describe("drag and drop", () => {
   const pinia = setupActivePinia();

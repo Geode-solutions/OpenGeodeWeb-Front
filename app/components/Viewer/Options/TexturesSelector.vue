@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ViewerOptionsTextureItem from "@ogw_front/components/Viewer/Options/TextureItem";
+import ViewerOptionsTextureItem from "@ogw_front/components/Viewer/Options/TextureItem.vue";
 
 interface Texture {
   id: string;
@@ -17,21 +17,14 @@ const { id } = defineProps<Props>();
 const internal_textures = ref<Texture[]>([]);
 
 onMounted(() => {
-  if (
-    textures.value === null ||
-    textures.value === undefined ||
-    textures.value.length === 0
-  ) {
+  if (textures.value === null || textures.value === undefined || textures.value.length === 0) {
     internal_textures.value = [{ id: "", texture_name: "" }];
   } else {
     internal_textures.value = textures.value;
   }
 });
 
-function update_value_event(
-  $event: { key: keyof Texture; value: string },
-  index: number,
-) {
+function update_value_event($event: { key: keyof Texture; value: string }, index: number) {
   const texture = internal_textures.value[index];
   if (!texture) {
     return;
@@ -47,12 +40,7 @@ function update_value_event(
 </script>
 
 <template>
-  <v-row
-    v-for="(texture, index) in internal_textures"
-    :key="index"
-    align="center"
-    class="mt-2"
-  >
+  <v-row v-for="(texture, index) in internal_textures" :key="index" align="center" class="mt-2">
     <v-col cols="1" class="pa-0">
       <v-icon
         v-if="internal_textures.length > 1"

@@ -3,9 +3,9 @@
 // oxlint-disable eslint/sort-imports
 // This file exhaustively wires group- and per-component style properties (visibility/color/coloring/vertex+polyhedron attributes) to the style store; the formatter's line-wrapping of the resulting store calls pushes the file past max-lines even though no logic was added.
 // oxlint-disable eslint/max-lines
-import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection";
-import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector";
-import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch";
+import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
+import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
+import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -26,20 +26,13 @@ const hybridViewerStore = useHybridViewerStore();
 const blocksVisibility = computed({
   get: () => dataStyleStore.modelComponentTypeVisibility(modelId, "Block"),
   set: async (newValue) => {
-    await dataStyleStore.setModelBlocksVisibility(
-      modelId,
-      targetBlockIds,
-      newValue,
-    );
+    await dataStyleStore.setModelBlocksVisibility(modelId, targetBlockIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
 
 const blockVisibility = computed({
-  get: () =>
-    dataStyleStore.modelBlockVisibility(modelId, blockId) as
-      | boolean
-      | undefined,
+  get: () => dataStyleStore.modelBlockVisibility(modelId, blockId) as boolean | undefined,
   set: async (newValue) => {
     if (blockId === undefined) {
       return;
@@ -51,10 +44,7 @@ const blockVisibility = computed({
 
 // Color
 const blocksColor = computed<RGBAColor | undefined>({
-  get: () =>
-    dataStyleStore.modelComponentTypeColor(modelId, "Block") as
-      | RGBAColor
-      | undefined,
+  get: () => dataStyleStore.modelComponentTypeColor(modelId, "Block") as RGBAColor | undefined,
   set: async (color) => {
     await dataStyleStore.setModelBlocksColor(modelId, targetBlockIds, color);
     hybridViewerStore.remoteRender();
@@ -62,8 +52,7 @@ const blocksColor = computed<RGBAColor | undefined>({
 });
 
 const blockColor = computed<RGBAColor | undefined>({
-  get: () =>
-    dataStyleStore.modelBlockColor(modelId, blockId) as RGBAColor | undefined,
+  get: () => dataStyleStore.modelBlockColor(modelId, blockId) as RGBAColor | undefined,
   set: async (color) => {
     if (blockId === undefined) {
       return;
@@ -75,36 +64,23 @@ const blockColor = computed<RGBAColor | undefined>({
 
 const blocksActiveColoring = computed<string | undefined>({
   get: () =>
-    dataStyleStore.getModelComponentTypeActiveColoring(modelId, "Block") as
-      | string
-      | undefined,
+    dataStyleStore.getModelComponentTypeActiveColoring(modelId, "Block") as string | undefined,
   set: async (coloringType) => {
     if (typeof coloringType !== "string") {
       return;
     }
-    await dataStyleStore.setModelBlocksActiveColoring(
-      modelId,
-      targetBlockIds,
-      coloringType,
-    );
+    await dataStyleStore.setModelBlocksActiveColoring(modelId, targetBlockIds, coloringType);
     hybridViewerStore.remoteRender();
   },
 });
 
 const blockActiveColoring = computed<string | undefined>({
-  get: () =>
-    dataStyleStore.modelBlockActiveColoring(modelId, blockId) as
-      | string
-      | undefined,
+  get: () => dataStyleStore.modelBlockActiveColoring(modelId, blockId) as string | undefined,
   set: async (coloringType) => {
     if (blockId === undefined || typeof coloringType !== "string") {
       return;
     }
-    await dataStyleStore.setModelBlocksActiveColoring(
-      modelId,
-      [blockId],
-      coloringType,
-    );
+    await dataStyleStore.setModelBlocksActiveColoring(modelId, [blockId], coloringType);
     hybridViewerStore.remoteRender();
   },
 });
@@ -116,11 +92,7 @@ const blocksVertexAttributeName = computed({
     if (newValue === undefined) {
       return;
     }
-    await dataStyleStore.setModelBlocksVertexAttributeName(
-      modelId,
-      targetBlockIds,
-      newValue,
-    );
+    await dataStyleStore.setModelBlocksVertexAttributeName(modelId, targetBlockIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -128,11 +100,7 @@ const blocksVertexAttributeName = computed({
 const blocksVertexAttributeItem = computed({
   get: () => dataStyleStore.modelBlocksVertexAttributeItem(modelId),
   set: async (newValue) => {
-    await dataStyleStore.setModelBlocksVertexAttributeItem(
-      modelId,
-      targetBlockIds,
-      newValue,
-    );
+    await dataStyleStore.setModelBlocksVertexAttributeItem(modelId, targetBlockIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -157,20 +125,13 @@ const blocksVertexAttributeRange = computed({
 const blocksVertexAttributeColorMap = computed({
   get: () => dataStyleStore.modelBlocksVertexAttributeColorMap(modelId),
   set: async (newValue) => {
-    await dataStyleStore.setModelBlocksVertexAttributeColorMap(
-      modelId,
-      targetBlockIds,
-      newValue,
-    );
+    await dataStyleStore.setModelBlocksVertexAttributeColorMap(modelId, targetBlockIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
 
 const blocksVertexAttributeNoDataColor = computed<RGBAColor | undefined>({
-  get: () =>
-    dataStyleStore.modelBlocksVertexAttributeNoDataColor(modelId) as
-      | RGBAColor
-      | undefined,
+  get: () => dataStyleStore.modelBlocksVertexAttributeNoDataColor(modelId) as RGBAColor | undefined,
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksVertexAttributeNoDataColor(
       modelId,
@@ -187,11 +148,7 @@ const blocksPolyhedronAttributeName = computed({
     if (newValue === undefined) {
       return;
     }
-    await dataStyleStore.setModelBlocksPolyhedronAttributeName(
-      modelId,
-      targetBlockIds,
-      newValue,
-    );
+    await dataStyleStore.setModelBlocksPolyhedronAttributeName(modelId, targetBlockIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -199,11 +156,7 @@ const blocksPolyhedronAttributeName = computed({
 const blocksPolyhedronAttributeItem = computed({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeItem(modelId),
   set: async (newValue) => {
-    await dataStyleStore.setModelBlocksPolyhedronAttributeItem(
-      modelId,
-      targetBlockIds,
-      newValue,
-    );
+    await dataStyleStore.setModelBlocksPolyhedronAttributeItem(modelId, targetBlockIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -239,9 +192,7 @@ const blocksPolyhedronAttributeColorMap = computed({
 
 const blocksPolyhedronAttributeNoDataColor = computed<RGBAColor | undefined>({
   get: () =>
-    dataStyleStore.modelBlocksPolyhedronAttributeNoDataColor(modelId) as
-      | RGBAColor
-      | undefined,
+    dataStyleStore.modelBlocksPolyhedronAttributeNoDataColor(modelId) as RGBAColor | undefined,
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksPolyhedronAttributeNoDataColor(
       modelId,
@@ -259,11 +210,7 @@ const vertexAttributeName = computed({
     if (blockId === undefined || newValue === undefined) {
       return;
     }
-    await dataStyleStore.setModelBlocksVertexAttributeName(
-      modelId,
-      [blockId],
-      newValue,
-    );
+    await dataStyleStore.setModelBlocksVertexAttributeName(modelId, [blockId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -274,11 +221,7 @@ const vertexAttributeItem = computed({
     if (blockId === undefined) {
       return;
     }
-    await dataStyleStore.setModelBlocksVertexAttributeItem(
-      modelId,
-      [blockId],
-      newValue,
-    );
+    await dataStyleStore.setModelBlocksVertexAttributeItem(modelId, [blockId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -287,99 +230,64 @@ const vertexAttributeRange = computed({
   get: () => dataStyleStore.modelBlocksVertexAttributeRange(modelId, blockId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
-    if (
-      blockId === undefined ||
-      minimum === undefined ||
-      maximum === undefined
-    ) {
+    if (blockId === undefined || minimum === undefined || maximum === undefined) {
       return;
     }
-    await dataStyleStore.setModelBlocksVertexAttributeRange(
-      modelId,
-      [blockId],
-      minimum,
-      maximum,
-    );
+    await dataStyleStore.setModelBlocksVertexAttributeRange(modelId, [blockId], minimum, maximum);
     hybridViewerStore.remoteRender();
   },
 });
 
 const vertexAttributeColorMap = computed({
-  get: () =>
-    dataStyleStore.modelBlocksVertexAttributeColorMap(modelId, blockId),
+  get: () => dataStyleStore.modelBlocksVertexAttributeColorMap(modelId, blockId),
   set: async (newValue) => {
     if (blockId === undefined) {
       return;
     }
-    await dataStyleStore.setModelBlocksVertexAttributeColorMap(
-      modelId,
-      [blockId],
-      newValue,
-    );
+    await dataStyleStore.setModelBlocksVertexAttributeColorMap(modelId, [blockId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
 
 const vertexAttributeNoDataColor = computed<RGBAColor | undefined>({
   get: () =>
-    dataStyleStore.modelBlocksVertexAttributeNoDataColor(modelId, blockId) as
-      | RGBAColor
-      | undefined,
+    dataStyleStore.modelBlocksVertexAttributeNoDataColor(modelId, blockId) as RGBAColor | undefined,
   set: async (newValue) => {
     if (blockId === undefined) {
       return;
     }
-    await dataStyleStore.setModelBlocksVertexAttributeNoDataColor(
-      modelId,
-      [blockId],
-      newValue,
-    );
+    await dataStyleStore.setModelBlocksVertexAttributeNoDataColor(modelId, [blockId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
 
 const polyhedronAttributeName = computed({
-  get: () =>
-    dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, blockId),
+  get: () => dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, blockId),
   set: async (newValue) => {
     if (blockId === undefined || newValue === undefined) {
       return;
     }
-    await dataStyleStore.setModelBlocksPolyhedronAttributeName(
-      modelId,
-      [blockId],
-      newValue,
-    );
+    await dataStyleStore.setModelBlocksPolyhedronAttributeName(modelId, [blockId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
 
 const polyhedronAttributeItem = computed({
-  get: () =>
-    dataStyleStore.modelBlocksPolyhedronAttributeItem(modelId, blockId),
+  get: () => dataStyleStore.modelBlocksPolyhedronAttributeItem(modelId, blockId),
   set: async (newValue) => {
     if (blockId === undefined) {
       return;
     }
-    await dataStyleStore.setModelBlocksPolyhedronAttributeItem(
-      modelId,
-      [blockId],
-      newValue,
-    );
+    await dataStyleStore.setModelBlocksPolyhedronAttributeItem(modelId, [blockId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
 
 const polyhedronAttributeRange = computed({
-  get: () =>
-    dataStyleStore.modelBlocksPolyhedronAttributeRange(modelId, blockId),
+  get: () => dataStyleStore.modelBlocksPolyhedronAttributeRange(modelId, blockId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
-    if (
-      blockId === undefined ||
-      minimum === undefined ||
-      maximum === undefined
-    ) {
+    if (blockId === undefined || minimum === undefined || maximum === undefined) {
       return;
     }
     await dataStyleStore.setModelBlocksPolyhedronAttributeRange(
@@ -393,36 +301,26 @@ const polyhedronAttributeRange = computed({
 });
 
 const polyhedronAttributeColorMap = computed({
-  get: () =>
-    dataStyleStore.modelBlocksPolyhedronAttributeColorMap(modelId, blockId),
+  get: () => dataStyleStore.modelBlocksPolyhedronAttributeColorMap(modelId, blockId),
   set: async (newValue) => {
     if (blockId === undefined) {
       return;
     }
-    await dataStyleStore.setModelBlocksPolyhedronAttributeColorMap(
-      modelId,
-      [blockId],
-      newValue,
-    );
+    await dataStyleStore.setModelBlocksPolyhedronAttributeColorMap(modelId, [blockId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
 
 const polyhedronAttributeNoDataColor = computed<RGBAColor | undefined>({
   get: () =>
-    dataStyleStore.modelBlocksPolyhedronAttributeNoDataColor(
-      modelId,
-      blockId,
-    ) as RGBAColor | undefined,
+    dataStyleStore.modelBlocksPolyhedronAttributeNoDataColor(modelId, blockId) as
+      | RGBAColor
+      | undefined,
   set: async (newValue) => {
     if (blockId === undefined) {
       return;
     }
-    await dataStyleStore.setModelBlocksPolyhedronAttributeNoDataColor(
-      modelId,
-      [blockId],
-      newValue,
-    );
+    await dataStyleStore.setModelBlocksPolyhedronAttributeNoDataColor(modelId, [blockId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -437,22 +335,13 @@ const capabilities = {
   polyhedron: { available: true },
 };
 
-const vertexSchema =
-  back_schemas.opengeodeweb_back.model_component_vertex_attribute_names;
-const polyhedronSchema =
-  back_schemas.opengeodeweb_back.model_component_polyhedron_attribute_names;
+const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attribute_names;
+const polyhedronSchema = back_schemas.opengeodeweb_back.model_component_polyhedron_attribute_names;
 </script>
 
 <template>
-  <OptionsSection
-    title="Blocks Options"
-    class="mt-4"
-    data-testid="modelComponentTypeOptions"
-  >
-    <VisibilitySwitch
-      data-testid="modelBlocksVisibilitySwitch"
-      v-model="blocksVisibility"
-    />
+  <OptionsSection title="Blocks Options" class="mt-4" data-testid="modelComponentTypeOptions">
+    <VisibilitySwitch data-testid="modelBlocksVisibilitySwitch" v-model="blocksVisibility" />
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
       :componentIds="targetBlockIds"
@@ -467,9 +356,7 @@ const polyhedronSchema =
       v-model:polyhedron_attribute_item="blocksPolyhedronAttributeItem"
       v-model:polyhedron_attribute_range="blocksPolyhedronAttributeRange"
       v-model:polyhedron_attribute_color_map="blocksPolyhedronAttributeColorMap"
-      v-model:polyhedron_attribute_no_data_color="
-        blocksPolyhedronAttributeNoDataColor
-      "
+      v-model:polyhedron_attribute_no_data_color="blocksPolyhedronAttributeNoDataColor"
       :capabilities="capabilities"
       :schemas="{ vertex: vertexSchema, polyhedron: polyhedronSchema }"
       :allowRandom="true"
@@ -497,9 +384,7 @@ const polyhedronSchema =
       v-model:polyhedron_attribute_item="polyhedronAttributeItem"
       v-model:polyhedron_attribute_range="polyhedronAttributeRange"
       v-model:polyhedron_attribute_color_map="polyhedronAttributeColorMap"
-      v-model:polyhedron_attribute_no_data_color="
-        polyhedronAttributeNoDataColor
-      "
+      v-model:polyhedron_attribute_no_data_color="polyhedronAttributeNoDataColor"
       :capabilities="capabilities"
       :schemas="{ vertex: vertexSchema, polyhedron: polyhedronSchema }"
       :allowRandom="true"

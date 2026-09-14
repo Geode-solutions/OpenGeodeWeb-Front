@@ -1,14 +1,11 @@
 <script setup lang="ts">
 // Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
 // oxlint-disable eslint/sort-imports
-import {
-  sortAndFormatItems,
-  useTreeFilter,
-} from "@ogw_front/composables/tree_filter";
-import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView";
-import FetchingData from "@ogw_front/components/FetchingData";
-import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls";
-import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel";
+import { sortAndFormatItems, useTreeFilter } from "@ogw_front/composables/tree_filter";
+import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
+import FetchingData from "@ogw_front/components/FetchingData.vue";
+import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
+import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -76,16 +73,11 @@ const {
 } = useTreeFilter(localCategories);
 
 function onUpdateSelection(newSelection: string[]) {
-  const finalSelection = applySearchFilter(
-    newSelection,
-    visibleComponents.value,
-  );
+  const finalSelection = applySearchFilter(newSelection, visibleComponents.value);
   updateVisibility(finalSelection as string[]);
 }
 
-const visibleSelection = computed(() =>
-  applySearchFilter(visibleComponents.value, []),
-);
+const visibleSelection = computed(() => applySearchFilter(visibleComponents.value, []));
 
 const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
   if (search.value && componentsCache.value) {
@@ -101,10 +93,7 @@ const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
         result.push({
           id: type,
           title: `${type}s (${matches.length})`,
-          children: sortAndFormatItems(
-            matches,
-            sortType.value,
-          ) as unknown as CollectionTreeItem[],
+          children: sortAndFormatItems(matches, sortType.value) as unknown as CollectionTreeItem[],
         });
       }
     }
@@ -131,9 +120,7 @@ function showContextMenu(event: unknown, item: CollectionTreeItem) {
   emit("show-menu", {
     event,
     itemId: actualItem.category ? actualItem.id : id,
-    context_type: actualItem.category
-      ? "model_component"
-      : "model_component_type",
+    context_type: actualItem.category ? "model_component" : "model_component_type",
     modelId: id,
     modelComponentType: actualItem.category ? undefined : actualItem.id,
   });
@@ -158,10 +145,7 @@ function handleHoverEnter({
 }) {
   const actualItem = item.raw || item;
 
-  if (
-    !actualItem.category &&
-    (!actualItem.children || actualItem.children.length === 0)
-  ) {
+  if (!actualItem.category && (!actualItem.children || actualItem.children.length === 0)) {
     return;
   }
 
@@ -227,21 +211,11 @@ function getLeafViewerIdsForFocus(item: CollectionTreeItem): string[] {
       :scroll-top="currentView?.scrollTop || 0"
       class="transparent-treeview virtual-tree-height"
       @update:selected="(val) => onUpdateSelection(val as string[])"
-      @click:item="
-        onUpdateSelection([$event.id as string, ...visibleComponents])
-      "
+      @click:item="onUpdateSelection([$event.id as string, ...visibleComponents])"
       @update:scroll-top="treeviewStore.setScrollTop(actualViewId, $event)"
-      @hover:enter="
-        ({ item }) =>
-          handleHoverEnter({ item: item as unknown as CollectionTreeItem })
-      "
+      @hover:enter="({ item }) => handleHoverEnter({ item: item as unknown as CollectionTreeItem })"
       @hover:leave="handleHoverLeave"
-      @contextmenu="
-        showContextMenu(
-          $event.event,
-          $event.item as unknown as CollectionTreeItem,
-        )
-      "
+      @contextmenu="showContextMenu($event.event, $event.item as unknown as CollectionTreeItem)"
     >
       <template #title="{ item, isLeaf }">
         <ObjectTreeItemLabel
@@ -249,17 +223,13 @@ function getLeafViewerIdsForFocus(item: CollectionTreeItem): string[] {
           :is-leaf="isLeaf"
           show-tooltip
           class="text-body-1"
-          @contextmenu="
-            showContextMenu($event, item as unknown as CollectionTreeItem)
-          "
+          @contextmenu="showContextMenu($event, item as unknown as CollectionTreeItem)"
         />
       </template>
 
       <template #append="{ item }">
         <v-btn
-          v-if="
-            getLeafViewerIds(item as unknown as CollectionTreeItem).length > 0
-          "
+          v-if="getLeafViewerIds(item as unknown as CollectionTreeItem).length > 0"
           icon="mdi-target"
           size="medium"
           variant="text"

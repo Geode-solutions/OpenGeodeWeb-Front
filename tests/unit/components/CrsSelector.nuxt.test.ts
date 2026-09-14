@@ -6,7 +6,7 @@ import { mountSuspended } from "@nuxt/test-utils/runtime";
 
 // Local imports
 import { setupActivePinia, vuetify } from "@ogw_tests/utils";
-import CrsSelector from "@ogw_front/components/CrsSelector";
+import CrsSelector from "@ogw_front/components/CrsSelector.vue";
 import { useBackStore } from "@ogw_front/stores/back";
 
 const EXPECTED_LENGTH = 1;

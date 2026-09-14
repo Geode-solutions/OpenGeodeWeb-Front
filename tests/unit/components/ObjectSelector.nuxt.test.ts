@@ -6,7 +6,7 @@ import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime";
 import { flushPromises } from "@vue/test-utils";
 
 import { setupActivePinia, vuetify } from "@ogw_tests/utils";
-import ObjectSelector from "@ogw_front/components/ObjectSelector";
+import ObjectSelector from "@ogw_front/components/ObjectSelector.vue";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 import type { HTTPMethod } from "h3";
 import { useBackStore } from "@ogw_front/stores/back";

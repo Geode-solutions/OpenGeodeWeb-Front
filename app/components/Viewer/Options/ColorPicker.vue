@@ -13,7 +13,7 @@ const colorPickerRef = useTemplateRef<HTMLElement>("colorPickerRef");
 const model = defineModel<RGBAColor>();
 const { pressed } = useMousePressed({ target: colorPickerRef });
 
-// The model is always bound by every current caller (ColoringTypeSelector, AttributeSelector); defineModel can't express that as a required prop without breaking its optional v-model contract, so this reads it as defined here.
+// The model is always bound by every current caller (ColoringTypeSelector.vue, AttributeSelector.vue); defineModel can't express that as a required prop without breaking its optional v-model contract, so this reads it as defined here.
 const initialColor = model.value as RGBAColor;
 const vuetifyColor = ref({
   r: initialColor.red,

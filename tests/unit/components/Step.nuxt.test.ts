@@ -3,8 +3,8 @@ import { describe, expect, test } from "vitest";
 import ResizeObserver from "resize-observer-polyfill";
 import { mount } from "@vue/test-utils";
 
-import ObjectSelector from "@ogw_front/components/ObjectSelector";
-import Step from "@ogw_front/components/Step";
+import ObjectSelector from "@ogw_front/components/ObjectSelector.vue";
+import Step from "@ogw_front/components/Step.vue";
 import { useStepperTree } from "@ogw_front/composables/stepper_tree.js";
 
 import { vuetify } from "@ogw_tests/utils";

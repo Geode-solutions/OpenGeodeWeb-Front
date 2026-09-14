@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 
-import FetchingData from "@ogw_front/components/FetchingData";
-import FileUploader from "@ogw_front/components/FileUploader";
+import FetchingData from "@ogw_front/components/FetchingData.vue";
+import FileUploader from "@ogw_front/components/FileUploader.vue";
 import { useBackStore } from "@ogw_front/stores/back";
 
 const schema = schemas.opengeodeweb_back.allowed_files;
@@ -20,12 +20,7 @@ interface Props {
   showOverlay?: boolean;
 }
 
-const {
-  multiple,
-  files = [],
-  autoUpload = true,
-  showOverlay = true,
-} = defineProps<Props>();
+const { multiple, files = [], autoUpload = true, showOverlay = true } = defineProps<Props>();
 
 const internal_files = ref(files);
 const internal_auto_upload = ref(autoUpload);
@@ -61,9 +56,7 @@ async function get_allowed_files() {
   const response = (await backStore.request({ schema })) as {
     extensions: string[];
   };
-  accept.value = response.extensions
-    .map((extension) => `.${extension}`)
-    .join(",");
+  accept.value = response.extensions.map((extension) => `.${extension}`).join(",");
   toggle_loading();
 }
 

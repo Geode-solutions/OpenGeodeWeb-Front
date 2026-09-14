@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import ColormapQuickPicker from "@ogw_front/components/Viewer/Options/ColormapQuickPicker";
-import HybridViewerTooltip from "@ogw_front/components/HybridViewerTooltip";
-import ViewToolbar from "@ogw_front/components/ViewToolbar";
+import ColormapQuickPicker from "@ogw_front/components/Viewer/Options/ColormapQuickPicker.vue";
+import HybridViewerTooltip from "@ogw_front/components/HybridViewerTooltip.vue";
+import ViewToolbar from "@ogw_front/components/ViewToolbar.vue";
 
 import { useDataStore } from "@ogw_front/stores/data";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -21,14 +21,10 @@ const viewerStore = useViewerStore();
 const menuStore = useMenuStore();
 const dataStore = useDataStore();
 
-const { width: elementWidth, height: elementHeight } =
-  useElementSize(container);
+const { width: elementWidth, height: elementHeight } = useElementSize(container);
 const { width: windowWidth, height: windowHeight } = useWindowSize();
 
-function debounce<Callback extends (...args: unknown[]) => void>(
-  func: Callback,
-  wait: number,
-) {
+function debounce<Callback extends (...args: unknown[]) => void>(func: Callback, wait: number) {
   let timeout: ReturnType<typeof setTimeout> | undefined = undefined;
   return function executedFunction(...args: Parameters<Callback>) {
     function later() {
@@ -97,11 +93,7 @@ async function handleClick(event: PointerEvent) {
 
 <template>
   <ClientOnly>
-    <div
-      data-testid="hybridViewer"
-      class="fill-height"
-      style="position: relative; height: 100%"
-    >
+    <div data-testid="hybridViewer" class="fill-height" style="position: relative; height: 100%">
       <ColormapQuickPicker
         v-model:show="quickColormap.show"
         :x="quickColormap.x"
@@ -110,10 +102,7 @@ async function handleClick(event: PointerEvent) {
       />
       <ViewToolbar />
       <slot name="ui"></slot>
-      <HybridViewerTooltip
-        :container-width="elementWidth"
-        :container-height="elementHeight"
-      />
+      <HybridViewerTooltip :container-width="elementWidth" :container-height="elementHeight" />
       <v-col
         class="pa-0"
         ref="viewer"

@@ -12,7 +12,7 @@ import type { HTTPMethod } from "h3";
 
 // Local imports
 import { setupActivePinia, vuetify } from "@ogw_tests/utils";
-import ExtensionSelector from "@ogw_front/components/ExtensionSelector";
+import ExtensionSelector from "@ogw_front/components/ExtensionSelector.vue";
 import { useBackStore } from "@ogw_front/stores/back";
 
 const EXPECTED_LENGTH = 1;
