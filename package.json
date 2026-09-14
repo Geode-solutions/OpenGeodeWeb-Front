@@ -16,12 +16,6 @@
     "type": "git",
     "url": "git+https://github.com/Geode-solutions/OpenGeodeWeb-Front.git"
   },
-  "type": "module",
-  "main": "./nuxt.config.ts",
-  "exports": {
-    ".": "./nuxt.config.ts",
-    "./*": "./*"
-  },
   "files": [
     "app",
     "internal",
@@ -33,6 +27,12 @@
     "LICENSE",
     "README.md"
   ],
+  "type": "module",
+  "main": "./nuxt.config.ts",
+  "exports": {
+    ".": "./nuxt.config.ts",
+    "./*": "./*"
+  },
   "publishConfig": {
     "access": "public"
   },
