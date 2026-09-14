@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { PropType } from "vue";
-
 interface CsvHeader {
   title: string;
   key: string;
@@ -14,19 +12,25 @@ interface CsvCoordinates {
   z?: string;
 }
 
-// oxlint-disable-next-line vue/define-props-declaration
-const { headers, rows, loading, coordinates, separator, headerRow, firstRow } = defineProps({
-  headers: { type: Array as PropType<CsvHeader[]>, required: true },
-  rows: { type: Array as PropType<CsvRow[]>, required: true },
-  loading: { type: Boolean, default: false },
-  coordinates: {
-    type: Object as PropType<CsvCoordinates>,
-    default: () => ({ x: undefined, y: undefined, z: undefined }),
-  },
-  separator: { type: String, default: "," },
-  headerRow: { type: Number, default: 0 },
-  firstRow: { type: Number, default: 1 },
-});
+interface Props {
+  headers: CsvHeader[];
+  rows: CsvRow[];
+  loading?: boolean;
+  coordinates?: CsvCoordinates;
+  separator?: string;
+  headerRow?: number;
+  firstRow?: number;
+}
+
+const {
+  headers,
+  rows,
+  loading = false,
+  coordinates = { x: undefined, y: undefined, z: undefined },
+  separator = ",",
+  headerRow = 0,
+  firstRow = 1,
+} = defineProps<Props>();
 
 function getColumnClass(key: string) {
   if (key === coordinates.x) {
@@ -68,14 +72,22 @@ function getColumnClass(key: string) {
       fixed-header
       item-height="35"
     >
-      <template v-for="header in headers" v-slot:[`item.${header.key}`]="{ item }">
-        <div :class="getColumnClass(header.key)" class="px-2 py-1 rounded text-truncate">
+      <template
+        v-for="header in headers"
+        v-slot:[`item.${header.key}`]="{ item }"
+      >
+        <div
+          :class="getColumnClass(header.key)"
+          class="px-2 py-1 rounded text-truncate"
+        >
           {{ item[header.key] }}
         </div>
       </template>
 
       <template #no-data>
-        <div class="d-flex flex-column align-center justify-center h-100 py-12 opacity-40">
+        <div
+          class="d-flex flex-column align-center justify-center h-100 py-12 opacity-40"
+        >
           <v-icon size="64" icon="mdi-table-off" />
           <div class="text-h6 mt-2">No preview available</div>
           <div class="text-caption">Check your parser settings</div>

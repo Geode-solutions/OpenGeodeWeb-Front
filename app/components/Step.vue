@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import type { PropType, Ref } from "vue";
+import type { Ref } from "vue";
 import type { useStepperTree } from "@ogw_front/composables/stepper_tree";
 
 interface StepConfig {
   step_title: string;
   chips?: string[];
-  component: { component_name: string; component_options?: Record<string, unknown> };
+  component: {
+    component_name: string;
+    component_options?: Record<string, unknown>;
+  };
 }
 
 function truncate(text: string, maxLength: number) {
@@ -15,14 +18,16 @@ function truncate(text: string, maxLength: number) {
   return text;
 }
 
-// oxlint-disable-next-line vue/define-props-declaration
-const { stepIndex, stepperTree } = defineProps({
-  stepIndex: { type: Number, required: true },
-  stepperTree: { type: Object as PropType<ReturnType<typeof useStepperTree>>, required: true },
-});
+interface Props {
+  stepIndex: number;
+  stepperTree: ReturnType<typeof useStepperTree>;
+}
 
-// oxlint-disable-next-line vue/define-emits-declaration
-const emit = defineEmits(["reset_values"]);
+const { stepIndex, stepperTree } = defineProps<Props>();
+
+const emit = defineEmits<{
+  reset_values: [];
+}>();
 
 const { state, increment_step, decrement_step, update_values } = stepperTree;
 const { current_step_index, steps } = toRefs(state) as unknown as {
@@ -49,11 +54,18 @@ const sortedChips = computed(() => {
     hide-actions
   >
     <template #title>
-      <v-sheet color="transparent" class="d-flex flex-column justify-center ps-2">
+      <v-sheet
+        color="transparent"
+        class="d-flex flex-column justify-center ps-2"
+      >
         <p
           tag="h3"
           class="text-subtitle-1 font-weight-bold mb-0 transition-swing"
-          :class="current_step_index === stepIndex ? 'text-primary' : 'text-grey-darken-1'"
+          :class="
+            current_step_index === stepIndex
+              ? 'text-primary'
+              : 'text-grey-darken-1'
+          "
         >
           {{ steps[stepIndex]!.step_title }}
         </p>

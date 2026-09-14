@@ -1,23 +1,35 @@
 <script setup lang="ts">
-const { isDragging, showOverlay, fullscreen, loading, texts, multiple, accept, showExtensions } =
-  // oxlint-disable-next-line vue/define-props-declaration
-  defineProps({
-    isDragging: { type: Boolean, required: true },
-    showOverlay: { type: Boolean, required: true },
-    fullscreen: { type: Boolean, required: true },
-    loading: { type: Boolean, required: true },
-    texts: {
-      type: Object,
-      default: () => ({
-        idle: "Click or drag and drop",
-        drop: "Drop files here",
-        loading: "Loading...",
-      }),
-    },
-    multiple: { type: Boolean, required: true },
-    accept: { type: [String, Array], default: "" },
-    showExtensions: { type: Boolean, required: true },
-  });
+interface DragAndDropTexts {
+  idle: string;
+  drop: string;
+  loading: string;
+}
+
+interface Props {
+  isDragging: boolean;
+  showOverlay: boolean;
+  fullscreen: boolean;
+  loading: boolean;
+  texts?: DragAndDropTexts;
+  multiple: boolean;
+  accept?: string | string[];
+  showExtensions: boolean;
+}
+
+const {
+  isDragging,
+  showOverlay,
+  fullscreen,
+  loading,
+  texts = {
+    idle: "Click or drag and drop",
+    drop: "Drop files here",
+    loading: "Loading...",
+  },
+  multiple,
+  accept = "",
+  showExtensions,
+} = defineProps<Props>();
 </script>
 
 <template>

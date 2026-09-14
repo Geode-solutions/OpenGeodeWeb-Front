@@ -1,7 +1,10 @@
 <script setup lang="ts">
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
 import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
+import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import { compareSelections } from "@ogw_front/utils/treeview";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -16,8 +19,9 @@ const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 
-// oxlint-disable-next-line vue/define-emits-declaration
-const emit = defineEmits(["show-menu"]);
+const emit = defineEmits<{
+  "show-menu": [payload: { event: MouseEvent; itemId: string }];
+}>();
 
 interface TreeGroupItem {
   raw?: TreeGroupItem;
@@ -182,17 +186,28 @@ function expandAll() {
       }"
       :scroll-top="mainView?.scrollTop || 0"
       class="transparent-treeview virtual-tree-height"
-      @update:selected="onUpdateSelection"
+      @update:selected="(val) => onUpdateSelection(val as string[])"
       @update:scroll-top="treeviewStore.setScrollTop(mainView?.id ?? '', $event)"
-      @hover:enter="handleHoverEnter"
-      @hover:leave="handleHoverLeave"
-      @contextmenu="emit('show-menu', { event: $event.event, itemId: $event.item.id })"
+      @hover:enter="
+        ({ item }) => handleHoverEnter({ item: item as unknown as TreeGroupItem })
+      "
+      @hover:leave="
+        ({ item }) => handleHoverLeave({ item: item as unknown as TreeGroupItem })
+      "
+      @contextmenu="
+        emit('show-menu', {
+          event: $event.event,
+          itemId: $event.item.id as string,
+        })
+      "
     >
       <template #title="{ item, isLeaf }">
         <ObjectTreeItemLabel
-          :item="item"
+          :item="item as unknown as DisplayItem"
           :is-leaf="isLeaf"
-          @contextmenu="emit('show-menu', { event: $event, itemId: item.id })"
+          @contextmenu="
+            emit('show-menu', { event: $event, itemId: item.id as string })
+          "
         />
       </template>
 
@@ -205,10 +220,10 @@ function expandAll() {
             size="medium"
             variant="text"
             v-tooltip="'Focus camera on object'"
-            @click.stop="hybridViewerStore.focusCameraOnObject(item.id)"
+            @click.stop="hybridViewerStore.focusCameraOnObject(item.id as string)"
           />
           <v-btn
-            v-if="isModel(item)"
+            v-if="isModel(item as unknown as TreeGroupItem)"
             data-testid="expandModelComponentsButton"
             icon="mdi-magnify-expand"
             size="medium"
@@ -217,15 +232,18 @@ function expandAll() {
             v-tooltip="'Model\'s mesh components'"
             @click.stop="
               treeviewStore.displayAdditionalTree(
-                item.id,
-                item.title,
-                item.geode_object_type,
+                item.id as string,
+                item.title as string | undefined,
+                item.geode_object_type as string,
                 'model_components',
               )
             "
           />
           <v-btn
-            v-if="isModel(item) && hasCollectionsMap[item.id]"
+            v-if="
+              isModel(item as unknown as TreeGroupItem) &&
+              hasCollectionsMap[item.id as string]
+            "
             data-testid="expandModelCollectionsButton"
             icon="mdi-format-list-group"
             size="medium"
@@ -234,9 +252,9 @@ function expandAll() {
             v-tooltip="'Model\'s collections'"
             @click.stop="
               treeviewStore.displayAdditionalTree(
-                item.id,
-                item.title,
-                item.geode_object_type,
+                item.id as string,
+                item.title as string | undefined,
+                item.geode_object_type as string,
                 'model_collections',
               )
             "

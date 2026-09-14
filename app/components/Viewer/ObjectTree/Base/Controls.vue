@@ -1,21 +1,31 @@
 <script setup lang="ts">
 // Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
 // oxlint-disable eslint/sort-imports
-import type { PropType } from "vue";
 import ActionButton from "@ogw_front/components/ActionButton.vue";
 import SearchBar from "@ogw_front/components/SearchBar.vue";
 
-// oxlint-disable-next-line vue/define-props-declaration
-const { search, sortType, filterOptions, availableFilterOptions, isCollapsed } = defineProps({
-  search: { type: String, required: true },
-  sortType: { type: String, required: true },
-  filterOptions: { type: Object as PropType<Record<string, boolean>>, required: true },
-  availableFilterOptions: { type: Array as PropType<string[]>, required: true },
-  isCollapsed: { type: Boolean, required: false, default: false },
-});
+interface Props {
+  search: string;
+  sortType: string;
+  filterOptions: Record<string, boolean>;
+  availableFilterOptions: string[];
+  isCollapsed?: boolean;
+}
 
-// oxlint-disable-next-line vue/define-emits-declaration
-const emit = defineEmits(["update:search", "toggle-sort", "collapse-all", "expand-all"]);
+const {
+  search,
+  sortType,
+  filterOptions,
+  availableFilterOptions,
+  isCollapsed = false,
+} = defineProps<Props>();
+
+const emit = defineEmits<{
+  "update:search": [value: string];
+  "toggle-sort": [];
+  "collapse-all": [];
+  "expand-all": [];
+}>();
 
 const showSearch = ref(false);
 
@@ -47,7 +57,10 @@ watch(
         />
 
         <v-expand-x-transition>
-          <div v-if="showSearch" class="flex-grow-1 ms-1 text-no-wrap overflow-hidden">
+          <div
+            v-if="showSearch"
+            class="flex-grow-1 ms-1 text-no-wrap overflow-hidden"
+          >
             <SearchBar
               data-testid="searchObjectsInput"
               :model-value="search"
@@ -77,7 +90,9 @@ watch(
             data-testid="sortObjectsButton"
             :tooltip="'Sort by ' + (sortType === 'name' ? 'ID' : 'Name')"
             :icon="
-              sortType === 'name' ? 'mdi-sort-alphabetical-ascending' : 'mdi-sort-numeric-ascending'
+              sortType === 'name'
+                ? 'mdi-sort-alphabetical-ascending'
+                : 'mdi-sort-numeric-ascending'
             "
             variant="text"
             color="black"
@@ -97,7 +112,10 @@ watch(
               />
             </template>
             <v-list class="mt-1">
-              <v-list-item v-for="category_id in availableFilterOptions" :key="category_id">
+              <v-list-item
+                v-for="category_id in availableFilterOptions"
+                :key="category_id"
+              >
                 <v-checkbox
                   v-model="filterOptions[category_id]"
                   :label="category_id"
@@ -111,7 +129,11 @@ watch(
           <ActionButton
             data-testid="CollapseOrExpandAll"
             :tooltip="isCollapsed ? 'Expand All' : 'Collapse All'"
-            :icon="isCollapsed ? 'mdi-expand-all-outline' : 'mdi-collapse-all-outline'"
+            :icon="
+              isCollapsed
+                ? 'mdi-expand-all-outline'
+                : 'mdi-collapse-all-outline'
+            "
             variant="text"
             color="black"
             tooltipLocation="bottom"

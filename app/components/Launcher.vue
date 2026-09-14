@@ -5,13 +5,19 @@ import { Status } from "@ogw_front/utils/status";
 import { appMode } from "@ogw_shared/app_mode";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
-// oxlint-disable-next-line vue/define-props-declaration
-const { appName, email, isUserAuthenticated, logo } = defineProps({
-  appName: { type: String, required: true },
-  email: { type: String, default: undefined },
-  isUserAuthenticated: { type: Boolean, default: false },
-  logo: { type: String, required: false, default: "" },
-});
+interface Props {
+  appName: string;
+  email?: string;
+  isUserAuthenticated?: boolean;
+  logo?: string;
+}
+
+const {
+  appName,
+  email = undefined,
+  isUserAuthenticated = false,
+  logo = "",
+} = defineProps<Props>();
 
 const infraStore = useInfraStore();
 if (infraStore.app_mode !== appMode.CLOUD) {

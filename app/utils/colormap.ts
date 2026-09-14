@@ -17,7 +17,9 @@ function getRGBPointsFromPreset(presetName: string): number[] {
 
 function getPresetsWithCurrentAtTop(presetName: string) {
   const currentPreset = getPresetByName(presetName);
-  return [currentPreset, ...colormaps].filter(Boolean);
+  return [currentPreset, ...colormaps].filter((preset): preset is NonNullable<typeof preset> =>
+    Boolean(preset),
+  );
 }
 
 function drawCanvasForPreset(

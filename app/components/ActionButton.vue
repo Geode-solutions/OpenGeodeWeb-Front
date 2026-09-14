@@ -1,23 +1,33 @@
 <script setup lang="ts">
-import type { PropType } from "vue";
-
 const DEFAULT_ICON_SIZE = 28;
-// oxlint-disable-next-line vue/define-props-declaration
-const { icon, tooltip, color, size, variant, density, tooltipLocation, iconSize } = defineProps({
-  icon: { type: String, required: true },
-  tooltip: { type: String, required: true },
-  color: { type: String, default: undefined },
-  size: { type: [String, Number], default: undefined },
+
+interface Props {
+  icon: string;
+  tooltip: string;
+  color?: string;
+  size?: string | number;
   // Vuetify's variant/density accept narrow literal unions; kept loose here since
   // Callers pass plain strings and this is only a typing widening, not a behavior change.
-  variant: { type: String as PropType<any>, default: undefined },
-  density: { type: String as PropType<any>, default: "comfortable" },
-  tooltipLocation: { type: String, default: "left" },
-  iconSize: { type: [String, Number], default: DEFAULT_ICON_SIZE },
-});
+  variant?: any;
+  density?: any;
+  tooltipLocation?: string;
+  iconSize?: string | number;
+}
 
-// oxlint-disable-next-line vue/define-emits-declaration
-const emit = defineEmits(["click"]);
+const {
+  icon,
+  tooltip,
+  color = undefined,
+  size = undefined,
+  variant = undefined,
+  density = "comfortable",
+  tooltipLocation = "left",
+  iconSize = DEFAULT_ICON_SIZE,
+} = defineProps<Props>();
+
+const emit = defineEmits<{
+  click: [event: MouseEvent];
+}>();
 </script>
 
 <template>
@@ -31,9 +41,11 @@ const emit = defineEmits(["click"]);
     icon
     @click="emit('click', $event)"
   >
-    <v-icon v-if="typeof icon === 'string' && icon.startsWith('mdi-')" :size="iconSize">{{
-      icon
-    }}</v-icon>
+    <v-icon
+      v-if="typeof icon === 'string' && icon.startsWith('mdi-')"
+      :size="iconSize"
+      >{{ icon }}</v-icon
+    >
     <v-img
       v-else
       :src="icon"

@@ -2,22 +2,17 @@
 const DEFAULT_SIZE = 22;
 const DEFAULT_WIDTH = 3;
 
+interface Props {
+  text?: string;
+  size?: number | string;
+  width?: number | string;
+}
+
 const {
   text = "Fetching data...",
   size = DEFAULT_SIZE,
   width = DEFAULT_WIDTH,
-  // oxlint-disable-next-line vue/define-props-declaration
-} = defineProps({
-  text: {
-    type: String,
-  },
-  size: {
-    type: [Number, String],
-  },
-  width: {
-    type: [Number, String],
-  },
-});
+} = defineProps<Props>();
 </script>
 
 <template>

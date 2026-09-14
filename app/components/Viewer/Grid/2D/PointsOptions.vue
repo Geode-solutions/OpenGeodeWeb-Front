@@ -1,13 +1,18 @@
 <script setup lang="ts">
 import Grid2D_Points from "@ogw_front/assets/viewer_svgs/grid_2d_points.svg";
+import type { ItemProps } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import ViewerGenericMeshPointsOptions from "@ogw_front/components/Viewer/Generic/Mesh/PointsOptions.vue";
 
-// oxlint-disable-next-line vue/define-props-declaration
-const { itemProps } = defineProps({
-  itemProps: { type: Object, required: true },
-});
+interface Props {
+  itemProps: ItemProps & { index?: number };
+}
+
+const { itemProps } = defineProps<Props>();
 </script>
 
 <template>
-  <ViewerGenericMeshPointsOptions :itemProps="itemProps" :btnImage="Grid2D_Points" />
+  <ViewerGenericMeshPointsOptions
+    :itemProps="itemProps"
+    :btnImage="Grid2D_Points"
+  />
 </template>

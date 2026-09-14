@@ -1,22 +1,29 @@
 <script setup lang="ts">
-import type { PropType } from "vue";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 
 import FetchingData from "@ogw_front/components/FetchingData.vue";
 import { useBackStore } from "@ogw_front/stores/back";
 
 const schema = schemas.opengeodeweb_back.geode_objects_and_output_extensions;
-// oxlint-disable-next-line vue/define-emits-declaration
-const emit = defineEmits(["update_values", "increment_step", "decrement_step"]);
+const emit = defineEmits<{
+  update_values: [
+    values: { output_geode_object: string; output_extension: string },
+  ];
+  increment_step: [];
+  decrement_step: [];
+}>();
 
-// oxlint-disable-next-line vue/define-props-declaration
-const { geodeObjectType, filenames } = defineProps({
-  geodeObjectType: { type: String, required: true },
-  filenames: { type: Array as PropType<string[]>, required: true },
-});
+interface Props {
+  geodeObjectType: string;
+  filenames: string[];
+}
+
+const { geodeObjectType, filenames } = defineProps<Props>();
 type OutputExtensions = Record<string, { is_saveable: boolean }>;
 
-const geode_objects_and_output_extensions = ref<Record<string, OutputExtensions>>({});
+const geode_objects_and_output_extensions = ref<
+  Record<string, OutputExtensions>
+>({});
 const loading = ref(false);
 
 const toggle_loading = useToggle(loading);
@@ -26,15 +33,25 @@ async function get_output_file_extensions() {
   geode_objects_and_output_extensions.value = {};
   const backStore = useBackStore();
   const values: Record<string, OutputExtensions>[] = await Promise.all(
-    filenames.map(async (filename): Promise<Record<string, OutputExtensions>> => {
-      const params = { geode_object_type: geodeObjectType, filename };
-      const response = await backStore.request({ schema, params });
-      return (response as { geode_objects_and_output_extensions: Record<string, OutputExtensions> })
-        .geode_objects_and_output_extensions;
-    }),
+    filenames.map(
+      async (filename): Promise<Record<string, OutputExtensions>> => {
+        const params = { geode_object_type: geodeObjectType, filename };
+        const response = await backStore.request({ schema, params });
+        return (
+          response as {
+            geode_objects_and_output_extensions: Record<
+              string,
+              OutputExtensions
+            >;
+          }
+        ).geode_objects_and_output_extensions;
+      },
+    ),
   );
   const all_keys = [...new Set(values.flatMap((value) => Object.keys(value)))];
-  const common_keys = all_keys.filter((i) => !values.some((j) => !Object.keys(j).includes(i)));
+  const common_keys = all_keys.filter(
+    (i) => !values.some((j) => !Object.keys(j).includes(i)),
+  );
   const final_object: Record<string, OutputExtensions> = {};
   for (const key of common_keys) {
     final_object[key] = {};
@@ -72,7 +89,9 @@ await get_output_file_extensions();
   <FetchingData v-if="loading" />
   <v-row v-else class="justify-left">
     <v-col
-      v-for="(output_extensions, output_geode_object) in geode_objects_and_output_extensions"
+      v-for="(
+        output_extensions, output_geode_object
+      ) in geode_objects_and_output_extensions"
       :key="output_geode_object"
       class="justify-left"
     >
@@ -99,7 +118,9 @@ await get_output_file_extensions();
                       class="card ma-2"
                       :color="extension.is_saveable ? 'primary' : 'grey'"
                       hover
-                      @click="update_values(output_geode_object, output_extension)"
+                      @click="
+                        update_values(output_geode_object, output_extension)
+                      "
                       :disabled="!extension.is_saveable"
                     >
                       <v-card-title align="center">

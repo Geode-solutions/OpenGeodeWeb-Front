@@ -2,14 +2,17 @@
 import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
 import { useMenuStore } from "@ogw_front/stores/menu";
 
-// oxlint-disable-next-line vue/define-props-declaration
-const { isOverTreeview, isOverToolbar } = defineProps({
-  isOverTreeview: { type: Boolean, required: true },
-  isOverToolbar: { type: Boolean, default: false },
-});
+interface Props {
+  isOverTreeview: boolean;
+  isOverToolbar?: boolean;
+}
 
-// oxlint-disable-next-line vue/define-emits-declaration
-const emit = defineEmits(["drag", "click"]);
+const { isOverTreeview, isOverToolbar = false } = defineProps<Props>();
+
+const emit = defineEmits<{
+  drag: [event: MouseEvent];
+  click: [event: MouseEvent];
+}>();
 
 const ADAPTIVE_BLUR_VAL = "15px";
 const ADAPTIVE_OPACITY_VAL = 0.85;
@@ -84,7 +87,12 @@ function onCenterClick(event: MouseEvent) {
     @mouseup="onMouseUp"
     @click.stop="onCenterClick"
   >
-    <v-icon icon="mdi-information-outline" size="28" color="primary" style="pointer-events: none" />
+    <v-icon
+      icon="mdi-information-outline"
+      size="28"
+      color="primary"
+      style="pointer-events: none"
+    />
   </v-btn>
 </template>
 
@@ -102,8 +110,10 @@ function onCenterClick(event: MouseEvent) {
   position: absolute;
   inset: 0;
   background: rgba(255, 255, 255, var(--adaptive-opacity));
-  backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
-  -webkit-backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
+  backdrop-filter: blur(var(--adaptive-blur))
+    brightness(var(--adaptive-brightness));
+  -webkit-backdrop-filter: blur(var(--adaptive-blur))
+    brightness(var(--adaptive-brightness));
   z-index: 0;
   pointer-events: none;
   border-radius: inherit;

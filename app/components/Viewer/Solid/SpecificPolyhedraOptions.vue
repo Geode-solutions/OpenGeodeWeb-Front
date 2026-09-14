@@ -1,22 +1,27 @@
 <script setup lang="ts">
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
 import SolidPolyhedra from "@ogw_front/assets/viewer_svgs/solid_polyhedra.svg";
-import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+// oxlint-disable-next-line import/consistent-type-specifier-style -- combining the default import with the type import avoids a duplicate-imports violation on this same module
+import ViewerContextMenuItem, { type ItemProps } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const { applyBatchStyle } = useBatchStyle();
 
-// oxlint-disable-next-line vue/define-props-declaration
-const { itemProps } = defineProps({
-  itemProps: { type: Object, required: true },
-  tooltip: { type: String, required: false, default: "Polyhedra options" },
-});
+interface Props {
+  itemProps: ItemProps & { index: number };
+  tooltip?: string;
+}
+
+const { itemProps, tooltip = "Polyhedra options" } = defineProps<Props>();
 
 const id = toRef(() => itemProps.id);
 
@@ -38,8 +43,9 @@ const coloring_style_key = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const color = computed({
-  get: () => dataStyleStore.meshPolyhedraColor(id.value),
+const color = computed<RGBAColor | undefined>({
+  get: () =>
+    dataStyleStore.meshPolyhedraColor(id.value) as RGBAColor | undefined,
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPolyhedraColor(targetId, newValue),
@@ -54,7 +60,9 @@ const vertex_attribute_name = computed({
       return;
     }
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolyhedraVertexAttributeName(targetId, newValue)),
+      Promise.resolve(
+        dataStyleStore.setMeshPolyhedraVertexAttributeName(targetId, newValue),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
@@ -63,7 +71,9 @@ const vertex_attribute_item = computed({
   get: () => dataStyleStore.meshPolyhedraVertexAttributeItem(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolyhedraVertexAttributeItem(targetId, newValue)),
+      Promise.resolve(
+        dataStyleStore.setMeshPolyhedraVertexAttributeItem(targetId, newValue),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
@@ -77,7 +87,11 @@ const vertex_attribute_range = computed({
     }
     await applyBatchStyle(id.value, (targetId: string) =>
       Promise.resolve(
-        dataStyleStore.setMeshPolyhedraVertexAttributeRange(targetId, minimum, maximum),
+        dataStyleStore.setMeshPolyhedraVertexAttributeRange(
+          targetId,
+          minimum,
+          maximum,
+        ),
       ),
     );
     hybridViewerStore.remoteRender();
@@ -87,16 +101,27 @@ const vertex_attribute_color_map = computed({
   get: () => dataStyleStore.meshPolyhedraVertexAttributeColorMap(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolyhedraVertexAttributeColorMap(targetId, newValue)),
+      Promise.resolve(
+        dataStyleStore.setMeshPolyhedraVertexAttributeColorMap(
+          targetId,
+          newValue,
+        ),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_no_data_color = computed({
-  get: () => dataStyleStore.meshPolyhedraVertexAttributeNoDataColor(id.value),
+const vertex_attribute_no_data_color = computed<RGBAColor | undefined>({
+  get: () =>
+    dataStyleStore.meshPolyhedraVertexAttributeNoDataColor(id.value) as
+      | RGBAColor
+      | undefined,
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshPolyhedraVertexAttributeNoDataColor(targetId, newValue),
+      dataStyleStore.setMeshPolyhedraVertexAttributeNoDataColor(
+        targetId,
+        newValue,
+      ),
     );
     hybridViewerStore.remoteRender();
   },
@@ -108,7 +133,12 @@ const polyhedron_attribute_name = computed({
       return;
     }
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(targetId, newValue)),
+      Promise.resolve(
+        dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(
+          targetId,
+          newValue,
+        ),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
@@ -117,7 +147,12 @@ const polyhedron_attribute_item = computed({
   get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeItem(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolyhedraPolyhedronAttributeItem(targetId, newValue)),
+      Promise.resolve(
+        dataStyleStore.setMeshPolyhedraPolyhedronAttributeItem(
+          targetId,
+          newValue,
+        ),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
@@ -131,7 +166,11 @@ const polyhedron_attribute_range = computed({
     }
     await applyBatchStyle(id.value, (targetId: string) =>
       Promise.resolve(
-        dataStyleStore.setMeshPolyhedraPolyhedronAttributeRange(targetId, minimum, maximum),
+        dataStyleStore.setMeshPolyhedraPolyhedronAttributeRange(
+          targetId,
+          minimum,
+          maximum,
+        ),
       ),
     );
     hybridViewerStore.remoteRender();
@@ -142,17 +181,26 @@ const polyhedron_attribute_color_map = computed({
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
       Promise.resolve(
-        dataStyleStore.setMeshPolyhedraPolyhedronAttributeColorMap(targetId, newValue),
+        dataStyleStore.setMeshPolyhedraPolyhedronAttributeColorMap(
+          targetId,
+          newValue,
+        ),
       ),
     );
     hybridViewerStore.remoteRender();
   },
 });
-const polyhedron_attribute_no_data_color = computed({
-  get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeNoDataColor(id.value),
+const polyhedron_attribute_no_data_color = computed<RGBAColor | undefined>({
+  get: () =>
+    dataStyleStore.meshPolyhedraPolyhedronAttributeNoDataColor(id.value) as
+      | RGBAColor
+      | undefined,
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshPolyhedraPolyhedronAttributeNoDataColor(targetId, newValue),
+      dataStyleStore.setMeshPolyhedraPolyhedronAttributeNoDataColor(
+        targetId,
+        newValue,
+      ),
     );
     hybridViewerStore.remoteRender();
   },
@@ -180,12 +228,18 @@ const polyhedron_attribute_no_data_color = computed({
           v-model:vertex_attribute_item="vertex_attribute_item"
           v-model:vertex_attribute_range="vertex_attribute_range"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
-          v-model:vertex_attribute_no_data_color="vertex_attribute_no_data_color"
+          v-model:vertex_attribute_no_data_color="
+            vertex_attribute_no_data_color
+          "
           v-model:polyhedron_attribute_name="polyhedron_attribute_name"
           v-model:polyhedron_attribute_item="polyhedron_attribute_item"
           v-model:polyhedron_attribute_range="polyhedron_attribute_range"
-          v-model:polyhedron_attribute_color_map="polyhedron_attribute_color_map"
-          v-model:polyhedron_attribute_no_data_color="polyhedron_attribute_no_data_color"
+          v-model:polyhedron_attribute_color_map="
+            polyhedron_attribute_color_map
+          "
+          v-model:polyhedron_attribute_no_data_color="
+            polyhedron_attribute_no_data_color
+          "
         />
       </template>
     </template>

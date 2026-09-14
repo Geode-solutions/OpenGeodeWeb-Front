@@ -1,11 +1,9 @@
 <script setup lang="ts">
-// oxlint-disable-next-line vue/define-props-declaration
-const { progress } = defineProps({
-  progress: {
-    type: Number,
-    required: true,
-  },
-});
+interface Props {
+  progress: number;
+}
+
+const { progress } = defineProps<Props>();
 </script>
 
 <template>

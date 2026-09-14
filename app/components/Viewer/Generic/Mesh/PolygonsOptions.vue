@@ -1,23 +1,43 @@
 <script setup lang="ts">
-import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
+// oxlint-disable-next-line import/consistent-type-specifier-style -- combining the default import with the type import avoids a duplicate-imports violation on this same module
+import ViewerContextMenuItem, { type ItemProps } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+
+interface Texture {
+  id: string;
+  texture_name: string;
+}
+
+interface CapabilityConfig {
+  available?: boolean;
+  hasColorMap?: boolean;
+}
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const { applyBatchStyle } = useBatchStyle();
 
-// oxlint-disable-next-line vue/define-props-declaration
-const { itemProps, btnImage, tooltip, capabilities } = defineProps({
-  itemProps: { type: Object, required: true },
-  btnImage: { type: String, required: true },
-  tooltip: { type: String, required: false, default: "Polygons options" },
-  capabilities: { type: Object, default: () => ({}) },
-});
+interface Props {
+  itemProps: ItemProps & { index?: number };
+  btnImage: string;
+  tooltip?: string;
+  capabilities?: Record<string, CapabilityConfig>;
+}
+
+const {
+  itemProps,
+  btnImage,
+  tooltip = "Polygons options",
+  capabilities = {},
+} = defineProps<Props>();
 
 const id = toRef(() => itemProps.id);
 
@@ -39,8 +59,9 @@ const coloring_style_key = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const color = computed({
-  get: () => dataStyleStore.meshPolygonsColor(id.value),
+const color = computed<RGBAColor | undefined>({
+  get: () =>
+    dataStyleStore.meshPolygonsColor(id.value) as RGBAColor | undefined,
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPolygonsColor(targetId, newValue),
@@ -48,8 +69,9 @@ const color = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const textures = computed({
-  get: () => dataStyleStore.meshPolygonsTextures(id.value),
+const textures = computed<Texture[] | undefined>({
+  get: () =>
+    dataStyleStore.meshPolygonsTextures(id.value) as Texture[] | undefined,
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPolygonsTextures(targetId, newValue),
@@ -65,7 +87,9 @@ const vertex_attribute_name = computed({
       return;
     }
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolygonsVertexAttributeName(targetId, newValue)),
+      Promise.resolve(
+        dataStyleStore.setMeshPolygonsVertexAttributeName(targetId, newValue),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
@@ -74,7 +98,9 @@ const vertex_attribute_item = computed({
   get: () => dataStyleStore.meshPolygonsVertexAttributeItem(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolygonsVertexAttributeItem(targetId, newValue)),
+      Promise.resolve(
+        dataStyleStore.setMeshPolygonsVertexAttributeItem(targetId, newValue),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
@@ -88,7 +114,11 @@ const vertex_attribute_range = computed({
     }
     await applyBatchStyle(id.value, (targetId: string) =>
       Promise.resolve(
-        dataStyleStore.setMeshPolygonsVertexAttributeRange(targetId, minimum, maximum),
+        dataStyleStore.setMeshPolygonsVertexAttributeRange(
+          targetId,
+          minimum,
+          maximum,
+        ),
       ),
     );
     hybridViewerStore.remoteRender();
@@ -98,16 +128,27 @@ const vertex_attribute_color_map = computed({
   get: () => dataStyleStore.meshPolygonsVertexAttributeColorMap(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolygonsVertexAttributeColorMap(targetId, newValue)),
+      Promise.resolve(
+        dataStyleStore.setMeshPolygonsVertexAttributeColorMap(
+          targetId,
+          newValue,
+        ),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_no_data_color = computed({
-  get: () => dataStyleStore.meshPolygonsVertexAttributeNoDataColor(id.value),
+const vertex_attribute_no_data_color = computed<RGBAColor | undefined>({
+  get: () =>
+    dataStyleStore.meshPolygonsVertexAttributeNoDataColor(id.value) as
+      | RGBAColor
+      | undefined,
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshPolygonsVertexAttributeNoDataColor(targetId, newValue),
+      dataStyleStore.setMeshPolygonsVertexAttributeNoDataColor(
+        targetId,
+        newValue,
+      ),
     );
     hybridViewerStore.remoteRender();
   },
@@ -119,7 +160,9 @@ const polygon_attribute_name = computed({
       return;
     }
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolygonsPolygonAttributeName(targetId, newValue)),
+      Promise.resolve(
+        dataStyleStore.setMeshPolygonsPolygonAttributeName(targetId, newValue),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
@@ -128,7 +171,9 @@ const polygon_attribute_item = computed({
   get: () => dataStyleStore.meshPolygonsPolygonAttributeItem(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolygonsPolygonAttributeItem(targetId, newValue)),
+      Promise.resolve(
+        dataStyleStore.setMeshPolygonsPolygonAttributeItem(targetId, newValue),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
@@ -142,7 +187,11 @@ const polygon_attribute_range = computed({
     }
     await applyBatchStyle(id.value, (targetId: string) =>
       Promise.resolve(
-        dataStyleStore.setMeshPolygonsPolygonAttributeRange(targetId, minimum, maximum),
+        dataStyleStore.setMeshPolygonsPolygonAttributeRange(
+          targetId,
+          minimum,
+          maximum,
+        ),
       ),
     );
     hybridViewerStore.remoteRender();
@@ -152,16 +201,27 @@ const polygon_attribute_color_map = computed({
   get: () => dataStyleStore.meshPolygonsPolygonAttributeColorMap(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolygonsPolygonAttributeColorMap(targetId, newValue)),
+      Promise.resolve(
+        dataStyleStore.setMeshPolygonsPolygonAttributeColorMap(
+          targetId,
+          newValue,
+        ),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
 });
-const polygon_attribute_no_data_color = computed({
-  get: () => dataStyleStore.meshPolygonsPolygonAttributeNoDataColor(id.value),
+const polygon_attribute_no_data_color = computed<RGBAColor | undefined>({
+  get: () =>
+    dataStyleStore.meshPolygonsPolygonAttributeNoDataColor(id.value) as
+      | RGBAColor
+      | undefined,
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshPolygonsPolygonAttributeNoDataColor(targetId, newValue),
+      dataStyleStore.setMeshPolygonsPolygonAttributeNoDataColor(
+        targetId,
+        newValue,
+      ),
     );
     hybridViewerStore.remoteRender();
   },
@@ -171,7 +231,7 @@ const polygon_attribute_no_data_color = computed({
 <template>
   <ViewerContextMenuItem
     data-testid="meshPolygonsMenu"
-    :index="itemProps.index"
+    :index="itemProps.index!"
     :itemProps="itemProps"
     :tooltip="tooltip"
     :btnImage="btnImage"
@@ -192,12 +252,16 @@ const polygon_attribute_no_data_color = computed({
           v-model:vertex_attribute_item="vertex_attribute_item"
           v-model:vertex_attribute_range="vertex_attribute_range"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
-          v-model:vertex_attribute_no_data_color="vertex_attribute_no_data_color"
+          v-model:vertex_attribute_no_data_color="
+            vertex_attribute_no_data_color
+          "
           v-model:polygon_attribute_name="polygon_attribute_name"
           v-model:polygon_attribute_item="polygon_attribute_item"
           v-model:polygon_attribute_range="polygon_attribute_range"
           v-model:polygon_attribute_color_map="polygon_attribute_color_map"
-          v-model:polygon_attribute_no_data_color="polygon_attribute_no_data_color"
+          v-model:polygon_attribute_no_data_color="
+            polygon_attribute_no_data_color
+          "
           :capabilities="capabilities"
         />
       </template>

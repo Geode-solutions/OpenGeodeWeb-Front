@@ -11,8 +11,9 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 const DEFAULT_ELEMENT_HEIGHT = 100;
 
-// oxlint-disable-next-line vue/define-emits-declaration
-const emit = defineEmits(["click"]);
+const emit = defineEmits<{
+  click: [event: PointerEvent];
+}>();
 
 const container = useTemplateRef("viewer");
 const hybridViewerStore = useHybridViewerStore();

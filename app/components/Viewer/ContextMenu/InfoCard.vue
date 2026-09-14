@@ -5,14 +5,17 @@ import { useClipboard } from "@vueuse/core";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useMenuStore } from "@ogw_front/stores/menu";
 
-// oxlint-disable-next-line vue/define-props-declaration
-const { show, metaData } = defineProps({
-  show: { type: Boolean, required: true },
-  metaData: { type: Object, required: true },
-});
+interface Props {
+  show: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  metaData: Record<string, any>;
+}
 
-// oxlint-disable-next-line vue/define-emits-declaration
-const emit = defineEmits(["update:show"]);
+const { show, metaData } = defineProps<Props>();
+
+const emit = defineEmits<{
+  "update:show": [value: boolean];
+}>();
 
 const COPIED_TIMEOUT = 1500;
 const MAX_SHORT_ID_LENGTH = 15;
@@ -58,7 +61,8 @@ watch(
     if (newMeta.pickedComponentId && modelId) {
       const components = await dataStore.getAllMeshComponents(modelId);
       const comp = components.find(
-        (component: MeshComponentInfo) => component.id === newMeta.pickedComponentId,
+        (component: MeshComponentInfo) =>
+          component.id === newMeta.pickedComponentId,
       );
       if (comp) {
         componentName.value = comp.title;
@@ -85,7 +89,12 @@ const displayTitle = computed(() => {
   if (!name) {
     return "";
   }
-  return middleTruncate(name, TRUNCATE_MAX_LENGTH, TRUNCATE_START_CHARS, TRUNCATE_END_CHARS);
+  return middleTruncate(
+    name,
+    TRUNCATE_MAX_LENGTH,
+    TRUNCATE_START_CHARS,
+    TRUNCATE_END_CHARS,
+  );
 });
 
 const displayComponentTitle = computed(() => {
@@ -127,7 +136,12 @@ const formattedId = computed(() => formatId(metaData.id));
 
 <template>
   <v-fade-transition>
-    <v-sheet v-if="show" class="object-name-popover bg-transparent" @mousedown.stop @click.stop>
+    <v-sheet
+      v-if="show"
+      class="object-name-popover bg-transparent"
+      @mousedown.stop
+      @click.stop
+    >
       <GlassCard
         variant="panel"
         padding="pa-2 px-3"
@@ -186,10 +200,16 @@ const formattedId = computed(() => formatId(metaData.id));
               @click.stop="copyId(componentItem.id)"
             >
               <span class="id-text">
-                {{ isCopied(componentItem.id) ? "COPIED!" : formatId(componentItem.id) }}
+                {{
+                  isCopied(componentItem.id)
+                    ? "COPIED!"
+                    : formatId(componentItem.id)
+                }}
               </span>
               <v-icon
-                :icon="isCopied(componentItem.id) ? 'mdi-check' : 'mdi-content-copy'"
+                :icon="
+                  isCopied(componentItem.id) ? 'mdi-check' : 'mdi-content-copy'
+                "
                 size="10"
                 :color="isCopied(componentItem.id) ? 'success' : 'white'"
                 class="ml-1"

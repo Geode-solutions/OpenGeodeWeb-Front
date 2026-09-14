@@ -8,15 +8,17 @@ import { useMenuStore } from "@ogw_front/stores/menu";
 import { useOverlappingPicker } from "@ogw_front/composables/use_overlapping_picker";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
-// oxlint-disable-next-line vue/define-props-declaration
-const { displayMenu, containerWidth, containerHeight } = defineProps({
-  displayMenu: { type: Boolean, required: true },
-  containerWidth: { type: Number, required: true },
-  containerHeight: { type: Number, required: true },
-});
+interface Props {
+  displayMenu: boolean;
+  containerWidth: number;
+  containerHeight: number;
+}
 
-// oxlint-disable-next-line vue/define-emits-declaration
-const emit = defineEmits(["show-menu"]);
+const { displayMenu, containerWidth, containerHeight } = defineProps<Props>();
+
+const emit = defineEmits<{
+  "show-menu": [args: unknown];
+}>();
 const menuStore = useMenuStore();
 const viewerStore = useViewerStore();
 const hybridViewerStore = useHybridViewerStore();
@@ -60,7 +62,9 @@ function get_viewer_id(x: number, y: number) {
   const containerRect = instance?.proxy?.$el
     ?.closest?.('[data-testid="hybridViewer"]')
     ?.getBoundingClientRect() ||
-    document.querySelector('[data-testid="hybridViewer"]')?.getBoundingClientRect() || {
+    document
+      .querySelector('[data-testid="hybridViewer"]')
+      ?.getBoundingClientRect() || {
       left: 0,
       top: 0,
     };
@@ -138,7 +142,9 @@ defineExpose({ get_viewer_id });
         @click="stopHoverHighlight"
       >
         Highlight active ({{
-          hybridViewerStore.hover_highlight_field_type === "CELL" ? "Cells" : "Points"
+          hybridViewerStore.hover_highlight_field_type === "CELL"
+            ? "Cells"
+            : "Points"
         }}) &middot; Esc to stop
         <v-divider vertical class="mx-2 my-1" opacity="0.3" />
         <v-icon icon="mdi-close" size="small" />
@@ -162,7 +168,8 @@ defineExpose({ get_viewer_id });
         prepend-icon="mdi-ruler"
         @click="hybridViewerStore.clearRuler()"
       >
-        Ruler &mdash; click to set point {{ hybridViewerStore.ruler_awaiting_point }}
+        Ruler &mdash; click to set point
+        {{ hybridViewerStore.ruler_awaiting_point }}
         &middot; Esc to stop
         <v-divider vertical class="mx-2 my-1" opacity="0.3" />
         <v-icon icon="mdi-close" size="small" />

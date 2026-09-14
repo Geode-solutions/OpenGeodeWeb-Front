@@ -1,12 +1,17 @@
 <script setup lang="ts">
+import type { ItemProps } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import ViewerSpecificPolygonsOptions from "@ogw_front/components/Viewer/Surface/PolygonsOptions.vue";
 
-// oxlint-disable-next-line vue/define-props-declaration
-const { itemProps } = defineProps({
-  itemProps: { type: Object, required: true },
-});
+interface Props {
+  itemProps: ItemProps & { index: number };
+}
+
+const { itemProps } = defineProps<Props>();
 </script>
 
 <template>
-  <ViewerSpecificPolygonsOptions :itemProps="itemProps" tooltip="Triangles options" />
+  <ViewerSpecificPolygonsOptions
+    :itemProps="itemProps"
+    tooltip="Triangles options"
+  />
 </template>

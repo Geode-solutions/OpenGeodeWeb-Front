@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const model = defineModel({ type: Boolean });
+const model = defineModel<boolean>();
 </script>
 
 <template>

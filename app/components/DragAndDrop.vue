@@ -2,33 +2,44 @@
 // Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
 // oxlint-disable eslint/sort-imports
 import { onMounted, onUnmounted, ref } from "vue";
-// oxlint-disable-next-line eslint/no-duplicate-imports
-import type { PropType } from "vue";
 import DragAndDropInline from "./DragAndDropInternal/DragAndDropInline.vue";
 import DragAndDropOverlay from "./DragAndDropInternal/DragAndDropOverlay.vue";
 
-const { multiple, accept, loading, showExtensions, fullscreen, inline, showOverlay, texts } =
-  // oxlint-disable-next-line vue/define-props-declaration
-  defineProps({
-    multiple: { type: Boolean, default: false },
-    accept: { type: [String, Array] as PropType<string | string[]>, default: "" },
-    loading: { type: Boolean, default: false },
-    showExtensions: { type: Boolean, default: true },
-    fullscreen: { type: Boolean, default: false },
-    inline: { type: Boolean, default: true },
-    showOverlay: { type: Boolean, default: true },
-    texts: {
-      type: Object,
-      default: () => ({
-        idle: "Click or drag and drop",
-        drop: "Drop files here",
-        loading: "Loading...",
-      }),
-    },
-  });
+interface DragAndDropTexts {
+  idle: string;
+  drop: string;
+  loading: string;
+}
 
-// oxlint-disable-next-line vue/define-emits-declaration
-const emit = defineEmits(["files-selected"]);
+interface Props {
+  multiple?: boolean;
+  accept?: string | string[];
+  loading?: boolean;
+  showExtensions?: boolean;
+  fullscreen?: boolean;
+  inline?: boolean;
+  showOverlay?: boolean;
+  texts?: DragAndDropTexts;
+}
+
+const {
+  multiple = false,
+  accept = "",
+  loading = false,
+  showExtensions = true,
+  fullscreen = false,
+  inline = true,
+  showOverlay = true,
+  texts = {
+    idle: "Click or drag and drop",
+    drop: "Drop files here",
+    loading: "Loading...",
+  },
+} = defineProps<Props>();
+
+const emit = defineEmits<{
+  "files-selected": [files: File[]];
+}>();
 
 const isDragging = ref(false);
 const isInternalDrag = ref(false);

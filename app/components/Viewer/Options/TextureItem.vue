@@ -6,19 +6,21 @@ import { useBackStore } from "@ogw_front/stores/back";
 // Mirrors FileUploader's own (unexported) UploadFile type.
 type UploadFile = File & { isConfigured?: boolean; displayName?: string };
 
-// oxlint-disable-next-line vue/define-emits-declaration
-const emit = defineEmits(["update_value"]);
+const emit = defineEmits<{
+  update_value: [payload: { key: "texture_name" | "id"; value: string }];
+}>();
+
+interface Props {
+  id: string;
+  textureId: string;
+  textureName: string;
+}
 
 const {
   id,
   textureId: propTextureId,
   textureName: propTextureName,
-  // oxlint-disable-next-line vue/define-props-declaration
-} = defineProps({
-  id: { type: String, required: true },
-  textureId: { type: String, required: true },
-  textureName: { type: String, required: true },
-});
+} = defineProps<Props>();
 
 const textureName = ref(propTextureName);
 const textureId = ref(propTextureId);

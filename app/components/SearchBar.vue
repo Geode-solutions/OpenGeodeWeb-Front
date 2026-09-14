@@ -1,12 +1,14 @@
 <script setup lang="ts">
-// oxlint-disable-next-line vue/define-props-declaration
-const { modelValue, label } = defineProps({
-  modelValue: { type: String, default: "" },
-  label: { type: String, default: "" },
-});
+interface Props {
+  modelValue?: string;
+  label?: string;
+}
 
-// oxlint-disable-next-line vue/define-emits-declaration
-const emit = defineEmits(["update:modelValue"]);
+const { modelValue = "", label = "" } = defineProps<Props>();
+
+const emit = defineEmits<{
+  "update:modelValue": [value: string];
+}>();
 </script>
 
 <template>

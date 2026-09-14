@@ -4,14 +4,18 @@ import { useBackStore } from "@ogw_front/stores/back";
 
 const schema = schemas.opengeodeweb_back.geographic_coordinate_systems;
 
-// oxlint-disable-next-line vue/define-emits-declaration
-const emit = defineEmits(["update_values", "increment_step", "decrement_step"]);
+const emit = defineEmits<{
+  update_values: [values: Record<string, unknown>];
+  increment_step: [];
+  decrement_step: [];
+}>();
 
-// oxlint-disable-next-line vue/define-props-declaration
-const { geodeObjectType, keyToUpdate } = defineProps({
-  geodeObjectType: { type: String, required: true },
-  keyToUpdate: { type: String, required: true },
-});
+interface Props {
+  geodeObjectType: string;
+  keyToUpdate: string;
+}
+
+const { geodeObjectType, keyToUpdate } = defineProps<Props>();
 
 const search = ref("");
 const data_table_loading = ref(false);
@@ -47,7 +51,9 @@ async function get_crs_table() {
     { schema, params },
     {
       response_function: (response: unknown) => {
-        crs_list.value = (response as { crs_list: Record<string, unknown>[] }).crs_list;
+        crs_list.value = (
+          response as { crs_list: Record<string, unknown>[] }
+        ).crs_list;
       },
     },
   );

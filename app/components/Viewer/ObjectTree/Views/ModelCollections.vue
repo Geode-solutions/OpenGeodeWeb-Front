@@ -1,19 +1,26 @@
 <script setup lang="ts">
-import { sortAndFormatItems, useTreeFilter } from "@ogw_front/composables/tree_filter";
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
+import {
+  sortAndFormatItems,
+  useTreeFilter,
+} from "@ogw_front/composables/tree_filter";
 import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
+import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useModelCollections } from "@ogw_front/composables/model_collections";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
-// oxlint-disable-next-line vue/define-props-declaration
-const { id, viewId } = defineProps({
-  id: { type: String, required: true },
-  viewId: { type: String, required: false, default: undefined },
-});
+interface Props {
+  id: string;
+  viewId?: string;
+}
+
+const { id, viewId = undefined } = defineProps<Props>();
 const actualViewId = viewId || id;
 
 interface CollectionTreeItem {
@@ -27,8 +34,17 @@ interface CollectionTreeItem {
 
 const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 const hybridViewerStore = useHybridViewerStore();
-// oxlint-disable-next-line vue/define-emits-declaration
-const emit = defineEmits(["show-menu"]);
+const emit = defineEmits<{
+  "show-menu": [
+    payload: {
+      event: unknown;
+      itemId: string;
+      context_type: "model_component" | "model_component_type";
+      modelId: string;
+      modelComponentType: string | undefined;
+    },
+  ];
+}>();
 
 const treeviewStore = useTreeviewStore();
 const {
@@ -60,11 +76,16 @@ const {
 } = useTreeFilter(localCategories);
 
 function onUpdateSelection(newSelection: string[]) {
-  const finalSelection = applySearchFilter(newSelection, visibleComponents.value);
+  const finalSelection = applySearchFilter(
+    newSelection,
+    visibleComponents.value,
+  );
   updateVisibility(finalSelection as string[]);
 }
 
-const visibleSelection = computed(() => applySearchFilter(visibleComponents.value, []));
+const visibleSelection = computed(() =>
+  applySearchFilter(visibleComponents.value, []),
+);
 
 const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
   if (search.value && componentsCache.value) {
@@ -80,7 +101,10 @@ const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
         result.push({
           id: type,
           title: `${type}s (${matches.length})`,
-          children: sortAndFormatItems(matches, sortType.value) as unknown as CollectionTreeItem[],
+          children: sortAndFormatItems(
+            matches,
+            sortType.value,
+          ) as unknown as CollectionTreeItem[],
         });
       }
     }
@@ -107,7 +131,9 @@ function showContextMenu(event: unknown, item: CollectionTreeItem) {
   emit("show-menu", {
     event,
     itemId: actualItem.category ? actualItem.id : id,
-    context_type: actualItem.category ? "model_component" : "model_component_type",
+    context_type: actualItem.category
+      ? "model_component"
+      : "model_component_type",
     modelId: id,
     modelComponentType: actualItem.category ? undefined : actualItem.id,
   });
@@ -132,7 +158,10 @@ function handleHoverEnter({
 }) {
   const actualItem = item.raw || item;
 
-  if (!actualItem.category && (!actualItem.children || actualItem.children.length === 0)) {
+  if (
+    !actualItem.category &&
+    (!actualItem.children || actualItem.children.length === 0)
+  ) {
     return;
   }
 
@@ -197,31 +226,40 @@ function getLeafViewerIdsForFocus(item: CollectionTreeItem): string[] {
       }"
       :scroll-top="currentView?.scrollTop || 0"
       class="transparent-treeview virtual-tree-height"
-      @update:selected="onUpdateSelection"
-      @click:item="onUpdateSelection([$event.id, ...visibleComponents])"
+      @update:selected="(val) => onUpdateSelection(val as string[])"
+      @click:item="onUpdateSelection([$event.id as string, ...visibleComponents])"
       @update:scroll-top="treeviewStore.setScrollTop(actualViewId, $event)"
-      @hover:enter="handleHoverEnter"
+      @hover:enter="
+        ({ item }) => handleHoverEnter({ item: item as unknown as CollectionTreeItem })
+      "
       @hover:leave="handleHoverLeave"
-      @contextmenu="showContextMenu($event.event, $event.item)"
+      @contextmenu="
+        showContextMenu($event.event, $event.item as unknown as CollectionTreeItem)
+      "
     >
       <template #title="{ item, isLeaf }">
         <ObjectTreeItemLabel
-          :item="item"
+          :item="item as unknown as DisplayItem"
           :is-leaf="isLeaf"
           show-tooltip
           class="text-body-1"
-          @contextmenu="showContextMenu($event, item)"
+          @contextmenu="showContextMenu($event, item as unknown as CollectionTreeItem)"
         />
       </template>
 
       <template #append="{ item }">
         <v-btn
-          v-if="getLeafViewerIds(item).length > 0"
+          v-if="getLeafViewerIds(item as unknown as CollectionTreeItem).length > 0"
           icon="mdi-target"
           size="medium"
           variant="text"
           v-tooltip="'Focus camera on object'"
-          @click.stop="hybridViewerStore.focusCameraOnObject(id, getLeafViewerIdsForFocus(item))"
+          @click.stop="
+            hybridViewerStore.focusCameraOnObject(
+              id,
+              getLeafViewerIdsForFocus(item as unknown as CollectionTreeItem),
+            )
+          "
         />
       </template>
     </CommonTreeView>

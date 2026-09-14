@@ -1,21 +1,36 @@
 <script setup lang="ts">
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
 import TreeRow from "@ogw_front/components/Viewer/ObjectTree/Base/TreeRow.vue";
+import type {
+  DisplayItem,
+  ItemPropsConfig,
+  SelectionConfig,
+  TreeItem,
+} from "@ogw_front/composables/virtual_tree";
 
-// oxlint-disable-next-line vue/define-props-declaration
-const { item, itemProps, selection, isSelected, getIndeterminate } = defineProps({
-  item: { type: Object, required: true },
-  itemProps: { type: Object, required: true },
-  selection: { type: Object, required: true },
-  isSelected: { type: Function, required: true },
-  getIndeterminate: { type: Function, required: true },
-});
+interface Props {
+  item: DisplayItem;
+  itemProps: ItemPropsConfig;
+  selection: SelectionConfig;
+  isSelected: (item: TreeItem) => boolean;
+  getIndeterminate: (item: TreeItem) => boolean;
+}
 
-// oxlint-disable-next-line vue/define-emits-declaration
-const emit = defineEmits(["toggle-open", "toggle-select"]);
+const { item, itemProps, selection, isSelected, getIndeterminate } =
+  defineProps<Props>();
+
+const emit = defineEmits<{
+  "toggle-open": [item: TreeItem];
+  "toggle-select": [item: TreeItem];
+}>();
 </script>
 
 <template>
-  <div class="sticky-tree-header tree-row" @click="$emit('toggle-open', item.raw)">
+  <div
+    class="sticky-tree-header tree-row"
+    @click="$emit('toggle-open', item.raw)"
+  >
     <TreeRow
       :item="item"
       :item-props="itemProps"

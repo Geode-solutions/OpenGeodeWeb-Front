@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import SurfaceEdges from "@ogw_front/assets/viewer_svgs/surface_edges.svg";
-import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+// oxlint-disable-next-line import/consistent-type-specifier-style -- combining the default import with the type import avoids a duplicate-imports violation on this same module
+import ViewerContextMenuItem, { type ItemProps } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
@@ -11,12 +12,15 @@ const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const { applyBatchStyle } = useBatchStyle();
 
-// oxlint-disable-next-line vue/define-props-declaration
-const { itemProps } = defineProps({
-  itemProps: { type: Object, required: true },
-});
+interface Props {
+  itemProps: ItemProps & { index: number };
+}
 
-const id = computed(() => itemProps.meta_data.modelId || itemProps.id);
+const { itemProps } = defineProps<Props>();
+
+const id = computed(
+  () => (itemProps.meta_data.modelId as string | undefined) || itemProps.id,
+);
 
 const visibility = computed({
   get: () => dataStyleStore.modelEdgesVisibility(id.value),

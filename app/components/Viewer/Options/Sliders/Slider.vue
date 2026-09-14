@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import BasicSlider from "@ogw_front/components/Basic/Slider.vue";
 
-const model = defineModel({ type: Number });
-// oxlint-disable-next-line vue/define-props-declaration
-const { tooltip } = defineProps({
-  tooltip: { type: String, required: true },
-});
+const model = defineModel<number>();
+
+interface Props {
+  tooltip: string;
+}
+
+const { tooltip } = defineProps<Props>();
 </script>
 
 <template>

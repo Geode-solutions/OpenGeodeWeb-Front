@@ -1,17 +1,22 @@
 <script setup lang="ts">
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 
-const zScale = defineModel({ type: Number, default: 1 });
-const show = defineModel("show", { type: Boolean, default: false });
+const zScale = defineModel<number>({ default: 1 });
+const show = defineModel<boolean>("show", { default: false });
 
-// oxlint-disable-next-line vue/define-props-declaration
-const { width, escapeFunction } = defineProps({
-  width: { type: Number, default: 260 },
-  escapeFunction: { type: Function, default: undefined },
-});
+const DEFAULT_PANEL_WIDTH = 260;
 
-// oxlint-disable-next-line vue/define-emits-declaration
-const emit = defineEmits(["apply"]);
+interface Props {
+  width?: number;
+  escapeFunction?: () => void;
+}
+
+const { width = DEFAULT_PANEL_WIDTH, escapeFunction = undefined } =
+  defineProps<Props>();
+
+const emit = defineEmits<{
+  apply: [];
+}>();
 
 function apply() {
   emit("apply");

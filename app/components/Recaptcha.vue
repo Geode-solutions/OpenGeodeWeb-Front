@@ -1,24 +1,17 @@
 <script setup lang="ts">
 import { useInfraStore } from "@ogw_front/stores/infra";
 
-// oxlint-disable-next-line vue/define-props-declaration
-const { buttonLabel, buttonColor, color } = defineProps({
-  buttonLabel: {
-    type: String,
-    required: false,
-    default: "Load the app",
-  },
-  buttonColor: {
-    type: String,
-    required: false,
-    default: "white",
-  },
-  color: {
-    type: String,
-    required: false,
-    default: undefined,
-  },
-});
+interface Props {
+  buttonLabel?: string;
+  buttonColor?: string;
+  color?: string;
+}
+
+const {
+  buttonLabel = "Load the app",
+  buttonColor = "white",
+  color = undefined,
+} = defineProps<Props>();
 
 const name = ref("");
 const email = ref("");
@@ -57,7 +50,12 @@ function submit() {
           </VRow>
           <VRow>
             <VCol>
-              <VTextField v-model="email" :rules="emailRules" label="E-mail" required />
+              <VTextField
+                v-model="email"
+                :rules="emailRules"
+                label="E-mail"
+                required
+              />
             </VCol>
           </VRow>
           <VRow>
@@ -71,7 +69,12 @@ function submit() {
   </VRow>
   <VRow align="center" justify="center">
     <VCol cols="auto" class="d-flex justify-center align-center">
-      <VBtn class="load-btn" :text="buttonLabel" :color="color || buttonColor" @click="submit" />
+      <VBtn
+        class="load-btn"
+        :text="buttonLabel"
+        :color="color || buttonColor"
+        @click="submit"
+      />
     </VCol>
   </VRow>
 </template>

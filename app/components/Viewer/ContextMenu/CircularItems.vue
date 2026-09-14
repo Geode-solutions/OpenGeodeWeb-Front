@@ -1,13 +1,15 @@
 <script setup lang="ts">
+import type { Component } from "vue";
 import { useMenuStore } from "@ogw_front/stores/menu";
 
-// oxlint-disable-next-line vue/define-props-declaration
-const { menuItems, id, metaData, menuItemCount } = defineProps({
-  menuItems: { type: Array, required: true },
-  id: { type: String, required: true },
-  metaData: { type: Object, required: true },
-  menuItemCount: { type: Number, required: true },
-});
+interface Props {
+  menuItems: Component[];
+  id: string;
+  metaData: Record<string, unknown>;
+  menuItemCount: number;
+}
+
+const { menuItems, id, metaData, menuItemCount } = defineProps<Props>();
 
 const RADIUS = 80;
 const Z_INDEX_ACTIVE_ITEM = 10;
@@ -26,7 +28,10 @@ function getItemStyle(index: number) {
     transform: `translate(${Math.cos(angle) * RADIUS}px, ${Math.sin(angle) * RADIUS}px)`,
     transition: "opacity 0.2s ease, transform 0.2s ease",
     position: "absolute",
-    zIndex: menuStore.active_item_index === index ? Z_INDEX_ACTIVE_ITEM : Z_INDEX_BASE_ITEM,
+    zIndex:
+      menuStore.active_item_index === index
+        ? Z_INDEX_ACTIVE_ITEM
+        : Z_INDEX_BASE_ITEM,
   };
 }
 

@@ -8,12 +8,13 @@ const DEFAULT_SHRINK_VALUE = 0.8;
 const MAX_SHRINK_VALUE = 1;
 const DEBOUNCE_DELAY = 100;
 
-// oxlint-disable-next-line vue/define-props-declaration
-const { escapeFunction } = defineProps({
-  escapeFunction: { type: Function, default: undefined },
-});
+interface Props {
+  escapeFunction?: () => void;
+}
 
-const show = defineModel("show", { type: Boolean, default: false });
+const { escapeFunction = undefined } = defineProps<Props>();
+
+const show = defineModel<boolean>("show", { default: false });
 const dataStore = useDataStore();
 const hybridViewerStore = useHybridViewerStore();
 const targetAllVisible = ref(true);
@@ -22,7 +23,10 @@ const shrinkFactor = ref(DEFAULT_SHRINK_VALUE);
 
 const allItems = dataStore.refAllItems();
 const availableDatasets = computed(() =>
-  allItems.value.map((item) => ({ title: item.name || item.id, value: item.id })),
+  allItems.value.map((item) => ({
+    title: item.name || item.id,
+    value: item.id,
+  })),
 );
 
 async function applyShrink() {
@@ -83,7 +87,10 @@ watch(allItems, () => {
 });
 
 watch(
-  () => Object.values(hybridViewerStore.hybridDb).filter((entry) => entry && entry.actor).length,
+  () =>
+    Object.values(hybridViewerStore.hybridDb).filter(
+      (entry) => entry && entry.actor,
+    ).length,
   (actorCount) => {
     if (show.value && actorCount > 0) {
       applyShrink();
@@ -100,7 +107,9 @@ watch(
     :click-outside="false"
     :escapeFunction="escapeFunction"
   >
-    <v-card-text class="pa-3 max-panel-height overflow-y-auto overflow-x-hidden">
+    <v-card-text
+      class="pa-3 max-panel-height overflow-y-auto overflow-x-hidden"
+    >
       <v-switch
         v-model="targetAllVisible"
         data-testid="shrinkTargetAllVisibleSwitch"

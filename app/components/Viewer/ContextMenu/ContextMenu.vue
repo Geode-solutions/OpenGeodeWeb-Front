@@ -9,14 +9,15 @@ import { useMenuStore } from "@ogw_front/stores/menu";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 import type { Component } from "vue";
 
-// oxlint-disable-next-line vue/define-props-declaration
-const { id, x, y, containerWidth, containerHeight } = defineProps({
-  id: { type: String, required: true },
-  x: { type: Number, required: true },
-  y: { type: Number, required: true },
-  containerWidth: { type: Number, required: true },
-  containerHeight: { type: Number, required: true },
-});
+interface Props {
+  id: string;
+  x: number;
+  y: number;
+  containerWidth: number;
+  containerHeight: number;
+}
+
+const { id, x, y, containerWidth, containerHeight } = defineProps<Props>();
 
 const RADIUS = 80;
 const MARGIN_OFFSET = 40;
@@ -118,7 +119,9 @@ watch(
 const menuItemCount = computed(() => menu_items.value.length);
 
 const isOverTreeview = computed(() => {
-  const hasAdditional = treeviewStore.opened_views.some((view) => view.id !== "main");
+  const hasAdditional = treeviewStore.opened_views.some(
+    (view) => view.id !== "main",
+  );
   const hasMain = treeviewStore.opened_views.some((view) => view.id === "main");
   const firstColWidth = hasMain ? treeviewStore.panelWidth : 0;
   const secondColWidth = hasAdditional ? treeviewStore.additionalPanelWidth : 0;

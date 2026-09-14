@@ -1,20 +1,28 @@
 <script setup lang="ts">
-import { drawCanvasForPreset, getPresetsWithCurrentAtTop } from "@ogw_front/utils/colormap";
+import {
+  drawCanvasForPreset,
+  getPresetsWithCurrentAtTop,
+} from "@ogw_front/utils/colormap";
 import ColorMapList from "./ColorMapList.vue";
 import GlassCard from "@ogw_front/components/GlassCard.vue";
 
-// oxlint-disable-next-line vue/define-props-declaration
-const { max, min } = defineProps({
-  min: { type: Number, required: true },
-  max: { type: Number, required: true },
-});
+interface Props {
+  min: number;
+  max: number;
+}
 
-const selectedPresetName = defineModel("selectedPresetName", { type: String, default: "batlow" });
+const { max, min } = defineProps<Props>();
+
+const selectedPresetName = defineModel<string>("selectedPresetName", {
+  default: "batlow",
+});
 
 const menuOpen = ref(false);
 const lutCanvas = ref<HTMLCanvasElement | undefined>(undefined);
 
-const presets = computed(() => getPresetsWithCurrentAtTop(selectedPresetName.value));
+const presets = computed(() =>
+  getPresetsWithCurrentAtTop(selectedPresetName.value),
+);
 
 function drawLutCanvas() {
   drawCanvasForPreset(selectedPresetName.value, lutCanvas.value);
@@ -44,7 +52,12 @@ watch([lutCanvas, selectedPresetName, () => min, () => max], drawLutCanvas);
         <span class="text-caption text-white font-weight-medium">
           {{ selectedPresetName }}
         </span>
-        <canvas ref="lutCanvas" width="200" height="18" class="w-100 rounded-xs border-thin" />
+        <canvas
+          ref="lutCanvas"
+          width="200"
+          height="18"
+          class="w-100 rounded-xs border-thin"
+        />
       </GlassCard>
     </template>
 

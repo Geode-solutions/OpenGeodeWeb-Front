@@ -1,8 +1,9 @@
 <script setup lang="ts">
-// oxlint-disable-next-line vue/define-props-declaration
-const { title } = defineProps({
-  title: { type: String, required: true },
-});
+interface Props {
+  title: string;
+}
+
+const { title } = defineProps<Props>();
 
 const isCollapsed = ref(false);
 </script>

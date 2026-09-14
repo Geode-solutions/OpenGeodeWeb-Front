@@ -12,10 +12,11 @@ import ViewToolbar from "@ogw_front/components/ViewToolbar.vue";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 import vtkRemoteView from "@kitware/vtk.js/Rendering/Misc/RemoteView";
 
-// oxlint-disable-next-line vue/define-props-declaration
-const { viewId } = defineProps({
-  viewId: { type: String, default: "-1" },
-});
+interface Props {
+  viewId?: string;
+}
+
+const { viewId = "-1" } = defineProps<Props>();
 
 const viewerStore = useViewerStore();
 const menuStore = useMenuStore();

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { PropType } from "vue";
 import StickyHeader from "@ogw_front/components/Viewer/ObjectTree/Base/StickyHeader.vue";
 import TreeRow from "@ogw_front/components/Viewer/ObjectTree/Base/TreeRow.vue";
 import { useTreeKeyboardNav } from "@ogw_front/composables/tree_keyboard_nav";
@@ -14,35 +13,40 @@ type UnwrapMaybeRefOrGetter<Source> = Source extends () => infer Result
   : Source extends { value: infer Result }
     ? Result
     : Source;
-type VirtualTreeProps = UnwrapMaybeRefOrGetter<Parameters<typeof useVirtualTree>[0]>;
+type VirtualTreeProps = UnwrapMaybeRefOrGetter<
+  Parameters<typeof useVirtualTree>[0]
+>;
 
-// oxlint-disable-next-line vue/define-props-declaration
-const { items, opened, selected, active, scrollTop, options } = defineProps({
-  items: { type: Array, required: true },
-  opened: { type: Array as PropType<unknown[]>, required: false, default: () => [] },
-  selected: { type: Array as PropType<unknown[]>, required: false, default: () => [] },
-  active: { type: Array as PropType<unknown[]>, required: false, default: () => [] },
-  scrollTop: { type: Number, required: false, default: 0 },
-  options: {
-    type: Object as PropType<Record<string, unknown>>,
-    required: false,
-    default: () => ({}),
-  },
-});
+interface Props {
+  items: unknown[];
+  opened?: unknown[];
+  selected?: unknown[];
+  active?: unknown[];
+  scrollTop?: number;
+  options?: Record<string, unknown>;
+}
+
+const {
+  items,
+  opened = [],
+  selected = [],
+  active = [],
+  scrollTop = 0,
+  options = {},
+} = defineProps<Props>();
 
 const treeWrapper = ref<HTMLDivElement | undefined>(undefined);
 
-// oxlint-disable-next-line vue/define-emits-declaration
-const emit = defineEmits([
-  "update:opened",
-  "update:selected",
-  "update:active",
-  "click:item",
-  "update:scrollTop",
-  "hover:enter",
-  "hover:leave",
-  "contextmenu",
-]);
+const emit = defineEmits<{
+  "update:opened": [value: unknown[]];
+  "update:selected": [value: unknown[]];
+  "update:active": [value: unknown[]];
+  "click:item": [item: DisplayItem["raw"]];
+  "update:scrollTop": [value: number];
+  "hover:enter": [payload: { item: DisplayItem }];
+  "hover:leave": [payload: { item: DisplayItem }];
+  contextmenu: [payload: { event: MouseEvent; item: DisplayItem["raw"] }];
+}>();
 
 const {
   actualItemProps,
@@ -66,13 +70,18 @@ const {
   emit as EmitFn,
 );
 
-const { virtualScrollRef, stickyHeader, handleScroll, scrollToIndex, getScrollInfo } =
-  useTreeScroll(
-    computed(() => ({ scrollTop })),
-    emit as EmitFn,
-    displayItems,
-    actualItemProps,
-  );
+const {
+  virtualScrollRef,
+  stickyHeader,
+  handleScroll,
+  scrollToIndex,
+  getScrollInfo,
+} = useTreeScroll(
+  computed(() => ({ scrollTop })),
+  emit as EmitFn,
+  displayItems,
+  actualItemProps,
+);
 
 const focusedIndex = ref(-1);
 const lastActiveIndex = ref(-1);
