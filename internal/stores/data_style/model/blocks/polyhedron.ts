@@ -241,10 +241,7 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
       params,
     });
   }
-  async function applyPolyhedronAttribute(
-    modelId: string,
-    blockIds: string[],
-  ): Promise<unknown> {
+  async function applyPolyhedronAttribute(modelId: string, blockIds: string[]): Promise<unknown> {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockIds[0]);
     const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(

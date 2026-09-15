@@ -8,7 +8,10 @@ import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 import { useBackStore } from "@ogw_front/stores/back";
 
 // Mirrors the (unexported) shape produced by shared/utils/response_handlers/load.ts.
-interface AllowedObject { is_loadable: number; object_priority?: number }
+interface AllowedObject {
+  is_loadable: number;
+  object_priority?: number;
+}
 type AllowedObjectMap = Record<string, AllowedObject>;
 
 const schema = schemas.opengeodeweb_back.allowed_objects;

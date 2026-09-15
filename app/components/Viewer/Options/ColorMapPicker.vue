@@ -29,10 +29,7 @@ function onSelectPreset(preset: { Name: string }): void {
 }
 
 onMounted(() => nextTick(drawLutCanvas));
-watch(
-  [lutCanvas, selectedPresetName, (): number => min, (): number => max],
-  drawLutCanvas,
-);
+watch([lutCanvas, selectedPresetName, (): number => min, (): number => max], drawLutCanvas);
 </script>
 
 <template>

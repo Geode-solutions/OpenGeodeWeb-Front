@@ -48,9 +48,7 @@ async function get_crs_table(): void {
     { schema, params },
     {
       response_function: (response: unknown) => {
-        crs_list.value = (
-          response as { crs_list: Record<string, unknown>[] }
-        ).crs_list;
+        crs_list.value = (response as { crs_list: Record<string, unknown>[] }).crs_list;
       },
     },
   );

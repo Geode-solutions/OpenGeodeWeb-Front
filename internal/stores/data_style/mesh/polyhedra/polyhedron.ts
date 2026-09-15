@@ -54,9 +54,7 @@ function isMeshPolyhedraPolyhedronAttributeValid({
 function useMeshPolyhedraPolyhedronAttributeStyle(): {
   meshPolyhedraPolyhedronAttributeName: (id: string) => string | undefined;
   meshPolyhedraPolyhedronAttributeItem: (id: string) => number;
-  meshPolyhedraPolyhedronAttributeRange: (
-    id: string,
-  ) => [number | undefined, number | undefined];
+  meshPolyhedraPolyhedronAttributeRange: (id: string) => [number | undefined, number | undefined];
   meshPolyhedraPolyhedronAttributeColorMap: (id: string) => string | undefined;
   meshPolyhedraPolyhedronAttributeStoredConfig: (
     id: string,

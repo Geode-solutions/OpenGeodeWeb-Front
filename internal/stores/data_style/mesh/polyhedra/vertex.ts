@@ -203,7 +203,10 @@ function useMeshPolyhedraVertexAttributeStyle(): UseMeshPolyhedraVertexAttribute
       return setMeshPolyhedraVertexAttribute(id, attribute);
     }
   }
-  function setMeshPolyhedraVertexAttributeName(id: string, name: string): Promise<unknown> | undefined {
+  function setMeshPolyhedraVertexAttributeName(
+    id: string,
+    name: string,
+  ): Promise<unknown> | undefined {
     const item = meshPolyhedraVertexAttributeLastItem(id, name);
     mutateMeshPolyhedraVertexStyle(id, {
       name,
@@ -211,7 +214,10 @@ function useMeshPolyhedraVertexAttributeStyle(): UseMeshPolyhedraVertexAttribute
     });
     return applyVertexAttribute(id);
   }
-  function setMeshPolyhedraVertexAttributeItem(id: string, item: number): Promise<unknown> | undefined {
+  function setMeshPolyhedraVertexAttributeItem(
+    id: string,
+    item: number,
+  ): Promise<unknown> | undefined {
     mutateMeshPolyhedraVertexStyle(id, {
       item,
     });

@@ -11,7 +11,10 @@ interface Props {
 
 const { schema } = defineProps<Props>();
 
-interface PackageVersion { package: string; version: string }
+interface PackageVersion {
+  package: string;
+  version: string;
+}
 
 const backStore = useBackStore();
 const packages_versions = ref<PackageVersion[]>([]);

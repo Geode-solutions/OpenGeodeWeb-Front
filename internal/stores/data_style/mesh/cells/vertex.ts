@@ -104,10 +104,7 @@ function useMeshCellsVertexAttributeStyle(): UseMeshCellsVertexAttributeStyleRet
       no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
-  function mutateMeshCellsVertexStyle(
-    id: string,
-    values: Record<string, unknown>,
-  ): Promise<void> {
+  function mutateMeshCellsVertexStyle(id: string, values: Record<string, unknown>): Promise<void> {
     return meshCellsCommonStyle.mutateMeshCellsStyle(id, {
       coloring: {
         vertex: values,

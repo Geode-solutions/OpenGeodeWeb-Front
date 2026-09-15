@@ -59,9 +59,7 @@ const emit = defineEmits<Emits>();
       </v-sheet>
 
       <v-card-text class="pa-0">
-        <v-sheet
-          class="text-h6 font-weight-bold text-white d-block mb-1 bg-transparent"
-        >
+        <v-sheet class="text-h6 font-weight-bold text-white d-block mb-1 bg-transparent">
           {{ loading ? texts.loading : isDragging ? texts.drop : texts.idle }}
         </v-sheet>
         <v-sheet

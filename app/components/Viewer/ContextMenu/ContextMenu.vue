@@ -122,9 +122,7 @@ watch(
 const menuItemCount = computed<number>(() => menu_items.value.length);
 
 const isOverTreeview = computed<boolean>(() => {
-  const hasAdditional = treeviewStore.opened_views.some(
-    (view) => view.id !== "main",
-  );
+  const hasAdditional = treeviewStore.opened_views.some((view) => view.id !== "main");
   const hasMain = treeviewStore.opened_views.some((view) => view.id === "main");
   const firstColWidth = hasMain ? treeviewStore.panelWidth : 0;
   const secondColWidth = hasAdditional ? treeviewStore.additionalPanelWidth : 0;

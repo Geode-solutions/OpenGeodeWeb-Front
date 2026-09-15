@@ -32,10 +32,7 @@ function startEditing(position: { id?: number; name?: string }): void {
 
 async function saveRename(): void {
   if (editingName.value && editingId.value !== undefined) {
-    await cameraManagerStore.renameCameraPosition(
-      editingId.value,
-      editingName.value,
-    );
+    await cameraManagerStore.renameCameraPosition(editingId.value, editingName.value);
   }
   editingId.value = undefined;
 }
@@ -107,9 +104,7 @@ async function saveRename(): void {
     </v-list-item>
   </v-list>
   <div v-else class="text-center text-grey-lighten-1 py-4 italic text-caption">
-    <v-icon size="32" class="mb-1 d-block mx-auto opacity-20"
-      >mdi-camera-off</v-icon
-    >
+    <v-icon size="32" class="mb-1 d-block mx-auto opacity-20">mdi-camera-off</v-icon>
     No saved positions yet.
   </div>
 </template>

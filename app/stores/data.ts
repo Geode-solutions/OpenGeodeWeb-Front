@@ -224,11 +224,7 @@ export const useDataStore = defineStore("data", () => {
   }
   async function addComponentRelations(new_item: NewDataItem): Promise<string> {
     const relations: ModelComponentRelationRecord[] = [];
-    function addModelComponentRelations(
-      components: string[],
-      parent: string,
-      type: string,
-    ): void {
+    function addModelComponentRelations(components: string[], parent: string, type: string): void {
       for (const child of components) {
         relations.push({
           id: new_item.id,
