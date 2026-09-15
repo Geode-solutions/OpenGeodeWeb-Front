@@ -128,19 +128,19 @@ export function useDataMesh() {
   }
 
   async function getCornersGeodeIds(modelId: string): Promise<string[]> {
-    return getMeshComponentGeodeIds(modelId, "Corner");
+    return await getMeshComponentGeodeIds(modelId, "Corner");
   }
 
   async function getLinesGeodeIds(modelId: string): Promise<string[]> {
-    return getMeshComponentGeodeIds(modelId, "Line");
+    return await getMeshComponentGeodeIds(modelId, "Line");
   }
 
   async function getSurfacesGeodeIds(modelId: string): Promise<string[]> {
-    return getMeshComponentGeodeIds(modelId, "Surface");
+    return await getMeshComponentGeodeIds(modelId, "Surface");
   }
 
   async function getBlocksGeodeIds(modelId: string): Promise<string[]> {
-    return getMeshComponentGeodeIds(modelId, "Block");
+    return await getMeshComponentGeodeIds(modelId, "Block");
   }
 
   return {

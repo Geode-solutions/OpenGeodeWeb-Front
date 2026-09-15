@@ -18,7 +18,7 @@ interface CallSchemaOptions {
   timeout?: number;
 }
 
-async function callSchema(
+ function callSchema(
   { schema, params = {}, client, timeout }: CallSchemaOptions,
   {
     request_error_function,

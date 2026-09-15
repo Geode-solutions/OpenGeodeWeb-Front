@@ -23,14 +23,14 @@ interface CallRawOptions {
   timeout?: number;
 }
 
-async function callClient({ rpc, params = {}, client }: Omit<CallRawOptions, "timeout">) {
+ function callClient({ rpc, params = {}, client }: Omit<CallRawOptions, "timeout">) {
   if (globalThis.window !== undefined) {
     return client.getConnection().getSession().call(rpc, [params]);
   }
   return client.call(rpc, params);
 }
 
-async function callRaw(
+ function callRaw(
   { rpc, params = {}, client, timeout }: CallRawOptions,
   { request_error_function, response_function, response_error_function }: RequestHandlers = {},
 ) {
