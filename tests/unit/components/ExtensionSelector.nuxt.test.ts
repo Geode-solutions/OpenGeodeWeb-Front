@@ -28,13 +28,13 @@ describe("extension selector", () => {
   beforeEach(() => {
     (backStore as { base_url: string }).base_url = "/";
 
-    backStore.request = vi.fn(() => {
+    backStore.request = vi.fn(async () => {
       const response = {
         geode_objects_and_output_extensions: {
           BRep: { msh: { is_saveable: true } },
         },
       };
-      return Promise.resolve(response);
+      return response;
     });
   });
 

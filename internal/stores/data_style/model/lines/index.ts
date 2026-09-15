@@ -32,7 +32,7 @@ export function useModelLinesStyle() {
   const modelLinesVertexAttribute = useModelLinesVertexAttribute();
   const modelLinesEdgeAttribute = useModelLinesEdgeAttribute();
 
-  function applyModelLinesVisibilityStyle(modelId: string, lines_ids: string[]) {
+  async function applyModelLinesVisibilityStyle(modelId: string, lines_ids: string[]) {
     const visibilityGroups: Record<string, string[]> = {};
     for (const line_id of lines_ids) {
       const style = modelCommonStyle.modelLineStyle(modelId, line_id);
@@ -49,7 +49,7 @@ export function useModelLinesStyle() {
     );
   }
 
-  function applyModelLinesColoringStyle(modelId: string, lines_ids: string[]) {
+  async function applyModelLinesColoringStyle(modelId: string, lines_ids: string[]) {
     const activeColoringGroups: Record<string, string[]> = {};
     for (const line_id of lines_ids) {
       const activeColoring = String(modelColorStyle.modelLineActiveColoring(modelId, line_id));
@@ -113,7 +113,7 @@ export function useModelLinesStyle() {
         }
         coloringPromises.push(
           ...Object.values(vertexGroups).map(
-            ({ name, item, minimum, maximum, colorMap, lines_ids: ids }) =>
+            async ({ name, item, minimum, maximum, colorMap, lines_ids: ids }) =>
               modelLinesVertexAttribute.setModelLinesVertexAttribute(modelId, ids, {
                 name,
                 item,
@@ -155,7 +155,7 @@ export function useModelLinesStyle() {
         }
         coloringPromises.push(
           ...Object.values(edgeGroups).map(
-            ({ name, item, minimum, maximum, colorMap, lines_ids: ids }) =>
+            async ({ name, item, minimum, maximum, colorMap, lines_ids: ids }) =>
               modelLinesEdgeAttribute.setModelLinesEdgeAttribute(modelId, ids, {
                 name,
                 item,

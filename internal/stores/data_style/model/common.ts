@@ -200,7 +200,7 @@ export function useModelCommonStyle() {
     return viewerStore.request(
       { schema, params },
       {
-        response_function: () => mutateComponentStyles(id, component_ids, { visibility }),
+        response_function: async () => mutateComponentStyles(id, component_ids, { visibility }),
       },
     );
   }

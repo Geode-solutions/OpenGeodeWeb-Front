@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Ref } from "vue";
 import type { useStepperTree } from "@ogw_front/composables/stepper_tree";
 
 interface StepConfig {
@@ -11,7 +10,7 @@ interface StepConfig {
   };
 }
 
-function truncate(text: string, maxLength: number) {
+function truncate(text: string, maxLength: number): string {
   if (text.length > maxLength) {
     return `${text.slice(0, maxLength)}...`;
   }
@@ -25,9 +24,11 @@ interface Props {
 
 const { stepIndex, stepperTree } = defineProps<Props>();
 
-const emit = defineEmits<{
+interface Emits {
   reset_values: [];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 
 const { state, increment_step, decrement_step, update_values } = stepperTree;
 const { current_step_index, steps } = toRefs(state) as unknown as {
@@ -35,7 +36,7 @@ const { current_step_index, steps } = toRefs(state) as unknown as {
   steps: Ref<StepConfig[]>;
 };
 
-const sortedChips = computed(() => {
+const sortedChips = computed<string[]>(() => {
   const chips = steps.value[stepIndex]?.chips || [];
   return chips.toSorted((chipA, chipB) =>
     chipA.localeCompare(chipB, undefined, {

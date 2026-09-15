@@ -177,7 +177,7 @@ export const useAppStore = defineStore("app", () => {
   async function loadExtension(
     path: string,
     extensionPort: string,
-    backendPath: string | undefined = undefined,
+    backendPath?: string,
   ): Promise<ExtensionModule> {
     try {
       let finalURL = path;

@@ -70,9 +70,9 @@ function useMeshEdgesEdgeAttributeStyle() {
       name !== undefined &&
       name in storedConfigs &&
       item !== undefined &&
-      item in storedConfigs[name]!
+      item in storedConfigs[name]
     ) {
-      return storedConfigs[name]![item]!;
+      return storedConfigs[name][item];
     }
     return {
       minimum: undefined,
@@ -109,7 +109,7 @@ function useMeshEdgesEdgeAttributeStyle() {
   function meshEdgesEdgeAttributeLastItem(id: string, name: string | undefined): number {
     const { storedConfigs } = meshEdgesEdgeAttribute(id);
     if (storedConfigs && name !== undefined && name in storedConfigs) {
-      return storedConfigs[name]!.lastItem;
+      return storedConfigs[name].lastItem;
     }
     return 0;
   }
@@ -138,7 +138,7 @@ function useMeshEdgesEdgeAttributeStyle() {
       colorMap,
       no_data_color,
     });
-    const points = getRGBPointsFromPreset(colorMap as string);
+    const points = getRGBPointsFromPreset(colorMap);
     const schema = meshEdgesEdgeAttributeSchemas.attribute;
     const params = {
       id,

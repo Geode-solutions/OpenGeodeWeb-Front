@@ -13,10 +13,12 @@ interface Props {
 
 const { show = false, item = undefined, selectedCount = 0 } = defineProps<Props>();
 
-const emit = defineEmits<{
+interface Emits {
   "update:show": [value: boolean];
   confirm: [];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 </script>
 
 <template>

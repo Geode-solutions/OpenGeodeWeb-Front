@@ -80,7 +80,7 @@ export function useDataMesh() {
     // The two are structurally close enough at runtime (vueuse only calls
     // `.subscribe`) but not identical, hence the cast.
     return useObservable(
-      liveQuery(() => formatedMeshComponents(modelId)) as unknown as Observable<
+      liveQuery(async () => formatedMeshComponents(modelId)) as unknown as Observable<
         FormattedComponentGroup[]
       >,
       {

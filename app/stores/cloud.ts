@@ -12,7 +12,7 @@ export const useCloudStore = defineStore("cloud", {
     status: Status.NOT_CONNECTED,
   }),
   actions: {
-    launch(email: string) {
+    async launch(email: string) {
       this.status = Status.CONNECTING;
       console.log("[CLOUD] Launching cloud backend...");
       const schema = opengeodeweb_front_schemas.api.serverless.run_cloud;
@@ -48,10 +48,10 @@ export const useCloudStore = defineStore("cloud", {
         },
       );
     },
-    connect() {
+    async connect() {
       console.log("[CLOUD] Cloud connected");
       this.status = Status.CONNECTED;
-      return Promise.resolve();
+      return;
     },
   },
   share: {

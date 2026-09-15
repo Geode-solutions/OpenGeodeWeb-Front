@@ -5,7 +5,13 @@ interface Props {
 
 const { appName } = defineProps<Props>();
 
-const ecoMessages = computed(() => [
+interface EcoMessage {
+  icon: string;
+  title: string;
+  message: string;
+}
+
+const ecoMessages = computed<EcoMessage[]>(() => [
   {
     icon: "mdi-leaf",
     title: "Why the wait?",
@@ -24,12 +30,12 @@ const ecoMessages = computed(() => [
 ]);
 
 const MESSAGE_INTERVAL_MS = 5000;
-const currentMessage = ref(0);
+const currentMessage = ref<number>(0);
 let interval: ReturnType<typeof setInterval> | undefined = undefined;
 
 // Fallback only guards against noUncheckedIndexedAccess; currentMessage is always kept in range by the modulo below, so it is never actually used.
 const FALLBACK_ECO_MESSAGE = { icon: "", title: "", message: "" };
-const currentEcoMessage = computed(
+const currentEcoMessage = computed<EcoMessage>(
   () => ecoMessages.value[currentMessage.value] ?? FALLBACK_ECO_MESSAGE,
 );
 

@@ -39,7 +39,7 @@ export function useMeshStyle() {
       },
       {
         response_function: async () => {
-          await hybridViewerStore.setVisibility(id, visibility as boolean);
+          await hybridViewerStore.setVisibility(id, visibility);
           return dataStyleState.mutateStyle(id, { visibility });
         },
       },
@@ -64,7 +64,7 @@ export function useMeshStyle() {
     );
   }
 
-  function applyMeshStyle(id: string) {
+  async function applyMeshStyle(id: string) {
     const style = dataStyleState.getStyle(id);
     const promise_array: unknown[] = [];
     for (const [key, value] of Object.entries(style)) {

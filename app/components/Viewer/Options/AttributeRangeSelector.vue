@@ -1,7 +1,9 @@
 <script setup lang="ts">
-const emit = defineEmits<{
+interface Emits {
   reset: [];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 
 const minimum = defineModel<number>("minimum");
 const maximum = defineModel<number>("maximum");

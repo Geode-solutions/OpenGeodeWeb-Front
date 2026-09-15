@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import type { Ref } from "vue";
 import Step from "@ogw_front/components/Step.vue";
 import type { useStepperTree } from "@ogw_front/composables/stepper_tree";
 
-const emit = defineEmits<{
+interface Emits {
   reset_values: [];
   close: [];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 
 interface Props {
   stepperTree: ReturnType<typeof useStepperTree>;

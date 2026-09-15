@@ -36,9 +36,9 @@ describe("crs selector", () => {
 
     // Mock backStore.request instead of registerEndpoint
     backStore.request = vi.fn(
-      (_request: unknown, callbacks: { response_function?: (response: unknown) => void }) => {
+      async (_request: unknown, callbacks: { response_function?: (response: unknown) => void }) => {
         callbacks.response_function?.({ crs_list });
-        return Promise.resolve({ crs_list });
+        return { crs_list };
       },
     );
 

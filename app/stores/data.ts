@@ -15,6 +15,7 @@ import { useDataMesh } from "./data_helpers/mesh.js";
 // oxlint-disable-next-line eslint/no-duplicate-imports
 import type { ModelComponentRecord } from "./data_helpers/mesh.js";
 import { useViewerStore } from "@ogw_front/stores/viewer";
+import type { Ref } from "vue";
 
 interface DataItem {
   id: string;
@@ -133,24 +134,27 @@ export const useDataStore = defineStore("data", () => {
     return data_item;
   }
   async function allItems(): Promise<DataItem[]> {
-    return await data_db.toArray();
+    return data_db.toArray();
   }
-  function refItem(id: string) {
+  function refItem(id: string): Readonly<Ref<DataItem | undefined>> {
     // Dexie's liveQuery() returns Dexie's own minimal Observable shape, not an
     // Actual rxjs Observable instance (useObservable's declared parameter type);
     // The two are structurally close enough at runtime (vueuse only calls
     // `.subscribe`) but not identical, hence the cast.
     return useObservable(
-      liveQuery(() => data_db.get(id)) as unknown as Observable<DataItem | undefined>,
+      liveQuery(async () => data_db.get(id)) as unknown as Observable<DataItem | undefined>,
       {
         initialValue: {} as DataItem,
       },
     );
   }
-  function refAllItems() {
-    return useObservable(liveQuery(() => data_db.toArray()) as unknown as Observable<DataItem[]>, {
-      initialValue: [] as DataItem[],
-    });
+  function refAllItems(): Readonly<Ref<DataItem[]>> {
+    return useObservable(
+      liveQuery(async () => data_db.toArray()) as unknown as Observable<DataItem[]>,
+      {
+        initialValue: [] as DataItem[],
+      },
+    );
   }
   async function meshComponentType(modelId: string, geode_id: string): Promise<string | undefined> {
     const component = await model_components_db
@@ -159,29 +163,29 @@ export const useDataStore = defineStore("data", () => {
       .first();
     return component?.type;
   }
-  async function registerObject(id: string, name: string) {
+  async function registerObject(id: string, name: string): Promise<unknown> {
     const schema = viewer_generic_schemas.register;
     const params = {
       id,
       name,
     };
-    return await viewerStore.request({
+    return viewerStore.request({
       schema,
       params,
       timeout: 0,
     });
   }
-  async function deregisterObject(id: string) {
+  async function deregisterObject(id: string): Promise<unknown> {
     const schema = viewer_generic_schemas.deregister;
     const params = {
       id,
     };
-    return await viewerStore.request({
+    return viewerStore.request({
       schema,
       params,
     });
   }
-  function addItem(new_item: NewDataItem) {
+  async function addItem(new_item: NewDataItem): Promise<string> {
     const itemData: DataItem = {
       id: new_item.id,
       name: new_item.name || new_item.id,
@@ -196,9 +200,9 @@ export const useDataStore = defineStore("data", () => {
     }
     return data_db.put(itemData);
   }
-  function addComponents(new_item: NewDataItem) {
+  async function addComponents(new_item: NewDataItem): Promise<string> {
     const allComponents: ModelComponentRecord[] = [];
-    function addModelComponents(components: ModelComponentInput[]) {
+    function addModelComponents(components: ModelComponentInput[]): void {
       for (const component of components) {
         allComponents.push({
           id: new_item.id,
@@ -218,9 +222,9 @@ export const useDataStore = defineStore("data", () => {
     }
     return model_components_db.bulkPut(allComponents);
   }
-  function addComponentRelations(new_item: NewDataItem) {
+  async function addComponentRelations(new_item: NewDataItem): Promise<string> {
     const relations: ModelComponentRelationRecord[] = [];
-    function addModelComponentRelations(components: string[], parent: string, type: string) {
+    function addModelComponentRelations(components: string[], parent: string, type: string): void {
       for (const child of components) {
         relations.push({
           id: new_item.id,
@@ -249,7 +253,10 @@ export const useDataStore = defineStore("data", () => {
     }
     return model_components_relation_db.bulkPut(relations);
   }
-  async function getComponentByViewerId(modelId: string, viewer_id: string | number) {
+  async function getComponentByViewerId(
+    modelId: string,
+    viewer_id: string | number,
+  ): Promise<ModelComponentRecord | undefined> {
     const component = await model_components_db
       .where("viewer_id")
       .equals(Number(viewer_id))
@@ -285,7 +292,11 @@ export const useDataStore = defineStore("data", () => {
       .toArray();
     return components.map((component) => Math.trunc(Number(component.viewer_id)));
   }
-  async function exportStores() {
+  async function exportStores(): Promise<{
+    items: DataItem[];
+    modelComponents: ModelComponentRecord[];
+    modelComponentsRelations: ModelComponentRelationRecord[];
+  }> {
     const items = await data_db.toArray();
     const modelComponents = await model_components_db.toArray();
     const modelComponentsRelations = await model_components_relation_db.toArray();

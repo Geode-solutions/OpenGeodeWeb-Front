@@ -120,9 +120,7 @@ function createHoverHighlight({
       currentHoverId.value = hoverKey;
       let componentInfo: HoverComponentInfo | undefined = undefined;
       let modelName: string | undefined = undefined;
-      const modelRecord = (await database.data?.get(response.id as string)) as
-        | { name?: string }
-        | undefined;
+      const modelRecord = (await database.data?.get(response.id)) as { name?: string } | undefined;
       if (modelRecord) {
         modelName = modelRecord.name;
       }

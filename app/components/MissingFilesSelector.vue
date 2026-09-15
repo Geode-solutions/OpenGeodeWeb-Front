@@ -7,19 +7,21 @@ import { useBackStore } from "@ogw_front/stores/back";
 
 // Files carry extra app-specific bookkeeping fields once picked up here.
 type UploadFile = File & { isConfigured?: boolean };
-type FilePlan = {
+interface FilePlan {
   has_missing_files: boolean;
   mandatory_files: string[];
   additional_files: string[];
-};
+}
 
 const schema = schemas.opengeodeweb_back.missing_files;
 
-const emit = defineEmits<{
+interface Emits {
   update_values: [value: { additional_files: UploadFile[] }];
   increment_step: [];
   decrement_step: [];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 
 interface Props {
   multiple: boolean;
@@ -30,23 +32,23 @@ interface Props {
 
 const { multiple, geodeObjectType, filenames, files = [] } = defineProps<Props>();
 
-const accept = ref("");
-const loading = ref(false);
-const has_missing_files = ref(false);
+const accept = ref<string>("");
+const loading = ref<boolean>(false);
+const has_missing_files = ref<boolean>(false);
 const mandatory_files = ref<string[]>([]);
 const additional_files = ref<string[]>([]);
 const toggle_loading = useToggle(loading);
 
-function files_uploaded_event(value: UploadFile[]) {
+function files_uploaded_event(value: UploadFile[]): void {
   emit("update_values", { additional_files: value });
   emit("increment_step");
 }
 
-function isCsvFile(filename: string) {
+function isCsvFile(filename: string): boolean {
   return filename.toLowerCase().endsWith(".csv") || filename.toLowerCase().endsWith(".csv.json");
 }
 
-async function missing_files() {
+async function missing_files(): Promise<void> {
   toggle_loading();
   has_missing_files.value = false;
   mandatory_files.value = [];

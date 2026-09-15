@@ -31,7 +31,7 @@ export function useModelSurfacesStyle() {
   const modelSurfacesVertexAttribute = useModelSurfacesVertexAttribute();
   const modelSurfacesPolygonAttribute = useModelSurfacesPolygonAttribute();
 
-  function applyModelSurfacesVisibilityStyle(modelId: string, surfaces_ids: string[]) {
+  async function applyModelSurfacesVisibilityStyle(modelId: string, surfaces_ids: string[]) {
     const visibilityGroups: Record<string, string[]> = {};
     for (const surfaces_id of surfaces_ids) {
       const style = modelCommonStyle.modelSurfaceStyle(modelId, surfaces_id);
@@ -48,7 +48,7 @@ export function useModelSurfacesStyle() {
     );
   }
 
-  function applyModelSurfacesColoringStyle(modelId: string, surfaces_ids: string[]) {
+  async function applyModelSurfacesColoringStyle(modelId: string, surfaces_ids: string[]) {
     const activeColoringGroups: Record<string, string[]> = {};
     for (const surfaces_id of surfaces_ids) {
       const activeColoring = String(
@@ -120,7 +120,7 @@ export function useModelSurfacesStyle() {
         }
         coloringPromises.push(
           ...Object.values(vertexGroups).map(
-            ({ name, item, minimum, maximum, colorMap, surfaces_ids: ids }) =>
+            async ({ name, item, minimum, maximum, colorMap, surfaces_ids: ids }) =>
               modelSurfacesVertexAttribute.setModelSurfacesVertexAttribute(modelId, ids, {
                 name,
                 item,
@@ -166,7 +166,7 @@ export function useModelSurfacesStyle() {
         }
         coloringPromises.push(
           ...Object.values(polygonGroups).map(
-            ({ name, item, minimum, maximum, colorMap, surfaces_ids: ids }) =>
+            async ({ name, item, minimum, maximum, colorMap, surfaces_ids: ids }) =>
               modelSurfacesPolygonAttribute.setModelSurfacesPolygonAttribute(modelId, ids, {
                 name,
                 item,

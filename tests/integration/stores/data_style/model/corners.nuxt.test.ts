@@ -20,7 +20,7 @@ const SLEEP_MS = 200;
 const MINIMUM_RANGE = 10;
 const MAXIMUM_RANGE = 20;
 
-function sleep(milliseconds: number) {
+async function sleep(milliseconds: number) {
   // oxlint-disable-next-line promise/avoid-new
   return new Promise((resolve) => {
     setTimeout(resolve, milliseconds);

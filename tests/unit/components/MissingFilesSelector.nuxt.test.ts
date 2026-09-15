@@ -29,17 +29,17 @@ describe("missing files selector", () => {
 
   test("select file", async () => {
     backStore.request = vi.fn(
-      (_request: unknown, callbacks: { response_function?: (response: unknown) => void }) => {
+      async (_request: unknown, callbacks: { response_function?: (response: unknown) => void }) => {
         callbacks?.response_function?.({
           has_missing_files: true,
           mandatory_files: ["fake_file.txt"],
           additional_files: ["fake_file_2.txt"],
         });
-        return Promise.resolve({
+        return {
           has_missing_files: true,
           mandatory_files: ["fake_file.txt"],
           additional_files: ["fake_file_2.txt"],
-        });
+        };
       },
     );
 

@@ -71,9 +71,9 @@ function useMeshEdgesVertexAttributeStyle() {
       name !== undefined &&
       name in storedConfigs &&
       item !== undefined &&
-      item in storedConfigs[name]!
+      item in storedConfigs[name]
     ) {
-      return storedConfigs[name]![item]!;
+      return storedConfigs[name][item];
     }
     return {
       minimum: undefined,
@@ -110,7 +110,7 @@ function useMeshEdgesVertexAttributeStyle() {
   function meshEdgesVertexAttributeLastItem(id: string, name: string | undefined): number {
     const { storedConfigs } = meshEdgesVertexAttribute(id);
     if (storedConfigs && name !== undefined && name in storedConfigs) {
-      return storedConfigs[name]!.lastItem;
+      return storedConfigs[name].lastItem;
     }
     return 0;
   }
@@ -139,7 +139,7 @@ function useMeshEdgesVertexAttributeStyle() {
       colorMap,
       no_data_color,
     });
-    const points = getRGBPointsFromPreset(colorMap as string);
+    const points = getRGBPointsFromPreset(colorMap);
     const schema = meshEdgesVertexAttributeSchemas.attribute;
     const params = {
       id,

@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
     const body = await readBody<DownloadExtensionBody>(event);
     const { projectName, url, extensionFileName } = body;
     console.log({ projectName, url, extensionFileName });
-    const fileBuffer = await fetch(url).then((file) => file.arrayBuffer());
+    const fileBuffer = await fetch(url).then(async (file) => file.arrayBuffer());
     const filePath = targetExtensionFilePath(projectName, extensionFileName);
     await fs.writeFile(filePath, Buffer.from(fileBuffer));
     await registerExtensionFile(projectName, filePath);

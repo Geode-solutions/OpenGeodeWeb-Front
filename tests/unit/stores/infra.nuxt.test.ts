@@ -85,8 +85,8 @@ describe("infra store", () => {
         const backStore = useBackStore();
         const viewerStore = useViewerStore();
 
-        infraStore.register_microservice(backStore as unknown as Microservice);
-        infraStore.register_microservice(viewerStore as unknown as Microservice);
+        infraStore.register_microservice(backStore);
+        infraStore.register_microservice(viewerStore);
 
         backStore.$patch({ status: Status.NOT_CONNECTED });
         viewerStore.$patch({ status: Status.NOT_CONNECTED });
@@ -98,8 +98,8 @@ describe("infra store", () => {
         const backStore = useBackStore();
         const viewerStore = useViewerStore();
 
-        infraStore.register_microservice(backStore as unknown as Microservice);
-        infraStore.register_microservice(viewerStore as unknown as Microservice);
+        infraStore.register_microservice(backStore);
+        infraStore.register_microservice(viewerStore);
 
         backStore.$patch({ status: Status.CONNECTED });
         viewerStore.$patch({ status: Status.NOT_CONNECTED });
@@ -111,8 +111,8 @@ describe("infra store", () => {
         const backStore = useBackStore();
         const viewerStore = useViewerStore();
 
-        infraStore.register_microservice(backStore as unknown as Microservice);
-        infraStore.register_microservice(viewerStore as unknown as Microservice);
+        infraStore.register_microservice(backStore);
+        infraStore.register_microservice(viewerStore);
 
         backStore.$patch({ status: Status.NOT_CONNECTED });
         viewerStore.$patch({ status: Status.CONNECTED });
@@ -124,8 +124,8 @@ describe("infra store", () => {
         const backStore = useBackStore();
         const viewerStore = useViewerStore();
 
-        infraStore.register_microservice(backStore as unknown as Microservice);
-        infraStore.register_microservice(viewerStore as unknown as Microservice);
+        infraStore.register_microservice(backStore);
+        infraStore.register_microservice(viewerStore);
 
         backStore.$patch({ status: Status.CONNECTED });
         viewerStore.$patch({ status: Status.CONNECTED });
@@ -144,8 +144,8 @@ describe("infra store", () => {
         const backStore = useBackStore();
         const viewerStore = useViewerStore();
 
-        infraStore.register_microservice(backStore as unknown as Microservice);
-        infraStore.register_microservice(viewerStore as unknown as Microservice);
+        infraStore.register_microservice(backStore);
+        infraStore.register_microservice(viewerStore);
 
         backStore.$patch({ request_counter: 0 });
         viewerStore.$patch({ request_counter: 0 });
@@ -157,8 +157,8 @@ describe("infra store", () => {
         const backStore = useBackStore();
         const viewerStore = useViewerStore();
 
-        infraStore.register_microservice(backStore as unknown as Microservice);
-        infraStore.register_microservice(viewerStore as unknown as Microservice);
+        infraStore.register_microservice(backStore);
+        infraStore.register_microservice(viewerStore);
 
         backStore.$patch({ request_counter: 1 });
         viewerStore.$patch({ request_counter: 0 });
@@ -170,8 +170,8 @@ describe("infra store", () => {
         const backStore = useBackStore();
         const viewerStore = useViewerStore();
 
-        infraStore.register_microservice(backStore as unknown as Microservice);
-        infraStore.register_microservice(viewerStore as unknown as Microservice);
+        infraStore.register_microservice(backStore);
+        infraStore.register_microservice(viewerStore);
 
         backStore.$patch({ request_counter: 0 });
         viewerStore.$patch({ request_counter: 1 });
@@ -183,8 +183,8 @@ describe("infra store", () => {
         const backStore = useBackStore();
         const viewerStore = useViewerStore();
 
-        infraStore.register_microservice(backStore as unknown as Microservice);
-        infraStore.register_microservice(viewerStore as unknown as Microservice);
+        infraStore.register_microservice(backStore);
+        infraStore.register_microservice(viewerStore);
 
         backStore.$patch({ request_counter: 1 });
         viewerStore.$patch({ request_counter: 1 });
@@ -199,7 +199,7 @@ describe("infra store", () => {
         const infraStore = useInfraStore();
         const backStore = useBackStore();
 
-        infraStore.register_microservice(backStore as unknown as Microservice);
+        infraStore.register_microservice(backStore);
 
         expect(infraStore.microservices).toHaveLength(1);
         expect(infraStore.microservices[0]?.$id).toBe("back");
@@ -210,9 +210,9 @@ describe("infra store", () => {
         const backStore = useBackStore();
         const viewerStore = useViewerStore();
 
-        infraStore.register_microservice(backStore as unknown as Microservice);
+        infraStore.register_microservice(backStore);
 
-        infraStore.register_microservice(viewerStore as unknown as Microservice);
+        infraStore.register_microservice(viewerStore);
 
         expect(infraStore.microservices).toHaveLength(2);
       });
@@ -227,7 +227,7 @@ describe("infra store", () => {
 
       infraStore.app_mode = appMode.CLOUD;
       const url = "test.com";
-      vi.mocked($fetch).mockImplementation(((
+      vi.mocked($fetch).mockImplementation((async (
         _route: unknown,
         // oxlint-disable-next-line eslint/id-length -- mirrors the real ofetch/vitest API field name (`ok`/`fn`)
         options: { onResponse?: (context: { response: { ok: boolean; _data: unknown } }) => void },
@@ -235,7 +235,7 @@ describe("infra store", () => {
         const data = { url };
         // oxlint-disable-next-line eslint/id-length
         options.onResponse?.({ response: { ok: true, _data: data } });
-        return Promise.resolve(data);
+        return data;
       }) as unknown as typeof $fetch);
 
       await infraStore.create_backend("noreply@example.com");

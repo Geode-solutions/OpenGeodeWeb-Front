@@ -74,7 +74,7 @@ export function useMeshPolyhedraStyle() {
     throw new Error(`Unknown mesh polyhedra coloring type: ${type}`);
   }
 
-  function applyMeshPolyhedraStyle(id: string) {
+  async function applyMeshPolyhedraStyle(id: string) {
     return Promise.all([
       meshPolyhedraVisibility.setMeshPolyhedraVisibility(
         id,

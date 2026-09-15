@@ -1,6 +1,4 @@
 <script setup lang="ts">
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
 import { onMounted, onUnmounted, ref } from "vue";
 import DragAndDropInline from "./DragAndDropInternal/DragAndDropInline.vue";
 import DragAndDropOverlay from "./DragAndDropInternal/DragAndDropOverlay.vue";
@@ -48,7 +46,7 @@ const fileInput = ref<HTMLInputElement | undefined>(undefined);
 
 const WILDCARD_SUFFIX_LENGTH = 2;
 
-function isFileAccepted(file: File, acceptValue: string | string[] | undefined) {
+function isFileAccepted(file: File, acceptValue: string | string[] | undefined): boolean {
   const fileName = (file.name || "").toLowerCase();
   const fileType = (file.type || "").toLowerCase();
   const isVext = fileName.endsWith(".vext");
@@ -92,18 +90,18 @@ function isFileAccepted(file: File, acceptValue: string | string[] | undefined) 
   });
 }
 
-function triggerFileDialog() {
+function triggerFileDialog(): void {
   fileInput.value?.click();
 }
 
-function onDragEnter(event: DragEvent) {
+function onDragEnter(event: DragEvent): void {
   if (!isInternalDrag.value && event.dataTransfer?.types.includes("Files")) {
     dragCounter.value += 1;
     isDragging.value = true;
   }
 }
 
-function onDragLeave() {
+function onDragLeave(): void {
   dragCounter.value -= 1;
   if (dragCounter.value <= 0) {
     isDragging.value = false;
@@ -111,13 +109,13 @@ function onDragLeave() {
   }
 }
 
-function onDragOver(event: DragEvent) {
+function onDragOver(event: DragEvent): void {
   if (!isInternalDrag.value && event.dataTransfer?.types.includes("Files")) {
     event.preventDefault();
   }
 }
 
-function onDrop(event: DragEvent) {
+function onDrop(event: DragEvent): void {
   event.preventDefault();
   dragCounter.value = 0;
   isDragging.value = false;
@@ -129,7 +127,7 @@ function onDrop(event: DragEvent) {
   }
 }
 
-function onKeyDown(event: KeyboardEvent) {
+function onKeyDown(event: KeyboardEvent): void {
   if (event.key === "Escape") {
     event.preventDefault();
     event.stopPropagation();
@@ -138,7 +136,7 @@ function onKeyDown(event: KeyboardEvent) {
   }
 }
 
-function handleFileSelect(event: Event) {
+function handleFileSelect(event: Event): void {
   const target = event.target as HTMLInputElement;
   const files = [...(target.files ?? [])];
   if (files.length > 0) {
@@ -147,11 +145,11 @@ function handleFileSelect(event: Event) {
   target.value = "";
 }
 
-function onInternalDragStart() {
+function onInternalDragStart(): void {
   isInternalDrag.value = true;
 }
 
-function onInternalDragEnd() {
+function onInternalDragEnd(): void {
   isInternalDrag.value = false;
 }
 

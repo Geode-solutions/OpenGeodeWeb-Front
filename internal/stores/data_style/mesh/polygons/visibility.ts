@@ -8,14 +8,20 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 // Local constants
 const schema = viewer_schemas.opengeodeweb_viewer.mesh.polygons.visibility;
 
-export function useMeshPolygonsVisibilityStyle() {
+export function useMeshPolygonsVisibilityStyle(): {
+  meshPolygonsVisibility: (id: string) => boolean | undefined;
+  setMeshPolygonsVisibility: (id: string, visibility: boolean | undefined) => Promise<unknown>;
+} {
   const viewerStore = useViewerStore();
   const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle();
 
   function meshPolygonsVisibility(id: string): boolean | undefined {
     return meshPolygonsCommonStyle.meshPolygonsStyle(id).visibility as boolean | undefined;
   }
-  function setMeshPolygonsVisibility(id: string, visibility: boolean | undefined) {
+  function setMeshPolygonsVisibility(
+    id: string,
+    visibility: boolean | undefined,
+  ): Promise<unknown> {
     const params = { id, visibility };
     return viewerStore.request(
       {

@@ -29,8 +29,8 @@ describe("when_microservices_connected_run_function", () => {
     viewerStore = useViewerStore();
 
     // Register microservices in infra store
-    infraStore.register_microservice(backStore as unknown as Microservice);
-    infraStore.register_microservice(viewerStore as unknown as Microservice);
+    infraStore.register_microservice(backStore);
+    infraStore.register_microservice(viewerStore);
 
     backStore.$patch({ status: Status.NOT_CONNECTED });
     viewerStore.$patch({ status: Status.NOT_CONNECTED });

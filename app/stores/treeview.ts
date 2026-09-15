@@ -204,7 +204,8 @@ export const useTreeviewStore = defineStore("treeview", () => {
     const viewId = `${id}_${viewType}`;
     const index = opened_views.value.findIndex((view) => view.id === viewId);
     if (index !== -1) {
-      return closeView(viewId);
+      closeView(viewId);
+      return;
     }
     additionalPanelWidth.value = panelWidth.value;
     opened_views.value.push({

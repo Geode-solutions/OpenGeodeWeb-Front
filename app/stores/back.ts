@@ -96,7 +96,7 @@ export const useBackStore = defineStore("back", {
     connect() {
       console.log("[GEODE] Connecting to geode microservice...");
       this.set_ping();
-      return Promise.resolve();
+      return;
     },
     request(
       { schema, params = {} }: { schema: JsonRpcSchema; params?: Record<string, unknown> },

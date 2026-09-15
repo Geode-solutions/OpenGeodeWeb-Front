@@ -8,7 +8,10 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 // Local constants
 const schema = viewer_schemas.opengeodeweb_viewer.model.points.visibility;
 
-export function useModelPointsVisibilityStyle() {
+export function useModelPointsVisibilityStyle(): {
+  modelPointsVisibility: (id: string) => boolean | undefined;
+  setModelPointsVisibility: (id: string, visibility: boolean | undefined) => Promise<unknown>;
+} {
   const viewerStore = useViewerStore();
   const modelPointsCommonStyle = useModelPointsCommonStyle();
 
@@ -16,7 +19,7 @@ export function useModelPointsVisibilityStyle() {
     return modelPointsCommonStyle.modelPointsStyle(id).visibility as boolean | undefined;
   }
 
-  function setModelPointsVisibility(id: string, visibility: boolean | undefined) {
+  function setModelPointsVisibility(id: string, visibility: boolean | undefined): Promise<unknown> {
     const params = { id, visibility };
     return viewerStore.request(
       { schema, params },

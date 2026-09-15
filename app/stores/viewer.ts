@@ -60,7 +60,7 @@ export const useViewerStore = defineStore(
     function toggle_picking_mode(value: boolean): void {
       picking_mode.value = value;
     }
-    function request(
+    async function request(
       {
         schema,
         params = {},
@@ -145,7 +145,7 @@ export const useViewerStore = defineStore(
     function stop_request(): void {
       request_counter.value -= 1;
     }
-    function launch(args: { projectFolderPath?: string } = {}) {
+    async function launch(args: { projectFolderPath?: string } = {}) {
       console.log("[VIEWER] Launching viewer microservice...", {
         args,
       });

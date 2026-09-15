@@ -19,7 +19,7 @@ const {
 } = defineProps<Props>();
 
 const attrs = useAttrs();
-const isInteractive = computed(() => Boolean(attrs.onClick));
+const isInteractive = computed<boolean>(() => Boolean(attrs.onClick));
 
 onKeyStroke("Escape", () => {
   if (escapeFunction) {

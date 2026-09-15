@@ -35,7 +35,7 @@ export function useModelBlocksStyle() {
   const modelBlocksVertexAttribute = useModelBlocksVertexAttribute();
   const modelBlocksPolyhedronAttribute = useModelBlocksPolyhedronAttribute();
 
-  function applyModelBlocksVisibilityStyle(modelId: string, blocks_ids: string[]) {
+  async function applyModelBlocksVisibilityStyle(modelId: string, blocks_ids: string[]) {
     const visibilityGroups: Record<string, string[]> = {};
     for (const block_id of blocks_ids) {
       const style = modelCommonStyle.modelBlockStyle(modelId, block_id);
@@ -52,7 +52,7 @@ export function useModelBlocksStyle() {
     );
   }
 
-  function applyModelBlocksColoringStyle(modelId: string, blocks_ids: string[]) {
+  async function applyModelBlocksColoringStyle(modelId: string, blocks_ids: string[]) {
     const activeColoringGroups: Record<string, string[]> = {};
     for (const block_id of blocks_ids) {
       const activeColoring = String(modelColorStyle.modelBlockActiveColoring(modelId, block_id));
@@ -116,7 +116,7 @@ export function useModelBlocksStyle() {
         }
         coloringPromises.push(
           ...Object.values(vertexGroups).map(
-            ({ name, item, minimum, maximum, colorMap, blocks_ids: ids }) =>
+            async ({ name, item, minimum, maximum, colorMap, blocks_ids: ids }) =>
               modelBlocksVertexAttribute.setModelBlocksVertexAttribute(modelId, ids, {
                 name,
                 item,
@@ -162,7 +162,7 @@ export function useModelBlocksStyle() {
         }
         coloringPromises.push(
           ...Object.values(polyhedronGroups).map(
-            ({ name, item, minimum, maximum, colorMap, blocks_ids: ids }) =>
+            async ({ name, item, minimum, maximum, colorMap, blocks_ids: ids }) =>
               modelBlocksPolyhedronAttribute.setModelBlocksPolyhedronAttribute(modelId, ids, {
                 name,
                 item,

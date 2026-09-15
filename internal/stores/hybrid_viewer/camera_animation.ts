@@ -120,12 +120,12 @@ function animateCamera(options: AnimateCameraOptions): void {
     // `index` ranges over startState.focal_point's own length (3), which always
     // Matches targetState.focal_point's length, so the lookup is always in bounds.
     const focalPoint = startState.focal_point.map(
-      (startValue, index) => startValue + (targetState.focal_point[index]! - startValue) * ease,
+      (startValue, index) => startValue + (targetState.focal_point[index] - startValue) * ease,
     );
     const viewUp = slerp(startState.view_up, targetState.view_up, ease);
     camera.set({
       // Same reasoning: `index` ranges over focalPoint's length, matching `dir`'s length (3).
-      position: focalPoint.map((focalCoord, index) => focalCoord + dir[index]! * dist),
+      position: focalPoint.map((focalCoord, index) => focalCoord + dir[index] * dist),
       viewUp,
       focalPoint,
     });

@@ -58,7 +58,7 @@ export function useMeshPointsStyle() {
   const meshPointsSizeStyle = useMeshPointsSizeStyle();
   const meshPointsColoringStyle = useMeshPointsColoringStyle();
 
-  function applyMeshPointsStyle(id: string) {
+  async function applyMeshPointsStyle(id: string) {
     return Promise.all([
       meshPointsVisibility.setMeshPointsVisibility(
         id,

@@ -75,7 +75,7 @@ export const useInfraStore = defineStore("infra", {
           }
           await setAppBaseUrl(appStore.base_url);
           const microservices_with_launch = this.microservices.filter((store) => store.launch);
-          const launch_promises = microservices_with_launch.map((store) =>
+          const launch_promises = microservices_with_launch.map(async (store) =>
             store.launch!({ projectFolderPath: appStore.projectFolderPath }),
           );
           launch_promises.push(registerRunningExtensions());

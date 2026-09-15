@@ -28,7 +28,7 @@ async function uploadExtension(file: File): Promise<void> {
   await appStore.upload(file);
 }
 
-function runExtensions() {
+async function runExtensions() {
   const appStore = useAppStore();
   const { projectFolderPath } = appStore;
   const { PROJECT: projectName } = useRuntimeConfig().public;
@@ -45,7 +45,7 @@ function runExtensions() {
   }) as Promise<{ extensionsArray: ExtensionDescriptor[] }>;
 }
 
-function downloadExtension({ url, extensionFileName }: DownloadExtensionParams) {
+async function downloadExtension({ url, extensionFileName }: DownloadExtensionParams) {
   const appStore = useAppStore();
   const { PROJECT: projectName } = useRuntimeConfig().public;
   const schema = opengeodeweb_front_schemas.api.microservice.extensions.download;
@@ -125,7 +125,7 @@ async function unloadExtension(extensionId: string): Promise<boolean> {
   return true;
 }
 
-function killExtension(extensionId: string) {
+async function killExtension(extensionId: string) {
   const appStore = useAppStore();
   const { projectFolderPath } = appStore;
   const { PROJECT: projectName } = useRuntimeConfig().public;

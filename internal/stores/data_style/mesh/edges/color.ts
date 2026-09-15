@@ -8,14 +8,17 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 // Local constants
 const schema = viewer_schemas.opengeodeweb_viewer.mesh.edges.color;
 
-export function useMeshEdgesColorStyle() {
+export function useMeshEdgesColorStyle(): {
+  meshEdgesColor: (id: string) => unknown;
+  setMeshEdgesColor: (id: string, color: unknown) => Promise<unknown>;
+} {
   const viewerStore = useViewerStore();
   const meshEdgesCommonStyle = useMeshEdgesCommonStyle();
 
   function meshEdgesColor(id: string): unknown {
     return meshEdgesCommonStyle.meshEdgesColoring(id).constant;
   }
-  function setMeshEdgesColor(id: string, color: unknown) {
+  function setMeshEdgesColor(id: string, color: unknown): Promise<unknown> {
     const params = { id, color };
     return viewerStore.request(
       {

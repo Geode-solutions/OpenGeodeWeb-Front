@@ -6,25 +6,25 @@ const storage = new Map<string, unknown>();
 function getAppBaseUrl(): unknown {
   return storage.get("APP_BASE_URL");
 }
-function setAppBaseUrl(baseUrl: string) {
+function setAppBaseUrl(baseUrl: string): Map<string, unknown> {
   return storage.set("APP_BASE_URL", baseUrl);
 }
 function getBackBaseUrl(): unknown {
   return storage.get("BACK_BASE_URL");
 }
-function setBackBaseUrl(baseUrl: string) {
+function setBackBaseUrl(baseUrl: string): Map<string, unknown> {
   return storage.set("BACK_BASE_URL", baseUrl);
 }
 function getViewerBaseUrl(): unknown {
   return storage.get("VIEWER_BASE_URL");
 }
-function setViewerBaseUrl(baseUrl: string) {
+function setViewerBaseUrl(baseUrl: string): Map<string, unknown> {
   return storage.set("VIEWER_BASE_URL", baseUrl);
 }
 function getIsAppReady(): unknown {
   return storage.get("IS_APP_READY") ?? false;
 }
-function setIsAppReady(isAppReady: boolean) {
+function setIsAppReady(isAppReady: boolean): Map<string, unknown> {
   return storage.set("IS_APP_READY", isAppReady);
 }
 async function setViewerWebSocketClient(baseUrl: string): Promise<ServerWsRpcClient> {

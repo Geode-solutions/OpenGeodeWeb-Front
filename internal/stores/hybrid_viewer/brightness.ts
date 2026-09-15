@@ -69,7 +69,7 @@ function computeAverageBrightness(rect: Rect, options: BrightnessOptions): numbe
     const { data } = offscreenCtx.getImageData(0, 0, SAMPLE_SIZE, SAMPLE_SIZE);
     let minBrightness = 1;
     for (let i = 0; i < TOTAL_CHANNELS; i += RGBA_CHANNELS) {
-      const brightness = (data[i]! + data[i + 1]! + data[i + 2]!) / (3 * RGB_MAX);
+      const brightness = (data[i] + data[i + 1] + data[i + 2]) / (3 * RGB_MAX);
       if (brightness < minBrightness) {
         minBrightness = brightness;
       }

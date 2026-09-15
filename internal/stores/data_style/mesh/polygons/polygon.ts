@@ -71,9 +71,9 @@ function useMeshPolygonsPolygonAttributeStyle() {
       name !== undefined &&
       name in storedConfigs &&
       item !== undefined &&
-      item in storedConfigs[name]!
+      item in storedConfigs[name]
     ) {
-      return storedConfigs[name]![item]!;
+      return storedConfigs[name][item];
     }
     return {
       minimum: undefined,
@@ -110,7 +110,7 @@ function useMeshPolygonsPolygonAttributeStyle() {
   function meshPolygonsPolygonAttributeLastItem(id: string, name: string | undefined): number {
     const { storedConfigs } = meshPolygonsPolygonAttribute(id);
     if (storedConfigs && name !== undefined && name in storedConfigs) {
-      return storedConfigs[name]!.lastItem;
+      return storedConfigs[name].lastItem;
     }
     return 0;
   }
@@ -139,7 +139,7 @@ function useMeshPolygonsPolygonAttributeStyle() {
       colorMap,
       no_data_color,
     });
-    const points = getRGBPointsFromPreset(colorMap as string);
+    const points = getRGBPointsFromPreset(colorMap);
     const schema = meshPolygonsPolygonAttributeSchemas.attribute;
     const params = {
       id,

@@ -49,7 +49,7 @@ function addExtensionToConf(
 
 function extensionPathFromConf(projectName: string, extensionId: string): string {
   const projectConfig = projectConf(projectName);
-  return projectConfig.get(`extensions.${extensionId}.path`) as string;
+  return projectConfig.get(`extensions.${extensionId}.path`);
 }
 
 async function removeExtensionFromConf(projectName: string, extensionId: string) {

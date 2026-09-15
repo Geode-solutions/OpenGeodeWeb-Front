@@ -69,9 +69,9 @@ function useModelCornersVertexAttribute() {
       name !== undefined &&
       name in storedConfigs &&
       item !== undefined &&
-      item in storedConfigs[name]!
+      item in storedConfigs[name]
     ) {
-      return storedConfigs[name]![item]!;
+      return storedConfigs[name][item];
     }
     return {
       minimum: undefined,
@@ -120,7 +120,7 @@ function useModelCornersVertexAttribute() {
   ): number {
     const { storedConfigs } = modelCornersVertexAttribute(modelId, cornerId);
     if (storedConfigs && name !== undefined && name in storedConfigs) {
-      return storedConfigs[name]!.lastItem;
+      return storedConfigs[name].lastItem;
     }
     return 0;
   }
@@ -172,7 +172,7 @@ function useModelCornersVertexAttribute() {
       colorMap,
       no_data_color,
     });
-    const points = getRGBPointsFromPreset(colorMap as string);
+    const points = getRGBPointsFromPreset(colorMap);
     const corner_viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, cornerIds);
     const params = {
       id: modelId,
@@ -189,7 +189,7 @@ function useModelCornersVertexAttribute() {
       params,
     });
   }
-  function applyVertexAttribute(modelId: string, cornerIds: string[]) {
+  async function applyVertexAttribute(modelId: string, cornerIds: string[]) {
     const name = modelCornersVertexAttributeName(modelId, cornerIds[0]);
     const item = modelCornersVertexAttributeItem(modelId, cornerIds[0]);
     const storedConfig = modelCornersVertexAttributeStoredConfig(modelId, cornerIds[0], name, item);
@@ -204,9 +204,13 @@ function useModelCornersVertexAttribute() {
     if (isModelCornersVertexAttributeValid(attribute)) {
       return setModelCornersVertexAttribute(modelId, cornerIds, attribute);
     }
-    return Promise.resolve();
+    return;
   }
-  function setModelCornersVertexAttributeName(modelId: string, cornerIds: string[], name: string) {
+  async function setModelCornersVertexAttributeName(
+    modelId: string,
+    cornerIds: string[],
+    name: string,
+  ) {
     const item = modelCornersVertexAttributeLastItem(modelId, cornerIds[0], name);
     mutateModelCornersVertexStyle(modelId, cornerIds, {
       name,
@@ -214,13 +218,17 @@ function useModelCornersVertexAttribute() {
     });
     return applyVertexAttribute(modelId, cornerIds);
   }
-  function setModelCornersVertexAttributeItem(modelId: string, cornerIds: string[], item: number) {
+  async function setModelCornersVertexAttributeItem(
+    modelId: string,
+    cornerIds: string[],
+    item: number,
+  ) {
     mutateModelCornersVertexStyle(modelId, cornerIds, {
       item,
     });
     return applyVertexAttribute(modelId, cornerIds);
   }
-  function setModelCornersVertexAttributeRange(
+  async function setModelCornersVertexAttributeRange(
     modelId: string,
     cornerIds: string[],
     minimum: number,
@@ -234,7 +242,7 @@ function useModelCornersVertexAttribute() {
     });
     return applyVertexAttribute(modelId, cornerIds);
   }
-  function setModelCornersVertexAttributeColorMap(
+  async function setModelCornersVertexAttributeColorMap(
     modelId: string,
     cornerIds: string[],
     colorMap: string | undefined,

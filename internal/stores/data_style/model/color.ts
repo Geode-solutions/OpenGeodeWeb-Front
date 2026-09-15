@@ -18,7 +18,32 @@ interface AttributeAccessors {
 }
 
 // oxlint-disable-next-line max-lines-per-function
-function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions) {
+function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
+  getModelColor: (modelId: string) => unknown;
+  getModelActiveColoring: (modelId: string) => unknown;
+  getModelComponentColor: (modelId: string, componentId: string) => unknown;
+  getModelComponentEffectiveColor: (modelId: string, componentId: string, type: string) => unknown;
+  getModelComponentActiveColoring: (modelId: string, componentId: string) => unknown;
+  modelComponentTypeColor: (modelId: string, type: string) => unknown;
+  getModelComponentTypeActiveColoring: (modelId: string, type: string) => unknown;
+  setModelComponentTypeColor: (modelId: string, type: string, color: unknown) => Promise<void>;
+  setModelComponentTypeActiveColoring: (
+    modelId: string,
+    type: string,
+    activeColoring: string,
+  ) => Promise<void>;
+  setModelComponentActiveColoring: (
+    modelId: string,
+    componentId: string,
+    activeColoring: string,
+  ) => Promise<void>;
+  setModelComponentsColor: (
+    modelId: string,
+    componentIds: string[],
+    color: unknown,
+    activeColoring?: string,
+  ) => Promise<unknown[]>;
+} {
   const dataStore = useDataStore();
   const dataStyleState = useDataStyleState();
   const modelCommonStyle = useModelCommonStyle();
@@ -90,14 +115,11 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions) {
     },
   };
   function getModelComponentColor(modelId: string, componentId: string): unknown {
-    return (
-      dataStyleState.getComponentStyle(modelId, componentId).coloring as StyleValues | undefined
-    )?.constant;
+    return dataStyleState.getComponentStyle(modelId, componentId).coloring?.constant;
   }
   function modelComponentTypeColor(modelId: string, type: string): unknown {
     return (
-      (dataStyleState.getModelComponentTypeStyle(modelId, type).coloring as StyleValues | undefined)
-        ?.constant ||
+      dataStyleState.getModelComponentTypeStyle(modelId, type).coloring?.constant ||
       (
         (dataStyleState.getStyle(modelId)[`${type.toLowerCase()}s`] as StyleValues)
           .coloring as StyleValues
@@ -116,14 +138,11 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions) {
     return modelComponentTypeColor(modelId, type);
   }
   function getModelComponentActiveColoring(modelId: string, componentId: string): unknown {
-    return (
-      dataStyleState.getComponentStyle(modelId, componentId).coloring as StyleValues | undefined
-    )?.active;
+    return dataStyleState.getComponentStyle(modelId, componentId).coloring?.active;
   }
   function getModelComponentTypeActiveColoring(modelId: string, type: string): unknown {
     return (
-      (dataStyleState.getModelComponentTypeStyle(modelId, type).coloring as StyleValues | undefined)
-        ?.active ||
+      dataStyleState.getModelComponentTypeStyle(modelId, type).coloring?.active ||
       (
         (dataStyleState.getStyle(modelId)[`${type.toLowerCase()}s`] as StyleValues)
           .coloring as StyleValues
@@ -135,14 +154,14 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions) {
     componentIds: string[],
     color: unknown,
     activeColoring = "constant",
-  ) {
+  ): Promise<unknown[]> {
     await modelCommonStyle.mutateComponentStyles(modelId, componentIds, {
       coloring: {
         constant: color,
         active: activeColoring,
       },
     });
-    return await dispatchToComponentTypes(
+    return dispatchToComponentTypes(
       modelId,
       componentIds,
       "Color",
@@ -153,7 +172,11 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions) {
       activeColoring,
     );
   }
-  async function setModelComponentTypeColor(modelId: string, type: string, color: unknown) {
+  async function setModelComponentTypeColor(
+    modelId: string,
+    type: string,
+    color: unknown,
+  ): Promise<void> {
     await modelCommonStyle.mutateModelComponentTypeStyle(modelId, type, {
       coloring: {
         constant: color,
@@ -170,7 +193,7 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions) {
     modelId: string,
     type: string,
     activeColoring: string,
-  ) {
+  ): Promise<void> {
     await modelCommonStyle.mutateModelComponentTypeStyle(modelId, type, {
       coloring: {
         active: activeColoring,
@@ -190,15 +213,15 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions) {
       },
     });
     const { getName, setName, getRange, setRange, getColorMap, setColorMap } =
-      ATTRIBUTE_FUNCTIONS[type]![activeColoring]!;
-    const name = getName(modelId, idsForType[0]!);
+      ATTRIBUTE_FUNCTIONS[type][activeColoring];
+    const name = getName(modelId, idsForType[0]);
     if (name) {
       await setName(modelId, idsForType, name);
-      const [minimum, maximum] = getRange(modelId, idsForType[0]!);
+      const [minimum, maximum] = getRange(modelId, idsForType[0]);
       if (minimum !== undefined && maximum !== undefined) {
         await setRange(modelId, idsForType, minimum, maximum);
       }
-      const colorMap = getColorMap(modelId, idsForType[0]!);
+      const colorMap = getColorMap(modelId, idsForType[0]);
       if (colorMap) {
         await setColorMap(modelId, idsForType, colorMap);
       }
@@ -208,7 +231,7 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions) {
     modelId: string,
     componentId: string,
     activeColoring: string,
-  ) {
+  ): Promise<void> {
     await modelCommonStyle.mutateComponentStyle(modelId, componentId, {
       coloring: {
         active: activeColoring,
@@ -223,7 +246,7 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions) {
       return;
     }
     const { getName, setName, getRange, setRange, getColorMap, setColorMap } =
-      ATTRIBUTE_FUNCTIONS[type]![activeColoring]!;
+      ATTRIBUTE_FUNCTIONS[type][activeColoring];
     const name = getName(modelId, componentId);
     if (name) {
       await setName(modelId, [componentId], name);

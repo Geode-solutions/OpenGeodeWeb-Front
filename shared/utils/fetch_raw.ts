@@ -36,9 +36,9 @@ function fetchRaw(
   if (expectEvent) {
     const value = "text/event-stream";
     if (_.isEmpty(headers)) {
-      headers["Accept"] = value;
+      headers.Accept = value;
     } else {
-      headers["Accept"] = `${headers["Accept"]}, ${value}`;
+      headers.Accept = `${headers.Accept}, ${value}`;
     }
   }
 

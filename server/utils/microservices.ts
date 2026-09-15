@@ -45,7 +45,9 @@ async function runScript(
     console.log(`[${child.name}] spawned, pid=${child.pid}`);
   });
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutSeconds * MILLISECONDS_PER_SECOND);
+  const timer = setTimeout(() => {
+    controller.abort();
+  }, timeoutSeconds * MILLISECONDS_PER_SECOND);
   if (typeof timer.unref === "function") {
     timer.unref();
   }
