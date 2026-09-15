@@ -12,14 +12,19 @@ interface Props {
   logo?: string;
 }
 
-const { appName, email = undefined, isUserAuthenticated = false, logo = "" } = defineProps<Props>();
+const {
+  appName,
+  email = undefined,
+  isUserAuthenticated = false,
+  logo = "",
+} = defineProps<Props>();
 
 const infraStore = useInfraStore();
 if (infraStore.app_mode !== appMode.CLOUD) {
   infraStore.create_backend();
 }
 
-function cloudCreateBackend() {
+function cloudCreateBackend(): Promise<void> {
   return infraStore.create_backend(email);
 }
 </script>

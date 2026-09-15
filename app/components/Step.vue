@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Ref } from "vue";
 import type { useStepperTree } from "@ogw_front/composables/stepper_tree";
 
 interface StepConfig {
@@ -11,7 +10,7 @@ interface StepConfig {
   };
 }
 
-function truncate(text: string, maxLength: number) {
+function truncate(text: string, maxLength: number): string {
   if (text.length > maxLength) {
     return `${text.slice(0, maxLength)}...`;
   }
@@ -25,9 +24,11 @@ interface Props {
 
 const { stepIndex, stepperTree } = defineProps<Props>();
 
-const emit = defineEmits<{
+interface Emits {
   reset_values: [];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 
 const { state, increment_step, decrement_step, update_values } = stepperTree;
 const { current_step_index, steps } = toRefs(state) as unknown as {
@@ -35,7 +36,7 @@ const { current_step_index, steps } = toRefs(state) as unknown as {
   steps: Ref<StepConfig[]>;
 };
 
-const sortedChips = computed(() => {
+const sortedChips = computed<string[]>(() => {
   const chips = steps.value[stepIndex]?.chips || [];
   return chips.toSorted((chipA, chipB) =>
     chipA.localeCompare(chipB, undefined, {
@@ -54,11 +55,18 @@ const sortedChips = computed(() => {
     hide-actions
   >
     <template #title>
-      <v-sheet color="transparent" class="d-flex flex-column justify-center ps-2">
+      <v-sheet
+        color="transparent"
+        class="d-flex flex-column justify-center ps-2"
+      >
         <p
           tag="h3"
           class="text-subtitle-1 font-weight-bold mb-0 transition-swing"
-          :class="current_step_index === stepIndex ? 'text-primary' : 'text-grey-darken-1'"
+          :class="
+            current_step_index === stepIndex
+              ? 'text-primary'
+              : 'text-grey-darken-1'
+          "
         >
           {{ steps[stepIndex]!.step_title }}
         </p>

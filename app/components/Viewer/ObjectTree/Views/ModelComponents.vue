@@ -1,12 +1,13 @@
 <script setup lang="ts">
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
-import { sortAndFormatItems, useTreeFilter } from "@ogw_front/composables/tree_filter";
+import {
+  sortAndFormatItems,
+  useTreeFilter,
+} from "@ogw_front/composables/tree_filter";
 import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
+import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
-import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useModelComponents } from "@ogw_front/composables/model_components";
@@ -31,7 +32,8 @@ interface TreeViewItem {
 
 const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 const hybridViewerStore = useHybridViewerStore();
-const emit = defineEmits<{
+
+interface Emits {
   "show-menu": [
     payload: {
       event: unknown;
@@ -42,7 +44,9 @@ const emit = defineEmits<{
       targetComponentIds?: string[];
     },
   ];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 
 const treeviewStore = useTreeviewStore();
 const {
@@ -53,11 +57,11 @@ const {
   updateVisibility,
 } = useModelComponents(id);
 
-const currentView = computed(() =>
+const currentView = computed<TreeViewItem | undefined>(() =>
   treeviewStore.opened_views.find((view) => view.id === actualViewId),
 );
 
-const opened = computed({
+const opened = computed<string[]>({
   get: () => currentView.value?.opened || [],
   set: (val) => treeviewStore.setOpened(actualViewId, val),
 });
@@ -74,11 +78,16 @@ const {
 } = useTreeFilter(localCategories);
 
 function onUpdateSelection(newSelection: string[]): void {
-  const finalSelection = applySearchFilter(newSelection, visibleComponents.value);
+  const finalSelection = applySearchFilter(
+    newSelection,
+    visibleComponents.value,
+  );
   updateVisibility(finalSelection as string[]);
 }
 
-const visibleSelection = computed(() => applySearchFilter(visibleComponents.value, []));
+const visibleSelection = computed<string[]>(() =>
+  applySearchFilter(visibleComponents.value, []),
+);
 
 const itemsForTreeView = computed<TreeViewItem[]>(() => {
   if (search.value && componentsCache.value) {
@@ -94,7 +103,10 @@ const itemsForTreeView = computed<TreeViewItem[]>(() => {
         result.push({
           id: type,
           title: `${type}s (${matches.length})`,
-          children: sortAndFormatItems(matches, sortType.value) as unknown as TreeViewItem[],
+          children: sortAndFormatItems(
+            matches,
+            sortType.value,
+          ) as unknown as TreeViewItem[],
         });
       }
     }
@@ -126,7 +138,9 @@ function showContextMenu(event: unknown, item: TreeViewItem): void {
   emit("show-menu", {
     event,
     itemId: actualItem.category ? actualItem.id : id,
-    context_type: actualItem.category ? "model_component" : "model_component_type",
+    context_type: actualItem.category
+      ? "model_component"
+      : "model_component_type",
     modelId: id,
     modelComponentType: actualItem.category ? undefined : actualItem.id,
     targetComponentIds,
@@ -142,7 +156,10 @@ function handleHoverEnter({
 }): void {
   const actualItem = item.raw || item;
 
-  if (!actualItem.category && (!actualItem.children || actualItem.children.length === 0)) {
+  if (
+    !actualItem.category &&
+    (!actualItem.children || actualItem.children.length === 0)
+  ) {
     return;
   }
 
@@ -217,11 +234,18 @@ function expandAll(): void {
       :scroll-top="currentView?.scrollTop || 0"
       class="transparent-treeview virtual-tree-height"
       @update:selected="(val) => onUpdateSelection(val as string[])"
-      @click:item="onUpdateSelection([$event.id as string, ...visibleComponents])"
+      @click:item="
+        onUpdateSelection([$event.id as string, ...visibleComponents])
+      "
       @update:scroll-top="treeviewStore.setScrollTop(actualViewId, $event)"
-      @hover:enter="({ item }) => handleHoverEnter({ item: item as unknown as TreeViewItem })"
+      @hover:enter="
+        ({ item }) =>
+          handleHoverEnter({ item: item as unknown as TreeViewItem })
+      "
       @hover:leave="handleHoverLeave"
-      @contextmenu="showContextMenu($event.event, $event.item as unknown as TreeViewItem)"
+      @contextmenu="
+        showContextMenu($event.event, $event.item as unknown as TreeViewItem)
+      "
     >
       <template #title="{ item, isLeaf }">
         <ObjectTreeItemLabel
@@ -229,7 +253,9 @@ function expandAll(): void {
           :is-leaf="isLeaf"
           show-tooltip
           class="text-body-1"
-          @contextmenu="showContextMenu($event, item as unknown as TreeViewItem)"
+          @contextmenu="
+            showContextMenu($event, item as unknown as TreeViewItem)
+          "
         />
       </template>
 
@@ -237,14 +263,18 @@ function expandAll(): void {
         <v-btn
           v-if="
             asTreeViewItem(rawItem).category ||
-            (asTreeViewItem(rawItem).children && asTreeViewItem(rawItem).children!.length > 0)
+            (asTreeViewItem(rawItem).children &&
+              asTreeViewItem(rawItem).children!.length > 0)
           "
           icon="mdi-target"
           size="medium"
           variant="text"
           v-tooltip="'Focus camera on object'"
           @click.stop="
-            hybridViewerStore.focusCameraOnObject(id, getFocusBlockIds(asTreeViewItem(rawItem)))
+            hybridViewerStore.focusCameraOnObject(
+              id,
+              getFocusBlockIds(asTreeViewItem(rawItem)),
+            )
           "
         />
       </template>

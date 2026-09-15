@@ -22,11 +22,14 @@ const {
 } = defineProps<Props>();
 
 const model = defineModel<boolean>({ default: false });
-const emit = defineEmits<{
-  action: [];
-}>();
 
-function close() {
+interface Emits {
+  action: [];
+}
+
+const emit = defineEmits<Emits>();
+
+function close(): void {
   if (escapeFunction) {
     escapeFunction();
   }

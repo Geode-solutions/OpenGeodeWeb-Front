@@ -6,9 +6,11 @@ import { useBackStore } from "@ogw_front/stores/back";
 // Mirrors FileUploader's own (unexported) UploadFile type.
 type UploadFile = File & { isConfigured?: boolean; displayName?: string };
 
-const emit = defineEmits<{
+interface Emits {
   update_value: [payload: { key: "texture_name" | "id"; value: string }];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 
 interface Props {
   id: string;
@@ -16,10 +18,14 @@ interface Props {
   textureName: string;
 }
 
-const { id, textureId: propTextureId, textureName: propTextureName } = defineProps<Props>();
+const {
+  id,
+  textureId: propTextureId,
+  textureName: propTextureName,
+} = defineProps<Props>();
 
-const textureName = ref(propTextureName);
-const textureId = ref(propTextureId);
+const textureName = ref<string>(propTextureName);
+const textureId = ref<string>(propTextureId);
 
 watch(
   () => propTextureName,
@@ -101,7 +107,14 @@ watch(textureId, (value) => {
     />
   </v-col>
   <v-col cols="1" class="ma-1 d-flex justify-center align-center">
-    <v-badge :model-value="textureId !== ''" color="white" floating dot offset-x="10" offset-y="10">
+    <v-badge
+      :model-value="textureId !== ''"
+      color="white"
+      floating
+      dot
+      offset-x="10"
+      offset-y="10"
+    >
       <FileUploader
         @files_uploaded="files_uploaded_event($event)"
         :accept="['image/png', 'image/jpeg', 'image/bmp']"
@@ -113,6 +126,10 @@ watch(textureId, (value) => {
     </v-badge>
   </v-col>
   <v-col v-if="textureName === '' || textureId === ''" cols="1">
-    <v-icon size="20" icon="mdi-close-circle" v-tooltip:bottom="'Invalid texture'" />
+    <v-icon
+      size="20"
+      icon="mdi-close-circle"
+      v-tooltip:bottom="'Invalid texture'"
+    />
   </v-col>
 </template>

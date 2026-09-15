@@ -5,9 +5,11 @@ import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 
 const DEFAULT_PANEL_WIDTH = 260;
 
-const emit = defineEmits<{
+interface Emits {
   close: [];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 
 interface Props {
   showDialog: boolean;
@@ -21,7 +23,7 @@ const {
   escapeFunction = undefined,
 } = defineProps<Props>();
 
-function handleClose() {
+function handleClose(): void {
   if (escapeFunction) {
     escapeFunction();
   } else {
@@ -29,7 +31,7 @@ function handleClose() {
   }
 }
 
-const show = computed({
+const show = computed<boolean>({
   get: () => showDialog,
   set: (val) => {
     if (!val) {
@@ -40,7 +42,12 @@ const show = computed({
 </script>
 
 <template>
-  <ToolPanel v-model="show" title="Camera Positions" :width="width" :escapeFunction="handleClose">
+  <ToolPanel
+    v-model="show"
+    title="Camera Positions"
+    :width="width"
+    :escapeFunction="handleClose"
+  >
     <v-card-text class="pa-0">
       <Saver />
       <v-divider />

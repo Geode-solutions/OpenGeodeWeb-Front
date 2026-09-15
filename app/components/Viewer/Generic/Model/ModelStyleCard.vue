@@ -1,26 +1,23 @@
 <script setup lang="ts">
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
+import BlocksOptions from "./BlocksOptions.vue";
+import CornersOptions from "./CornersOptions.vue";
+import LinesOptions from "./LinesOptions.vue";
 import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
+import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import SurfacesOptions from "./SurfacesOptions.vue";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
-
-import BlocksOptions from "./BlocksOptions.vue";
-import CornersOptions from "./CornersOptions.vue";
-import LinesOptions from "./LinesOptions.vue";
-import SurfacesOptions from "./SurfacesOptions.vue";
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const dataStore = useDataStore();
 const treeviewStore = useTreeviewStore();
 
-function getBatchComponentIds(currentId: string) {
+function getBatchComponentIds(currentId: string): string[] {
   const { activeItems } = treeviewStore;
   if (activeItems.includes(currentId) && activeItems.length > 1) {
     return activeItems;
@@ -29,14 +26,20 @@ function getBatchComponentIds(currentId: string) {
 }
 
 interface Props {
-  itemProps: Record<string, any>;
+  itemProps: Record<string, unknown>;
 }
 
 const { itemProps } = defineProps<Props>();
 
-const modelId = computed(() => itemProps.meta_data.modelId || itemProps.id);
-const componentId = computed(() => itemProps.meta_data.pickedComponentId);
-const selection = computed(() => dataStyleStore.visibleMeshComponents(modelId.value).value || []);
+const modelId = computed<string>(
+  () => itemProps.meta_data.modelId || itemProps.id,
+);
+const componentId = computed<string | undefined>(
+  () => itemProps.meta_data.pickedComponentId,
+);
+const selection = computed<string[]>(
+  () => dataStyleStore.visibleMeshComponents(modelId.value).value || [],
+);
 const componentType = ref<string | undefined>(undefined);
 
 watch(
@@ -53,7 +56,10 @@ watch(
     } else if (componentId.value && modelId.value) {
       const currentModelId = modelId.value;
       const currentCompId = componentId.value;
-      const type = await dataStore.meshComponentType(currentModelId, currentCompId);
+      const type = await dataStore.meshComponentType(
+        currentModelId,
+        currentCompId,
+      );
       if (
         modelId.value === currentModelId &&
         componentId.value === currentCompId &&
@@ -68,7 +74,11 @@ watch(
 
 const targetComponentIds = ref<string[]>([]);
 watch(
-  () => [modelId.value, componentType.value, itemProps.meta_data.targetComponentIds],
+  () => [
+    modelId.value,
+    componentType.value,
+    itemProps.meta_data.targetComponentIds,
+  ],
   async () => {
     targetComponentIds.value = [];
     if (itemProps.meta_data.targetComponentIds) {
@@ -78,8 +88,14 @@ watch(
     if (componentType.value && modelId.value) {
       const currentModelId = modelId.value;
       const currentType = componentType.value;
-      const ids = await dataStore.getMeshComponentGeodeIds(currentModelId, currentType);
-      if (modelId.value === currentModelId && componentType.value === currentType) {
+      const ids = await dataStore.getMeshComponentGeodeIds(
+        currentModelId,
+        currentType,
+      );
+      if (
+        modelId.value === currentModelId &&
+        componentType.value === currentType
+      ) {
         targetComponentIds.value = ids;
       }
     }
@@ -87,7 +103,7 @@ watch(
   { immediate: true },
 );
 
-const modelVisibility = computed({
+const modelVisibility = computed<boolean | undefined>({
   get: () => dataStyleStore.modelVisibility(modelId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -99,7 +115,8 @@ const modelVisibility = computed({
 });
 
 const modelComponentsColor = computed<RGBAColor | undefined>({
-  get: () => dataStyleStore.getModelColor(modelId.value) as RGBAColor | undefined,
+  get: () =>
+    dataStyleStore.getModelColor(modelId.value) as RGBAColor | undefined,
   set: async (color) => {
     await dataStyleStore.mutateStyle(modelId.value, {
       coloring: { constant: color },
@@ -116,7 +133,8 @@ const modelComponentsColor = computed<RGBAColor | undefined>({
 });
 
 const modelComponentsActiveColoring = computed<string | undefined>({
-  get: () => dataStyleStore.getModelActiveColoring(modelId.value) as string | undefined,
+  get: () =>
+    dataStyleStore.getModelActiveColoring(modelId.value) as string | undefined,
   set: async (coloringType) => {
     if (typeof coloringType !== "string") {
       return;
@@ -138,10 +156,17 @@ const modelComponentsActiveColoring = computed<string | undefined>({
 <template>
   <v-sheet class="model-style-card" color="transparent">
     <OptionsSection title="Model Options">
-      <VisibilitySwitch data-testid="modelStyleVisibilitySwitch" v-model="modelVisibility" />
+      <VisibilitySwitch
+        data-testid="modelStyleVisibilitySwitch"
+        v-model="modelVisibility"
+      />
     </OptionsSection>
 
-    <OptionsSection v-if="!componentType && !componentId" title="Components Options" class="mt-4">
+    <OptionsSection
+      v-if="!componentType && !componentId"
+      title="Components Options"
+      class="mt-4"
+    >
       <ViewerOptionsColoringTypeSelector
         :id="modelId"
         v-model:coloring_style_key="modelComponentsActiveColoring"

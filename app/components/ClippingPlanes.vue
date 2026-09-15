@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { DEBOUNCE_DELAY, DEFAULT_NORMALS } from "@ogw_front/utils/clipping_planes";
+import {
+  DEBOUNCE_DELAY,
+  DEFAULT_NORMALS,
+} from "@ogw_front/utils/clipping_planes";
 import ClippingPlaneCard from "@ogw_front/components/ClippingPlaneCard.vue";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import { useClippingPlanesWidget } from "@ogw_front/composables/clipping_planes_widget";
@@ -16,13 +19,13 @@ const { escapeFunction = undefined } = defineProps<Props>();
 const show = defineModel<boolean>("show", { default: false });
 const dataStore = useDataStore();
 const hybridViewerStore = useHybridViewerStore();
-const targetAllVisible = ref(true);
+const targetAllVisible = ref<boolean>(true);
 const selectedDatasetIds = ref<string[]>([]);
 const planes = ref<{ origin?: number[]; normal: number[] }[]>([
   { origin: undefined, normal: [1, 0, 0] },
 ]);
 const allItems = dataStore.refAllItems();
-const availableDatasets = computed(() =>
+const availableDatasets = computed<{ title: string; value: string }[]>(() =>
   allItems.value.map((item) => ({
     title: item.name || item.id,
     value: item.id,
@@ -75,7 +78,9 @@ debouncedApply = useDebounceFn(() => applyClippingPlanes(), DEBOUNCE_DELAY);
 function addPlane(): void {
   // Index is always in-bounds (modulo the fixed-size list); the fallbacks only
   // Satisfy noUncheckedIndexedAccess and are never hit at runtime.
-  const normal = DEFAULT_NORMALS[planes.value.length % DEFAULT_NORMALS.length] ??
+  const normal = DEFAULT_NORMALS[
+    planes.value.length % DEFAULT_NORMALS.length
+  ] ??
     DEFAULT_NORMALS[0] ?? [1, 0, 0];
   planes.value.push({ origin: getSceneCenter(), normal });
 }
@@ -147,7 +152,10 @@ watch(allItems, () => {
 });
 
 watch(
-  () => Object.values(hybridViewerStore.hybridDb).filter((entry) => entry && entry.actor).length,
+  () =>
+    Object.values(hybridViewerStore.hybridDb).filter(
+      (entry) => entry && entry.actor,
+    ).length,
   (actorCount) => {
     if (show.value && actorCount > 0) {
       updateWidgetPlacement({ isReset: true });
@@ -204,7 +212,9 @@ onBeforeUnmount(cleanupLocalWidget);
       <v-divider class="my-2" />
 
       <v-row align="center" justify="space-between" no-gutters class="mb-2">
-        <v-col class="text-caption font-weight-bold">Planes ({{ planes.length }})</v-col>
+        <v-col class="text-caption font-weight-bold"
+          >Planes ({{ planes.length }})</v-col
+        >
         <v-col cols="auto">
           <v-btn
             data-testid="addPlaneButton"

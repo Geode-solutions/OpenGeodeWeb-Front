@@ -32,33 +32,36 @@ const {
 } = defineProps<Props>();
 
 const backStore = useBackStore();
-const internal_files = ref(files);
+const internal_files = ref<UploadFile[]>(files);
 const dragAndDropRef = useTemplateRef("dragAndDropRef");
-const csv_dialog = ref(false);
+const csv_dialog = ref<boolean>(false);
 const current_csv_file = ref<UploadFile | undefined>(undefined);
-const current_csv_index = ref(-1);
-const loading = ref(false);
-const files_uploaded = ref(false);
+const current_csv_index = ref<number>(-1);
+const loading = ref<boolean>(false);
+const files_uploaded = ref<boolean>(false);
 const toggle_loading = useToggle(loading);
 
-function isCsv(file: UploadFile) {
+function isCsv(file: UploadFile): boolean {
   return file.name.toLowerCase().endsWith(".csv");
 }
 
-function openCsvPreviewer(file: UploadFile, index: number) {
+function openCsvPreviewer(file: UploadFile, index: number): void {
   current_csv_file.value = file;
   current_csv_index.value = index;
   csv_dialog.value = true;
 }
 
-async function onCsvConfirm(result: unknown) {
+async function onCsvConfirm(result: unknown): Promise<void> {
   // Only reachable while the CsvPreviewer dialog (gated on current_csv_file) is open.
   const currentFile = current_csv_file.value;
   if (!currentFile) {
     return;
   }
   const json_content = JSON.stringify(result, undefined, 2);
-  const base_name = currentFile.name.slice(0, currentFile.name.lastIndexOf("."));
+  const base_name = currentFile.name.slice(
+    0,
+    currentFile.name.lastIndexOf("."),
+  );
   const json_filename = `${base_name}.json`;
 
   const blob = new Blob([json_content], { type: "application/json" });
@@ -72,7 +75,7 @@ async function onCsvConfirm(result: unknown) {
   csv_dialog.value = false;
 }
 
-function processSelectedFiles(selected_files: UploadFile[]) {
+function processSelectedFiles(selected_files: UploadFile[]): void {
   if (multiple) {
     internal_files.value = [...internal_files.value, ...selected_files];
   } else {
@@ -83,7 +86,7 @@ function processSelectedFiles(selected_files: UploadFile[]) {
   }
 }
 
-function removeFile(index: number) {
+function removeFile(index: number): void {
   internal_files.value.splice(index, 1);
   if (internal_files.value.length === 0) {
     files_uploaded.value = false;
@@ -91,9 +94,11 @@ function removeFile(index: number) {
   }
 }
 
-async function upload_files() {
+async function upload_files(): Promise<void> {
   toggle_loading();
-  const promise_array = internal_files.value.map((file) => backStore.upload(file));
+  const promise_array = internal_files.value.map((file) =>
+    backStore.upload(file),
+  );
   await Promise.all(promise_array);
   files_uploaded.value = true;
   toggle_loading();
@@ -106,14 +111,21 @@ watch(
     if (newFiles.length === 0) {
       return;
     }
-    const unconfiguredCsv = newFiles.find((file) => isCsv(file) && !file.isConfigured);
+    const unconfiguredCsv = newFiles.find(
+      (file) => isCsv(file) && !file.isConfigured,
+    );
 
     if (unconfiguredCsv) {
-      openCsvPreviewer(unconfiguredCsv, internal_files.value.indexOf(unconfiguredCsv));
+      openCsvPreviewer(
+        unconfiguredCsv,
+        internal_files.value.indexOf(unconfiguredCsv),
+      );
       return;
     }
 
-    const allConfigured = newFiles.every((file) => !isCsv(file) || file.isConfigured);
+    const allConfigured = newFiles.every(
+      (file) => !isCsv(file) || file.isConfigured,
+    );
 
     if (autoUpload && allConfigured) {
       await upload_files();
@@ -171,8 +183,15 @@ watch(
   <v-card-text v-if="internal_files.length" class="mt-6 pa-0">
     <v-sheet class="d-flex align-center mb-4" color="transparent">
       <v-icon icon="mdi-file-check" class="mr-3" color="primary" size="24" />
-      <span class="text-subtitle-1 font-weight-bold text-white"> Selected files </span>
-      <v-chip size="small" class="ml-3 bg-white-opacity-10" color="white" variant="flat">
+      <span class="text-subtitle-1 font-weight-bold text-white">
+        Selected files
+      </span>
+      <v-chip
+        size="small"
+        class="ml-3 bg-white-opacity-10"
+        color="white"
+        variant="flat"
+      >
         {{ internal_files.length }}
       </v-chip>
       <v-spacer />
@@ -200,7 +219,11 @@ watch(
           style="background: rgba(255, 255, 255, 0.05) !important"
           @click:close="removeFile(index)"
         >
-          <v-icon start size="18" :color="isCsv(file) && file.isConfigured ? 'success' : 'primary'">
+          <v-icon
+            start
+            size="18"
+            :color="isCsv(file) && file.isConfigured ? 'success' : 'primary'"
+          >
             {{
               isCsv(file)
                 ? file.isConfigured
@@ -230,7 +253,9 @@ watch(
           </v-tooltip>
 
           <template #close>
-            <v-icon size="16" class="ml-2 opacity-60 hover-opacity-100">mdi-close-circle</v-icon>
+            <v-icon size="16" class="ml-2 opacity-60 hover-opacity-100"
+              >mdi-close-circle</v-icon
+            >
           </template>
         </v-chip>
       </template>

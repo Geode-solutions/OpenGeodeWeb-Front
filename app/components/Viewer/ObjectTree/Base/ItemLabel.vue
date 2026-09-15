@@ -1,11 +1,9 @@
 <script setup lang="ts">
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
+import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import { middleTruncate } from "@ogw_front/utils/string";
 import { useClipboard } from "@vueuse/core";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useResponsiveMiddleTruncate } from "@ogw_front/composables/responsive_middle_truncate";
-import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 
 const feedbackStore = useFeedbackStore();
 const { copy } = useClipboard();
@@ -17,11 +15,13 @@ interface Props {
 
 const { item, isLeaf } = defineProps<Props>();
 
-const emit = defineEmits<{
+interface Emits {
   contextmenu: [event: MouseEvent];
   mouseenter: [];
   mouseleave: [];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 
 const labelContainer = useTemplateRef("label-container");
 const { width: containerWidth } = useElementSize(labelContainer);
@@ -34,15 +34,20 @@ interface LabeledItem {
   children?: unknown[];
 }
 
-const actualItem = computed(() => (item.raw || item) as unknown as LabeledItem);
+const actualItem = computed<LabeledItem>(
+  () => (item.raw || item) as unknown as LabeledItem,
+);
 
 const TOOLTIP_NAME_MAX_LENGTH = 40;
 const TOOLTIP_NAME_START_CHARS = 10;
 const TOOLTIP_NAME_END_CHARS = 8;
 
-const displayTitle = useResponsiveMiddleTruncate(() => actualItem.value.title, containerWidth);
+const displayTitle = useResponsiveMiddleTruncate(
+  () => actualItem.value.title,
+  containerWidth,
+);
 
-const tooltipTitle = computed(() =>
+const tooltipTitle = computed<string>(() =>
   middleTruncate(
     actualItem.value.title,
     TOOLTIP_NAME_MAX_LENGTH,
@@ -51,14 +56,14 @@ const tooltipTitle = computed(() =>
   ),
 );
 
-const tooltipDisabled = computed(() => {
+const tooltipDisabled = computed<boolean>(() => {
   if (isLeaf !== undefined) {
     return !isLeaf;
   }
   return actualItem.value.children && actualItem.value.children.length > 0;
 });
 
-async function copyToClipboard(text: string, label: string) {
+async function copyToClipboard(text: string, label: string): Promise<void> {
   await copy(text);
   feedbackStore.add_success(`${label} copied to clipboard`);
 }
@@ -122,7 +127,10 @@ async function copyToClipboard(text: string, label: string) {
             <v-icon size="12">mdi-content-copy</v-icon>
           </v-btn>
         </span>
-        <span v-if="actualItem.is_active !== undefined" class="text-caption d-flex align-center">
+        <span
+          v-if="actualItem.is_active !== undefined"
+          class="text-caption d-flex align-center"
+        >
           <strong class="text-white mr-1">Status:</strong>
           <i class="ml-1">{{ actualItem.is_active ? "Active" : "Inactive" }}</i>
         </span>

@@ -18,13 +18,13 @@ const email = ref("");
 const launch = ref(false);
 const valid = ref(false);
 const emailRules = [
-  (value: string) => {
+  (value: string): boolean | string => {
     if (value) {
       return true;
     }
     return "E-mail is required.";
   },
-  (value: string) => {
+  (value: string): boolean | string => {
     if (/.+@.+\..+/u.test(value)) {
       return true;
     }
@@ -32,7 +32,7 @@ const emailRules = [
   },
 ];
 
-function submit() {
+function submit(): Promise<void> {
   const infraStore = useInfraStore();
   return infraStore.create_backend(email.value);
 }
@@ -50,7 +50,12 @@ function submit() {
           </VRow>
           <VRow>
             <VCol>
-              <VTextField v-model="email" :rules="emailRules" label="E-mail" required />
+              <VTextField
+                v-model="email"
+                :rules="emailRules"
+                label="E-mail"
+                required
+              />
             </VCol>
           </VRow>
           <VRow>
@@ -64,7 +69,12 @@ function submit() {
   </VRow>
   <VRow align="center" justify="center">
     <VCol cols="auto" class="d-flex justify-center align-center">
-      <VBtn class="load-btn" :text="buttonLabel" :color="color || buttonColor" @click="submit" />
+      <VBtn
+        class="load-btn"
+        :text="buttonLabel"
+        :color="color || buttonColor"
+        @click="submit"
+      />
     </VCol>
   </VRow>
 </template>

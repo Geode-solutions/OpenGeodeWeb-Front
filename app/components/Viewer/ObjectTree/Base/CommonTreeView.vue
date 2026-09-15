@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { type DisplayItem, type EmitFn, useVirtualTree } from "@ogw_front/composables/virtual_tree";
+import {
+  type DisplayItem,
+  type EmitFn,
+  useVirtualTree,
+} from "@ogw_front/composables/virtual_tree";
 import StickyHeader from "@ogw_front/components/Viewer/ObjectTree/Base/StickyHeader.vue";
 import TreeRow from "@ogw_front/components/Viewer/ObjectTree/Base/TreeRow.vue";
 import { useTreeKeyboardNav } from "@ogw_front/composables/tree_keyboard_nav";
@@ -11,7 +15,9 @@ type UnwrapMaybeRefOrGetter<Source> = Source extends () => infer Result
   : Source extends { value: infer Result }
     ? Result
     : Source;
-type VirtualTreeProps = UnwrapMaybeRefOrGetter<Parameters<typeof useVirtualTree>[0]>;
+type VirtualTreeProps = UnwrapMaybeRefOrGetter<
+  Parameters<typeof useVirtualTree>[0]
+>;
 
 interface Props {
   items: unknown[];
@@ -33,7 +39,7 @@ const {
 
 const treeWrapper = ref<HTMLDivElement | undefined>(undefined);
 
-const emit = defineEmits<{
+interface Emits {
   "update:opened": [value: unknown[]];
   "update:selected": [value: unknown[]];
   "update:active": [value: unknown[]];
@@ -42,7 +48,9 @@ const emit = defineEmits<{
   "hover:enter": [payload: { item: DisplayItem }];
   "hover:leave": [payload: { item: DisplayItem }];
   contextmenu: [payload: { event: MouseEvent; item: DisplayItem["raw"] }];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 
 const {
   actualItemProps,
@@ -66,16 +74,21 @@ const {
   emit as EmitFn,
 );
 
-const { virtualScrollRef, stickyHeader, handleScroll, scrollToIndex, getScrollInfo } =
-  useTreeScroll(
-    computed(() => ({ scrollTop })),
-    emit as EmitFn,
-    displayItems,
-    actualItemProps,
-  );
+const {
+  virtualScrollRef,
+  stickyHeader,
+  handleScroll,
+  scrollToIndex,
+  getScrollInfo,
+} = useTreeScroll(
+  computed(() => ({ scrollTop })),
+  emit as EmitFn,
+  displayItems,
+  actualItemProps,
+);
 
-const focusedIndex = ref(-1);
-const lastActiveIndex = ref(-1);
+const focusedIndex = ref<number>(-1);
+const lastActiveIndex = ref<number>(-1);
 
 function applyRangeSelect(newActive: Set<unknown>, index: number): void {
   const start = Math.min(lastActiveIndex.value, index);
@@ -88,7 +101,11 @@ function applyRangeSelect(newActive: Set<unknown>, index: number): void {
   }
 }
 
-function applyToggleActive(newActive: Set<unknown>, id: unknown, index: number | undefined): void {
+function applyToggleActive(
+  newActive: Set<unknown>,
+  id: unknown,
+  index: number | undefined,
+): void {
   if (newActive.has(id)) {
     newActive.delete(id);
   } else {

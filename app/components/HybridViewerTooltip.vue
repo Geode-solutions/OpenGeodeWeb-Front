@@ -14,9 +14,10 @@ const { containerWidth, containerHeight } = defineProps<Props>();
 const hybridViewerStore = useHybridViewerStore();
 
 const tooltipRef = useTemplateRef("tooltip");
-const { width: tooltipWidth, height: tooltipHeight } = useElementSize(tooltipRef);
+const { width: tooltipWidth, height: tooltipHeight } =
+  useElementSize(tooltipRef);
 
-const tooltipStyle = computed(() => {
+const tooltipStyle = computed<Record<string, string>>(() => {
   if (!hybridViewerStore.hoverData) {
     return {};
   }
@@ -48,7 +49,7 @@ const tooltipStyle = computed(() => {
   };
 });
 
-const originalIndex = computed(() => {
+const originalIndex = computed<number | undefined>(() => {
   const attributes = hybridViewerStore.hoverData?.attributes || {};
   const originalId =
     attributes.vtkOriginalCellIds ??
@@ -65,14 +66,14 @@ const RESERVED_ATTRIBUTE_KEYS = new Set([
   "vtkOriginalPointIds",
 ]);
 
-const hasOtherAttributes = computed(() => {
+const hasOtherAttributes = computed<boolean>(() => {
   const attributes = hybridViewerStore.hoverData?.attributes || {};
   return Object.keys(attributes).some(
     (key) => key !== "vtkOriginalCellIds" && key !== "vtkOriginalPointIds",
   );
 });
 
-const sortedAttributes = computed(() => {
+const sortedAttributes = computed<[string, unknown][]>(() => {
   const attributes = hybridViewerStore.hoverData?.attributes || {};
   return (
     Object.entries(attributes)
@@ -82,7 +83,7 @@ const sortedAttributes = computed(() => {
   );
 });
 
-function capitalize(val: string) {
+function capitalize(val: string): string {
   if (!val) {
     return "";
   }
@@ -90,9 +91,11 @@ function capitalize(val: string) {
   return spaced.charAt(0).toUpperCase() + spaced.slice(1);
 }
 
-const fieldTypeLabel = computed(() => {
+const fieldTypeLabel = computed<string>(() => {
   const fieldType = hybridViewerStore.hoverData?.fieldType;
-  return typeof fieldType === "string" ? capitalize(fieldType.toLowerCase()) : "";
+  return typeof fieldType === "string"
+    ? capitalize(fieldType.toLowerCase())
+    : "";
 });
 
 const coordinates = computed<number[] | undefined>(() => {
@@ -100,7 +103,7 @@ const coordinates = computed<number[] | undefined>(() => {
   return Array.isArray(value) ? (value as number[]) : undefined;
 });
 
-function formatAttributeValue(val: unknown) {
+function formatAttributeValue(val: unknown): string {
   if (Array.isArray(val)) {
     const formattedValues = val.map((value) => {
       if (typeof value === "number") {
@@ -147,7 +150,10 @@ function formatAttributeValue(val: unknown) {
         <v-col>
           <span class="tooltip-label">Id:</span>
           <span class="tooltip-value-dim font-mono">
-            {{ hybridViewerStore.hoverData.component?.id || hybridViewerStore.hoverData.modelId }}
+            {{
+              hybridViewerStore.hoverData.component?.id ||
+              hybridViewerStore.hoverData.modelId
+            }}
           </span>
         </v-col>
         <v-col v-if="originalIndex !== undefined">
@@ -169,7 +175,8 @@ function formatAttributeValue(val: unknown) {
           <v-col v-if="coordinates" class="d-flex justify-space-between ga-3">
             <span class="tooltip-label">Position:</span>
             <span class="tooltip-value font-mono">
-              [ {{ Number(coordinates[0]).toFixed(3) }}, {{ Number(coordinates[1]).toFixed(3) }},
+              [ {{ Number(coordinates[0]).toFixed(3) }},
+              {{ Number(coordinates[1]).toFixed(3) }},
               {{ Number(coordinates[2]).toFixed(3) }} ]
             </span>
           </v-col>

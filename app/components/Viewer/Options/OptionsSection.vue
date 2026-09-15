@@ -5,7 +5,7 @@ interface Props {
 
 const { title } = defineProps<Props>();
 
-const isCollapsed = ref(false);
+const isCollapsed = ref<boolean>(false);
 </script>
 
 <template>

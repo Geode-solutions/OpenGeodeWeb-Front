@@ -11,8 +11,8 @@ const { escapeFunction = undefined } = defineProps<Props>();
 const show = defineModel<boolean>("show", { default: false });
 const hybridViewerStore = useHybridViewerStore();
 
-const localPoint1 = ref([0, 0, 0]);
-const localPoint2 = ref([0, 0, 0]);
+const localPoint1 = ref<number[]>([0, 0, 0]);
+const localPoint2 = ref<number[]>([0, 0, 0]);
 
 watch(
   () => hybridViewerStore.ruler_point1,
@@ -49,7 +49,7 @@ watch(
   },
 );
 
-async function applyManualCoords() {
+async function applyManualCoords(): Promise<void> {
   hybridViewerStore.ruler_point1 = [...localPoint1.value];
   hybridViewerStore.ruler_point2 = [...localPoint2.value];
   await hybridViewerStore.applyRuler();
@@ -78,7 +78,9 @@ async function applyManualCoords() {
 
       <v-divider class="mb-3" />
 
-      <div class="text-caption font-weight-bold mb-2 text-medium-emphasis">Point 1</div>
+      <div class="text-caption font-weight-bold mb-2 text-medium-emphasis">
+        Point 1
+      </div>
       <v-row dense class="mb-1" data-testid="rulerPointCard">
         <v-col v-for="(axis, index) in ['X', 'Y', 'Z']" :key="axis">
           <v-text-field
@@ -93,7 +95,9 @@ async function applyManualCoords() {
         </v-col>
       </v-row>
 
-      <div class="text-caption font-weight-bold mb-2 mt-3 text-medium-emphasis">Point 2</div>
+      <div class="text-caption font-weight-bold mb-2 mt-3 text-medium-emphasis">
+        Point 2
+      </div>
       <v-row dense class="mb-1" data-testid="rulerPointCard">
         <v-col v-for="(axis, index) in ['X', 'Y', 'Z']" :key="axis">
           <v-text-field
@@ -122,7 +126,10 @@ async function applyManualCoords() {
 
       <v-divider class="my-3" />
 
-      <div v-if="hybridViewerStore.ruler_distance !== undefined" class="text-center">
+      <div
+        v-if="hybridViewerStore.ruler_distance !== undefined"
+        class="text-center"
+      >
         <div class="text-caption text-medium-emphasis mb-1">Distance</div>
         <div data-testid="rulerDistance" class="text-h6 font-weight-bold">
           {{ hybridViewerStore.ruler_distance.toFixed(4) }}

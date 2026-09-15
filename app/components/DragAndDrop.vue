@@ -1,6 +1,4 @@
 <script setup lang="ts">
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
 import { onMounted, onUnmounted, ref } from "vue";
 import DragAndDropInline from "./DragAndDropInternal/DragAndDropInline.vue";
 import DragAndDropOverlay from "./DragAndDropInternal/DragAndDropOverlay.vue";
@@ -48,7 +46,10 @@ const fileInput = ref<HTMLInputElement | undefined>(undefined);
 
 const WILDCARD_SUFFIX_LENGTH = 2;
 
-function isFileAccepted(file: File, acceptValue: string | string[] | undefined): boolean {
+function isFileAccepted(
+  file: File,
+  acceptValue: string | string[] | undefined,
+): boolean {
   const fileName = (file.name || "").toLowerCase();
   const fileType = (file.type || "").toLowerCase();
   const isVext = fileName.endsWith(".vext");
@@ -201,7 +202,14 @@ defineExpose({ triggerFileDialog });
     :show-extensions
   />
 
-  <input ref="fileInput" type="file" class="d-none" :multiple :accept @change="handleFileSelect" />
+  <input
+    ref="fileInput"
+    type="file"
+    class="d-none"
+    :multiple
+    :accept
+    @change="handleFileSelect"
+  />
 </template>
 
 <style>

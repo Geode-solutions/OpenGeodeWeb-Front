@@ -23,7 +23,7 @@ const menuStore = useMenuStore();
 const viewerStore = useViewerStore();
 const hybridViewerStore = useHybridViewerStore();
 
-function stopHoverHighlight() {
+function stopHoverHighlight(): void {
   hybridViewerStore.is_hover_highlight = false;
   hybridViewerStore.clearHoverHighlight();
 }
@@ -57,12 +57,14 @@ const {
   get_viewer_id: trigger_picker,
 } = useOverlappingPicker();
 
-function get_viewer_id(x: number, y: number) {
+function get_viewer_id(x: number, y: number): string {
   const instance = getCurrentInstance();
   const containerRect = instance?.proxy?.$el
     ?.closest?.('[data-testid="hybridViewer"]')
     ?.getBoundingClientRect() ||
-    document.querySelector('[data-testid="hybridViewer"]')?.getBoundingClientRect() || {
+    document
+      .querySelector('[data-testid="hybridViewer"]')
+      ?.getBoundingClientRect() || {
       left: 0,
       top: 0,
     };
@@ -140,7 +142,9 @@ defineExpose({ get_viewer_id });
         @click="stopHoverHighlight"
       >
         Highlight active ({{
-          hybridViewerStore.hover_highlight_field_type === "CELL" ? "Cells" : "Points"
+          hybridViewerStore.hover_highlight_field_type === "CELL"
+            ? "Cells"
+            : "Points"
         }}) &middot; Esc to stop
         <v-divider vertical class="mx-2 my-1" opacity="0.3" />
         <v-icon icon="mdi-close" size="small" />

@@ -23,11 +23,13 @@ const {
   borderLeft = true,
 } = defineProps<Props>();
 
-const emit = defineEmits<{
+interface Emits {
   close: [];
   dragstart: [event: DragEvent];
   "update:scrollTop": [value: number];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 
 const scrollContainer = useTemplateRef("scroll-container");
 const treeviewBox = useTemplateRef("treeview-box");
@@ -37,14 +39,14 @@ const { adaptiveStyles } = useAdaptiveStyles(treeviewBox);
 let isApplyingScroll = false;
 let resizeObserver: ResizeObserver | undefined = undefined;
 
-function handleScroll(event: Event) {
+function handleScroll(event: Event): void {
   if (isApplyingScroll) {
     return;
   }
   emit("update:scrollTop", (event.target as HTMLElement).scrollTop);
 }
 
-function applyScrollTop(val: number) {
+function applyScrollTop(val: number): void {
   if (scrollContainer.value) {
     isApplyingScroll = true;
     scrollContainer.value.scrollTop = val;
@@ -95,7 +97,10 @@ watch(
     ref="treeview-box"
     variant="outlined"
     class="tree-box d-flex flex-column"
-    :style="[adaptiveStyles, { borderRadius, borderLeft: borderLeft ? undefined : 'none' }]"
+    :style="[
+      adaptiveStyles,
+      { borderRadius, borderLeft: borderLeft ? undefined : 'none' },
+    ]"
   >
     <v-card-title
       class="tree-box-header d-flex align-center"
@@ -113,7 +118,9 @@ watch(
         style="filter: brightness(0); display: flex; align-items: center"
       />
       <v-icon v-else-if="mdiIcon" size="24" class="mr-2">{{ mdiIcon }}</v-icon>
-      <v-icon v-else-if="closable" size="24" class="mr-2">mdi-drag-variant</v-icon>
+      <v-icon v-else-if="closable" size="24" class="mr-2"
+        >mdi-drag-variant</v-icon
+      >
       <span
         class="text-subtitle-2 font-weight-bold d-inline-flex align-center"
         style="
@@ -138,7 +145,10 @@ watch(
       />
     </v-card-title>
     <v-divider />
-    <v-card-text class="pa-0 flex-grow-1 overflow-hidden d-flex flex-column" style="min-height: 0">
+    <v-card-text
+      class="pa-0 flex-grow-1 overflow-hidden d-flex flex-column"
+      style="min-height: 0"
+    >
       <div
         ref="scroll-container"
         class="flex-grow-1 overflow-y-hidden overflow-x-hidden d-flex flex-column"
@@ -170,8 +180,10 @@ watch(
   position: absolute;
   inset: 0;
   background: rgba(255, 255, 255, var(--adaptive-opacity));
-  backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
-  -webkit-backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
+  backdrop-filter: blur(var(--adaptive-blur))
+    brightness(var(--adaptive-brightness));
+  -webkit-backdrop-filter: blur(var(--adaptive-blur))
+    brightness(var(--adaptive-brightness));
   mix-blend-mode: lighten;
   z-index: 0;
   pointer-events: none;

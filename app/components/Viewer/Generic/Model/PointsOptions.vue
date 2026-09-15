@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import SurfacePoints from "@ogw_front/assets/viewer_svgs/surface_points.svg";
-// oxlint-disable import/consistent-type-specifier-style -- combining the default import with the type import avoids a duplicate-imports violation on this same module; using disable-next-line here is fragile because a formatter can re-wrap the import onto multiple lines and shift the flagged line
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import SurfacePoints from "@ogw_front/assets/viewer_svgs/surface_points.svg";
 import ViewerOptionsSizeSlider from "@ogw_front/components/Viewer/Options/Sliders/Size.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
-
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -21,9 +19,11 @@ interface Props {
 
 const { itemProps } = defineProps<Props>();
 
-const id = computed(() => (itemProps.meta_data.modelId as string | undefined) || itemProps.id);
+const id = computed<string>(
+  () => (itemProps.meta_data.modelId as string | undefined) || itemProps.id,
+);
 
-const visibility = computed({
+const visibility = computed<boolean>({
   get: () => dataStyleStore.modelPointsVisibility(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
@@ -32,7 +32,7 @@ const visibility = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const size = computed({
+const size = computed<number>({
   get: () => dataStyleStore.modelPointsSize(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
@@ -58,7 +58,10 @@ const size = computed({
       />
       <template v-if="visibility">
         <v-divider class="my-2" />
-        <ViewerOptionsSizeSlider data-testid="modelPointsSizeSlider" v-model="size" />
+        <ViewerOptionsSizeSlider
+          data-testid="modelPointsSizeSlider"
+          v-model="size"
+        />
       </template>
     </template>
   </ViewerContextMenuItem>
