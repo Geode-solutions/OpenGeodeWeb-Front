@@ -31,8 +31,7 @@ interface Emits {
 const emit = defineEmits<Emits>();
 
 const activityBar = useTemplateRef("activity-bar");
-const { adaptiveStyles: activityBarAdaptiveStyles } =
-  useAdaptiveStyles(activityBar);
+const { adaptiveStyles: activityBarAdaptiveStyles } = useAdaptiveStyles(activityBar);
 
 const maxWidth = computed<number>(() => containerWidth * MAX_PANEL_WIDTH_RATIO);
 
@@ -62,40 +61,33 @@ watch(
   () => additionalViews.value.length,
   (newLength) => {
     if (newLength > 0 && rowHeights.value.length !== newLength) {
-      treeviewStore.setRowHeights(
-        Array.from({ length: newLength }, () => PERCENT_100 / newLength),
-      );
+      treeviewStore.setRowHeights(Array.from({ length: newLength }, () => PERCENT_100 / newLength));
     }
   },
   { immediate: true },
 );
 
-watch(
-  [maxWidth, (): number => additionalViews.value.length],
-  ([newMax]): void => {
-    const hasAdditional = additionalViews.value.length > 0;
-    const gap = hasAdditional ? GAP_WIDTH : 0;
-    const total =
-      treeviewStore.panelWidth +
-      (hasAdditional ? treeviewStore.additionalPanelWidth : 0) +
-      gap;
+watch([maxWidth, (): number => additionalViews.value.length], ([newMax]): void => {
+  const hasAdditional = additionalViews.value.length > 0;
+  const gap = hasAdditional ? GAP_WIDTH : 0;
+  const total =
+    treeviewStore.panelWidth + (hasAdditional ? treeviewStore.additionalPanelWidth : 0) + gap;
 
-    if (total > newMax) {
-      if (hasAdditional) {
-        const newAdditionalWidth = newMax - treeviewStore.panelWidth - gap;
-        if (newAdditionalWidth < WIDTH_MIN) {
-          treeviewStore.setAdditionalPanelWidth(WIDTH_MIN);
-          const newMainWidth = newMax - WIDTH_MIN - gap;
-          treeviewStore.setPanelWidth(Math.max(WIDTH_MIN, newMainWidth));
-        } else {
-          treeviewStore.setAdditionalPanelWidth(newAdditionalWidth);
-        }
+  if (total > newMax) {
+    if (hasAdditional) {
+      const newAdditionalWidth = newMax - treeviewStore.panelWidth - gap;
+      if (newAdditionalWidth < WIDTH_MIN) {
+        treeviewStore.setAdditionalPanelWidth(WIDTH_MIN);
+        const newMainWidth = newMax - WIDTH_MIN - gap;
+        treeviewStore.setPanelWidth(Math.max(WIDTH_MIN, newMainWidth));
       } else {
-        treeviewStore.setPanelWidth(Math.max(WIDTH_MIN, newMax));
+        treeviewStore.setAdditionalPanelWidth(newAdditionalWidth);
       }
+    } else {
+      treeviewStore.setPanelWidth(Math.max(WIDTH_MIN, newMax));
     }
-  },
-);
+  }
+});
 
 function onDragStart(index: number): void {
   draggedIndex.value = index;
@@ -123,10 +115,7 @@ function onResizeStart(event: MouseEvent): void {
     const currentTotalWidth =
       newWidth + (hasAdditional ? treeviewStore.additionalPanelWidth : 0) + gap;
     if (currentTotalWidth > maxWidth.value) {
-      newWidth =
-        maxWidth.value -
-        (hasAdditional ? treeviewStore.additionalPanelWidth : 0) -
-        gap;
+      newWidth = maxWidth.value - (hasAdditional ? treeviewStore.additionalPanelWidth : 0) - gap;
     }
 
     if (newWidth < AUTO_CLOSE_THRESHOLD) {
@@ -177,8 +166,7 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
   const startY = event.clientY;
   const startHeight1 = rowHeights.value[index] ?? 0;
   const startHeight2 = rowHeights.value[index + 1] ?? 0;
-  const containerHeight =
-    (event.currentTarget as HTMLElement).parentElement?.offsetHeight ?? 0;
+  const containerHeight = (event.currentTarget as HTMLElement).parentElement?.offsetHeight ?? 0;
 
   function resize(move_event: MouseEvent): void {
     const deltaY = move_event.clientY - startY;
@@ -256,14 +244,9 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
           :border-radius="additionalViews.length > 0 ? '0' : '0 16px 16px 0'"
           :border-left="false"
           @close="treeviewStore.closeView('main')"
-          @update:scroll-top="
-            mainView && treeviewStore.setScrollTop(mainView.id, $event)
-          "
+          @update:scroll-top="mainView && treeviewStore.setScrollTop(mainView.id, $event)"
         >
-          <GlobalObjects
-            data-testid="mainObjectTree"
-            @show-menu="emit('show-menu', $event)"
-          />
+          <GlobalObjects data-testid="mainObjectTree" @show-menu="emit('show-menu', $event)" />
         </ViewerObjectTreeBox>
       </div>
 
@@ -284,8 +267,7 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
           <div
             class="view-wrapper"
             :class="{
-              'drag-over':
-                draggedIndex !== undefined && draggedIndex !== index + 1,
+              'drag-over': draggedIndex !== undefined && draggedIndex !== index + 1,
             }"
             :style="{ flex: `0 0 ${rowHeights[index]}%` }"
             @dragover="onDragOver"
@@ -303,11 +285,7 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
               @update:scroll-top="treeviewStore.setScrollTop(view.id, $event)"
             >
               <component
-                :is="
-                  view.viewType === 'model_collections'
-                    ? ModelCollections
-                    : ModelComponents
-                "
+                :is="view.viewType === 'model_collections' ? ModelCollections : ModelComponents"
                 data-testid="modelComponentsObjectTree"
                 :id="view.modelId || view.id"
                 :view-id="view.id"
@@ -373,10 +351,8 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
   position: absolute;
   inset: 0;
   background: rgba(255, 255, 255, var(--adaptive-opacity));
-  backdrop-filter: blur(var(--adaptive-blur))
-    brightness(var(--adaptive-brightness));
-  -webkit-backdrop-filter: blur(var(--adaptive-blur))
-    brightness(var(--adaptive-brightness));
+  backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
+  -webkit-backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
   mix-blend-mode: lighten;
   z-index: 0;
   pointer-events: none;

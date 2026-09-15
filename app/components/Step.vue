@@ -55,18 +55,11 @@ const sortedChips = computed<string[]>(() => {
     hide-actions
   >
     <template #title>
-      <v-sheet
-        color="transparent"
-        class="d-flex flex-column justify-center ps-2"
-      >
+      <v-sheet color="transparent" class="d-flex flex-column justify-center ps-2">
         <p
           tag="h3"
           class="text-subtitle-1 font-weight-bold mb-0 transition-swing"
-          :class="
-            current_step_index === stepIndex
-              ? 'text-primary'
-              : 'text-grey-darken-1'
-          "
+          :class="current_step_index === stepIndex ? 'text-primary' : 'text-grey-darken-1'"
         >
           {{ steps[stepIndex]!.step_title }}
         </p>

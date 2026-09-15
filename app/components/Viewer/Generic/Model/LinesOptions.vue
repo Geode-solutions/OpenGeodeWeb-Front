@@ -22,18 +22,13 @@ const hybridViewerStore = useHybridViewerStore();
 const linesVisibility = computed<boolean>({
   get: () => dataStyleStore.modelComponentTypeVisibility(modelId, "Line"),
   set: async (newValue) => {
-    await dataStyleStore.setModelLinesVisibility(
-      modelId,
-      targetLineIds,
-      newValue,
-    );
+    await dataStyleStore.setModelLinesVisibility(modelId, targetLineIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
 
 const lineVisibility = computed<boolean | undefined>({
-  get: () =>
-    dataStyleStore.modelLineVisibility(modelId, lineId) as boolean | undefined,
+  get: () => dataStyleStore.modelLineVisibility(modelId, lineId) as boolean | undefined,
   set: async (newValue) => {
     if (lineId === undefined) {
       return;
@@ -45,10 +40,7 @@ const lineVisibility = computed<boolean | undefined>({
 
 // Color
 const linesColor = computed<RGBAColor | undefined>({
-  get: () =>
-    dataStyleStore.modelComponentTypeColor(modelId, "Line") as
-      | RGBAColor
-      | undefined,
+  get: () => dataStyleStore.modelComponentTypeColor(modelId, "Line") as RGBAColor | undefined,
   set: async (color) => {
     await dataStyleStore.setModelLinesColor(modelId, targetLineIds, color);
     hybridViewerStore.remoteRender();
@@ -56,8 +48,7 @@ const linesColor = computed<RGBAColor | undefined>({
 });
 
 const lineColor = computed<RGBAColor | undefined>({
-  get: () =>
-    dataStyleStore.modelLineColor(modelId, lineId) as RGBAColor | undefined,
+  get: () => dataStyleStore.modelLineColor(modelId, lineId) as RGBAColor | undefined,
   set: async (color) => {
     if (lineId === undefined) {
       return;
@@ -69,36 +60,23 @@ const lineColor = computed<RGBAColor | undefined>({
 
 const linesActiveColoring = computed<string | undefined>({
   get: () =>
-    dataStyleStore.getModelComponentTypeActiveColoring(modelId, "Line") as
-      | string
-      | undefined,
+    dataStyleStore.getModelComponentTypeActiveColoring(modelId, "Line") as string | undefined,
   set: async (coloringType) => {
     if (typeof coloringType !== "string") {
       return;
     }
-    await dataStyleStore.setModelLinesActiveColoring(
-      modelId,
-      targetLineIds,
-      coloringType,
-    );
+    await dataStyleStore.setModelLinesActiveColoring(modelId, targetLineIds, coloringType);
     hybridViewerStore.remoteRender();
   },
 });
 
 const lineActiveColoring = computed<string | undefined>({
-  get: () =>
-    dataStyleStore.modelLineActiveColoring(modelId, lineId) as
-      | string
-      | undefined,
+  get: () => dataStyleStore.modelLineActiveColoring(modelId, lineId) as string | undefined,
   set: async (coloringType) => {
     if (lineId === undefined || typeof coloringType !== "string") {
       return;
     }
-    await dataStyleStore.setModelLinesActiveColoring(
-      modelId,
-      [lineId],
-      coloringType,
-    );
+    await dataStyleStore.setModelLinesActiveColoring(modelId, [lineId], coloringType);
     hybridViewerStore.remoteRender();
   },
 });
@@ -110,11 +88,7 @@ const linesVertexAttributeName = computed<string | undefined>({
     if (newValue === undefined) {
       return;
     }
-    await dataStyleStore.setModelLinesVertexAttributeName(
-      modelId,
-      targetLineIds,
-      newValue,
-    );
+    await dataStyleStore.setModelLinesVertexAttributeName(modelId, targetLineIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -122,11 +96,7 @@ const linesVertexAttributeName = computed<string | undefined>({
 const linesVertexAttributeItem = computed<string | undefined>({
   get: () => dataStyleStore.modelLinesVertexAttributeItem(modelId),
   set: async (newValue) => {
-    await dataStyleStore.setModelLinesVertexAttributeItem(
-      modelId,
-      targetLineIds,
-      newValue,
-    );
+    await dataStyleStore.setModelLinesVertexAttributeItem(modelId, targetLineIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -151,26 +121,15 @@ const linesVertexAttributeRange = computed<[number, number] | undefined>({
 const linesVertexAttributeColorMap = computed<RGBAColorMap | undefined>({
   get: () => dataStyleStore.modelLinesVertexAttributeColorMap(modelId),
   set: async (newValue) => {
-    await dataStyleStore.setModelLinesVertexAttributeColorMap(
-      modelId,
-      targetLineIds,
-      newValue,
-    );
+    await dataStyleStore.setModelLinesVertexAttributeColorMap(modelId, targetLineIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
 
 const linesVertexAttributeNoDataColor = computed<RGBAColor | undefined>({
-  get: () =>
-    dataStyleStore.modelLinesVertexAttributeNoDataColor(modelId) as
-      | RGBAColor
-      | undefined,
+  get: () => dataStyleStore.modelLinesVertexAttributeNoDataColor(modelId) as RGBAColor | undefined,
   set: async (newValue) => {
-    await dataStyleStore.setModelLinesVertexAttributeNoDataColor(
-      modelId,
-      targetLineIds,
-      newValue,
-    );
+    await dataStyleStore.setModelLinesVertexAttributeNoDataColor(modelId, targetLineIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -181,11 +140,7 @@ const linesEdgeAttributeName = computed<string | undefined>({
     if (newValue === undefined) {
       return;
     }
-    await dataStyleStore.setModelLinesEdgeAttributeName(
-      modelId,
-      targetLineIds,
-      newValue,
-    );
+    await dataStyleStore.setModelLinesEdgeAttributeName(modelId, targetLineIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -193,11 +148,7 @@ const linesEdgeAttributeName = computed<string | undefined>({
 const linesEdgeAttributeItem = computed<string | undefined>({
   get: () => dataStyleStore.modelLinesEdgeAttributeItem(modelId),
   set: async (newValue) => {
-    await dataStyleStore.setModelLinesEdgeAttributeItem(
-      modelId,
-      targetLineIds,
-      newValue,
-    );
+    await dataStyleStore.setModelLinesEdgeAttributeItem(modelId, targetLineIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -209,41 +160,23 @@ const linesEdgeAttributeRange = computed<[number, number] | undefined>({
     if (minimum === undefined || maximum === undefined) {
       return;
     }
-    await dataStyleStore.setModelLinesEdgeAttributeRange(
-      modelId,
-      targetLineIds,
-      minimum,
-      maximum,
-    );
+    await dataStyleStore.setModelLinesEdgeAttributeRange(modelId, targetLineIds, minimum, maximum);
     hybridViewerStore.remoteRender();
   },
 });
 
-const linesEdgeAttributeColorMap = computed<Map<string, RGBAColor> | undefined>(
-  {
-    get: () => dataStyleStore.modelLinesEdgeAttributeColorMap(modelId),
-    set: async (newValue) => {
-      await dataStyleStore.setModelLinesEdgeAttributeColorMap(
-        modelId,
-        targetLineIds,
-        newValue,
-      );
-      hybridViewerStore.remoteRender();
-    },
+const linesEdgeAttributeColorMap = computed<Map<string, RGBAColor> | undefined>({
+  get: () => dataStyleStore.modelLinesEdgeAttributeColorMap(modelId),
+  set: async (newValue) => {
+    await dataStyleStore.setModelLinesEdgeAttributeColorMap(modelId, targetLineIds, newValue);
+    hybridViewerStore.remoteRender();
   },
-);
+});
 
 const linesEdgeAttributeNoDataColor = computed<RGBAColor | undefined>({
-  get: () =>
-    dataStyleStore.modelLinesEdgeAttributeNoDataColor(modelId) as
-      | RGBAColor
-      | undefined,
+  get: () => dataStyleStore.modelLinesEdgeAttributeNoDataColor(modelId) as RGBAColor | undefined,
   set: async (newValue) => {
-    await dataStyleStore.setModelLinesEdgeAttributeNoDataColor(
-      modelId,
-      targetLineIds,
-      newValue,
-    );
+    await dataStyleStore.setModelLinesEdgeAttributeNoDataColor(modelId, targetLineIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -255,11 +188,7 @@ const vertexAttributeName = computed<string | undefined>({
     if (lineId === undefined || newValue === undefined) {
       return;
     }
-    await dataStyleStore.setModelLinesVertexAttributeName(
-      modelId,
-      [lineId],
-      newValue,
-    );
+    await dataStyleStore.setModelLinesVertexAttributeName(modelId, [lineId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -270,11 +199,7 @@ const vertexAttributeItem = computed<string | undefined>({
     if (lineId === undefined) {
       return;
     }
-    await dataStyleStore.setModelLinesVertexAttributeItem(
-      modelId,
-      [lineId],
-      newValue,
-    );
+    await dataStyleStore.setModelLinesVertexAttributeItem(modelId, [lineId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -283,19 +208,10 @@ const vertexAttributeRange = computed<[number, number] | undefined>({
   get: () => dataStyleStore.modelLinesVertexAttributeRange(modelId, lineId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
-    if (
-      lineId === undefined ||
-      minimum === undefined ||
-      maximum === undefined
-    ) {
+    if (lineId === undefined || minimum === undefined || maximum === undefined) {
       return;
     }
-    await dataStyleStore.setModelLinesVertexAttributeRange(
-      modelId,
-      [lineId],
-      minimum,
-      maximum,
-    );
+    await dataStyleStore.setModelLinesVertexAttributeRange(modelId, [lineId], minimum, maximum);
     hybridViewerStore.remoteRender();
   },
 });
@@ -306,29 +222,19 @@ const vertexAttributeColorMap = computed<ColorMap | undefined>({
     if (lineId === undefined) {
       return;
     }
-    await dataStyleStore.setModelLinesVertexAttributeColorMap(
-      modelId,
-      [lineId],
-      newValue,
-    );
+    await dataStyleStore.setModelLinesVertexAttributeColorMap(modelId, [lineId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
 
 const vertexAttributeNoDataColor = computed<RGBAColor | undefined>({
   get: () =>
-    dataStyleStore.modelLinesVertexAttributeNoDataColor(modelId, lineId) as
-      | RGBAColor
-      | undefined,
+    dataStyleStore.modelLinesVertexAttributeNoDataColor(modelId, lineId) as RGBAColor | undefined,
   set: async (newValue) => {
     if (lineId === undefined) {
       return;
     }
-    await dataStyleStore.setModelLinesVertexAttributeNoDataColor(
-      modelId,
-      [lineId],
-      newValue,
-    );
+    await dataStyleStore.setModelLinesVertexAttributeNoDataColor(modelId, [lineId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -339,11 +245,7 @@ const edgeAttributeName = computed<string | undefined>({
     if (lineId === undefined || newValue === undefined) {
       return;
     }
-    await dataStyleStore.setModelLinesEdgeAttributeName(
-      modelId,
-      [lineId],
-      newValue,
-    );
+    await dataStyleStore.setModelLinesEdgeAttributeName(modelId, [lineId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -354,11 +256,7 @@ const edgeAttributeItem = computed<string | undefined>({
     if (lineId === undefined) {
       return;
     }
-    await dataStyleStore.setModelLinesEdgeAttributeItem(
-      modelId,
-      [lineId],
-      newValue,
-    );
+    await dataStyleStore.setModelLinesEdgeAttributeItem(modelId, [lineId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -367,19 +265,10 @@ const edgeAttributeRange = computed<[number, number] | undefined>({
   get: () => dataStyleStore.modelLinesEdgeAttributeRange(modelId, lineId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
-    if (
-      lineId === undefined ||
-      minimum === undefined ||
-      maximum === undefined
-    ) {
+    if (lineId === undefined || minimum === undefined || maximum === undefined) {
       return;
     }
-    await dataStyleStore.setModelLinesEdgeAttributeRange(
-      modelId,
-      [lineId],
-      minimum,
-      maximum,
-    );
+    await dataStyleStore.setModelLinesEdgeAttributeRange(modelId, [lineId], minimum, maximum);
     hybridViewerStore.remoteRender();
   },
 });
@@ -390,29 +279,19 @@ const edgeAttributeColorMap = computed<Map<string, RGBAColor> | undefined>({
     if (lineId === undefined) {
       return;
     }
-    await dataStyleStore.setModelLinesEdgeAttributeColorMap(
-      modelId,
-      [lineId],
-      newValue,
-    );
+    await dataStyleStore.setModelLinesEdgeAttributeColorMap(modelId, [lineId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
 
 const edgeAttributeNoDataColor = computed<RGBAColor | undefined>({
   get: () =>
-    dataStyleStore.modelLinesEdgeAttributeNoDataColor(modelId, lineId) as
-      | RGBAColor
-      | undefined,
+    dataStyleStore.modelLinesEdgeAttributeNoDataColor(modelId, lineId) as RGBAColor | undefined,
   set: async (newValue) => {
     if (lineId === undefined) {
       return;
     }
-    await dataStyleStore.setModelLinesEdgeAttributeNoDataColor(
-      modelId,
-      [lineId],
-      newValue,
-    );
+    await dataStyleStore.setModelLinesEdgeAttributeNoDataColor(modelId, [lineId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -427,22 +306,13 @@ const capabilities = {
   polyhedron: { available: false },
 };
 
-const vertexSchema =
-  back_schemas.opengeodeweb_back.model_component_vertex_attribute_names;
-const edgeSchema =
-  back_schemas.opengeodeweb_back.model_component_edge_attribute_names;
+const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attribute_names;
+const edgeSchema = back_schemas.opengeodeweb_back.model_component_edge_attribute_names;
 </script>
 
 <template>
-  <OptionsSection
-    title="Lines Options"
-    class="mt-4"
-    data-testid="modelComponentTypeOptions"
-  >
-    <VisibilitySwitch
-      data-testid="modelLinesVisibilitySwitch"
-      v-model="linesVisibility"
-    />
+  <OptionsSection title="Lines Options" class="mt-4" data-testid="modelComponentTypeOptions">
+    <VisibilitySwitch data-testid="modelLinesVisibilitySwitch" v-model="linesVisibility" />
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
       :componentIds="targetLineIds"

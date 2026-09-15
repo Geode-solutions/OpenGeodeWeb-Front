@@ -46,10 +46,7 @@ const fileInput = ref<HTMLInputElement | undefined>(undefined);
 
 const WILDCARD_SUFFIX_LENGTH = 2;
 
-function isFileAccepted(
-  file: File,
-  acceptValue: string | string[] | undefined,
-): boolean {
+function isFileAccepted(file: File, acceptValue: string | string[] | undefined): boolean {
   const fileName = (file.name || "").toLowerCase();
   const fileType = (file.type || "").toLowerCase();
   const isVext = fileName.endsWith(".vext");
@@ -202,14 +199,7 @@ defineExpose({ triggerFileDialog });
     :show-extensions
   />
 
-  <input
-    ref="fileInput"
-    type="file"
-    class="d-none"
-    :multiple
-    :accept
-    @change="handleFileSelect"
-  />
+  <input ref="fileInput" type="file" class="d-none" :multiple :accept @change="handleFileSelect" />
 </template>
 
 <style>

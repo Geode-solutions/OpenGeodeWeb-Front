@@ -11,8 +11,7 @@ interface Props {
   escapeFunction?: () => void;
 }
 
-const { width = DEFAULT_PANEL_WIDTH, escapeFunction = undefined } =
-  defineProps<Props>();
+const { width = DEFAULT_PANEL_WIDTH, escapeFunction = undefined } = defineProps<Props>();
 
 interface Emits {
   apply: [];

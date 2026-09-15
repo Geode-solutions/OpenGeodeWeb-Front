@@ -41,11 +41,9 @@ const emit = defineEmits<Emits>();
     icon
     @click="emit('click', $event)"
   >
-    <v-icon
-      v-if="typeof icon === 'string' && icon.startsWith('mdi-')"
-      :size="iconSize"
-      >{{ icon }}</v-icon
-    >
+    <v-icon v-if="typeof icon === 'string' && icon.startsWith('mdi-')" :size="iconSize">{{
+      icon
+    }}</v-icon>
     <v-img
       v-else
       :src="icon"

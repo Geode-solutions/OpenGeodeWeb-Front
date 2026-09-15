@@ -1,9 +1,5 @@
 <script setup lang="ts">
-import {
-  type DisplayItem,
-  type EmitFn,
-  useVirtualTree,
-} from "@ogw_front/composables/virtual_tree";
+import { type DisplayItem, type EmitFn, useVirtualTree } from "@ogw_front/composables/virtual_tree";
 import StickyHeader from "@ogw_front/components/Viewer/ObjectTree/Base/StickyHeader.vue";
 import TreeRow from "@ogw_front/components/Viewer/ObjectTree/Base/TreeRow.vue";
 import { useTreeKeyboardNav } from "@ogw_front/composables/tree_keyboard_nav";
@@ -15,9 +11,7 @@ type UnwrapMaybeRefOrGetter<Source> = Source extends () => infer Result
   : Source extends { value: infer Result }
     ? Result
     : Source;
-type VirtualTreeProps = UnwrapMaybeRefOrGetter<
-  Parameters<typeof useVirtualTree>[0]
->;
+type VirtualTreeProps = UnwrapMaybeRefOrGetter<Parameters<typeof useVirtualTree>[0]>;
 
 interface Props {
   items: unknown[];
@@ -74,18 +68,13 @@ const {
   emit as EmitFn,
 );
 
-const {
-  virtualScrollRef,
-  stickyHeader,
-  handleScroll,
-  scrollToIndex,
-  getScrollInfo,
-} = useTreeScroll(
-  computed(() => ({ scrollTop })),
-  emit as EmitFn,
-  displayItems,
-  actualItemProps,
-);
+const { virtualScrollRef, stickyHeader, handleScroll, scrollToIndex, getScrollInfo } =
+  useTreeScroll(
+    computed(() => ({ scrollTop })),
+    emit as EmitFn,
+    displayItems,
+    actualItemProps,
+  );
 
 const focusedIndex = ref<number>(-1);
 const lastActiveIndex = ref<number>(-1);
@@ -101,11 +90,7 @@ function applyRangeSelect(newActive: Set<unknown>, index: number): void {
   }
 }
 
-function applyToggleActive(
-  newActive: Set<unknown>,
-  id: unknown,
-  index: number | undefined,
-): void {
+function applyToggleActive(newActive: Set<unknown>, id: unknown, index: number | undefined): void {
   if (newActive.has(id)) {
     newActive.delete(id);
   } else {

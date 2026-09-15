@@ -23,14 +23,10 @@ const viewerStore = useViewerStore();
 const menuStore = useMenuStore();
 const dataStore = useDataStore();
 
-const { width: elementWidth, height: elementHeight } =
-  useElementSize(container);
+const { width: elementWidth, height: elementHeight } = useElementSize(container);
 const { width: windowWidth, height: windowHeight } = useWindowSize();
 
-function debounce<Callback extends (...args: unknown[]) => void>(
-  func: Callback,
-  wait: number,
-) {
+function debounce<Callback extends (...args: unknown[]) => void>(func: Callback, wait: number) {
   let timeout: ReturnType<typeof setTimeout> | undefined = undefined;
   return function executedFunction(...args: Parameters<Callback>): void {
     function later(): void {
@@ -99,11 +95,7 @@ async function handleClick(event: PointerEvent): Promise<void> {
 
 <template>
   <ClientOnly>
-    <div
-      data-testid="hybridViewer"
-      class="fill-height"
-      style="position: relative; height: 100%"
-    >
+    <div data-testid="hybridViewer" class="fill-height" style="position: relative; height: 100%">
       <ColormapQuickPicker
         v-model:show="quickColormap.show"
         :x="quickColormap.x"
@@ -112,10 +104,7 @@ async function handleClick(event: PointerEvent): Promise<void> {
       />
       <ViewToolbar />
       <slot name="ui"></slot>
-      <HybridViewerTooltip
-        :container-width="elementWidth"
-        :container-height="elementHeight"
-      />
+      <HybridViewerTooltip :container-width="elementWidth" :container-height="elementHeight" />
       <v-col
         class="pa-0"
         ref="viewer"

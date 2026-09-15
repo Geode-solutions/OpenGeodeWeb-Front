@@ -50,12 +50,7 @@ function submit(): Promise<void> {
           </VRow>
           <VRow>
             <VCol>
-              <VTextField
-                v-model="email"
-                :rules="emailRules"
-                label="E-mail"
-                required
-              />
+              <VTextField v-model="email" :rules="emailRules" label="E-mail" required />
             </VCol>
           </VRow>
           <VRow>
@@ -69,12 +64,7 @@ function submit(): Promise<void> {
   </VRow>
   <VRow align="center" justify="center">
     <VCol cols="auto" class="d-flex justify-center align-center">
-      <VBtn
-        class="load-btn"
-        :text="buttonLabel"
-        :color="color || buttonColor"
-        @click="submit"
-      />
+      <VBtn class="load-btn" :text="buttonLabel" :color="color || buttonColor" @click="submit" />
     </VCol>
   </VRow>
 </template>

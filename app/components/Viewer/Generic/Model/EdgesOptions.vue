@@ -18,9 +18,7 @@ interface Props {
 
 const { itemProps } = defineProps<Props>();
 
-const id = computed(
-  () => (itemProps.meta_data.modelId as string | undefined) || itemProps.id,
-);
+const id = computed(() => (itemProps.meta_data.modelId as string | undefined) || itemProps.id);
 
 const visibility = computed({
   get: () => dataStyleStore.modelEdgesVisibility(id.value),

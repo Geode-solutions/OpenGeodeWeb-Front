@@ -33,12 +33,10 @@ const toggleLoading = useToggle(loading);
 const multipleFilesNoCommon = ref<boolean>(false);
 
 async function fetchAllowedObjectsList(): Promise<AllowedObjectMap[]> {
-  const promiseArray = filenames.map(
-    (filename): Promise<{ allowed_objects: AllowedObjectMap }> => {
-      const params = { filename };
-      return backStore.request({ schema, params });
-    },
-  );
+  const promiseArray = filenames.map((filename): Promise<{ allowed_objects: AllowedObjectMap }> => {
+    const params = { filename };
+    return backStore.request({ schema, params });
+  });
   const responses = await Promise.all(promiseArray);
   return responses.map((response) => response.allowed_objects);
 }
@@ -82,20 +80,9 @@ await getAllowedGeodeObjects();
 
 <template>
   <FetchingData v-if="loading" />
-  <v-row
-    v-else-if="Object.keys(allowedGeodeObjects).length"
-    class="justify-left"
-  >
-    <v-col
-      v-for="(value, key) in allowedGeodeObjects"
-      :key="key"
-      cols="3"
-      md="4"
-    >
-      <v-tooltip
-        :text="geodeObjectTooltip(key, Boolean(value['is_loadable']))"
-        location="bottom"
-      >
+  <v-row v-else-if="Object.keys(allowedGeodeObjects).length" class="justify-left">
+    <v-col v-for="(value, key) in allowedGeodeObjects" :key="key" cols="3" md="4">
+      <v-tooltip :text="geodeObjectTooltip(key, Boolean(value['is_loadable']))" location="bottom">
         <template v-slot:activator="{ props }">
           <span v-bind="props">
             <v-card
@@ -121,8 +108,7 @@ await getAllowedGeodeObjects();
   <v-row v-else-if="multipleFilesNoCommon" class="pa-5">
     <v-card class="card" variant="tonal" rounded>
       <v-card-text>
-        These files cannot be loaded together because they don't share a common
-        data type.
+        These files cannot be loaded together because they don't share a common data type.
       </v-card-text>
     </v-card>
   </v-row>
@@ -130,10 +116,7 @@ await getAllowedGeodeObjects();
     <v-card class="card" variant="tonal" rounded>
       <v-card-text>
         This file format isn't supported! Please check the
-        <a
-          href="https://docs.geode-solutions.com/guides/formats/"
-          target="_blank"
-        >
+        <a href="https://docs.geode-solutions.com/guides/formats/" target="_blank">
           supported file formats documentation</a
         >
         for more information

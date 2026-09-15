@@ -22,12 +22,7 @@ interface Props {
   showOverlay?: boolean;
 }
 
-const {
-  multiple,
-  files = [],
-  autoUpload = true,
-  showOverlay = true,
-} = defineProps<Props>();
+const { multiple, files = [], autoUpload = true, showOverlay = true } = defineProps<Props>();
 
 const internal_files = ref<File[]>(files);
 const internal_auto_upload = ref<boolean>(autoUpload);
@@ -63,9 +58,7 @@ async function get_allowed_files(): Promise<void> {
   const response = (await backStore.request({ schema })) as {
     extensions: string[];
   };
-  accept.value = response.extensions
-    .map((extension) => `.${extension}`)
-    .join(",");
+  accept.value = response.extensions.map((extension) => `.${extension}`).join(",");
   toggle_loading();
 }
 

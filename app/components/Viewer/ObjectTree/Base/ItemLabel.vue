@@ -34,18 +34,13 @@ interface LabeledItem {
   children?: unknown[];
 }
 
-const actualItem = computed<LabeledItem>(
-  () => (item.raw || item) as unknown as LabeledItem,
-);
+const actualItem = computed<LabeledItem>(() => (item.raw || item) as unknown as LabeledItem);
 
 const TOOLTIP_NAME_MAX_LENGTH = 40;
 const TOOLTIP_NAME_START_CHARS = 10;
 const TOOLTIP_NAME_END_CHARS = 8;
 
-const displayTitle = useResponsiveMiddleTruncate(
-  () => actualItem.value.title,
-  containerWidth,
-);
+const displayTitle = useResponsiveMiddleTruncate(() => actualItem.value.title, containerWidth);
 
 const tooltipTitle = computed<string>(() =>
   middleTruncate(
@@ -127,10 +122,7 @@ async function copyToClipboard(text: string, label: string): Promise<void> {
             <v-icon size="12">mdi-content-copy</v-icon>
           </v-btn>
         </span>
-        <span
-          v-if="actualItem.is_active !== undefined"
-          class="text-caption d-flex align-center"
-        >
+        <span v-if="actualItem.is_active !== undefined" class="text-caption d-flex align-center">
           <strong class="text-white mr-1">Status:</strong>
           <i class="ml-1">{{ actualItem.is_active ? "Active" : "Inactive" }}</i>
         </span>

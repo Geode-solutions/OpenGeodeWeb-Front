@@ -11,11 +11,7 @@ interface Props {
   selectedCount?: number;
 }
 
-const {
-  show = false,
-  item = undefined,
-  selectedCount = 0,
-} = defineProps<Props>();
+const { show = false, item = undefined, selectedCount = 0 } = defineProps<Props>();
 
 interface Emits {
   "update:show": [value: boolean];
@@ -26,20 +22,10 @@ const emit = defineEmits<Emits>();
 </script>
 
 <template>
-  <v-dialog
-    :model-value="show"
-    @update:model-value="emit('update:show', $event)"
-    max-width="400"
-  >
+  <v-dialog :model-value="show" @update:model-value="emit('update:show', $event)" max-width="400">
     <GlassCard v-if="item" variant="panel" padding="pa-8">
-      <v-card-title
-        class="pb-2 text-h5 font-weight-bold d-flex align-center text-white"
-      >
-        <v-icon
-          icon="mdi-trash-can-outline"
-          class="mr-3 text-h4"
-          color="error"
-        ></v-icon>
+      <v-card-title class="pb-2 text-h5 font-weight-bold d-flex align-center text-white">
+        <v-icon icon="mdi-trash-can-outline" class="mr-3 text-h4" color="error"></v-icon>
         Delete Item
       </v-card-title>
 
@@ -82,14 +68,8 @@ const emit = defineEmits<Emits>();
     </GlassCard>
 
     <GlassCard v-else variant="panel" padding="pa-8">
-      <v-card-title
-        class="pb-2 text-h5 font-weight-bold d-flex align-center text-white"
-      >
-        <v-icon
-          icon="mdi-alert-circle-outline"
-          class="mr-3 text-h4"
-          color="error"
-        ></v-icon>
+      <v-card-title class="pb-2 text-h5 font-weight-bold d-flex align-center text-white">
+        <v-icon icon="mdi-alert-circle-outline" class="mr-3 text-h4" color="error"></v-icon>
         Delete Items
       </v-card-title>
 

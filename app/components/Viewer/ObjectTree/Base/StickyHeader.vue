@@ -15,8 +15,7 @@ interface Props {
   getIndeterminate: (item: TreeItem) => boolean;
 }
 
-const { item, itemProps, selection, isSelected, getIndeterminate } =
-  defineProps<Props>();
+const { item, itemProps, selection, isSelected, getIndeterminate } = defineProps<Props>();
 
 interface Emits {
   "toggle-open": [item: TreeItem];
@@ -27,10 +26,7 @@ const emit = defineEmits<Emits>();
 </script>
 
 <template>
-  <div
-    class="sticky-tree-header tree-row"
-    @click="$emit('toggle-open', item.raw)"
-  >
+  <div class="sticky-tree-header tree-row" @click="$emit('toggle-open', item.raw)">
     <TreeRow
       :item="item"
       :item-props="itemProps"

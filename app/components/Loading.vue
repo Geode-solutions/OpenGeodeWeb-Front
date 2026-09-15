@@ -12,9 +12,7 @@ const { logo = "", appName } = defineProps<Props>();
 const infraStore = useInfraStore();
 
 const extensionStores = computed(() =>
-  infraStore.microservices.filter(
-    (store) => store.$id !== "back" && store.$id !== "viewer",
-  ),
+  infraStore.microservices.filter((store) => store.$id !== "back" && store.$id !== "viewer"),
 );
 
 const show = ref<boolean>(false);
@@ -67,10 +65,7 @@ onUnmounted(() => {
           style="
             position: fixed;
             inset: 0;
-            background-image: radial-gradient(
-              rgba(255, 255, 255, 0.08) 1px,
-              transparent 0
-            );
+            background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 0);
             background-size: 40px 40px;
             background-position: center;
             pointer-events: none;
@@ -78,10 +73,7 @@ onUnmounted(() => {
           "
         />
 
-        <div
-          class="d-flex align-center justify-center pa-6"
-          style="min-height: 100%"
-        >
+        <div class="d-flex align-center justify-center pa-6" style="min-height: 100%">
           <div
             class="d-flex flex-column align-center text-center w-100"
             style="max-width: 650px; gap: clamp(1rem, 4vh, 2rem)"
@@ -94,17 +86,13 @@ onUnmounted(() => {
               <v-chip
                 v-for="store in extensionStores"
                 :key="store.$id"
-                :color="
-                  store.status === Status.CONNECTED ? 'success' : 'primary'
-                "
+                :color="store.status === Status.CONNECTED ? 'success' : 'primary'"
                 variant="flat"
               >
                 <v-icon
                   start
                   :icon="
-                    store.status === Status.CONNECTED
-                      ? 'mdi-check-circle'
-                      : 'mdi-loading mdi-spin'
+                    store.status === Status.CONNECTED ? 'mdi-check-circle' : 'mdi-loading mdi-spin'
                   "
                 />
                 {{ store.$id.charAt(0).toUpperCase() + store.$id.slice(1) }}

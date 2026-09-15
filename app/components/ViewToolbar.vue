@@ -50,9 +50,7 @@ async function handleZScalingClose(): Promise<void> {
 }
 
 onKeyStroke("Escape", () => {
-  const openMenuKeys = Object.keys(openSubMenus.value).filter(
-    (key) => openSubMenus.value[key],
-  );
+  const openMenuKeys = Object.keys(openSubMenus.value).filter((key) => openSubMenus.value[key]);
   if (openMenuKeys.length > 0) {
     for (const key of openMenuKeys) {
       openSubMenus.value[key] = false;
@@ -234,15 +232,8 @@ const camera_options = computed<CameraOptionAction[]>(() => [
 </script>
 
 <template>
-  <v-container
-    :class="[$style.floatToolbar, 'pa-0', 'view-toolbar']"
-    width="auto"
-  >
-    <v-row
-      v-for="camera_option in camera_options"
-      :key="camera_option.testId"
-      dense
-    >
+  <v-container :class="[$style.floatToolbar, 'pa-0', 'view-toolbar']" width="auto">
+    <v-row v-for="camera_option in camera_options" :key="camera_option.testId" dense>
       <v-col>
         <v-menu
           v-if="camera_option.menu && !camera_option.action"
@@ -300,14 +291,8 @@ const camera_options = computed<CameraOptionAction[]>(() => [
     panel
     @select="hybridViewerStore.setCameraOrientation"
   />
-  <Screenshot
-    v-model="showScreenshot"
-    :escapeFunction="() => (showScreenshot = false)"
-  />
-  <CameraManager
-    :showDialog="showCameraManager"
-    @close="showCameraManager = false"
-  />
+  <Screenshot v-model="showScreenshot" :escapeFunction="() => (showScreenshot = false)" />
+  <CameraManager :showDialog="showCameraManager" @close="showCameraManager = false" />
   <ZScaling
     v-model:show="showZScaling"
     v-model="zScale"
