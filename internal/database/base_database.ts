@@ -21,7 +21,7 @@ export class BaseDatabase extends Dexie {
     };
   }
 
-  clear(): Promise<void[]> {
-    return Promise.all(this.tables.map((table) => table.clear()));
+  async clear(): Promise<void[]> {
+    return Promise.all(this.tables.map(async (table) => table.clear()));
   }
 }

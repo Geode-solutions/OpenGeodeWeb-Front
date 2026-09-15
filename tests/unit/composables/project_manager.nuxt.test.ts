@@ -160,7 +160,7 @@ const hybridViewerStoreMock = {
 };
 
 // MOCKS
-mockedFetch.mockImplementation(((
+mockedFetch.mockImplementation((async (
   _route: unknown,
   // oxlint-disable-next-line eslint/id-length -- mirrors the real ofetch/vitest API field name (`ok`/`fn`)
   options: { onResponse?: (context: { response: { ok: boolean; _data: unknown } }) => void },
@@ -168,7 +168,7 @@ mockedFetch.mockImplementation(((
   const data = { snapshot: snapshotMock };
   // oxlint-disable-next-line eslint/id-length
   options.onResponse?.({ response: { ok: true, _data: data } });
-  return Promise.resolve(data);
+  return data;
 }) as unknown as typeof $fetch);
 vi.mock(import("@ogw_internal/utils/viewer_call"), () => ({
   viewer_call: viewer_call_mock_fn,
@@ -186,7 +186,8 @@ vi.mock(
         const response = {
           _data: new Blob(["zipcontent"], { type: "application/zip" }),
           headers: {
-            get: (k: string) => (k === "new-file-name" ? "project_123.vease" : undefined),
+            get: (k: string): string | undefined =>
+              k === "new-file-name" ? "project_123.vease" : undefined,
           },
         };
         if (options.response_function) {
@@ -280,12 +281,12 @@ vi.stubGlobal("navigator", {
   },
 });
 
-function verifyViewerCalls() {
+function verifyViewerCalls(): void {
   expect(viewerStoreMock.ws_connect).toHaveBeenCalledWith();
   expect(viewer_call_mock_fn).toHaveBeenCalledTimes(VIEWER_CALL_COUNT);
 }
 
-function verifyStoreImports() {
+function verifyStoreImports(): void {
   expect(treeviewStoreMock.importStores).toHaveBeenCalledWith(snapshotMock.treeview);
   expect(dataStoreMock.importStores).toHaveBeenCalledWith(snapshotMock.data);
   expect(hybridViewerStoreMock.initHybridViewer).toHaveBeenCalledWith();
@@ -293,7 +294,7 @@ function verifyStoreImports() {
   expect(hybridViewerStoreMock.setZScaling).toHaveBeenCalledWith(Z_SCALE);
 }
 
-function verifyDataManagement() {
+function verifyDataManagement(): void {
   expect(dataStyleStoreMock.importStores).toHaveBeenCalledWith(snapshotMock.dataStyle);
   expect(dataStyleStoreMock.applyAllStylesFromState).toHaveBeenCalledWith();
   expect(dataStoreMock.registerObject).toHaveBeenCalledWith("abc123", "My Data");
@@ -301,7 +302,7 @@ function verifyDataManagement() {
   expect(treeviewStoreMock.addItem).toHaveBeenCalledWith("PointSet2D", "My Data", "abc123", "mesh");
 }
 
-function verifyRemaining() {
+function verifyRemaining(): void {
   expect(hybridViewerStoreMock.addItem).toHaveBeenCalledWith("abc123");
   expect(dataStyleStoreMock.addDataStyle).toHaveBeenCalledWith("abc123", "PointSet2D");
   expect(dataStyleStoreMock.applyDefaultStyle).toHaveBeenCalledWith("abc123");

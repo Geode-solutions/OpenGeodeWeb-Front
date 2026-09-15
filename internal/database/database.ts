@@ -74,19 +74,20 @@ databaseContainer.instance = new Database();
 (databaseContainer.instance as Database).clear();
 
 // The set of tables is assembled dynamically at runtime (Database.addTable/addTables add stores on the fly), so fully modelling this with Dexie's row generics isn't worth it here: the proxy target is typed loosely as "any table name maps to a Dexie Table of loosely-typed rows".
-interface DatabaseTables {
-  [tableName: string]: Table<Record<string, unknown>, string>;
-}
+type DatabaseTables = Record<string, Table<Record<string, unknown>, string>>;
 
-const database = new Proxy({} as DatabaseTables, {
-  get(_target, prop: string | symbol) {
-    const instance = databaseContainer.instance as unknown as Record<string | symbol, unknown>;
-    const value = instance[prop];
-    if (typeof value === "function") {
-      return value.bind(databaseContainer.instance);
-    }
-    return value;
+const database = new Proxy(
+  {},
+  {
+    get(_target, prop: string | symbol) {
+      const instance = databaseContainer.instance as unknown as Record<string | symbol, unknown>;
+      const value = instance[prop];
+      if (typeof value === "function") {
+        return value.bind(databaseContainer.instance);
+      }
+      return value;
+    },
   },
-});
+);
 
 export { Database, database };

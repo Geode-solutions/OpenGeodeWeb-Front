@@ -38,7 +38,7 @@ watch(
 const textureCoordinates = ref<string[]>([]);
 const backStore = useBackStore();
 
-function getTextureCoordinates() {
+function getTextureCoordinates(): void {
   const schema = back_schemas.opengeodeweb_back.texture_coordinates;
   const params = { id };
   backStore.request(
@@ -57,7 +57,7 @@ onMounted(() => {
   getTextureCoordinates();
 });
 
-async function files_uploaded_event(value: UploadFile[]) {
+async function files_uploaded_event(value: UploadFile[]): Promise<void> {
   if (value.length > 0 && value[0]) {
     const schema = back_schemas.opengeodeweb_back.save_viewable_file;
     const params = {

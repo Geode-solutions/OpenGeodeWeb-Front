@@ -24,11 +24,8 @@ const selected_crs = ref<unknown[]>([]);
 const toggle_loading = useToggle(data_table_loading);
 const backStore = useBackStore();
 
-function get_selected_crs(crs_code: unknown) {
-  // Pre-existing off-by-one fixed: `i <= length` read one past the end of
-  // Crs_list, which would have thrown on `undefined["code"]` at runtime.
-  for (let i = 0; i < crs_list.value.length; i += 1) {
-    const crs = crs_list.value[i];
+function get_selected_crs(crs_code: unknown): unknown {
+  for (const crs of crs_list.value) {
     if (crs && crs["code"] === crs_code) {
       return crs;
     }
@@ -44,14 +41,16 @@ watch(selected_crs, (new_value) => {
   emit("increment_step");
 });
 
-async function get_crs_table() {
+async function get_crs_table(): void {
   const params = { geode_object_type: geodeObjectType };
   toggle_loading();
   await backStore.request(
     { schema, params },
     {
       response_function: (response: unknown) => {
-        crs_list.value = (response as { crs_list: Record<string, unknown>[] }).crs_list;
+        crs_list.value = (
+          response as { crs_list: Record<string, unknown>[] }
+        ).crs_list;
       },
     },
   );

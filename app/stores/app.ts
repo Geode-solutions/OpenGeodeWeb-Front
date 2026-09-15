@@ -177,7 +177,7 @@ export const useAppStore = defineStore("app", () => {
   async function loadExtension(
     path: string,
     extensionPort: string,
-    backendPath: string | undefined = undefined,
+    backendPath?: string,
   ): Promise<ExtensionModule> {
     try {
       let finalURL = path;
@@ -282,7 +282,7 @@ export const useAppStore = defineStore("app", () => {
     return getExtension(extensionId)?.enabled ?? false;
   }
 
-  function upload(file: File, callbacks: RequestHandlers = {}) {
+  async function upload(file: File, callbacks: RequestHandlers = {}) {
     const store = useAppStore();
     const schema = opengeodeweb_front_schemas.api.local.extensions.upload;
     const { PROJECT: projectName } = useRuntimeConfig().public;
@@ -302,7 +302,7 @@ export const useAppStore = defineStore("app", () => {
     );
   }
 
-  function request(
+  async function request(
     { schema, params }: { schema: JsonRpcSchema; params?: Record<string, unknown> },
     callbacks: RequestHandlers = {},
   ) {
@@ -333,7 +333,7 @@ export const useAppStore = defineStore("app", () => {
 
   const projectFolderPath = ref("");
 
-  function createProjectFolder() {
+  async function createProjectFolder() {
     const { PROJECT } = useRuntimeConfig().public;
     const schema = opengeodeweb_front_schemas.api.local.app.project_folder_path;
     const params = { PROJECT };

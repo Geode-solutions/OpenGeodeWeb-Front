@@ -35,7 +35,7 @@ function useModelStyle() {
     return useModelSelection(modelId, dataStyleState);
   }
 
-  function applyModelStyle(modelId: string) {
+  async function applyModelStyle(modelId: string) {
     const style = dataStyleState.getStyle(modelId);
 
     return Promise.all([
@@ -54,7 +54,7 @@ function useModelStyle() {
     if (!item) {
       return;
     }
-    return await Promise.all([
+    return Promise.all([
       modelBlocksStyle.setModelBlocksDefaultStyle(modelId),
       modelSurfacesStyle.setModelSurfacesDefaultStyle(modelId),
       modelLinesStyle.setModelLinesDefaultStyle(modelId),

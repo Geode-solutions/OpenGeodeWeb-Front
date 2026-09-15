@@ -5,7 +5,13 @@ interface Props {
 
 const { appName } = defineProps<Props>();
 
-const ecoMessages = computed(() => [
+interface EcoMessage {
+  icon: string;
+  title: string;
+  message: string;
+}
+
+const ecoMessages = computed<EcoMessage[]>(() => [
   {
     icon: "mdi-leaf",
     title: "Why the wait?",
@@ -14,7 +20,8 @@ const ecoMessages = computed(() => [
   {
     icon: "mdi-lightning-bolt-outline",
     title: "Lower carbon footprint",
-    message: "On-demand computing uses up to 70% less energy than always-on servers.",
+    message:
+      "On-demand computing uses up to 70% less energy than always-on servers.",
   },
   {
     icon: "mdi-earth",
@@ -24,18 +31,19 @@ const ecoMessages = computed(() => [
 ]);
 
 const MESSAGE_INTERVAL_MS = 5000;
-const currentMessage = ref(0);
+const currentMessage = ref<number>(0);
 let interval: ReturnType<typeof setInterval> | undefined = undefined;
 
 // Fallback only guards against noUncheckedIndexedAccess; currentMessage is always kept in range by the modulo below, so it is never actually used.
 const FALLBACK_ECO_MESSAGE = { icon: "", title: "", message: "" };
-const currentEcoMessage = computed(
+const currentEcoMessage = computed<EcoMessage>(
   () => ecoMessages.value[currentMessage.value] ?? FALLBACK_ECO_MESSAGE,
 );
 
 onMounted(() => {
   interval = setInterval(() => {
-    currentMessage.value = (currentMessage.value + 1) % ecoMessages.value.length;
+    currentMessage.value =
+      (currentMessage.value + 1) % ecoMessages.value.length;
   }, MESSAGE_INTERVAL_MS);
 });
 
@@ -45,7 +53,11 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <v-sheet color="transparent" min-height="160" class="position-relative overflow-visible mb-4">
+  <v-sheet
+    color="transparent"
+    min-height="160"
+    class="position-relative overflow-visible mb-4"
+  >
     <v-scroll-y-reverse-transition mode="out-in">
       <v-card
         :key="currentMessage"
@@ -62,7 +74,9 @@ onUnmounted(() => {
             :icon="currentEcoMessage.icon"
             color="white"
             size="22"
-            style="filter: drop-shadow(0 0 6px rgba(var(--v-theme-primary), 0.6))"
+            style="
+              filter: drop-shadow(0 0 6px rgba(var(--v-theme-primary), 0.6));
+            "
           />
           {{ currentEcoMessage.title }}
         </v-card-title>

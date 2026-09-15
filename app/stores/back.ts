@@ -47,7 +47,7 @@ export const useBackStore = defineStore("back", {
         this.ping();
       }, DEFAULT_PING_INTERVAL_SECONDS * MILLISECONDS_IN_SECOND);
     },
-    ping() {
+    async ping() {
       const feedbackStore = useFeedbackStore();
       const schema = back_schemas.opengeodeweb_back.ping;
       return this.request(
@@ -74,7 +74,7 @@ export const useBackStore = defineStore("back", {
     stop_request() {
       this.request_counter -= 1;
     },
-    launch(args: Record<string, unknown>) {
+    async launch(args: Record<string, unknown>) {
       console.log("[GEODE] Launching back microservice...", { args });
       const appStore = useAppStore();
       const { COMMAND_BACK, NUXT_ROOT_PATH } = useRuntimeConfig().public;
@@ -93,12 +93,12 @@ export const useBackStore = defineStore("back", {
         },
       );
     },
-    connect() {
+    async connect() {
       console.log("[GEODE] Connecting to geode microservice...");
       this.set_ping();
-      return Promise.resolve();
+      return;
     },
-    request(
+    async request(
       { schema, params = {} }: { schema: JsonRpcSchema; params?: Record<string, unknown> },
       callbacks: RequestHandlers = {},
     ) {
@@ -118,7 +118,7 @@ export const useBackStore = defineStore("back", {
         },
       );
     },
-    upload(file: File, callbacks: RequestHandlers = {}) {
+    async upload(file: File, callbacks: RequestHandlers = {}) {
       const schema = back_schemas.opengeodeweb_back.upload_file;
       return upload_file(
         this,

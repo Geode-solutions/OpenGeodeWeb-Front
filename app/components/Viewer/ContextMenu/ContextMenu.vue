@@ -1,13 +1,11 @@
 <script setup lang="ts">
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
 import CenterButton from "@ogw_front/components/Viewer/ContextMenu/CenterButton.vue";
 import CircularItems from "@ogw_front/components/Viewer/ContextMenu/CircularItems.vue";
+import type { Component } from "vue";
 import InfoCard from "@ogw_front/components/Viewer/ContextMenu/InfoCard.vue";
 import { useEventListener } from "@vueuse/core";
 import { useMenuStore } from "@ogw_front/stores/menu";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
-import type { Component } from "vue";
 
 interface Props {
   id: string;
@@ -33,15 +31,20 @@ const treeviewStore = useTreeviewStore();
 
 const meta_data = computed(() => menuStore.current_meta_data || {});
 
-const show_menu = ref(true);
-const showName = ref(false);
-const isDragging = ref(false);
-const dragStartX = ref(0);
-const dragStartY = ref(0);
-const menuX = ref(x);
-const menuY = ref(y);
+const show_menu = ref<boolean>(true);
+const showName = ref<boolean>(false);
+const isDragging = ref<boolean>(false);
+const dragStartX = ref<number>(0);
+const dragStartY = ref<number>(0);
+const menuX = ref<number>(x);
+const menuY = ref<number>(y);
 
-function clampPosition(posX: number, posY: number) {
+interface Position {
+  x: number;
+  y: number;
+}
+
+function clampPosition(posX: number, posY: number): Position {
   const margin = RADIUS + MARGIN_OFFSET;
   return {
     x: Math.min(Math.max(posX, margin), containerWidth - margin),
@@ -49,13 +52,13 @@ function clampPosition(posX: number, posY: number) {
   };
 }
 
-function startDrag(event: MouseEvent) {
+function startDrag(event: MouseEvent): void {
   isDragging.value = true;
   dragStartX.value = event.clientX - menuX.value;
   dragStartY.value = event.clientY - menuY.value;
 }
 
-function handleDrag(event: MouseEvent) {
+function handleDrag(event: MouseEvent): void {
   const { x: clampedX, y: clampedY } = clampPosition(
     event.clientX - dragStartX.value,
     event.clientY - dragStartY.value,
@@ -65,7 +68,7 @@ function handleDrag(event: MouseEvent) {
   menuStore.setMenuPosition(clampedX, clampedY);
 }
 
-function stopDrag(event: MouseEvent) {
+function stopDrag(event: MouseEvent): void {
   isDragging.value = false;
   event.stopPropagation();
   menuStore.setMenuPosition(menuX.value, menuY.value);
@@ -116,10 +119,12 @@ watch(
   { immediate: true },
 );
 
-const menuItemCount = computed(() => menu_items.value.length);
+const menuItemCount = computed<number>(() => menu_items.value.length);
 
-const isOverTreeview = computed(() => {
-  const hasAdditional = treeviewStore.opened_views.some((view) => view.id !== "main");
+const isOverTreeview = computed<boolean>(() => {
+  const hasAdditional = treeviewStore.opened_views.some(
+    (view) => view.id !== "main",
+  );
   const hasMain = treeviewStore.opened_views.some((view) => view.id === "main");
   const firstColWidth = hasMain ? treeviewStore.panelWidth : 0;
   const secondColWidth = hasAdditional ? treeviewStore.additionalPanelWidth : 0;
@@ -132,7 +137,7 @@ const isOverTreeview = computed(() => {
   return menuX.value < treeviewWidth;
 });
 
-const isOverToolbar = computed(() => {
+const isOverToolbar = computed<boolean>(() => {
   const toolbarEl = document.querySelector(".view-toolbar");
   if (!toolbarEl) {
     return false;
@@ -150,7 +155,7 @@ const isOverToolbar = computed(() => {
   );
 });
 
-function getMenuStyle() {
+function getMenuStyle(): Record<string, string> {
   return {
     position: "fixed" as const,
     left: `${menuStore.containerLeft + menuX.value - RADIUS}px`,
@@ -158,7 +163,7 @@ function getMenuStyle() {
   };
 }
 
-function toggleShowName() {
+function toggleShowName(): void {
   showName.value = !showName.value;
 }
 </script>

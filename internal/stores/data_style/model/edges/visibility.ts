@@ -25,9 +25,9 @@ export function useModelEdgesVisibilityStyle() {
     );
   }
 
-  function applyModelEdgesStyle(id: string) {
+  async function applyModelEdgesStyle(id: string) {
     const visibility = modelEdgesVisibility(id);
-    return Promise.resolve([setModelEdgesVisibility(id, visibility)]);
+    return [setModelEdgesVisibility(id, visibility)];
   }
 
   return {

@@ -69,9 +69,9 @@ function useModelLinesVertexAttribute() {
       name !== undefined &&
       name in storedConfigs &&
       item !== undefined &&
-      item in storedConfigs[name]!
+      item in storedConfigs[name]
     ) {
-      return storedConfigs[name]![item]!;
+      return storedConfigs[name][item];
     }
     return {
       minimum: undefined,
@@ -120,7 +120,7 @@ function useModelLinesVertexAttribute() {
   ): number {
     const { storedConfigs } = modelLinesVertexAttribute(modelId, lineId);
     if (storedConfigs && name !== undefined && name in storedConfigs) {
-      return storedConfigs[name]!.lastItem;
+      return storedConfigs[name].lastItem;
     }
     return 0;
   }
@@ -169,7 +169,7 @@ function useModelLinesVertexAttribute() {
       colorMap,
       no_data_color,
     });
-    const points = getRGBPointsFromPreset(colorMap as string);
+    const points = getRGBPointsFromPreset(colorMap);
     const line_viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
     const params = {
       id: modelId,
@@ -186,7 +186,7 @@ function useModelLinesVertexAttribute() {
       params,
     });
   }
-  function applyVertexAttribute(modelId: string, lineIds: string[]) {
+  async function applyVertexAttribute(modelId: string, lineIds: string[]) {
     const name = modelLinesVertexAttributeName(modelId, lineIds[0]);
     const item = modelLinesVertexAttributeItem(modelId, lineIds[0]);
     const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineIds[0], name, item);
@@ -201,9 +201,13 @@ function useModelLinesVertexAttribute() {
     if (isModelLinesVertexAttributeValid(attribute)) {
       return setModelLinesVertexAttribute(modelId, lineIds, attribute);
     }
-    return Promise.resolve();
+    return;
   }
-  function setModelLinesVertexAttributeName(modelId: string, lineIds: string[], name: string) {
+  async function setModelLinesVertexAttributeName(
+    modelId: string,
+    lineIds: string[],
+    name: string,
+  ) {
     const item = modelLinesVertexAttributeLastItem(modelId, lineIds[0], name);
     mutateModelLinesVertexStyle(modelId, lineIds, {
       name,
@@ -211,13 +215,17 @@ function useModelLinesVertexAttribute() {
     });
     return applyVertexAttribute(modelId, lineIds);
   }
-  function setModelLinesVertexAttributeItem(modelId: string, lineIds: string[], item: number) {
+  async function setModelLinesVertexAttributeItem(
+    modelId: string,
+    lineIds: string[],
+    item: number,
+  ) {
     mutateModelLinesVertexStyle(modelId, lineIds, {
       item,
     });
     return applyVertexAttribute(modelId, lineIds);
   }
-  function setModelLinesVertexAttributeRange(
+  async function setModelLinesVertexAttributeRange(
     modelId: string,
     lineIds: string[],
     minimum: number,
@@ -231,7 +239,7 @@ function useModelLinesVertexAttribute() {
     });
     return applyVertexAttribute(modelId, lineIds);
   }
-  function setModelLinesVertexAttributeColorMap(
+  async function setModelLinesVertexAttributeColorMap(
     modelId: string,
     lineIds: string[],
     colorMap: string | undefined,

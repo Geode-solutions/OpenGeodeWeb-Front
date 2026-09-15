@@ -36,7 +36,7 @@ function buildSelection(
   );
   for (const component of components) {
     if (componentsByType[component.type]) {
-      componentsByType[component.type]!.push(component);
+      componentsByType[component.type].push(component);
     }
   }
 
@@ -53,7 +53,7 @@ function buildSelection(
     const typeStyle = modelComponentTypeStyles.value[typeStyleKey];
     const defaultVisibility =
       (typeStyle?.visibility as boolean | undefined) ??
-      ((groupStyles[typeKey] as StyleValues | undefined)?.visibility as boolean | undefined) ??
+      (groupStyles[typeKey]?.visibility as boolean | undefined) ??
       true;
 
     let allVisible = true;
@@ -81,7 +81,7 @@ function useModelSelection(modelId: string | undefined, dataStyleState: DataStyl
     return computed<string[]>(() => []);
   }
 
-  const cacheKey = `${modelId}`;
+  const cacheKey = modelId;
   if (selectionCache.has(cacheKey)) {
     return selectionCache.get(cacheKey)!;
   }

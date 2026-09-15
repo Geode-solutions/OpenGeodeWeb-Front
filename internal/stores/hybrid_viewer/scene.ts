@@ -23,7 +23,7 @@ async function performAddItem(id: string): Promise<void> {
   }
   const reader = vtkXMLPolyDataReader();
   await reader.parseAsArrayBuffer(
-    new TextEncoder().encode(value.binary_light_viewable as string).buffer as ArrayBuffer,
+    new TextEncoder().encode(value.binary_light_viewable as string).buffer,
   );
   const actor = vtkActor();
   const mapper = vtkMapper();
@@ -55,7 +55,7 @@ function performRemoveItem(id: string): void {
     return;
   }
   const renderer = genericRenderWindow.value!.getRenderer();
-  renderer.removeActor(hybridDb[id]!.actor);
+  renderer.removeActor(hybridDb[id].actor);
   const renderWindow = genericRenderWindow.value!.getRenderWindow();
   renderWindow.render();
   delete hybridDb[id];
@@ -66,7 +66,7 @@ function performSetVisibility(id: string, visibility: boolean): void {
   if (!hybridDb[id]) {
     return;
   }
-  hybridDb[id]!.actor.setVisibility(visibility);
+  hybridDb[id].actor.setVisibility(visibility);
   const renderWindow = genericRenderWindow.value!.getRenderWindow();
   renderWindow.render();
 }

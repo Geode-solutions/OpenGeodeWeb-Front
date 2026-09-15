@@ -12,6 +12,7 @@ import type { Observable } from "rxjs";
 import { database } from "@ogw_internal/database/database.js";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types.js";
+import type { Ref } from "vue";
 
 interface CameraPositionRecord {
   id?: number;
@@ -26,31 +27,31 @@ export const useCameraManagerStore = defineStore("camera_manager", () => {
     number
   >;
 
-  function refAllCameraPositions() {
+  function refAllCameraPositions(): Readonly<Ref<CameraPositionRecord[]>> {
     // Dexie's liveQuery() returns Dexie's own minimal Observable shape, not an
     // Actual rxjs Observable instance (useObservable's declared parameter type);
     // The two are structurally close enough at runtime (vueuse only calls
     // `.subscribe`) but not identical, hence the cast.
     return useObservable(
-      liveQuery(() => camera_positions_db.toArray()) as unknown as Observable<
+      liveQuery(async () => camera_positions_db.toArray()) as unknown as Observable<
         CameraPositionRecord[]
       >,
       { initialValue: [] as CameraPositionRecord[] },
     );
   }
 
-  async function getCameraPosition(id: number) {
-    return await camera_positions_db.get(id);
+  async function getCameraPosition(id: number): Promise<CameraPositionRecord | undefined> {
+    return camera_positions_db.get(id);
   }
 
-  async function saveCameraPosition(name: string, camera_options: CameraOptions) {
+  async function saveCameraPosition(name: string, camera_options: CameraOptions): Promise<void> {
     await camera_positions_db.put({
       name,
       camera_options,
-    } as CameraPositionRecord);
+    });
   }
 
-  async function restoreCameraPosition(id: number) {
+  async function restoreCameraPosition(id: number): Promise<void> {
     const position = await camera_positions_db.get(id);
     if (position) {
       const schema = viewer_schemas.opengeodeweb_viewer.viewer.update_camera;
@@ -59,11 +60,11 @@ export const useCameraManagerStore = defineStore("camera_manager", () => {
     }
   }
 
-  async function deleteCameraPosition(id: number) {
+  async function deleteCameraPosition(id: number): Promise<void> {
     await camera_positions_db.delete(id);
   }
 
-  async function renameCameraPosition(id: number, newName: string) {
+  async function renameCameraPosition(id: number, newName: string): Promise<void> {
     await camera_positions_db.update(id, { name: newName });
   }
 

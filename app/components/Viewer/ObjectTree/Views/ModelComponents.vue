@@ -73,7 +73,7 @@ const {
   applySearchFilter,
 } = useTreeFilter(localCategories);
 
-function onUpdateSelection(newSelection: string[]) {
+function onUpdateSelection(newSelection: string[]): void {
   const finalSelection = applySearchFilter(newSelection, visibleComponents.value);
   updateVisibility(finalSelection as string[]);
 }
@@ -116,7 +116,7 @@ const itemsForTreeView = computed<TreeViewItem[]>(() => {
   return result;
 });
 
-function showContextMenu(event: unknown, item: TreeViewItem) {
+function showContextMenu(event: unknown, item: TreeViewItem): void {
   const actualItem = item.raw || item;
   const typeId = actualItem.category || actualItem.id;
   const typeItem = itemsForTreeView.value.find((type) => type.id === typeId);
@@ -139,7 +139,7 @@ function handleHoverEnter({
 }: {
   item: TreeViewItem;
   immediate?: boolean;
-}) {
+}): void {
   const actualItem = item.raw || item;
 
   if (!actualItem.category && (!actualItem.children || actualItem.children.length === 0)) {
@@ -157,7 +157,7 @@ function handleHoverEnter({
   );
 }
 
-function handleHoverLeave() {
+function handleHoverLeave(): void {
   onHoverLeave(id);
 }
 
@@ -174,9 +174,9 @@ function getFocusBlockIds(item: TreeViewItem): string[] {
   return ids as unknown as string[];
 }
 
-function expandAll() {
+function expandAll(): void {
   const allIds: string[] = [];
-  function traverse(itemsList: TreeViewItem[]) {
+  function traverse(itemsList: TreeViewItem[]): void {
     for (const item of itemsList) {
       if (item.children && item.children.length > 0) {
         allIds.push(item.id);

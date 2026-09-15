@@ -97,14 +97,14 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
     await dataStyleState.clear();
 
-    const style_promises = Object.entries(stylesSnapshot).map(([id, style]) =>
+    const style_promises = Object.entries(stylesSnapshot).map(async ([id, style]) =>
       data_style_db.put(structuredClone({ ...style, id })),
     );
-    const component_style_promises = Object.values(componentStylesSnapshot).map((style) =>
+    const component_style_promises = Object.values(componentStylesSnapshot).map(async (style) =>
       component_datastyle_db.put(structuredClone(style)),
     );
     const model_component_type_style_promises = Object.values(modelComponentTypeStylesSnapshot).map(
-      (style) => model_component_type_datastyle_db.put(structuredClone(style)),
+      async (style) => model_component_type_datastyle_db.put(structuredClone(style)),
     );
 
     await Promise.all([
@@ -114,7 +114,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     ]);
   }
 
-  function applyAllStylesFromState() {
+  async function applyAllStylesFromState() {
     const ids = Object.keys(dataStyleState.styles.value);
     const promises = ids.map(async (id) => {
       const meta = await dataStore.item(id);

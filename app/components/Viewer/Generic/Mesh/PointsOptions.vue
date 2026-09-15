@@ -1,18 +1,14 @@
 <script setup lang="ts">
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
-// oxlint-disable import/consistent-type-specifier-style -- combining the default import with the type import avoids a duplicate-imports violation on this same module; using disable-next-line here is fragile because a formatter can re-wrap the import onto multiple lines and shift the flagged line
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import ViewerOptionsSizeSlider from "@ogw_front/components/Viewer/Options/Sliders/Size.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
-
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
@@ -24,11 +20,15 @@ interface Props {
   tooltip?: string;
 }
 
-const { itemProps, btnImage, tooltip = "Points options" } = defineProps<Props>();
+const {
+  itemProps,
+  btnImage,
+  tooltip = "Points options",
+} = defineProps<Props>();
 
 const id = toRef(() => itemProps.id);
 
-const visibility = computed({
+const visibility = computed<boolean>({
   get: () => dataStyleStore.meshPointsVisibility(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
@@ -37,7 +37,7 @@ const visibility = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const size = computed({
+const size = computed<number>({
   get: () => dataStyleStore.meshPointsSize(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
@@ -46,7 +46,7 @@ const size = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const coloring_style_key = computed({
+const coloring_style_key = computed<string>({
   get: () => dataStyleStore.meshPointsActiveColoring(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
@@ -64,28 +64,32 @@ const color = computed<RGBAColor | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_name = computed({
+const vertex_attribute_name = computed<string | undefined>({
   get: () => dataStyleStore.meshPointsVertexAttributeName(id.value),
   set: async (newValue) => {
     if (newValue === undefined) {
       return;
     }
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPointsVertexAttributeName(targetId, newValue)),
+      Promise.resolve(
+        dataStyleStore.setMeshPointsVertexAttributeName(targetId, newValue),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_item = computed({
+const vertex_attribute_item = computed<string | undefined>({
   get: () => dataStyleStore.meshPointsVertexAttributeItem(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPointsVertexAttributeItem(targetId, newValue)),
+      Promise.resolve(
+        dataStyleStore.setMeshPointsVertexAttributeItem(targetId, newValue),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_range = computed({
+const vertex_attribute_range = computed<[number, number] | undefined>({
   get: () => dataStyleStore.meshPointsVertexAttributeRange(id.value),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -93,25 +97,39 @@ const vertex_attribute_range = computed({
       return;
     }
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPointsVertexAttributeRange(targetId, minimum, maximum)),
+      Promise.resolve(
+        dataStyleStore.setMeshPointsVertexAttributeRange(
+          targetId,
+          minimum,
+          maximum,
+        ),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_color_map = computed({
+const vertex_attribute_color_map = computed<Map<string, RGBAColor>>({
   get: () => dataStyleStore.meshPointsVertexAttributeColorMap(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPointsVertexAttributeColorMap(targetId, newValue)),
+      Promise.resolve(
+        dataStyleStore.setMeshPointsVertexAttributeColorMap(targetId, newValue),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_no_data_color = computed<RGBAColor | undefined>({
-  get: () => dataStyleStore.meshPointsVertexAttributeNoDataColor(id.value) as RGBAColor | undefined,
+  get: () =>
+    dataStyleStore.meshPointsVertexAttributeNoDataColor(id.value) as
+      | RGBAColor
+      | undefined,
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshPointsVertexAttributeNoDataColor(targetId, newValue),
+      dataStyleStore.setMeshPointsVertexAttributeNoDataColor(
+        targetId,
+        newValue,
+      ),
     );
     hybridViewerStore.remoteRender();
   },
@@ -137,7 +155,10 @@ const vertex_attribute_no_data_color = computed<RGBAColor | undefined>({
       </v-row>
       <template v-if="visibility">
         <v-divider class="my-2" />
-        <ViewerOptionsSizeSlider data-testid="meshPointsSizeSlider" v-model="size" />
+        <ViewerOptionsSizeSlider
+          data-testid="meshPointsSizeSlider"
+          v-model="size"
+        />
         <ViewerOptionsColoringTypeSelector
           :id="id"
           v-model:coloring_style_key="coloring_style_key"
@@ -146,7 +167,9 @@ const vertex_attribute_no_data_color = computed<RGBAColor | undefined>({
           v-model:vertex_attribute_item="vertex_attribute_item"
           v-model:vertex_attribute_range="vertex_attribute_range"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
-          v-model:vertex_attribute_no_data_color="vertex_attribute_no_data_color"
+          v-model:vertex_attribute_no_data_color="
+            vertex_attribute_no_data_color
+          "
           :capabilities="{ vertex: { available: false } }"
         />
       </template>

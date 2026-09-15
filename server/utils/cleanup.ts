@@ -44,7 +44,7 @@ async function deleteFolderRecursive(folderPath: string): Promise<void> {
     `Failed to delete folder ${folderPath} after ${MAX_DELETE_FOLDER_RETRIES} retries`,
   );
 }
-function killHttpMicroservice(microservice: Microservice): Promise<void> {
+async function killHttpMicroservice(microservice: Microservice): Promise<void> {
   console.log("killHttpMicroservice", {
     ...microservice,
   });
@@ -63,13 +63,13 @@ function killHttpMicroservice(microservice: Microservice): Promise<void> {
     message: failMessage,
   });
 }
-function killWebsocketMicroservice(microservice: Microservice): Promise<void> {
+async function killWebsocketMicroservice(microservice: Microservice): Promise<void> {
   console.log("killWebsocketMicroservice", {
     ...microservice,
   });
   const failMessage = `Failed to kill ${microservice.name}`;
   const successMessage = `Disconnected from ${microservice.name} WebSocket server`;
-  function do_kill() {
+  async function do_kill() {
     // oxlint-disable-next-line promise/avoid-new
     return new Promise<void>((resolve) => {
       const socket = new WebSocket(microservice.url as string);
@@ -132,7 +132,7 @@ async function killMicroservices(microservices: Microservice[]): Promise<void> {
     microservices,
   });
   const results = await Promise.allSettled(
-    microservices.map((microservice) => killMicroservice(microservice)),
+    microservices.map(async (microservice) => killMicroservice(microservice)),
   );
   const killed = microservices.filter((_, index) => results[index]?.status === "fulfilled");
   for (let i = 0; i < killed.length; i += 1) {

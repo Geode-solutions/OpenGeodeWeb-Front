@@ -9,10 +9,12 @@ interface Props {
 
 const { isOverTreeview, isOverToolbar = false } = defineProps<Props>();
 
-const emit = defineEmits<{
+interface Emits {
   drag: [event: MouseEvent];
   click: [event: MouseEvent];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 
 const ADAPTIVE_BLUR_VAL = "15px";
 const ADAPTIVE_OPACITY_VAL = 0.85;
@@ -51,14 +53,14 @@ let dragMoved = false;
 let dragStartClientX = 0;
 let dragStartClientY = 0;
 
-function onMouseDown(event: MouseEvent) {
+function onMouseDown(event: MouseEvent): void {
   dragMoved = false;
   dragStartClientX = event.clientX;
   dragStartClientY = event.clientY;
   emit("drag", event);
 }
 
-function onMouseUp(event: MouseEvent) {
+function onMouseUp(event: MouseEvent): void {
   const deltaX = event.clientX - dragStartClientX;
   const deltaY = event.clientY - dragStartClientY;
   if (Math.hypot(deltaX, deltaY) > dragThreshold) {
@@ -66,7 +68,7 @@ function onMouseUp(event: MouseEvent) {
   }
 }
 
-function onCenterClick(event: MouseEvent) {
+function onCenterClick(event: MouseEvent): void {
   event.stopPropagation();
   if (!dragMoved) {
     emit("click", event);
@@ -87,7 +89,12 @@ function onCenterClick(event: MouseEvent) {
     @mouseup="onMouseUp"
     @click.stop="onCenterClick"
   >
-    <v-icon icon="mdi-information-outline" size="28" color="primary" style="pointer-events: none" />
+    <v-icon
+      icon="mdi-information-outline"
+      size="28"
+      color="primary"
+      style="pointer-events: none"
+    />
   </v-btn>
 </template>
 
@@ -105,8 +112,10 @@ function onCenterClick(event: MouseEvent) {
   position: absolute;
   inset: 0;
   background: rgba(255, 255, 255, var(--adaptive-opacity));
-  backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
-  -webkit-backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
+  backdrop-filter: blur(var(--adaptive-blur))
+    brightness(var(--adaptive-brightness));
+  -webkit-backdrop-filter: blur(var(--adaptive-blur))
+    brightness(var(--adaptive-brightness));
   z-index: 0;
   pointer-events: none;
   border-radius: inherit;

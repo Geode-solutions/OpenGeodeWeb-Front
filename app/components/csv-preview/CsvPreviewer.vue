@@ -33,26 +33,28 @@ const MIN_AVG_COUNT = 1.5;
 const MAX_VARIANCE = 0.5;
 const PREVIEW_ROWS_LIMIT = 101;
 
-const emit = defineEmits<{
+interface Emits {
   "update:modelValue": [value: boolean];
   confirm: [result: CsvParseResult];
-}>();
+}
 
-const separator = ref(",");
-const headerRow = ref(0);
-const firstRow = ref(1);
+const emit = defineEmits<Emits>();
+
+const separator = ref<string>(",");
+const headerRow = ref<number>(0);
+const firstRow = ref<number>(1);
 
 const xColumn = ref<string | undefined>(undefined);
 const yColumn = ref<string | undefined>(undefined);
 const zColumn = ref<string | undefined>(undefined);
 
-const rawContent = ref("");
+const rawContent = ref<string>("");
 const previewRows = ref<CsvRow[]>([]);
 const previewHeaders = ref<CsvHeader[]>([]);
-const loading = ref(false);
+const loading = ref<boolean>(false);
 const toggleLoading = useToggle(loading);
 
-function autoDetectSeparator(content: string) {
+function autoDetectSeparator(content: string): string {
   const lines = content
     .slice(0, MAX_CONTENT_SLICE)
     .split(/\r?\n/u)
@@ -63,11 +65,17 @@ function autoDetectSeparator(content: string) {
 
   for (const candidate of candidates) {
     const counts = lines.map((line) => line.split(candidate).length);
-    const average = counts.reduce((total, count) => total + count, 0) / counts.length;
+    const average =
+      counts.reduce((total, count) => total + count, 0) / counts.length;
     const variance =
-      counts.reduce((total, count) => total + (count - average) ** 2, 0) / counts.length;
+      counts.reduce((total, count) => total + (count - average) ** 2, 0) /
+      counts.length;
 
-    if (average > MIN_AVG_COUNT && variance < MAX_VARIANCE && average > maxCount) {
+    if (
+      average > MIN_AVG_COUNT &&
+      variance < MAX_VARIANCE &&
+      average > maxCount
+    ) {
       maxCount = average;
       best = candidate;
     }
@@ -75,12 +83,14 @@ function autoDetectSeparator(content: string) {
   return best;
 }
 
-function parseContent() {
+function parseContent(): string[] {
   if (!rawContent.value) {
     return;
   }
 
-  const allLines = rawContent.value.split(/\r?\n/u).filter((line) => line.trim() !== "");
+  const allLines = rawContent.value
+    .split(/\r?\n/u)
+    .filter((line) => line.trim() !== "");
 
   function splitLine(line: string): string[] {
     if (!separator.value) {
@@ -89,8 +99,7 @@ function parseContent() {
     const result = [];
     let current = "";
     let inQuotes = false;
-    for (let index = 0; index < line.length; index += 1) {
-      const char = line[index];
+    for (const char of line) {
       if (char === '"') {
         inQuotes = !inQuotes;
       } else if (char === separator.value && !inQuotes) {
@@ -114,7 +123,10 @@ function parseContent() {
     sortable: true,
   }));
 
-  const dataLines = allLines.slice(firstRow.value, firstRow.value + PREVIEW_ROWS_LIMIT);
+  const dataLines = allLines.slice(
+    firstRow.value,
+    firstRow.value + PREVIEW_ROWS_LIMIT,
+  );
   previewRows.value = dataLines.map((line) => {
     const row = splitLine(line);
     const obj: CsvRow = {};
@@ -125,7 +137,7 @@ function parseContent() {
   });
 }
 
-function readAndParse() {
+function readAndParse(): void {
   if (!file) {
     return;
   }
@@ -133,7 +145,9 @@ function readAndParse() {
 
   const reader = new FileReader();
   reader.addEventListener("load", (event) => {
-    rawContent.value = String((event.target as FileReader | null)?.result ?? "");
+    rawContent.value = String(
+      (event.target as FileReader | null)?.result ?? "",
+    );
     if (!separator.value || separator.value === ",") {
       separator.value = autoDetectSeparator(rawContent.value);
     }
@@ -145,10 +159,17 @@ function readAndParse() {
   });
   reader.readAsText(file, "utf8");
 }
-const computedResult = computed(() => {
-  const xIndex = previewHeaders.value.findIndex((header) => header.key === xColumn.value);
-  const yIndex = previewHeaders.value.findIndex((header) => header.key === yColumn.value);
-  const zIndex = previewHeaders.value.findIndex((header) => header.key === zColumn.value);
+
+const computedResult = computed<CsvParseResult>(() => {
+  const xIndex = previewHeaders.value.findIndex(
+    (header) => header.key === xColumn.value,
+  );
+  const yIndex = previewHeaders.value.findIndex(
+    (header) => header.key === yColumn.value,
+  );
+  const zIndex = previewHeaders.value.findIndex(
+    (header) => header.key === zColumn.value,
+  );
 
   return {
     firstRow: firstRow.value,
@@ -160,7 +181,7 @@ const computedResult = computed(() => {
   };
 });
 
-const isFormValid = computed(
+const isFormValid = computed<boolean>(
   () =>
     separator.value !== "" &&
     separator.value !== undefined &&
@@ -197,7 +218,7 @@ watch(
   },
 );
 
-function onConfirm() {
+function onConfirm(): void {
   emit("confirm", computedResult.value);
   emit("update:modelValue", false);
 }
@@ -209,7 +230,10 @@ function onConfirm() {
     @update:model-value="emit('update:modelValue', $event)"
     max-width="1200px"
   >
-    <v-card class="glass-ui rounded-xl overflow-hidden border-opacity-10" color="grey-darken-4">
+    <v-card
+      class="glass-ui rounded-xl overflow-hidden border-opacity-10"
+      color="grey-darken-4"
+    >
       <v-toolbar color="transparent" flat class="px-4">
         <v-icon icon="mdi-file-table" size="32" color="primary" class="ml-1" />
         <v-toolbar-title class="text-h6 font-weight-bold text-white">

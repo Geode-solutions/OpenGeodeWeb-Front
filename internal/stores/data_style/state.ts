@@ -232,7 +232,7 @@ export function useDataStyleState() {
 
   function getComponentStyle(modelId: string, componentId: string): ModelComponentStyle {
     const cacheKey = `${modelId}_${componentId}`;
-    return merge({ coloring: {} }, componentStyles.value[cacheKey]) as ModelComponentStyle;
+    return merge({ coloring: {} }, componentStyles.value[cacheKey]);
   }
 
   function getModelComponentTypeStyle(
@@ -240,10 +240,7 @@ export function useDataStyleState() {
     componentType: string,
   ): ModelComponentTypeStyle {
     const cacheKey = `${modelId}_${componentType}`;
-    return merge(
-      { coloring: {} },
-      modelComponentTypeStyles.value[cacheKey],
-    ) as ModelComponentTypeStyle;
+    return merge({ coloring: {} }, modelComponentTypeStyles.value[cacheKey]);
   }
 
   async function clear(): Promise<void> {

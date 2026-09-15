@@ -71,9 +71,9 @@ function useModelSurfacesPolygonAttribute() {
       name !== undefined &&
       name in storedConfigs &&
       item !== undefined &&
-      item in storedConfigs[name]!
+      item in storedConfigs[name]
     ) {
-      return storedConfigs[name]![item]!;
+      return storedConfigs[name][item];
     }
     return {
       minimum: undefined,
@@ -125,7 +125,7 @@ function useModelSurfacesPolygonAttribute() {
   ): number {
     const { storedConfigs } = modelSurfacesPolygonAttribute(modelId, surfaceId);
     if (storedConfigs && name !== undefined && name in storedConfigs) {
-      return storedConfigs[name]!.lastItem;
+      return storedConfigs[name].lastItem;
     }
     return 0;
   }
@@ -177,7 +177,7 @@ function useModelSurfacesPolygonAttribute() {
       colorMap,
       no_data_color,
     });
-    const points = getRGBPointsFromPreset(colorMap as string);
+    const points = getRGBPointsFromPreset(colorMap);
     const surface_viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
     const params = {
       id: modelId,
@@ -194,7 +194,7 @@ function useModelSurfacesPolygonAttribute() {
       params,
     });
   }
-  function applyPolygonAttribute(modelId: string, surfaceIds: string[]) {
+  async function applyPolygonAttribute(modelId: string, surfaceIds: string[]) {
     const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
     const item = modelSurfacesPolygonAttributeItem(modelId, surfaceIds[0]);
     const storedConfig = modelSurfacesPolygonAttributeStoredConfig(
@@ -214,9 +214,9 @@ function useModelSurfacesPolygonAttribute() {
     if (isModelSurfacesPolygonAttributeValid(attribute)) {
       return setModelSurfacesPolygonAttribute(modelId, surfaceIds, attribute);
     }
-    return Promise.resolve();
+    return;
   }
-  function setModelSurfacesPolygonAttributeName(
+  async function setModelSurfacesPolygonAttributeName(
     modelId: string,
     surfaceIds: string[],
     name: string,
@@ -228,7 +228,7 @@ function useModelSurfacesPolygonAttribute() {
     });
     return applyPolygonAttribute(modelId, surfaceIds);
   }
-  function setModelSurfacesPolygonAttributeItem(
+  async function setModelSurfacesPolygonAttributeItem(
     modelId: string,
     surfaceIds: string[],
     item: number,
@@ -238,7 +238,7 @@ function useModelSurfacesPolygonAttribute() {
     });
     return applyPolygonAttribute(modelId, surfaceIds);
   }
-  function setModelSurfacesPolygonAttributeRange(
+  async function setModelSurfacesPolygonAttributeRange(
     modelId: string,
     surfaceIds: string[],
     minimum: number,
@@ -252,7 +252,7 @@ function useModelSurfacesPolygonAttribute() {
     });
     return applyPolygonAttribute(modelId, surfaceIds);
   }
-  function setModelSurfacesPolygonAttributeColorMap(
+  async function setModelSurfacesPolygonAttributeColorMap(
     modelId: string,
     surfaceIds: string[],
     colorMap: string | undefined,

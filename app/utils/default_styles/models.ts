@@ -25,10 +25,79 @@ function emptyAttributeConfig(): AttributeConfig {
   return { name: undefined, storedConfigs: {} };
 }
 
+interface ModelComponentColoring {
+  active: string;
+  constant: RGBAColor;
+  vertex: AttributeConfig;
+}
+
+interface ModelLinesColoring extends ModelComponentColoring {
+  edge: AttributeConfig;
+}
+
+interface ModelSurfacesColoring extends ModelComponentColoring {
+  polygon: AttributeConfig;
+}
+
+interface ModelBlocksColoring extends ModelComponentColoring {
+  polyhedron: AttributeConfig;
+}
+
+interface ModelCornersStyle {
+  visibility: boolean;
+  coloring: ModelComponentColoring;
+}
+
+interface ModelLinesStyle {
+  visibility: boolean;
+  coloring: ModelLinesColoring;
+}
+
+interface ModelSurfacesStyle {
+  visibility: boolean;
+  coloring: ModelSurfacesColoring;
+}
+
+interface ModelBlocksStyle {
+  visibility: boolean;
+  coloring: ModelBlocksColoring;
+}
+
+interface ModelPointsStyle {
+  visibility: boolean;
+  size: number;
+}
+
+interface ModelEdgesStyle {
+  visibility: boolean;
+  width: number;
+}
+
+interface ModelWithBlocksStyle {
+  visibility: boolean;
+  coloring: { active: string; constant: RGBAColor };
+  corners: ModelCornersStyle;
+  lines: ModelLinesStyle;
+  surfaces: ModelSurfacesStyle;
+  blocks: ModelBlocksStyle;
+  points: ModelPointsStyle;
+  edges: ModelEdgesStyle;
+}
+
+interface ModelWithoutBlocksStyle {
+  visibility: boolean;
+  coloring: { active: string; constant: RGBAColor };
+  corners: ModelCornersStyle;
+  lines: ModelLinesStyle;
+  surfaces: ModelSurfacesStyle;
+  points: ModelPointsStyle;
+  edges: ModelEdgesStyle;
+}
+
 function modelCornersDefaultStyle(
   visibility: boolean = CORNERS_DEFAULT_VISIBILITY,
   constant: RGBAColor = CORNERS_DEFAULT_COLOR,
-) {
+): ModelCornersStyle {
   return {
     visibility,
     coloring: {
@@ -42,7 +111,7 @@ function modelCornersDefaultStyle(
 function modelLinesDefaultStyle(
   visibility: boolean = LINES_DEFAULT_VISIBILITY,
   constant: RGBAColor = LINES_DEFAULT_COLOR,
-) {
+): ModelLinesStyle {
   return {
     visibility,
     coloring: {
@@ -57,7 +126,7 @@ function modelLinesDefaultStyle(
 function modelSurfacesDefaultStyle(
   visibility: boolean = SURFACES_DEFAULT_VISIBILITY,
   constant: RGBAColor = SURFACES_DEFAULT_COLOR,
-) {
+): ModelSurfacesStyle {
   return {
     visibility,
     coloring: {
@@ -72,7 +141,7 @@ function modelSurfacesDefaultStyle(
 function modelBlocksDefaultStyle(
   visibility: boolean = BLOCKS_DEFAULT_VISIBILITY,
   constant: RGBAColor = BLOCKS_DEFAULT_COLOR,
-) {
+): ModelBlocksStyle {
   return {
     visibility,
     coloring: {
@@ -87,14 +156,14 @@ function modelBlocksDefaultStyle(
 function modelPointsDefaultStyle(
   visibility: boolean = POINTS_DEFAULT_VISIBILITY,
   size: number = POINTS_DEFAULT_SIZE,
-) {
+): ModelPointsStyle {
   return { visibility, size };
 }
 
 function modelEdgesDefaultStyle(
   visibility: boolean = EDGES_DEFAULT_VISIBILITY,
   width: number = EDGES_DEFAULT_WIDTH,
-) {
+): ModelEdgesStyle {
   return { visibility, width };
 }
 
@@ -105,7 +174,7 @@ const DEFAULT_MODEL_COMPONENT_TYPE_STYLES = {
   Block: modelBlocksDefaultStyle(),
 };
 
-function brepDefaultStyle() {
+function brepDefaultStyle(): ModelWithBlocksStyle {
   return {
     visibility: true,
     coloring: {
@@ -121,7 +190,7 @@ function brepDefaultStyle() {
   };
 }
 
-function crossSectionDefaultStyle() {
+function crossSectionDefaultStyle(): ModelWithoutBlocksStyle {
   return {
     visibility: true,
     coloring: {
@@ -136,7 +205,7 @@ function crossSectionDefaultStyle() {
   };
 }
 
-function structuralModelDefaultStyle() {
+function structuralModelDefaultStyle(): ModelWithBlocksStyle {
   return {
     visibility: true,
     coloring: {
@@ -152,7 +221,7 @@ function structuralModelDefaultStyle() {
   };
 }
 
-function sectionDefaultStyle() {
+function sectionDefaultStyle(): ModelWithoutBlocksStyle {
   return {
     visibility: true,
     coloring: {
@@ -167,7 +236,7 @@ function sectionDefaultStyle() {
   };
 }
 
-function implicitCrossSectionDefaultStyle() {
+function implicitCrossSectionDefaultStyle(): ModelWithoutBlocksStyle {
   return {
     visibility: true,
     coloring: {
@@ -182,7 +251,7 @@ function implicitCrossSectionDefaultStyle() {
   };
 }
 
-function implicitStructuralModelDefaultStyle() {
+function implicitStructuralModelDefaultStyle(): ModelWithBlocksStyle {
   return {
     visibility: true,
     coloring: {

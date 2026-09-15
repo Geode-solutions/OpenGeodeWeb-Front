@@ -20,7 +20,7 @@ interface FetchRawOptions {
   expectEvent?: boolean;
 }
 
-function fetchRaw(
+async function fetchRaw(
   {
     route,
     method,
@@ -36,9 +36,9 @@ function fetchRaw(
   if (expectEvent) {
     const value = "text/event-stream";
     if (_.isEmpty(headers)) {
-      headers["Accept"] = value;
+      headers.Accept = value;
     } else {
-      headers["Accept"] = `${headers["Accept"]}, ${value}`;
+      headers.Accept = `${headers.Accept}, ${value}`;
     }
   }
 
@@ -50,7 +50,7 @@ function fetchRaw(
     request_options.max_retry = max_retry;
   }
 
-  function doFetch() {
+  async function doFetch() {
     return $fetch(route, {
       baseURL,
       ...request_options,

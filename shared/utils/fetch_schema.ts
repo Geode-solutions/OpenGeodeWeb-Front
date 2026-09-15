@@ -18,7 +18,7 @@ interface FetchSchemaOptions {
   expectEvent?: boolean;
 }
 
-function fetchSchema(
+async function fetchSchema(
   { schema, params = {}, baseURL, headers, timeout, expectEvent = false }: FetchSchemaOptions,
   {
     request_error_function,

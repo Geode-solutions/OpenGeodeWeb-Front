@@ -51,7 +51,7 @@ describe("cloud store", () => {
         const cloudStore = useCloudStore();
         const feedbackStore = useFeedbackStore();
 
-        mockedFetch.mockImplementation(((
+        mockedFetch.mockImplementation((async (
           _route: unknown,
           options: {
             // oxlint-disable-next-line eslint/id-length -- mirrors the real ofetch/vitest API field name (`ok`/`fn`)
@@ -61,7 +61,7 @@ describe("cloud store", () => {
           const data = { url: "test.com" };
           // oxlint-disable-next-line eslint/id-length
           options.onResponse?.({ response: { ok: true, _data: data } });
-          return Promise.resolve(data);
+          return data;
         }) as unknown as typeof $fetch);
 
         await cloudStore.launch("noreply@example.com");
@@ -77,7 +77,7 @@ describe("cloud store", () => {
 
         const error = createError({ statusCode: 500, statusMessage: "500 Internal Server Error" });
 
-        mockedFetch.mockImplementation(((
+        mockedFetch.mockImplementation((async (
           _route: unknown,
           options: {
             onResponseError?: (context: {
@@ -88,7 +88,7 @@ describe("cloud store", () => {
           options.onResponseError?.({
             response: { status: 500, name: "Error", description: "500 Internal Server Error" },
           });
-          return Promise.reject(error);
+          throw error;
         }) as unknown as typeof $fetch);
 
         await expect(cloudStore.launch("noreply@example.com")).rejects.toThrow(

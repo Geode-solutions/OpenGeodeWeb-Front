@@ -32,7 +32,7 @@ const {
   firstRow = 1,
 } = defineProps<Props>();
 
-function getColumnClass(key: string) {
+function getColumnClass(key: string): string {
   if (key === coordinates.x) {
     return "x-col-highlight";
   }
@@ -72,14 +72,22 @@ function getColumnClass(key: string) {
       fixed-header
       item-height="35"
     >
-      <template v-for="header in headers" v-slot:[`item.${header.key}`]="{ item }">
-        <div :class="getColumnClass(header.key)" class="px-2 py-1 rounded text-truncate">
+      <template
+        v-for="header in headers"
+        v-slot:[`item.${header.key}`]="{ item }"
+      >
+        <div
+          :class="getColumnClass(header.key)"
+          class="px-2 py-1 rounded text-truncate"
+        >
           {{ item[header.key] }}
         </div>
       </template>
 
       <template #no-data>
-        <div class="d-flex flex-column align-center justify-center h-100 py-12 opacity-40">
+        <div
+          class="d-flex flex-column align-center justify-center h-100 py-12 opacity-40"
+        >
           <v-icon size="64" icon="mdi-table-off" />
           <div class="text-h6 mt-2">No preview available</div>
           <div class="text-caption">Check your parser settings</div>

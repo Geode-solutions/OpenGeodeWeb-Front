@@ -76,6 +76,10 @@ export default defineEventHandler(async (event) => {
   if (savedFiles.length === 0) {
     throw createError({ statusCode: 400, message: "No file received" });
   }
-  await Promise.all(savedFiles.map(async (file) => await registerExtensionFile(projectName, file)));
+  await Promise.all(
+    savedFiles.map(async (file) => {
+      await registerExtensionFile(projectName, file);
+    }),
+  );
   return { statusCode: CODE_201 };
 });

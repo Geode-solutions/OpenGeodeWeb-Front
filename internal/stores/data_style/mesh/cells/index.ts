@@ -59,7 +59,7 @@ export function useMeshCellsStyle() {
     throw new Error(`Unknown mesh cells coloring type: ${type}`);
   }
 
-  function applyMeshCellsStyle(id: string) {
+  async function applyMeshCellsStyle(id: string) {
     return Promise.all([
       meshCellsVisibility.setMeshCellsVisibility(id, meshCellsVisibility.meshCellsVisibility(id)),
       setMeshCellsActiveColoring(id, meshCellsActiveColoring(id)),

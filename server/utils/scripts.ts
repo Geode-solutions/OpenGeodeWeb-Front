@@ -18,7 +18,7 @@ import { setAppBaseUrl } from "@geode/opengeodeweb-front/shared/scripts.ts";
 const BYTES_PER_KIBIBYTE = 1024;
 const MAX_ERROR_BUFFER_KIBIBYTES = 64;
 const MAX_ERROR_BUFFER_BYTES = MAX_ERROR_BUFFER_KIBIBYTES * BYTES_PER_KIBIBYTE;
-function getAvailablePort(): Promise<number> {
+async function getAvailablePort(): Promise<number> {
   return getPort({
     host: "localhost",
     random: true,
@@ -41,7 +41,7 @@ interface NamedChildProcess extends child_process.ChildProcessByStdio<null, Read
 }
 
 // oxlint-disable-next-line max-lines-per-function
-function waitForReady(
+async function waitForReady(
   child: NamedChildProcess,
   expectedResponse: string,
   signal?: AbortSignal,
@@ -55,7 +55,7 @@ function waitForReady(
       input: child.stderr,
     });
     let recentOutput = "";
-    function recordOutput(lineOutput: string) {
+    function recordOutput(lineOutput: string): void {
       const safeLine =
         byteLength(lineOutput) > MAX_ERROR_BUFFER_BYTES / 2
           ? `${lineOutput.slice(0, MAX_ERROR_BUFFER_BYTES / 2)}…[truncated]`
@@ -76,7 +76,7 @@ function waitForReady(
     let onClose: ((code: number | null) => void) | undefined = undefined;
     let onAbort: (() => void) | undefined = undefined;
 
-    function cleanup() {
+    function cleanup(): void {
       if (onLine) {
         readlineStdout.removeListener("line", onLine);
       }
@@ -94,7 +94,7 @@ function waitForReady(
       }
     }
 
-    function becomeReady() {
+    function becomeReady(): void {
       cleanup();
       readlineStdout.on("line", (line) => {
         console.log(`[${child.name}] ${line}`);
@@ -108,7 +108,7 @@ function waitForReady(
       resolve(child);
     }
 
-    onLine = (lineOutput) => {
+    onLine = (lineOutput): void => {
       console.log(`[${child.name}] ${lineOutput}`);
       recordOutput(lineOutput);
       if (lineOutput.includes(expectedResponse)) {
@@ -116,7 +116,7 @@ function waitForReady(
       }
     };
 
-    onErrLine = (line) => {
+    onErrLine = (line): void => {
       console.log(`[${child.name}] ${line}`);
       recordOutput(line);
       if (line.includes(expectedResponse)) {
@@ -124,12 +124,12 @@ function waitForReady(
       }
     };
 
-    onError = (err) => {
+    onError = (err): void => {
       cleanup();
       reject(err);
     };
 
-    onClose = (code) => {
+    onClose = (code): void => {
       console.log(`[${child.name}] exited with code ${code}`);
       cleanup();
       reject(
@@ -139,7 +139,7 @@ function waitForReady(
       );
     };
 
-    onAbort = () => {
+    onAbort = (): void => {
       cleanup();
       reject(new Error(`[${child.name}] timed out waiting for "${expectedResponse}"`));
     };

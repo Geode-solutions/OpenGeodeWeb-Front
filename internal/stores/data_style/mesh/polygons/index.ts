@@ -88,7 +88,7 @@ export function useMeshPolygonsStyle() {
   const meshPolygonsVisibility = useMeshPolygonsVisibilityStyle();
   const coloringStyle = useMeshPolygonsColoringStyle();
 
-  function applyMeshPolygonsStyle(id: string) {
+  async function applyMeshPolygonsStyle(id: string) {
     return Promise.all([
       meshPolygonsVisibility.setMeshPolygonsVisibility(
         id,

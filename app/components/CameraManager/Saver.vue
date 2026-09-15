@@ -1,16 +1,14 @@
 <script setup lang="ts">
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
+import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types.js";
 import { useCameraManagerStore } from "@ogw_front/stores/camera_manager";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types.js";
 
 const cameraManagerStore = useCameraManagerStore();
 const hybridViewerStore = useHybridViewerStore();
 
-const newPositionName = ref("");
+const newPositionName = ref<string>("");
 
-async function saveCurrentPosition() {
+async function saveCurrentPosition(): void {
   if (!newPositionName.value) {
     return;
   }

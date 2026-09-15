@@ -126,7 +126,7 @@ function performSetContainer(container: ContainerRef | undefined): void {
       has_dragged = false;
     },
   });
-  useEventListener(container as never, "mousemove", (event: MouseEvent) => {
+  useEventListener(container, "mousemove", (event: MouseEvent) => {
     if (is_moving.value) {
       has_dragged = true;
       if (imageStyle) {
@@ -136,7 +136,7 @@ function performSetContainer(container: ContainerRef | undefined): void {
     hoverHighlight(event);
   });
   let wheelEventEndTimeout: ReturnType<typeof setTimeout> | undefined = undefined;
-  useEventListener(container as never, "wheel", () => {
+  useEventListener(container, "wheel", () => {
     is_moving.value = true;
     if (imageStyle) {
       imageStyle.opacity = "0";

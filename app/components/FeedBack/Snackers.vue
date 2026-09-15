@@ -5,9 +5,9 @@ const MARGIN_BETWEEN_SNACKERS = 60;
 const FIRST_SNACKER_MARGIN = 8;
 
 const feedbackStore = useFeedbackStore();
-const show = ref(true);
+const show = ref<boolean>(true);
 
-function calc_margin(index: number) {
+function calc_margin(index: number): string {
   return `${index * MARGIN_BETWEEN_SNACKERS + FIRST_SNACKER_MARGIN}px`;
 }
 </script>
@@ -41,10 +41,14 @@ function calc_margin(index: number) {
           </template>
         </v-tooltip>
         <v-tooltip v-else-if="feedback.type === 'success'" location="left">
-          <v-icon color="white" class="justify-right"> mdi-check-circle-outline </v-icon>
+          <v-icon color="white" class="justify-right">
+            mdi-check-circle-outline
+          </v-icon>
         </v-tooltip>
         <v-tooltip v-else-if="feedback.type === 'warning'" location="left">
-          <v-icon color="white" class="justify-right"> mdi-alert-outline </v-icon>
+          <v-icon color="white" class="justify-right">
+            mdi-alert-outline
+          </v-icon>
         </v-tooltip>
       </v-col>
       <v-col cols="9" class="text-no-wrap overflow-hidden">

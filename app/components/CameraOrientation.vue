@@ -87,7 +87,7 @@ let genericRenderWindow: any = undefined;
 let cubeActor: any = undefined;
 let isInteracting = false;
 
-function initVTK() {
+function initVTK(): void {
   if (genericRenderWindow) {
     return;
   }
@@ -132,7 +132,7 @@ function initVTK() {
   renderer.resetCamera();
 }
 
-function syncCubeCamera() {
+function syncCubeCamera(): void {
   const options = hybridViewerStore.camera_options;
   if (!genericRenderWindow || isInteracting || !options.position) {
     return;
@@ -165,7 +165,7 @@ watch(hoveredFace, (newFace, oldFace) => {
   if (!cubeActor) {
     return;
   }
-  function updateFace(face: string | undefined, active: boolean) {
+  function updateFace(face: string | undefined, active: boolean): void {
     const config = orientations.find((orientation) => orientation.face === face);
     if (config) {
       cubeActor[`set${config.vtkKey}FaceProperty`]({

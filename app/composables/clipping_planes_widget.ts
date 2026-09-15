@@ -272,14 +272,22 @@ function useClippingPlanesWidget({
 
   function initLocalWidget(container: HTMLElement): void {
     cleanupLocalWidget();
-    container.addEventListener("wheel", (event) => event.stopPropagation(), { passive: true });
+    container.addEventListener(
+      "wheel",
+      (event) => {
+        event.stopPropagation();
+      },
+      { passive: true },
+    );
     localRenderWindow = vtkGenericRenderWindow({
       background: [0, 0, 0, 0],
       listenWindowResize: false,
     });
     localRenderWindow.setContainer(container);
     const camera = localRenderWindow.getRenderer().getActiveCamera();
-    camera.onModified(() => limitCameraZoomOut(camera));
+    camera.onModified(() => {
+      limitCameraZoomOut(camera);
+    });
     const canvas = (
       localRenderWindow.getApiSpecificRenderWindow() as unknown as {
         getCanvas: () => HTMLCanvasElement;

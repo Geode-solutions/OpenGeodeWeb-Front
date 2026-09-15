@@ -119,7 +119,7 @@ export function useDataCollections() {
     // The two are structurally close enough at runtime (vueuse only calls
     // `.subscribe`) but not identical, hence the cast.
     return useObservable(
-      liveQuery(() => formatedCollectionComponents(modelId)) as unknown as Observable<
+      liveQuery(async () => formatedCollectionComponents(modelId)) as unknown as Observable<
         CollectionComponentGroup[]
       >,
       {

@@ -66,9 +66,9 @@ function useMeshCellsCellAttributeStyle() {
       name !== undefined &&
       name in storedConfigs &&
       item !== undefined &&
-      item in storedConfigs[name]!
+      item in storedConfigs[name]
     ) {
-      return storedConfigs[name]![item]!;
+      return storedConfigs[name][item];
     }
     return {
       minimum: undefined,
@@ -105,7 +105,7 @@ function useMeshCellsCellAttributeStyle() {
   function meshCellsCellAttributeLastItem(id: string, name: string | undefined): number {
     const { storedConfigs } = meshCellsCellAttribute(id);
     if (storedConfigs && name !== undefined && name in storedConfigs) {
-      return storedConfigs[name]!.lastItem;
+      return storedConfigs[name].lastItem;
     }
     return 0;
   }
@@ -134,7 +134,7 @@ function useMeshCellsCellAttributeStyle() {
       colorMap,
       no_data_color,
     });
-    const points = getRGBPointsFromPreset(colorMap as string);
+    const points = getRGBPointsFromPreset(colorMap);
     const schema = meshCellsCellAttributeSchemas.attribute;
     const params = {
       id,

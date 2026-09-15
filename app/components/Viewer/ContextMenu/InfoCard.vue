@@ -28,7 +28,7 @@ const TRUNCATE_END_CHARS = 7;
 const { copy, copied } = useClipboard({ copiedDuring: COPIED_TIMEOUT });
 const copiedId = ref("");
 
-function isCopied(id: string | undefined) {
+function isCopied(id: string | undefined): boolean {
   return copied.value && copiedId.value === id;
 }
 
@@ -41,7 +41,7 @@ interface MeshComponentInfo {
   category?: string;
 }
 
-const componentName = ref("");
+const componentName = ref<string>("");
 const componentItem = ref<MeshComponentInfo | undefined>(undefined);
 
 function asString(value: unknown): string | undefined {
@@ -61,7 +61,8 @@ watch(
     if (newMeta.pickedComponentId && modelId) {
       const components = await dataStore.getAllMeshComponents(modelId);
       const comp = components.find(
-        (component: MeshComponentInfo) => component.id === newMeta.pickedComponentId,
+        (component: MeshComponentInfo) =>
+          component.id === newMeta.pickedComponentId,
       );
       if (comp) {
         componentName.value = comp.title;
@@ -72,7 +73,7 @@ watch(
   { immediate: true },
 );
 
-const cleanName = computed(() => {
+const cleanName = computed<string>(() => {
   const meta = menuStore.current_meta_data;
   if (!meta) {
     return "Unnamed Object";
@@ -83,15 +84,20 @@ const cleanName = computed(() => {
   return asString(meta.name) ?? "Unnamed Object";
 });
 
-const displayTitle = computed(() => {
+const displayTitle = computed<string>(() => {
   const name = cleanName.value;
   if (!name) {
     return "";
   }
-  return middleTruncate(name, TRUNCATE_MAX_LENGTH, TRUNCATE_START_CHARS, TRUNCATE_END_CHARS);
+  return middleTruncate(
+    name,
+    TRUNCATE_MAX_LENGTH,
+    TRUNCATE_START_CHARS,
+    TRUNCATE_END_CHARS,
+  );
 });
 
-const displayComponentTitle = computed(() => {
+const displayComponentTitle = computed<string>(() => {
   if (!componentItem.value) {
     return "";
   }
@@ -103,7 +109,7 @@ const displayComponentTitle = computed(() => {
   );
 });
 
-async function copyId(targetId: string | undefined) {
+async function copyId(targetId: string | undefined): Promise<void> {
   if (!targetId) {
     return;
   }
@@ -115,7 +121,7 @@ async function copyId(targetId: string | undefined) {
   }
 }
 
-function formatId(id: string | undefined) {
+function formatId(id: string | undefined): string {
   if (!id) {
     return "";
   }
@@ -125,12 +131,17 @@ function formatId(id: string | undefined) {
   return `${id.slice(0, ID_SLICE_START)}...${id.slice(id.length - ID_SLICE_END_OFFSET)}`;
 }
 
-const formattedId = computed(() => formatId(metaData.id));
+const formattedId = computed<string>(() => formatId(metaData.id));
 </script>
 
 <template>
   <v-fade-transition>
-    <v-sheet v-if="show" class="object-name-popover bg-transparent" @mousedown.stop @click.stop>
+    <v-sheet
+      v-if="show"
+      class="object-name-popover bg-transparent"
+      @mousedown.stop
+      @click.stop
+    >
       <GlassCard
         variant="panel"
         padding="pa-2 px-3"
@@ -189,10 +200,16 @@ const formattedId = computed(() => formatId(metaData.id));
               @click.stop="copyId(componentItem.id)"
             >
               <span class="id-text">
-                {{ isCopied(componentItem.id) ? "COPIED!" : formatId(componentItem.id) }}
+                {{
+                  isCopied(componentItem.id)
+                    ? "COPIED!"
+                    : formatId(componentItem.id)
+                }}
               </span>
               <v-icon
-                :icon="isCopied(componentItem.id) ? 'mdi-check' : 'mdi-content-copy'"
+                :icon="
+                  isCopied(componentItem.id) ? 'mdi-check' : 'mdi-content-copy'
+                "
                 size="10"
                 :color="isCopied(componentItem.id) ? 'success' : 'white'"
                 class="ml-1"

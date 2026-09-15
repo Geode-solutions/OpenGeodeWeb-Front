@@ -97,7 +97,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   let renderPromise: Promise<void> | undefined = undefined;
   let renderPending = false;
 
-  function remoteRender(): Promise<void> {
+  async function remoteRender(): Promise<void> {
     if (renderPromise) {
       renderPending = true;
       return renderPromise;

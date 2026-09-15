@@ -48,7 +48,7 @@ export function useOverlappingPicker() {
   const intermediateMenuY = ref(0);
   let resolveIntermediate: ((item: ProposedItem | undefined) => void) | undefined = undefined;
 
-  function fetchProposedItems(pickedList: PickedItem[]): Promise<ProposedItem[]> {
+  async function fetchProposedItems(pickedList: PickedItem[]): Promise<ProposedItem[]> {
     return Promise.all(
       pickedList.map(async (pick) => {
         try {

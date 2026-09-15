@@ -17,9 +17,11 @@ const xColumn = defineModel<string>("xColumn");
 const yColumn = defineModel<string>("yColumn");
 const zColumn = defineModel<string>("zColumn");
 
-const emit = defineEmits<{
+interface Emits {
   "update:separator": [value: string];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 
 const separators = [
   { title: "Comma (,)", value: "," },
@@ -30,13 +32,15 @@ const separators = [
   { title: "Custom", value: "custom" },
 ];
 
-const selectedType = ref(",");
-const customValue = ref("");
+const selectedType = ref<string>(",");
+const customValue = ref<string>("");
 
 watch(
   () => separator,
   (newVal) => {
-    const predefined = separators.find((sep) => sep.value === newVal && sep.value !== "custom");
+    const predefined = separators.find(
+      (sep) => sep.value === newVal && sep.value !== "custom",
+    );
     if (predefined) {
       selectedType.value = predefined.value;
     } else {
@@ -65,8 +69,12 @@ watch(customValue, (newVal) => {
 </script>
 
 <template>
-  <div class="pa-6 overflow-y-auto border-e border-opacity-10 bg-white-opacity-5">
-    <div class="text-overline mb-4 text-primary font-weight-bold">Parser Settings</div>
+  <div
+    class="pa-6 overflow-y-auto border-e border-opacity-10 bg-white-opacity-5"
+  >
+    <div class="text-overline mb-4 text-primary font-weight-bold">
+      Parser Settings
+    </div>
 
     <v-select
       v-model="selectedType"
@@ -93,7 +101,9 @@ watch(customValue, (newVal) => {
 
     <v-divider class="my-6 border-opacity-10" />
 
-    <div class="text-overline mb-4 text-primary font-weight-bold">Row Configuration</div>
+    <div class="text-overline mb-4 text-primary font-weight-bold">
+      Row Configuration
+    </div>
 
     <v-text-field
       v-model.number="headerRow"
@@ -123,7 +133,9 @@ watch(customValue, (newVal) => {
 
     <v-divider class="my-6 border-opacity-10" />
 
-    <div class="text-overline mb-4 text-primary font-weight-bold">Spatial Mapping</div>
+    <div class="text-overline mb-4 text-primary font-weight-bold">
+      Spatial Mapping
+    </div>
 
     <v-select
       v-model="xColumn"

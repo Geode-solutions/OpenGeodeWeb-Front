@@ -7,14 +7,17 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 // Local constants
 const schema = viewer_schemas.opengeodeweb_viewer.mesh.edges.visibility;
 
-export function useMeshEdgesVisibilityStyle() {
+export function useMeshEdgesVisibilityStyle(): {
+  meshEdgesVisibility: (id: string) => boolean | undefined;
+  setMeshEdgesVisibility: (id: string, visibility: boolean | undefined) => Promise<unknown>;
+} {
   const viewerStore = useViewerStore();
   const meshEdgesCommonStyle = useMeshEdgesCommonStyle();
 
   function meshEdgesVisibility(id: string): boolean | undefined {
     return meshEdgesCommonStyle.meshEdgesStyle(id).visibility as boolean | undefined;
   }
-  function setMeshEdgesVisibility(id: string, visibility: boolean | undefined) {
+  function setMeshEdgesVisibility(id: string, visibility: boolean | undefined): Promise<unknown> {
     const params = { id, visibility };
     return viewerStore.request(
       {

@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
     const extensionsArray = await Promise.all(
       Object.keys(extensionsConfig).map(async (extensionId) => {
         // Safe: extensionId comes from Object.keys(extensionsConfig) itself.
-        const extensionPath = extensionsConfig[extensionId]!.path;
+        const extensionPath = extensionsConfig[extensionId].path;
         const unzippedExtensionPath = await unzipFile(
           extensionPath,
           extensionFolderPath(projectFolderPath, extensionId),

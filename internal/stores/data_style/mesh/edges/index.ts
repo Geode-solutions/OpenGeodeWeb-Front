@@ -58,7 +58,7 @@ export function useMeshEdgesStyle() {
     throw new Error(`Unknown mesh edges coloring type: ${type}`);
   }
 
-  function applyMeshEdgesStyle(id: string) {
+  async function applyMeshEdgesStyle(id: string) {
     return Promise.all([
       meshEdgesVisibility.setMeshEdgesVisibility(id, meshEdgesVisibility.meshEdgesVisibility(id)),
       meshEdgesWidthStyle.setMeshEdgesWidth(id, meshEdgesWidthStyle.meshEdgesWidth(id)),

@@ -55,8 +55,10 @@ const TREEVIEW_MARGIN_RIGHT = 20;
 const TREEVIEW_ICON_WIDTH = 48;
 
 const treeviewStore = useTreeviewStore();
-const isOverTreeview = computed(() => {
-  const hasAdditional = treeviewStore.opened_views.some((view) => view.id !== "main");
+const isOverTreeview = computed<boolean>(() => {
+  const hasAdditional = treeviewStore.opened_views.some(
+    (view) => view.id !== "main",
+  );
   const hasMain = treeviewStore.opened_views.some((view) => view.id === "main");
   const firstColWidth = hasMain ? treeviewStore.panelWidth : 0;
   const secondColWidth = hasAdditional ? treeviewStore.additionalPanelWidth : 0;
@@ -69,7 +71,7 @@ const isOverTreeview = computed(() => {
   return buttonCoords.value.x < treeviewWidth;
 });
 
-const isOverToolbar = computed(() => {
+const isOverToolbar = computed<boolean>(() => {
   const toolbarEl = document.querySelector(".view-toolbar");
   if (!toolbarEl) {
     return false;
@@ -84,7 +86,7 @@ const isOverToolbar = computed(() => {
   );
 });
 
-const computedItemStyles = computed(() => {
+const computedItemStyles = computed<Record<string, string>>(() => {
   if (isOverTreeview.value || isOverToolbar.value) {
     return {
       "--adaptive-blur": "15px",
@@ -95,13 +97,17 @@ const computedItemStyles = computed(() => {
   return adaptiveStyles.value;
 });
 
-const is_active = computed(() => menuStore.active_item_index === index);
+const is_active = computed<boolean>(
+  () => menuStore.active_item_index === index,
+);
 const optionsRef = ref<HTMLElement | undefined>(undefined);
 const { height: optionsHeight } = useElementSize(optionsRef);
 
-const maxCardHeight = computed(() => Math.min(CARD_HEIGHT, menuStore.containerHeight - OFFSET));
+const maxCardHeight = computed<number>(() =>
+  Math.min(CARD_HEIGHT, menuStore.containerHeight - OFFSET),
+);
 
-const optionsStyle = computed(() => {
+const optionsStyle = computed<Record<string, string>>(() => {
   if (!is_active.value || !optionsHeight.value) {
     return {};
   }
@@ -114,25 +120,32 @@ const optionsStyle = computed(() => {
 
   if (absoluteButtonY - height / 2 < margin) {
     offsetY = margin - (absoluteButtonY - height / 2);
-  } else if (absoluteButtonY + height / 2 > menuStore.containerHeight - margin) {
-    offsetY = menuStore.containerHeight - margin - (absoluteButtonY + height / 2);
+  } else if (
+    absoluteButtonY + height / 2 >
+    menuStore.containerHeight - margin
+  ) {
+    offsetY =
+      menuStore.containerHeight - margin - (absoluteButtonY + height / 2);
   }
   return { top: `calc(50% + ${offsetY}px)` };
 });
 
-const optionsClass = computed(() => {
+const optionsClass = computed<string>(() => {
   const loc = itemProps.tooltip_location;
   const margin = MARGIN;
   const radius = RADIUS;
   if (loc === "right") {
-    return menuStore.menuX + radius + margin + CARD_WIDTH > menuStore.containerWidth
+    return menuStore.menuX + radius + margin + CARD_WIDTH >
+      menuStore.containerWidth
       ? "options-left"
       : "options-right";
   }
-  return menuStore.menuX - radius - margin - CARD_WIDTH < 0 ? "options-right" : "options-left";
+  return menuStore.menuX - radius - margin - CARD_WIDTH < 0
+    ? "options-right"
+    : "options-left";
 });
 
-function toggleOptions() {
+function toggleOptions(): void {
   menuStore.toggleItemOptions(index);
 }
 
@@ -140,7 +153,10 @@ export type { ItemProps };
 </script>
 <template>
   <v-sheet class="menu-item-container transition-swing" color="transparent">
-    <v-tooltip :location="itemProps.tooltip_location" :origin="itemProps.tooltip_origin">
+    <v-tooltip
+      :location="itemProps.tooltip_location"
+      :origin="itemProps.tooltip_origin"
+    >
       <template v-slot:activator="{ props: tooltipProps }">
         <v-btn
           icon
@@ -149,7 +165,11 @@ export type { ItemProps };
           @click.stop="toggleOptions"
           v-bind="tooltipProps"
           class="menu-btn"
-          :data-testid="is_active ? 'activeCircularMenuItemButton' : 'circularMenuItemButton'"
+          :data-testid="
+            is_active
+              ? 'activeCircularMenuItemButton'
+              : 'circularMenuItemButton'
+          "
           elevation="2"
           :style="computedItemStyles"
         >
@@ -186,7 +206,10 @@ export type { ItemProps };
         <v-card-title class="text-subtitle-1 pt-3 pb-0 px-3 font-weight-bold">{{
           tooltip
         }}</v-card-title>
-        <v-card-text class="px-3 pb-3 pt-1" style="overflow-y: auto; flex: 1; min-height: 0">
+        <v-card-text
+          class="px-3 pb-3 pt-1"
+          style="overflow-y: auto; flex: 1; min-height: 0"
+        >
           <slot name="options" />
         </v-card-text>
       </GlassCard>
@@ -220,8 +243,10 @@ export type { ItemProps };
   position: absolute;
   inset: 0;
   background: rgba(255, 255, 255, var(--adaptive-opacity));
-  backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
-  -webkit-backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
+  backdrop-filter: blur(var(--adaptive-blur))
+    brightness(var(--adaptive-brightness));
+  -webkit-backdrop-filter: blur(var(--adaptive-blur))
+    brightness(var(--adaptive-brightness));
   z-index: 0;
   pointer-events: none;
   border-radius: inherit;

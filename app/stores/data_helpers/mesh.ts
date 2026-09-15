@@ -80,7 +80,7 @@ export function useDataMesh() {
     // The two are structurally close enough at runtime (vueuse only calls
     // `.subscribe`) but not identical, hence the cast.
     return useObservable(
-      liveQuery(() => formatedMeshComponents(modelId)) as unknown as Observable<
+      liveQuery(async () => formatedMeshComponents(modelId)) as unknown as Observable<
         FormattedComponentGroup[]
       >,
       {
@@ -128,19 +128,19 @@ export function useDataMesh() {
   }
 
   async function getCornersGeodeIds(modelId: string): Promise<string[]> {
-    return await getMeshComponentGeodeIds(modelId, "Corner");
+    return getMeshComponentGeodeIds(modelId, "Corner");
   }
 
   async function getLinesGeodeIds(modelId: string): Promise<string[]> {
-    return await getMeshComponentGeodeIds(modelId, "Line");
+    return getMeshComponentGeodeIds(modelId, "Line");
   }
 
   async function getSurfacesGeodeIds(modelId: string): Promise<string[]> {
-    return await getMeshComponentGeodeIds(modelId, "Surface");
+    return getMeshComponentGeodeIds(modelId, "Surface");
   }
 
   async function getBlocksGeodeIds(modelId: string): Promise<string[]> {
-    return await getMeshComponentGeodeIds(modelId, "Block");
+    return getMeshComponentGeodeIds(modelId, "Block");
   }
 
   return {

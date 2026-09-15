@@ -29,7 +29,7 @@ export function useModelCornersStyle() {
   const modelColorStyle = useModelCornersColor();
   const modelCornersVertexAttribute = useModelCornersVertexAttribute();
 
-  function applyModelCornersVisibilityStyle(modelId: string, corners_ids: string[]) {
+  async function applyModelCornersVisibilityStyle(modelId: string, corners_ids: string[]) {
     const visibilityGroups: Record<string, string[]> = {};
     for (const corner_id of corners_ids) {
       const style = modelCommonStyle.modelCornerStyle(modelId, corner_id);
@@ -46,7 +46,7 @@ export function useModelCornersStyle() {
     );
   }
 
-  function applyModelCornersColoringStyle(modelId: string, corners_ids: string[]) {
+  async function applyModelCornersColoringStyle(modelId: string, corners_ids: string[]) {
     const activeColoringGroups: Record<string, string[]> = {};
     for (const corner_id of corners_ids) {
       const activeColoring = String(modelColorStyle.modelCornerActiveColoring(modelId, corner_id));
@@ -116,7 +116,7 @@ export function useModelCornersStyle() {
         }
         coloringPromises.push(
           ...Object.values(vertexGroups).map(
-            ({ name, item, minimum, maximum, colorMap, corners_ids: ids }) =>
+            async ({ name, item, minimum, maximum, colorMap, corners_ids: ids }) =>
               modelCornersVertexAttribute.setModelCornersVertexAttribute(modelId, ids, {
                 name,
                 item,

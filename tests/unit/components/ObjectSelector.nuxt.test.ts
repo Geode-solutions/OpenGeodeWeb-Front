@@ -37,7 +37,7 @@ describe("object selector", () => {
       allowed_objects: {},
     };
     const geode_object_1 = "BRep";
-    response["allowed_objects"][geode_object_1] = { is_loadable: true };
+    response.allowed_objects[geode_object_1] = { is_loadable: true };
     registerEndpoint(allowed_objects.$id, {
       method: allowed_objects.methods[FIRST_INDEX] as HTTPMethod,
       handler: () => response,
@@ -66,8 +66,8 @@ describe("object selector", () => {
     };
     const geode_object_1 = "BRep";
     const geode_object_2 = "EdgedCurve3D";
-    response["allowed_objects"][geode_object_1] = { is_loadable: true };
-    response["allowed_objects"][geode_object_2] = { is_loadable: true };
+    response.allowed_objects[geode_object_1] = { is_loadable: true };
+    response.allowed_objects[geode_object_2] = { is_loadable: true };
     registerEndpoint(allowed_objects.$id, {
       method: allowed_objects.methods[FIRST_INDEX] as HTTPMethod,
       handler: () => response,
@@ -98,11 +98,11 @@ describe("object selector", () => {
     const response: AllowedObjectsResponse = { allowed_objects: {} };
     const geode_object_1 = "BRep";
     const geode_object_2 = "EdgedCurve3D";
-    response["allowed_objects"][geode_object_1] = {
+    response.allowed_objects[geode_object_1] = {
       is_loadable: LOADABLE_SCORE,
       object_priority: PRIORITY_2,
     };
-    response["allowed_objects"][geode_object_2] = {
+    response.allowed_objects[geode_object_2] = {
       is_loadable: LOADABLE_SCORE,
       object_priority: PRIORITY_1,
     };

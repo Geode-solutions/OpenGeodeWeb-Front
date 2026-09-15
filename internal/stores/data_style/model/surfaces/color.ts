@@ -9,7 +9,22 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 const schema = viewer_schemas.opengeodeweb_viewer.model.surfaces.color;
 
-export function useModelSurfacesColor() {
+export function useModelSurfacesColor(): {
+  setModelSurfacesColor: (
+    modelId: string,
+    surfaces_ids: string[],
+    color: unknown,
+    activeColoring?: string,
+  ) => Promise<unknown>;
+  modelSurfaceColoring: (id: string, surface_id?: string) => StyleValues;
+  modelSurfaceColor: (id: string, surface_id?: string) => unknown;
+  modelSurfaceActiveColoring: (id: string, surface_id?: string) => unknown;
+  setModelSurfacesActiveColoring: (
+    modelId: string,
+    surfaces_ids: string[],
+    activeColoring: string,
+  ) => Promise<unknown>;
+} {
   const modelCommonStyle = useModelCommonStyle();
   const modelSurfacesCommonStyle = useModelSurfacesCommonStyle();
   const modelSurfacesVertexAttribute = useModelSurfacesVertexAttribute();
@@ -28,7 +43,7 @@ export function useModelSurfacesColor() {
     surfaces_ids: string[],
     color: unknown,
     activeColoring = "constant",
-  ) {
+  ): Promise<unknown> {
     return modelCommonStyle.setModelTypeColor(modelId, surfaces_ids, color, schema, activeColoring);
   }
 
@@ -40,7 +55,7 @@ export function useModelSurfacesColor() {
     modelId: string,
     surfaces_ids: string[],
     activeColoring: string,
-  ) {
+  ): Promise<unknown> {
     if (surfaces_ids.length > 1) {
       modelSurfacesCommonStyle.mutateModelSurfacesTypeColoring(modelId, {
         active: activeColoring,
