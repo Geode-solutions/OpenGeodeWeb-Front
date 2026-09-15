@@ -20,7 +20,7 @@ interface FetchRawOptions {
   expectEvent?: boolean;
 }
 
- function fetchRaw(
+function fetchRaw(
   {
     route,
     method,
@@ -50,7 +50,7 @@ interface FetchRawOptions {
     request_options.max_retry = max_retry;
   }
 
-   function doFetch() {
+  function doFetch() {
     return $fetch(route, {
       baseURL,
       ...request_options,

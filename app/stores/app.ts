@@ -302,7 +302,7 @@ export const useAppStore = defineStore("app", () => {
     );
   }
 
-   function request(
+  function request(
     { schema, params }: { schema: JsonRpcSchema; params?: Record<string, unknown> },
     callbacks: RequestHandlers = {},
   ) {
@@ -333,7 +333,7 @@ export const useAppStore = defineStore("app", () => {
 
   const projectFolderPath = ref("");
 
-   function createProjectFolder() {
+  function createProjectFolder() {
     const { PROJECT } = useRuntimeConfig().public;
     const schema = opengeodeweb_front_schemas.api.local.app.project_folder_path;
     const params = { PROJECT };
