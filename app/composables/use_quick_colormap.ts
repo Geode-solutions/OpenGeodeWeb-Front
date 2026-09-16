@@ -1,7 +1,20 @@
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-export function useQuickColormap() {
+// Runtime guard for the unknown response of viewerStore.request(), used instead of an
+// `as` cast so the shape is actually verified (data_id, when present, must be a string).
+function isPickColormapResult(value: unknown): value is { data_id?: string } {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    (!("data_id" in value) || typeof value.data_id === "string")
+  );
+}
+
+export function useQuickColormap(): {
+  pickColormap: typeof pickColormap;
+  quickColormap: typeof quickColormap;
+} {
   const viewerStore = useViewerStore();
   const quickColormap = reactive<{
     data_id: string | undefined;
@@ -24,10 +37,8 @@ export function useQuickColormap() {
     try {
       const schema = viewer_schemas.opengeodeweb_viewer.viewer.pick_colormap;
       const params = { x: offsetX, y: offsetY };
-      const result = (await viewerStore.request({ schema, params })) as
-        | { data_id?: string }
-        | undefined;
-      if (result && result.data_id) {
+      const result = await viewerStore.request({ schema, params });
+      if (isPickColormapResult(result) && result.data_id !== undefined && result.data_id !== "") {
         quickColormap.data_id = result.data_id;
         quickColormap.x = clientX;
         quickColormap.y = clientY;

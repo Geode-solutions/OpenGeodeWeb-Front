@@ -123,3 +123,5 @@ export {
   computeSceneBounds,
   computeSceneBoundsInfo,
 };
+
+export type { SceneBoundsInfo };

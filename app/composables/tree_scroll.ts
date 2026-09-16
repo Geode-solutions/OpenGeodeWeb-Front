@@ -5,24 +5,57 @@ interface TreeScrollProps {
 }
 
 interface ScrollableElement {
-  $el: { scrollTop: number; clientHeight: number };
+  $el: { scrollTop: number; clientHeight: number } | undefined;
+}
+
+interface ScrollInfo {
+  scrollTop: number;
+  containerHeight: number;
+  itemHeight: number;
+}
+
+type ReadonlyMaybeRefOrGetter<Value> = Value | Readonly<Ref<Value>> | (() => Value);
+
+type ReadonlyDisplayItem = Readonly<Omit<DisplayItem, "raw">> & {
+  readonly raw: Readonly<Record<string, unknown>>;
+};
+
+interface ScrollEventLike {
+  readonly target: Readonly<EventTarget> | null;
+}
+
+interface UseTreeScrollReturn {
+  internalScrollTop: Ref<number>;
+  virtualScrollRef: Ref<ScrollableElement | undefined>;
+  stickyHeader: ComputedRef<ReadonlyDisplayItem | undefined>;
+  handleScroll: (event: Readonly<ScrollEventLike>) => void;
+  scrollToIndex: (index: number) => void;
+  getScrollInfo: () => ScrollInfo;
+}
+
+function isHtmlElement(value: Readonly<EventTarget> | null): value is HTMLElement {
+  return value instanceof HTMLElement;
 }
 
 export function useTreeScroll(
-  propsIn: MaybeRefOrGetter<TreeScrollProps>,
+  propsIn: ReadonlyMaybeRefOrGetter<Readonly<TreeScrollProps>>,
   emit: EmitFn,
-  displayItems: Ref<DisplayItem[]>,
-  actualItemProps: Ref<ItemPropsConfig>,
-) {
+  displayItems: Readonly<Ref<readonly ReadonlyDisplayItem[]>>,
+  actualItemProps: Readonly<Ref<Readonly<ItemPropsConfig>>>,
+): UseTreeScrollReturn {
   const SCROLL_STICKY_THRESHOLD = 10;
   const DEFAULT_ITEM_HEIGHT = 28;
 
   const props = toRef(propsIn);
-  const internalScrollTop = ref(props.value.scrollTop || 0);
+  const internalScrollTop = ref(props.value.scrollTop ?? 0);
   const virtualScrollRef = ref<ScrollableElement | undefined>(undefined);
 
-  function handleScroll(event: Event): void {
-    const { scrollTop } = event.target as HTMLElement;
+  function handleScroll(event: Readonly<ScrollEventLike>): void {
+    const { target } = event;
+    if (!isHtmlElement(target)) {
+      return;
+    }
+    const { scrollTop } = target;
     internalScrollTop.value = scrollTop;
     emit("update:scrollTop", scrollTop);
   }
@@ -32,7 +65,7 @@ export function useTreeScroll(
     (newVal = 0) => {
       if (Math.abs(newVal - internalScrollTop.value) > 1) {
         internalScrollTop.value = newVal;
-        if (virtualScrollRef.value && virtualScrollRef.value.$el) {
+        if (virtualScrollRef.value !== undefined && virtualScrollRef.value.$el !== undefined) {
           virtualScrollRef.value.$el.scrollTop = newVal;
         }
       }
@@ -73,12 +106,12 @@ export function useTreeScroll(
   });
 
   function scrollToIndex(index: number): void {
-    if (index === -1 || !virtualScrollRef.value) {
+    if (index === -1 || virtualScrollRef.value === undefined) {
       return;
     }
 
     const container = virtualScrollRef.value.$el;
-    if (!container) {
+    if (container === undefined) {
       return;
     }
 
@@ -97,7 +130,7 @@ export function useTreeScroll(
     }
   }
 
-  function getScrollInfo() {
+  function getScrollInfo(): ScrollInfo {
     const container = virtualScrollRef.value?.$el;
     const containerHeight = container ? container.clientHeight : 0;
     const itemHeight = actualItemProps.value?.height || DEFAULT_ITEM_HEIGHT;

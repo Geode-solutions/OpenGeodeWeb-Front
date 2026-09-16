@@ -1,11 +1,12 @@
 import { useDataStore } from "@ogw_front/stores/data";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import vtk_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import type { JsonRpcSchema } from "@ogw_shared/utils/types";
 
 const HOVER_DELAY = 200;
 
 type HighlightType = "mesh" | "model";
-type BlockIdsProvider = number[] | (() => number[] | Promise<number[]>);
+type BlockIdsProvider = readonly number[] | (() => readonly number[] | Promise<readonly number[]>);
 
 export function useHoverhighlight(): {
   onHoverEnter: typeof onHoverEnter;
@@ -29,7 +30,7 @@ export function useHoverhighlight(): {
     }
     const schema = vtk_schemas.opengeodeweb_viewer[type].highlight;
 
-    async function highlightAction() {
+    async function highlightAction(): Promise<void> {
       currentId = id;
       currentType = type;
 
@@ -37,11 +38,14 @@ export function useHoverhighlight(): {
         return;
       }
 
-      let block_ids: number[] =
-        typeof block_ids_provider === "function" ? await block_ids_provider() : block_ids_provider;
+      let block_ids: number[] = [
+        ...(typeof block_ids_provider === "function"
+          ? await block_ids_provider()
+          : block_ids_provider),
+      ];
 
       block_ids = (Array.isArray(block_ids) ? block_ids : [])
-        .map((blockId) => Math.trunc(Number(blockId)))
+        .map((blockId) => Math.trunc(blockId))
         .filter((blockId) => !Number.isNaN(blockId));
 
       if (currentId !== id) {
@@ -61,9 +65,27 @@ export function useHoverhighlight(): {
     }
 
     if (immediate) {
-      highlightAction();
+      highlightAction().catch(() => undefined);
     } else {
-      timer = setTimeout(highlightAction, HOVER_DELAY);
+      timer = setTimeout(() => {
+        highlightAction().catch(() => undefined);
+      }, HOVER_DELAY);
+    }
+  }
+
+  async function unhighlightAction(
+    type: HighlightType,
+    id: string,
+    request: Readonly<{
+      schema: JsonRpcSchema;
+      params?: Readonly<Record<string, unknown>>;
+      timeout?: number;
+    }>,
+  ): Promise<void> {
+    try {
+      await viewerStore.request(request);
+    } catch (error) {
+      console.error(`Unhighlight failed for ${type} ${id}:`, error);
     }
   }
 
@@ -79,21 +101,12 @@ export function useHoverhighlight(): {
         visibility: false,
         ...(currentType === "model" && { block_ids: [] }),
       };
-      const unhighlightType = currentType;
-      const unhighlightId = id;
-      async function unhighlightAction(): Promise<void> {
-        try {
-          await viewerStore.request({ schema, params });
-        } catch (error) {
-          console.error(`Unhighlight failed for ${unhighlightType} ${unhighlightId}:`, error);
-        }
-      }
-      void unhighlightAction();
+      unhighlightAction(currentType, id, { schema, params }).catch(() => undefined);
       currentId = undefined;
       currentType = undefined;
     }
 
-    if (!currentId) {
+    if (currentId === undefined) {
       currentId = undefined;
       currentType = undefined;
     }

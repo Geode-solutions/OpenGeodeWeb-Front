@@ -3,6 +3,7 @@ import {
   CHANGE_THRESHOLD,
   PLANE_COLORS,
   SIZE_RATIO,
+  type SceneBoundsInfo,
   computeSceneBoundsInfo,
   getPlaneStyle,
   hasPlaneChanged,
@@ -27,8 +28,8 @@ interface DataItemLike {
   id: string;
 }
 
-type PlaneWidget = unkown;
-type WidgetHandle = unkown;
+type PlaneWidget = unknown;
+type WidgetHandle = unknown;
 
 interface WidgetEntry {
   planeWidget: PlaneWidget;
@@ -53,7 +54,16 @@ function useClippingPlanesWidget({
   allItems,
   hybridViewerStore,
   debouncedApply,
-}: ClippingPlanesWidgetParams) {
+}: ClippingPlanesWidgetParams): {
+  getSceneCenter: typeof getSceneCenter;
+  syncWidgets: typeof syncWidgets;
+  syncLocalCamera: typeof syncLocalCamera;
+  cleanupLocalWidget: typeof cleanupLocalWidget;
+  initLocalWidget: typeof initLocalWidget;
+  updateWidgetPlacement: typeof updateWidgetPlacement;
+  isFromWidget: typeof isFromWidget;
+  setFromWidget: typeof setFromWidget;
+} {
   let localRenderWindow: GenericRenderWindowInstance | undefined = undefined;
   let widgetManager: WidgetManagerInstance | undefined = undefined;
   let widgetEntries: WidgetEntry[] = [];
@@ -77,7 +87,7 @@ function useClippingPlanesWidget({
       .map((entry) => entry && entry.actor)
       .filter((actor): actor is vtkActor => Boolean(actor));
   }
-  function getSceneBoundsInfo() {
+  function getSceneBoundsInfo(): SceneBoundsInfo {
     return computeSceneBoundsInfo(resolveActiveActors());
   }
   function getSceneCenter(): number[] {
@@ -165,7 +175,8 @@ function useClippingPlanesWidget({
     }
     localRenderWindow.getRenderWindow().render();
   }
-  function limitCameraZoomOut(camera: vtkCamera): void {
+
+  function limitCameraZoomOut(camera: Readonly<vtkCamera>): void {
     if (maxDistance <= 0 || isLimitingCameraZoom) {
       return;
     }
@@ -185,8 +196,7 @@ function useClippingPlanesWidget({
     localRenderWindow?.getRenderWindow().render();
     isLimitingCameraZoom = false;
   }
-  // The `noUncheckedIndexedAccess` compiler option (needed elsewhere in this migration) forces every `focal_point[i]`/`position[i]`/`view_up[i]` access below into its own `?? 0` fallback branch, which is what pushes this pre-existing function's cyclomatic complexity over the limit - the control flow itself is unchanged from the plain-JS version.
-  // oxlint-disable-next-line complexity
+
   function syncLocalCamera(): void {
     if (!localRenderWindow) {
       return;
@@ -226,6 +236,7 @@ function useClippingPlanesWidget({
     limitCameraZoomOut(camera);
     localRenderWindow.getRenderWindow().render();
   }
+
   function cleanupLocalWidget(): void {
     maxDistance = 0;
     isLimitingCameraZoom = false;
@@ -296,9 +307,11 @@ function useClippingPlanesWidget({
   function isFromWidget(): boolean {
     return fromWidget;
   }
+
   function setFromWidget(value: boolean): void {
     fromWidget = value;
   }
+
   return {
     getSceneCenter,
     syncWidgets,

@@ -352,3 +352,5 @@ export const useTreeviewStore = defineStore("treeview", () => {
     clear,
   };
 });
+
+export type { TreeviewSnapshot };

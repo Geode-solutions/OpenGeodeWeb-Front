@@ -13,17 +13,17 @@ interface ModelComponentRecord {
 }
 
 interface FormattedComponent {
-  id: string;
-  title: string;
-  category: string;
-  viewer_id: number;
-  is_active: boolean;
+  readonly id: string;
+  readonly title: string;
+  readonly category: string;
+  readonly viewer_id: number;
+  readonly is_active: boolean;
 }
 
 interface FormattedComponentGroup {
   id: string;
   title: string;
-  children: FormattedComponent[];
+  readonly children: readonly FormattedComponent[];
 }
 
 function toFormattedComponent(meshComponent: ModelComponentRecord): FormattedComponent {

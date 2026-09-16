@@ -307,3 +307,4 @@ export {
   performSyncRemoteCamera,
   useHybridViewerCamera,
 };
+export type { CameraSnapshot };

@@ -13,13 +13,13 @@ interface ModelComponentRelationRecord {
 }
 
 interface CollectionComponent extends FormattedComponent {
-  children: FormattedComponent[];
+  readonly children: readonly FormattedComponent[];
 }
 
 interface CollectionComponentGroup {
   id: string;
   title: string;
-  children: CollectionComponent[];
+  readonly children: readonly CollectionComponent[];
 }
 
 function pluralize(type: string): string {
@@ -114,9 +114,7 @@ export function useDataCollections(): {
       }));
   }
 
-  function refFormatedCollectionComponents(
-    modelId: string,
-  ): Observable<CollectionComponentGroup[]> {
+  function refFormatedCollectionComponents(modelId: string) {
     // Dexie's liveQuery() returns Dexie's own minimal Observable shape, not an
     // Actual rxjs Observable instance (useObservable's declared parameter type);
     // The two are structurally close enough at runtime (vueuse only calls

@@ -1,6 +1,6 @@
 interface AttributeRangeSource {
-  min_values?: number[];
-  max_values?: number[];
+  min_values?: readonly number[];
+  max_values?: readonly number[];
   min_value?: number;
   max_value?: number;
 }

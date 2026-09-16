@@ -7,6 +7,13 @@ import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
+// The `watch` callback receives the freshly-fetched component groups purely for reading (matching against and copying into `localCategories`, never mutated in place), so it's typed with its own fully-readonly mirror of `FormattedComponentGroup` rather than that (intentionally mutable, see `existing.title` below) store type directly.
+interface ReadonlyFormattedComponentGroup {
+  readonly id: string;
+  readonly title: string;
+  readonly children: readonly FormattedComponent[];
+}
+
 export function useModelComponents(viewId: string): {
   items: typeof items;
   componentsCache: typeof componentsCache;
@@ -29,7 +36,7 @@ export function useModelComponents(viewId: string): {
 
   watch(
     items,
-    async (newItems) => {
+    async (newItems: readonly ReadonlyFormattedComponentGroup[] | undefined) => {
       if (!newItems) {
         localCategories.value = [];
         return;
@@ -38,8 +45,10 @@ export function useModelComponents(viewId: string): {
       const data = await dataStore.fetchAllMeshComponents(viewId);
       componentsCache.value = markRaw(data);
 
-      localCategories.value = newItems.map((newCategory) => {
-        const existing = localCategories.value.find((category) => category.id === newCategory.id);
+      localCategories.value = newItems.map((newCategory: ReadonlyFormattedComponentGroup) => {
+        const existing = localCategories.value.find(
+          (category: ReadonlyFormattedComponentGroup) => category.id === newCategory.id,
+        );
         if (existing) {
           existing.title = newCategory.title || newCategory.id;
           return existing;
@@ -55,9 +64,9 @@ export function useModelComponents(viewId: string): {
 
   const selection = dataStyleStore.visibleMeshComponents(viewId);
 
-  async function updateVisibility(current: string[]): Promise<void> {
+  async function updateVisibility(current: readonly string[]): Promise<void> {
     const previous = selection.value;
-    const { added, removed } = compareSelections(current, previous);
+    const { added, removed } = compareSelections([...current], previous);
 
     if (added.length === 0 && removed.length === 0) {
       return;
@@ -69,7 +78,7 @@ export function useModelComponents(viewId: string): {
     if (removed.length > 0) {
       await dataStyleStore.setModelComponentsVisibility(viewId, removed, false);
     }
-    hybridViewerStore.remoteRender();
+    await hybridViewerStore.remoteRender();
   }
 
   return {

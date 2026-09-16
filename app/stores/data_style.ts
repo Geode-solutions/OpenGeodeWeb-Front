@@ -141,3 +141,5 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     ...modelStyleStore,
   };
 });
+
+export type { DataStyleSnapshot };
