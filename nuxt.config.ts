@@ -111,7 +111,7 @@ export default defineNuxtConfig({
   typescript: {
     tsConfig: {
       compilerOptions: {
-        types: ["node"],
+        types: ["node", "ws", "busboy"],
       },
     },
   },

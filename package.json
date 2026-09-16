@@ -94,6 +94,7 @@
   "devDependencies": {
     "@nuxt/test-utils": "4.1.0",
     "@pinia/testing": "2.0.1",
+    "@types/busboy": "1.5.4",
     "@types/lodash": "4.17.25",
     "@types/node": "22.20.3",
     "@types/ws": "8.18.1",

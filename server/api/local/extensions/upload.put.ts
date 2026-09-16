@@ -1,5 +1,3 @@
-// oxlint-disable-next-line import/no-unassigned-import
-import "@geode/opengeodeweb-front/server/types/vendor.d.ts";
 // Node imports
 import { finished, pipeline } from "node:stream/promises";
 import { Readable } from "node:stream";
