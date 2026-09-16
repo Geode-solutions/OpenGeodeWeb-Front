@@ -2,7 +2,7 @@
 import { promises as fs } from "node:fs";
 
 // Third party imports
-import { createError, defineEventHandler, readBody } from "h3";
+import { type H3Event, createError, defineEventHandler, readBody } from "h3";
 
 // Local imports
 import {
@@ -16,12 +16,14 @@ interface DownloadExtensionBody {
   extensionFileName: string;
 }
 
-export default defineEventHandler(async (event) => {
+// oxlint-disable-next-line typescript/prefer-readonly-parameter-types
+export default defineEventHandler(async (event: H3Event) => {
   try {
     const body = await readBody<DownloadExtensionBody>(event);
     const { projectName, url, extensionFileName } = body;
     console.log({ projectName, url, extensionFileName });
-    const fileBuffer = await fetch(url).then(async (file) => file.arrayBuffer());
+    const response: Readonly<Response> = await fetch(url);
+    const fileBuffer = await response.arrayBuffer();
     const filePath = targetExtensionFilePath(projectName, extensionFileName);
     await fs.writeFile(filePath, Buffer.from(fileBuffer));
     await registerExtensionFile(projectName, filePath);
@@ -32,7 +34,7 @@ export default defineEventHandler(async (event) => {
     console.error("Error downloading extension:", error);
     throw createError({
       statusCode: 500,
-      statusMessage: (error as Error).message,
+      statusMessage: error instanceof Error ? error.message : String(error),
     });
   }
 });

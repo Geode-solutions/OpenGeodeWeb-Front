@@ -13,7 +13,11 @@ import { useHybridViewerFilters } from "@ogw_internal/stores/hybrid_viewer/filte
 import { useHybridViewerHighlight } from "@ogw_internal/stores/hybrid_viewer/highlight";
 import { useHybridViewerRuler } from "@ogw_internal/stores/hybrid_viewer/ruler";
 import { useHybridViewerScene } from "@ogw_internal/stores/hybrid_viewer/scene";
-import { useHybridViewerViewport } from "@ogw_internal/stores/hybrid_viewer/viewport";
+import {
+  type ViewStreamLike,
+  useHybridViewerViewport,
+} from "@ogw_internal/stores/hybrid_viewer/viewport";
+import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types";
 
 import { Status } from "@ogw_front/utils/status";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -51,7 +55,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     const canvas = (
       webGLRenderWindow as unknown as { getCanvas: () => HTMLCanvasElement }
     ).getCanvas();
-    if (canvas && canvas.parentElement) {
+    if (canvas.parentElement) {
       canvas.parentElement.style.cursor = value ? "crosshair" : "default";
     }
   });
@@ -73,10 +77,12 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     Object.assign(imageStyle, { transition: "opacity 0.1s ease-in", zIndex: 1 });
     await viewerStore.ws_connect();
     const imageStream = (
-      viewerStore.client as unknown as { getImageStream: () => any }
+      viewerStore.client as unknown as {
+        getImageStream: () => { createViewStream: (id: string) => ViewStreamLike };
+      }
     ).getImageStream();
     viewportStore.viewStream.value = imageStream.createViewStream("-1");
-    viewportStore.viewStream.value?.onImageReady((event: { image: unknown }) => {
+    viewportStore.viewStream.value?.onImageReady((event: Readonly<{ image: unknown }>) => {
       if (is_moving.value) {
         return;
       }
@@ -104,7 +110,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       return renderPromise;
     }
 
-    renderPromise = (async () => {
+    renderPromise = (async (): Promise<void> => {
       try {
         const schema = viewer_schemas.opengeodeweb_viewer.viewer.render;
         await viewerStore.request({ schema });
@@ -119,12 +125,15 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     return renderPromise;
   }
 
-  function exportStores() {
+  function exportStores(): {
+    zScale: number;
+    camera_options: CameraOptions | Record<string, unknown>;
+  } {
     const renderer = genericRenderWindow.value?.getRenderer();
     const camera = renderer?.getActiveCamera();
     return {
       zScale: sceneStore.zScale.value,
-      camera_options: (camera ? getCameraOptions(camera) : undefined) || cameraStore.camera_options,
+      camera_options: (camera ? getCameraOptions(camera) : undefined) ?? cameraStore.camera_options,
     };
   }
 

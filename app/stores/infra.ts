@@ -9,9 +9,15 @@ export interface Microservice {
   $id: string;
   status?: string;
   is_busy?: boolean;
-  launch?: (params: Record<string, unknown>) => Promise<unknown>;
+  launch?: (params: Readonly<Record<string, unknown>>) => Promise<unknown>;
   connect: () => Promise<void>;
   [key: string]: unknown;
+}
+
+interface ElectronApi {
+  electronAPI: {
+    project_folder_path: (args: { projectFolderPath: string }) => void;
+  };
 }
 
 export const useInfraStore = defineStore("infra", {
@@ -23,45 +29,40 @@ export const useInfraStore = defineStore("infra", {
   }),
   getters: {
     microservices_connected(): boolean {
-      console.log("microservices", this.microservices);
-      return this.microservices.every((store) => store.status === Status.CONNECTED);
+      return this.microservices.every(
+        (store: Readonly<Microservice>) => store.status === Status.CONNECTED,
+      );
     },
     microservices_busy(): boolean {
-      return this.microservices.some((store) => store.is_busy === true);
+      return this.microservices.some((store: Readonly<Microservice>) => store.is_busy === true);
     },
   },
   actions: {
-    register_microservice(store: Microservice) {
+    register_microservice(store: Readonly<Microservice>) {
       const store_name = store.$id;
-      console.log("[INFRA] Registering microservice:", store_name);
 
-      if (!this.microservices.some((microservice) => microservice.$id === store_name)) {
+      if (
+        !this.microservices.some(
+          (microservice: Readonly<Microservice>) => microservice.$id === store_name,
+        )
+      ) {
         this.microservices.push(store);
-        console.log("[INFRA] Microservice registered:", store_name);
       }
     },
     unregister_microservice(microserviceId: string) {
-      console.log("[INFRA] Unregistering microservice:", microserviceId);
       this.microservices = this.microservices.filter(
-        (microservice) => microservice.$id !== microserviceId,
+        (microservice: Readonly<Microservice>) => microservice.$id !== microserviceId,
       );
-      console.log("[INFRA] Microservice unregistered:", microserviceId);
     },
-    create_backend(email?: string) {
-      console.log("[INFRA] Starting create_backend - Mode:", this.app_mode);
-      console.log(
-        "[INFRA] Registered microservices:",
-        this.microservices.map((store) => store.$id),
-      );
+    async create_backend(email?: string) {
       if (this.status === Status.CREATED) {
-        return;
+        return undefined;
       }
-      return navigator.locks.request("infra.create_backend", async () => {
+      navigator.locks.request("infra.create_backend", async () => {
         if (this.status === Status.CREATED) {
           return;
         }
         this.status = Status.CREATING;
-        console.log("[INFRA] Lock granted for create_backend");
         if (this.app_mode === appMode.CLOUD) {
           const cloudStore = useCloudStore();
           await cloudStore.launch(email ?? "");
@@ -69,33 +70,30 @@ export const useInfraStore = defineStore("infra", {
           const appStore = useAppStore();
           await appStore.createProjectFolder();
           if (this.app_mode === appMode.DESKTOP) {
-            (globalThis as any).electronAPI.project_folder_path({
+            (globalThis as unknown as ElectronApi).electronAPI.project_folder_path({
               projectFolderPath: appStore.projectFolderPath,
             });
           }
           await setAppBaseUrl(appStore.base_url);
-          const microservices_with_launch = this.microservices.filter((store) => store.launch);
-          const launch_promises = microservices_with_launch.map(async (store) =>
-            store.launch!({ projectFolderPath: appStore.projectFolderPath }),
+          const microservices_with_launch = this.microservices.filter(
+            (store: Readonly<Microservice>) => store.launch,
+          );
+          const launch_promises = microservices_with_launch.map((store: Readonly<Microservice>) =>
+            store.launch?.({ projectFolderPath: appStore.projectFolderPath }),
           );
           launch_promises.push(registerRunningExtensions());
           await Promise.all(launch_promises);
         }
         this.status = Status.CREATED;
-        console.log("[INFRA] Backend created successfully");
         return this.create_connection();
       });
     },
     async create_connection() {
-      console.log("[INFRA] Starting create_connection");
       await Promise.all(
-        this.microservices.map(async (store) => {
-          console.log("[INFRA] Connecting to microservice:", store.$id);
+        this.microservices.map(async (store: Readonly<Microservice>) => {
           await store.connect();
-          console.log("[INFRA] Microservice connected:", store.$id);
         }),
       );
-      console.log("[INFRA] All microservices connected");
     },
   },
   share: {

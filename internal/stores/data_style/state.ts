@@ -18,26 +18,39 @@ interface SharedState {
   updateComponentStyleCache: (
     modelId: string,
     componentId: string,
-    styleValues: StyleValues,
+    styleValues: Readonly<StyleValues>,
   ) => void;
   bulkUpdateComponentStyleCache: (
     modelId: string,
-    componentStyleUpdates: { id_component: string; values: StyleValues }[],
+    componentStyleUpdates: readonly {
+      readonly id_component: string;
+      readonly values: Readonly<StyleValues>;
+    }[],
   ) => void;
   bulkUpdateComponentStylesCache: (
     modelId: string,
-    componentIds: string[],
-    styleValues: StyleValues,
+    componentIds: readonly string[],
+    styleValues: Readonly<StyleValues>,
   ) => void;
   updateModelComponentTypeStyleCache: (
     modelId: string,
     componentType: string,
-    styleValues: StyleValues,
+    styleValues: Readonly<StyleValues>,
   ) => void;
-  updateStyleCache: (objectId: string, styleValues: StyleValues) => void;
+  updateStyleCache: (objectId: string, styleValues: Readonly<StyleValues>) => void;
 }
 
 let sharedState: SharedState | undefined = undefined;
+
+// The database's table map is dynamically assembled at runtime (see internal/database/database.ts),
+// So `noUncheckedIndexedAccess` sees these as possibly undefined even though they're always
+// Registered before this module is used; guard defensively rather than asserting.
+function requireTable<Table>(table: Table | undefined, name: string): Table {
+  if (table === undefined) {
+    throw new Error(`Database table not initialized: ${name}`);
+  }
+  return table;
+}
 
 // oxlint-disable-next-line max-lines-per-function
 function getSharedState(): SharedState {
@@ -45,9 +58,15 @@ function getSharedState(): SharedState {
     return sharedState;
   }
 
-  const dataStyleTable = database.data_style!;
-  const modelComponentDataStyleTable = database.model_component_datastyle!;
-  const modelComponentTypeDataStyleTable = database.model_component_type_datastyle!;
+  const dataStyleTable = requireTable(database.data_style, "data_style");
+  const modelComponentDataStyleTable = requireTable(
+    database.model_component_datastyle,
+    "model_component_datastyle",
+  );
+  const modelComponentTypeDataStyleTable = requireTable(
+    database.model_component_type_datastyle,
+    "model_component_type_datastyle",
+  );
 
   // Dexie's `liveQuery` returns Dexie's own `Observable` type, structurally distinct
   // From rxjs's `Observable` that `useObservable` (from @vueuse/rxjs) expects, even
@@ -67,7 +86,7 @@ function getSharedState(): SharedState {
   const modelComponentTypeStyles = ref<Record<string, ModelComponentTypeStyle>>({});
   const componentStyles = ref<Record<string, ModelComponentStyle>>({});
 
-  async function loadFromDatabase() {
+  async function loadFromDatabase(): Promise<void> {
     const [fetchedTypeStyles, fetchedComponentStyles] = await Promise.all([
       modelComponentTypeDataStyleTable.toArray() as unknown as Promise<ModelComponentTypeStyle[]>,
       modelComponentDataStyleTable.toArray() as unknown as Promise<ModelComponentStyle[]>,
@@ -87,44 +106,47 @@ function getSharedState(): SharedState {
     componentStyles.value = componentStylesMap;
   }
 
-  loadFromDatabase();
+  void loadFromDatabase();
 
   function updateComponentStyleCache(
     modelId: string,
     componentId: string,
-    styleValues: StyleValues,
-  ) {
+    styleValues: Readonly<StyleValues>,
+  ): void {
     const cacheKey = `${modelId}_${componentId}`;
     const existingStyle = componentStyles.value[cacheKey];
-    if (existingStyle) {
-      merge(existingStyle, styleValues);
-    } else {
+    if (existingStyle === undefined) {
       componentStyles.value[cacheKey] = merge(
         { id_model: modelId, id_component: componentId },
         styleValues,
       );
+    } else {
+      merge(existingStyle, styleValues);
     }
   }
 
   function bulkUpdateComponentStyleCache(
     modelId: string,
-    componentStyleUpdates: { id_component: string; values: StyleValues }[],
-  ) {
+    componentStyleUpdates: readonly {
+      readonly id_component: string;
+      readonly values: Readonly<StyleValues>;
+    }[],
+  ): void {
     const updatedComponentStyles = { ...componentStyles.value };
     for (const { id_component: componentId, values: styleValues } of componentStyleUpdates) {
       const cacheKey = `${modelId}_${componentId}`;
       const existingStyle = updatedComponentStyles[cacheKey];
-      if (existingStyle) {
+      if (existingStyle === undefined) {
+        updatedComponentStyles[cacheKey] = merge(
+          { id_model: modelId, id_component: componentId },
+          styleValues,
+        );
+      } else {
         updatedComponentStyles[cacheKey] = merge(
           {},
           existingStyle,
           styleValues,
         ) as ModelComponentStyle;
-      } else {
-        updatedComponentStyles[cacheKey] = merge(
-          { id_model: modelId, id_component: componentId },
-          styleValues,
-        );
       }
     }
     componentStyles.value = updatedComponentStyles;
@@ -132,24 +154,24 @@ function getSharedState(): SharedState {
 
   function bulkUpdateComponentStylesCache(
     modelId: string,
-    componentIds: string[],
-    styleValues: StyleValues,
-  ) {
+    componentIds: readonly string[],
+    styleValues: Readonly<StyleValues>,
+  ): void {
     const updatedComponentStyles = { ...componentStyles.value };
     for (const componentId of componentIds) {
       const cacheKey = `${modelId}_${componentId}`;
       const existingStyle = updatedComponentStyles[cacheKey];
-      if (existingStyle) {
+      if (existingStyle === undefined) {
+        updatedComponentStyles[cacheKey] = merge(
+          { id_model: modelId, id_component: componentId },
+          styleValues,
+        );
+      } else {
         updatedComponentStyles[cacheKey] = merge(
           {},
           existingStyle,
           styleValues,
         ) as ModelComponentStyle;
-      } else {
-        updatedComponentStyles[cacheKey] = merge(
-          { id_model: modelId, id_component: componentId },
-          styleValues,
-        );
       }
     }
     componentStyles.value = updatedComponentStyles;
@@ -158,19 +180,15 @@ function getSharedState(): SharedState {
   function updateModelComponentTypeStyleCache(
     modelId: string,
     componentType: string,
-    styleValues: StyleValues,
-  ) {
+    styleValues: Readonly<StyleValues>,
+  ): void {
     const cacheKey = `${modelId}_${componentType}`;
-    if (!modelComponentTypeStyles.value[cacheKey]) {
-      modelComponentTypeStyles.value[cacheKey] = { id_model: modelId, type: componentType };
-    }
+    modelComponentTypeStyles.value[cacheKey] ??= { id_model: modelId, type: componentType };
     merge(modelComponentTypeStyles.value[cacheKey], styleValues);
   }
 
-  function updateStyleCache(objectId: string, styleValues: StyleValues) {
-    if (!styles.value[objectId]) {
-      styles.value[objectId] = { id: objectId };
-    }
+  function updateStyleCache(objectId: string, styleValues: Readonly<StyleValues>): void {
+    styles.value[objectId] ??= { id: objectId };
     merge(styles.value[objectId], styleValues);
   }
 
@@ -189,18 +207,34 @@ function getSharedState(): SharedState {
   return sharedState;
 }
 
+interface DataStyleStateApi extends SharedState {
+  getStyle: (objectId: string) => ObjectStyle;
+  getComponentStyle: (modelId: string, componentId: string) => ModelComponentStyle;
+  getModelComponentTypeStyle: (modelId: string, componentType: string) => ModelComponentTypeStyle;
+  mutateStyle: (objectId: string, styleValues: Readonly<StyleValues>) => Promise<string>;
+  objectVisibility: ComputedRef<(objectId: string) => boolean | undefined>;
+  selectedObjects: ComputedRef<string[]>;
+  clear: () => Promise<void>;
+}
+
 // oxlint-disable-next-line max-lines-per-function
-export function useDataStyleState() {
-  const dataStyleTable = database.data_style!;
-  const modelComponentDataStyleTable = database.model_component_datastyle!;
-  const modelComponentTypeDataStyleTable = database.model_component_type_datastyle!;
+export function useDataStyleState(): DataStyleStateApi {
+  const dataStyleTable = requireTable(database.data_style, "data_style");
+  const modelComponentDataStyleTable = requireTable(
+    database.model_component_datastyle,
+    "model_component_datastyle",
+  );
+  const modelComponentTypeDataStyleTable = requireTable(
+    database.model_component_type_datastyle,
+    "model_component_type_datastyle",
+  );
 
   const state = getSharedState();
   const { styles, modelComponentTypeStyles, componentStyles } = state;
 
   const objectVisibility = computed(() => (objectId: string): boolean | undefined => {
     const style = styles.value[objectId];
-    if (style) {
+    if (style !== undefined) {
       return style.visibility;
     }
     return false;
@@ -220,7 +254,10 @@ export function useDataStyleState() {
     return { ...toRaw(styles.value[objectId]) } as ObjectStyle;
   }
 
-  function mutateStyle(objectId: string, styleValues: StyleValues) {
+  async function mutateStyle(
+    objectId: string,
+    styleValues: Readonly<StyleValues>,
+  ): Promise<string> {
     state.updateStyleCache(objectId, styleValues);
     const currentStyle = getStyle(objectId);
     merge(currentStyle, styleValues);

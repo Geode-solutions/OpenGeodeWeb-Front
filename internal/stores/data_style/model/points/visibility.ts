@@ -27,7 +27,7 @@ export function useModelPointsVisibilityStyle(): {
     return viewerStore.request(
       { schema, params },
       {
-        response_function: () =>
+        response_function: async () =>
           modelPointsCommonStyle.mutateModelPointsStyle(id, {
             visibility,
           }),

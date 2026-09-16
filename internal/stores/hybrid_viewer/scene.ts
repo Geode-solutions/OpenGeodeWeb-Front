@@ -56,7 +56,7 @@ function performRemoveItem(id: string): void {
   renderer.removeActor(hybridDb[id].actor);
   const renderWindow = genericRenderWindow.value!.getRenderWindow();
   renderWindow.render();
-  delete hybridDb[id];
+  Reflect.deleteProperty(hybridDb, id);
 }
 function performSetVisibility(id: string, visibility: boolean): void {
   const { genericRenderWindow, hybridDb } =
@@ -103,7 +103,7 @@ function performClear(): void {
   const renderWindow = genericRenderWindow.value!.getRenderWindow();
   renderWindow.render();
   for (const id of Object.keys(hybridDb)) {
-    delete hybridDb[id];
+    Reflect.deleteProperty(hybridDb, id);
   }
 }
 function useHybridViewerScene() {

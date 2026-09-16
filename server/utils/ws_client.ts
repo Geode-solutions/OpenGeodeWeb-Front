@@ -1,4 +1,5 @@
-/// <reference path="../types/vendor.d.ts" />
+// oxlint-disable-next-line import/no-unassigned-import
+import "@geode/opengeodeweb-front/server/types/vendor.d.ts";
 // Third party imports
 import { WebSocket } from "ws";
 import { v4 as uuidv4 } from "uuid";

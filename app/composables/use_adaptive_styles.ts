@@ -48,7 +48,7 @@ function isCoordinatesLike(value: unknown): value is CoordinatesLike {
 }
 
 // `useElementBounding`'s target accepts an element/ref/getter or nullish value -
-// i.e. anything that isn't a primitive (string, number, boolean, bigint, symbol).
+// I.e. anything that isn't a primitive (string, number, boolean, bigint, symbol).
 function isElementBoundingTarget(value: unknown): value is MaybeComputedElementRef {
   return (
     value === undefined ||

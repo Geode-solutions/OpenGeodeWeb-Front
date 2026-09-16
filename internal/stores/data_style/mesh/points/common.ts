@@ -1,16 +1,26 @@
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 
-export function useMeshPointsCommonStyle() {
+export function useMeshPointsCommonStyle(): {
+  meshPointsStyle: (id: string) => StyleValues;
+  meshPointsColoring: (id: string) => StyleValues;
+  mutateMeshPointsColoring: (id: string, values: StyleValues) => Promise<string>;
+  mutateMeshPointsStyle: (id: string, values: StyleValues) => Promise<string>;
+  mutateMeshPointsVisibility: (
+    response: Readonly<{ id: string; visibility: boolean }>,
+  ) => Promise<string>;
+} {
   const dataStyleState = useDataStyleState();
 
-  function mutateMeshPointsStyle(id: string, values: StyleValues) {
-    return dataStyleState.mutateStyle(id, {
+  async function mutateMeshPointsStyle(id: string, values: StyleValues): Promise<string> {
+    return await dataStyleState.mutateStyle(id, {
       points: values,
     });
   }
 
-  function mutateMeshPointsVisibility(response: { id: string; visibility: boolean }) {
+  async function mutateMeshPointsVisibility(
+    response: Readonly<{ id: string; visibility: boolean }>,
+  ): Promise<string> {
     return mutateMeshPointsStyle(response.id, { visibility: response.visibility });
   }
 
@@ -22,7 +32,7 @@ export function useMeshPointsCommonStyle() {
     return meshPointsStyle(id).coloring as StyleValues;
   }
 
-  function mutateMeshPointsColoring(id: string, values: StyleValues) {
+  async function mutateMeshPointsColoring(id: string, values: StyleValues): Promise<string> {
     return mutateMeshPointsStyle(id, {
       coloring: values,
     });

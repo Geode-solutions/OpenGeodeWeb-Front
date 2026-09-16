@@ -24,11 +24,19 @@ const MINIMUM_RANGE = 10;
 const MAXIMUM_RANGE = 20;
 const MAX_RANGE_TEST_VALUE = 100;
 
-async function sleep(milliseconds: number) {
+async function sleep(milliseconds: number): Promise<void> {
   // oxlint-disable-next-line promise/avoid-new
   return new Promise((resolve) => {
     setTimeout(resolve, milliseconds);
   });
+}
+
+function firstElement<T>(array: readonly T[]): T {
+  const [element] = array;
+  if (element === undefined) {
+    throw new Error("Expected array to contain at least one element");
+  }
+  return element;
 }
 
 let id = "";
@@ -40,7 +48,6 @@ describe("model surfaces", () => {
   }, beforeAllTimeout);
 
   afterAll(async () => {
-    console.log("afterAll model surfaces kill", projectFolderPath);
     await cleanupBackend(projectFolderPath);
   });
   describe("surfaces visibility", () => {
@@ -69,7 +76,7 @@ describe("model surfaces", () => {
         expect(dataStyleStore.modelSurfaceVisibility(id, surface_id)).toBe(visibility);
       }
       expect(viewerStore.status).toBe(Status.CONNECTED);
-    });
+    }, 15_000);
   });
 
   describe("surfaces color", () => {
@@ -98,7 +105,7 @@ describe("model surfaces", () => {
         expect(dataStyleStore.modelSurfaceColor(id, surface_id)).toStrictEqual(color);
       }
       expect(viewerStore.status).toBe(Status.CONNECTED);
-    });
+    }, 15_000);
   });
   describe("surfaces vertex attribute", () => {
     test("coloring vertex attribute", () => {
@@ -111,7 +118,7 @@ describe("model surfaces", () => {
           colorMap: undefined,
         }),
       ).toBe(false);
-    });
+    }, 15_000);
 
     test("coloring vertex attribute — direct set with full object", async () => {
       const dataStyleStore = useDataStyleStore();
@@ -149,18 +156,18 @@ describe("model surfaces", () => {
         no_data_color: DEFAULT_NO_DATA_COLOR,
       };
       expect(spy).toHaveBeenCalledWith({ schema, params });
-      const surface_id = surface_ids[0]!;
+      const surface_id = firstElement(surface_ids);
       expect(dataStyleStore.modelSurfacesVertexAttributeName(id, surface_id)).toBe(
         vertex_attribute.name,
       );
       expect(viewerStore.status).toBe(Status.CONNECTED);
-    });
+    }, 15_000);
 
     test("coloring vertex attribute — item switching and stored configs restore", async () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const surface_id = surface_ids[0]!;
+      const surface_id = firstElement(surface_ids);
 
       await dataStyleStore.setModelSurfacesVertexAttribute(id, surface_ids, {
         name: "points",
@@ -193,7 +200,7 @@ describe("model surfaces", () => {
       ]);
       // oxlint-disable-next-line max-expects
       expect(dataStyleStore.modelSurfacesVertexAttributeColorMap(id, surface_id)).toBe("batlow");
-    });
+    }, 15_000);
 
     test("coloring vertex attribute — request sent when all params defined", async () => {
       const dataStyleStore = useDataStyleStore();
@@ -213,9 +220,11 @@ describe("model surfaces", () => {
       await dataStyleStore.setModelSurfacesVertexAttributeColorMap(id, surface_ids, "budaS");
       await sleep(SLEEP_MS);
       const [lastCall] = spy.mock.calls.slice(-1);
-      expect(lastCall).toBeDefined();
-      expect(lastCall![0].schema).toStrictEqual(model_surfaces_schemas.attribute.vertex.attribute);
-      expect(lastCall![0].params).toStrictEqual(
+      if (lastCall === undefined) {
+        throw new Error("Expected spy to have been called");
+      }
+      expect(lastCall[0].schema).toStrictEqual(model_surfaces_schemas.attribute.vertex.attribute);
+      expect(lastCall[0].params).toStrictEqual(
         expect.objectContaining({
           id,
           block_ids: surface_viewer_ids,
@@ -226,24 +235,24 @@ describe("model surfaces", () => {
         }),
       );
       expect(viewerStore.status).toBe(Status.CONNECTED);
-    });
+    }, 15_000);
 
     test("stored configs 1 - select attribute points and item 2", async () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const surface_id = surface_ids[0]!;
+      const surface_id = firstElement(surface_ids);
       await dataStyleStore.setModelSurfacesVertexAttributeName(id, surface_ids, "points");
       await dataStyleStore.setModelSurfacesVertexAttributeItem(id, surface_ids, 2);
       expect(dataStyleStore.modelSurfacesVertexAttributeName(id, surface_id)).toBe("points");
       expect(dataStyleStore.modelSurfacesVertexAttributeItem(id, surface_id)).toBe(2);
-    });
+    }, 15_000);
 
     test("stored configs 2 - set range and colormap", async () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const surface_id = surface_ids[0]!;
+      const surface_id = firstElement(surface_ids);
       await dataStyleStore.setModelSurfacesVertexAttributeRange(
         id,
         surface_ids,
@@ -257,26 +266,26 @@ describe("model surfaces", () => {
         MAXIMUM_RANGE,
       ]);
       expect(dataStyleStore.modelSurfacesVertexAttributeColorMap(id, surface_id)).toBe("budaS");
-    });
+    }, 15_000);
 
     test("stored configs 3 - select unique_vertices", async () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const surface_id = surface_ids[0]!;
+      const surface_id = firstElement(surface_ids);
       await dataStyleStore.setModelSurfacesVertexAttributeName(id, surface_ids, "unique_vertices");
       await dataStyleStore.setModelSurfacesVertexAttributeItem(id, surface_ids, 0);
       expect(dataStyleStore.modelSurfacesVertexAttributeName(id, surface_id)).toBe(
         "unique_vertices",
       );
       expect(dataStyleStore.modelSurfacesVertexAttributeItem(id, surface_id)).toBe(0);
-    });
+    }, 15_000);
 
     test("stored configs 4 - switch back to points and verify restoration", async () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const surface_id = surface_ids[0]!;
+      const surface_id = firstElement(surface_ids);
       await dataStyleStore.setModelSurfacesVertexAttributeName(id, surface_ids, "points");
       expect(dataStyleStore.modelSurfacesVertexAttributeName(id, surface_id)).toBe("points");
       expect(dataStyleStore.modelSurfacesVertexAttributeItem(id, surface_id)).toBe(2);
@@ -285,7 +294,7 @@ describe("model surfaces", () => {
         MAXIMUM_RANGE,
       ]);
       expect(dataStyleStore.modelSurfacesVertexAttributeColorMap(id, surface_id)).toBe("budaS");
-    });
+    }, 15_000);
   });
 
   describe("surfaces polygon attribute", () => {
@@ -299,7 +308,7 @@ describe("model surfaces", () => {
           colorMap: undefined,
         }),
       ).toBe(false);
-    });
+    }, 15_000);
 
     test("coloring polygon attribute — direct set with full object", async () => {
       const dataStyleStore = useDataStyleStore();
@@ -337,18 +346,18 @@ describe("model surfaces", () => {
         no_data_color: DEFAULT_NO_DATA_COLOR,
       };
       expect(spy).toHaveBeenCalledWith({ schema, params });
-      const surface_id = surface_ids[0]!;
+      const surface_id = firstElement(surface_ids);
       expect(dataStyleStore.modelSurfacesPolygonAttributeName(id, surface_id)).toBe(
         polygon_attribute.name,
       );
       expect(viewerStore.status).toBe(Status.CONNECTED);
-    });
+    }, 15_000);
 
     test("coloring polygon attribute — item switching and stored configs restore", async () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const surface_id = surface_ids[0]!;
+      const surface_id = firstElement(surface_ids);
 
       await dataStyleStore.setModelSurfacesPolygonAttribute(id, surface_ids, {
         name: "triangle_vertices",
@@ -381,7 +390,7 @@ describe("model surfaces", () => {
       ]);
       // oxlint-disable-next-line max-expects
       expect(dataStyleStore.modelSurfacesPolygonAttributeColorMap(id, surface_id)).toBe("batlow");
-    });
+    }, 15_000);
 
     test("coloring polygon attribute — no request until range+colormap set", async () => {
       const dataStyleStore = useDataStyleStore();
@@ -406,7 +415,7 @@ describe("model surfaces", () => {
         );
       }
       expect(viewerStore.status).toBe(Status.CONNECTED);
-    });
+    }, 15_000);
 
     test("coloring polygon attribute — request sent when all params defined", async () => {
       const dataStyleStore = useDataStyleStore();
@@ -426,9 +435,11 @@ describe("model surfaces", () => {
       await dataStyleStore.setModelSurfacesPolygonAttributeColorMap(id, surface_ids, "budaS");
       await sleep(SLEEP_MS);
       const [lastCall] = spy.mock.calls.slice(-1);
-      expect(lastCall).toBeDefined();
-      expect(lastCall![0].schema).toStrictEqual(model_surfaces_schemas.attribute.polygon.attribute);
-      expect(lastCall![0].params).toStrictEqual(
+      if (lastCall === undefined) {
+        throw new Error("Expected spy to have been called");
+      }
+      expect(lastCall[0].schema).toStrictEqual(model_surfaces_schemas.attribute.polygon.attribute);
+      expect(lastCall[0].params).toStrictEqual(
         expect.objectContaining({
           id,
           block_ids: surface_viewer_ids,
@@ -439,13 +450,13 @@ describe("model surfaces", () => {
         }),
       );
       expect(viewerStore.status).toBe(Status.CONNECTED);
-    });
+    }, 15_000);
 
     test("stored configs 1 - select attribute triangle_vertices and item 2", async () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const surface_id = surface_ids[0]!;
+      const surface_id = firstElement(surface_ids);
       await dataStyleStore.setModelSurfacesPolygonAttributeName(
         id,
         surface_ids,
@@ -456,13 +467,13 @@ describe("model surfaces", () => {
         "triangle_vertices",
       );
       expect(dataStyleStore.modelSurfacesPolygonAttributeItem(id, surface_id)).toBe(2);
-    });
+    }, 15_000);
 
     test("stored configs 2 - set range and colormap", async () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const surface_id = surface_ids[0]!;
+      const surface_id = firstElement(surface_ids);
       await dataStyleStore.setModelSurfacesPolygonAttributeRange(
         id,
         surface_ids,
@@ -476,13 +487,13 @@ describe("model surfaces", () => {
         MAXIMUM_RANGE,
       ]);
       expect(dataStyleStore.modelSurfacesPolygonAttributeColorMap(id, surface_id)).toBe("budaS");
-    });
+    }, 15_000);
 
     test("stored configs 3 - select triangle_adjacents", async () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const surface_id = surface_ids[0]!;
+      const surface_id = firstElement(surface_ids);
       await dataStyleStore.setModelSurfacesPolygonAttributeName(
         id,
         surface_ids,
@@ -493,13 +504,13 @@ describe("model surfaces", () => {
         "triangle_adjacents",
       );
       expect(dataStyleStore.modelSurfacesPolygonAttributeItem(id, surface_id)).toBe(0);
-    });
+    }, 15_000);
 
     test("stored configs 4 - switch back to triangle_vertices and verify restoration", async () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const surface_id = surface_ids[0]!;
+      const surface_id = firstElement(surface_ids);
       await dataStyleStore.setModelSurfacesPolygonAttributeName(
         id,
         surface_ids,
@@ -514,7 +525,7 @@ describe("model surfaces", () => {
         MAXIMUM_RANGE,
       ]);
       expect(dataStyleStore.modelSurfacesPolygonAttributeColorMap(id, surface_id)).toBe("budaS");
-    });
+    }, 15_000);
   });
 
   describe("surfaces style", () => {
@@ -525,7 +536,7 @@ describe("model surfaces", () => {
       expect(result).toBeInstanceOf(Promise);
       await result;
       expect(viewerStore.status).toBe(Status.CONNECTED);
-    });
+    }, 15_000);
   });
 
   describe("surface component active coloring", () => {
@@ -534,21 +545,21 @@ describe("model surfaces", () => {
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const surface_id = surface_ids[0]!;
+      const surface_id = firstElement(surface_ids);
       const coloringName = "constant";
       const result = dataStyleStore.setModelComponentActiveColoring(id, surface_id, coloringName);
       expect(result).toBeInstanceOf(Promise);
       await result;
       expect(dataStyleStore.modelSurfaceActiveColoring(id, surface_id)).toBe(coloringName);
       expect(viewerStore.status).toBe(Status.CONNECTED);
-    });
+    }, 15_000);
 
     test("coloring vertex", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const surface_id = surface_ids[0]!;
+      const surface_id = firstElement(surface_ids);
       await dataStyleStore.setModelSurfacesVertexAttributeName(id, [surface_id], "points");
       const coloringName = "vertex";
       const result = dataStyleStore.setModelComponentActiveColoring(id, surface_id, coloringName);
@@ -556,14 +567,14 @@ describe("model surfaces", () => {
       await result;
       expect(dataStyleStore.modelSurfaceActiveColoring(id, surface_id)).toBe(coloringName);
       expect(viewerStore.status).toBe(Status.CONNECTED);
-    });
+    }, 15_000);
 
     test("coloring polygon", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const surface_id = surface_ids[0]!;
+      const surface_id = firstElement(surface_ids);
       await dataStyleStore.setModelSurfacesPolygonAttributeName(id, [surface_id], "test_attribute");
       const coloringName = "polygon";
       const result = dataStyleStore.setModelComponentActiveColoring(id, surface_id, coloringName);
@@ -571,6 +582,6 @@ describe("model surfaces", () => {
       await result;
       expect(dataStyleStore.modelSurfaceActiveColoring(id, surface_id)).toBe(coloringName);
       expect(viewerStore.status).toBe(Status.CONNECTED);
-    });
+    }, 15_000);
   });
 });

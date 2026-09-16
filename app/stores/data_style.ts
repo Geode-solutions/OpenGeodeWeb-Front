@@ -18,7 +18,7 @@ interface DataStyleSnapshot {
 
 // The database's table map is dynamically assembled at runtime (see internal/database/database.ts), so `noUncheckedIndexedAccess` sees these as possibly undefined even though they're always registered before this store is used; guard defensively rather than asserting.
 function requireTable<Table>(table: Table | undefined, name: string): Table {
-  if (!table) {
+  if (table === undefined) {
     throw new Error(`Database table not initialized: ${name}`);
   }
   return table;
@@ -46,7 +46,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     );
   }
 
-  async function setVisibility(id: string, visibility: boolean) {
+  async function setVisibility(id: string, visibility: boolean): Promise<unknown> {
     const item = await dataStore.item(id);
     if (!(await dataStore.isItemViewable(item))) {
       return dataStyleState.mutateStyle(id, { visibility });
@@ -63,7 +63,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     throw new Error("Unknown viewer_type");
   }
 
-  async function applyDefaultStyle(id: string) {
+  async function applyDefaultStyle(id: string): Promise<unknown[]> {
     const item = await dataStore.item(id);
     if (!(await dataStore.isItemViewable(item))) {
       throw new Error(`applyDefaultStyle called for non-viewable item: ${id}`);
@@ -88,21 +88,23 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     };
   }
 
-  async function importStores(snapshot: DataStyleSnapshot): Promise<void> {
+  async function importStores(snapshot: Readonly<DataStyleSnapshot>): Promise<void> {
     const stylesSnapshot = snapshot.styles;
     const componentStylesSnapshot = snapshot.componentStyles;
     const modelComponentTypeStylesSnapshot = snapshot.modelComponentTypeStyles;
 
     await dataStyleState.clear();
 
-    const style_promises = Object.entries(stylesSnapshot).map(async ([id, style]) =>
-      data_style_db.put(structuredClone({ ...style, id })),
+    const style_promises = Object.entries(stylesSnapshot).map(
+      ([id, style]: readonly [string, ObjectStyle]) =>
+        data_style_db.put(structuredClone({ ...style, id })),
     );
-    const component_style_promises = Object.values(componentStylesSnapshot).map(async (style) =>
-      component_datastyle_db.put(structuredClone(style)),
+    const component_style_promises = Object.values(componentStylesSnapshot).map(
+      (style: Readonly<ModelComponentStyle>) => component_datastyle_db.put(structuredClone(style)),
     );
     const model_component_type_style_promises = Object.values(modelComponentTypeStylesSnapshot).map(
-      async (style) => model_component_type_datastyle_db.put(structuredClone(style)),
+      (style: Readonly<ModelComponentTypeStyle>) =>
+        model_component_type_datastyle_db.put(structuredClone(style)),
     );
 
     await Promise.all([
@@ -112,7 +114,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     ]);
   }
 
-  async function applyAllStylesFromState() {
+  async function applyAllStylesFromState(): Promise<void[]> {
     const ids = Object.keys(dataStyleState.styles.value);
     const promises = ids.map(async (id) => {
       const meta = await dataStore.item(id);
@@ -121,9 +123,9 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
       }
       const viewerType = meta.viewer_type;
       if (viewerType === "mesh") {
-        return meshStyleStore.applyMeshStyle(id);
+        await meshStyleStore.applyMeshStyle(id);
       } else if (viewerType === "model") {
-        return modelStyleStore.applyModelStyle(id);
+        await modelStyleStore.applyModelStyle(id);
       }
     });
     return Promise.all(promises);

@@ -1,12 +1,15 @@
 import {
   AXIS_SCALE,
   CHANGE_THRESHOLD,
+  type MainCameraOptions,
   PLANE_COLORS,
   SIZE_RATIO,
   type SceneBoundsInfo,
+  alignCameraToMainCamera,
   computeSceneBoundsInfo,
   getPlaneStyle,
   hasPlaneChanged,
+  resolveActiveActors,
 } from "@ogw_front/utils/clipping_planes";
 import {
   type vtkWidgetManager as WidgetManagerInstance,
@@ -14,7 +17,6 @@ import {
 } from "@kitware/vtk.js/Widgets/Core/WidgetManager";
 import type { vtkGenericRenderWindow as GenericRenderWindowInstance } from "@ogw_internal/stores/hybrid_viewer/vtk_types";
 import type { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import type vtkActor from "@kitware/vtk.js/Rendering/Core/Actor";
 import type { vtkCamera } from "@kitware/vtk.js/Rendering/Core/Camera";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 import { newInstance as vtkImplicitPlaneWidget } from "@kitware/vtk.js/Widgets/Widgets3D/ImplicitPlaneWidget";
@@ -43,7 +45,7 @@ interface ClippingPlanesWidgetParams {
   selectedDatasetIds: Ref<string[]>;
   allItems: Ref<DataItemLike[]>;
   hybridViewerStore: ReturnType<typeof useHybridViewerStore>;
-  debouncedApply: (...args: unknown[]) => void;
+  debouncedApply: (...args: readonly unknown[]) => void;
 }
 
 // oxlint-disable-next-line max-params max-lines-per-function
@@ -54,7 +56,7 @@ function useClippingPlanesWidget({
   allItems,
   hybridViewerStore,
   debouncedApply,
-}: ClippingPlanesWidgetParams): {
+}: Readonly<ClippingPlanesWidgetParams>): {
   getSceneCenter: typeof getSceneCenter;
   syncWidgets: typeof syncWidgets;
   syncLocalCamera: typeof syncLocalCamera;
@@ -70,25 +72,15 @@ function useClippingPlanesWidget({
   let fromWidget = false;
   let maxDistance = 0;
   let isLimitingCameraZoom = false;
-  function resolveActiveActors(): vtkActor[] {
-    const targetIds = targetAllVisible.value
-      ? allItems.value.map((item) => item.id)
-      : selectedDatasetIds.value;
-    const targeted = targetIds
-      .map((id) => {
-        const item = hybridViewerStore.hybridDb[id];
-        return item ? item.actor : undefined;
-      })
-      .filter((actor): actor is vtkActor => Boolean(actor));
-    if (targeted.length > 0) {
-      return targeted;
-    }
-    return Object.values(hybridViewerStore.hybridDb)
-      .map((entry) => entry && entry.actor)
-      .filter((actor): actor is vtkActor => Boolean(actor));
-  }
   function getSceneBoundsInfo(): SceneBoundsInfo {
-    return computeSceneBoundsInfo(resolveActiveActors());
+    return computeSceneBoundsInfo(
+      resolveActiveActors(
+        targetAllVisible.value,
+        allItems.value,
+        selectedDatasetIds.value,
+        hybridViewerStore.hybridDb,
+      ),
+    );
   }
   function getSceneCenter(): number[] {
     return getSceneBoundsInfo().center;
@@ -122,7 +114,7 @@ function useClippingPlanesWidget({
       fromWidget = true;
       currentPlane.origin = origin;
       currentPlane.normal = normal;
-      nextTick(() => {
+      void nextTick(() => {
         fromWidget = false;
       });
       debouncedApply();
@@ -133,45 +125,60 @@ function useClippingPlanesWidget({
       subscription,
     };
   }
-  function syncWidgets(): void {
-    if (!widgetManager || !localRenderWindow) {
-      return;
-    }
+  function removeExtraWidgets(): void {
     while (widgetEntries.length > planes.value.length) {
       const entry = widgetEntries.pop();
       if (!entry) {
         continue;
       }
       entry.subscription.unsubscribe();
-      widgetManager.removeWidget(entry.planeWidget);
+      widgetManager?.removeWidget(entry.planeWidget);
       entry.planeWidget.delete();
     }
+  }
+
+  function updateWidgetEntry(
+    idx: number,
+    plane: Readonly<ClippingPlane>,
+    cubicBounds: readonly number[],
+  ): void {
+    // Modulo guarantees this index is within bounds of the non-empty PLANE_COLORS array.
+    const rgb = PLANE_COLORS[idx % PLANE_COLORS.length];
+    if (rgb === undefined || !widgetManager) {
+      return;
+    }
+    if (!widgetEntries[idx]) {
+      const planeWidget = vtkImplicitPlaneWidget();
+      const widgetHandle = widgetManager.addWidget(planeWidget);
+      widgetHandle.setAxisScale(AXIS_SCALE);
+      widgetHandle.setHandleSizeRatio(SIZE_RATIO);
+      widgetEntries.push(createWidgetEntry(planeWidget, widgetHandle, idx));
+    }
+    const entry = widgetEntries[idx];
+    if (!entry) {
+      return;
+    }
+    entry.widgetHandle.setRepresentationStyle(getPlaneStyle(rgb));
+    fromWidget = true;
+    entry.widgetHandle.placeWidget(cubicBounds);
+    fromWidget = false;
+    entry.widgetHandle.setAxisScale(AXIS_SCALE);
+    entry.widgetHandle.setHandleSizeRatio(SIZE_RATIO);
+    const widgetState = entry.planeWidget.getWidgetState();
+    if (plane.origin) {
+      widgetState.setOrigin(plane.origin);
+    }
+    widgetState.setNormal(plane.normal);
+  }
+
+  function syncWidgets(): void {
+    if (!widgetManager || !localRenderWindow) {
+      return;
+    }
+    removeExtraWidgets();
     const { cubicBounds } = getSceneBoundsInfo();
     for (const [idx, plane] of planes.value.entries()) {
-      // Modulo guarantees this index is within bounds of the non-empty PLANE_COLORS array.
-      const rgb = PLANE_COLORS[idx % PLANE_COLORS.length]!;
-      if (!widgetEntries[idx]) {
-        const planeWidget = vtkImplicitPlaneWidget();
-        const widgetHandle = widgetManager.addWidget(planeWidget);
-        widgetHandle.setAxisScale(AXIS_SCALE);
-        widgetHandle.setHandleSizeRatio(SIZE_RATIO);
-        widgetEntries.push(createWidgetEntry(planeWidget, widgetHandle, idx));
-      }
-      const entry = widgetEntries[idx];
-      if (!entry) {
-        continue;
-      }
-      entry.widgetHandle.setRepresentationStyle(getPlaneStyle(rgb));
-      fromWidget = true;
-      entry.widgetHandle.placeWidget(cubicBounds);
-      fromWidget = false;
-      entry.widgetHandle.setAxisScale(AXIS_SCALE);
-      entry.widgetHandle.setHandleSizeRatio(SIZE_RATIO);
-      const widgetState = entry.planeWidget.getWidgetState();
-      if (plane.origin) {
-        widgetState.setOrigin(plane.origin);
-      }
-      widgetState.setNormal(plane.normal);
+      updateWidgetEntry(idx, plane, cubicBounds);
     }
     localRenderWindow.getRenderWindow().render();
   }
@@ -203,36 +210,10 @@ function useClippingPlanesWidget({
     }
     const renderer = localRenderWindow.getRenderer();
     const camera = renderer.getActiveCamera();
-    const mainCam = hybridViewerStore.camera_options as {
-      focal_point?: number[];
-      position?: number[];
-      view_up?: number[];
-    };
+    const mainCam = hybridViewerStore.camera_options as MainCameraOptions;
     const { center, cubicBounds } = getSceneBoundsInfo();
     renderer.resetCamera(cubicBounds as [number, number, number, number, number, number]);
-    if (mainCam && mainCam.focal_point && mainCam.position) {
-      const { focal_point, position } = mainCam;
-      const dir = [
-        (position[0] ?? 0) - (focal_point[0] ?? 0),
-        (position[1] ?? 0) - (focal_point[1] ?? 0),
-        (position[2] ?? 0) - (focal_point[2] ?? 0),
-      ];
-      const dirLen = Math.hypot(...dir);
-      if (dirLen > 0) {
-        const distance = camera.getDistance();
-        const normDir = dir.map((component) => component / dirLen);
-        camera.setFocalPoint(center[0] ?? 0, center[1] ?? 0, center[2] ?? 0);
-        camera.setPosition(
-          (center[0] ?? 0) + (normDir[0] ?? 0) * distance,
-          (center[1] ?? 0) + (normDir[1] ?? 0) * distance,
-          (center[2] ?? 0) + (normDir[2] ?? 0) * distance,
-        );
-        if (mainCam.view_up) {
-          const [viewUpX = 0, viewUpY = 0, viewUpZ = 0] = mainCam.view_up;
-          camera.setViewUp(viewUpX, viewUpY, viewUpZ);
-        }
-      }
-    }
+    alignCameraToMainCamera(camera, mainCam, center);
     limitCameraZoomOut(camera);
     localRenderWindow.getRenderWindow().render();
   }
@@ -254,7 +235,7 @@ function useClippingPlanesWidget({
       widgetManager = undefined;
     }
   }
-  function updateWidgetPlacement({ isReset = false } = {}): void {
+  function updateWidgetPlacement({ isReset = false }: Readonly<{ isReset?: boolean }> = {}): void {
     if (!widgetManager || !localRenderWindow) {
       return;
     }
@@ -274,11 +255,11 @@ function useClippingPlanesWidget({
     }
   }
 
-  function initLocalWidget(container: HTMLElement): void {
+  function initLocalWidget(container: Readonly<HTMLElement>): void {
     cleanupLocalWidget();
     container.addEventListener(
       "wheel",
-      (event) => {
+      (event: Readonly<WheelEvent>) => {
         event.stopPropagation();
       },
       { passive: true },

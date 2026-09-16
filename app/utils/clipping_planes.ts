@@ -1,5 +1,6 @@
 import type { Bounds } from "@kitware/vtk.js/types";
 import type vtkActor from "@kitware/vtk.js/Rendering/Core/Actor";
+import type { vtkCamera } from "@kitware/vtk.js/Rendering/Core/Camera";
 
 const AXIS_SCALE = 0.45;
 const SIZE_RATIO = 0.1;
@@ -110,6 +111,70 @@ function computeSceneBoundsInfo(actors: vtkActor[]): SceneBoundsInfo {
   return { center, cubicBounds };
 }
 
+interface ActorEntry {
+  actor: vtkActor;
+}
+
+interface MainCameraOptions {
+  focal_point?: number[];
+  position?: number[];
+  view_up?: number[];
+}
+
+function resolveActiveActors(
+  targetAllVisible: boolean,
+  allItems: readonly { id: string }[],
+  selectedDatasetIds: readonly string[],
+  hybridDb: Readonly<Record<string, ActorEntry | undefined>>,
+): vtkActor[] {
+  const targetIds = targetAllVisible
+    ? allItems.map((item: Readonly<{ id: string }>) => item.id)
+    : selectedDatasetIds;
+  const targeted = targetIds
+    .map((id) => hybridDb[id]?.actor)
+    .filter((actor): actor is vtkActor => actor !== undefined);
+  if (targeted.length > 0) {
+    return targeted;
+  }
+  return Object.values(hybridDb)
+    .filter((entry): entry is ActorEntry => entry !== undefined)
+    .map((entry: Readonly<ActorEntry>) => entry.actor);
+}
+
+// Aligns the local clipping-plane preview camera onto the same viewing direction as the
+// Main viewer camera, re-centered on the clipped scene's bounds.
+function alignCameraToMainCamera(
+  camera: Readonly<vtkCamera>,
+  mainCam: Readonly<MainCameraOptions>,
+  center: readonly number[],
+): void {
+  if (!mainCam.focal_point || !mainCam.position) {
+    return;
+  }
+  const { focal_point, position } = mainCam;
+  const dir = [
+    (position[0] ?? 0) - (focal_point[0] ?? 0),
+    (position[1] ?? 0) - (focal_point[1] ?? 0),
+    (position[2] ?? 0) - (focal_point[2] ?? 0),
+  ];
+  const dirLen = Math.hypot(...dir);
+  if (dirLen === 0) {
+    return;
+  }
+  const distance = camera.getDistance();
+  const normDir = dir.map((component) => component / dirLen);
+  camera.setFocalPoint(center[0] ?? 0, center[1] ?? 0, center[2] ?? 0);
+  camera.setPosition(
+    (center[0] ?? 0) + (normDir[0] ?? 0) * distance,
+    (center[1] ?? 0) + (normDir[1] ?? 0) * distance,
+    (center[2] ?? 0) + (normDir[2] ?? 0) * distance,
+  );
+  if (mainCam.view_up) {
+    const [viewUpX = 0, viewUpY = 0, viewUpZ = 0] = mainCam.view_up;
+    camera.setViewUp(viewUpX, viewUpY, viewUpZ);
+  }
+}
+
 export {
   AXIS_SCALE,
   SIZE_RATIO,
@@ -122,6 +187,8 @@ export {
   getPlaneStyle,
   computeSceneBounds,
   computeSceneBoundsInfo,
+  resolveActiveActors,
+  alignCameraToMainCamera,
 };
 
-export type { SceneBoundsInfo };
+export type { SceneBoundsInfo, MainCameraOptions };

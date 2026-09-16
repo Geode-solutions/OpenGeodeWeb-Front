@@ -24,7 +24,7 @@ vi.stubGlobal("navigator", {
 
 describe("viewer store", () => {
   beforeAll(() => {
-    globalThis.WebSocket = WebSocket as unknown as typeof globalThis.WebSocket;
+    globalThis.WebSocket = WebSocket;
   });
 
   beforeEach(() => {
@@ -48,7 +48,7 @@ describe("viewer store", () => {
       }>();
       expectTypeOf(viewerStore.picked_point.x).toEqualTypeOf<number | undefined>();
       expectTypeOf(viewerStore.status).toBeString();
-    });
+    }, 5000);
   });
 
   describe("getters", () => {
@@ -58,21 +58,21 @@ describe("viewer store", () => {
         const viewerStore = useViewerStore();
         infraStore.app_mode = appMode.CLOUD;
         expect(viewerStore.protocol).toBe("wss");
-      });
+      }, 5000);
 
       test("app_mode BROWSER", () => {
         const infraStore = useInfraStore();
         const viewerStore = useViewerStore();
         infraStore.app_mode = appMode.BROWSER;
         expect(viewerStore.protocol).toBe("ws");
-      });
+      }, 5000);
 
       test("app_mode DESKTOP", () => {
         const infraStore = useInfraStore();
         const viewerStore = useViewerStore();
         infraStore.app_mode = appMode.DESKTOP;
         expect(viewerStore.protocol).toBe("ws");
-      });
+      }, 5000);
     });
 
     describe("port", () => {
@@ -81,21 +81,21 @@ describe("viewer store", () => {
         const viewerStore = useViewerStore();
         infraStore.app_mode = appMode.CLOUD;
         expect(viewerStore.port).toBe("443");
-      });
+      }, 5000);
 
       test("app_mode BROWSER", () => {
         const infraStore = useInfraStore();
         const viewerStore = useViewerStore();
         infraStore.app_mode = appMode.BROWSER;
         expect(viewerStore.port).toBe(viewerStore.default_local_port);
-      });
+      }, 5000);
 
       test("app_mode DESKTOP", () => {
         const infraStore = useInfraStore();
         const viewerStore = useViewerStore();
         infraStore.app_mode = appMode.DESKTOP;
         expect(viewerStore.port).toBe(viewerStore.default_local_port);
-      });
+      }, 5000);
 
       test("override default_local_port", () => {
         const infraStore = useInfraStore();
@@ -103,7 +103,7 @@ describe("viewer store", () => {
         infraStore.app_mode = appMode.DESKTOP;
         viewerStore.default_local_port = "8080";
         expect(viewerStore.port).toBe("8080");
-      });
+      }, 5000);
     });
     describe("base_url", () => {
       test("app_mode DESKTOP", () => {
@@ -112,7 +112,7 @@ describe("viewer store", () => {
         infraStore.app_mode = appMode.DESKTOP;
         infraStore.domain_name = "localhost";
         expect(viewerStore.base_url).toBe("ws://localhost:1234/ws");
-      });
+      }, 5000);
 
       test("app_mode CLOUD", () => {
         const infraStore = useInfraStore();
@@ -120,20 +120,20 @@ describe("viewer store", () => {
         infraStore.app_mode = appMode.CLOUD;
         infraStore.domain_name = "example.com";
         expect(viewerStore.base_url).toBe("wss://example.com:443/viewer/ws");
-      });
+      }, 5000);
     });
     describe("is_busy", () => {
       test("is_busy", () => {
         const viewerStore = useViewerStore();
         viewerStore.request_counter = 1;
         expect(viewerStore.is_busy).toBe(true);
-      });
+      }, 5000);
 
       test("not is_busy", () => {
         const viewerStore = useViewerStore();
         viewerStore.request_counter = 0;
         expect(viewerStore.is_busy).toBe(false);
-      });
+      }, 5000);
     });
   });
   describe("actions", () => {
@@ -142,7 +142,7 @@ describe("viewer store", () => {
         const viewerStore = useViewerStore();
         await viewerStore.toggle_picking_mode(true);
         expect(viewerStore.picking_mode).toBe(true);
-      });
+      }, 5000);
     });
 
     describe("start_request", () => {
@@ -150,7 +150,7 @@ describe("viewer store", () => {
         const viewerStore = useViewerStore();
         await viewerStore.start_request();
         expect(viewerStore.request_counter).toBe(1);
-      });
+      }, 5000);
     });
 
     describe("stop_request", () => {
@@ -158,7 +158,7 @@ describe("viewer store", () => {
         const viewerStore = useViewerStore();
         await viewerStore.stop_request();
         expect(viewerStore.request_counter).toBe(-1);
-      });
+      }, 5000);
     });
   });
 });

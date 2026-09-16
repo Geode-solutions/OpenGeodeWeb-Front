@@ -21,11 +21,12 @@ interface RunArgs {
 const MILLISECONDS_PER_SECOND = 1000;
 const DEFAULT_TIMEOUT_SECONDS = 45;
 const MAX_PORT_RETRIES = 1;
-const DEFAULT_RUN_ARGS: RunArgs = { projectFolderPath: "" };
+const DEFAULT_RUN_ARGS: Readonly<RunArgs> = { projectFolderPath: "" };
+
 async function runScript(
   execPath: string,
   execName: string,
-  args: string[],
+  args: readonly string[],
   expectedResponse: string,
   timeoutSeconds = DEFAULT_TIMEOUT_SECONDS,
 ): Promise<NamedChildProcess> {
@@ -55,16 +56,20 @@ async function runScript(
     throw error;
   }
 }
+
 function isPortInUseError(error: unknown): boolean {
   return /EADDRINUSE|address already in use|port already in use/iu.test(String(error));
 }
 
-function backArgs(args: RunArgs, port: number): string[] {
+function backArgs(args: Readonly<RunArgs>, port: number): string[] {
   const { projectFolderPath } = args;
   if (!projectFolderPath) {
     throw new Error("projectFolderPath is required");
   }
-  const uploadFolderPath = args.uploadFolderPath || path.join(projectFolderPath, "uploads");
+  const uploadFolderPath =
+    args.uploadFolderPath !== undefined && args.uploadFolderPath !== ""
+      ? args.uploadFolderPath
+      : path.join(projectFolderPath, "uploads");
   const executableArgs = [
     "--port",
     String(port),
@@ -77,7 +82,7 @@ function backArgs(args: RunArgs, port: number): string[] {
     "--timeout",
     "0",
   ];
-  if (process.env.NODE_ENV === "development" || !process.env.NODE_ENV) {
+  if (process.env.NODE_ENV === undefined || process.env.NODE_ENV === "development") {
     executableArgs.push("--debug");
   }
   return executableArgs;
@@ -86,9 +91,9 @@ function backArgs(args: RunArgs, port: number): string[] {
 async function runBack(
   execName: string,
   execPath: string,
-  args: RunArgs = DEFAULT_RUN_ARGS,
+  args: Readonly<RunArgs> = DEFAULT_RUN_ARGS,
   attempts = 0,
-): Promise<number | undefined> {
+): Promise<number> {
   let port: number | undefined = undefined;
   try {
     port = await getAvailablePort();
@@ -107,15 +112,15 @@ async function runBack(
       return newPort;
     }
   }
-  return undefined;
+  throw new Error(`runBack failed to run ${execName}`);
 }
 
 async function runViewer(
   execName: string,
   execPath: string,
-  args: RunArgs = DEFAULT_RUN_ARGS,
+  args: Readonly<RunArgs> = DEFAULT_RUN_ARGS,
   attempts = 0,
-): Promise<number | undefined> {
+): Promise<number> {
   const { projectFolderPath } = args;
   if (!projectFolderPath) {
     throw new Error("projectFolderPath is required");
@@ -136,7 +141,7 @@ async function runViewer(
     return port;
   } catch (error) {
     if (!isPortInUseError(error)) {
-      console.log("runBack error", error);
+      console.log("runViewer error", error);
       throw error;
     }
     if (attempts <= MAX_PORT_RETRIES) {
@@ -145,16 +150,16 @@ async function runViewer(
       return newPort;
     }
   }
-  return undefined;
+  throw new Error(`runViewer failed to run ${execName}`);
 }
 
 async function runExtension(
   extensionId: string,
   execName: string,
   execPath: string,
-  args: RunArgs = DEFAULT_RUN_ARGS,
+  args: Readonly<RunArgs> = DEFAULT_RUN_ARGS,
   attempts = 0,
-): Promise<number | undefined> {
+): Promise<number> {
   let port: number | undefined = undefined;
   try {
     port = await getAvailablePort();
@@ -166,7 +171,7 @@ async function runExtension(
     return port;
   } catch (error) {
     if (!isPortInUseError(error)) {
-      console.log("runBack error", error);
+      console.log("runExtension error", error);
       throw error;
     }
     if (attempts <= MAX_PORT_RETRIES) {
@@ -175,19 +180,29 @@ async function runExtension(
       return newPort;
     }
   }
-  return undefined;
+  throw new Error(`runExtension failed to run ${extensionId}`);
 }
-function addMicroserviceMetadatas(projectFolderPath: string, serviceObj: Microservice): void {
+function addMicroserviceMetadatas(
+  projectFolderPath: string,
+  serviceObj: Readonly<Microservice>,
+): void {
   const microservices = projectMicroservices(projectFolderPath);
+  let enriched: Microservice = { ...serviceObj };
   if (serviceObj.type === "back") {
     const schema = back_schemas.opengeodeweb_back.kill;
-    serviceObj.url = `http://localhost:${serviceObj.port}/${schema.$id}`;
     const [method] = schema.methods;
-    serviceObj.method = method;
+    enriched = {
+      ...enriched,
+      url: `http://localhost:${serviceObj.port}/${schema.$id}`,
+      method,
+    };
   } else if (serviceObj.type === "viewer") {
-    serviceObj.url = `ws://localhost:${serviceObj.port}/ws`;
+    enriched = {
+      ...enriched,
+      url: `ws://localhost:${serviceObj.port}/ws`,
+    };
   }
-  microservices.push(serviceObj);
+  microservices.push(enriched);
   fs.writeFileSync(
     microservicesMetadatasPath(projectFolderPath),
     JSON.stringify(
@@ -199,4 +214,5 @@ function addMicroserviceMetadatas(projectFolderPath: string, serviceObj: Microse
     ),
   );
 }
+
 export { addMicroserviceMetadatas, runBack, runExtension, runViewer };

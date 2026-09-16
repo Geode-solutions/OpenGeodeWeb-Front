@@ -39,7 +39,7 @@ function isMeshPointsVertexAttributeValid({
   minimum,
   maximum,
   colorMap,
-}: AttributeInput): boolean {
+}: Readonly<AttributeInput>): boolean {
   return (
     name !== undefined &&
     item !== undefined &&
@@ -60,7 +60,7 @@ function useMeshPointsVertexAttributeStyle(): {
     name: string | undefined,
     item: number | undefined,
   ) => AttributeStoredConfig;
-  setMeshPointsVertexAttribute: (id: string, input: AttributeInput) => Promise<unknown>;
+  setMeshPointsVertexAttribute: (id: string, input: Readonly<AttributeInput>) => Promise<unknown>;
   setMeshPointsVertexAttributeName: (id: string, name: string) => Promise<unknown> | undefined;
   setMeshPointsVertexAttributeItem: (id: string, item: number) => Promise<unknown> | undefined;
   setMeshPointsVertexAttributeRange: (
@@ -102,9 +102,9 @@ function useMeshPointsVertexAttributeStyle(): {
       no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
-  function mutateMeshPointsVertexStyle(
+  async function mutateMeshPointsVertexStyle(
     id: string,
-    values: Record<string, unknown>,
+    values: Readonly<Record<string, unknown>>,
   ): ReturnType<typeof meshPointsCommonStyle.mutateMeshPointsStyle> {
     return meshPointsCommonStyle.mutateMeshPointsStyle(id, {
       coloring: {
@@ -112,7 +112,7 @@ function useMeshPointsVertexAttributeStyle(): {
       },
     });
   }
-  function setMeshPointsVertexAttributeStoredConfig(
+  async function setMeshPointsVertexAttributeStoredConfig(
     id: string,
     name: string | undefined,
     item: number | undefined,
@@ -120,9 +120,9 @@ function useMeshPointsVertexAttributeStyle(): {
   ): ReturnType<typeof mutateMeshPointsVertexStyle> {
     return mutateMeshPointsVertexStyle(id, {
       storedConfigs: {
-        [name as string]: {
+        [name!]: {
           lastItem: item,
-          [item as number]: config,
+          [item!]: config,
         },
       },
     });
@@ -150,7 +150,7 @@ function useMeshPointsVertexAttributeStyle(): {
       maximum,
       colorMap,
       no_data_color = DEFAULT_NO_DATA_COLOR,
-    }: AttributeInput,
+    }: Readonly<AttributeInput>,
   ): Promise<unknown> {
     mutateMeshPointsVertexStyle(id, {
       name,
@@ -193,6 +193,7 @@ function useMeshPointsVertexAttributeStyle(): {
     if (isMeshPointsVertexAttributeValid(attribute)) {
       return setMeshPointsVertexAttribute(id, attribute);
     }
+    return undefined;
   }
   function setMeshPointsVertexAttributeName(
     id: string,

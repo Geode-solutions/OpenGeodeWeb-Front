@@ -16,7 +16,17 @@ import { useMeshPolyhedraStyle } from "./polyhedra";
 const meshSchemas = viewer_schemas.opengeodeweb_viewer.mesh;
 
 // oxlint-disable-next-line max-lines-per-function
-export function useMeshStyle() {
+export function useMeshStyle(): {
+  meshVisibility: (id: string) => boolean | undefined;
+  setMeshVisibility: (id: string, visibility: boolean | undefined) => Promise<unknown>;
+  meshColor: (id: string) => unknown;
+  setMeshColor: (id: string, color: unknown) => Promise<unknown>;
+  applyMeshStyle: (id: string) => Promise<unknown[]>;
+} & ReturnType<typeof useMeshPointsStyle> &
+  ReturnType<typeof useMeshEdgesStyle> &
+  ReturnType<typeof useMeshCellsStyle> &
+  ReturnType<typeof useMeshPolygonsStyle> &
+  ReturnType<typeof useMeshPolyhedraStyle> {
   const hybridViewerStore = useHybridViewerStore();
   const viewerStore = useViewerStore();
   const dataStyleState = useDataStyleState();
@@ -29,7 +39,7 @@ export function useMeshStyle() {
   function meshVisibility(id: string): boolean | undefined {
     return dataStyleState.getStyle(id).visibility;
   }
-  function setMeshVisibility(id: string, visibility: boolean | undefined) {
+  async function setMeshVisibility(id: string, visibility: boolean | undefined): Promise<unknown> {
     const schema = meshSchemas.visibility;
     const params = { id, visibility };
     return viewerStore.request(
@@ -50,7 +60,7 @@ export function useMeshStyle() {
     return dataStyleState.getStyle(id).color;
   }
 
-  function setMeshColor(id: string, color: unknown) {
+  async function setMeshColor(id: string, color: unknown): Promise<unknown> {
     const schema = meshSchemas.color;
     const params = { id, color };
     return viewerStore.request(
@@ -64,7 +74,7 @@ export function useMeshStyle() {
     );
   }
 
-  async function applyMeshStyle(id: string) {
+  async function applyMeshStyle(id: string): Promise<unknown[]> {
     const style = dataStyleState.getStyle(id);
     const promise_array: unknown[] = [];
     for (const [key, value] of Object.entries(style)) {

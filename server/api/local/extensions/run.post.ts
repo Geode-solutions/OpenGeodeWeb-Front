@@ -2,7 +2,7 @@
 import fs from "node:fs";
 
 // Third party imports
-import { createError, defineEventHandler, readBody } from "h3";
+import { type H3Event, createError, defineEventHandler, readBody } from "h3";
 
 // Local imports
 import {
@@ -25,7 +25,8 @@ interface RunExtensionsBody {
   projectName: string;
 }
 
-export default defineEventHandler(async (event) => {
+// oxlint-disable-next-line typescript/prefer-readonly-parameter-types
+export default defineEventHandler(async (event: H3Event) => {
   try {
     console.log("NITRO: runExtensions", event);
     const { projectFolderPath, projectName } = await readBody<RunExtensionsBody>(event);
@@ -49,12 +50,10 @@ export default defineEventHandler(async (event) => {
         const port = await runBack(backendExecutable, unzippedExtensionPath, {
           projectFolderPath,
         });
-        await addMicroserviceMetadatas(projectFolderPath, {
+        addMicroserviceMetadatas(projectFolderPath, {
           type: "back",
           name,
-          // RunBack can exhaust its port-conflict retries and return undefined
-          // (pre-existing bug: addMicroserviceMetadatas/URLs then embed "undefined").
-          port: port as number,
+          port,
         });
         return {
           id,
@@ -74,7 +73,8 @@ export default defineEventHandler(async (event) => {
     console.error("Error running extensions:", error);
     throw createError({
       statusCode: 500,
-      statusMessage: (error as Error).message,
+
+      statusMessage: error instanceof Error ? error.message : String(error),
     });
   }
 });

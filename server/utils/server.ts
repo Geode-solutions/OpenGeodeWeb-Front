@@ -18,13 +18,13 @@ async function extractZipArchive(zipFilePath: string, outputDir: string): Promis
 
     if (zipEntry.dir) {
       promises.push(
-        (async () => {
+        (async (): Promise<void> => {
           await fs.promises.mkdir(outputPath, { recursive: true });
         })(),
       );
     } else {
       promises.push(
-        (async () => {
+        (async (): Promise<void> => {
           const content = await zipEntry.async("nodebuffer");
           await fs.promises.mkdir(path.dirname(outputPath), {
             recursive: true,

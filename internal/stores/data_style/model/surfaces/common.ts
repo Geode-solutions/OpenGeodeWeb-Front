@@ -3,7 +3,19 @@ import merge from "lodash/merge";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 
-export function useModelSurfacesCommonStyle() {
+interface UseModelSurfacesCommonStyleReturn {
+  modelSurfacesStyle: (id: string) => StyleValues;
+  modelSurfaceStyle: (id: string, surface_id?: string) => StyleValues;
+  modelSurfaceColoring: (id: string, surface_id?: string) => StyleValues;
+  mutateModelSurfacesColoring: (
+    id: string,
+    surfaces_ids: readonly string[],
+    values: StyleValues,
+  ) => Promise<void>;
+  mutateModelSurfacesTypeColoring: (id: string, values: StyleValues) => Promise<void>;
+}
+
+export function useModelSurfacesCommonStyle(): UseModelSurfacesCommonStyleReturn {
   const dataStyleState = useDataStyleState();
   const modelCommonStyle = useModelCommonStyle();
 
@@ -30,14 +42,18 @@ export function useModelSurfacesCommonStyle() {
     return modelSurfaceStyle(id, surface_id).coloring as StyleValues;
   }
 
-  function mutateModelSurfacesColoring(id: string, surfaces_ids: string[], values: StyleValues) {
-    return modelCommonStyle.mutateComponentStyles(id, surfaces_ids, {
+  async function mutateModelSurfacesColoring(
+    id: string,
+    surfaces_ids: readonly string[],
+    values: StyleValues,
+  ): Promise<void> {
+    await modelCommonStyle.mutateComponentStyles(id, [...surfaces_ids], {
       coloring: values,
     });
   }
 
-  function mutateModelSurfacesTypeColoring(id: string, values: StyleValues) {
-    return modelCommonStyle.mutateModelComponentTypeStyle(id, "Surface", {
+  async function mutateModelSurfacesTypeColoring(id: string, values: StyleValues): Promise<void> {
+    await modelCommonStyle.mutateModelComponentTypeStyle(id, "Surface", {
       coloring: values,
     });
   }

@@ -8,7 +8,7 @@ import { vi } from "vitest";
 
 const vuetify = createVuetify({ components, directives });
 
-function setupActivePinia() {
+function setupActivePinia(): ReturnType<typeof createTestingPinia> {
   const pinia = createTestingPinia({
     stubActions: false,
     createSpy: vi.fn,

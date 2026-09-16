@@ -10,9 +10,10 @@ export function useMeshPolyhedraCommonStyle(): {
   const dataStyleState = useDataStyleState();
 
   async function mutateMeshPolyhedraStyle(id: string, values: StyleValues): Promise<string> {
-    return dataStyleState.mutateStyle(id, {
+    const result = await dataStyleState.mutateStyle(id, {
       polyhedra: values,
     });
+    return result;
   }
 
   function meshPolyhedraStyle(id: string): StyleValues {
@@ -24,9 +25,10 @@ export function useMeshPolyhedraCommonStyle(): {
   }
 
   async function mutateMeshPolyhedraColoring(id: string, values: StyleValues): Promise<string> {
-    return mutateMeshPolyhedraStyle(id, {
+    const result = await mutateMeshPolyhedraStyle(id, {
       coloring: values,
     });
+    return result;
   }
 
   return {

@@ -21,12 +21,20 @@ interface DownloadExtensionParams {
   extensionFileName: string;
 }
 
-async function uploadExtension(file: File): Promise<void> {
+type AppStoreInstance = ReturnType<typeof useAppStore>;
+type ExtensionModuleType = Awaited<ReturnType<AppStoreInstance["loadExtension"]>>;
+interface RegisteredExtension {
+  name: string;
+  version: string;
+  extensionModule: ExtensionModuleType;
+}
+
+async function uploadExtension(file: Readonly<File>): Promise<void> {
   const appStore = useAppStore();
   await appStore.upload(file);
 }
 
-async function runExtensions() {
+async function runExtensions(): Promise<{ extensionsArray: ExtensionDescriptor[] }> {
   const appStore = useAppStore();
   const { projectFolderPath } = appStore;
   const { PROJECT: projectName } = useRuntimeConfig().public;
@@ -43,7 +51,10 @@ async function runExtensions() {
   }) as Promise<{ extensionsArray: ExtensionDescriptor[] }>;
 }
 
-async function downloadExtension({ url, extensionFileName }: DownloadExtensionParams) {
+async function downloadExtension({
+  url,
+  extensionFileName,
+}: Readonly<DownloadExtensionParams>): Promise<unknown> {
   const appStore = useAppStore();
   const { PROJECT: projectName } = useRuntimeConfig().public;
   const schema = opengeodeweb_front_schemas.api.microservice.extensions.download;
@@ -58,12 +69,12 @@ async function downloadExtension({ url, extensionFileName }: DownloadExtensionPa
   });
 }
 
-async function registerRunningExtensions() {
+async function registerRunningExtensions(): Promise<RegisteredExtension[]> {
   const appStore = useAppStore();
   const infraStore = useInfraStore();
   const { extensionsArray } = await runExtensions();
   return Promise.all(
-    extensionsArray.map(async (extension) => {
+    extensionsArray.map(async (extension: Readonly<ExtensionDescriptor>) => {
       const { id, name, version, frontendContent, port } = extension;
       const blob = new Blob([frontendContent], {
         type: "application/javascript",
@@ -88,12 +99,14 @@ async function registerRunningExtensions() {
   );
 }
 
-async function importExtensionFile(file: File) {
+async function importExtensionFile(file: Readonly<File>): Promise<RegisteredExtension[]> {
   await uploadExtension(file);
   return registerRunningExtensions();
 }
 
-async function importExtensionURL(url: DownloadExtensionParams) {
+async function importExtensionURL(
+  url: Readonly<DownloadExtensionParams>,
+): Promise<RegisteredExtension[]> {
   await downloadExtension(url);
   return registerRunningExtensions();
 }
@@ -109,7 +122,7 @@ async function unloadExtension(extensionId: string): Promise<boolean> {
 
   // Get the store if it exists
   const storeFactory = extensionData.metadata?.store;
-  if (storeFactory) {
+  if (storeFactory !== undefined) {
     const store = storeFactory();
     // Stop the microservice if possible
     if (typeof store.kill === "function") {
@@ -118,12 +131,12 @@ async function unloadExtension(extensionId: string): Promise<boolean> {
   }
 
   // Unload from AppStore
-  appStore.unloadExtension(extensionId);
+  await appStore.unloadExtension(extensionId);
   console.log("[ExtensionManager] Extension unloaded:", extensionId);
   return true;
 }
 
-async function killExtension(extensionId: string) {
+async function killExtension(extensionId: string): Promise<unknown> {
   const appStore = useAppStore();
   const { projectFolderPath } = appStore;
   const { PROJECT: projectName } = useRuntimeConfig().public;

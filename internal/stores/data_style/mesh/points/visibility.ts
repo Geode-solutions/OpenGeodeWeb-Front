@@ -8,14 +8,20 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 // Local constants
 const schema = viewer_schemas.opengeodeweb_viewer.mesh.points.visibility;
 
-export function useMeshPointsVisibilityStyle() {
+export function useMeshPointsVisibilityStyle(): {
+  meshPointsVisibility: (id: string) => boolean | undefined;
+  setMeshPointsVisibility: (id: string, visibility: boolean | undefined) => Promise<unknown>;
+} {
   const viewerStore = useViewerStore();
   const meshPointsCommonStyle = useMeshPointsCommonStyle();
 
   function meshPointsVisibility(id: string): boolean | undefined {
     return meshPointsCommonStyle.meshPointsStyle(id).visibility as boolean | undefined;
   }
-  function setMeshPointsVisibility(id: string, visibility: boolean | undefined) {
+  async function setMeshPointsVisibility(
+    id: string,
+    visibility: boolean | undefined,
+  ): Promise<unknown> {
     const params = { id, visibility };
     return viewerStore.request(
       {
@@ -23,7 +29,7 @@ export function useMeshPointsVisibilityStyle() {
         params,
       },
       {
-        response_function(response: unknown) {
+        async response_function(response: unknown) {
           return meshPointsCommonStyle.mutateMeshPointsVisibility(
             response as { id: string; visibility: boolean },
           );

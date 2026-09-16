@@ -4,24 +4,23 @@ import fs from "node:fs";
 import path from "node:path";
 
 // Third party imports
+import type { GoogleAuth } from "google-auth-library";
 import { google } from "googleapis";
 import type { protos } from "@google-cloud/run";
 
 // Local imports
 
-// The googleapis package's per-API-version `auth` option types don't line up with the concrete client returned by `GoogleAuth.getClient()` (they're structurally close but not nominally assignable). `any` matches how googleapis treats it at runtime (duck typed).
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type GoogleAuthClient = any;
-// `v2` is a namespace segment in the `@google-cloud/run` package's own generated protobuf types, not a name this codebase declares.
 // oxlint-disable-next-line eslint/id-length
 type CreateServiceRequest = protos.google.cloud.run.v2.ICreateServiceRequest;
 
 const LOCATIONS_DIR = "/etc/nginx/locations";
 
-async function artifactImage(parent: string, authClient: GoogleAuthClient): Promise<string> {
+// oxlint-disable-next-line typescript/prefer-readonly-parameter-types
+async function artifactImage(parent: string, authClient: GoogleAuth): Promise<string> {
   const projectName = process.env.PROJECT;
   const registry = google.artifactregistry({
     version: "v1",
+    // oxlint-disable-next-line typescript/no-unsafe-assignment
     auth: authClient,
   });
   const branch = process.env.NETLIFY_BRANCH;
@@ -112,7 +111,11 @@ function requestConfig(
   };
 }
 
-function addSupervisorProgram(name: string, command: string, executableArgs: string[]): void {
+function addSupervisorProgram(
+  name: string,
+  command: string,
+  executableArgs: readonly string[],
+): void {
   const conf = `
 [program:${name}]
 command=${command} ${executableArgs.join(" ")}

@@ -8,14 +8,17 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 // Local constants
 const schema = viewer_schemas.opengeodeweb_viewer.mesh.points.color;
 
-export function useMeshPointsColorStyle() {
+export function useMeshPointsColorStyle(): {
+  meshPointsColor: (id: string) => unknown;
+  setMeshPointsColor: (id: string, color: unknown) => Promise<unknown>;
+} {
   const viewerStore = useViewerStore();
   const meshPointsCommonStyle = useMeshPointsCommonStyle();
 
   function meshPointsColor(id: string): unknown {
     return meshPointsCommonStyle.meshPointsColoring(id).constant;
   }
-  function setMeshPointsColor(id: string, color: unknown) {
+  async function setMeshPointsColor(id: string, color: unknown): Promise<unknown> {
     const params = { id, color };
     return viewerStore.request(
       {
@@ -23,7 +26,7 @@ export function useMeshPointsColorStyle() {
         params,
       },
       {
-        response_function: () =>
+        response_function: async () =>
           meshPointsCommonStyle.mutateMeshPointsColoring(id, {
             constant: color,
           }),

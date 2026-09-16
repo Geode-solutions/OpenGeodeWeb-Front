@@ -1,5 +1,5 @@
 // Third party imports
-import { createError, defineEventHandler, readBody } from "h3";
+import { type H3Event, createError, defineEventHandler, readBody } from "h3";
 
 // Local imports
 import { setBackBaseUrl } from "@geode/opengeodeweb-front/server/utils/server_config.ts";
@@ -8,20 +8,20 @@ interface SetBackBaseUrlBody {
   baseUrl: string;
 }
 
-export default defineEventHandler(async (event) => {
+// oxlint-disable-next-line typescript/prefer-readonly-parameter-types
+export default defineEventHandler(async (event: H3Event) => {
   try {
     const { baseUrl } = await readBody<SetBackBaseUrlBody>(event);
     if (!baseUrl) {
       throw createError({ statusCode: 400, statusMessage: "baseUrl is required" });
     }
-    await setBackBaseUrl(baseUrl);
+    setBackBaseUrl(baseUrl);
     return { statusCode: 200, baseUrl };
   } catch (error) {
     console.log(error);
-    const err = error as { statusCode?: number; message?: string };
     throw createError({
-      statusCode: err.statusCode,
-      statusMessage: err.message,
+      statusCode: 500,
+      statusMessage: error instanceof Error ? error.message : String(error),
     });
   }
 });

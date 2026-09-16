@@ -1,10 +1,13 @@
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 
-export function useModelPointsCommonStyle() {
+export function useModelPointsCommonStyle(): {
+  modelPointsStyle: (id: string) => StyleValues;
+  mutateModelPointsStyle: (id: string, values: StyleValues) => Promise<unknown>;
+} {
   const dataStyleState = useDataStyleState();
 
-  function mutateModelPointsStyle(id: string, values: StyleValues) {
+  async function mutateModelPointsStyle(id: string, values: StyleValues): Promise<unknown> {
     return dataStyleState.mutateStyle(id, {
       points: values,
     });

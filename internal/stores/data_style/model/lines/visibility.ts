@@ -4,7 +4,14 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 const schema = viewer_schemas.opengeodeweb_viewer.model.lines.visibility;
 
-export function useModelLinesVisibility() {
+export function useModelLinesVisibility(): {
+  setModelLinesVisibility: (
+    modelId: string,
+    lines_ids: readonly string[],
+    visibility: boolean | undefined,
+  ) => Promise<unknown>;
+  modelLineVisibility: (id: string, line_id?: string) => unknown;
+} {
   const modelCommonStyle = useModelCommonStyle();
   const modelLinesCommonStyle = useModelLinesCommonStyle();
 
@@ -12,11 +19,11 @@ export function useModelLinesVisibility() {
     return modelLinesCommonStyle.modelLineStyle(id, line_id).visibility;
   }
 
-  function setModelLinesVisibility(
+  async function setModelLinesVisibility(
     modelId: string,
-    lines_ids: string[],
+    lines_ids: readonly string[],
     visibility: boolean | undefined,
-  ) {
+  ): Promise<unknown> {
     return modelCommonStyle.setModelTypeVisibility(modelId, lines_ids, visibility, schema);
   }
 

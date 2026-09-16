@@ -25,14 +25,13 @@ export function useBatchStyle(): { applyBatchStyle: typeof applyBatchStyle } {
           if (item.geode_object_type === targetType) {
             await action(selectedId);
           }
-        } catch (error) {
-          console.error("Failed to apply batch style to item", selectedId, error);
+        } catch {
+          // Ignore items that fail to load; batch style continues for the rest.
         }
       });
 
       await Promise.all(promises);
-    } catch (error) {
-      console.error("Failed to fetch current item for batch style", id, error);
+    } catch {
       await action(id);
     }
   }

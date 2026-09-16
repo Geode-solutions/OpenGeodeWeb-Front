@@ -8,7 +8,10 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 // Local constants
 const schema = viewer_schemas.opengeodeweb_viewer.model.points.size;
 
-export function useModelPointsSizeStyle() {
+export function useModelPointsSizeStyle(): {
+  modelPointsSize: (id: string) => number | undefined;
+  setModelPointsSize: (id: string, size: number | undefined) => Promise<unknown>;
+} {
   const viewerStore = useViewerStore();
   const modelPointsCommonStyle = useModelPointsCommonStyle();
 
@@ -16,7 +19,7 @@ export function useModelPointsSizeStyle() {
     return modelPointsCommonStyle.modelPointsStyle(id).size as number | undefined;
   }
 
-  function setModelPointsSize(id: string, size: number | undefined) {
+  async function setModelPointsSize(id: string, size: number | undefined): Promise<unknown> {
     const params = { id, size };
     return viewerStore.request(
       {
@@ -24,7 +27,7 @@ export function useModelPointsSizeStyle() {
         params,
       },
       {
-        response_function: () => modelPointsCommonStyle.mutateModelPointsStyle(id, { size }),
+        response_function: async () => modelPointsCommonStyle.mutateModelPointsStyle(id, { size }),
       },
     );
   }
