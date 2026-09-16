@@ -1,18 +1,12 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
-// Third party imports
-import { liveQuery } from "dexie";
-// oxlint-disable-next-line eslint/no-duplicate-imports
-import type { Table } from "dexie";
-import { useObservable } from "@vueuse/rxjs";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import { type Table, liveQuery } from "dexie";
 import type { Observable } from "rxjs";
+import { useObservable } from "@vueuse/rxjs";
 
 // Local imports
+import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types.js";
 import { database } from "@ogw_internal/database/database.js";
 import { useViewerStore } from "@ogw_front/stores/viewer";
-import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types.js";
-import type { Ref } from "vue";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 interface CameraPositionRecord {
   id?: number;

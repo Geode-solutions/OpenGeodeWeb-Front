@@ -1,5 +1,4 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
+import type { HybridDb, HybridViewerStorePublic, vtkActor as VtkActorInstance } from "./vtk_types";
 import { ACTOR_COLOR } from "./constants";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -8,7 +7,6 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
 import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper";
 import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLPolyDataReader";
-import type { HybridDb, HybridViewerStorePublic, vtkActor as VtkActorInstance } from "./vtk_types";
 
 async function performAddItem(id: string): Promise<void> {
   const { genericRenderWindow, hybridDb } =

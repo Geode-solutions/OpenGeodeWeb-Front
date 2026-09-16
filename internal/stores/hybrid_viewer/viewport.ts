@@ -1,13 +1,10 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
-import type { Ref } from "vue";
+import type { HybridViewerStorePublic, Vector3 } from "./vtk_types";
 import { Status } from "@ogw_front/utils/status";
 import { WHEEL_TIME_OUT_MS } from "./constants";
 import { centerCameraOnPosition } from "./camera";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
-import type { HybridViewerStorePublic, Vector3 } from "./vtk_types";
 
 type ContainerRef = Ref<{ $el: HTMLElement } | undefined>;
 

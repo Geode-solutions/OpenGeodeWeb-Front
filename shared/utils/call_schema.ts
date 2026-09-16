@@ -1,32 +1,28 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
 // Third party imports
 
 // Local imports
-import { callRaw } from "./call_raw.js";
-// oxlint-disable-next-line eslint/no-duplicate-imports
-import type { RpcClient } from "./call_raw.js";
 import type { JsonRpcSchema, RequestHandlersWithValidation } from "./types.js";
+import { type RpcClient, callRaw } from "./call_raw.js";
 import { validateSchema } from "./validate_schema.js";
 
 const ERROR_400 = 400;
 
 interface CallSchemaOptions {
-  schema: JsonRpcSchema;
-  params?: Record<string, unknown>;
-  client: RpcClient;
+  schema: Readonly<JsonRpcSchema>;
+  params?: Readonly<Record<string, unknown>>;
+  client: Readonly<RpcClient>;
   timeout?: number;
 }
 
-function callSchema(
-  { schema, params = {}, client, timeout }: CallSchemaOptions,
+async function callSchema(
+  { schema, params = {}, client, timeout }: Readonly<CallSchemaOptions>,
   {
     request_error_function,
     response_function,
     response_error_function,
     validation_error_function,
-  }: RequestHandlersWithValidation = {},
-) {
+  }: Readonly<RequestHandlersWithValidation> = {},
+): Promise<unknown> {
   const { valid, error: schema_error } = validateSchema(schema, params);
 
   if (!valid) {
@@ -39,7 +35,7 @@ function callSchema(
     throw new Error(`${schema.$id}: ${schema_error}`);
   }
 
-  return callRaw(
+  const result = await callRaw(
     {
       rpc: schema.$id,
       params,
@@ -52,6 +48,7 @@ function callSchema(
       response_error_function,
     },
   );
+  return result;
 }
 
 export { callSchema };

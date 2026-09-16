@@ -1,5 +1,3 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
 import {
   AXIS_SCALE,
   CHANGE_THRESHOLD,
@@ -9,18 +7,16 @@ import {
   getPlaneStyle,
   hasPlaneChanged,
 } from "@ogw_front/utils/clipping_planes";
-import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
-// ImplicitPlaneWidget ships no type declarations at all (unlike most of vtk.js), unlike a module that simply doesn't exist, so it can't be given an ambient `declare module` shim either - suppress the resulting implicit-any error at the import site instead.
-// @ts-expect-error -- see comment above; newInstance() below is implicitly `any`.
-import { newInstance as vtkImplicitPlaneWidget } from "@kitware/vtk.js/Widgets/Widgets3D/ImplicitPlaneWidget";
-import { newInstance as vtkWidgetManager } from "@kitware/vtk.js/Widgets/Core/WidgetManager";
-// oxlint-disable-next-line eslint/no-duplicate-imports
-import type { vtkWidgetManager as WidgetManagerInstance } from "@kitware/vtk.js/Widgets/Core/WidgetManager";
-import type { Ref } from "vue";
-import type vtkActor from "@kitware/vtk.js/Rendering/Core/Actor";
-import type { vtkCamera } from "@kitware/vtk.js/Rendering/Core/Camera";
+import {
+  type vtkWidgetManager as WidgetManagerInstance,
+  newInstance as vtkWidgetManager,
+} from "@kitware/vtk.js/Widgets/Core/WidgetManager";
 import type { vtkGenericRenderWindow as GenericRenderWindowInstance } from "@ogw_internal/stores/hybrid_viewer/vtk_types";
 import type { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import type vtkActor from "@kitware/vtk.js/Rendering/Core/Actor";
+import type { vtkCamera } from "@kitware/vtk.js/Rendering/Core/Camera";
+import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
+import { newInstance as vtkImplicitPlaneWidget } from "@kitware/vtk.js/Widgets/Widgets3D/ImplicitPlaneWidget";
 
 interface ClippingPlane {
   origin?: number[];
@@ -31,11 +27,8 @@ interface DataItemLike {
   id: string;
 }
 
-// Vtk.js's plane-widget factory/handle/state objects (from ImplicitPlaneWidget, which ships no type declarations) are kept as `any` here - deep vtk.js widget internals with no typed surface to build on.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type PlaneWidget = any;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type WidgetHandle = any;
+type PlaneWidget = unkown;
+type WidgetHandle = unkown;
 
 interface WidgetEntry {
   planeWidget: PlaneWidget;

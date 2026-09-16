@@ -1,12 +1,10 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
 // Node imports
+import type { Readable } from "node:stream";
 import child_process from "node:child_process";
 import fs from "node:fs";
 import { on } from "node:events";
 import path from "node:path";
 import readline from "node:readline";
-import type { Readable } from "node:stream";
 
 // Third party imports
 import { getPort } from "get-port-please";

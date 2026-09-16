@@ -1,9 +1,6 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
 import { BACKGROUND_GREY_VALUE, RGB_MAX } from "./constants";
-import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import type { Ref } from "vue";
 import type { HybridViewerStorePublic } from "./vtk_types";
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 const RGBA_CHANNELS = 4;
 const SAMPLE_SIZE = 10;

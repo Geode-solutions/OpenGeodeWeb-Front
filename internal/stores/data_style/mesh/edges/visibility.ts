@@ -17,7 +17,10 @@ export function useMeshEdgesVisibilityStyle(): {
   function meshEdgesVisibility(id: string): boolean | undefined {
     return meshEdgesCommonStyle.meshEdgesStyle(id).visibility as boolean | undefined;
   }
-  function setMeshEdgesVisibility(id: string, visibility: boolean | undefined): Promise<unknown> {
+  async function setMeshEdgesVisibility(
+    id: string,
+    visibility: boolean | undefined,
+  ): Promise<unknown> {
     const params = { id, visibility };
     return viewerStore.request(
       {

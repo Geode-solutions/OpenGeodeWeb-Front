@@ -46,7 +46,7 @@ export function useModelBlocksStyle() {
       visibilityGroups[visibility].push(block_id);
     }
     return Promise.all(
-      Object.entries(visibilityGroups).map(([visibility, ids]) =>
+      Object.entries(visibilityGroups).map(async ([visibility, ids]) =>
         modelVisibilityStyle.setModelBlocksVisibility(modelId, ids, visibility === "true"),
       ),
     );

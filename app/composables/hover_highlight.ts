@@ -7,7 +7,10 @@ const HOVER_DELAY = 200;
 type HighlightType = "mesh" | "model";
 type BlockIdsProvider = number[] | (() => number[] | Promise<number[]>);
 
-export function useHoverhighlight() {
+export function useHoverhighlight(): {
+  onHoverEnter: typeof onHoverEnter;
+  onHoverLeave: typeof onHoverLeave;
+} {
   const viewerStore = useViewerStore();
   const dataStore = useDataStore();
   let timer: ReturnType<typeof setTimeout> | undefined = undefined;
@@ -76,11 +79,16 @@ export function useHoverhighlight() {
         visibility: false,
         ...(currentType === "model" && { block_ids: [] }),
       };
-      try {
-        viewerStore.request({ schema, params });
-      } catch (error) {
-        console.error(`Unhighlight failed for ${currentType} ${id}:`, error);
+      const unhighlightType = currentType;
+      const unhighlightId = id;
+      async function unhighlightAction(): Promise<void> {
+        try {
+          await viewerStore.request({ schema, params });
+        } catch (error) {
+          console.error(`Unhighlight failed for ${unhighlightType} ${unhighlightId}:`, error);
+        }
       }
+      void unhighlightAction();
       currentId = undefined;
       currentType = undefined;
     }

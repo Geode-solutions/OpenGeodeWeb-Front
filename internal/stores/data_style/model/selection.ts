@@ -1,14 +1,10 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
 import type {
   ModelComponentStyle,
   ModelComponentTypeStyle,
-  StyleValues,
 } from "@ogw_internal/stores/data_style/types.js";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
-import { database } from "@ogw_internal/database/database";
 import type { Table } from "dexie";
-import type { ComputedRef, Ref } from "vue";
+import { database } from "@ogw_internal/database/database";
 import type { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 
 interface ModelComponentRecord {

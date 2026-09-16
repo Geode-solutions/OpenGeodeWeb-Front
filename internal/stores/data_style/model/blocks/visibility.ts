@@ -19,7 +19,7 @@ export function useModelBlocksVisibility(): {
     return modelBlocksCommonStyle.modelBlockStyle(id, block_id).visibility;
   }
 
-  function setModelBlocksVisibility(
+  async function setModelBlocksVisibility(
     modelId: string,
     blocks_ids: string[],
     visibility: boolean | undefined,

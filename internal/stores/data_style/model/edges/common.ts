@@ -7,7 +7,7 @@ export function useModelEdgesCommonStyle(): {
 } {
   const dataStyleState = useDataStyleState();
 
-  function mutateModelEdgesStyle(id: string, values: StyleValues): Promise<string> {
+  async function mutateModelEdgesStyle(id: string, values: StyleValues): Promise<string> {
     return dataStyleState.mutateStyle(id, {
       edges: values,
     });

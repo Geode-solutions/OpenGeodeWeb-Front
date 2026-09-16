@@ -1,5 +1,4 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
+import type { CameraOptions, HybridViewerStorePublic, Vector3, vtkCamera } from "./vtk_types";
 import {
   LONG_ANIMATION_DURATION,
   SHORT_ANIMATION_DURATION,
@@ -10,8 +9,6 @@ import { dot } from "@kitware/vtk.js/Common/Core/Math";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
-import type { Ref } from "vue";
-import type { CameraOptions, HybridViewerStorePublic, Vector3, vtkCamera } from "./vtk_types";
 
 const BUMP_MULTIPLIER = 0.2;
 const ALIGNMENT_THRESHOLD = 0.9;

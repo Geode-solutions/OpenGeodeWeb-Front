@@ -47,10 +47,10 @@ export const useBackStore = defineStore("back", {
         this.ping();
       }, DEFAULT_PING_INTERVAL_SECONDS * MILLISECONDS_IN_SECOND);
     },
-    ping() {
+    async ping() {
       const feedbackStore = useFeedbackStore();
       const schema = back_schemas.opengeodeweb_back.ping;
-      return this.request(
+      const result = await this.request(
         { schema },
         {
           request_error_function: () => {
@@ -67,6 +67,7 @@ export const useBackStore = defineStore("back", {
           },
         },
       );
+      return result;
     },
     start_request() {
       this.request_counter += 1;
@@ -74,7 +75,7 @@ export const useBackStore = defineStore("back", {
     stop_request() {
       this.request_counter -= 1;
     },
-    launch(args: Record<string, unknown>) {
+    async launch(args: Record<string, unknown>) {
       console.log("[GEODE] Launching back microservice...", { args });
       const appStore = useAppStore();
       const { COMMAND_BACK, NUXT_ROOT_PATH } = useRuntimeConfig().public;
@@ -82,7 +83,7 @@ export const useBackStore = defineStore("back", {
       const params = { COMMAND_BACK, NUXT_ROOT_PATH, args };
 
       console.log("[GEODE] params", params);
-      return appStore.request(
+      const result = await appStore.request(
         { schema, params },
         {
           response_function: (response: unknown) => {
@@ -92,17 +93,18 @@ export const useBackStore = defineStore("back", {
           },
         },
       );
+      return result;
     },
     connect() {
       console.log("[GEODE] Connecting to geode microservice...");
       this.set_ping();
       return;
     },
-    request(
+    async request(
       { schema, params = {} }: { schema: JsonRpcSchema; params?: Record<string, unknown> },
       callbacks: RequestHandlers = {},
     ) {
-      return api_fetch(
+      const result = await api_fetch(
         this,
         // The back store is only ever used with HTTP ("front"/"back") schemas,
         // Which always carry `methods`; the wider JsonRpcSchema param above is
@@ -117,10 +119,11 @@ export const useBackStore = defineStore("back", {
           },
         },
       );
+      return result;
     },
-    upload(file: File, callbacks: RequestHandlers = {}) {
+    async upload(file: File, callbacks: RequestHandlers = {}) {
       const schema = back_schemas.opengeodeweb_back.upload_file;
-      return upload_file(
+      const result = await upload_file(
         this,
         {
           schema,
@@ -135,12 +138,13 @@ export const useBackStore = defineStore("back", {
           },
         },
       );
+      return result;
     },
-    get_version(schema: JsonRpcSchema | undefined) {
+    async get_version(schema: JsonRpcSchema | undefined) {
       if (!schema) {
-        return;
+        return undefined;
       }
-      return this.request(
+      const result = await this.request(
         { schema },
         {
           response_function: (response: unknown) => {
@@ -149,6 +153,7 @@ export const useBackStore = defineStore("back", {
           },
         },
       );
+      return result;
     },
   },
   share: {

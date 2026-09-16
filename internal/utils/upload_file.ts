@@ -1,9 +1,7 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
-import { fetchRaw } from "@ogw_shared/utils/fetch_raw.js";
-import { useFeedbackStore } from "@ogw_front/stores/feedback.js";
 import type { JsonRpcSchema, RequestHandlers } from "@ogw_shared/utils/types.js";
 import type { Microservice } from "./api_fetch.js";
+import { fetchRaw } from "@ogw_shared/utils/fetch_raw.js";
+import { useFeedbackStore } from "@ogw_front/stores/feedback.js";
 
 interface UploadFileParams {
   // Always forwarded to fetchRaw via schema.methods, which is only ever set on
@@ -26,16 +24,16 @@ interface FetchErrorResponseLike {
   description?: string;
 }
 
-function upload_file(
+async function upload_file(
   microservice: Microservice,
   { schema, file, params = {} }: UploadFileParams,
   { request_error_function, response_function, response_error_function }: RequestHandlers = {},
-) {
+): Promise<unknown> {
   console.log("[UPLOAD_FILE] Uploading file", { schema, file });
   const feedbackStore = useFeedbackStore();
 
   if (!(file instanceof File)) {
-    return Promise.reject(new Error("file must be an instance of File"));
+    throw new Error("file must be an instance of File");
   }
 
   const body = new FormData();
@@ -47,7 +45,7 @@ function upload_file(
   microservice.start_request();
   const route = schema.$id;
 
-  return fetchRaw(
+  const result = await fetchRaw(
     {
       route,
       method: schema.methods.find((method) => method !== "OPTIONS"),
@@ -89,6 +87,7 @@ function upload_file(
       },
     },
   );
+  return result;
 }
 
 export { upload_file };

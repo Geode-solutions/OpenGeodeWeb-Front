@@ -19,7 +19,10 @@ export function useModelPointsVisibilityStyle(): {
     return modelPointsCommonStyle.modelPointsStyle(id).visibility as boolean | undefined;
   }
 
-  function setModelPointsVisibility(id: string, visibility: boolean | undefined): Promise<unknown> {
+  async function setModelPointsVisibility(
+    id: string,
+    visibility: boolean | undefined,
+  ): Promise<unknown> {
     const params = { id, visibility };
     return viewerStore.request(
       { schema, params },

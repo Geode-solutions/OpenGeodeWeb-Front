@@ -177,11 +177,11 @@ export const useViewerStore = defineStore(
       await ws_connect();
       console.log("[VIEWER] Viewer connected successfully");
     }
-    function get_version(schema: JsonRpcSchema | undefined) {
+    async function get_version(schema: JsonRpcSchema | undefined) {
       if (!schema) {
         return undefined;
       }
-      return request(
+      const result = await request(
         {
           schema,
         },
@@ -192,6 +192,7 @@ export const useViewerStore = defineStore(
           },
         },
       );
+      return result;
     }
     return {
       default_local_port,

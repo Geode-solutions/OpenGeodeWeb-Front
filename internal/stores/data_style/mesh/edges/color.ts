@@ -18,7 +18,7 @@ export function useMeshEdgesColorStyle(): {
   function meshEdgesColor(id: string): unknown {
     return meshEdgesCommonStyle.meshEdgesColoring(id).constant;
   }
-  function setMeshEdgesColor(id: string, color: unknown): Promise<unknown> {
+  async function setMeshEdgesColor(id: string, color: unknown): Promise<unknown> {
     const params = { id, color };
     return viewerStore.request(
       {

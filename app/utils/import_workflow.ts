@@ -3,10 +3,8 @@
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 
 // Local imports
+import { type NewDataItem, useDataStore } from "@ogw_front/stores/data";
 import { useBackStore } from "@ogw_front/stores/back";
-import { useDataStore } from "@ogw_front/stores/data";
-// oxlint-disable-next-line eslint/no-duplicate-imports
-import type { NewDataItem } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";

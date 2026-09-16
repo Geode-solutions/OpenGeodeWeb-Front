@@ -1,15 +1,19 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
-import { compareSelections } from "@ogw_front/utils/treeview";
-import { useDataStore } from "@ogw_front/stores/data";
-import { useDataStyleStore } from "@ogw_front/stores/data_style";
-import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import type {
   CollectionComponent,
   CollectionComponentGroup,
 } from "@ogw_front/stores/data_helpers/collections";
+import { compareSelections } from "@ogw_front/utils/treeview";
+import { useDataStore } from "@ogw_front/stores/data";
+import { useDataStyleStore } from "@ogw_front/stores/data_style";
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
-export function useModelCollections(viewId: string) {
+export function useModelCollections(viewId: string): {
+  items: typeof items;
+  collectionsCache: typeof collectionsCache;
+  localCategories: typeof localCategories;
+  selection: typeof selection;
+  updateVisibility: typeof updateVisibility;
+} {
   const dataStore = useDataStore();
   const dataStyleStore = useDataStyleStore();
   const hybridViewerStore = useHybridViewerStore();
@@ -51,7 +55,7 @@ export function useModelCollections(viewId: string) {
 
   const selection = dataStyleStore.visibleMeshComponents(viewId);
 
-  async function updateVisibility(current: string[]) {
+  async function updateVisibility(current: string[]): Promise<void> {
     const previous = selection.value;
     const { added, removed } = compareSelections(current, previous);
 

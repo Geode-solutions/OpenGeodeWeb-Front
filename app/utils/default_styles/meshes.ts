@@ -1,4 +1,5 @@
 import {
+  type AttributeConfig,
   CELLS_DEFAULT_COLOR,
   CELLS_DEFAULT_VISIBILITY,
   EDGES_DEFAULT_COLOR,
@@ -12,9 +13,8 @@ import {
   POLYGONS_DEFAULT_VISIBILITY,
   POLYHEDRA_DEFAULT_COLOR,
   POLYHEDRA_DEFAULT_VISIBILITY,
+  type RGBAColor,
 } from "./constants";
-// oxlint-disable-next-line eslint/no-duplicate-imports
-import type { AttributeConfig, RGBAColor } from "./constants";
 
 function emptyAttributeConfig(): AttributeConfig {
   return { name: undefined, storedConfigs: {} };

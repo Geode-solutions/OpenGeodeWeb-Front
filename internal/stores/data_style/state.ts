@@ -1,17 +1,14 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
 import type {
   ModelComponentStyle,
   ModelComponentTypeStyle,
   ObjectStyle,
   StyleValues,
 } from "./types";
+import type { Observable as RxObservable } from "rxjs";
 import { database } from "@ogw_internal/database/database";
 import { liveQuery } from "dexie";
 import merge from "lodash/merge";
 import { useObservable } from "@vueuse/rxjs";
-import type { Ref } from "vue";
-import type { Observable as RxObservable } from "rxjs";
 
 interface SharedState {
   styles: Ref<Record<string, ObjectStyle>>;

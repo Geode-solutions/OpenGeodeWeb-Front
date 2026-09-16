@@ -1,9 +1,7 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
+import type { HybridViewerStorePublic } from "./vtk_types";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
-import type { HybridViewerStorePublic } from "./vtk_types";
 
 async function performSetClippingPlanes(ids: string[], planes: unknown): Promise<void> {
   const viewerStore = useViewerStore();

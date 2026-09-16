@@ -1,10 +1,8 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
 /// <reference path="../../../types/vendor.d.ts" />
 // Node imports
 import { finished, pipeline } from "node:stream/promises";
-import { Readable } from "node:stream";
 import type { ReadableStream as NodeReadableStream } from "node:stream/web";
+import { Readable } from "node:stream";
 import fs from "node:fs";
 
 // Third party imports

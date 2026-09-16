@@ -129,7 +129,7 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
       no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
-  function mutateModelBlocksPolyhedronStyle(
+  async function mutateModelBlocksPolyhedronStyle(
     modelId: string,
     blockIds: string[],
     values: Record<string, unknown>,
@@ -143,7 +143,7 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
       polyhedron: values,
     });
   }
-  function setModelBlocksPolyhedronAttributeStoredConfig(
+  async function setModelBlocksPolyhedronAttributeStoredConfig(
     modelId: string,
     blockIds: string[],
     name: string | undefined,

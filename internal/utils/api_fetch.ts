@@ -1,9 +1,7 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
+import type { JsonRpcSchema, RequestHandlersWithValidation } from "@ogw_shared/utils/types.js";
 import { endRequestLog, startRequestLog } from "@ogw_front/utils/log";
 import { fetchSchema } from "@ogw_shared/utils/fetch_schema";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
-import type { JsonRpcSchema, RequestHandlersWithValidation } from "@ogw_shared/utils/types.js";
 
 // The microservice-backed Pinia stores (back/app/...) all expose this shape; only the slice actually used here needs to be declared.
 interface Microservice {
@@ -33,7 +31,7 @@ interface FetchErrorResponseLike {
   description?: string;
 }
 
-function api_fetch(
+async function api_fetch(
   microservice: Microservice,
   { schema, params = {}, headers = {} }: ApiFetchParams,
   {
@@ -42,13 +40,13 @@ function api_fetch(
     response_error_function,
     timeout,
   }: RequestHandlersWithValidation & { timeout?: number } = {},
-) {
+): Promise<unknown> {
   console.log("[API] Fetching", microservice.base_url);
   const feedbackStore = useFeedbackStore();
   microservice.start_request();
 
   const requestStartingTime = startRequestLog(microservice, schema);
-  return fetchSchema(
+  const result = await fetchSchema(
     {
       schema,
       params,
@@ -96,6 +94,7 @@ function api_fetch(
       },
     },
   );
+  return result;
 }
 
 export { api_fetch };

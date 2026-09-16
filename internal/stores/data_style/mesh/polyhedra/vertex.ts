@@ -111,7 +111,7 @@ function useMeshPolyhedraVertexAttributeStyle(): UseMeshPolyhedraVertexAttribute
       no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
-  function mutateMeshPolyhedraVertexStyle(
+  async function mutateMeshPolyhedraVertexStyle(
     id: string,
     values: Record<string, unknown>,
   ): Promise<void> {
@@ -121,7 +121,7 @@ function useMeshPolyhedraVertexAttributeStyle(): UseMeshPolyhedraVertexAttribute
       },
     });
   }
-  function setMeshPolyhedraVertexAttributeStoredConfig(
+  async function setMeshPolyhedraVertexAttributeStoredConfig(
     id: string,
     name: string | undefined,
     item: number | undefined,
@@ -150,7 +150,7 @@ function useMeshPolyhedraVertexAttributeStyle(): UseMeshPolyhedraVertexAttribute
     const { item, name } = meshPolyhedraVertexAttribute(id);
     return item ?? meshPolyhedraVertexAttributeLastItem(id, name);
   }
-  function setMeshPolyhedraVertexAttribute(
+  async function setMeshPolyhedraVertexAttribute(
     id: string,
     {
       name,

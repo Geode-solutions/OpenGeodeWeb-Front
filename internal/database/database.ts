@@ -1,9 +1,5 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
+import { Dexie, type Table } from "dexie";
 import { BaseDatabase } from "./base_database";
-import { Dexie } from "dexie";
-// oxlint-disable-next-line eslint/no-duplicate-imports
-import type { Table } from "dexie";
 import { ExtendedDatabase } from "./extended_database";
 
 interface DatabaseContainer {

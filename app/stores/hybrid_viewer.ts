@@ -1,4 +1,8 @@
 import {
+  type vtkGenericRenderWindow as VtkGenericRenderWindow,
+  newInstance as vtkGenericRenderWindow,
+} from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
+import {
   applySnapshot,
   getCameraOptions,
   useHybridViewerCamera,
@@ -10,9 +14,6 @@ import { useHybridViewerHighlight } from "@ogw_internal/stores/hybrid_viewer/hig
 import { useHybridViewerRuler } from "@ogw_internal/stores/hybrid_viewer/ruler";
 import { useHybridViewerScene } from "@ogw_internal/stores/hybrid_viewer/scene";
 import { useHybridViewerViewport } from "@ogw_internal/stores/hybrid_viewer/viewport";
-import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
-// oxlint-disable-next-line eslint/no-duplicate-imports
-import type { vtkGenericRenderWindow as VtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 
 import { Status } from "@ogw_front/utils/status";
 import { useViewerStore } from "@ogw_front/stores/viewer";

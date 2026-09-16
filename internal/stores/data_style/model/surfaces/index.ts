@@ -74,7 +74,7 @@ export function useModelSurfacesStyle() {
           colorGroups[color_key].surfaces_ids.push(surfaces_id);
         }
         coloringPromises.push(
-          ...Object.values(colorGroups).map(({ color, surfaces_ids: ids }) =>
+          ...Object.values(colorGroups).map(async ({ color, surfaces_ids: ids }) =>
             modelColorStyle.setModelSurfacesColor(modelId, ids, color, "constant"),
           ),
         );

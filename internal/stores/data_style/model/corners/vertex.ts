@@ -80,7 +80,7 @@ function useModelCornersVertexAttribute() {
       no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
-  function mutateModelCornersVertexStyle(
+  async function mutateModelCornersVertexStyle(
     modelId: string,
     cornerIds: string[],
     values: Record<string, unknown>,
@@ -94,7 +94,7 @@ function useModelCornersVertexAttribute() {
       vertex: values,
     });
   }
-  function setModelCornersVertexAttributeStoredConfig(
+  async function setModelCornersVertexAttributeStoredConfig(
     modelId: string,
     cornerIds: string[],
     name: string | undefined,

@@ -40,7 +40,7 @@ export function useModelCornersCommonStyle(): {
     return modelCornerStyle(id, corner_id).coloring as StyleValues;
   }
 
-  function mutateModelCornersColoring(
+  async function mutateModelCornersColoring(
     id: string,
     corners_ids: string[],
     values: StyleValues,
@@ -50,7 +50,7 @@ export function useModelCornersCommonStyle(): {
     });
   }
 
-  function mutateModelCornersTypeColoring(id: string, values: StyleValues): Promise<void> {
+  async function mutateModelCornersTypeColoring(id: string, values: StyleValues): Promise<void> {
     return modelCommonStyle.mutateModelComponentTypeStyle(id, "Corner", {
       coloring: values,
     });

@@ -1,8 +1,4 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
-import { liveQuery } from "dexie";
-// oxlint-disable-next-line eslint/no-duplicate-imports
-import type { Table } from "dexie";
+import { type Table, liveQuery } from "dexie";
 import { database } from "@ogw_internal/database/database.js";
 import { useObservable } from "@vueuse/rxjs";
 import type { Observable } from "rxjs";
@@ -40,7 +36,19 @@ function toFormattedComponent(meshComponent: ModelComponentRecord): FormattedCom
   };
 }
 
-export function useDataMesh() {
+// oxlint-disable-next-line eslint/max-lines-per-function
+export function useDataMesh(): {
+  formatedMeshComponents: typeof formatedMeshComponents;
+  refFormatedMeshComponents: typeof refFormatedMeshComponents;
+  getMeshComponentsByType: typeof getMeshComponentsByType;
+  getAllMeshComponents: typeof getAllMeshComponents;
+  fetchAllMeshComponents: typeof fetchAllMeshComponents;
+  getMeshComponentGeodeIds: typeof getMeshComponentGeodeIds;
+  getCornersGeodeIds: typeof getCornersGeodeIds;
+  getLinesGeodeIds: typeof getLinesGeodeIds;
+  getSurfacesGeodeIds: typeof getSurfacesGeodeIds;
+  getBlocksGeodeIds: typeof getBlocksGeodeIds;
+} {
   const model_components_db = database.model_components as unknown as Table<
     ModelComponentRecord,
     string
@@ -128,19 +136,19 @@ export function useDataMesh() {
   }
 
   async function getCornersGeodeIds(modelId: string): Promise<string[]> {
-    return await getMeshComponentGeodeIds(modelId, "Corner");
+    return getMeshComponentGeodeIds(modelId, "Corner");
   }
 
   async function getLinesGeodeIds(modelId: string): Promise<string[]> {
-    return await getMeshComponentGeodeIds(modelId, "Line");
+    return getMeshComponentGeodeIds(modelId, "Line");
   }
 
   async function getSurfacesGeodeIds(modelId: string): Promise<string[]> {
-    return await getMeshComponentGeodeIds(modelId, "Surface");
+    return getMeshComponentGeodeIds(modelId, "Surface");
   }
 
   async function getBlocksGeodeIds(modelId: string): Promise<string[]> {
-    return await getMeshComponentGeodeIds(modelId, "Block");
+    return getMeshComponentGeodeIds(modelId, "Block");
   }
 
   return {

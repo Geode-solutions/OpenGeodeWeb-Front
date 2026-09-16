@@ -18,7 +18,7 @@ export function useMeshPolygonsVisibilityStyle(): {
   function meshPolygonsVisibility(id: string): boolean | undefined {
     return meshPolygonsCommonStyle.meshPolygonsStyle(id).visibility as boolean | undefined;
   }
-  function setMeshPolygonsVisibility(
+  async function setMeshPolygonsVisibility(
     id: string,
     visibility: boolean | undefined,
   ): Promise<unknown> {

@@ -128,7 +128,7 @@ function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
       no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
-  function mutateModelBlocksVertexStyle(
+  async function mutateModelBlocksVertexStyle(
     modelId: string,
     blockIds: string[],
     values: Record<string, unknown>,
@@ -142,7 +142,7 @@ function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
       vertex: values,
     });
   }
-  function setModelBlocksVertexAttributeStoredConfig(
+  async function setModelBlocksVertexAttributeStoredConfig(
     modelId: string,
     blockIds: string[],
     name: string | undefined,

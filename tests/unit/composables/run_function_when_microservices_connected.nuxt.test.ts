@@ -8,8 +8,6 @@ import { runFunctionWhenMicroservicesConnected } from "@ogw_front/composables/ru
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useInfraStore } from "@ogw_front/stores/infra";
-// oxlint-disable-next-line eslint/no-duplicate-imports
-import type { Microservice } from "@ogw_front/stores/infra";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 const dumb_obj = { dumb_method: () => true };

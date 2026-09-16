@@ -1,15 +1,9 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
-import { liveQuery } from "dexie";
-// oxlint-disable-next-line eslint/no-duplicate-imports
-import type { Table } from "dexie";
+import { type FormattedComponent, type ModelComponentRecord, useDataMesh } from "./mesh.js";
+import { type Table, liveQuery } from "dexie";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
-import { database } from "@ogw_internal/database/database.js";
-import { useDataMesh } from "./mesh.js";
-// oxlint-disable-next-line eslint/no-duplicate-imports
-import type { FormattedComponent, ModelComponentRecord } from "./mesh.js";
-import { useObservable } from "@vueuse/rxjs";
 import type { Observable } from "rxjs";
+import { database } from "@ogw_internal/database/database.js";
+import { useObservable } from "@vueuse/rxjs";
 
 interface ModelComponentRelationRecord {
   id: string;
@@ -35,7 +29,14 @@ function pluralize(type: string): string {
   return `${type}s`;
 }
 
-export function useDataCollections() {
+// oxlint-disable-next-line eslint/max-lines-per-function
+export function useDataCollections(): {
+  hasCollectionComponents: typeof hasCollectionComponents;
+  getAllCollectionComponents: typeof getAllCollectionComponents;
+  fetchAllCollectionComponents: typeof fetchAllCollectionComponents;
+  formatedCollectionComponents: typeof formatedCollectionComponents;
+  refFormatedCollectionComponents: typeof refFormatedCollectionComponents;
+} {
   const model_components_db = database.model_components as unknown as Table<
     ModelComponentRecord,
     string
@@ -113,7 +114,9 @@ export function useDataCollections() {
       }));
   }
 
-  function refFormatedCollectionComponents(modelId: string) {
+  function refFormatedCollectionComponents(
+    modelId: string,
+  ): Observable<CollectionComponentGroup[]> {
     // Dexie's liveQuery() returns Dexie's own minimal Observable shape, not an
     // Actual rxjs Observable instance (useObservable's declared parameter type);
     // The two are structurally close enough at runtime (vueuse only calls

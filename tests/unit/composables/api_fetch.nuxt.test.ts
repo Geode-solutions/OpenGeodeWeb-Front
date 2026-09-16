@@ -37,7 +37,7 @@ describe("backStore.request()", () => {
     (backStore as { base_url: string }).base_url = "";
   });
 
-  test("invalid schema", () => {
+  test("invalid schema", async () => {
     const invalid_schema = {
       $id: "/test",
       type: "object",
@@ -51,13 +51,15 @@ describe("backStore.request()", () => {
       additionalProperties: false,
     };
     const params = { test: "hello" };
-    expect(() => backStore.request({ schema: invalid_schema, params })).toThrow(
+    await expect(backStore.request({ schema: invalid_schema, params })).rejects.toThrow(
       "data/test must be number",
     );
   });
 
-  test("invalid params", () => {
-    expect(() => backStore.request({ schema })).toThrow("data must have required property 'test'");
+  test("invalid params", async () => {
+    await expect(backStore.request({ schema })).rejects.toThrow(
+      "data must have required property 'test'",
+    );
   });
 
   test("request with callbacks", async () => {

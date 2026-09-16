@@ -9,7 +9,7 @@ export function useMeshPolyhedraCommonStyle(): {
 } {
   const dataStyleState = useDataStyleState();
 
-  function mutateMeshPolyhedraStyle(id: string, values: StyleValues): Promise<string> {
+  async function mutateMeshPolyhedraStyle(id: string, values: StyleValues): Promise<string> {
     return dataStyleState.mutateStyle(id, {
       polyhedra: values,
     });
@@ -23,7 +23,7 @@ export function useMeshPolyhedraCommonStyle(): {
     return meshPolyhedraStyle(id).coloring as StyleValues;
   }
 
-  function mutateMeshPolyhedraColoring(id: string, values: StyleValues): Promise<string> {
+  async function mutateMeshPolyhedraColoring(id: string, values: StyleValues): Promise<string> {
     return mutateMeshPolyhedraStyle(id, {
       coloring: values,
     });

@@ -20,7 +20,8 @@ export function useModelEdgesVisibilityStyle() {
     return viewerStore.request(
       { schema, params },
       {
-        response_function: () => modelEdgesCommonStyle.mutateModelEdgesStyle(id, { visibility }),
+        response_function: async () =>
+          modelEdgesCommonStyle.mutateModelEdgesStyle(id, { visibility }),
       },
     );
   }

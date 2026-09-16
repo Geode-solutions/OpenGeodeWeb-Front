@@ -1,5 +1,3 @@
-// This file grew past the 310-line limit purely from added type annotations/interfaces during the TypeScript migration, with no new logic.
-// oxlint-disable eslint/max-lines
 // Local imports
 import { getRestApiPort, getRestApiProtocol, isCloudMode } from "@ogw_front/utils/stores.js";
 import { Status } from "@ogw_front/utils/status";
@@ -282,12 +280,12 @@ export const useAppStore = defineStore("app", () => {
     return getExtension(extensionId)?.enabled ?? false;
   }
 
-  function upload(file: File, callbacks: RequestHandlers = {}) {
+  async function upload(file: File, callbacks: RequestHandlers = {}) {
     const store = useAppStore();
     const schema = opengeodeweb_front_schemas.api.local.extensions.upload;
     const { PROJECT: projectName } = useRuntimeConfig().public;
     const params = { projectName };
-    return upload_file(
+    const result = await upload_file(
       store,
       { schema, file, params },
       {
@@ -300,14 +298,15 @@ export const useAppStore = defineStore("app", () => {
         },
       },
     );
+    return result;
   }
 
-  function request(
+  async function request(
     { schema, params }: { schema: JsonRpcSchema; params?: Record<string, unknown> },
     callbacks: RequestHandlers = {},
   ) {
     const store = useAppStore();
-    return api_fetch(
+    const result = await api_fetch(
       store,
       // The app store is only ever used with HTTP ("front") schemas, which always carry `methods`; the wider JsonRpcSchema param above is kept as-is to match this action's public signature (e.g. relayed from get_version-style callers that only know about the shared, looser schema shape).
       { schema: schema as JsonRpcSchema & { methods: string[] }, params },
@@ -320,6 +319,7 @@ export const useAppStore = defineStore("app", () => {
         },
       },
     );
+    return result;
   }
 
   const request_counter = ref(0);
@@ -333,11 +333,11 @@ export const useAppStore = defineStore("app", () => {
 
   const projectFolderPath = ref("");
 
-  function createProjectFolder() {
+  async function createProjectFolder() {
     const { PROJECT } = useRuntimeConfig().public;
     const schema = opengeodeweb_front_schemas.api.local.app.project_folder_path;
     const params = { PROJECT };
-    return request(
+    const result = await request(
       { schema, params },
       {
         response_function: (response: unknown) => {
@@ -349,6 +349,7 @@ export const useAppStore = defineStore("app", () => {
         },
       },
     );
+    return result;
   }
 
   return {

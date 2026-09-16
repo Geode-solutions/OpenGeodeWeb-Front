@@ -141,7 +141,7 @@ function useMeshPointsVertexAttributeStyle(): {
     const { item, name } = meshPointsVertexAttribute(id);
     return item ?? meshPointsVertexAttributeLastItem(id, name);
   }
-  function setMeshPointsVertexAttribute(
+  async function setMeshPointsVertexAttribute(
     id: string,
     {
       name,

@@ -115,7 +115,7 @@ function useMeshPolyhedraPolyhedronAttributeStyle(): {
       no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
-  function mutateMeshPolyhedraPolyhedronStyle(
+  async function mutateMeshPolyhedraPolyhedronStyle(
     id: string,
     values: Record<string, unknown>,
   ): Promise<string> {
@@ -125,7 +125,7 @@ function useMeshPolyhedraPolyhedronAttributeStyle(): {
       },
     });
   }
-  function setMeshPolyhedraPolyhedronAttributeStoredConfig(
+  async function setMeshPolyhedraPolyhedronAttributeStoredConfig(
     id: string,
     name: string | undefined,
     item: number | undefined,

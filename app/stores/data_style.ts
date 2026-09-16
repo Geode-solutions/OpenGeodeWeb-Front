@@ -1,16 +1,14 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
+import type {
+  ModelComponentStyle,
+  ModelComponentTypeStyle,
+  ObjectStyle,
+} from "@ogw_internal/stores/data_style/types";
 import { database } from "@ogw_internal/database/database.js";
 import { getDefaultStyle } from "@ogw_front/utils/default_styles";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useMeshStyle } from "@ogw_internal/stores/data_style/mesh/index";
 import { useModelStyle } from "@ogw_internal/stores/data_style/model/index";
-import type {
-  ModelComponentStyle,
-  ModelComponentTypeStyle,
-  ObjectStyle,
-} from "@ogw_internal/stores/data_style/types";
 
 interface DataStyleSnapshot {
   styles: Record<string, ObjectStyle>;

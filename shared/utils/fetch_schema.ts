@@ -6,23 +6,30 @@ import { validateSchema } from "./validate_schema.js";
 const ERROR_400 = 400;
 
 interface FetchSchemaOptions {
-  schema: JsonRpcSchema & { methods: string[] };
+  schema: Readonly<JsonRpcSchema & { methods: readonly string[] }>;
   params?: unknown;
   baseURL?: string;
-  headers?: Record<string, string>;
+  headers?: Readonly<Record<string, string>>;
   timeout?: number;
   expectEvent?: boolean;
 }
 
-function fetchSchema(
-  { schema, params = {}, baseURL, headers, timeout, expectEvent = false }: FetchSchemaOptions,
+async function fetchSchema(
+  {
+    schema,
+    params = {},
+    baseURL,
+    headers,
+    timeout,
+    expectEvent = false,
+  }: Readonly<FetchSchemaOptions>,
   {
     request_error_function,
     response_function,
     response_error_function,
     validation_error_function,
-  }: RequestHandlersWithValidation = {},
-) {
+  }: Readonly<RequestHandlersWithValidation> = {},
+): Promise<unknown> {
   const { valid, error: schema_error } = validateSchema(schema, params);
 
   if (!valid) {
@@ -35,7 +42,7 @@ function fetchSchema(
     throw new Error(`${schema.$id}: ${schema_error}`);
   }
 
-  return fetchRaw(
+  const result = await fetchRaw(
     {
       route: schema.$id,
       method: schema.methods.find((method) => method !== "OPTIONS"),
@@ -52,6 +59,7 @@ function fetchSchema(
       response_error_function,
     },
   );
+  return result;
 }
 
 export { fetchSchema };

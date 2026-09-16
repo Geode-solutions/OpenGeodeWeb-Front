@@ -153,7 +153,7 @@ function useModelVisibilityStyle(
   function modelVisibility(modelId: string): boolean | undefined {
     return dataStyleState.getStyle(modelId).visibility;
   }
-  function setModelVisibility(modelId: string, visibility: boolean): Promise<unknown> {
+  async function setModelVisibility(modelId: string, visibility: boolean): Promise<unknown> {
     const schema = model_schemas.visibility;
     const params = {
       id: modelId,
