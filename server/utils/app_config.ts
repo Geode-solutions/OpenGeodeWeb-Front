@@ -72,10 +72,7 @@ interface ExtensionMetadata {
 
 function isExtensionMetadata(value: unknown): value is ExtensionMetadata {
   return (
-    typeof value === "object" &&
-    value !== null &&
-    "id" in value &&
-    typeof (value).id === "string"
+    typeof value === "object" && value !== null && "id" in value && typeof value.id === "string"
   );
 }
 

@@ -37,56 +37,44 @@ describe("backStore.request()", () => {
     (backStore as { base_url: string }).base_url = "";
   });
 
-  test(
-    "invalid schema",
-    async () => {
-      const invalid_schema = {
-        $id: "/test",
-        type: "object",
-        methods: ["POST"],
-        properties: {
-          test: {
-            type: "number",
-          },
+  test("invalid schema", async () => {
+    const invalid_schema = {
+      $id: "/test",
+      type: "object",
+      methods: ["POST"],
+      properties: {
+        test: {
+          type: "number",
         },
-        required: ["test"],
-        additionalProperties: false,
-      };
-      const params = { test: "hello" };
-      await expect(backStore.request({ schema: invalid_schema, params })).rejects.toThrow(
-        "data/test must be number",
-      );
-    },
-    5000,
-  );
+      },
+      required: ["test"],
+      additionalProperties: false,
+    };
+    const params = { test: "hello" };
+    await expect(backStore.request({ schema: invalid_schema, params })).rejects.toThrow(
+      "data/test must be number",
+    );
+  }, 5000);
 
-  test(
-    "invalid params",
-    async () => {
-      await expect(backStore.request({ schema })).rejects.toThrow(
-        "data must have required property 'test'",
-      );
-    },
-    5000,
-  );
+  test("invalid params", async () => {
+    await expect(backStore.request({ schema })).rejects.toThrow(
+      "data must have required property 'test'",
+    );
+  }, 5000);
 
-  test(
-    "request with callbacks",
-    async () => {
-      const params = { test: "hello" };
-      let errorCalled = false;
-      const callbacks = {
-        request_error_function: (): void => {
-          errorCalled = true;
-        },
-      };
-      registerEndpoint(schema.$id, {
-        method: schema.methods[FIRST_INDEX] as HTTPMethod,
-        handler: () => ({ result: "success" }),
-      });
-      await backStore.request({ schema, params }, callbacks);
-      expect(errorCalled).toBe(false);
-    },
-    5000,
-  );
+  test("request with callbacks", async () => {
+    const params = { test: "hello" };
+    let errorCalled = false;
+    const callbacks = {
+      request_error_function: (): void => {
+        errorCalled = true;
+      },
+    };
+    registerEndpoint(schema.$id, {
+      method: schema.methods[FIRST_INDEX] as HTTPMethod,
+      handler: () => ({ result: "success" }),
+    });
+    await backStore.request({ schema, params }, callbacks);
+    expect(errorCalled).toBe(false);
+  }, 5000);
 });
