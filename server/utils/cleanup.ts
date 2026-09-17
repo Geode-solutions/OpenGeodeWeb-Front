@@ -105,7 +105,6 @@ async function killWebsocketMicroservice(microservice: Readonly<Microservice>): 
           }),
         );
       });
-      // oxlint-disable-next-line typescript/prefer-readonly-parameter-types -- Buffer's built-in mutating methods (write/fill/copy) can't be made structurally readonly
       socket.on("message", (data: Buffer | string) => {
         const message = data.toString();
         console.log("Received from server:", message);

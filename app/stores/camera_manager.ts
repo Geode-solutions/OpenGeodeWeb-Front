@@ -14,8 +14,12 @@ interface CameraPositionRecord {
   camera_options: CameraOptions;
 }
 
+// oxlint-disable-next-line max-lines-per-function
 export const useCameraManagerStore = defineStore("camera_manager", () => {
   const viewerStore = useViewerStore();
+  // Database's table map is assembled dynamically at runtime (see internal/database/database.ts),
+  // So it's typed as `{}`; this store's table is registered before use, hence the cast.
+  // oxlint-disable-next-line no-unsafe-type-assertion -- trusted database table boundary.
   const camera_positions_db = database.camera_positions as unknown as Table<
     CameraPositionRecord,
     number
@@ -27,18 +31,24 @@ export const useCameraManagerStore = defineStore("camera_manager", () => {
     // The two are structurally close enough at runtime (vueuse only calls
     // `.subscribe`) but not identical, hence the cast.
     return useObservable(
-      liveQuery(async () => camera_positions_db.toArray()) as unknown as Observable<
-        CameraPositionRecord[]
-      >,
+      // oxlint-disable-next-line no-unsafe-type-assertion -- trusted vueuse/Dexie Observable boundary; see comment above.
+      liveQuery(async () => {
+        const positions = await camera_positions_db.toArray();
+        return positions;
+      }) as unknown as Observable<CameraPositionRecord[]>,
       { initialValue: [] as CameraPositionRecord[] },
     );
   }
 
   async function getCameraPosition(id: number): Promise<CameraPositionRecord | undefined> {
-    return camera_positions_db.get(id);
+    const position = await camera_positions_db.get(id);
+    return position;
   }
 
-  async function saveCameraPosition(name: string, camera_options: CameraOptions): Promise<void> {
+  async function saveCameraPosition(
+    name: string,
+    camera_options: Readonly<CameraOptions>,
+  ): Promise<void> {
     await camera_positions_db.put({
       name,
       camera_options,

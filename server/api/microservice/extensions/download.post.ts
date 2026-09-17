@@ -16,7 +16,6 @@ interface DownloadExtensionBody {
   extensionFileName: string;
 }
 
-// oxlint-disable-next-line typescript/prefer-readonly-parameter-types
 export default defineEventHandler(async (event: H3Event) => {
   try {
     const body = await readBody<DownloadExtensionBody>(event);

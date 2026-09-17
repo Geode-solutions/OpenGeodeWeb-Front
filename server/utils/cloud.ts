@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 // Third party imports
-import type { GoogleAuth } from "google-auth-library";
+import type { AuthClient, OAuth2Client } from "google-auth-library";
 import { google } from "googleapis";
 import type { protos } from "@google-cloud/run";
 
@@ -15,13 +15,12 @@ type CreateServiceRequest = protos.google.cloud.run.v2.ICreateServiceRequest;
 
 const LOCATIONS_DIR = "/etc/nginx/locations";
 
-// oxlint-disable-next-line typescript/prefer-readonly-parameter-types
-async function artifactImage(parent: string, authClient: GoogleAuth): Promise<string> {
+async function artifactImage(parent: string, authClient: AuthClient): Promise<string> {
   const projectName = process.env.PROJECT;
   const registry = google.artifactregistry({
     version: "v1",
-    // oxlint-disable-next-line typescript/no-unsafe-assignment
-    auth: authClient,
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+    auth: authClient as OAuth2Client,
   });
   const branch = process.env.NETLIFY_BRANCH;
   const [, projectId] = parent.split("/");

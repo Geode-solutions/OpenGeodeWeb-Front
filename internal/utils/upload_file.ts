@@ -24,6 +24,14 @@ interface FetchErrorResponseLike {
   description?: string;
 }
 
+function isFetchErrorLike(value: unknown): value is FetchErrorLike {
+  return typeof value === "object" && value !== null;
+}
+
+function isFetchErrorResponseLike(value: unknown): value is FetchErrorResponseLike {
+  return typeof value === "object" && value !== null;
+}
+
 async function upload_file(
   microservice: Microservice,
   { schema, file, params = {} }: UploadFileParams,
@@ -55,7 +63,7 @@ async function upload_file(
     {
       request_error_function(error: unknown) {
         microservice.stop_request();
-        const typedError = error as FetchErrorLike;
+        const typedError = isFetchErrorLike(error) ? error : {};
         feedbackStore.add_error(
           typedError.code ?? 0,
           route,
@@ -74,7 +82,7 @@ async function upload_file(
       },
       response_error_function(response: unknown) {
         microservice.stop_request();
-        const typedResponse = response as FetchErrorResponseLike;
+        const typedResponse = isFetchErrorResponseLike(response) ? response : {};
         feedbackStore.add_error(
           typedResponse.status ?? 0,
           route,

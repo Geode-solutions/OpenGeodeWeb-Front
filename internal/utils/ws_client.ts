@@ -4,10 +4,24 @@ import vtkWSLinkClient, {
   newInstance,
 } from "@kitware/vtk.js/IO/Core/WSLinkClient";
 import SmartConnect from "wslink/src/SmartConnect";
-import _ from "lodash";
 
 interface WsClientCallbacks {
   onConnectionClose?: () => void;
+}
+
+// Wslink's connection event shape is untyped upstream; this describes the fields we read.
+interface WsConnectionEvent {
+  response?: { error?: string };
+}
+
+function isVtkWSLinkClient(value: unknown): value is VtkWSLinkClient {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "connect" in value &&
+    "onConnectionError" in value &&
+    "onConnectionClose" in value
+  );
 }
 
 async function initWebSocketClient(
@@ -16,16 +30,14 @@ async function initWebSocketClient(
   { onConnectionClose }: WsClientCallbacks = {},
 ): Promise<VtkWSLinkClient> {
   vtkWSLinkClient.setSmartConnectClass(SmartConnect);
-  const client = (_.isEmpty(initialClient) ? newInstance() : initialClient) as VtkWSLinkClient;
+  const client = isVtkWSLinkClient(initialClient) ? initialClient : newInstance();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- wslink's httpReq shape is untyped upstream.
-  client.onConnectionError((httpReq: any) => {
-    const message = httpReq?.response?.error || `Connection error`;
+  client.onConnectionError((httpReq: WsConnectionEvent) => {
+    const message = httpReq.response?.error ?? "Connection error";
     console.error(message);
   });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- wslink's httpReq shape is untyped upstream.
-  client.onConnectionClose((httpReq: any) => {
-    const message = httpReq?.response?.error || `Connection close`;
+  client.onConnectionClose((httpReq: WsConnectionEvent) => {
+    const message = httpReq.response?.error ?? "Connection close";
     onConnectionClose?.();
     console.error(message);
   });

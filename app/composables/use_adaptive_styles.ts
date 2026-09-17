@@ -47,17 +47,6 @@ function isCoordinatesLike(value: unknown): value is CoordinatesLike {
   return typeof value === "object" && value !== null;
 }
 
-// `useElementBounding`'s target accepts an element/ref/getter or nullish value -
-// I.e. anything that isn't a primitive (string, number, boolean, bigint, symbol).
-function isElementBoundingTarget(value: unknown): value is MaybeComputedElementRef {
-  return (
-    value === undefined ||
-    value === null ||
-    typeof value === "function" ||
-    typeof value === "object"
-  );
-}
-
 function getValue(val: unknown): number {
   if (typeof val === "object" && val !== null && "value" in val) {
     const wrapped = (val as { value?: unknown }).value;
@@ -93,7 +82,10 @@ export function useAdaptiveStyles(
         (targetAsRefLike.value as { x?: unknown }).x !== undefined) ||
       (targetAsRefLike?.x !== undefined && targetAsRefLike.value === undefined));
 
-  const bounding = useElementBounding(isCoordinates ? undefined : (target as never));
+  const bounding = useElementBounding(
+    // oxlint-disable-next-line no-unsafe-type-assertion -- duck-typed target; see comment above.
+    isCoordinates ? undefined : (target as MaybeComputedElementRef),
+  );
 
   const unwrapped = computed(() => {
     if (isCoordinates) {

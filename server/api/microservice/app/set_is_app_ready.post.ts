@@ -8,7 +8,6 @@ interface SetIsAppReadyBody {
   isReady: boolean;
 }
 
-// oxlint-disable-next-line typescript/prefer-readonly-parameter-types
 export default defineEventHandler(async (event: H3Event) => {
   try {
     const { isReady } = await readBody<SetIsAppReadyBody>(event);

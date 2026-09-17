@@ -1,9 +1,9 @@
 // Covers both flavors of schema used across this codebase: HTTP ("front") schemas carry a `methods` array, websocket RPC ("viewer"/"back") schemas carry `rpc` instead. Neither field is required here since call sites that need one specifically (e.g. fetchSchema needing `methods`) narrow it themselves.
 interface JsonRpcSchema {
-  $id: string;
-  methods?: readonly string[];
-  rpc?: string;
-  max_retry?: number;
+  readonly $id: string;
+  readonly methods?: readonly string[];
+  readonly rpc?: string;
+  readonly max_retry?: number;
   readonly [key: string]: unknown;
 }
 

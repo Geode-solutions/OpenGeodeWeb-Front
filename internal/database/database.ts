@@ -9,17 +9,17 @@ interface DatabaseContainer {
 const databaseContainer: DatabaseContainer = { instance: undefined };
 
 class Database extends BaseDatabase {
-  constructor() {
+  public constructor() {
     super("Database");
 
     this.version(3).stores(BaseDatabase.initialStores);
   }
 
-  static async addTable(tableName: string, schemaDefinition: string): Promise<void> {
+  public static async addTable(tableName: string, schemaDefinition: string): Promise<void> {
     await this.addTables({ [tableName]: schemaDefinition });
   }
 
-  static async addTables(newTables: Record<string, string>): Promise<void> {
+  public static async addTables(newTables: Record<string, string>): Promise<void> {
     let currentVersion = 1;
     let currentStores: Record<string, string> = { ...BaseDatabase.initialStores };
 
@@ -43,7 +43,7 @@ class Database extends BaseDatabase {
     const allExisting = Object.keys(newTables).every((tableName) => currentStores[tableName]);
 
     // Set at module load time below; always defined by the time addTable/addTables runs.
-    databaseContainer.instance!.close();
+    databaseContainer.instance?.close();
 
     if (allExisting) {
       const existingDb = new Dexie("Database");
@@ -66,19 +66,24 @@ class Database extends BaseDatabase {
 
 // oxlint-disable-next-line no-top-level-await
 await Dexie.delete("Database");
-databaseContainer.instance = new Database();
-(databaseContainer.instance as Database).clear();
+const initialDatabase = new Database();
+databaseContainer.instance = initialDatabase;
+// oxlint-disable-next-line no-top-level-await
+await initialDatabase.clear();
 
 // The set of tables is assembled dynamically at runtime (Database.addTable/addTables add stores on the fly), so fully modelling this with Dexie's row generics isn't worth it here: the proxy target is typed loosely as "any table name maps to a Dexie Table of loosely-typed rows".
 type DatabaseTables = Record<string, Table<Record<string, unknown>, string>>;
 
-const database = new Proxy(
+const database = new Proxy<DatabaseTables>(
   {},
   {
-    get(_target, prop: string | symbol) {
+    get(_target, prop: string | symbol): unknown {
+      // The instance is a Dexie subclass whose tables are only known dynamically at runtime.
+      // oxlint-disable-next-line no-unsafe-type-assertion
       const instance = databaseContainer.instance as unknown as Record<string | symbol, unknown>;
       const value = instance[prop];
       if (typeof value === "function") {
+        // oxlint-disable-next-line no-unsafe-return
         return value.bind(databaseContainer.instance);
       }
       return value;
@@ -86,4 +91,10 @@ const database = new Proxy(
   },
 );
 
-export { Database, database };
+// The proxy only knows the loose DatabaseTables shape; callers cast to the row type they know a given table holds.
+function getTable<TRow>(tableName: string): Table<TRow, string> {
+  // oxlint-disable-next-line no-unsafe-type-assertion
+  return database[tableName] as unknown as Table<TRow, string>;
+}
+
+export { Database, database, getTable };

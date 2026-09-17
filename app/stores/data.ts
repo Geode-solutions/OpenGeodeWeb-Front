@@ -1,3 +1,4 @@
+// oxlint-disable eslint/max-lines
 // Third party imports
 import { type Table, liveQuery } from "dexie";
 import type { Observable } from "rxjs";
@@ -60,12 +61,16 @@ interface ViewableItemLike {
 }
 
 const viewer_generic_schemas = viewer_schemas.opengeodeweb_viewer.generic;
-function checkItemViewable(item: ViewableItemLike | undefined | null): boolean {
+// The database's table map is dynamically assembled at runtime (see internal/database/database.ts), so its exported type is a loose `{}`; cast it to the shape it actually has at runtime rather than widening every call site.
+type DatabaseTables = Record<string, unknown>;
+// oxlint-disable-next-line no-unsafe-type-assertion -- see comment above.
+const typedDatabase = database as unknown as DatabaseTables;
+function checkItemViewable(item: Readonly<ViewableItemLike> | undefined | null): boolean {
   if (!item || typeof item !== "object") {
     return false;
   }
   if (item.is_viewable !== undefined) {
-    return Boolean(item.is_viewable);
+    return item.is_viewable;
   }
   if (item.binary_light_viewable !== undefined) {
     return item.binary_light_viewable !== "not_viewable";
@@ -79,11 +84,10 @@ function checkItemViewable(item: ViewableItemLike | undefined | null): boolean {
   }
   return true;
 }
-function isItemViewable(itemOrId: string | ViewableItemLike): boolean | Promise<boolean> {
+function isItemViewable(itemOrId: string | Readonly<ViewableItemLike>): boolean | Promise<boolean> {
   if (typeof itemOrId === "string") {
-    return (database.data as unknown as Table<DataItem, string>)
-      .get(itemOrId)
-      .then(checkItemViewable);
+    // oxlint-disable-next-line no-unsafe-type-assertion -- database's table map is dynamically typed at runtime; see comment above.
+    return (typedDatabase.data as Table<DataItem, string>).get(itemOrId).then(checkItemViewable);
   }
   return checkItemViewable(itemOrId);
 }
@@ -91,12 +95,12 @@ function isItemViewable(itemOrId: string | ViewableItemLike): boolean | Promise<
 // oxlint-disable-next-line max-lines-per-function, max-statements
 export const useDataStore = defineStore("data", () => {
   const viewerStore = useViewerStore();
-  const data_db = database.data as unknown as Table<DataItem, string>;
-  const model_components_db = database.model_components as unknown as Table<
-    ModelComponentRecord,
-    string
-  >;
-  const model_components_relation_db = database.model_components_relation as unknown as Table<
+  // oxlint-disable-next-line no-unsafe-type-assertion -- database's table map is dynamically typed at runtime; see comment above.
+  const data_db = typedDatabase.data as Table<DataItem, string>;
+  // oxlint-disable-next-line no-unsafe-type-assertion -- database's table map is dynamically typed at runtime; see comment above.
+  const model_components_db = typedDatabase.model_components as Table<ModelComponentRecord, string>;
+  // oxlint-disable-next-line no-unsafe-type-assertion -- database's table map is dynamically typed at runtime; see comment above.
+  const model_components_relation_db = typedDatabase.model_components_relation as Table<
     ModelComponentRelationRecord,
     string
   >;
@@ -127,7 +131,8 @@ export const useDataStore = defineStore("data", () => {
     return data_item;
   }
   async function allItems(): Promise<DataItem[]> {
-    return data_db.toArray();
+    const items = await data_db.toArray();
+    return items;
   }
   function refItem(id: string): Readonly<Ref<DataItem | undefined>> {
     // Dexie's liveQuery() returns Dexie's own minimal Observable shape, not an
@@ -135,15 +140,24 @@ export const useDataStore = defineStore("data", () => {
     // The two are structurally close enough at runtime (vueuse only calls
     // `.subscribe`) but not identical, hence the cast.
     return useObservable(
-      liveQuery(async () => data_db.get(id)) as unknown as Observable<DataItem | undefined>,
+      // oxlint-disable-next-line no-unsafe-type-assertion -- trusted vueuse/Dexie Observable boundary; see comment above.
+      liveQuery(async () => {
+        const data_item = await data_db.get(id);
+        return data_item;
+      }) as unknown as Observable<DataItem | undefined>,
       {
+        // oxlint-disable-next-line no-unsafe-type-assertion -- placeholder until the live query resolves; consumers must treat this as possibly incomplete.
         initialValue: {} as DataItem,
       },
     );
   }
   function refAllItems(): Readonly<Ref<DataItem[]>> {
     return useObservable(
-      liveQuery(async () => data_db.toArray()) as unknown as Observable<DataItem[]>,
+      // oxlint-disable-next-line no-unsafe-type-assertion -- trusted vueuse/Dexie Observable boundary; see comment above.
+      liveQuery(async () => {
+        const items = await data_db.toArray();
+        return items;
+      }) as unknown as Observable<DataItem[]>,
       {
         initialValue: [] as DataItem[],
       },
@@ -162,26 +176,30 @@ export const useDataStore = defineStore("data", () => {
       id,
       name,
     };
-    return viewerStore.request({
+    const result = await viewerStore.request({
       schema,
       params,
       timeout: 0,
     });
+    return result;
   }
   async function deregisterObject(id: string): Promise<unknown> {
     const schema = viewer_generic_schemas.deregister;
     const params = {
       id,
     };
-    return viewerStore.request({
+    const result = await viewerStore.request({
       schema,
       params,
     });
+    return result;
   }
-  async function addItem(new_item: NewDataItem): Promise<string> {
+  // NewDataItem has mutable array fields (mesh_components, collection_components), so Readonly<>
+  // Can't satisfy prefer-readonly-parameter-types deeply; same pattern as app/utils/import_workflow.ts.
+  async function addItem(new_item: Readonly<NewDataItem>): Promise<string> {
     const itemData: DataItem = {
       id: new_item.id,
-      name: new_item.name || new_item.id,
+      name: new_item.name ?? new_item.id,
       viewer_type: new_item.viewer_type,
       geode_object_type: new_item.geode_object_type,
       visible: true,
@@ -191,11 +209,16 @@ export const useDataStore = defineStore("data", () => {
     if (new_item.binary_light_viewable !== undefined && new_item.binary_light_viewable !== null) {
       itemData.binary_light_viewable = new_item.binary_light_viewable;
     }
-    return data_db.put(itemData);
+    const id = await data_db.put(itemData);
+    return id;
   }
-  async function addComponents(new_item: NewDataItem): Promise<string> {
+  // NewDataItem has mutable array fields (mesh_components, collection_components), so Readonly<>
+  // Can't satisfy prefer-readonly-parameter-types deeply; same pattern as app/utils/import_workflow.ts.
+  async function addComponents(new_item: Readonly<NewDataItem>): Promise<string> {
     const allComponents: ModelComponentRecord[] = [];
-    function addModelComponents(components: ModelComponentInput[]): void {
+    // ModelComponentInput has mutable array fields (boundaries, internals, items), so a readonly
+    // Array of it can't satisfy prefer-readonly-parameter-types deeply; same limitation as above.
+    function addModelComponents(components: readonly ModelComponentInput[]): void {
       for (const component of components) {
         allComponents.push({
           id: new_item.id,
@@ -213,11 +236,18 @@ export const useDataStore = defineStore("data", () => {
     if (new_item.collection_components) {
       addModelComponents(new_item.collection_components);
     }
-    return model_components_db.bulkPut(allComponents);
+    const lastKey = await model_components_db.bulkPut(allComponents);
+    return lastKey;
   }
-  async function addComponentRelations(new_item: NewDataItem): Promise<string> {
+  // NewDataItem has mutable array fields (mesh_components, collection_components), so Readonly<>
+  // Can't satisfy prefer-readonly-parameter-types deeply; same pattern as app/utils/import_workflow.ts.
+  async function addComponentRelations(new_item: Readonly<NewDataItem>): Promise<string> {
     const relations: ModelComponentRelationRecord[] = [];
-    function addModelComponentRelations(components: string[], parent: string, type: string): void {
+    function addModelComponentRelations(
+      components: readonly string[],
+      parent: string,
+      type: string,
+    ): void {
       for (const child of components) {
         relations.push({
           id: new_item.id,
@@ -244,7 +274,8 @@ export const useDataStore = defineStore("data", () => {
         }
       }
     }
-    return model_components_relation_db.bulkPut(relations);
+    const lastKey = await model_components_relation_db.bulkPut(relations);
+    return lastKey;
   }
   async function getComponentByViewerId(
     modelId: string,
@@ -253,7 +284,7 @@ export const useDataStore = defineStore("data", () => {
     const component = await model_components_db
       .where("viewer_id")
       .equals(Number(viewer_id))
-      .and((model_component) => model_component.id === modelId)
+      .and((model_component: Readonly<ModelComponentRecord>) => model_component.id === modelId)
       .first();
     return component;
   }
@@ -273,17 +304,21 @@ export const useDataStore = defineStore("data", () => {
 
   async function getAllModelComponentsViewerIds(modelId: string): Promise<number[]> {
     const components = await model_components_db.where("id").equals(modelId).toArray();
-    return components.map((component) => Math.trunc(Number(component.viewer_id)));
+    return components.map((component: Readonly<ModelComponentRecord>) =>
+      Math.trunc(Number(component.viewer_id)),
+    );
   }
   async function getMeshComponentsViewerIds(
     modelId: string,
-    meshComponentGeodeIds: string[],
+    meshComponentGeodeIds: readonly string[],
   ): Promise<number[]> {
     const components = await model_components_db
       .where("[id+geode_id]")
       .anyOf(meshComponentGeodeIds.map((geode_id) => [modelId, geode_id]))
       .toArray();
-    return components.map((component) => Math.trunc(Number(component.viewer_id)));
+    return components.map((component: Readonly<ModelComponentRecord>) =>
+      Math.trunc(Number(component.viewer_id)),
+    );
   }
   async function exportStores(): Promise<{
     items: DataItem[];
@@ -306,9 +341,11 @@ export const useDataStore = defineStore("data", () => {
     await model_components_relation_db.clear();
   }
 
+  // Dexie's bulkPut expects mutable arrays, so this snapshot parameter can't deeply satisfy
+  // The prefer-readonly-parameter-types rule; same pattern as app/utils/import_workflow.ts.
   async function importStores(snapshot: {
-    modelComponents: ModelComponentRecord[];
-    modelComponentsRelations: ModelComponentRelationRecord[];
+    readonly modelComponents: readonly ModelComponentRecord[];
+    readonly modelComponentsRelations: readonly ModelComponentRelationRecord[];
   }): Promise<void> {
     await clear();
     await model_components_db.bulkPut(snapshot.modelComponents);

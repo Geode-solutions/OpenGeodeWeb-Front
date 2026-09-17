@@ -18,6 +18,7 @@ import { useInfraStore } from "@ogw_front/stores/infra";
 import { viewer_call } from "@ogw_internal/utils/viewer_call";
 
 import type { JsonRpcSchema, RequestHandlers } from "@ogw_shared/utils/types.js";
+// oxlint-disable-next-line import/max-dependencies -- all imports above are required by this store.
 import type { RpcClient } from "@ogw_shared/utils/call_raw.js";
 
 interface PickedPoint {
@@ -35,6 +36,7 @@ export const useViewerStore = defineStore(
   () => {
     const infraStore = useInfraStore();
     const default_local_port = ref("1234");
+    // oxlint-disable-next-line no-unsafe-type-assertion -- placeholder before the real client is set by ws_connect.
     const client = ref<RpcClient>({} as RpcClient);
     const config = ref<unknown>(undefined);
     const picking_mode = ref(false);
@@ -65,11 +67,15 @@ export const useViewerStore = defineStore(
         schema,
         params = {},
         timeout = request_timeout,
-      }: { schema: JsonRpcSchema; params?: Record<string, unknown>; timeout?: number },
+      }: Readonly<{
+        schema: JsonRpcSchema;
+        params?: Readonly<Record<string, unknown>>;
+        timeout?: number;
+      }>,
       callbacks: RequestHandlers = {},
     ): Promise<unknown> {
       const store = useViewerStore();
-      return viewer_call(
+      const result = await viewer_call(
         store,
         {
           schema,
@@ -85,6 +91,7 @@ export const useViewerStore = defineStore(
           },
         },
       );
+      return result;
     }
     async function set_picked_point(x: number, y: number): Promise<void> {
       const schema = opengeodeweb_viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
@@ -100,6 +107,7 @@ export const useViewerStore = defineStore(
         x: world_x,
         y: world_y,
         z: world_z,
+        // oxlint-disable-next-line no-unsafe-type-assertion -- response shape is defined by the get_point_position schema.
       } = response as { x: number; y: number; z: number };
       picked_point.value = {
         x: world_x,
@@ -107,23 +115,24 @@ export const useViewerStore = defineStore(
         z: world_z,
       };
     }
-    function ws_connect() {
+    async function ws_connect(): Promise<void> {
       if (status.value === Status.CONNECTED) {
-        return undefined;
+        return;
       }
-      return navigator.locks.request("viewer.ws_connect", async (lock) => {
+      await navigator.locks.request("viewer.ws_connect", async () => {
         if (status.value === Status.CONNECTED) {
           return;
         }
         try {
-          console.log("VIEWER LOCK GRANTED !", lock);
           status.value = Status.CONNECTING;
+          // oxlint-disable-next-line no-unsafe-type-assertion -- initWebSocketClient's return is not typed as RpcClient.
           client.value = (await initWebSocketClient(base_url.value, client.value, {
             onConnectionClose: () => {
               status.value = Status.NOT_CONNECTED;
             },
           })) as unknown as RpcClient;
           connectImageStream(client.value.getConnection().getSession());
+          // oxlint-disable-next-line no-unsafe-type-assertion -- endBusy is not part of the RpcClient type.
           (client.value as unknown as { endBusy: () => void }).endBusy();
           const schema = opengeodeweb_viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization;
           const timeout = undefined;
@@ -133,7 +142,6 @@ export const useViewerStore = defineStore(
           });
           status.value = Status.CONNECTED;
         } catch (error) {
-          console.error("ws_connect error", error);
           status.value = Status.NOT_CONNECTED;
           throw error;
         }
@@ -145,10 +153,7 @@ export const useViewerStore = defineStore(
     function stop_request(): void {
       request_counter.value -= 1;
     }
-    async function launch(args: { projectFolderPath?: string } = {}) {
-      console.log("[VIEWER] Launching viewer microservice...", {
-        args,
-      });
+    async function launch(args: Readonly<{ projectFolderPath?: string }> = {}): Promise<unknown> {
       const appStore = useAppStore();
       const { COMMAND_VIEWER, NUXT_ROOT_PATH } = useRuntimeConfig().public;
       const schema = opengeodeweb_front_schemas.api.local.app.run_viewer;
@@ -157,27 +162,25 @@ export const useViewerStore = defineStore(
         NUXT_ROOT_PATH,
         args,
       };
-      console.log("[VIEWER] params", params);
-      return appStore.request(
+      const result = await appStore.request(
         {
           schema,
           params,
         },
         {
           response_function: (response: unknown) => {
+            // oxlint-disable-next-line no-unsafe-type-assertion -- response shape is defined by the run_viewer schema.
             const { port: viewerPort } = response as { port: string };
-            console.log(`[VIEWER] Viewer launched on port ${viewerPort}`);
             default_local_port.value = viewerPort;
           },
         },
       );
+      return result;
     }
     async function connect(): Promise<void> {
-      console.log("[VIEWER] Connecting to viewer microservice...");
       await ws_connect();
-      console.log("[VIEWER] Viewer connected successfully");
     }
-    async function get_version(schema: JsonRpcSchema | undefined) {
+    async function get_version(schema: JsonRpcSchema | undefined): Promise<unknown> {
       if (!schema) {
         return undefined;
       }
@@ -187,6 +190,7 @@ export const useViewerStore = defineStore(
         },
         {
           response_function: (response: unknown) => {
+            // oxlint-disable-next-line no-unsafe-type-assertion -- response shape is defined by the version schema.
             const { microservice_version } = response as { microservice_version: string };
             version.value = microservice_version;
           },

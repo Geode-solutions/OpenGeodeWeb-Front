@@ -25,7 +25,6 @@ interface RunExtensionsBody {
   projectName: string;
 }
 
-// oxlint-disable-next-line typescript/prefer-readonly-parameter-types
 export default defineEventHandler(async (event: H3Event) => {
   try {
     console.log("NITRO: runExtensions", event);

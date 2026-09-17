@@ -44,7 +44,6 @@ interface NamedChildProcess extends child_process.ChildProcessByStdio<null, Read
 
 // oxlint-disable-next-line max-lines-per-function typescript/prefer-readonly-parameter-types eslint/require-await
 async function waitForReady(
-  // oxlint-disable-next-line typescript/prefer-readonly-parameter-types
   child: NamedChildProcess,
   expectedResponse: string,
   signal?: Readonly<AbortSignal>,
@@ -158,10 +157,8 @@ async function waitForReady(
   });
 }
 async function waitNuxt(
-  // oxlint-disable-next-line typescript/prefer-readonly-parameter-types
   nuxtProcess: child_process.ChildProcessWithoutNullStreams,
 ): Promise<string> {
-  // oxlint-disable-next-line typescript/prefer-readonly-parameter-types
   nuxtProcess.stderr.on("data", (data: Buffer) => {
     console.log("Nuxt STDERR:", data.toString().trim());
   });
@@ -175,7 +172,6 @@ async function waitNuxt(
     if (portMatch?.groups) {
       const { port } = portMatch.groups;
       console.log("Nuxt listening on port", port);
-      // oxlint-disable-next-line typescript/prefer-readonly-parameter-types
       nuxtProcess.stdout.on("data", (newData: Buffer) => {
         console.log("Nuxt STDOUT:", newData.toString().trim());
       });

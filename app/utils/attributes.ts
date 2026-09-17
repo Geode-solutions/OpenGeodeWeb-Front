@@ -11,8 +11,8 @@ interface AttributeRange {
 }
 
 export function getAttributeRange(
-  currentAttribute: AttributeRangeSource | undefined | null,
-  compIndex: number = 0,
+  currentAttribute: Readonly<AttributeRangeSource> | undefined | null,
+  compIndex = 0,
 ): AttributeRange {
   if (!currentAttribute) {
     return { min: 0, max: 1 };

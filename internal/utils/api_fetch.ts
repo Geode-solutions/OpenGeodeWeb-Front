@@ -31,6 +31,32 @@ interface FetchErrorResponseLike {
   description?: string;
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function toFetchErrorLike(error: unknown): FetchErrorLike {
+  if (!isRecord(error)) {
+    return {};
+  }
+  return {
+    code: typeof error.code === "number" ? error.code : undefined,
+    message: typeof error.message === "string" ? error.message : undefined,
+    stack: typeof error.stack === "string" ? error.stack : undefined,
+  };
+}
+
+function toFetchErrorResponseLike(response: unknown): FetchErrorResponseLike {
+  if (!isRecord(response)) {
+    return {};
+  }
+  return {
+    status: typeof response.status === "number" ? response.status : undefined,
+    name: typeof response.name === "string" ? response.name : undefined,
+    description: typeof response.description === "string" ? response.description : undefined,
+  };
+}
+
 async function api_fetch(
   microservice: Microservice,
   { schema, params = {}, headers = {} }: ApiFetchParams,
@@ -57,7 +83,7 @@ async function api_fetch(
     {
       request_error_function(error: unknown) {
         microservice.stop_request();
-        const typedError = error as FetchErrorLike;
+        const typedError = toFetchErrorLike(error);
         feedbackStore.add_error(
           typedError.code ?? 0,
           schema.$id,
@@ -77,7 +103,7 @@ async function api_fetch(
       },
       response_error_function(response: unknown) {
         microservice.stop_request();
-        const typedResponse = response as FetchErrorResponseLike;
+        const typedResponse = toFetchErrorResponseLike(response);
         feedbackStore.add_error(
           typedResponse.status ?? 0,
           schema.$id,

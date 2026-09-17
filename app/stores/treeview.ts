@@ -55,6 +55,22 @@ function defaultOpenedViews(): OpenedView[] {
   return [{ type: "object", id: "main", title: "Objects", scrollTop: 0, opened: [] }];
 }
 
+type ReadonlyOpenedView = Readonly<Omit<OpenedView, "opened">> & {
+  readonly opened: readonly string[];
+};
+type ReadonlyTreeviewGroup = Readonly<Omit<TreeviewGroup, "children">> & {
+  readonly children: readonly Readonly<TreeviewChild>[];
+};
+type ReadonlyTreeviewSnapshot = Readonly<{
+  opened_views?: readonly ReadonlyOpenedView[];
+  panelWidth?: number;
+  additionalPanelWidth?: number;
+  rowHeights?: readonly number[];
+  selectionIds?: readonly string[];
+  selection?: readonly (string | Readonly<{ id: string }>)[];
+}>;
+
+// oxlint-disable-next-line max-lines-per-function, max-statements
 export const useTreeviewStore = defineStore("treeview", () => {
   const items = ref<TreeviewGroup[]>([]);
   const selection = ref<string[]>([]);
@@ -66,10 +82,12 @@ export const useTreeviewStore = defineStore("treeview", () => {
   const pendingSelectionIds = ref<string[]>([]);
   const rowHeights = ref<number[]>([]);
 
-  const treeview_config_db = database.treeview_config as unknown as Table<
-    TreeviewConfigRecord,
-    string
-  >;
+  // The database's table map is dynamically assembled at runtime (see internal/database/database.ts), so its exported type is a loose `{}`; cast it to the shape it actually has at runtime rather than widening every call site.
+  type DatabaseTables = Record<string, unknown>;
+  // oxlint-disable-next-line no-unsafe-type-assertion -- database's table map is dynamically typed at runtime; see comment above.
+  const typedDatabase = database as unknown as DatabaseTables;
+  // oxlint-disable-next-line no-unsafe-type-assertion -- database's table map is dynamically typed at runtime; see comment above.
+  const treeview_config_db = typedDatabase.treeview_config as Table<TreeviewConfigRecord, string>;
 
   async function loadConfig(): Promise<void> {
     try {
@@ -77,10 +95,10 @@ export const useTreeviewStore = defineStore("treeview", () => {
       if (config?.opened_views) {
         opened_views.value = config.opened_views;
       }
-      if (config?.panelWidth) {
+      if (config?.panelWidth !== undefined && config.panelWidth !== 0) {
         panelWidth.value = config.panelWidth;
       }
-      if (config?.additionalPanelWidth) {
+      if (config?.additionalPanelWidth !== undefined && config.additionalPanelWidth !== 0) {
         additionalPanelWidth.value = config.additionalPanelWidth;
       }
       if (config?.selectionIds) {
@@ -90,21 +108,24 @@ export const useTreeviewStore = defineStore("treeview", () => {
         rowHeights.value = config.rowHeights;
       }
     } catch (error) {
+      // oxlint-disable-next-line no-console -- surfaces persistence failures during local development.
       console.error("Failed to load treeview config:", error);
     }
   }
+  // oxlint-disable-next-line typescript/no-floating-promises -- loadConfig catches its own errors internally.
   loadConfig();
 
   watch(
     [opened_views, panelWidth, additionalPanelWidth, selection, rowHeights],
     () => {
-      // oxlint-disable-next-line unicorn/prefer-structured-clone
-      const clean_opened_views = JSON.parse(JSON.stringify(opened_views.value));
-      // oxlint-disable-next-line unicorn/prefer-structured-clone
-      const clean_selectionIds = JSON.parse(JSON.stringify(selection.value));
-      // oxlint-disable-next-line unicorn/prefer-structured-clone
-      const clean_rowHeights = JSON.parse(JSON.stringify(rowHeights.value));
+      // oxlint-disable-next-line unicorn/prefer-structured-clone, no-unsafe-type-assertion -- JSON round-trip of a known-shape ref; result matches the source type.
+      const clean_opened_views = JSON.parse(JSON.stringify(opened_views.value)) as OpenedView[];
+      // oxlint-disable-next-line unicorn/prefer-structured-clone, no-unsafe-type-assertion -- JSON round-trip of a known-shape ref; result matches the source type.
+      const clean_selectionIds = JSON.parse(JSON.stringify(selection.value)) as string[];
+      // oxlint-disable-next-line unicorn/prefer-structured-clone, no-unsafe-type-assertion -- JSON round-trip of a known-shape ref; result matches the source type.
+      const clean_rowHeights = JSON.parse(JSON.stringify(rowHeights.value)) as number[];
 
+      // oxlint-disable-next-line typescript/no-floating-promises -- best-effort persistence; failures aren't actionable here.
       treeview_config_db.put({
         id: "main",
         opened_views: clean_opened_views,
@@ -118,14 +139,14 @@ export const useTreeviewStore = defineStore("treeview", () => {
   );
 
   function closeView(id: string): void {
-    opened_views.value = opened_views.value.filter((view) => view.id !== id);
+    opened_views.value = opened_views.value.filter((view: ReadonlyOpenedView) => view.id !== id);
   }
 
-  watch(selection, (current, previous) => {
+  watch(selection, (current: readonly string[], previous: readonly string[]) => {
     const { removed } = compareSelections(current, previous);
     for (const id of removed) {
       const index = opened_views.value.findIndex(
-        (view) => view.type === "component" && view.id === id,
+        (view: ReadonlyOpenedView) => view.type === "component" && view.id === id,
       );
       if (index !== -1) {
         closeView(id);
@@ -134,7 +155,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
   });
 
   function toggleView(id: string): void {
-    const index = opened_views.value.findIndex((view) => view.id === id);
+    const index = opened_views.value.findIndex((view: ReadonlyOpenedView) => view.id === id);
     if (index !== -1) {
       closeView(id);
     } else if (id === "main") {
@@ -170,7 +191,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     if (!found) {
       items.value.push({ id: geodeObjectType, title: geodeObjectType, children: [child] });
       const sort_options = { numeric: true, sensitivity: "base" as const };
-      items.value.sort((groupA, groupB) =>
+      items.value.sort((groupA: ReadonlyTreeviewGroup, groupB: ReadonlyTreeviewGroup) =>
         groupA.title.localeCompare(groupB.title, undefined, sort_options),
       );
     }
@@ -199,10 +220,10 @@ export const useTreeviewStore = defineStore("treeview", () => {
     id: string,
     title: string | undefined,
     geodeObjectType: string,
-    viewType: string = "model_components",
-  ) {
+    viewType = "model_components",
+  ): void {
     const viewId = `${id}_${viewType}`;
-    const index = opened_views.value.findIndex((view) => view.id === viewId);
+    const index = opened_views.value.findIndex((view: ReadonlyOpenedView) => view.id === viewId);
     if (index !== -1) {
       closeView(viewId);
       return;
@@ -213,7 +234,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
       id: viewId,
       modelId: id,
       viewType,
-      title: title || id,
+      title: title ?? id,
       geode_object_type: geodeObjectType,
       scrollTop: 0,
       opened: [],
@@ -229,17 +250,19 @@ export const useTreeviewStore = defineStore("treeview", () => {
     }
   }
 
-  function importStores(snapshot: TreeviewSnapshot | undefined): void {
-    opened_views.value = snapshot?.opened_views || defaultOpenedViews();
-    panelWidth.value = snapshot?.panelWidth || PANEL_WIDTH;
-    additionalPanelWidth.value = snapshot?.additionalPanelWidth || PANEL_WIDTH;
-    rowHeights.value = snapshot?.rowHeights || [];
-    pendingSelectionIds.value =
-      snapshot?.selectionIds ||
-      (snapshot?.selection || []).map((selectionItem) =>
-        typeof selectionItem === "string" ? selectionItem : selectionItem.id,
-      ) ||
-      [];
+  function importStores(snapshot: ReadonlyTreeviewSnapshot | undefined): void {
+    opened_views.value = snapshot?.opened_views
+      ? // oxlint-disable-next-line no-unsafe-type-assertion -- narrowing the readonly parameter view back to the mutable working type; these objects aren't actually frozen at runtime.
+        ([...snapshot.opened_views] as OpenedView[])
+      : defaultOpenedViews();
+    panelWidth.value = snapshot?.panelWidth ?? PANEL_WIDTH;
+    additionalPanelWidth.value = snapshot?.additionalPanelWidth ?? PANEL_WIDTH;
+    rowHeights.value = snapshot?.rowHeights ? [...snapshot.rowHeights] : [];
+    pendingSelectionIds.value = snapshot?.selectionIds
+      ? [...snapshot.selectionIds]
+      : (snapshot?.selection ?? []).map((selectionItem: Readonly<string | { id: string }>) =>
+          typeof selectionItem === "string" ? selectionItem : selectionItem.id,
+        );
   }
 
   function finalizeImportSelection(): void {
@@ -279,24 +302,28 @@ export const useTreeviewStore = defineStore("treeview", () => {
   }
 
   function setScrollTop(viewId: string, scrollTop: number): void {
-    const view = opened_views.value.find((openedView) => openedView.id === viewId);
+    const view = opened_views.value.find(
+      (openedView: ReadonlyOpenedView) => openedView.id === viewId,
+    );
     if (view) {
       view.scrollTop = scrollTop;
     }
   }
 
-  function setOpened(viewId: string, opened: string[]): void {
-    const view = opened_views.value.find((openedView) => openedView.id === viewId);
+  function setOpened(viewId: string, opened: readonly string[]): void {
+    const view = opened_views.value.find(
+      (openedView: ReadonlyOpenedView) => openedView.id === viewId,
+    );
     if (view) {
-      view.opened = opened;
+      view.opened = [...opened];
     }
   }
 
-  function setRowHeights(heights: number[]): void {
-    rowHeights.value = heights;
+  function setRowHeights(heights: readonly number[]): void {
+    rowHeights.value = [...heights];
   }
 
-  function exportStores() {
+  function exportStores(): Omit<TreeviewConfigRecord, "id"> {
     return {
       opened_views: opened_views.value,
       panelWidth: panelWidth.value,
@@ -318,7 +345,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
         break;
       }
     }
-    const view = opened_views.value.find((openedView) => openedView.id === id);
+    const view = opened_views.value.find((openedView: ReadonlyOpenedView) => openedView.id === id);
     if (view) {
       view.title = newName;
     }

@@ -30,8 +30,25 @@ interface DataItemLike {
   id: string;
 }
 
-type PlaneWidget = unknown;
-type WidgetHandle = unknown;
+interface ClippingWidgetState {
+  getOrigin: () => number[];
+  setOrigin: (origin: readonly number[]) => void;
+  getNormal: () => number[];
+  setNormal: (normal: readonly number[]) => void;
+  onModified: (callback: () => void) => { unsubscribe: () => void };
+}
+
+interface PlaneWidget {
+  getWidgetState: () => ClippingWidgetState;
+  delete: () => void;
+}
+
+interface WidgetHandle {
+  setAxisScale: (scale: number) => void;
+  setHandleSizeRatio: (ratio: number) => void;
+  setRepresentationStyle: (style: unknown) => void;
+  placeWidget: (bounds: readonly number[]) => void;
+}
 
 interface WidgetEntry {
   planeWidget: PlaneWidget;
@@ -48,7 +65,7 @@ interface ClippingPlanesWidgetParams {
   debouncedApply: (...args: readonly unknown[]) => void;
 }
 
-// oxlint-disable-next-line max-params max-lines-per-function
+// oxlint-disable-next-line max-params max-lines-per-function typescript/prefer-readonly-parameter-types -- Ref-backed params are inherently mutable through .value.
 function useClippingPlanesWidget({
   planes,
   targetAllVisible,
@@ -82,12 +99,12 @@ function useClippingPlanesWidget({
       ),
     );
   }
-  function getSceneCenter(): number[] {
+  function getSceneCenter(): readonly number[] {
     return getSceneBoundsInfo().center;
   }
   function createWidgetEntry(
-    planeWidget: PlaneWidget,
-    widgetHandle: WidgetHandle,
+    planeWidget: Readonly<PlaneWidget>,
+    widgetHandle: Readonly<WidgetHandle>,
     planeIndex: number,
   ): WidgetEntry {
     const widgetState = planeWidget.getWidgetState();
@@ -114,9 +131,10 @@ function useClippingPlanesWidget({
       fromWidget = true;
       currentPlane.origin = origin;
       currentPlane.normal = normal;
-      void nextTick(() => {
+      nextTick(() => {
         fromWidget = false;
-      });
+        // oxlint-disable-next-line promise/prefer-await-to-then -- fire-and-forget inside a sync widget callback; see codebase convention in global_attribute_style.ts.
+      }).catch(() => undefined);
       debouncedApply();
     });
     return {
@@ -140,16 +158,18 @@ function useClippingPlanesWidget({
   function updateWidgetEntry(
     idx: number,
     plane: Readonly<ClippingPlane>,
-    cubicBounds: readonly number[],
   ): void {
+    cubicBounds: readonly number[],
     // Modulo guarantees this index is within bounds of the non-empty PLANE_COLORS array.
     const rgb = PLANE_COLORS[idx % PLANE_COLORS.length];
     if (rgb === undefined || !widgetManager) {
       return;
     }
     if (!widgetEntries[idx]) {
-      const planeWidget = vtkImplicitPlaneWidget();
-      const widgetHandle = widgetManager.addWidget(planeWidget);
+      // oxlint-disable-next-line no-unsafe-call no-unsafe-type-assertion -- vtk.js has no types for ImplicitPlaneWidget's factory; narrowed here.
+      const planeWidget = vtkImplicitPlaneWidget() as PlaneWidget;
+      // oxlint-disable-next-line no-unsafe-type-assertion -- vtk.js WidgetManager.addWidget is untyped; narrowed here.
+      const widgetHandle = widgetManager.addWidget(planeWidget) as WidgetHandle;
       widgetHandle.setAxisScale(AXIS_SCALE);
       widgetHandle.setHandleSizeRatio(SIZE_RATIO);
       widgetEntries.push(createWidgetEntry(planeWidget, widgetHandle, idx));
@@ -212,6 +232,7 @@ function useClippingPlanesWidget({
     const camera = renderer.getActiveCamera();
     const mainCam = hybridViewerStore.camera_options as MainCameraOptions;
     const { center, cubicBounds } = getSceneBoundsInfo();
+    // oxlint-disable-next-line no-unsafe-type-assertion -- cubicBounds is always a 6-element bounds tuple.
     renderer.resetCamera(cubicBounds as [number, number, number, number, number, number]);
     alignCameraToMainCamera(camera, mainCam, center);
     limitCameraZoomOut(camera);
@@ -273,12 +294,16 @@ function useClippingPlanesWidget({
     camera.onModified(() => {
       limitCameraZoomOut(camera);
     });
-    const canvas = (
-      localRenderWindow.getApiSpecificRenderWindow() as unknown as {
-        getCanvas: () => HTMLCanvasElement;
-      }
-    ).getCanvas();
-    Object.assign(canvas.style, { width: "100%", height: "100%", background: "transparent" });
+    // oxlint-disable-next-line no-unsafe-type-assertion -- trusted vtk.js OpenGL render window API boundary.
+    const openGLRenderWindow = localRenderWindow.getApiSpecificRenderWindow() as unknown as {
+      getCanvas: () => HTMLCanvasElement;
+    };
+    const canvas = openGLRenderWindow.getCanvas();
+    Object.assign(canvas.style, {
+      width: "100%",
+      height: "100%",
+      background: "transparent",
+    });
     localRenderWindow.resize();
     widgetManager = vtkWidgetManager();
     widgetManager.setRenderer(localRenderWindow.getRenderer());

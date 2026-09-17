@@ -14,13 +14,11 @@ export const useCloudStore = defineStore("cloud", {
   actions: {
     async launch(email: string) {
       this.status = Status.CONNECTING;
-      console.log("[CLOUD] Launching cloud backend...");
       const schema = opengeodeweb_front_schemas.api.serverless.run_cloud;
       const params = { email };
-      console.log("[CLOUD] params", params);
       const appStore = useAppStore();
       const feedbackStore = useFeedbackStore();
-      return fetchSchema(
+      const result = await fetchSchema(
         { schema, params },
         {
           request_error_function: () => {
@@ -28,15 +26,22 @@ export const useCloudStore = defineStore("cloud", {
             this.status = Status.NOT_CONNECTED;
           },
           response_function: (response: unknown) => {
-            const { url } = response as { url: string };
+            if (
+              typeof response !== "object" ||
+              response === null ||
+              !("url" in response) ||
+              typeof response.url !== "string"
+            ) {
+              return;
+            }
+            const { url } = response;
             feedbackStore.$patch({ server_error: false });
-            console.log(`[CLOUD] Cloud launched on ${url}`);
             this.status = Status.CONNECTED;
             const infraStore = useInfraStore();
             infraStore.$patch({
               domain_name: url,
             });
-            setAppBaseUrl(appStore.base_url);
+            setAppBaseUrl(appStore.base_url).catch(() => undefined);
             appStore.$patch({
               projectFolderPath: "/project",
             });
@@ -47,11 +52,10 @@ export const useCloudStore = defineStore("cloud", {
           },
         },
       );
+      return result;
     },
-    async connect() {
-      console.log("[CLOUD] Cloud connected");
+    connect() {
       this.status = Status.CONNECTED;
-      return;
     },
   },
   share: {

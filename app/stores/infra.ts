@@ -5,19 +5,15 @@ import { setAppBaseUrl } from "@ogw_shared/scripts";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useCloudStore } from "@ogw_front/stores/cloud";
 
-export interface Microservice {
-  $id: string;
-  status?: string;
-  is_busy?: boolean;
-  launch?: (params: Readonly<Record<string, unknown>>) => Promise<unknown>;
-  connect: () => Promise<void>;
-  [key: string]: unknown;
-}
-
 interface ElectronApi {
   electronAPI: {
-    project_folder_path: (args: { projectFolderPath: string }) => void;
+    project_folder_path: (args: Readonly<{ projectFolderPath: string }>) => void;
   };
+}
+
+declare global {
+  // eslint-disable-next-line no-var -- required for global augmentation
+  var electronAPI: ElectronApi["electronAPI"];
 }
 
 export const useInfraStore = defineStore("infra", {
@@ -58,7 +54,7 @@ export const useInfraStore = defineStore("infra", {
       if (this.status === Status.CREATED) {
         return undefined;
       }
-      navigator.locks.request("infra.create_backend", async () => {
+      await navigator.locks.request("infra.create_backend", async () => {
         if (this.status === Status.CREATED) {
           return;
         }
@@ -70,7 +66,7 @@ export const useInfraStore = defineStore("infra", {
           const appStore = useAppStore();
           await appStore.createProjectFolder();
           if (this.app_mode === appMode.DESKTOP) {
-            (globalThis as unknown as ElectronApi).electronAPI.project_folder_path({
+            globalThis.electronAPI.project_folder_path({
               projectFolderPath: appStore.projectFolderPath,
             });
           }
@@ -78,8 +74,13 @@ export const useInfraStore = defineStore("infra", {
           const microservices_with_launch = this.microservices.filter(
             (store: Readonly<Microservice>) => store.launch,
           );
-          const launch_promises = microservices_with_launch.map((store: Readonly<Microservice>) =>
-            store.launch?.({ projectFolderPath: appStore.projectFolderPath }),
+          const launch_promises = microservices_with_launch.map(
+            async (store: Readonly<Microservice>) => {
+              const result = await store.launch?.({
+                projectFolderPath: appStore.projectFolderPath,
+              });
+              return result;
+            },
           );
           launch_promises.push(registerRunningExtensions());
           await Promise.all(launch_promises);
@@ -87,6 +88,7 @@ export const useInfraStore = defineStore("infra", {
         this.status = Status.CREATED;
         return this.create_connection();
       });
+      return undefined;
     },
     async create_connection() {
       await Promise.all(
@@ -100,3 +102,12 @@ export const useInfraStore = defineStore("infra", {
     omit: ["microservices"],
   },
 });
+
+export interface Microservice {
+  $id: string;
+  status?: string;
+  is_busy?: boolean;
+  launch?: (params: Readonly<Record<string, unknown>>) => Promise<unknown>;
+  connect: () => Promise<void>;
+  [key: string]: unknown;
+}

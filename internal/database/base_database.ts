@@ -8,7 +8,7 @@ import { modelComponentsRelationTable } from "./tables/model_components_relation
 import { modelComponentsTable } from "./tables/model_components";
 
 export class BaseDatabase extends Dexie {
-  static get initialStores(): Record<string, string> {
+  public static get initialStores(): Record<string, string> {
     return {
       [dataTable.name]: dataTable.schema,
       [modelComponentsTable.name]: modelComponentsTable.schema,
@@ -21,7 +21,11 @@ export class BaseDatabase extends Dexie {
     };
   }
 
-  async clear(): Promise<void[]> {
-    return Promise.all(this.tables.map(async (table) => table.clear()));
+  public async clear(): Promise<void> {
+    await Promise.all(
+      this.tables.map(async (table) => {
+        await table.clear();
+      }),
+    );
   }
 }

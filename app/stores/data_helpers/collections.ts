@@ -1,8 +1,9 @@
 import { type FormattedComponent, type ModelComponentRecord, useDataMesh } from "./mesh.js";
-import { type Table, liveQuery } from "dexie";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import type { Observable } from "rxjs";
-import { database } from "@ogw_internal/database/database.js";
+import type { Ref } from "vue";
+import { getTable } from "@ogw_internal/database/database.js";
+import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 
 interface ModelComponentRelationRecord {
@@ -37,21 +38,20 @@ export function useDataCollections(): {
   formatedCollectionComponents: typeof formatedCollectionComponents;
   refFormatedCollectionComponents: typeof refFormatedCollectionComponents;
 } {
-  const model_components_db = database.model_components as unknown as Table<
-    ModelComponentRecord,
-    string
-  >;
-  const model_components_relation_db = database.model_components_relation as unknown as Table<
-    ModelComponentRelationRecord,
-    string
-  >;
+  const model_components_db = getTable<ModelComponentRecord>("model_components");
+  const model_components_relation_db = getTable<ModelComponentRelationRecord>(
+    "model_components_relation",
+  );
   const { getAllMeshComponents } = useDataMesh();
 
   async function hasCollectionComponents(modelId: string): Promise<boolean> {
     const count = await model_components_db
       .where("id")
       .equals(modelId)
-      .and((component) => !MESH_COMPONENT_TYPES.includes(component.type))
+      .and(
+        (component: Readonly<ModelComponentRecord>) =>
+          !MESH_COMPONENT_TYPES.includes(component.type),
+      )
       .count();
     return count > 0;
   }
@@ -59,8 +59,11 @@ export function useDataCollections(): {
   async function getAllCollectionComponents(modelId: string): Promise<FormattedComponent[]> {
     const items = await model_components_db.where("id").equals(modelId).toArray();
     return items
-      .filter((component) => !MESH_COMPONENT_TYPES.includes(component.type))
-      .map((component) => ({
+      .filter(
+        (component: Readonly<ModelComponentRecord>) =>
+          !MESH_COMPONENT_TYPES.includes(component.type),
+      )
+      .map((component: Readonly<ModelComponentRecord>) => ({
         id: component.geode_id,
         title: component.name,
         category: component.type,
@@ -82,14 +85,15 @@ export function useDataCollections(): {
 
     const byType: Record<string, CollectionComponent[]> = {};
     for (const component of components) {
-      if (!byType[component.category]) {
-        byType[component.category] = [];
-      }
+      byType[component.category] ??= [];
       const itemRelations = relations.filter(
-        (relation) => relation.parent === component.id && relation.type === "collection",
+        (relation: Readonly<ModelComponentRelationRecord>) =>
+          relation.parent === component.id && relation.type === "collection",
       );
       const children = itemRelations
-        .map((relation) => meshComponentsById[relation.child])
+        .map(
+          (relation: Readonly<ModelComponentRelationRecord>) => meshComponentsById[relation.child],
+        )
         .filter((child): child is FormattedComponent => Boolean(child));
       byType[component.category]?.push({
         ...component,
@@ -106,7 +110,7 @@ export function useDataCollections(): {
     const collectionTypes = Object.keys(byType);
 
     return collectionTypes
-      .filter((type) => byType[type] && (byType[type]?.length ?? 0) > 0)
+      .filter((type) => (byType[type]?.length ?? 0) > 0)
       .map((type) => ({
         id: type,
         title: pluralize(type),
@@ -114,15 +118,16 @@ export function useDataCollections(): {
       }));
   }
 
-  function refFormatedCollectionComponents(modelId: string) {
-    // Dexie's liveQuery() returns Dexie's own minimal Observable shape, not an
-    // Actual rxjs Observable instance (useObservable's declared parameter type);
-    // The two are structurally close enough at runtime (vueuse only calls
-    // `.subscribe`) but not identical, hence the cast.
+  function refFormatedCollectionComponents(
+    modelId: string,
+  ): Readonly<Ref<CollectionComponentGroup[] | undefined>> {
     return useObservable(
-      liveQuery(async () => formatedCollectionComponents(modelId)) as unknown as Observable<
-        CollectionComponentGroup[]
-      >,
+      // Dexie's liveQuery returns its own Observable-like type, not rxjs's Observable, so bridging needs a cast.
+      // oxlint-disable-next-line no-unsafe-type-assertion
+      liveQuery(async () => {
+        const groups = await formatedCollectionComponents(modelId);
+        return groups;
+      }) as unknown as Observable<CollectionComponentGroup[]>,
       {
         initialValue: undefined,
       },

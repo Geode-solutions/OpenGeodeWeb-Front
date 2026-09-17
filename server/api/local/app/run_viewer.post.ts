@@ -15,7 +15,6 @@ interface RunViewerBody {
   args: { projectFolderPath: string; [key: string]: unknown };
 }
 
-// oxlint-disable-next-line typescript/prefer-readonly-parameter-types
 export default defineEventHandler(async (event: H3Event) => {
   try {
     const { COMMAND_VIEWER, NUXT_ROOT_PATH, args } = await readBody<RunViewerBody>(event);

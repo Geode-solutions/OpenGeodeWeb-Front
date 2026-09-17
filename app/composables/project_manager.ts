@@ -34,15 +34,14 @@ function isImportSnapshotResponse(value: unknown): value is { snapshot?: Project
   return typeof value === "object" && value !== null;
 }
 
-// The backend response is an untyped network payload; this narrows it to what fileDownload accepts.
 function isFileDownloadData(
   value: unknown,
 ): value is string | ArrayBuffer | ArrayBufferView | Blob {
   return (
     typeof value === "string" ||
     value instanceof ArrayBuffer ||
-    value instanceof Blob ||
-    ArrayBuffer.isView(value)
+    ArrayBuffer.isView(value) ||
+    value instanceof Blob
   );
 }
 
@@ -63,10 +62,10 @@ async function exportProject(): Promise<{ result: unknown }> {
   });
 
   if (!isFileDownloadData(result)) {
-    throw new Error("export_project returned an unsupported response type");
+    throw new Error("Unexpected export_project response type");
   }
   fileDownload(result, defaultName);
-  await feedbackStore.add_success("Project exported successfully");
+  feedbackStore.add_success("Project exported successfully");
   return { result };
 }
 
@@ -150,7 +149,7 @@ async function importProject(file: Readonly<File>): Promise<void> {
   treeviewStore.finalizeImportSelection();
   treeviewStore.isImporting = false;
   const feedbackStore = useFeedbackStore();
-  await feedbackStore.add_success("Project imported successfully");
+  feedbackStore.add_success("Project imported successfully");
 }
 
 export { exportProject, importProject };

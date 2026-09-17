@@ -96,7 +96,7 @@ interface ModelWithoutBlocksStyle {
 
 function modelCornersDefaultStyle(
   visibility: boolean = CORNERS_DEFAULT_VISIBILITY,
-  constant: RGBAColor = CORNERS_DEFAULT_COLOR,
+  constant: Readonly<RGBAColor> = CORNERS_DEFAULT_COLOR,
 ): ModelCornersStyle {
   return {
     visibility,
@@ -110,7 +110,7 @@ function modelCornersDefaultStyle(
 
 function modelLinesDefaultStyle(
   visibility: boolean = LINES_DEFAULT_VISIBILITY,
-  constant: RGBAColor = LINES_DEFAULT_COLOR,
+  constant: Readonly<RGBAColor> = LINES_DEFAULT_COLOR,
 ): ModelLinesStyle {
   return {
     visibility,
@@ -125,7 +125,7 @@ function modelLinesDefaultStyle(
 
 function modelSurfacesDefaultStyle(
   visibility: boolean = SURFACES_DEFAULT_VISIBILITY,
-  constant: RGBAColor = SURFACES_DEFAULT_COLOR,
+  constant: Readonly<RGBAColor> = SURFACES_DEFAULT_COLOR,
 ): ModelSurfacesStyle {
   return {
     visibility,
@@ -140,7 +140,7 @@ function modelSurfacesDefaultStyle(
 
 function modelBlocksDefaultStyle(
   visibility: boolean = BLOCKS_DEFAULT_VISIBILITY,
-  constant: RGBAColor = BLOCKS_DEFAULT_COLOR,
+  constant: Readonly<RGBAColor> = BLOCKS_DEFAULT_COLOR,
 ): ModelBlocksStyle {
   return {
     visibility,

@@ -1,5 +1,6 @@
 // Node imports
 import { finished, pipeline } from "node:stream/promises";
+import type { IncomingHttpHeaders } from "node:http";
 import { Readable } from "node:stream";
 import fs from "node:fs";
 
@@ -25,13 +26,17 @@ const BYTES_PER_KIBIBYTE = 1024;
 const MAX_FILE_MEGABYTES = 500;
 const FILE_SIZE_LIMIT = MAX_FILE_MEGABYTES * BYTES_PER_KIBIBYTE * BYTES_PER_KIBIBYTE;
 
-// oxlint-disable-next-line typescript/prefer-readonly-parameter-types
 export default defineEventHandler(async (event: H3Event) => {
   const writePromises: Promise<void>[] = [];
   const savedFiles: string[] = [];
 
+  const headers: IncomingHttpHeaders = Object.fromEntries(
+    Object.entries(getRequestHeaders(event)).filter(
+      (entry: readonly [string, string | undefined]) => entry[1] !== undefined,
+    ),
+  );
   const busboyInstance = busboy({
-    headers: getRequestHeaders(event),
+    headers,
     limits: {
       fileSize: FILE_SIZE_LIMIT,
       files: 1,
@@ -45,7 +50,6 @@ export default defineEventHandler(async (event: H3Event) => {
     }
   });
 
-  // oxlint-disable-next-line typescript/prefer-readonly-parameter-types
   busboyInstance.on("file", (fieldname, fileStream, info) => {
     if (fieldname !== "file") {
       // Drain & ignore unwanted fields

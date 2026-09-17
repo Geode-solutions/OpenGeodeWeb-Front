@@ -1,4 +1,8 @@
 import {
+  type ViewStreamLike,
+  useHybridViewerViewport,
+} from "@ogw_internal/stores/hybrid_viewer/viewport";
+import {
   type vtkGenericRenderWindow as VtkGenericRenderWindow,
   newInstance as vtkGenericRenderWindow,
 } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
@@ -8,16 +12,12 @@ import {
   useHybridViewerCamera,
 } from "@ogw_internal/stores/hybrid_viewer/camera";
 import { BACKGROUND_COLOR } from "@ogw_internal/stores/hybrid_viewer/constants";
+import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types";
 import { useHybridViewerBrightness } from "@ogw_internal/stores/hybrid_viewer/brightness";
 import { useHybridViewerFilters } from "@ogw_internal/stores/hybrid_viewer/filters";
 import { useHybridViewerHighlight } from "@ogw_internal/stores/hybrid_viewer/highlight";
 import { useHybridViewerRuler } from "@ogw_internal/stores/hybrid_viewer/ruler";
 import { useHybridViewerScene } from "@ogw_internal/stores/hybrid_viewer/scene";
-import {
-  type ViewStreamLike,
-  useHybridViewerViewport,
-} from "@ogw_internal/stores/hybrid_viewer/viewport";
-import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types";
 
 import { Status } from "@ogw_front/utils/status";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -51,10 +51,13 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     if (!genericRenderWindow.value) {
       return;
     }
+    // oxlint-disable-next-line no-unsafe-assignment -- vtk.js has no types for getApiSpecificRenderWindow(); narrowed below.
     const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
-    const canvas = (
-      webGLRenderWindow as unknown as { getCanvas: () => HTMLCanvasElement }
-    ).getCanvas();
+    // oxlint-disable-next-line no-unsafe-type-assertion -- trusted vtk.js OpenGL render window API boundary.
+    const openGLRenderWindow = webGLRenderWindow as unknown as {
+      getCanvas: () => HTMLCanvasElement;
+    };
+    const canvas = openGLRenderWindow.getCanvas();
     if (canvas.parentElement) {
       canvas.parentElement.style.cursor = value ? "crosshair" : "default";
     }
@@ -69,24 +72,34 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       background: BACKGROUND_COLOR,
       listenWindowResize: false,
     });
-    const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow() as unknown as {
-      getReferenceByName: (name: string) => { style: CSSStyleDeclaration };
-      setBackgroundImage: (image: unknown) => void;
-    };
+    const webGLRenderWindow =
+      // oxlint-disable-next-line no-unsafe-type-assertion -- trusted vtk.js OpenGL render window API boundary.
+      genericRenderWindow.value.getApiSpecificRenderWindow() as unknown as {
+        getReferenceByName: (name: string) => { style: CSSStyleDeclaration };
+        setBackgroundImage: (image: unknown) => void;
+      };
     imageStyle = webGLRenderWindow.getReferenceByName("bgImage").style;
-    Object.assign(imageStyle, { transition: "opacity 0.1s ease-in", zIndex: 1 });
+    Object.assign(imageStyle, {
+      transition: "opacity 0.1s ease-in",
+      zIndex: 1,
+    });
     await viewerStore.ws_connect();
-    const imageStream = (
-      viewerStore.client as unknown as {
-        getImageStream: () => { createViewStream: (id: string) => ViewStreamLike };
-      }
-    ).getImageStream();
+    // oxlint-disable-next-line no-unsafe-type-assertion -- trusted @kitware/vtk.js WebSocket client API boundary.
+    const clientApi = viewerStore.client as unknown as {
+      getImageStream: () => {
+        createViewStream: (id: string) => ViewStreamLike;
+      };
+    };
+    const imageStream = clientApi.getImageStream();
     viewportStore.viewStream.value = imageStream.createViewStream("-1");
     viewportStore.viewStream.value?.onImageReady((event: Readonly<{ image: unknown }>) => {
       if (is_moving.value) {
         return;
       }
-      brightnessStore.latestImage.value = event.image as typeof brightnessStore.latestImage.value;
+      // oxlint-disable no-unsafe-type-assertion -- image payload shape is guaranteed by the viewer's onImageReady contract.
+      const latestImage = event.image as typeof brightnessStore.latestImage.value;
+      // oxlint-enable no-unsafe-type-assertion
+      brightnessStore.latestImage.value = latestImage;
       webGLRenderWindow.setBackgroundImage(event.image);
       if (imageStyle) {
         imageStyle.opacity = "1";
@@ -107,7 +120,8 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   async function remoteRender(): Promise<void> {
     if (renderPromise) {
       renderPending = true;
-      return renderPromise;
+      await renderPromise;
+      return;
     }
 
     renderPromise = (async (): Promise<void> => {

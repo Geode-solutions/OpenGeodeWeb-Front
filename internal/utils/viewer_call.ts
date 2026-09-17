@@ -21,6 +21,16 @@ interface RpcErrorLike {
   message?: string;
 }
 
+function toRpcErrorLike(value: unknown): RpcErrorLike {
+  if (typeof value !== "object" || value === null) {
+    return {};
+  }
+  return {
+    code: "code" in value && typeof value.code === "number" ? value.code : undefined,
+    message: "message" in value && typeof value.message === "string" ? value.message : undefined,
+  };
+}
+
 async function viewer_call(
   microservice: ViewerMicroservice,
   { schema, params = {}, timeout }: ViewerCallParams,
@@ -44,7 +54,7 @@ async function viewer_call(
     {
       request_error_function(error: unknown) {
         microservice.stop_request();
-        const typedError = error as RpcErrorLike;
+        const typedError = toRpcErrorLike(error);
         feedbackStore.add_error(
           typedError.code ?? 0,
           schema.$id,
@@ -64,8 +74,7 @@ async function viewer_call(
       },
       response_error_function(response: unknown) {
         microservice.stop_request();
-        // Pre-existing bug: this used an undefined `error` identifier (ReferenceError at runtime); fixed to use `response`, mirroring request_error_function above.
-        const typedResponse = response as RpcErrorLike;
+        const typedResponse = toRpcErrorLike(response);
         feedbackStore.add_error(
           typedResponse.code ?? 0,
           schema.$id,

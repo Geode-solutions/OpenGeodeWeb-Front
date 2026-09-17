@@ -1,7 +1,7 @@
+import type { JsonRpcSchema } from "@ogw_shared/utils/types";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import vtk_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
-import type { JsonRpcSchema } from "@ogw_shared/utils/types";
 
 const HOVER_DELAY = 200;
 
@@ -64,11 +64,21 @@ export function useHoverhighlight(): {
       }
     }
 
+    async function runHighlightAction(): Promise<void> {
+      try {
+        await highlightAction();
+      } catch {
+        // Ignore
+      }
+    }
+
     if (immediate) {
-      highlightAction().catch(() => undefined);
+      // oxlint-disable-next-line typescript/no-floating-promises -- runHighlightAction catches its own errors internally.
+      runHighlightAction();
     } else {
       timer = setTimeout(() => {
-        highlightAction().catch(() => undefined);
+        // oxlint-disable-next-line typescript/no-floating-promises -- runHighlightAction catches its own errors internally.
+        runHighlightAction();
       }, HOVER_DELAY);
     }
   }
@@ -101,7 +111,8 @@ export function useHoverhighlight(): {
         visibility: false,
         ...(currentType === "model" && { block_ids: [] }),
       };
-      unhighlightAction(currentType, id, { schema, params }).catch(() => undefined);
+      // oxlint-disable-next-line typescript/no-floating-promises -- unhighlightAction catches its own errors internally.
+      unhighlightAction(currentType, id, { schema, params });
       currentId = undefined;
       currentType = undefined;
     }

@@ -4,9 +4,9 @@
 
 // Local imports
 import { type Microservice, useInfraStore } from "@ogw_front/stores/infra";
+import { type RegisterableStore, useAppStore } from "@ogw_front/stores/app";
 import { isCloudMode } from "@ogw_front/utils/stores";
 import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json" with { type: "json" };
-import { useAppStore } from "@ogw_front/stores/app";
 
 interface ExtensionDescriptor {
   id: string;
@@ -45,10 +45,11 @@ async function runExtensions(): Promise<{ extensionsArray: ExtensionDescriptor[]
     projectFolderPath,
     projectName,
   };
-  return appStore.request({
+  const result = await appStore.request<{ extensionsArray: ExtensionDescriptor[] }>({
     schema,
     params,
-  }) as Promise<{ extensionsArray: ExtensionDescriptor[] }>;
+  });
+  return result;
 }
 
 async function downloadExtension({
@@ -63,10 +64,17 @@ async function downloadExtension({
     url,
     extensionFileName,
   };
-  return appStore.request({
+  const result = await appStore.request({
     schema,
     params,
   });
+  return result;
+}
+
+function isMicroservice(
+  store: Readonly<RegisterableStore>,
+): store is RegisterableStore & Microservice {
+  return typeof store.connect === "function";
 }
 
 async function registerRunningExtensions(): Promise<RegisteredExtension[]> {
@@ -89,7 +97,11 @@ async function registerRunningExtensions(): Promise<RegisteredExtension[]> {
       // Extension-provided stores are expected to satisfy the fuller
       // Microservice contract (connect, etc.) even though the loader's own
       // RegisterableStore type only models what app.ts itself needs.
-      infraStore.register_microservice(store as unknown as Microservice);
+      if (isMicroservice(store)) {
+        infraStore.register_microservice(store);
+      } else {
+        console.warn("[ExtensionManager] Store does not implement Microservice:", store.$id);
+      }
       return {
         name,
         version,
@@ -125,8 +137,8 @@ async function unloadExtension(extensionId: string): Promise<boolean> {
   if (storeFactory !== undefined) {
     const store = storeFactory();
     // Stop the microservice if possible
-    if (typeof store.kill === "function") {
-      await (store.kill as () => Promise<void>)();
+    if (store.kill) {
+      await store.kill();
     }
   }
 
@@ -146,10 +158,11 @@ async function killExtension(extensionId: string): Promise<unknown> {
     projectFolderPath,
     projectName,
   };
-  return appStore.request({
+  const result = await appStore.request({
     schema,
     params,
   });
+  return result;
 }
 export {
   importExtensionFile,

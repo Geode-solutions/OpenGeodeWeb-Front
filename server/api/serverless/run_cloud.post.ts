@@ -18,7 +18,6 @@ function isServiceAccountCredentials(value: unknown): value is JWTInput {
   );
 }
 
-// oxlint-disable-next-line typescript/prefer-readonly-parameter-types
 export default defineEventHandler(async (event: H3Event) => {
   try {
     const { email } = await readBody<RunCloudBody>(event);

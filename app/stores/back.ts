@@ -42,8 +42,10 @@ export const useBackStore = defineStore("back", {
   },
   actions: {
     set_ping() {
+      // oxlint-disable-next-line typescript/no-floating-promises
       this.ping();
       setInterval(() => {
+        // oxlint-disable-next-line typescript/no-floating-promises
         this.ping();
       }, DEFAULT_PING_INTERVAL_SECONDS * MILLISECONDS_IN_SECOND);
     },
@@ -75,33 +77,37 @@ export const useBackStore = defineStore("back", {
     stop_request() {
       this.request_counter -= 1;
     },
-    async launch(args: Record<string, unknown>) {
-      console.log("[GEODE] Launching back microservice...", { args });
+    async launch(args: Readonly<Record<string, unknown>>) {
       const appStore = useAppStore();
       const { COMMAND_BACK, NUXT_ROOT_PATH } = useRuntimeConfig().public;
       const schema = opengeodeweb_front_schemas.api.local.app.run_back;
       const params = { COMMAND_BACK, NUXT_ROOT_PATH, args };
 
-      console.log("[GEODE] params", params);
       const result = await appStore.request(
         { schema, params },
         {
           response_function: (response: unknown) => {
-            const { port } = response as { port: string };
-            console.log(`[GEODE] Back launched on port ${port}`);
-            this.default_local_port = port;
+            if (
+              typeof response === "object" &&
+              response !== null &&
+              "port" in response &&
+              typeof response.port === "string"
+            ) {
+              this.default_local_port = response.port;
+            }
           },
         },
       );
       return result;
     },
     connect() {
-      console.log("[GEODE] Connecting to geode microservice...");
       this.set_ping();
-      return;
     },
     async request(
-      { schema, params = {} }: { schema: JsonRpcSchema; params?: Record<string, unknown> },
+      {
+        schema,
+        params = {},
+      }: Readonly<{ schema: JsonRpcSchema; params?: Record<string, unknown> }>,
       callbacks: RequestHandlers = {},
     ) {
       const result = await api_fetch(
@@ -109,6 +115,7 @@ export const useBackStore = defineStore("back", {
         // The back store is only ever used with HTTP ("front"/"back") schemas,
         // Which always carry `methods`; the wider JsonRpcSchema param above is
         // Kept as-is to match this action's public signature.
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion
         { schema: schema as JsonRpcSchema & { methods: string[] }, params, headers: {} },
         {
           ...callbacks,
@@ -121,7 +128,7 @@ export const useBackStore = defineStore("back", {
       );
       return result;
     },
-    async upload(file: File, callbacks: RequestHandlers = {}) {
+    async upload(file: Readonly<File>, callbacks: RequestHandlers = {}) {
       const schema = back_schemas.opengeodeweb_back.upload_file;
       const result = await upload_file(
         this,
@@ -148,8 +155,14 @@ export const useBackStore = defineStore("back", {
         { schema },
         {
           response_function: (response: unknown) => {
-            const { microservice_version } = response as { microservice_version: string };
-            this.version = microservice_version;
+            if (
+              typeof response === "object" &&
+              response !== null &&
+              "microservice_version" in response &&
+              typeof response.microservice_version === "string"
+            ) {
+              this.version = response.microservice_version;
+            }
           },
         },
       );

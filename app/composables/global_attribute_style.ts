@@ -161,6 +161,26 @@ export function useGlobalAttributeStyle(dataIdRef: Readonly<Ref<string | undefin
     return "batlow";
   });
 
+  async function applyCurrentRange(newValue: readonly [number, number]): Promise<void> {
+    const targetId = dataIdRef.value;
+    if (targetId === undefined || targetId === "") {
+      return;
+    }
+
+    let updated = false;
+    for (const comp of getActiveComponents(targetId)) {
+      const setterName = `set${comp.setterKey}${comp.attributeType}Range`;
+      const setter = getDynamicStoreMethod(dataStyleStore, setterName);
+      if (setter) {
+        setter(targetId, newValue[0], newValue[1]);
+        updated = true;
+      }
+    }
+    if (updated) {
+      await hybridViewerStore.remoteRender();
+    }
+  }
+
   const currentRange = computed<readonly [number, number]>({
     get(): readonly [number, number] {
       const targetId = dataIdRef.value;
@@ -181,25 +201,10 @@ export function useGlobalAttributeStyle(dataIdRef: Readonly<Ref<string | undefin
       }
       return [0, 1];
     },
-    // Vue's WritableComputedOptions setter is strictly `(v: T) => void` (enforced here by `no-misused-promises`/`strict-void-return`), so this can't be made `async` to `await` the render call below without violating those rules; `no-void` also forbids discarding it with the `void` operator (see the same trade-off in `app/composables/hover_highlight.ts`'s `onHoverEnter`), so the promise is resolved with an explicit `.catch` instead.
-    set: async (newValue: readonly [number, number]): Promise<void> => {
-      const targetId = dataIdRef.value;
-      if (targetId === undefined || targetId === "") {
-        return;
-      }
-
-      let updated = false;
-      for (const comp of getActiveComponents(targetId)) {
-        const setterName = `set${comp.setterKey}${comp.attributeType}Range`;
-        const setter = getDynamicStoreMethod(dataStyleStore, setterName);
-        if (setter) {
-          setter(targetId, newValue[0], newValue[1]);
-          updated = true;
-        }
-      }
-      if (updated) {
-        await hybridViewerStore.remoteRender();
-      }
+    // Vue's WritableComputedOptions setter is strictly `(v: T) => void`, so the async render call is delegated to a helper (see the same trade-off in `app/composables/hover_highlight.ts`'s `onHoverEnter`).
+    set: (newValue: readonly [number, number]): void => {
+      /* oxlint-disable-next-line promise/prefer-await-to-then -- setter cannot be async; see comment above. */
+      applyCurrentRange(newValue).catch(() => undefined);
     },
   });
 
