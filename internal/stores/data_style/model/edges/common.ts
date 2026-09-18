@@ -8,13 +8,18 @@ export function useModelEdgesCommonStyle(): {
   const dataStyleState = useDataStyleState();
 
   async function mutateModelEdgesStyle(id: string, values: StyleValues): Promise<string> {
-    return dataStyleState.mutateStyle(id, {
+    const result = await dataStyleState.mutateStyle(id, {
       edges: values,
     });
+    return result;
   }
 
   function modelEdgesStyle(id: string): StyleValues {
-    return dataStyleState.getStyle(id).edges as StyleValues;
+    const { edges } = dataStyleState.getStyle(id);
+    if (edges === undefined) {
+      return {};
+    }
+    return edges;
   }
 
   return {

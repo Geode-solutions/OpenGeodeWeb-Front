@@ -1,16 +1,15 @@
 import {
-  AXIS_SCALE,
   CHANGE_THRESHOLD,
   type MainCameraOptions,
-  PLANE_COLORS,
-  SIZE_RATIO,
   type SceneBoundsInfo,
   alignCameraToMainCamera,
   computeSceneBoundsInfo,
-  getPlaneStyle,
-  hasPlaneChanged,
   resolveActiveActors,
 } from "@ogw_front/utils/clipping_planes";
+import {
+  type ClippingPlane,
+  useWidgetEntryManager,
+} from "@ogw_front/composables/clipping_planes_widget_entries";
 import {
   type vtkWidgetManager as WidgetManagerInstance,
   newInstance as vtkWidgetManager,
@@ -19,41 +18,9 @@ import type { vtkGenericRenderWindow as GenericRenderWindowInstance } from "@ogw
 import type { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import type { vtkCamera } from "@kitware/vtk.js/Rendering/Core/Camera";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
-import { newInstance as vtkImplicitPlaneWidget } from "@kitware/vtk.js/Widgets/Widgets3D/ImplicitPlaneWidget";
-
-interface ClippingPlane {
-  origin?: number[];
-  normal: number[];
-}
 
 interface DataItemLike {
   id: string;
-}
-
-interface ClippingWidgetState {
-  getOrigin: () => number[];
-  setOrigin: (origin: readonly number[]) => void;
-  getNormal: () => number[];
-  setNormal: (normal: readonly number[]) => void;
-  onModified: (callback: () => void) => { unsubscribe: () => void };
-}
-
-interface PlaneWidget {
-  getWidgetState: () => ClippingWidgetState;
-  delete: () => void;
-}
-
-interface WidgetHandle {
-  setAxisScale: (scale: number) => void;
-  setHandleSizeRatio: (ratio: number) => void;
-  setRepresentationStyle: (style: unknown) => void;
-  placeWidget: (bounds: readonly number[]) => void;
-}
-
-interface WidgetEntry {
-  planeWidget: PlaneWidget;
-  widgetHandle: WidgetHandle;
-  subscription: { unsubscribe: () => void };
 }
 
 interface ClippingPlanesWidgetParams {
@@ -85,10 +52,10 @@ function useClippingPlanesWidget({
 } {
   let localRenderWindow: GenericRenderWindowInstance | undefined = undefined;
   let widgetManager: WidgetManagerInstance | undefined = undefined;
-  let widgetEntries: WidgetEntry[] = [];
-  let fromWidget = false;
   let maxDistance = 0;
   let isLimitingCameraZoom = false;
+  const widgetEntryManager = useWidgetEntryManager({ planes, debouncedApply });
+
   function getSceneBoundsInfo(): SceneBoundsInfo {
     return computeSceneBoundsInfo(
       resolveActiveActors(
@@ -102,103 +69,15 @@ function useClippingPlanesWidget({
   function getSceneCenter(): readonly number[] {
     return getSceneBoundsInfo().center;
   }
-  function createWidgetEntry(
-    planeWidget: Readonly<PlaneWidget>,
-    widgetHandle: Readonly<WidgetHandle>,
-    planeIndex: number,
-  ): WidgetEntry {
-    const widgetState = planeWidget.getWidgetState();
-    const plane = planes.value[planeIndex];
-    if (plane?.origin) {
-      widgetState.setOrigin(plane.origin);
-    }
-    if (plane) {
-      widgetState.setNormal(plane.normal);
-    }
-    const subscription = widgetState.onModified(() => {
-      if (fromWidget) {
-        return;
-      }
-      const origin: number[] = widgetState.getOrigin().map((val: number) => Number(val.toFixed(4)));
-      const normal: number[] = widgetState.getNormal().map((val: number) => Number(val.toFixed(4)));
-      const currentPlane = planes.value[planeIndex];
-      if (
-        !currentPlane ||
-        !hasPlaneChanged(origin, normal, currentPlane.origin, currentPlane.normal)
-      ) {
-        return;
-      }
-      fromWidget = true;
-      currentPlane.origin = origin;
-      currentPlane.normal = normal;
-      nextTick(() => {
-        fromWidget = false;
-        // oxlint-disable-next-line promise/prefer-await-to-then -- fire-and-forget inside a sync widget callback; see codebase convention in global_attribute_style.ts.
-      }).catch(() => undefined);
-      debouncedApply();
-    });
-    return {
-      planeWidget,
-      widgetHandle,
-      subscription,
-    };
-  }
-  function removeExtraWidgets(): void {
-    while (widgetEntries.length > planes.value.length) {
-      const entry = widgetEntries.pop();
-      if (!entry) {
-        continue;
-      }
-      entry.subscription.unsubscribe();
-      widgetManager?.removeWidget(entry.planeWidget);
-      entry.planeWidget.delete();
-    }
-  }
-
-  function updateWidgetEntry(
-    idx: number,
-    plane: Readonly<ClippingPlane>,
-  ): void {
-    cubicBounds: readonly number[],
-    // Modulo guarantees this index is within bounds of the non-empty PLANE_COLORS array.
-    const rgb = PLANE_COLORS[idx % PLANE_COLORS.length];
-    if (rgb === undefined || !widgetManager) {
-      return;
-    }
-    if (!widgetEntries[idx]) {
-      // oxlint-disable-next-line no-unsafe-call no-unsafe-type-assertion -- vtk.js has no types for ImplicitPlaneWidget's factory; narrowed here.
-      const planeWidget = vtkImplicitPlaneWidget() as PlaneWidget;
-      // oxlint-disable-next-line no-unsafe-type-assertion -- vtk.js WidgetManager.addWidget is untyped; narrowed here.
-      const widgetHandle = widgetManager.addWidget(planeWidget) as WidgetHandle;
-      widgetHandle.setAxisScale(AXIS_SCALE);
-      widgetHandle.setHandleSizeRatio(SIZE_RATIO);
-      widgetEntries.push(createWidgetEntry(planeWidget, widgetHandle, idx));
-    }
-    const entry = widgetEntries[idx];
-    if (!entry) {
-      return;
-    }
-    entry.widgetHandle.setRepresentationStyle(getPlaneStyle(rgb));
-    fromWidget = true;
-    entry.widgetHandle.placeWidget(cubicBounds);
-    fromWidget = false;
-    entry.widgetHandle.setAxisScale(AXIS_SCALE);
-    entry.widgetHandle.setHandleSizeRatio(SIZE_RATIO);
-    const widgetState = entry.planeWidget.getWidgetState();
-    if (plane.origin) {
-      widgetState.setOrigin(plane.origin);
-    }
-    widgetState.setNormal(plane.normal);
-  }
 
   function syncWidgets(): void {
     if (!widgetManager || !localRenderWindow) {
       return;
     }
-    removeExtraWidgets();
+    widgetEntryManager.removeExtraWidgets(widgetManager);
     const { cubicBounds } = getSceneBoundsInfo();
     for (const [idx, plane] of planes.value.entries()) {
-      updateWidgetEntry(idx, plane, cubicBounds);
+      widgetEntryManager.updateWidgetEntry(idx, plane, cubicBounds, widgetManager);
     }
     localRenderWindow.getRenderWindow().render();
   }
@@ -242,14 +121,7 @@ function useClippingPlanesWidget({
   function cleanupLocalWidget(): void {
     maxDistance = 0;
     isLimitingCameraZoom = false;
-    for (const entry of widgetEntries) {
-      entry.subscription.unsubscribe();
-      if (widgetManager) {
-        widgetManager.removeWidget(entry.planeWidget);
-      }
-      entry.planeWidget.delete();
-    }
-    widgetEntries = [];
+    widgetEntryManager.cleanupAll(widgetManager);
     if (localRenderWindow) {
       localRenderWindow.delete();
       localRenderWindow = undefined;
@@ -311,11 +183,11 @@ function useClippingPlanesWidget({
   }
 
   function isFromWidget(): boolean {
-    return fromWidget;
+    return widgetEntryManager.isFromWidget();
   }
 
   function setFromWidget(value: boolean): void {
-    fromWidget = value;
+    widgetEntryManager.setFromWidget(value);
   }
 
   return {

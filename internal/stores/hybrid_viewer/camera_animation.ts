@@ -115,15 +115,18 @@ function animateCamera(options: AnimateCameraOptions): void {
     const bump = bumpMultiplier * Math.sin(Math.PI * progress);
     const dir = slerp(startDir, targetDir, ease, antipodalMid);
     const dist = startDist + (targetDist - startDist) * ease + bump;
-    // `index` ranges over startState.focal_point's own length (3), which always
-    // Matches targetState.focal_point's length, so the lookup is always in bounds.
-    const focalPoint = startState.focal_point.map(
-      (startValue, index) => startValue + (targetState.focal_point[index] - startValue) * ease,
-    );
+    const focalPoint: Vector3 = [
+      startState.focal_point[0] + (targetState.focal_point[0] - startState.focal_point[0]) * ease,
+      startState.focal_point[1] + (targetState.focal_point[1] - startState.focal_point[1]) * ease,
+      startState.focal_point[2] + (targetState.focal_point[2] - startState.focal_point[2]) * ease,
+    ];
     const viewUp = slerp(startState.view_up, targetState.view_up, ease);
     camera.set({
-      // Same reasoning: `index` ranges over focalPoint's length, matching `dir`'s length (3).
-      position: focalPoint.map((focalCoord, index) => focalCoord + dir[index] * dist),
+      position: [
+        focalPoint[0] + dir[0] * dist,
+        focalPoint[1] + dir[1] * dist,
+        focalPoint[2] + dir[2] * dist,
+      ],
       viewUp,
       focalPoint,
     });

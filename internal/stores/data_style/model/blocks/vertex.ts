@@ -1,3 +1,4 @@
+// oxlint-disable eslint/max-lines
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
@@ -103,6 +104,7 @@ function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
   const modelBlocksCommonStyle = useModelBlocksCommonStyle();
   const viewerStore = useViewerStore();
   function modelBlocksVertexAttribute(modelId: string, blockId?: string): AttributeState {
+    // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.vertex shape is defined by the data style schema.
     return modelBlocksCommonStyle.modelBlockColoring(modelId, blockId).vertex as AttributeState;
   }
   function modelBlocksVertexAttributeStoredConfig(
@@ -112,14 +114,10 @@ function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
     item: number | undefined,
   ): AttributeStoredConfig {
     const { storedConfigs } = modelBlocksVertexAttribute(modelId, blockId);
-    if (
-      storedConfigs &&
-      name !== undefined &&
-      name in storedConfigs &&
-      item !== undefined &&
-      item in storedConfigs[name]
-    ) {
-      return storedConfigs[name][item];
+    const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
+    const itemConfig = item === undefined ? undefined : nameConfig?.[item];
+    if (itemConfig !== undefined) {
+      return itemConfig;
     }
     return {
       minimum: undefined,
@@ -134,11 +132,11 @@ function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
     values: Record<string, unknown>,
   ): Promise<void> {
     if (blockIds.length > 1) {
-      modelBlocksCommonStyle.mutateModelBlocksTypeColoring(modelId, {
+      await modelBlocksCommonStyle.mutateModelBlocksTypeColoring(modelId, {
         vertex: values,
       });
     }
-    return modelBlocksCommonStyle.mutateModelBlocksColoring(modelId, blockIds, {
+    await modelBlocksCommonStyle.mutateModelBlocksColoring(modelId, blockIds, {
       vertex: values,
     });
   }
@@ -149,11 +147,14 @@ function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
     item: number | undefined,
     config: Partial<AttributeStoredConfig>,
   ): Promise<void> {
-    return mutateModelBlocksVertexStyle(modelId, blockIds, {
+    if (name === undefined || item === undefined) {
+      return;
+    }
+    await mutateModelBlocksVertexStyle(modelId, blockIds, {
       storedConfigs: {
-        [name as string]: {
+        [name]: {
           lastItem: item,
-          [item as number]: config,
+          [item]: config,
         },
       },
     });
@@ -167,8 +168,9 @@ function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
     name: string | undefined,
   ): number {
     const { storedConfigs } = modelBlocksVertexAttribute(modelId, blockId);
-    if (storedConfigs && name !== undefined && name in storedConfigs) {
-      return storedConfigs[name].lastItem;
+    const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
+    if (nameConfig !== undefined) {
+      return nameConfig.lastItem;
     }
     return 0;
   }
@@ -210,17 +212,17 @@ function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
       no_data_color = DEFAULT_NO_DATA_COLOR,
     }: AttributeInput,
   ): Promise<unknown> {
-    mutateModelBlocksVertexStyle(modelId, blockIds, {
+    await mutateModelBlocksVertexStyle(modelId, blockIds, {
       name,
       item,
     });
-    setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, item, {
+    await setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, item, {
       minimum,
       maximum,
       colorMap,
       no_data_color,
     });
-    const points = getRGBPointsFromPreset(colorMap);
+    const points = getRGBPointsFromPreset(colorMap ?? "");
     const block_viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
     const params = {
       id: modelId,
@@ -250,9 +252,10 @@ function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
       no_data_color: storedConfig.no_data_color,
     };
     if (isModelBlocksVertexAttributeValid(attribute)) {
-      return setModelBlocksVertexAttribute(modelId, blockIds, attribute);
+      const result = await setModelBlocksVertexAttribute(modelId, blockIds, attribute);
+      return result;
     }
-    return;
+    return undefined;
   }
   async function setModelBlocksVertexAttributeName(
     modelId: string,
@@ -260,7 +263,7 @@ function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
     name: string,
   ): Promise<unknown> {
     const item = modelBlocksVertexAttributeLastItem(modelId, blockIds[0], name);
-    mutateModelBlocksVertexStyle(modelId, blockIds, {
+    await mutateModelBlocksVertexStyle(modelId, blockIds, {
       name,
       item,
     });
@@ -271,7 +274,7 @@ function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
     blockIds: string[],
     item: number,
   ): Promise<unknown> {
-    mutateModelBlocksVertexStyle(modelId, blockIds, {
+    await mutateModelBlocksVertexStyle(modelId, blockIds, {
       item,
     });
     return applyVertexAttribute(modelId, blockIds);
@@ -284,7 +287,7 @@ function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
   ): Promise<unknown> {
     const name = modelBlocksVertexAttributeName(modelId, blockIds[0]);
     const item = modelBlocksVertexAttributeItem(modelId, blockIds[0]);
-    setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, item, {
+    await setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, item, {
       minimum,
       maximum,
     });
@@ -297,7 +300,7 @@ function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
   ): Promise<unknown> {
     const name = modelBlocksVertexAttributeName(modelId, blockIds[0]);
     const item = modelBlocksVertexAttributeItem(modelId, blockIds[0]);
-    setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, item, {
+    await setModelBlocksVertexAttributeStoredConfig(modelId, blockIds, name, item, {
       colorMap,
     });
     return applyVertexAttribute(modelId, blockIds);

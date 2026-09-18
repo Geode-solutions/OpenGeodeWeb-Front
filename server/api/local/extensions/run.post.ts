@@ -31,9 +31,7 @@ export default defineEventHandler(async (event: H3Event) => {
     const { projectFolderPath, projectName } = await readBody<RunExtensionsBody>(event);
     const extensionsConfig = extensionsConf(projectName);
     const extensionsArray = await Promise.all(
-      Object.keys(extensionsConfig).map(async (extensionId) => {
-        // Safe: extensionId comes from Object.keys(extensionsConfig) itself.
-        const extensionPath = extensionsConfig[extensionId].path;
+      Object.entries(extensionsConfig).map(async ([extensionId, { path: extensionPath }]) => {
         const unzippedExtensionPath = await unzipFile(
           extensionPath,
           extensionFolderPath(projectFolderPath, extensionId),

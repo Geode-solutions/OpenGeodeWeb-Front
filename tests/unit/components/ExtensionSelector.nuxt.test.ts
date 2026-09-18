@@ -28,7 +28,7 @@ describe("extension selector", () => {
   beforeEach(() => {
     (backStore as { base_url: string }).base_url = "/";
 
-    backStore.request = vi.fn(async () => {
+    backStore.request = vi.fn(() => {
       const response = {
         geode_objects_and_output_extensions: {
           BRep: { msh: { is_saveable: true } },
@@ -58,7 +58,7 @@ describe("extension selector", () => {
     });
     await nextTick();
     expect(wrapper.exists()).toBe(true);
-    const v_card = await wrapper.findAllComponents(components.VCard);
+    const v_card = wrapper.findAllComponents(components.VCard);
     await v_card[SECOND_INDEX]?.trigger("click");
     expect(wrapper.emitted()).toHaveProperty("update_values");
     expect(wrapper.emitted<unknown[]>().update_values).toHaveLength(EXPECTED_LENGTH);

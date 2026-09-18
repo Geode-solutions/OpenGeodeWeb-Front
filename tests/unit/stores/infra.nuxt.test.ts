@@ -5,13 +5,11 @@ import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest";
 import { $fetch } from "ofetch";
 
 // Local imports
+import { type Microservice, useInfraStore } from "@ogw_front/stores/infra";
 import { Status } from "@ogw_front/utils/status";
 import { appMode } from "@ogw_shared/app_mode";
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useBackStore } from "@ogw_front/stores/back";
-import { useInfraStore } from "@ogw_front/stores/infra";
-// oxlint-disable-next-line eslint/no-duplicate-imports
-import type { Microservice } from "@ogw_front/stores/infra";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 vi.mock(
@@ -227,7 +225,7 @@ describe("infra store", () => {
 
       infraStore.app_mode = appMode.CLOUD;
       const url = "test.com";
-      vi.mocked($fetch).mockImplementation((async (
+      vi.mocked($fetch).mockImplementation(((
         _route: unknown,
         // oxlint-disable-next-line eslint/id-length -- mirrors the real ofetch/vitest API field name (`ok`/`fn`)
         options: { onResponse?: (context: { response: { ok: boolean; _data: unknown } }) => void },

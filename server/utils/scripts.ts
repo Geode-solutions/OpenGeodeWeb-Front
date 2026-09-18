@@ -169,8 +169,8 @@ async function waitNuxt(
     const output = String(data);
     console.log("Nuxt STDOUT:", output.trim());
     const portMatch = /Listening on http:\/\/\[::\]:(?<port>\d+)/u.exec(output);
-    if (portMatch?.groups) {
-      const { port } = portMatch.groups;
+    const port = portMatch?.groups?.port;
+    if (port !== undefined) {
       console.log("Nuxt listening on port", port);
       nuxtProcess.stdout.on("data", (newData: Buffer) => {
         console.log("Nuxt STDOUT:", newData.toString().trim());

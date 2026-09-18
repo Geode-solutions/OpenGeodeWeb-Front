@@ -40,7 +40,9 @@ class Database extends BaseDatabase {
       tempDb.close();
     }
 
-    const allExisting = Object.keys(newTables).every((tableName) => currentStores[tableName]);
+    const allExisting = Object.keys(newTables).every(
+      (tableName) => currentStores[tableName] !== undefined,
+    );
 
     // Set at module load time below; always defined by the time addTable/addTables runs.
     databaseContainer.instance?.close();

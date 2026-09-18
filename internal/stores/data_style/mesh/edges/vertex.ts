@@ -3,7 +3,6 @@ import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 // Local imports
-import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { useMeshEdgesCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -50,15 +49,39 @@ function isMeshEdgesVertexAttributeValid({
   );
 }
 
+interface UseMeshEdgesVertexAttributeStyleReturn {
+  meshEdgesVertexAttributeName: (id: string) => string | undefined;
+  meshEdgesVertexAttributeItem: (id: string) => number;
+  meshEdgesVertexAttributeRange: (id: string) => [number | undefined, number | undefined];
+  meshEdgesVertexAttributeColorMap: (id: string) => string | undefined;
+  meshEdgesVertexAttributeStoredConfig: (
+    id: string,
+    name: string | undefined,
+    item: number | undefined,
+  ) => AttributeStoredConfig;
+  setMeshEdgesVertexAttribute: (id: string, input: AttributeInput) => Promise<unknown>;
+  setMeshEdgesVertexAttributeName: (id: string, name: string) => Promise<unknown>;
+  setMeshEdgesVertexAttributeItem: (id: string, item: number) => Promise<unknown>;
+  setMeshEdgesVertexAttributeRange: (
+    id: string,
+    minimum: number,
+    maximum: number,
+  ) => Promise<unknown>;
+  setMeshEdgesVertexAttributeColorMap: (
+    id: string,
+    colorMap: string | undefined,
+  ) => Promise<unknown>;
+  meshEdgesVertexAttributeNoDataColor: (id: string) => unknown;
+  setMeshEdgesVertexAttributeNoDataColor: (id: string, no_data_color: unknown) => Promise<unknown>;
+}
+
 // oxlint-disable-next-line max-lines-per-function
-function useMeshEdgesVertexAttributeStyle() {
+function useMeshEdgesVertexAttributeStyle(): UseMeshEdgesVertexAttributeStyleReturn {
   const viewerStore = useViewerStore();
   const meshEdgesCommonStyle = useMeshEdgesCommonStyle();
-  function meshEdgesColoring(id: string): StyleValues {
-    return meshEdgesCommonStyle.meshEdgesStyle(id).coloring as StyleValues;
-  }
   function meshEdgesVertexAttribute(id: string): AttributeState {
-    return meshEdgesColoring(id).vertex as AttributeState;
+    // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.vertex shape is defined by the data style schema.
+    return meshEdgesCommonStyle.meshEdgesColoring(id).vertex as AttributeState;
   }
   function meshEdgesVertexAttributeStoredConfig(
     id: string,
@@ -66,14 +89,10 @@ function useMeshEdgesVertexAttributeStyle() {
     item: number | undefined,
   ): AttributeStoredConfig {
     const { storedConfigs } = meshEdgesVertexAttribute(id);
-    if (
-      storedConfigs &&
-      name !== undefined &&
-      name in storedConfigs &&
-      item !== undefined &&
-      item in storedConfigs[name]
-    ) {
-      return storedConfigs[name][item];
+    const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
+    const itemConfig = item === undefined ? undefined : nameConfig?.[item];
+    if (itemConfig !== undefined) {
+      return itemConfig;
     }
     return {
       minimum: undefined,
@@ -82,35 +101,41 @@ function useMeshEdgesVertexAttributeStyle() {
       no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
-  function mutateMeshEdgesVertexStyle(id: string, values: Record<string, unknown>) {
-    return meshEdgesCommonStyle.mutateMeshEdgesStyle(id, {
+  async function mutateMeshEdgesVertexStyle(
+    id: string,
+    values: Record<string, unknown>,
+  ): Promise<string> {
+    const result = await meshEdgesCommonStyle.mutateMeshEdgesStyle(id, {
       coloring: {
         vertex: values,
       },
     });
+    return result;
   }
-  function setMeshEdgesVertexAttributeStoredConfig(
+  async function setMeshEdgesVertexAttributeStoredConfig(
     id: string,
     name: string | undefined,
     item: number | undefined,
     config: Partial<AttributeStoredConfig>,
-  ) {
-    return mutateMeshEdgesVertexStyle(id, {
+  ): Promise<string> {
+    const result = await mutateMeshEdgesVertexStyle(id, {
       storedConfigs: {
-        [name as string]: {
+        [name ?? ""]: {
           lastItem: item,
-          [item as number]: config,
+          [item ?? 0]: config,
         },
       },
     });
+    return result;
   }
   function meshEdgesVertexAttributeName(id: string): string | undefined {
     return meshEdgesVertexAttribute(id).name;
   }
   function meshEdgesVertexAttributeLastItem(id: string, name: string | undefined): number {
     const { storedConfigs } = meshEdgesVertexAttribute(id);
-    if (storedConfigs && name !== undefined && name in storedConfigs) {
-      return storedConfigs[name].lastItem;
+    const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
+    if (nameConfig !== undefined) {
+      return nameConfig.lastItem;
     }
     return 0;
   }
@@ -118,7 +143,7 @@ function useMeshEdgesVertexAttributeStyle() {
     const { item, name } = meshEdgesVertexAttribute(id);
     return item ?? meshEdgesVertexAttributeLastItem(id, name);
   }
-  function setMeshEdgesVertexAttribute(
+  async function setMeshEdgesVertexAttribute(
     id: string,
     {
       name,
@@ -128,18 +153,18 @@ function useMeshEdgesVertexAttributeStyle() {
       colorMap,
       no_data_color = DEFAULT_NO_DATA_COLOR,
     }: AttributeInput,
-  ) {
-    mutateMeshEdgesVertexStyle(id, {
+  ): Promise<unknown> {
+    await mutateMeshEdgesVertexStyle(id, {
       name,
       item,
     });
-    setMeshEdgesVertexAttributeStoredConfig(id, name, item, {
+    await setMeshEdgesVertexAttributeStoredConfig(id, name, item, {
       minimum,
       maximum,
       colorMap,
       no_data_color,
     });
-    const points = getRGBPointsFromPreset(colorMap);
+    const points = getRGBPointsFromPreset(colorMap ?? "");
     const schema = meshEdgesVertexAttributeSchemas.attribute;
     const params = {
       id,
@@ -155,7 +180,7 @@ function useMeshEdgesVertexAttributeStyle() {
       params,
     });
   }
-  function applyVertexAttribute(id: string) {
+  async function applyVertexAttribute(id: string): Promise<unknown> {
     const name = meshEdgesVertexAttributeName(id);
     const item = meshEdgesVertexAttributeItem(id);
     const storedConfig = meshEdgesVertexAttributeStoredConfig(id, name, item);
@@ -168,19 +193,21 @@ function useMeshEdgesVertexAttributeStyle() {
       no_data_color: storedConfig.no_data_color,
     };
     if (isMeshEdgesVertexAttributeValid(attribute)) {
-      return setMeshEdgesVertexAttribute(id, attribute);
+      const result = await setMeshEdgesVertexAttribute(id, attribute);
+      return result;
     }
+    return undefined;
   }
-  function setMeshEdgesVertexAttributeName(id: string, name: string) {
+  async function setMeshEdgesVertexAttributeName(id: string, name: string): Promise<unknown> {
     const item = meshEdgesVertexAttributeLastItem(id, name);
-    mutateMeshEdgesVertexStyle(id, {
+    await mutateMeshEdgesVertexStyle(id, {
       name,
       item,
     });
     return applyVertexAttribute(id);
   }
-  function setMeshEdgesVertexAttributeItem(id: string, item: number) {
-    mutateMeshEdgesVertexStyle(id, {
+  async function setMeshEdgesVertexAttributeItem(id: string, item: number): Promise<unknown> {
+    await mutateMeshEdgesVertexStyle(id, {
       item,
     });
     return applyVertexAttribute(id);
@@ -191,10 +218,14 @@ function useMeshEdgesVertexAttributeStyle() {
     const storedConfig = meshEdgesVertexAttributeStoredConfig(id, name, item);
     return [storedConfig.minimum, storedConfig.maximum];
   }
-  function setMeshEdgesVertexAttributeRange(id: string, minimum: number, maximum: number) {
+  async function setMeshEdgesVertexAttributeRange(
+    id: string,
+    minimum: number,
+    maximum: number,
+  ): Promise<unknown> {
     const name = meshEdgesVertexAttributeName(id);
     const item = meshEdgesVertexAttributeItem(id);
-    setMeshEdgesVertexAttributeStoredConfig(id, name, item, {
+    await setMeshEdgesVertexAttributeStoredConfig(id, name, item, {
       minimum,
       maximum,
     });
@@ -206,10 +237,13 @@ function useMeshEdgesVertexAttributeStyle() {
     const storedConfig = meshEdgesVertexAttributeStoredConfig(id, name, item);
     return storedConfig.colorMap;
   }
-  function setMeshEdgesVertexAttributeColorMap(id: string, colorMap: string | undefined) {
+  async function setMeshEdgesVertexAttributeColorMap(
+    id: string,
+    colorMap: string | undefined,
+  ): Promise<unknown> {
     const name = meshEdgesVertexAttributeName(id);
     const item = meshEdgesVertexAttributeItem(id);
-    setMeshEdgesVertexAttributeStoredConfig(id, name, item, {
+    await setMeshEdgesVertexAttributeStoredConfig(id, name, item, {
       colorMap,
     });
     return applyVertexAttribute(id);
@@ -220,7 +254,10 @@ function useMeshEdgesVertexAttributeStyle() {
     const storedConfig = meshEdgesVertexAttributeStoredConfig(id, name, item);
     return storedConfig.no_data_color;
   }
-  async function setMeshEdgesVertexAttributeNoDataColor(id: string, no_data_color: unknown) {
+  async function setMeshEdgesVertexAttributeNoDataColor(
+    id: string,
+    no_data_color: unknown,
+  ): Promise<unknown> {
     const name = meshEdgesVertexAttributeName(id);
     const item = meshEdgesVertexAttributeItem(id);
     const storedConfig = meshEdgesVertexAttributeStoredConfig(id, name, item);

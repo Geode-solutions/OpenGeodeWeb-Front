@@ -20,18 +20,21 @@ export function useMeshEdgesColorStyle(): {
   }
   async function setMeshEdgesColor(id: string, color: unknown): Promise<unknown> {
     const params = { id, color };
-    return viewerStore.request(
+    const result = await viewerStore.request(
       {
         schema,
         params,
       },
       {
-        response_function: () =>
-          meshEdgesCommonStyle.mutateMeshEdgesColoring(id, {
+        response_function: async () => {
+          const mutateResult = await meshEdgesCommonStyle.mutateMeshEdgesColoring(id, {
             constant: color,
-          }),
+          });
+          return mutateResult;
+        },
       },
     );
+    return result;
   }
 
   return {

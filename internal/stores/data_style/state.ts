@@ -5,7 +5,7 @@ import type {
   StyleValues,
 } from "./types";
 import type { Observable as RxObservable } from "rxjs";
-import { database } from "@ogw_internal/database/database";
+import { getTable } from "@ogw_internal/database/database";
 import { liveQuery } from "dexie";
 import merge from "lodash/merge";
 import { useObservable } from "@vueuse/rxjs";
@@ -42,29 +42,15 @@ interface SharedState {
 
 let sharedState: SharedState | undefined = undefined;
 
-// The database's table map is dynamically assembled at runtime (see internal/database/database.ts),
-// So `noUncheckedIndexedAccess` sees these as possibly undefined even though they're always
-// Registered before this module is used; guard defensively rather than asserting.
-function requireTable<Table>(table: Table | undefined, name: string): Table {
-  if (table === undefined) {
-    throw new Error(`Database table not initialized: ${name}`);
-  }
-  return table;
-}
-
 // oxlint-disable-next-line max-lines-per-function
 function getSharedState(): SharedState {
   if (sharedState) {
     return sharedState;
   }
 
-  const dataStyleTable = requireTable(database.data_style, "data_style");
-  const modelComponentDataStyleTable = requireTable(
-    database.model_component_datastyle,
-    "model_component_datastyle",
-  );
-  const modelComponentTypeDataStyleTable = requireTable(
-    database.model_component_type_datastyle,
+  const dataStyleTable = getTable<ObjectStyle>("data_style");
+  const modelComponentDataStyleTable = getTable<ModelComponentStyle>("model_component_datastyle");
+  const modelComponentTypeDataStyleTable = getTable<ModelComponentTypeStyle>(
     "model_component_type_datastyle",
   );
 
@@ -72,8 +58,9 @@ function getSharedState(): SharedState {
   // From rxjs's `Observable` that `useObservable` (from @vueuse/rxjs) expects, even
   // Though they're interoperable at runtime (both are plain subscribe-based streams).
   const styles = useObservable<Record<string, ObjectStyle>, Record<string, ObjectStyle>>(
+    // oxlint-disable-next-line no-unsafe-type-assertion
     liveQuery(async () => {
-      const objectStyles = (await dataStyleTable.toArray()) as ObjectStyle[];
+      const objectStyles = await dataStyleTable.toArray();
       const stylesByObjectId: Record<string, ObjectStyle> = {};
       for (const objectStyle of objectStyles) {
         stylesByObjectId[objectStyle.id] = objectStyle;
@@ -88,8 +75,8 @@ function getSharedState(): SharedState {
 
   async function loadFromDatabase(): Promise<void> {
     const [fetchedTypeStyles, fetchedComponentStyles] = await Promise.all([
-      modelComponentTypeDataStyleTable.toArray() as unknown as Promise<ModelComponentTypeStyle[]>,
-      modelComponentDataStyleTable.toArray() as unknown as Promise<ModelComponentStyle[]>,
+      modelComponentTypeDataStyleTable.toArray(),
+      modelComponentDataStyleTable.toArray(),
     ]);
     const typeStylesMap: Record<string, ModelComponentTypeStyle> = {};
     for (const typeStyle of fetchedTypeStyles) {
@@ -142,11 +129,7 @@ function getSharedState(): SharedState {
           styleValues,
         );
       } else {
-        updatedComponentStyles[cacheKey] = merge(
-          {},
-          existingStyle,
-          styleValues,
-        ) as ModelComponentStyle;
+        updatedComponentStyles[cacheKey] = merge({}, existingStyle, styleValues);
       }
     }
     componentStyles.value = updatedComponentStyles;
@@ -167,11 +150,7 @@ function getSharedState(): SharedState {
           styleValues,
         );
       } else {
-        updatedComponentStyles[cacheKey] = merge(
-          {},
-          existingStyle,
-          styleValues,
-        ) as ModelComponentStyle;
+        updatedComponentStyles[cacheKey] = merge({}, existingStyle, styleValues);
       }
     }
     componentStyles.value = updatedComponentStyles;
@@ -219,13 +198,9 @@ interface DataStyleStateApi extends SharedState {
 
 // oxlint-disable-next-line max-lines-per-function
 export function useDataStyleState(): DataStyleStateApi {
-  const dataStyleTable = requireTable(database.data_style, "data_style");
-  const modelComponentDataStyleTable = requireTable(
-    database.model_component_datastyle,
-    "model_component_datastyle",
-  );
-  const modelComponentTypeDataStyleTable = requireTable(
-    database.model_component_type_datastyle,
+  const dataStyleTable = getTable<ObjectStyle>("data_style");
+  const modelComponentDataStyleTable = getTable<ModelComponentStyle>("model_component_datastyle");
+  const modelComponentTypeDataStyleTable = getTable<ModelComponentTypeStyle>(
     "model_component_type_datastyle",
   );
 
@@ -251,7 +226,11 @@ export function useDataStyleState(): DataStyleStateApi {
   });
 
   function getStyle(objectId: string): ObjectStyle {
-    return { ...toRaw(styles.value[objectId]) } as ObjectStyle;
+    const style = styles.value[objectId];
+    if (style === undefined) {
+      return { id: objectId };
+    }
+    return { ...toRaw(style) };
   }
 
   async function mutateStyle(
@@ -261,7 +240,10 @@ export function useDataStyleState(): DataStyleStateApi {
     state.updateStyleCache(objectId, styleValues);
     const currentStyle = getStyle(objectId);
     merge(currentStyle, styleValues);
-    return dataStyleTable.put(structuredClone({ ...toRaw(currentStyle), id: objectId }));
+    const savedId = await dataStyleTable.put(
+      structuredClone({ ...toRaw(currentStyle), id: objectId }),
+    );
+    return savedId;
   }
 
   function getComponentStyle(modelId: string, componentId: string): ModelComponentStyle {

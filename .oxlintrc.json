@@ -8,7 +8,8 @@
     "restriction": "error"
   },
   "options": {
-    "typeAware": true
+    "typeAware": true,
+    "typeCheck": true
   },
   "plugins": [
     "eslint",
@@ -41,6 +42,7 @@
     ],
     "eslint/no-ternary": "off", // A utiliser pour des opérations simples
     "eslint/no-undefined": "off", // Conflict with unicorn/no-typeof-undefined which prefers direct undefined comparison
+    "eslint/no-void": "off", // Conflicts with typescript/no-floating-promises, whose fix for fire-and-forget promises is the void operator
     "eslint/no-underscore-dangle": [
       "error",
       {

@@ -42,18 +42,22 @@ export function useMeshStyle(): {
   async function setMeshVisibility(id: string, visibility: boolean | undefined): Promise<unknown> {
     const schema = meshSchemas.visibility;
     const params = { id, visibility };
-    return viewerStore.request(
+    const result = await viewerStore.request(
       {
         schema,
         params,
       },
       {
         response_function: async () => {
-          await hybridViewerStore.setVisibility(id, visibility);
-          return dataStyleState.mutateStyle(id, { visibility });
+          if (visibility !== undefined) {
+            hybridViewerStore.setVisibility(id, visibility);
+          }
+          const mutatedId = await dataStyleState.mutateStyle(id, { visibility });
+          return mutatedId;
         },
       },
     );
+    return result;
   }
 
   function meshColor(id: string): unknown {
@@ -63,15 +67,19 @@ export function useMeshStyle(): {
   async function setMeshColor(id: string, color: unknown): Promise<unknown> {
     const schema = meshSchemas.color;
     const params = { id, color };
-    return viewerStore.request(
+    const result = await viewerStore.request(
       {
         schema,
         params,
       },
       {
-        response_function: () => dataStyleState.mutateStyle(id, { color }),
+        response_function: async () => {
+          const mutatedId = await dataStyleState.mutateStyle(id, { color });
+          return mutatedId;
+        },
       },
     );
+    return result;
   }
 
   async function applyMeshStyle(id: string): Promise<unknown[]> {
@@ -79,7 +87,7 @@ export function useMeshStyle(): {
     const promise_array: unknown[] = [];
     for (const [key, value] of Object.entries(style)) {
       if (key === "visibility") {
-        promise_array.push(setMeshVisibility(id, value as boolean | undefined));
+        promise_array.push(setMeshVisibility(id, style.visibility));
       } else if (key === "color") {
         promise_array.push(setMeshColor(id, value));
       } else if (key === "points") {
@@ -106,7 +114,8 @@ export function useMeshStyle(): {
         throw new Error(`Unknown mesh key: ${key}`);
       }
     }
-    return Promise.all(promise_array);
+    const results = await Promise.all(promise_array);
+    return results;
   }
 
   return {

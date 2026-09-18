@@ -8,24 +8,35 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 // Local constants
 const schema = viewer_schemas.opengeodeweb_viewer.mesh.cells.visibility;
 
-export function useMeshCellsVisibilityStyle() {
+export function useMeshCellsVisibilityStyle(): {
+  meshCellsVisibility: (id: string) => boolean | undefined;
+  setMeshCellsVisibility: (id: string, visibility: boolean | undefined) => Promise<unknown>;
+} {
   const viewerStore = useViewerStore();
   const meshCellsCommonStyle = useMeshCellsCommonStyle();
 
   function meshCellsVisibility(id: string): boolean | undefined {
+    // oxlint-disable-next-line no-unsafe-type-assertion -- visibility is defined as boolean in the data style schema.
     return meshCellsCommonStyle.meshCellsStyle(id).visibility as boolean | undefined;
   }
-  function setMeshCellsVisibility(id: string, visibility: boolean | undefined) {
+  async function setMeshCellsVisibility(
+    id: string,
+    visibility: boolean | undefined,
+  ): Promise<unknown> {
     const params = { id, visibility };
-    return viewerStore.request(
+    const result = await viewerStore.request(
       {
         schema,
         params,
       },
       {
-        response_function: () => meshCellsCommonStyle.mutateMeshCellsStyle(id, { visibility }),
+        response_function: async () => {
+          const mutateResult = await meshCellsCommonStyle.mutateMeshCellsStyle(id, { visibility });
+          return mutateResult;
+        },
       },
     );
+    return result;
   }
 
   return {

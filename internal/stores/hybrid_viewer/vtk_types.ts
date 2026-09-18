@@ -1,10 +1,5 @@
-import type { vtkCamera } from "@kitware/vtk.js/Rendering/Core/Camera";
-import type { vtkRenderer } from "@kitware/vtk.js/Rendering/Core/Renderer";
-import type { vtkRenderWindow } from "@kitware/vtk.js/Rendering/Core/RenderWindow";
-import type { vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
-import type { vtkOpenGLRenderWindow } from "@kitware/vtk.js/Rendering/OpenGL/RenderWindow";
-import type vtkActor from "@kitware/vtk.js/Rendering/Core/Actor";
 import type { Vector3 } from "@kitware/vtk.js/types";
+import type vtkActor from "@kitware/vtk.js/Rendering/Core/Actor";
 
 // The camera state as exchanged with the viewer microservice (snake_case field names, plain arrays) - distinct from vtk.js's own vtkCamera object.
 interface CameraOptions {
@@ -40,31 +35,24 @@ interface HoverData {
   attributes: Record<string, unknown>;
 }
 
-// The parent Pinia store (app/stores/hybrid_viewer.ts) assembles these composables via `...spread` and is converted/typed separately from this directory, so its exact inferred return type isn't reliable to build on here. This describes just the slice of its returned (already-unwrapped) state and actions that the composables in this folder read or call directly (i.e. not through `storeToRefs`, which callers type separately at each destructuring site).
-interface HybridViewerStorePublic {
-  genericRenderWindow: { value: vtkGenericRenderWindow | undefined };
-  hybridDb: HybridDb;
-  camera_options: Record<string, unknown>;
-  remoteRender: () => Promise<void> | void;
-  clearHoverHighlight: () => void;
-  syncRemoteCamera: () => void;
-  hoverHighlight: (event: MouseEvent) => void;
-  setZScaling: (value: number) => Promise<void>;
-  setCamera: (options: CameraOptions) => void;
+// The image stream object returned by vtk.js's ImageStream.createViewStream(); vtk.js's own vtkViewStream type declares `onImageReady` with a zero-arg callback, which doesn't match how it's actually invoked at runtime (with the decoded image), so this describes the shape as it's actually used here.
+interface ViewStreamLike {
+  setSize: (width: number, height: number) => void;
+  onImageReady: (callback: (event: { image: unknown }) => void) => void;
 }
 
+export type { Vector3 } from "@kitware/vtk.js/types";
+export type { default as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
+export type { vtkCamera } from "@kitware/vtk.js/Rendering/Core/Camera";
+export type { vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
+export type { vtkOpenGLRenderWindow } from "@kitware/vtk.js/Rendering/OpenGL/RenderWindow";
+export type { vtkRenderWindow } from "@kitware/vtk.js/Rendering/Core/RenderWindow";
+export type { vtkRenderer } from "@kitware/vtk.js/Rendering/Core/Renderer";
 export type {
-  vtkCamera,
-  vtkRenderer,
-  vtkRenderWindow,
-  vtkGenericRenderWindow,
-  vtkOpenGLRenderWindow,
-  vtkActor,
-  Vector3,
   CameraOptions,
   HybridDbEntry,
   HybridDb,
   HoverComponentInfo,
   HoverData,
-  HybridViewerStorePublic,
+  ViewStreamLike,
 };

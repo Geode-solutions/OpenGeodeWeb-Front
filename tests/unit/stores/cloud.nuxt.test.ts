@@ -51,7 +51,7 @@ describe("cloud store", () => {
         const cloudStore = useCloudStore();
         const feedbackStore = useFeedbackStore();
 
-        mockedFetch.mockImplementation((async (
+        mockedFetch.mockImplementation(((
           _route: unknown,
           options: {
             // oxlint-disable-next-line eslint/id-length -- mirrors the real ofetch/vitest API field name (`ok`/`fn`)
@@ -77,7 +77,7 @@ describe("cloud store", () => {
 
         const error = createError({ statusCode: 500, statusMessage: "500 Internal Server Error" });
 
-        mockedFetch.mockImplementation((async (
+        mockedFetch.mockImplementation(((
           _route: unknown,
           options: {
             onResponseError?: (context: {
@@ -101,9 +101,9 @@ describe("cloud store", () => {
     });
 
     describe("connect", () => {
-      test("successful connect", async () => {
+      test("successful connect", () => {
         const cloudStore = useCloudStore();
-        await cloudStore.connect();
+        cloudStore.connect();
         expect(cloudStore.status).toBe(Status.CONNECTED);
       });
     });

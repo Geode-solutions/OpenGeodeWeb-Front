@@ -50,12 +50,61 @@ function isModelSurfacesPolygonAttributeValid({
   );
 }
 
+interface UseModelSurfacesPolygonAttributeReturn {
+  modelSurfacesPolygonAttributeName: (modelId: string, surfaceId?: string) => string | undefined;
+  modelSurfacesPolygonAttributeItem: (modelId: string, surfaceId?: string) => number;
+  modelSurfacesPolygonAttributeRange: (
+    modelId: string,
+    surfaceId?: string,
+  ) => [number | undefined, number | undefined];
+  modelSurfacesPolygonAttributeColorMap: (modelId: string, surfaceId?: string) => string | undefined;
+  modelSurfacesPolygonAttributeStoredConfig: (
+    modelId: string,
+    surfaceId: string | undefined,
+    name: string | undefined,
+    item: number | undefined,
+  ) => AttributeStoredConfig;
+  setModelSurfacesPolygonAttribute: (
+    modelId: string,
+    surfaceIds: string[],
+    input: AttributeInput,
+  ) => Promise<unknown>;
+  setModelSurfacesPolygonAttributeName: (
+    modelId: string,
+    surfaceIds: string[],
+    name: string,
+  ) => Promise<void>;
+  setModelSurfacesPolygonAttributeItem: (
+    modelId: string,
+    surfaceIds: string[],
+    item: number,
+  ) => Promise<void>;
+  setModelSurfacesPolygonAttributeRange: (
+    modelId: string,
+    surfaceIds: string[],
+    minimum: number,
+    maximum: number,
+  ) => Promise<void>;
+  setModelSurfacesPolygonAttributeColorMap: (
+    modelId: string,
+    surfaceIds: string[],
+    colorMap: string | undefined,
+  ) => Promise<void>;
+  modelSurfacesPolygonAttributeNoDataColor: (modelId: string, surfaceId?: string) => unknown;
+  setModelSurfacesPolygonAttributeNoDataColor: (
+    modelId: string,
+    surfaceIds: string[],
+    no_data_color: unknown,
+  ) => Promise<void>;
+}
+
 // oxlint-disable-next-line max-lines-per-function
-function useModelSurfacesPolygonAttribute() {
+function useModelSurfacesPolygonAttribute(): UseModelSurfacesPolygonAttributeReturn {
   const dataStore = useDataStore();
   const modelSurfacesCommonStyle = useModelSurfacesCommonStyle();
   const viewerStore = useViewerStore();
   function modelSurfacesPolygonAttribute(modelId: string, surfaceId?: string): AttributeState {
+    // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.polygon shape is defined by the data style schema.
     return modelSurfacesCommonStyle.modelSurfaceColoring(modelId, surfaceId)
       .polygon as AttributeState;
   }
@@ -66,14 +115,10 @@ function useModelSurfacesPolygonAttribute() {
     item: number | undefined,
   ): AttributeStoredConfig {
     const { storedConfigs } = modelSurfacesPolygonAttribute(modelId, surfaceId);
-    if (
-      storedConfigs &&
-      name !== undefined &&
-      name in storedConfigs &&
-      item !== undefined &&
-      item in storedConfigs[name]
-    ) {
-      return storedConfigs[name][item];
+    const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
+    const itemConfig = item === undefined ? undefined : nameConfig?.[item];
+    if (itemConfig !== undefined) {
+      return itemConfig;
     }
     return {
       minimum: undefined,
@@ -82,40 +127,30 @@ function useModelSurfacesPolygonAttribute() {
       no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
-  function mutateModelSurfacesPolygonStyle(
+  async function mutateModelSurfacesPolygonStyle(
     modelId: string,
     surfaceIds: string[],
     values: Record<string, unknown>,
-  ) {
+  ): Promise<void> {
     if (surfaceIds.length > 1) {
-      modelSurfacesCommonStyle.mutateModelSurfacesTypeColoring(modelId, {
-        polygon: values,
-      });
+      await modelSurfacesCommonStyle.mutateModelSurfacesTypeColoring(modelId, { polygon: values });
     }
-    return modelSurfacesCommonStyle.mutateModelSurfacesColoring(modelId, surfaceIds, {
+    await modelSurfacesCommonStyle.mutateModelSurfacesColoring(modelId, surfaceIds, {
       polygon: values,
     });
   }
-  function setModelSurfacesPolygonAttributeStoredConfig(
+  async function setModelSurfacesPolygonAttributeStoredConfig(
     modelId: string,
     surfaceIds: string[],
     name: string | undefined,
     item: number | undefined,
     config: Partial<AttributeStoredConfig>,
-  ) {
-    return mutateModelSurfacesPolygonStyle(modelId, surfaceIds, {
-      storedConfigs: {
-        [name as string]: {
-          lastItem: item,
-          [item as number]: config,
-        },
-      },
+  ): Promise<void> {
+    await mutateModelSurfacesPolygonStyle(modelId, surfaceIds, {
+      storedConfigs: { [name ?? ""]: { lastItem: item, [item ?? 0]: config } },
     });
   }
-  function modelSurfacesPolygonAttributeName(
-    modelId: string,
-    surfaceId?: string,
-  ): string | undefined {
+  function modelSurfacesPolygonAttributeName(modelId: string, surfaceId?: string): string | undefined {
     return modelSurfacesPolygonAttribute(modelId, surfaceId).name;
   }
   function modelSurfacesPolygonAttributeLastItem(
@@ -124,8 +159,9 @@ function useModelSurfacesPolygonAttribute() {
     name: string | undefined,
   ): number {
     const { storedConfigs } = modelSurfacesPolygonAttribute(modelId, surfaceId);
-    if (storedConfigs && name !== undefined && name in storedConfigs) {
-      return storedConfigs[name].lastItem;
+    const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
+    if (nameConfig !== undefined) {
+      return nameConfig.lastItem;
     }
     return 0;
   }
@@ -146,10 +182,7 @@ function useModelSurfacesPolygonAttribute() {
     const { minimum, maximum } = storedConfig;
     return [minimum, maximum];
   }
-  function modelSurfacesPolygonAttributeColorMap(
-    modelId: string,
-    surfaceId?: string,
-  ): string | undefined {
+  function modelSurfacesPolygonAttributeColorMap(modelId: string, surfaceId?: string): string | undefined {
     const name = modelSurfacesPolygonAttributeName(modelId, surfaceId);
     const item = modelSurfacesPolygonAttributeItem(modelId, surfaceId);
     const storedConfig = modelSurfacesPolygonAttributeStoredConfig(modelId, surfaceId, name, item);
@@ -158,26 +191,16 @@ function useModelSurfacesPolygonAttribute() {
   async function setModelSurfacesPolygonAttribute(
     modelId: string,
     surfaceIds: string[],
-    {
-      name,
-      item,
-      minimum,
-      maximum,
-      colorMap,
-      no_data_color = DEFAULT_NO_DATA_COLOR,
-    }: AttributeInput,
-  ) {
-    mutateModelSurfacesPolygonStyle(modelId, surfaceIds, {
-      name,
-      item,
-    });
-    setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, {
+    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR }: AttributeInput,
+  ): Promise<unknown> {
+    await mutateModelSurfacesPolygonStyle(modelId, surfaceIds, { name, item });
+    await setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, {
       minimum,
       maximum,
       colorMap,
       no_data_color,
     });
-    const points = getRGBPointsFromPreset(colorMap);
+    const points = getRGBPointsFromPreset(colorMap ?? "");
     const surface_viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
     const params = {
       id: modelId,
@@ -189,20 +212,13 @@ function useModelSurfacesPolygonAttribute() {
       maximum,
       no_data_color,
     };
-    return viewerStore.request({
-      schema: attributeSchema,
-      params,
-    });
+    const result = await viewerStore.request({ schema: attributeSchema, params });
+    return result;
   }
-  async function applyPolygonAttribute(modelId: string, surfaceIds: string[]) {
+  async function applyPolygonAttribute(modelId: string, surfaceIds: string[]): Promise<void> {
     const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
     const item = modelSurfacesPolygonAttributeItem(modelId, surfaceIds[0]);
-    const storedConfig = modelSurfacesPolygonAttributeStoredConfig(
-      modelId,
-      surfaceIds[0],
-      name,
-      item,
-    );
+    const storedConfig = modelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds[0], name, item);
     const attribute: AttributeInput = {
       name,
       item,
@@ -212,57 +228,51 @@ function useModelSurfacesPolygonAttribute() {
       no_data_color: storedConfig.no_data_color,
     };
     if (isModelSurfacesPolygonAttributeValid(attribute)) {
-      return setModelSurfacesPolygonAttribute(modelId, surfaceIds, attribute);
+      await setModelSurfacesPolygonAttribute(modelId, surfaceIds, attribute);
     }
-    return;
   }
   async function setModelSurfacesPolygonAttributeName(
     modelId: string,
     surfaceIds: string[],
     name: string,
-  ) {
+  ): Promise<void> {
     const item = modelSurfacesPolygonAttributeLastItem(modelId, surfaceIds[0], name);
-    mutateModelSurfacesPolygonStyle(modelId, surfaceIds, {
-      name,
-      item,
-    });
-    return applyPolygonAttribute(modelId, surfaceIds);
+    await mutateModelSurfacesPolygonStyle(modelId, surfaceIds, { name, item });
+    await applyPolygonAttribute(modelId, surfaceIds);
   }
   async function setModelSurfacesPolygonAttributeItem(
     modelId: string,
     surfaceIds: string[],
     item: number,
-  ) {
-    mutateModelSurfacesPolygonStyle(modelId, surfaceIds, {
-      item,
-    });
-    return applyPolygonAttribute(modelId, surfaceIds);
+  ): Promise<void> {
+    await mutateModelSurfacesPolygonStyle(modelId, surfaceIds, { item });
+    await applyPolygonAttribute(modelId, surfaceIds);
   }
   async function setModelSurfacesPolygonAttributeRange(
     modelId: string,
     surfaceIds: string[],
     minimum: number,
     maximum: number,
-  ) {
+  ): Promise<void> {
     const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
     const item = modelSurfacesPolygonAttributeItem(modelId, surfaceIds[0]);
-    setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, {
+    await setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, {
       minimum,
       maximum,
     });
-    return applyPolygonAttribute(modelId, surfaceIds);
+    await applyPolygonAttribute(modelId, surfaceIds);
   }
   async function setModelSurfacesPolygonAttributeColorMap(
     modelId: string,
     surfaceIds: string[],
     colorMap: string | undefined,
-  ) {
+  ): Promise<void> {
     const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
     const item = modelSurfacesPolygonAttributeItem(modelId, surfaceIds[0]);
-    setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, {
+    await setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, {
       colorMap,
     });
-    return applyPolygonAttribute(modelId, surfaceIds);
+    await applyPolygonAttribute(modelId, surfaceIds);
   }
   function modelSurfacesPolygonAttributeNoDataColor(modelId: string, surfaceId?: string): unknown {
     const name = modelSurfacesPolygonAttributeName(modelId, surfaceId);
@@ -274,20 +284,15 @@ function useModelSurfacesPolygonAttribute() {
     modelId: string,
     surfaceIds: string[],
     no_data_color: unknown,
-  ) {
+  ): Promise<void> {
     const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
     const item = modelSurfacesPolygonAttributeItem(modelId, surfaceIds[0]);
-    const storedConfig = modelSurfacesPolygonAttributeStoredConfig(
-      modelId,
-      surfaceIds[0],
-      name,
-      item,
-    );
+    const storedConfig = modelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds[0], name, item);
     await setModelSurfacesPolygonAttributeStoredConfig(modelId, surfaceIds, name, item, {
       ...storedConfig,
       no_data_color,
     });
-    return applyPolygonAttribute(modelId, surfaceIds);
+    await applyPolygonAttribute(modelId, surfaceIds);
   }
   return {
     modelSurfacesPolygonAttributeName,

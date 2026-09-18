@@ -166,7 +166,7 @@ function useModelVisibilityStyle(
       },
       {
         response_function: async () => {
-          await hybridViewerStore.setVisibility(modelId, visibility);
+          hybridViewerStore.setVisibility(modelId, visibility);
           await dataStyleState.mutateStyle(modelId, {
             visibility,
           });

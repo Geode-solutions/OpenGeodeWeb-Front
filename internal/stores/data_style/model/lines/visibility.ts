@@ -7,7 +7,7 @@ const schema = viewer_schemas.opengeodeweb_viewer.model.lines.visibility;
 export function useModelLinesVisibility(): {
   setModelLinesVisibility: (
     modelId: string,
-    lines_ids: readonly string[],
+    lines_ids: string[],
     visibility: boolean | undefined,
   ) => Promise<unknown>;
   modelLineVisibility: (id: string, line_id?: string) => unknown;
@@ -21,10 +21,16 @@ export function useModelLinesVisibility(): {
 
   async function setModelLinesVisibility(
     modelId: string,
-    lines_ids: readonly string[],
+    lines_ids: string[],
     visibility: boolean | undefined,
   ): Promise<unknown> {
-    return modelCommonStyle.setModelTypeVisibility(modelId, lines_ids, visibility, schema);
+    const result = await modelCommonStyle.setModelTypeVisibility(
+      modelId,
+      lines_ids,
+      visibility,
+      schema,
+    );
+    return result;
   }
 
   return { setModelLinesVisibility, modelLineVisibility };

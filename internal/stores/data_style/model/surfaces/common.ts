@@ -20,7 +20,7 @@ export function useModelSurfacesCommonStyle(): UseModelSurfacesCommonStyleReturn
   const modelCommonStyle = useModelCommonStyle();
 
   function modelSurfacesStyle(id: string): StyleValues {
-    return dataStyleState.getStyle(id).surfaces as StyleValues;
+    return dataStyleState.getStyle(id).surfaces ?? {};
   }
 
   function modelComponentTypeSurfacesStyle(id: string): StyleValues {
@@ -39,6 +39,7 @@ export function useModelSurfacesCommonStyle(): UseModelSurfacesCommonStyleReturn
   }
 
   function modelSurfaceColoring(id: string, surface_id?: string): StyleValues {
+    // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
     return modelSurfaceStyle(id, surface_id).coloring as StyleValues;
   }
 

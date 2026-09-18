@@ -16,6 +16,7 @@ export function useMeshPolyhedraVisibilityStyle(): {
   const meshPolyhedraCommonStyle = useMeshPolyhedraCommonStyle();
 
   function meshPolyhedraVisibility(id: string): boolean | undefined {
+    // oxlint-disable-next-line no-unsafe-type-assertion -- visibility is defined as boolean in the data style schema.
     return meshPolyhedraCommonStyle.meshPolyhedraStyle(id).visibility as boolean | undefined;
   }
   async function setMeshPolyhedraVisibility(

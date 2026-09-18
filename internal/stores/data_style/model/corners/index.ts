@@ -18,41 +18,52 @@ interface AttributeGroup {
   corners_ids: string[];
 }
 
-async function setModelCornersDefaultStyle(_id: string) {
+async function setModelCornersDefaultStyle(_id: string): Promise<void> {
   // Placeholder
 }
 
-export function useModelCornersStyle() {
+type ModelCornersStyleApi = ReturnType<typeof useModelCornersCommonStyle> &
+  ReturnType<typeof useModelCornersVisibility> &
+  ReturnType<typeof useModelCornersColor> &
+  ReturnType<typeof useModelCornersVertexAttribute> & {
+    applyModelCornersStyle: (modelId: string) => Promise<void>;
+    setModelCornersDefaultStyle: (id: string) => Promise<void>;
+  };
+
+export function useModelCornersStyle(): ModelCornersStyleApi {
   const dataStore = useDataStore();
   const modelCommonStyle = useModelCornersCommonStyle();
   const modelVisibilityStyle = useModelCornersVisibility();
   const modelColorStyle = useModelCornersColor();
   const modelCornersVertexAttribute = useModelCornersVertexAttribute();
 
-  async function applyModelCornersVisibilityStyle(modelId: string, corners_ids: string[]) {
+  async function applyModelCornersVisibilityStyle(
+    modelId: string,
+    corners_ids: string[],
+  ): Promise<unknown[]> {
     const visibilityGroups: Record<string, string[]> = {};
     for (const corner_id of corners_ids) {
       const style = modelCommonStyle.modelCornerStyle(modelId, corner_id);
       const visibility = String(style.visibility);
-      if (!visibilityGroups[visibility]) {
-        visibilityGroups[visibility] = [];
-      }
+      visibilityGroups[visibility] ??= [];
       visibilityGroups[visibility].push(corner_id);
     }
-    return Promise.all(
+    const results = await Promise.all(
       Object.entries(visibilityGroups).map(([visibility, ids]) =>
         modelVisibilityStyle.setModelCornersVisibility(modelId, ids, visibility === "true"),
       ),
     );
+    return results;
   }
 
-  async function applyModelCornersColoringStyle(modelId: string, corners_ids: string[]) {
+  async function applyModelCornersColoringStyle(
+    modelId: string,
+    corners_ids: string[],
+  ): Promise<unknown[]> {
     const activeColoringGroups: Record<string, string[]> = {};
     for (const corner_id of corners_ids) {
       const activeColoring = String(modelColorStyle.modelCornerActiveColoring(modelId, corner_id));
-      if (!activeColoringGroups[activeColoring]) {
-        activeColoringGroups[activeColoring] = [];
-      }
+      activeColoringGroups[activeColoring] ??= [];
       activeColoringGroups[activeColoring].push(corner_id);
     }
 
@@ -64,9 +75,7 @@ export function useModelCornersStyle() {
         for (const corner_id of type_corners_ids) {
           const color = modelColorStyle.modelCornerColor(modelId, corner_id);
           const color_key = JSON.stringify(color);
-          if (!colorGroups[color_key]) {
-            colorGroups[color_key] = { color, corners_ids: [] };
-          }
+          colorGroups[color_key] ??= { color, corners_ids: [] };
           colorGroups[color_key].corners_ids.push(corner_id);
         }
         coloringPromises.push(
@@ -102,21 +111,19 @@ export function useModelCornersStyle() {
             continue;
           }
           const key = `${name}_${item}_${colorMap}_${minimum}_${maximum}`;
-          if (!vertexGroups[key]) {
-            vertexGroups[key] = {
-              name,
-              item,
-              minimum,
-              maximum,
-              colorMap,
-              corners_ids: [],
-            };
-          }
+          vertexGroups[key] ??= {
+            name,
+            item,
+            minimum,
+            maximum,
+            colorMap,
+            corners_ids: [],
+          };
           vertexGroups[key].corners_ids.push(corner_id);
         }
         coloringPromises.push(
           ...Object.values(vertexGroups).map(
-            async ({ name, item, minimum, maximum, colorMap, corners_ids: ids }) =>
+            ({ name, item, minimum, maximum, colorMap, corners_ids: ids }) =>
               modelCornersVertexAttribute.setModelCornersVertexAttribute(modelId, ids, {
                 name,
                 item,
@@ -129,16 +136,17 @@ export function useModelCornersStyle() {
       }
     }
 
-    return Promise.all(coloringPromises);
+    const results = await Promise.all(coloringPromises);
+    return results;
   }
 
-  async function applyModelCornersStyle(modelId: string) {
+  async function applyModelCornersStyle(modelId: string): Promise<void> {
     const corners_ids = await dataStore.getCornersGeodeIds(modelId);
     if (corners_ids.length === 0) {
       return;
     }
 
-    return Promise.all([
+    await Promise.all([
       applyModelCornersVisibilityStyle(modelId, corners_ids),
       applyModelCornersColoringStyle(modelId, corners_ids),
     ]);

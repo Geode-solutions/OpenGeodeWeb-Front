@@ -22,12 +22,21 @@ interface AttributeGroup {
   blocks_ids: string[];
 }
 
-async function setModelBlocksDefaultStyle(_id: string) {
+async function setModelBlocksDefaultStyle(_id: string): Promise<void> {
   // Placeholder
 }
 
+type UseModelBlocksStyleReturn = {
+  applyModelBlocksStyle: (modelId: string) => Promise<void>;
+  setModelBlocksDefaultStyle: (id: string) => Promise<void>;
+} & ReturnType<typeof useModelBlocksCommonStyle> &
+  ReturnType<typeof useModelBlocksVisibility> &
+  ReturnType<typeof useModelBlocksColor> &
+  ReturnType<typeof useModelBlocksVertexAttribute> &
+  ReturnType<typeof useModelBlocksPolyhedronAttribute>;
+
 // oxlint-disable-next-line max-lines-per-function
-export function useModelBlocksStyle() {
+export function useModelBlocksStyle(): UseModelBlocksStyleReturn {
   const dataStore = useDataStore();
   const modelCommonStyle = useModelBlocksCommonStyle();
   const modelVisibilityStyle = useModelBlocksVisibility();
@@ -35,30 +44,38 @@ export function useModelBlocksStyle() {
   const modelBlocksVertexAttribute = useModelBlocksVertexAttribute();
   const modelBlocksPolyhedronAttribute = useModelBlocksPolyhedronAttribute();
 
-  async function applyModelBlocksVisibilityStyle(modelId: string, blocks_ids: string[]) {
+  async function applyModelBlocksVisibilityStyle(
+    modelId: string,
+    blocks_ids: string[],
+  ): Promise<unknown[]> {
     const visibilityGroups: Record<string, string[]> = {};
     for (const block_id of blocks_ids) {
       const style = modelCommonStyle.modelBlockStyle(modelId, block_id);
       const visibility = String(style.visibility);
-      if (!visibilityGroups[visibility]) {
-        visibilityGroups[visibility] = [];
-      }
+      visibilityGroups[visibility] ??= [];
       visibilityGroups[visibility].push(block_id);
     }
-    return Promise.all(
-      Object.entries(visibilityGroups).map(async ([visibility, ids]) =>
-        modelVisibilityStyle.setModelBlocksVisibility(modelId, ids, visibility === "true"),
-      ),
+    const result = await Promise.all(
+      Object.entries(visibilityGroups).map(async ([visibility, ids]) => {
+        const visibilityResult = await modelVisibilityStyle.setModelBlocksVisibility(
+          modelId,
+          ids,
+          visibility === "true",
+        );
+        return visibilityResult;
+      }),
     );
+    return result;
   }
 
-  async function applyModelBlocksColoringStyle(modelId: string, blocks_ids: string[]) {
+  async function applyModelBlocksColoringStyle(
+    modelId: string,
+    blocks_ids: string[],
+  ): Promise<unknown[]> {
     const activeColoringGroups: Record<string, string[]> = {};
     for (const block_id of blocks_ids) {
       const activeColoring = String(modelColorStyle.modelBlockActiveColoring(modelId, block_id));
-      if (!activeColoringGroups[activeColoring]) {
-        activeColoringGroups[activeColoring] = [];
-      }
+      activeColoringGroups[activeColoring] ??= [];
       activeColoringGroups[activeColoring].push(block_id);
     }
 
@@ -70,15 +87,19 @@ export function useModelBlocksStyle() {
         for (const block_id of type_blocks_ids) {
           const color = modelColorStyle.modelBlockColor(modelId, block_id);
           const color_key = JSON.stringify(color);
-          if (!colorGroups[color_key]) {
-            colorGroups[color_key] = { color, blocks_ids: [] };
-          }
+          colorGroups[color_key] ??= { color, blocks_ids: [] };
           colorGroups[color_key].blocks_ids.push(block_id);
         }
         coloringPromises.push(
-          ...Object.values(colorGroups).map(({ color, blocks_ids: ids }) =>
-            modelColorStyle.setModelBlocksColor(modelId, ids, color, "constant"),
-          ),
+          ...Object.values(colorGroups).map(async ({ color, blocks_ids: ids }) => {
+            const result = await modelColorStyle.setModelBlocksColor(
+              modelId,
+              ids,
+              color,
+              "constant",
+            );
+            return result;
+          }),
         );
       } else if (type === "random") {
         coloringPromises.push(
@@ -102,28 +123,32 @@ export function useModelBlocksStyle() {
             continue;
           }
           const key = `${name}_${item}_${colorMap}_${minimum}_${maximum}`;
-          if (!vertexGroups[key]) {
-            vertexGroups[key] = {
-              name,
-              item,
-              minimum,
-              maximum,
-              colorMap,
-              blocks_ids: [],
-            };
-          }
+          vertexGroups[key] ??= {
+            name,
+            item,
+            minimum,
+            maximum,
+            colorMap,
+            blocks_ids: [],
+          };
           vertexGroups[key].blocks_ids.push(block_id);
         }
         coloringPromises.push(
           ...Object.values(vertexGroups).map(
-            async ({ name, item, minimum, maximum, colorMap, blocks_ids: ids }) =>
-              modelBlocksVertexAttribute.setModelBlocksVertexAttribute(modelId, ids, {
-                name,
-                item,
-                minimum,
-                maximum,
-                colorMap,
-              }),
+            async ({ name, item, minimum, maximum, colorMap, blocks_ids: ids }) => {
+              const result = await modelBlocksVertexAttribute.setModelBlocksVertexAttribute(
+                modelId,
+                ids,
+                {
+                  name,
+                  item,
+                  minimum,
+                  maximum,
+                  colorMap,
+                },
+              );
+              return result;
+            },
           ),
         );
       } else if (type === "polyhedron") {
@@ -148,43 +173,48 @@ export function useModelBlocksStyle() {
             continue;
           }
           const key = `${name}_${item}_${colorMap}_${minimum}_${maximum}`;
-          if (!polyhedronGroups[key]) {
-            polyhedronGroups[key] = {
-              name,
-              item,
-              minimum,
-              maximum,
-              colorMap,
-              blocks_ids: [],
-            };
-          }
+          polyhedronGroups[key] ??= {
+            name,
+            item,
+            minimum,
+            maximum,
+            colorMap,
+            blocks_ids: [],
+          };
           polyhedronGroups[key].blocks_ids.push(block_id);
         }
         coloringPromises.push(
           ...Object.values(polyhedronGroups).map(
-            async ({ name, item, minimum, maximum, colorMap, blocks_ids: ids }) =>
-              modelBlocksPolyhedronAttribute.setModelBlocksPolyhedronAttribute(modelId, ids, {
-                name,
-                item,
-                minimum,
-                maximum,
-                colorMap,
-              }),
+            async ({ name, item, minimum, maximum, colorMap, blocks_ids: ids }) => {
+              const result = await modelBlocksPolyhedronAttribute.setModelBlocksPolyhedronAttribute(
+                modelId,
+                ids,
+                {
+                  name,
+                  item,
+                  minimum,
+                  maximum,
+                  colorMap,
+                },
+              );
+              return result;
+            },
           ),
         );
       }
     }
 
-    return Promise.all(coloringPromises);
+    const result = await Promise.all(coloringPromises);
+    return result;
   }
 
-  async function applyModelBlocksStyle(modelId: string) {
+  async function applyModelBlocksStyle(modelId: string): Promise<void> {
     const blocks_ids = await dataStore.getBlocksGeodeIds(modelId);
     if (blocks_ids.length === 0) {
       return;
     }
 
-    return Promise.all([
+    await Promise.all([
       applyModelBlocksVisibilityStyle(modelId, blocks_ids),
       applyModelBlocksColoringStyle(modelId, blocks_ids),
     ]);

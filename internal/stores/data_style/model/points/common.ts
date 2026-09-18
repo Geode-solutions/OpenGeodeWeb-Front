@@ -8,13 +8,14 @@ export function useModelPointsCommonStyle(): {
   const dataStyleState = useDataStyleState();
 
   async function mutateModelPointsStyle(id: string, values: StyleValues): Promise<unknown> {
-    return dataStyleState.mutateStyle(id, {
+    const result = await dataStyleState.mutateStyle(id, {
       points: values,
     });
+    return result;
   }
 
   function modelPointsStyle(id: string): StyleValues {
-    return dataStyleState.getStyle(id).points as StyleValues;
+    return dataStyleState.getStyle(id).points ?? {};
   }
 
   return {

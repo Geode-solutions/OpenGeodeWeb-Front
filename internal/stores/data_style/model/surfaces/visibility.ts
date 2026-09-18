@@ -24,12 +24,13 @@ export function useModelSurfacesVisibility(): {
     surfaces_ids: readonly string[],
     visibility: boolean | undefined,
   ): Promise<unknown> {
-    return await modelCommonStyle.setModelTypeVisibility(
+    const result = await modelCommonStyle.setModelTypeVisibility(
       modelId,
       [...surfaces_ids],
       visibility,
       schema,
     );
+    return result;
   }
 
   return { setModelSurfacesVisibility, modelSurfaceVisibility };

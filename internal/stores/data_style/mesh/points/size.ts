@@ -16,19 +16,24 @@ export function useMeshPointsSizeStyle(): {
   const meshPointsCommonStyle = useMeshPointsCommonStyle();
 
   function meshPointsSize(id: string): number | undefined {
+    // oxlint-disable-next-line no-unsafe-type-assertion -- size is defined as number in the data style schema.
     return meshPointsCommonStyle.meshPointsStyle(id).size as number | undefined;
   }
   async function setMeshPointsSize(id: string, size: number | undefined): Promise<unknown> {
     const params = { id, size };
-    return viewerStore.request(
+    const result = await viewerStore.request(
       {
         schema,
         params,
       },
       {
-        response_function: async () => meshPointsCommonStyle.mutateMeshPointsStyle(id, { size }),
+        response_function: async () => {
+          const mutateResult = await meshPointsCommonStyle.mutateMeshPointsStyle(id, { size });
+          return mutateResult;
+        },
       },
     );
+    return result;
   }
 
   return {

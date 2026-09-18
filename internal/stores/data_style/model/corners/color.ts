@@ -6,12 +6,30 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 const schema = viewer_schemas.opengeodeweb_viewer.model.corners.color;
 
-export function useModelCornersColor() {
+interface ModelCornersColorApi {
+  setModelCornersColor: (
+    modelId: string,
+    corners_ids: string[],
+    color: unknown,
+    activeColoring?: string,
+  ) => Promise<unknown>;
+  modelCornerColoring: (id: string, corner_id?: string) => StyleValues;
+  modelCornerColor: (id: string, corner_id?: string) => unknown;
+  modelCornerActiveColoring: (id: string, corner_id?: string) => unknown;
+  setModelCornersActiveColoring: (
+    modelId: string,
+    corners_ids: string[],
+    activeColoring: string,
+  ) => Promise<unknown>;
+}
+
+export function useModelCornersColor(): ModelCornersColorApi {
   const modelCommonStyle = useModelCommonStyle();
   const modelCornersCommonStyle = useModelCornersCommonStyle();
   const modelCornersVertexAttribute = useModelCornersVertexAttribute();
 
   function modelCornerColoring(id: string, corner_id?: string): StyleValues {
+    // oxlint-disable-next-line no-unsafe-type-assertion -- coloring is a StyleValues sub-object stored under a StyleValues index signature.
     return modelCornersCommonStyle.modelCornerStyle(id, corner_id).coloring as StyleValues;
   }
 
@@ -19,13 +37,20 @@ export function useModelCornersColor() {
     return modelCornerColoring(id, corner_id).constant;
   }
 
-  function setModelCornersColor(
+  async function setModelCornersColor(
     modelId: string,
     corners_ids: string[],
     color: unknown,
     activeColoring = "constant",
-  ) {
-    return modelCommonStyle.setModelTypeColor(modelId, corners_ids, color, schema, activeColoring);
+  ): Promise<unknown> {
+    const result = await modelCommonStyle.setModelTypeColor(
+      modelId,
+      corners_ids,
+      color,
+      schema,
+      activeColoring,
+    );
+    return result;
   }
 
   function modelCornerActiveColoring(id: string, corner_id?: string): unknown {
@@ -36,9 +61,9 @@ export function useModelCornersColor() {
     modelId: string,
     corners_ids: string[],
     activeColoring: string,
-  ) {
+  ): Promise<unknown> {
     if (corners_ids.length > 1) {
-      modelCornersCommonStyle.mutateModelCornersTypeColoring(modelId, {
+      await modelCornersCommonStyle.mutateModelCornersTypeColoring(modelId, {
         active: activeColoring,
       });
     }
@@ -76,6 +101,7 @@ export function useModelCornersColor() {
         );
       }
     }
+    return undefined;
   }
 
   return {

@@ -10,13 +10,29 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 const schema = viewer_schemas.opengeodeweb_viewer.model.blocks.color;
 
-export function useModelBlocksColor() {
+export function useModelBlocksColor(): {
+  modelBlockColoring: (id: string, block_id?: string) => StyleValues;
+  modelBlockColor: (id: string, block_id?: string) => unknown;
+  setModelBlocksColor: (
+    modelId: string,
+    blocks_ids: string[],
+    color: unknown,
+    activeColoring?: string,
+  ) => Promise<unknown>;
+  modelBlockActiveColoring: (id: string, block_id?: string) => unknown;
+  setModelBlocksActiveColoring: (
+    modelId: string,
+    blocks_ids: string[],
+    activeColoring: string,
+  ) => Promise<void>;
+} {
   const modelCommonStyle = useModelCommonStyle();
   const modelBlocksCommonStyle = useModelBlocksCommonStyle();
   const modelBlocksVertexAttribute = useModelBlocksVertexAttribute();
   const modelBlocksPolyhedronAttribute = useModelBlocksPolyhedronAttribute();
 
   function modelBlockColoring(id: string, block_id?: string): StyleValues {
+    // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
     return modelBlocksCommonStyle.modelBlockStyle(id, block_id).coloring as StyleValues;
   }
 
@@ -24,13 +40,20 @@ export function useModelBlocksColor() {
     return modelBlockColoring(id, block_id).constant;
   }
 
-  function setModelBlocksColor(
+  async function setModelBlocksColor(
     modelId: string,
     blocks_ids: string[],
     color: unknown,
     activeColoring = "constant",
-  ) {
-    return modelCommonStyle.setModelTypeColor(modelId, blocks_ids, color, schema, activeColoring);
+  ): Promise<unknown> {
+    const result = await modelCommonStyle.setModelTypeColor(
+      modelId,
+      blocks_ids,
+      color,
+      schema,
+      activeColoring,
+    );
+    return result;
   }
 
   function modelBlockActiveColoring(id: string, block_id?: string): unknown {
@@ -41,9 +64,9 @@ export function useModelBlocksColor() {
     modelId: string,
     blocks_ids: string[],
     activeColoring: string,
-  ) {
+  ): Promise<void> {
     if (blocks_ids.length > 1) {
-      modelBlocksCommonStyle.mutateModelBlocksTypeColoring(modelId, {
+      await modelBlocksCommonStyle.mutateModelBlocksTypeColoring(modelId, {
         active: activeColoring,
       });
     }
@@ -52,7 +75,8 @@ export function useModelBlocksColor() {
     });
     if (activeColoring === "constant" || activeColoring === "random") {
       const color = modelBlockColor(modelId, blocks_ids[0]);
-      return setModelBlocksColor(modelId, blocks_ids, color, activeColoring);
+      await setModelBlocksColor(modelId, blocks_ids, color, activeColoring);
+      return;
     }
 
     if (activeColoring === "vertex") {
@@ -74,7 +98,7 @@ export function useModelBlocksColor() {
       );
       const attribute = { name, item, minimum, maximum, colorMap };
       if (isModelBlocksVertexAttributeValid(attribute)) {
-        return modelBlocksVertexAttribute.setModelBlocksVertexAttribute(
+        await modelBlocksVertexAttribute.setModelBlocksVertexAttribute(
           modelId,
           blocks_ids,
           attribute,
@@ -99,7 +123,7 @@ export function useModelBlocksColor() {
       );
       const attribute = { name, item, minimum, maximum, colorMap };
       if (isModelBlocksPolyhedronAttributeValid(attribute)) {
-        return modelBlocksPolyhedronAttribute.setModelBlocksPolyhedronAttribute(
+        await modelBlocksPolyhedronAttribute.setModelBlocksPolyhedronAttribute(
           modelId,
           blocks_ids,
           attribute,

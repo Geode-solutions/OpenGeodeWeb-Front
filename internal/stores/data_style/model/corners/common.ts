@@ -18,7 +18,11 @@ export function useModelCornersCommonStyle(): {
   const modelCommonStyle = useModelCommonStyle();
 
   function modelCornersStyle(id: string): StyleValues {
-    return dataStyleState.getStyle(id).corners as StyleValues;
+    const { corners } = dataStyleState.getStyle(id);
+    if (corners === undefined) {
+      return {};
+    }
+    return corners;
   }
 
   function modelComponentTypeCornersStyle(id: string): StyleValues {
@@ -37,6 +41,7 @@ export function useModelCornersCommonStyle(): {
   }
 
   function modelCornerColoring(id: string, corner_id?: string): StyleValues {
+    // oxlint-disable-next-line no-unsafe-type-assertion -- coloring is a StyleValues sub-object stored under a StyleValues index signature.
     return modelCornerStyle(id, corner_id).coloring as StyleValues;
   }
 
@@ -45,13 +50,13 @@ export function useModelCornersCommonStyle(): {
     corners_ids: string[],
     values: StyleValues,
   ): Promise<void> {
-    return modelCommonStyle.mutateComponentStyles(id, corners_ids, {
+    await modelCommonStyle.mutateComponentStyles(id, corners_ids, {
       coloring: values,
     });
   }
 
   async function mutateModelCornersTypeColoring(id: string, values: StyleValues): Promise<void> {
-    return modelCommonStyle.mutateModelComponentTypeStyle(id, "Corner", {
+    await modelCommonStyle.mutateModelComponentTypeStyle(id, "Corner", {
       coloring: values,
     });
   }

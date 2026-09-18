@@ -17,10 +17,11 @@ export function useMeshPolyhedraCommonStyle(): {
   }
 
   function meshPolyhedraStyle(id: string): StyleValues {
-    return dataStyleState.getStyle(id).polyhedra as StyleValues;
+    return dataStyleState.getStyle(id).polyhedra ?? {};
   }
 
   function meshPolyhedraColoring(id: string): StyleValues {
+    // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
     return meshPolyhedraStyle(id).coloring as StyleValues;
   }
 

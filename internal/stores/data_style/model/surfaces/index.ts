@@ -19,11 +19,21 @@ interface AttributeGroup {
   surfaces_ids: string[];
 }
 
-async function setModelSurfacesDefaultStyle(_id: string) {
+async function setModelSurfacesDefaultStyle(_id: string): Promise<void> {
   // Placeholder
 }
+
+type UseModelSurfacesStyleReturn = ReturnType<typeof useModelSurfacesCommonStyle> &
+  ReturnType<typeof useModelSurfacesVisibility> &
+  ReturnType<typeof useModelSurfacesColor> &
+  ReturnType<typeof useModelSurfacesVertexAttribute> &
+  ReturnType<typeof useModelSurfacesPolygonAttribute> & {
+    applyModelSurfacesStyle: (modelId: string) => Promise<void>;
+    setModelSurfacesDefaultStyle: (id: string) => Promise<void>;
+  };
+
 // oxlint-disable-next-line max-lines-per-function
-export function useModelSurfacesStyle() {
+export function useModelSurfacesStyle(): UseModelSurfacesStyleReturn {
   const dataStore = useDataStore();
   const modelCommonStyle = useModelSurfacesCommonStyle();
   const modelVisibilityStyle = useModelSurfacesVisibility();
@@ -31,32 +41,34 @@ export function useModelSurfacesStyle() {
   const modelSurfacesVertexAttribute = useModelSurfacesVertexAttribute();
   const modelSurfacesPolygonAttribute = useModelSurfacesPolygonAttribute();
 
-  async function applyModelSurfacesVisibilityStyle(modelId: string, surfaces_ids: string[]) {
+  async function applyModelSurfacesVisibilityStyle(
+    modelId: string,
+    surfaces_ids: string[],
+  ): Promise<void> {
     const visibilityGroups: Record<string, string[]> = {};
     for (const surfaces_id of surfaces_ids) {
       const style = modelCommonStyle.modelSurfaceStyle(modelId, surfaces_id);
       const visibility = String(style.visibility);
-      if (!visibilityGroups[visibility]) {
-        visibilityGroups[visibility] = [];
-      }
+      visibilityGroups[visibility] ??= [];
       visibilityGroups[visibility].push(surfaces_id);
     }
-    return Promise.all(
+    await Promise.all(
       Object.entries(visibilityGroups).map(([visibility, ids]) =>
         modelVisibilityStyle.setModelSurfacesVisibility(modelId, ids, visibility === "true"),
       ),
     );
   }
 
-  async function applyModelSurfacesColoringStyle(modelId: string, surfaces_ids: string[]) {
+  async function applyModelSurfacesColoringStyle(
+    modelId: string,
+    surfaces_ids: string[],
+  ): Promise<void> {
     const activeColoringGroups: Record<string, string[]> = {};
     for (const surfaces_id of surfaces_ids) {
       const activeColoring = String(
         modelColorStyle.modelSurfaceActiveColoring(modelId, surfaces_id),
       );
-      if (!activeColoringGroups[activeColoring]) {
-        activeColoringGroups[activeColoring] = [];
-      }
+      activeColoringGroups[activeColoring] ??= [];
       activeColoringGroups[activeColoring].push(surfaces_id);
     }
 
@@ -68,13 +80,11 @@ export function useModelSurfacesStyle() {
         for (const surfaces_id of type_surfaces_ids) {
           const color = modelColorStyle.modelSurfaceColor(modelId, surfaces_id);
           const color_key = JSON.stringify(color);
-          if (!colorGroups[color_key]) {
-            colorGroups[color_key] = { color, surfaces_ids: [] };
-          }
+          colorGroups[color_key] ??= { color, surfaces_ids: [] };
           colorGroups[color_key].surfaces_ids.push(surfaces_id);
         }
         coloringPromises.push(
-          ...Object.values(colorGroups).map(async ({ color, surfaces_ids: ids }) =>
+          ...Object.values(colorGroups).map(({ color, surfaces_ids: ids }) =>
             modelColorStyle.setModelSurfacesColor(modelId, ids, color, "constant"),
           ),
         );
@@ -106,21 +116,19 @@ export function useModelSurfacesStyle() {
             continue;
           }
           const key = `${name}_${item}_${colorMap}_${minimum}_${maximum}`;
-          if (!vertexGroups[key]) {
-            vertexGroups[key] = {
-              name,
-              item,
-              minimum,
-              maximum,
-              colorMap,
-              surfaces_ids: [],
-            };
-          }
+          vertexGroups[key] ??= {
+            name,
+            item,
+            minimum,
+            maximum,
+            colorMap,
+            surfaces_ids: [],
+          };
           vertexGroups[key].surfaces_ids.push(surfaces_id);
         }
         coloringPromises.push(
           ...Object.values(vertexGroups).map(
-            async ({ name, item, minimum, maximum, colorMap, surfaces_ids: ids }) =>
+            ({ name, item, minimum, maximum, colorMap, surfaces_ids: ids }) =>
               modelSurfacesVertexAttribute.setModelSurfacesVertexAttribute(modelId, ids, {
                 name,
                 item,
@@ -152,16 +160,14 @@ export function useModelSurfacesStyle() {
             continue;
           }
           const key = `${name}_${item}_${colorMap}_${minimum}_${maximum}`;
-          if (!polygonGroups[key]) {
-            polygonGroups[key] = {
-              name,
-              item,
-              minimum,
-              maximum,
-              colorMap,
-              surfaces_ids: [],
-            };
-          }
+          polygonGroups[key] ??= {
+            name,
+            item,
+            minimum,
+            maximum,
+            colorMap,
+            surfaces_ids: [],
+          };
           polygonGroups[key].surfaces_ids.push(surfaces_id);
         }
         coloringPromises.push(
@@ -186,7 +192,7 @@ export function useModelSurfacesStyle() {
     if (surfaces_ids.length === 0) {
       return;
     }
-    return Promise.all([
+    await Promise.all([
       applyModelSurfacesVisibilityStyle(modelId, surfaces_ids),
       applyModelSurfacesColoringStyle(modelId, surfaces_ids),
     ]);

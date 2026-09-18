@@ -59,7 +59,12 @@ describe("project import", () => {
     vi.spyOn(stores.dataBase, "importStores").mockImplementation(
       async (snapshot: { items: Record<string, unknown>[] }) => {
         const { items } = snapshot;
-        await Promise.all(items.map((item) => database.data!.put(item)));
+        await Promise.all(
+          items.map(async (item) => {
+            const result = await database.data.put(item);
+            return result;
+          }),
+        );
       },
     );
 
@@ -101,11 +106,11 @@ describe("project import", () => {
 
     await stores.app.importStores(snapshot);
 
-    const item = await database.data!.get("abc123");
+    const item = await database.data.get("abc123");
     expect(item).toBeDefined();
     expect(item?.id).toBe("abc123");
 
-    const style = await database.data_style!.get("abc123");
+    const style = await database.data_style.get("abc123");
     expect(style).toBeDefined();
     expect(style?.id).toBe("abc123");
   });

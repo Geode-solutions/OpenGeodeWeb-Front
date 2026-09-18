@@ -39,7 +39,7 @@ function isMeshPointsVertexAttributeValid({
   minimum,
   maximum,
   colorMap,
-}: Readonly<AttributeInput>): boolean {
+}: AttributeInput): boolean {
   return (
     name !== undefined &&
     item !== undefined &&
@@ -49,8 +49,7 @@ function isMeshPointsVertexAttributeValid({
   );
 }
 
-// oxlint-disable-next-line max-lines-per-function
-function useMeshPointsVertexAttributeStyle(): {
+interface UseMeshPointsVertexAttributeStyleReturn {
   meshPointsVertexAttributeName: (id: string) => string | undefined;
   meshPointsVertexAttributeItem: (id: string) => number;
   meshPointsVertexAttributeRange: (id: string) => [number | undefined, number | undefined];
@@ -60,24 +59,28 @@ function useMeshPointsVertexAttributeStyle(): {
     name: string | undefined,
     item: number | undefined,
   ) => AttributeStoredConfig;
-  setMeshPointsVertexAttribute: (id: string, input: Readonly<AttributeInput>) => Promise<unknown>;
-  setMeshPointsVertexAttributeName: (id: string, name: string) => Promise<unknown> | undefined;
-  setMeshPointsVertexAttributeItem: (id: string, item: number) => Promise<unknown> | undefined;
+  setMeshPointsVertexAttribute: (id: string, input: AttributeInput) => Promise<unknown>;
+  setMeshPointsVertexAttributeName: (id: string, name: string) => Promise<unknown>;
+  setMeshPointsVertexAttributeItem: (id: string, item: number) => Promise<unknown>;
   setMeshPointsVertexAttributeRange: (
     id: string,
     minimum: number,
     maximum: number,
-  ) => Promise<unknown> | undefined;
+  ) => Promise<unknown>;
   setMeshPointsVertexAttributeColorMap: (
     id: string,
     colorMap: string | undefined,
-  ) => Promise<unknown> | undefined;
+  ) => Promise<unknown>;
   meshPointsVertexAttributeNoDataColor: (id: string) => unknown;
   setMeshPointsVertexAttributeNoDataColor: (id: string, no_data_color: unknown) => Promise<unknown>;
-} {
+}
+
+// oxlint-disable-next-line max-lines-per-function
+function useMeshPointsVertexAttributeStyle(): UseMeshPointsVertexAttributeStyleReturn {
   const viewerStore = useViewerStore();
   const meshPointsCommonStyle = useMeshPointsCommonStyle();
   function meshPointsVertexAttribute(id: string): AttributeState {
+    // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.vertex shape is defined by the data style schema.
     return meshPointsCommonStyle.meshPointsColoring(id).vertex as AttributeState;
   }
   function meshPointsVertexAttributeStoredConfig(
@@ -86,14 +89,10 @@ function useMeshPointsVertexAttributeStyle(): {
     item: number | undefined,
   ): AttributeStoredConfig {
     const { storedConfigs } = meshPointsVertexAttribute(id);
-    if (
-      storedConfigs &&
-      name !== undefined &&
-      name in storedConfigs &&
-      item !== undefined &&
-      item in storedConfigs[name]
-    ) {
-      return storedConfigs[name][item];
+    const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
+    const itemConfig = item === undefined ? undefined : nameConfig?.[item];
+    if (itemConfig !== undefined) {
+      return itemConfig;
     }
     return {
       minimum: undefined,
@@ -104,36 +103,39 @@ function useMeshPointsVertexAttributeStyle(): {
   }
   async function mutateMeshPointsVertexStyle(
     id: string,
-    values: Readonly<Record<string, unknown>>,
-  ): ReturnType<typeof meshPointsCommonStyle.mutateMeshPointsStyle> {
-    return meshPointsCommonStyle.mutateMeshPointsStyle(id, {
+    values: Record<string, unknown>,
+  ): Promise<string> {
+    const result = await meshPointsCommonStyle.mutateMeshPointsStyle(id, {
       coloring: {
         vertex: values,
       },
     });
+    return result;
   }
   async function setMeshPointsVertexAttributeStoredConfig(
     id: string,
     name: string | undefined,
     item: number | undefined,
     config: Partial<AttributeStoredConfig>,
-  ): ReturnType<typeof mutateMeshPointsVertexStyle> {
-    return mutateMeshPointsVertexStyle(id, {
+  ): Promise<string> {
+    const result = await mutateMeshPointsVertexStyle(id, {
       storedConfigs: {
-        [name!]: {
+        [name ?? ""]: {
           lastItem: item,
-          [item!]: config,
+          [item ?? 0]: config,
         },
       },
     });
+    return result;
   }
   function meshPointsVertexAttributeName(id: string): string | undefined {
     return meshPointsVertexAttribute(id).name;
   }
   function meshPointsVertexAttributeLastItem(id: string, name: string | undefined): number {
     const { storedConfigs } = meshPointsVertexAttribute(id);
-    if (storedConfigs && name !== undefined && name in storedConfigs) {
-      return storedConfigs[name].lastItem;
+    const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
+    if (nameConfig !== undefined) {
+      return nameConfig.lastItem;
     }
     return 0;
   }
@@ -150,19 +152,19 @@ function useMeshPointsVertexAttributeStyle(): {
       maximum,
       colorMap,
       no_data_color = DEFAULT_NO_DATA_COLOR,
-    }: Readonly<AttributeInput>,
+    }: AttributeInput,
   ): Promise<unknown> {
-    mutateMeshPointsVertexStyle(id, {
+    await mutateMeshPointsVertexStyle(id, {
       name,
       item,
     });
-    setMeshPointsVertexAttributeStoredConfig(id, name, item, {
+    await setMeshPointsVertexAttributeStoredConfig(id, name, item, {
       minimum,
       maximum,
       colorMap,
       no_data_color,
     });
-    const points = getRGBPointsFromPreset(colorMap);
+    const points = getRGBPointsFromPreset(colorMap ?? "");
     const schema = meshPointsVertexAttributeSchemas.attribute;
     const params = {
       id,
@@ -178,7 +180,7 @@ function useMeshPointsVertexAttributeStyle(): {
       params,
     });
   }
-  function applyVertexAttribute(id: string): Promise<unknown> | undefined {
+  async function applyVertexAttribute(id: string): Promise<unknown> {
     const name = meshPointsVertexAttributeName(id);
     const item = meshPointsVertexAttributeItem(id);
     const storedConfig = meshPointsVertexAttributeStoredConfig(id, name, item);
@@ -191,26 +193,21 @@ function useMeshPointsVertexAttributeStyle(): {
       no_data_color: storedConfig.no_data_color,
     };
     if (isMeshPointsVertexAttributeValid(attribute)) {
-      return setMeshPointsVertexAttribute(id, attribute);
+      const result = await setMeshPointsVertexAttribute(id, attribute);
+      return result;
     }
     return undefined;
   }
-  function setMeshPointsVertexAttributeName(
-    id: string,
-    name: string,
-  ): ReturnType<typeof applyVertexAttribute> {
+  async function setMeshPointsVertexAttributeName(id: string, name: string): Promise<unknown> {
     const item = meshPointsVertexAttributeLastItem(id, name);
-    mutateMeshPointsVertexStyle(id, {
+    await mutateMeshPointsVertexStyle(id, {
       name,
       item,
     });
     return applyVertexAttribute(id);
   }
-  function setMeshPointsVertexAttributeItem(
-    id: string,
-    item: number,
-  ): ReturnType<typeof applyVertexAttribute> {
-    mutateMeshPointsVertexStyle(id, {
+  async function setMeshPointsVertexAttributeItem(id: string, item: number): Promise<unknown> {
+    await mutateMeshPointsVertexStyle(id, {
       item,
     });
     return applyVertexAttribute(id);
@@ -221,14 +218,14 @@ function useMeshPointsVertexAttributeStyle(): {
     const storedConfig = meshPointsVertexAttributeStoredConfig(id, name, item);
     return [storedConfig.minimum, storedConfig.maximum];
   }
-  function setMeshPointsVertexAttributeRange(
+  async function setMeshPointsVertexAttributeRange(
     id: string,
     minimum: number,
     maximum: number,
-  ): ReturnType<typeof applyVertexAttribute> {
+  ): Promise<unknown> {
     const name = meshPointsVertexAttributeName(id);
     const item = meshPointsVertexAttributeItem(id);
-    setMeshPointsVertexAttributeStoredConfig(id, name, item, {
+    await setMeshPointsVertexAttributeStoredConfig(id, name, item, {
       minimum,
       maximum,
     });
@@ -240,13 +237,13 @@ function useMeshPointsVertexAttributeStyle(): {
     const storedConfig = meshPointsVertexAttributeStoredConfig(id, name, item);
     return storedConfig.colorMap;
   }
-  function setMeshPointsVertexAttributeColorMap(
+  async function setMeshPointsVertexAttributeColorMap(
     id: string,
     colorMap: string | undefined,
-  ): ReturnType<typeof applyVertexAttribute> {
+  ): Promise<unknown> {
     const name = meshPointsVertexAttributeName(id);
     const item = meshPointsVertexAttributeItem(id);
-    setMeshPointsVertexAttributeStoredConfig(id, name, item, {
+    await setMeshPointsVertexAttributeStoredConfig(id, name, item, {
       colorMap,
     });
     return applyVertexAttribute(id);
@@ -260,7 +257,7 @@ function useMeshPointsVertexAttributeStyle(): {
   async function setMeshPointsVertexAttributeNoDataColor(
     id: string,
     no_data_color: unknown,
-  ): Promise<Awaited<ReturnType<typeof applyVertexAttribute>>> {
+  ): Promise<unknown> {
     const name = meshPointsVertexAttributeName(id);
     const item = meshPointsVertexAttributeItem(id);
     const storedConfig = meshPointsVertexAttributeStoredConfig(id, name, item);

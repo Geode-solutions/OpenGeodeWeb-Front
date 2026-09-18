@@ -3,10 +3,6 @@ import {
   useHybridViewerViewport,
 } from "@ogw_internal/stores/hybrid_viewer/viewport";
 import {
-  type vtkGenericRenderWindow as VtkGenericRenderWindow,
-  newInstance as vtkGenericRenderWindow,
-} from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
-import {
   applySnapshot,
   getCameraOptions,
   useHybridViewerCamera,
@@ -14,27 +10,21 @@ import {
 import { BACKGROUND_COLOR } from "@ogw_internal/stores/hybrid_viewer/constants";
 import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types";
 import { useHybridViewerBrightness } from "@ogw_internal/stores/hybrid_viewer/brightness";
+import { useHybridViewerCore } from "@ogw_internal/stores/hybrid_viewer/core";
 import { useHybridViewerFilters } from "@ogw_internal/stores/hybrid_viewer/filters";
 import { useHybridViewerHighlight } from "@ogw_internal/stores/hybrid_viewer/highlight";
 import { useHybridViewerRuler } from "@ogw_internal/stores/hybrid_viewer/ruler";
 import { useHybridViewerScene } from "@ogw_internal/stores/hybrid_viewer/scene";
+import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 
 import { Status } from "@ogw_front/utils/status";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
-
-interface GenericRenderWindowHolder {
-  value?: VtkGenericRenderWindow;
-}
-
 // oxlint-disable max-lines-per-function, max-statements
 export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const viewerStore = useViewerStore();
-  const genericRenderWindow = reactive<GenericRenderWindowHolder>({});
-  const status = ref(Status.NOT_CREATED);
-  const is_moving = ref(false);
-  const is_picking = ref(false);
+  const { genericRenderWindow, status, is_moving, is_picking, remoteRender } =
+    useHybridViewerCore();
   let imageStyle: CSSStyleDeclaration | undefined = undefined;
 
   const brightnessStore = useHybridViewerBrightness();
@@ -112,31 +102,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       Object.assign(cameraStore.camera_options, getCameraOptions(camera));
     });
     status.value = Status.CREATED;
-  }
-
-  let renderPromise: Promise<void> | undefined = undefined;
-  let renderPending = false;
-
-  async function remoteRender(): Promise<void> {
-    if (renderPromise) {
-      renderPending = true;
-      await renderPromise;
-      return;
-    }
-
-    renderPromise = (async (): Promise<void> => {
-      try {
-        const schema = viewer_schemas.opengeodeweb_viewer.viewer.render;
-        await viewerStore.request({ schema });
-      } finally {
-        renderPromise = undefined;
-        if (renderPending) {
-          renderPending = false;
-          await remoteRender();
-        }
-      }
-    })();
-    return renderPromise;
   }
 
   function exportStores(): {

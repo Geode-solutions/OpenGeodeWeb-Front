@@ -7,13 +7,29 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 const schema = viewer_schemas.opengeodeweb_viewer.model.lines.color;
 
-export function useModelLinesColor() {
+export function useModelLinesColor(): {
+  setModelLinesColor: (
+    modelId: string,
+    lines_ids: string[],
+    color: unknown,
+    activeColoring?: string,
+  ) => Promise<unknown>;
+  modelLineColoring: (id: string, line_id?: string) => StyleValues;
+  modelLineColor: (id: string, line_id?: string) => unknown;
+  modelLineActiveColoring: (id: string, line_id?: string) => unknown;
+  setModelLinesActiveColoring: (
+    modelId: string,
+    lines_ids: string[],
+    activeColoring: string,
+  ) => Promise<unknown>;
+} {
   const modelCommonStyle = useModelCommonStyle();
   const modelLinesCommonStyle = useModelLinesCommonStyle();
   const modelLinesVertexAttribute = useModelLinesVertexAttribute();
   const modelLinesEdgeAttribute = useModelLinesEdgeAttribute();
 
   function modelLineColoring(id: string, line_id?: string): StyleValues {
+    // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
     return modelLinesCommonStyle.modelLineStyle(id, line_id).coloring as StyleValues;
   }
 
@@ -21,13 +37,20 @@ export function useModelLinesColor() {
     return modelLineColoring(id, line_id).constant;
   }
 
-  function setModelLinesColor(
+  async function setModelLinesColor(
     modelId: string,
     lines_ids: string[],
     color: unknown,
     activeColoring = "constant",
-  ) {
-    return modelCommonStyle.setModelTypeColor(modelId, lines_ids, color, schema, activeColoring);
+  ): Promise<unknown> {
+    const result = await modelCommonStyle.setModelTypeColor(
+      modelId,
+      lines_ids,
+      color,
+      schema,
+      activeColoring,
+    );
+    return result;
   }
 
   function modelLineActiveColoring(id: string, line_id?: string): unknown {
@@ -38,9 +61,9 @@ export function useModelLinesColor() {
     modelId: string,
     lines_ids: string[],
     activeColoring: string,
-  ) {
+  ): Promise<unknown> {
     if (lines_ids.length > 1) {
-      modelLinesCommonStyle.mutateModelLinesTypeColoring(modelId, {
+      await modelLinesCommonStyle.mutateModelLinesTypeColoring(modelId, {
         active: activeColoring,
       });
     }
@@ -87,6 +110,7 @@ export function useModelLinesColor() {
         return modelLinesEdgeAttribute.setModelLinesEdgeAttribute(modelId, lines_ids, attribute);
       }
     }
+    return undefined;
   }
 
   return {

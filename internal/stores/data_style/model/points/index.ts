@@ -14,13 +14,16 @@ export function useModelPointsStyle(): {
 
   async function applyModelPointsStyle(id: string): Promise<unknown[]> {
     const style = modelPointsCommonStyle.modelPointsStyle(id);
-    return Promise.all([
+    const result = await Promise.all([
       modelPointsVisibilityStyle.setModelPointsVisibility(
         id,
+        // oxlint-disable-next-line no-unsafe-type-assertion -- points style values are dynamically typed at runtime.
         style.visibility as boolean | undefined,
       ),
+      // oxlint-disable-next-line no-unsafe-type-assertion -- points style values are dynamically typed at runtime.
       modelPointsSizeStyle.setModelPointsSize(id, style.size as number | undefined),
     ]);
+    return result;
   }
 
   return {

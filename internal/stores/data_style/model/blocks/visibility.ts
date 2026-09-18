@@ -24,7 +24,13 @@ export function useModelBlocksVisibility(): {
     blocks_ids: string[],
     visibility: boolean | undefined,
   ): Promise<unknown> {
-    return modelCommonStyle.setModelTypeVisibility(modelId, blocks_ids, visibility, schema);
+    const result = await modelCommonStyle.setModelTypeVisibility(
+      modelId,
+      blocks_ids,
+      visibility,
+      schema,
+    );
+    return result;
   }
 
   return { setModelBlocksVisibility, modelBlockVisibility };

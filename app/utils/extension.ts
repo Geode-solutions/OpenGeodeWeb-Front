@@ -3,8 +3,8 @@
 // Third party imports
 
 // Local imports
-import { type Microservice, useInfraStore } from "@ogw_front/stores/infra";
-import { type RegisterableStore, useAppStore } from "@ogw_front/stores/app";
+import type { RegisterableStore, useAppStore } from "@ogw_front/stores/app";
+import type { Microservice } from "@ogw_front/stores/infra";
 import { isCloudMode } from "@ogw_front/utils/stores";
 import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json" with { type: "json" };
 
@@ -30,11 +30,13 @@ interface RegisteredExtension {
 }
 
 async function uploadExtension(file: Readonly<File>): Promise<void> {
+  const { useAppStore } = await import("@ogw_front/stores/app");
   const appStore = useAppStore();
   await appStore.upload(file);
 }
 
 async function runExtensions(): Promise<{ extensionsArray: ExtensionDescriptor[] }> {
+  const { useAppStore } = await import("@ogw_front/stores/app");
   const appStore = useAppStore();
   const { projectFolderPath } = appStore;
   const { PROJECT: projectName } = useRuntimeConfig().public;
@@ -56,6 +58,7 @@ async function downloadExtension({
   url,
   extensionFileName,
 }: Readonly<DownloadExtensionParams>): Promise<unknown> {
+  const { useAppStore } = await import("@ogw_front/stores/app");
   const appStore = useAppStore();
   const { PROJECT: projectName } = useRuntimeConfig().public;
   const schema = opengeodeweb_front_schemas.api.microservice.extensions.download;
@@ -78,6 +81,8 @@ function isMicroservice(
 }
 
 async function registerRunningExtensions(): Promise<RegisteredExtension[]> {
+  const { useAppStore } = await import("@ogw_front/stores/app");
+  const { useInfraStore } = await import("@ogw_front/stores/infra");
   const appStore = useAppStore();
   const infraStore = useInfraStore();
   const { extensionsArray } = await runExtensions();
@@ -124,6 +129,7 @@ async function importExtensionURL(
 }
 
 async function unloadExtension(extensionId: string): Promise<boolean> {
+  const { useAppStore } = await import("@ogw_front/stores/app");
   const appStore = useAppStore();
   console.log("[ExtensionManager] Unloading extension:", extensionId);
   const extensionData = appStore.getExtension(extensionId);
@@ -149,6 +155,7 @@ async function unloadExtension(extensionId: string): Promise<boolean> {
 }
 
 async function killExtension(extensionId: string): Promise<unknown> {
+  const { useAppStore } = await import("@ogw_front/stores/app");
   const appStore = useAppStore();
   const { projectFolderPath } = appStore;
   const { PROJECT: projectName } = useRuntimeConfig().public;

@@ -29,6 +29,7 @@ export function useModelSurfacesColor(): {
   const modelSurfacesPolygonAttribute = useModelSurfacesPolygonAttribute();
 
   function modelSurfaceColoring(id: string, surface_id?: string): StyleValues {
+    // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
     return modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id).coloring as StyleValues;
   }
 
@@ -42,7 +43,14 @@ export function useModelSurfacesColor(): {
     color: unknown,
     activeColoring = "constant",
   ): Promise<unknown> {
-    return modelCommonStyle.setModelTypeColor(modelId, surfaces_ids, color, schema, activeColoring);
+    const result = await modelCommonStyle.setModelTypeColor(
+      modelId,
+      surfaces_ids,
+      color,
+      schema,
+      activeColoring,
+    );
+    return result;
   }
 
   function modelSurfaceActiveColoring(id: string, surface_id?: string): unknown {
@@ -55,7 +63,7 @@ export function useModelSurfacesColor(): {
     activeColoring: string,
   ): Promise<unknown> {
     if (surfaces_ids.length > 1) {
-      modelSurfacesCommonStyle.mutateModelSurfacesTypeColoring(modelId, {
+      await modelSurfacesCommonStyle.mutateModelSurfacesTypeColoring(modelId, {
         active: activeColoring,
       });
     }
@@ -118,6 +126,7 @@ export function useModelSurfacesColor(): {
         );
       }
     }
+    return undefined;
   }
 
   return {

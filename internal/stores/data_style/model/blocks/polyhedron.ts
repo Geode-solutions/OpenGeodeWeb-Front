@@ -1,3 +1,4 @@
+// oxlint-disable eslint/max-lines
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
@@ -104,6 +105,7 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
   const modelBlocksCommonStyle = useModelBlocksCommonStyle();
   const viewerStore = useViewerStore();
   function modelBlocksPolyhedronAttribute(modelId: string, blockId?: string): AttributeState {
+    // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.polyhedron shape is defined by the data style schema.
     return modelBlocksCommonStyle.modelBlockColoring(modelId, blockId).polyhedron as AttributeState;
   }
   function modelBlocksPolyhedronAttributeStoredConfig(
@@ -113,14 +115,10 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
     item: number | undefined,
   ): AttributeStoredConfig {
     const { storedConfigs } = modelBlocksPolyhedronAttribute(modelId, blockId);
-    if (
-      storedConfigs &&
-      name !== undefined &&
-      name in storedConfigs &&
-      item !== undefined &&
-      item in storedConfigs[name]
-    ) {
-      return storedConfigs[name][item];
+    const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
+    const itemConfig = item === undefined ? undefined : nameConfig?.[item];
+    if (itemConfig !== undefined) {
+      return itemConfig;
     }
     return {
       minimum: undefined,
@@ -135,11 +133,11 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
     values: Record<string, unknown>,
   ): Promise<void> {
     if (blockIds.length > 1) {
-      modelBlocksCommonStyle.mutateModelBlocksTypeColoring(modelId, {
+      await modelBlocksCommonStyle.mutateModelBlocksTypeColoring(modelId, {
         polyhedron: values,
       });
     }
-    return modelBlocksCommonStyle.mutateModelBlocksColoring(modelId, blockIds, {
+    await modelBlocksCommonStyle.mutateModelBlocksColoring(modelId, blockIds, {
       polyhedron: values,
     });
   }
@@ -150,11 +148,14 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
     item: number | undefined,
     config: Partial<AttributeStoredConfig>,
   ): Promise<void> {
-    return mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
+    if (name === undefined || item === undefined) {
+      return;
+    }
+    await mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
       storedConfigs: {
-        [name as string]: {
+        [name]: {
           lastItem: item,
-          [item as number]: config,
+          [item]: config,
         },
       },
     });
@@ -171,8 +172,9 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
     name: string | undefined,
   ): number {
     const { storedConfigs } = modelBlocksPolyhedronAttribute(modelId, blockId);
-    if (storedConfigs && name !== undefined && name in storedConfigs) {
-      return storedConfigs[name].lastItem;
+    const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
+    if (nameConfig !== undefined) {
+      return nameConfig.lastItem;
     }
     return 0;
   }
@@ -214,17 +216,17 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
       no_data_color = DEFAULT_NO_DATA_COLOR,
     }: AttributeInput,
   ): Promise<unknown> {
-    mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
+    await mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
       name,
       item,
     });
-    setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, {
+    await setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, {
       minimum,
       maximum,
       colorMap,
       no_data_color,
     });
-    const points = getRGBPointsFromPreset(colorMap);
+    const points = getRGBPointsFromPreset(colorMap ?? "");
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
     const params = {
       id: modelId,
@@ -259,9 +261,10 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
       no_data_color: storedConfig.no_data_color,
     };
     if (isModelBlocksPolyhedronAttributeValid(attribute)) {
-      return setModelBlocksPolyhedronAttribute(modelId, blockIds, attribute);
+      const result = await setModelBlocksPolyhedronAttribute(modelId, blockIds, attribute);
+      return result;
     }
-    return;
+    return undefined;
   }
   async function setModelBlocksPolyhedronAttributeName(
     modelId: string,
@@ -269,7 +272,7 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
     name: string,
   ): Promise<unknown> {
     const item = modelBlocksPolyhedronAttributeLastItem(modelId, blockIds[0], name);
-    mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
+    await mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
       name,
       item,
     });
@@ -280,7 +283,7 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
     blockIds: string[],
     item: number,
   ): Promise<unknown> {
-    mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
+    await mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
       item,
     });
     return applyPolyhedronAttribute(modelId, blockIds);
@@ -293,7 +296,7 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
   ): Promise<unknown> {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockIds[0]);
-    setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, {
+    await setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, {
       minimum,
       maximum,
     });
@@ -306,7 +309,7 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
   ): Promise<unknown> {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockIds[0]);
-    setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, {
+    await setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, {
       colorMap,
     });
     return applyPolyhedronAttribute(modelId, blockIds);

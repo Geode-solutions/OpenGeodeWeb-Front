@@ -20,18 +20,21 @@ export function useMeshPointsColorStyle(): {
   }
   async function setMeshPointsColor(id: string, color: unknown): Promise<unknown> {
     const params = { id, color };
-    return viewerStore.request(
+    const result = await viewerStore.request(
       {
         schema,
         params,
       },
       {
-        response_function: async () =>
-          meshPointsCommonStyle.mutateMeshPointsColoring(id, {
+        response_function: async () => {
+          const mutateResult = await meshPointsCommonStyle.mutateMeshPointsColoring(id, {
             constant: color,
-          }),
+          });
+          return mutateResult;
+        },
       },
     );
+    return result;
   }
 
   return {

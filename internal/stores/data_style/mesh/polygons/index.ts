@@ -6,6 +6,7 @@ import {
   useMeshPolygonsPolygonAttributeStyle,
 } from "./polygon";
 import { isMeshPolygonsVertexAttributeValid, useMeshPolygonsVertexAttributeStyle } from "./vertex";
+import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { useMeshPolygonsColorStyle } from "./color";
 import { useMeshPolygonsCommonStyle } from "./common";
 import { useMeshPolygonsTexturesStyle } from "./textures";
@@ -13,95 +14,154 @@ import { useMeshPolygonsVisibilityStyle } from "./visibility";
 
 // Local constants
 
-function useMeshPolygonsColoringStyle() {
+interface MeshPolygonsActiveColoringDeps {
+  readonly commonStyle: Readonly<ReturnType<typeof useMeshPolygonsCommonStyle>>;
+  readonly colorStyle: Readonly<ReturnType<typeof useMeshPolygonsColorStyle>>;
+  readonly texturesStyle: Readonly<ReturnType<typeof useMeshPolygonsTexturesStyle>>;
+  readonly vertexAttributeStyle: Readonly<ReturnType<typeof useMeshPolygonsVertexAttributeStyle>>;
+  readonly polygonAttributeStyle: Readonly<ReturnType<typeof useMeshPolygonsPolygonAttributeStyle>>;
+}
+
+function handleMeshPolygonsVertexColoring(
+  id: string,
+  vertexAttributeStyle: Readonly<ReturnType<typeof useMeshPolygonsVertexAttributeStyle>>,
+): Promise<unknown> | undefined {
+  const name = vertexAttributeStyle.meshPolygonsVertexAttributeName(id);
+  const item = vertexAttributeStyle.meshPolygonsVertexAttributeItem(id);
+  const [minimum, maximum] = vertexAttributeStyle.meshPolygonsVertexAttributeRange(id);
+  const colorMap = vertexAttributeStyle.meshPolygonsVertexAttributeColorMap(id);
+  const vertex_attribute = { name, item, minimum, maximum, colorMap };
+  if (!isMeshPolygonsVertexAttributeValid(vertex_attribute)) {
+    return undefined;
+  }
+  return vertexAttributeStyle.setMeshPolygonsVertexAttribute(id, vertex_attribute);
+}
+
+function handleMeshPolygonsPolygonColoring(
+  id: string,
+  polygonAttributeStyle: Readonly<ReturnType<typeof useMeshPolygonsPolygonAttributeStyle>>,
+): Promise<unknown> | undefined {
+  const name = polygonAttributeStyle.meshPolygonsPolygonAttributeName(id);
+  const item = polygonAttributeStyle.meshPolygonsPolygonAttributeItem(id);
+  const [minimum, maximum] = polygonAttributeStyle.meshPolygonsPolygonAttributeRange(id);
+  const colorMap = polygonAttributeStyle.meshPolygonsPolygonAttributeColorMap(id);
+  const polygon_attribute = { name, item, minimum, maximum, colorMap };
+  if (!isMeshPolygonsPolygonAttributeValid(polygon_attribute)) {
+    return undefined;
+  }
+  return polygonAttributeStyle.setMeshPolygonsPolygonAttribute(id, polygon_attribute);
+}
+
+async function setMeshPolygonsActiveColoring(
+  id: string,
+  type: string | undefined,
+  deps: Readonly<MeshPolygonsActiveColoringDeps>,
+): Promise<unknown> {
+  await deps.commonStyle.mutateMeshPolygonsStyle(id, {
+    coloring: { active: type },
+  });
+  if (type === "constant") {
+    const result = await deps.colorStyle.setMeshPolygonsColor(
+      id,
+      deps.colorStyle.meshPolygonsColor(id),
+    );
+    return result;
+  }
+  if (type === "textures") {
+    const result = await deps.texturesStyle.setMeshPolygonsTextures(
+      id,
+      deps.texturesStyle.meshPolygonsTextures(id),
+    );
+    return result;
+  }
+  if (type === "vertex") {
+    const result = await handleMeshPolygonsVertexColoring(id, deps.vertexAttributeStyle);
+    return result;
+  }
+  if (type === "polygon") {
+    const result = await handleMeshPolygonsPolygonColoring(id, deps.polygonAttributeStyle);
+    return result;
+  }
+  throw new Error(`Unknown mesh polygons coloring type: ${type}`);
+}
+
+async function applyMeshPolygonsStyle(
+  id: string,
+  visibilityStyle: Readonly<ReturnType<typeof useMeshPolygonsVisibilityStyle>>,
+  activeColoringType: string | undefined,
+  deps: Readonly<MeshPolygonsActiveColoringDeps>,
+): Promise<unknown[]> {
+  const result = await Promise.all([
+    visibilityStyle.setMeshPolygonsVisibility(id, visibilityStyle.meshPolygonsVisibility(id)),
+    setMeshPolygonsActiveColoring(id, activeColoringType, deps),
+  ]);
+  return result;
+}
+
+type UseMeshPolygonsStyleReturn = ReturnType<typeof useMeshPolygonsCommonStyle> & {
+  meshPolygonsColoring: (id: string) => StyleValues;
+  meshPolygonsActiveColoring: (id: string) => string | undefined;
+  setMeshPolygonsActiveColoring: (id: string, type: string | undefined) => Promise<unknown>;
+  applyMeshPolygonsStyle: (id: string) => Promise<unknown[]>;
+} & ReturnType<typeof useMeshPolygonsVisibilityStyle> &
+  ReturnType<typeof useMeshPolygonsColorStyle> &
+  ReturnType<typeof useMeshPolygonsTexturesStyle> &
+  ReturnType<typeof useMeshPolygonsVertexAttributeStyle> &
+  ReturnType<typeof useMeshPolygonsPolygonAttributeStyle>;
+
+export function useMeshPolygonsStyle(): UseMeshPolygonsStyleReturn {
   const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle();
+  const meshPolygonsVisibility = useMeshPolygonsVisibilityStyle();
   const meshPolygonsColorStyle = useMeshPolygonsColorStyle();
-  const meshPolygonsTexturesStyle = useMeshPolygonsTexturesStyle();
+  const meshPolygonsTexturesStore = useMeshPolygonsTexturesStyle();
   const meshPolygonsVertexAttributeStyle = useMeshPolygonsVertexAttributeStyle();
   const meshPolygonsPolygonAttributeStyle = useMeshPolygonsPolygonAttributeStyle();
 
-  function meshPolygonsColoring(id: string) {
+  const activeColoringDeps: MeshPolygonsActiveColoringDeps = {
+    commonStyle: meshPolygonsCommonStyle,
+    colorStyle: meshPolygonsColorStyle,
+    texturesStyle: meshPolygonsTexturesStore,
+    vertexAttributeStyle: meshPolygonsVertexAttributeStyle,
+    polygonAttributeStyle: meshPolygonsPolygonAttributeStyle,
+  };
+
+  function meshPolygonsColoring(id: string): StyleValues {
     return meshPolygonsCommonStyle.meshPolygonsColoring(id);
   }
 
   function meshPolygonsActiveColoring(id: string): string | undefined {
+    // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.active is defined as string in the data style schema.
     return meshPolygonsColoring(id).active as string | undefined;
   }
 
-  async function setMeshPolygonsActiveColoring(id: string, type: string | undefined) {
-    await meshPolygonsCommonStyle.mutateMeshPolygonsStyle(id, {
-      coloring: { active: type },
-    });
-    if (type === "constant") {
-      return meshPolygonsColorStyle.setMeshPolygonsColor(
-        id,
-        meshPolygonsColorStyle.meshPolygonsColor(id),
-      );
-    }
-    if (type === "textures") {
-      const textures = meshPolygonsTexturesStyle.meshPolygonsTextures(id);
-      return meshPolygonsTexturesStyle.setMeshPolygonsTextures(id, textures);
-    }
-    if (type === "vertex") {
-      const name = meshPolygonsVertexAttributeStyle.meshPolygonsVertexAttributeName(id);
-      const item = meshPolygonsVertexAttributeStyle.meshPolygonsVertexAttributeItem(id);
-      const [minimum, maximum] =
-        meshPolygonsVertexAttributeStyle.meshPolygonsVertexAttributeRange(id);
-      const colorMap = meshPolygonsVertexAttributeStyle.meshPolygonsVertexAttributeColorMap(id);
-      const vertex_attribute = { name, item, minimum, maximum, colorMap };
-      if (!isMeshPolygonsVertexAttributeValid(vertex_attribute)) {
-        return;
-      }
-      return meshPolygonsVertexAttributeStyle.setMeshPolygonsVertexAttribute(id, vertex_attribute);
-    }
-    if (type === "polygon") {
-      const name = meshPolygonsPolygonAttributeStyle.meshPolygonsPolygonAttributeName(id);
-      const item = meshPolygonsPolygonAttributeStyle.meshPolygonsPolygonAttributeItem(id);
-      const [minimum, maximum] =
-        meshPolygonsPolygonAttributeStyle.meshPolygonsPolygonAttributeRange(id);
-      const colorMap = meshPolygonsPolygonAttributeStyle.meshPolygonsPolygonAttributeColorMap(id);
-      const polygon_attribute = { name, item, minimum, maximum, colorMap };
-      if (!isMeshPolygonsPolygonAttributeValid(polygon_attribute)) {
-        return;
-      }
-      return meshPolygonsPolygonAttributeStyle.setMeshPolygonsPolygonAttribute(
-        id,
-        polygon_attribute,
-      );
-    }
-    throw new Error(`Unknown mesh polygons coloring type: ${type}`);
+  async function boundSetMeshPolygonsActiveColoring(
+    id: string,
+    type: string | undefined,
+  ): Promise<unknown> {
+    const result = await setMeshPolygonsActiveColoring(id, type, activeColoringDeps);
+    return result;
   }
 
-  return {
-    meshPolygonsColoring,
-    meshPolygonsActiveColoring,
-    setMeshPolygonsActiveColoring,
-    ...meshPolygonsColorStyle,
-    ...meshPolygonsTexturesStyle,
-    ...meshPolygonsVertexAttributeStyle,
-    ...meshPolygonsPolygonAttributeStyle,
-  };
-}
-
-export function useMeshPolygonsStyle() {
-  const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle();
-  const meshPolygonsVisibility = useMeshPolygonsVisibilityStyle();
-  const coloringStyle = useMeshPolygonsColoringStyle();
-
-  async function applyMeshPolygonsStyle(id: string) {
-    return Promise.all([
-      meshPolygonsVisibility.setMeshPolygonsVisibility(
-        id,
-        meshPolygonsVisibility.meshPolygonsVisibility(id),
-      ),
-      coloringStyle.setMeshPolygonsActiveColoring(id, coloringStyle.meshPolygonsActiveColoring(id)),
-    ]);
+  async function boundApplyMeshPolygonsStyle(id: string): Promise<unknown[]> {
+    const result = await applyMeshPolygonsStyle(
+      id,
+      meshPolygonsVisibility,
+      meshPolygonsActiveColoring(id),
+      activeColoringDeps,
+    );
+    return result;
   }
 
   return {
     ...meshPolygonsCommonStyle,
-    ...coloringStyle,
-    applyMeshPolygonsStyle,
+    meshPolygonsColoring,
+    meshPolygonsActiveColoring,
+    setMeshPolygonsActiveColoring: boundSetMeshPolygonsActiveColoring,
+    applyMeshPolygonsStyle: boundApplyMeshPolygonsStyle,
     ...meshPolygonsVisibility,
+    ...meshPolygonsColorStyle,
+    ...meshPolygonsTexturesStore,
+    ...meshPolygonsVertexAttributeStyle,
+    ...meshPolygonsPolygonAttributeStyle,
   };
 }

@@ -1,8 +1,6 @@
 import { Status } from "@ogw_front/utils/status";
 import { appMode } from "@ogw_shared/app_mode";
-import { registerRunningExtensions } from "@ogw_front/utils/extension";
 import { setAppBaseUrl } from "@ogw_shared/scripts";
-import { useAppStore } from "@ogw_front/stores/app";
 import { useCloudStore } from "@ogw_front/stores/cloud";
 
 interface ElectronApi {
@@ -63,6 +61,7 @@ export const useInfraStore = defineStore("infra", {
           const cloudStore = useCloudStore();
           await cloudStore.launch(email ?? "");
         } else {
+          const { useAppStore } = await import("@ogw_front/stores/app");
           const appStore = useAppStore();
           await appStore.createProjectFolder();
           if (this.app_mode === appMode.DESKTOP) {
@@ -82,6 +81,7 @@ export const useInfraStore = defineStore("infra", {
               return result;
             },
           );
+          const { registerRunningExtensions } = await import("@ogw_front/utils/extension");
           launch_promises.push(registerRunningExtensions());
           await Promise.all(launch_promises);
         }

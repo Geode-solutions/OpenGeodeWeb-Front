@@ -123,6 +123,7 @@ export function useMeshPolyhedraStyle(): UseMeshPolyhedraStyleReturn {
   }
 
   function meshPolyhedraActiveColoring(id: string): string | undefined {
+    // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.active is defined as string in the data style schema.
     return meshPolyhedraColoring(id).active as string | undefined;
   }
 

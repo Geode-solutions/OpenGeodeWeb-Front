@@ -16,6 +16,7 @@ export function useMeshPointsVisibilityStyle(): {
   const meshPointsCommonStyle = useMeshPointsCommonStyle();
 
   function meshPointsVisibility(id: string): boolean | undefined {
+    // oxlint-disable-next-line no-unsafe-type-assertion -- visibility is defined as boolean in the data style schema.
     return meshPointsCommonStyle.meshPointsStyle(id).visibility as boolean | undefined;
   }
   async function setMeshPointsVisibility(
@@ -23,19 +24,22 @@ export function useMeshPointsVisibilityStyle(): {
     visibility: boolean | undefined,
   ): Promise<unknown> {
     const params = { id, visibility };
-    return viewerStore.request(
+    const result = await viewerStore.request(
       {
         schema,
         params,
       },
       {
-        async response_function(response: unknown) {
-          return meshPointsCommonStyle.mutateMeshPointsVisibility(
-            response as { id: string; visibility: boolean },
-          );
+        response_function: async (response: unknown) => {
+          // oxlint-disable-next-line no-unsafe-type-assertion -- response shape is defined by the viewer schema.
+          const typedResponse = response as { id: string; visibility: boolean };
+          const mutateResult =
+            await meshPointsCommonStyle.mutateMeshPointsVisibility(typedResponse);
+          return mutateResult;
         },
       },
     );
+    return result;
   }
 
   return {

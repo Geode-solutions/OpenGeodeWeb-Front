@@ -39,7 +39,7 @@ function useModelStyle() {
     const style = dataStyleState.getStyle(modelId);
 
     return Promise.all([
-      modelVisibilityStyle.setModelVisibility(modelId, style.visibility as boolean),
+      modelVisibilityStyle.setModelVisibility(modelId, style.visibility!),
       modelBlocksStyle.applyModelBlocksStyle(modelId),
       modelSurfacesStyle.applyModelSurfacesStyle(modelId),
       modelLinesStyle.applyModelLinesStyle(modelId),
@@ -50,10 +50,7 @@ function useModelStyle() {
   }
 
   async function setModelMeshComponentsDefaultStyle(modelId: string) {
-    const item = await dataStore.item(modelId);
-    if (!item) {
-      return;
-    }
+    await dataStore.item(modelId);
     return Promise.all([
       modelBlocksStyle.setModelBlocksDefaultStyle(modelId),
       modelSurfacesStyle.setModelSurfacesDefaultStyle(modelId),

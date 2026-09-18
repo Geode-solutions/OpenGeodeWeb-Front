@@ -49,9 +49,9 @@ describe("crs selector", () => {
       },
       props: { geodeObjectType: "BRep", keyToUpdate: key_to_update },
     });
-    const td_wrapper = await wrapper.find("td");
+    const td_wrapper = wrapper.find("td");
     await wrapper.vm.$nextTick();
-    const input = await td_wrapper.find("input");
+    const input = td_wrapper.find("input");
     await input.trigger("click");
     expect(wrapper.emitted()).toHaveProperty("update_values");
     expect(wrapper.emitted<unknown[]>().update_values).toHaveLength(EXPECTED_LENGTH);

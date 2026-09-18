@@ -1,6 +1,5 @@
 import { BACKGROUND_GREY_VALUE, RGB_MAX } from "./constants";
-import type { HybridViewerStorePublic } from "./vtk_types";
-import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import { useHybridViewerCore } from "./core";
 
 const RGBA_CHANNELS = 4;
 const SAMPLE_SIZE = 10;
@@ -63,7 +62,7 @@ function sampleMinBrightness(
   const { data } = ctx.getImageData(0, 0, SAMPLE_SIZE, SAMPLE_SIZE);
   let minBrightness = 1;
   for (let i = 0; i < TOTAL_CHANNELS; i += RGBA_CHANNELS) {
-    const brightness = (data[i] + data[i + 1] + data[i + 2]) / (3 * RGB_MAX);
+    const brightness = ((data[i] ?? 0) + (data[i + 1] ?? 0) + (data[i + 2] ?? 0)) / (3 * RGB_MAX);
     if (brightness < minBrightness) {
       minBrightness = brightness;
     }
@@ -76,11 +75,17 @@ function computeAverageBrightness(
   options: Readonly<BrightnessOptions>,
 ): number {
   const { latestImage, offscreenCtx, offscreenCanvas } = options;
-  const { genericRenderWindow } = useHybridViewerStore() as unknown as HybridViewerStorePublic;
+  const { genericRenderWindow } = useHybridViewerCore();
   if (!latestImage || !offscreenCtx || !offscreenCanvas || !genericRenderWindow.value) {
     return BACKGROUND_GREY_VALUE / RGB_MAX;
   }
-  const canvas = genericRenderWindow.value.getApiSpecificRenderWindow().getCanvas();
+  // oxlint-disable-next-line no-unsafe-assignment -- vtk.js has no types for getApiSpecificRenderWindow(); narrowed below.
+  const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
+  // oxlint-disable-next-line no-unsafe-type-assertion -- trusted vtk.js OpenGL render window API boundary.
+  const apiSpecificRenderWindow = webGLRenderWindow as unknown as {
+    getCanvas: () => HTMLCanvasElement | null | undefined;
+  };
+  const canvas = apiSpecificRenderWindow.getCanvas();
   if (canvas === undefined || canvas === null) {
     return BACKGROUND_GREY_VALUE / RGB_MAX;
   }
