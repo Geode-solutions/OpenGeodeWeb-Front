@@ -140,10 +140,10 @@ export const useDataStore = defineStore("data", () => {
     // The two are structurally close enough at runtime (vueuse only calls
     // `.subscribe`) but not identical, hence the cast.
     return useObservable(
-      // oxlint-disable-next-line no-unsafe-type-assertion -- trusted vueuse/Dexie Observable boundary; see comment above.
       liveQuery(async () => {
         const data_item = await data_db.get(id);
         return data_item;
+        // oxlint-disable-next-line no-unsafe-type-assertion -- trusted vueuse/Dexie Observable boundary; see comment above.
       }) as unknown as Observable<DataItem | undefined>,
       {
         // oxlint-disable-next-line no-unsafe-type-assertion -- placeholder until the live query resolves; consumers must treat this as possibly incomplete.
@@ -153,10 +153,10 @@ export const useDataStore = defineStore("data", () => {
   }
   function refAllItems(): Readonly<Ref<DataItem[]>> {
     return useObservable(
-      // oxlint-disable-next-line no-unsafe-type-assertion -- trusted vueuse/Dexie Observable boundary; see comment above.
       liveQuery(async () => {
         const items = await data_db.toArray();
         return items;
+        // oxlint-disable-next-line no-unsafe-type-assertion -- trusted vueuse/Dexie Observable boundary; see comment above.
       }) as unknown as Observable<DataItem[]>,
       {
         initialValue: [] as DataItem[],

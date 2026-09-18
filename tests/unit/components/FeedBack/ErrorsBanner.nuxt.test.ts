@@ -22,6 +22,7 @@ describe("feedback error banner", () => {
     const feedbackStore = useFeedbackStore();
     feedbackStore.$patch({ server_error: true });
     expect(feedbackStore.server_error).toBe(true);
+    await wrapper.vm.$nextTick();
     const v_btn = wrapper.findAll(".v-btn");
     await v_btn[0]?.trigger("click");
     expect(reload_spy).toHaveBeenCalledTimes(CALLED_TIMES);

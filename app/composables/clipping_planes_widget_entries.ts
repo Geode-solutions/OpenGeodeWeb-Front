@@ -137,9 +137,9 @@ function useWidgetEntryManager({ planes, debouncedApply }: Readonly<WidgetEntryM
     if (!widgetEntries[idx]) {
       // oxlint-disable-next-line no-unsafe-call no-unsafe-type-assertion -- vtk.js has no types for ImplicitPlaneWidget's factory; narrowed here.
       const planeWidget = vtkImplicitPlaneWidget() as PlaneWidget;
-      // oxlint-disable-next-line no-unsafe-type-assertion -- vtk.js WidgetManager.addWidget is untyped for our custom WidgetHandle shape; narrowed here.
       const widgetHandle = widgetManager.addWidget(
         asWidgetFactory(planeWidget),
+        // oxlint-disable-next-line no-unsafe-type-assertion -- vtk.js WidgetManager.addWidget is untyped for our custom WidgetHandle shape; narrowed here.
       ) as unknown as WidgetHandle;
       widgetEntries.push(createWidgetEntry(planeWidget, widgetHandle, idx));
     }

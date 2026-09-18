@@ -87,10 +87,10 @@ export function useDataMesh(): {
     modelId: string,
   ): Readonly<Ref<FormattedComponentGroup[] | undefined>> {
     return useObservable(
-      // oxlint-disable-next-line no-unsafe-type-assertion
       liveQuery(async () => {
         const components = await formatedMeshComponents(modelId);
         return components;
+        // oxlint-disable-next-line no-unsafe-type-assertion
       }) as unknown as Observable<FormattedComponentGroup[]>,
       {
         initialValue: undefined,

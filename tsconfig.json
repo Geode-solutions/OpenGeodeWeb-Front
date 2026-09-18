@@ -16,48 +16,122 @@
     "noImplicitOverride": true,
     "module": "preserve",
     "noEmit": true,
-    "lib": ["ESNext", "dom", "dom.iterable", "webworker"],
+    "lib": [
+      "ESNext",
+      "dom",
+      "dom.iterable",
+      "webworker"
+    ],
     "libReplacement": false,
     "jsx": "preserve",
     "jsxImportSource": "vue",
-    "types": ["node", "ws", "busboy"],
+    "types": [
+      "node",
+      "ws",
+      "busboy"
+    ],
     "paths": {
-      "~": ["./app"],
-      "~/*": ["./app/*"],
-      "@": ["./app"],
-      "@/*": ["./app/*"],
-      "~~": ["./"],
-      "~~/*": ["./*"],
-      "@@": ["./"],
-      "@@/*": ["./*"],
-      "#shared": ["./shared"],
-      "#shared/*": ["./shared/*"],
-      "#server": ["./server"],
-      "#server/*": ["./server/*"],
-      "#build": ["./.nuxt"],
-      "#build/*": ["./.nuxt/*"],
-      "@ogw_front": ["./app"],
-      "@ogw_front/*": ["./app/*"],
-      "@ogw_internal": ["./internal"],
-      "@ogw_internal/*": ["./internal/*"],
-      "@ogw_tests": ["./tests"],
-      "@ogw_tests/*": ["./tests/*"],
-      "@ogw_shared": ["./shared"],
-      "@ogw_shared/*": ["./shared/*"],
-      "@ogw_server": ["./server"],
-      "@ogw_server/*": ["./server/*"],
-      "#app": ["../../node_modules/nuxt/dist/app"],
-      "#app/*": ["../../node_modules/nuxt/dist/app/*"],
-      "vue-demi": ["../../node_modules/nuxt/dist/app/compat/vue-demi"],
-      "#vue-router": ["../../node_modules/vue-router/vue-router.node.mjs"],
-      "#unhead/composables": ["../../node_modules/nuxt/dist/head/runtime/composables"],
-      "#imports": ["./.nuxt/imports"],
-      "#app-manifest": ["./.nuxt/manifest/meta/cead9cc9-04b1-41f0-b07d-b205c2489204.json"]
+      "~": [
+        "./app"
+      ],
+      "~/*": [
+        "./app/*"
+      ],
+      "@": [
+        "./app"
+      ],
+      "@/*": [
+        "./app/*"
+      ],
+      "~~": [
+        "./"
+      ],
+      "~~/*": [
+        "./*"
+      ],
+      "@@": [
+        "./"
+      ],
+      "@@/*": [
+        "./*"
+      ],
+      "#shared": [
+        "./shared"
+      ],
+      "#shared/*": [
+        "./shared/*"
+      ],
+      "#server": [
+        "./server"
+      ],
+      "#server/*": [
+        "./server/*"
+      ],
+      "#build": [
+        "./.nuxt"
+      ],
+      "#build/*": [
+        "./.nuxt/*"
+      ],
+      "@ogw_front": [
+        "./app"
+      ],
+      "@ogw_front/*": [
+        "./app/*"
+      ],
+      "@ogw_internal": [
+        "./internal"
+      ],
+      "@ogw_internal/*": [
+        "./internal/*"
+      ],
+      "@ogw_tests": [
+        "./tests"
+      ],
+      "@ogw_tests/*": [
+        "./tests/*"
+      ],
+      "@ogw_shared": [
+        "./shared"
+      ],
+      "@ogw_shared/*": [
+        "./shared/*"
+      ],
+      "@ogw_server": [
+        "./server"
+      ],
+      "@ogw_server/*": [
+        "./server/*"
+      ],
+      "#app": [
+        "../../node_modules/nuxt/dist/app"
+      ],
+      "#app/*": [
+        "../../node_modules/nuxt/dist/app/*"
+      ],
+      "vue-demi": [
+        "../../node_modules/nuxt/dist/app/compat/vue-demi"
+      ],
+      "#vue-router": [
+        "../../node_modules/vue-router/vue-router.node.mjs"
+      ],
+      "#unhead/composables": [
+        "../../node_modules/nuxt/dist/head/runtime/composables"
+      ],
+      "#imports": [
+        "./.nuxt/imports"
+      ],
+      "#app-manifest": [
+        "./.nuxt/manifest/meta/f7d5c49d-cdce-4bcc-bfc1-7548759e1038.json"
+      ]
     },
     "moduleResolution": "Bundler",
     "useDefineForClassFields": true,
     "noImplicitThis": true,
     "allowSyntheticDefaultImports": true
   },
-  "include": ["**/*", "./.nuxt/nuxt.d.ts"]
+  "include": [
+    "**/*",
+    "./.nuxt/nuxt.d.ts"
+  ]
 }

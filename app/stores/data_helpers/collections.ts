@@ -123,10 +123,10 @@ export function useDataCollections(): {
   ): Readonly<Ref<CollectionComponentGroup[] | undefined>> {
     return useObservable(
       // Dexie's liveQuery returns its own Observable-like type, not rxjs's Observable, so bridging needs a cast.
-      // oxlint-disable-next-line no-unsafe-type-assertion
       liveQuery(async () => {
         const groups = await formatedCollectionComponents(modelId);
         return groups;
+        // oxlint-disable-next-line no-unsafe-type-assertion
       }) as unknown as Observable<CollectionComponentGroup[]>,
       {
         initialValue: undefined,

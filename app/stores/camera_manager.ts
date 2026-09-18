@@ -31,10 +31,10 @@ export const useCameraManagerStore = defineStore("camera_manager", () => {
     // The two are structurally close enough at runtime (vueuse only calls
     // `.subscribe`) but not identical, hence the cast.
     return useObservable(
-      // oxlint-disable-next-line no-unsafe-type-assertion -- trusted vueuse/Dexie Observable boundary; see comment above.
       liveQuery(async () => {
         const positions = await camera_positions_db.toArray();
         return positions;
+        // oxlint-disable-next-line no-unsafe-type-assertion -- trusted vueuse/Dexie Observable boundary; see comment above.
       }) as unknown as Observable<CameraPositionRecord[]>,
       { initialValue: [] as CameraPositionRecord[] },
     );

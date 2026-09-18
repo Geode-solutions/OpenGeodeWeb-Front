@@ -103,6 +103,8 @@ export const useAppStore = defineStore("app", () => {
       return;
     }
 
+    const missingStoreIds: string[] = [];
+
     await Promise.all(
       stores.map(async (store: Readonly<RegisterableStore>) => {
         if (!store.importStores) {
@@ -110,6 +112,7 @@ export const useAppStore = defineStore("app", () => {
         }
         const storeId = store.$id;
         if (snapshot[storeId] === undefined) {
+          missingStoreIds.push(storeId);
           return;
         }
         try {
@@ -119,6 +122,10 @@ export const useAppStore = defineStore("app", () => {
         }
       }),
     );
+
+    if (missingStoreIds.length > 0) {
+      console.warn(`Stores not found in snapshot: ${missingStoreIds.join(", ")}`);
+    }
   }
 
   const {

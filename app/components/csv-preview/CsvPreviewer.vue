@@ -79,7 +79,7 @@ function autoDetectSeparator(content: string): string {
 
 function parseContent(): string[] {
   if (!rawContent.value) {
-    return;
+    return [];
   }
 
   const allLines = rawContent.value.split(/\r?\n/u).filter((line) => line.trim() !== "");

@@ -62,11 +62,11 @@ export function useModelCommonStyle(): UseModelCommonStyleReturn {
   const dataStore = useDataStore();
   const viewerStore = useViewerStore();
   const dataStyleState = useDataStyleState();
-  // oxlint-disable-next-line no-unsafe-type-assertion -- compound-key table cast; see comment above.
   const model_component_datastyle_db =
+    // oxlint-disable-next-line no-unsafe-type-assertion -- compound-key table cast; see comment above.
     database.model_component_datastyle as unknown as ComponentTable;
-  // oxlint-disable-next-line no-unsafe-type-assertion -- compound-key table cast; see comment above.
   const model_component_type_datastyle_db =
+    // oxlint-disable-next-line no-unsafe-type-assertion -- compound-key table cast; see comment above.
     database.model_component_type_datastyle as unknown as ComponentTypeTable;
 
   async function mutateComponentStyle(

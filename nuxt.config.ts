@@ -24,7 +24,7 @@ const __dirname = import.meta.dirname;
 // Nuxt's conventional folders and would otherwise silently drop internal/,
 // Tests/, etc. from the program). Regenerated on every Nuxt prepare so it
 // Can never drift from what Nuxt actually resolves.
-function remap_path_to_root(target: string, build_dir: string) {
+function remap_path_to_root(target: string, build_dir: string): string {
   const relative = path
     .relative(__dirname, path.resolve(build_dir, target))
     .split(path.sep)
@@ -40,7 +40,7 @@ export default defineNuxtConfig({
       COMMAND_BACK: "opengeodeweb-back",
       COMMAND_VIEWER: "opengeodeweb-viewer",
       NUXT_ROOT_PATH: __dirname,
-      MODE: process.env.MODE || "CLOUD",
+      MODE: process.env.MODE ?? "CLOUD",
       PROJECT: package_json.name,
     },
   },
@@ -159,7 +159,7 @@ export default defineNuxtConfig({
             compilerOptions: { ...tsConfig.compilerOptions, paths: root_paths },
             include: ["**/*", "./.nuxt/nuxt.d.ts"],
           },
-          null,
+          undefined,
           2,
         )}\n`,
       );

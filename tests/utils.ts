@@ -43,7 +43,10 @@ function toHTTPMethod(method: string | undefined): HTTPMethod {
 }
 
 // Narrows a possibly-undefined value (e.g. an array index access) through a real runtime check instead of a non-null assertion.
-function assertDefined<T>(value: T | undefined, message = "Expected value to be defined"): T {
+function assertDefined<TValue>(
+  value: TValue | undefined,
+  message = "Expected value to be defined",
+): TValue {
   if (value === undefined) {
     throw new Error(message);
   }

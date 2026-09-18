@@ -10,7 +10,7 @@ interface ElectronApi {
 }
 
 declare global {
-  // eslint-disable-next-line no-var -- required for global augmentation
+  // oxlint-disable-next-line no-var -- required for global augmentation
   var electronAPI: ElectronApi["electronAPI"];
 }
 

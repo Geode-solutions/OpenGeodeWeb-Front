@@ -6,6 +6,8 @@ const feedbackStore = useFeedbackStore();
 function reload(): void {
   globalThis.location.reload();
 }
+
+defineExpose({ reload });
 </script>
 
 <template>

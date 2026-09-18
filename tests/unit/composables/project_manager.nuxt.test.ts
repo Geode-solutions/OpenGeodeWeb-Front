@@ -16,6 +16,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { exportProject, importProject } from "@ogw_front/composables/project_manager";
 import type { api_fetch as apiFetchType } from "@ogw_internal/utils/api_fetch";
 import { appMode } from "@ogw_shared/app_mode";
+import backSchemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 import { setupActivePinia } from "@ogw_tests/utils";
 
 vi.mock(import("ofetch"), () => ({
@@ -185,8 +186,13 @@ async function respondWithSuccess(
   await onResponse({ request, options: resolvedOptions, response });
 }
 
+const exportProjectBlob = new Blob(["veasecontent"], { type: "application/octet-stream" });
+
 mockedFetch.mockImplementation(async (route, options) => {
-  const data = { snapshot: snapshotMock };
+  const data =
+    route === backSchemas.opengeodeweb_back.export_project.$id
+      ? exportProjectBlob
+      : { snapshot: snapshotMock };
   await respondWithSuccess(options, route, data);
   return data;
 });
@@ -330,7 +336,7 @@ describe("projectManager composable (compact)", () => {
 
     await exportProject();
 
-    expect(fileDownload).toHaveBeenCalledWith({ snapshot: snapshotMock }, "project.vease");
+    expect(fileDownload).toHaveBeenCalledWith(exportProjectBlob, "project.vease");
     expect(feedbackStoreMock.add_success).toHaveBeenCalledWith("Project exported successfully");
   });
 
