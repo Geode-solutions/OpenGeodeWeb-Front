@@ -7,21 +7,7 @@
     "style": "error",
     "restriction": "error"
   },
-  "options": {
-    "typeAware": true,
-    "typeCheck": true
-  },
-  "plugins": [
-    "eslint",
-    "import",
-    "node",
-    "oxc",
-    "promise",
-    "typescript",
-    "unicorn",
-    "vitest",
-    "vue"
-  ],
+  "plugins": ["import", "node", "oxc", "promise", "unicorn", "vitest", "vue"],
   "rules": {
     "eslint/func-style": ["error", "declaration"],
     "eslint/id-length": [
@@ -135,19 +121,6 @@
       "files": ["app/plugins/**", "node_scripts/**", "server/**", "*.config.js"],
       "rules": {
         "import/no-default-export": "off"
-      }
-    },
-    {
-      "files": ["app/components/Viewer/Generic/Model/SurfacesOptions.vue"],
-      "rules": {
-        "max-lines": [
-          "error",
-          {
-            "max": 330,
-            "skipBlankLines": true,
-            "skipComments": true
-          }
-        ]
       }
     },
     {
