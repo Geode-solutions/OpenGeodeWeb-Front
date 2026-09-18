@@ -140,9 +140,7 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
         setName: attributeFn<SetAttributeNameFn>(Block.setModelBlocksPolyhedronAttributeName),
         getRange: attributeFn<AttributeRangeFn>(Block.modelBlocksPolyhedronAttributeRange),
         setRange: attributeFn<SetAttributeRangeFn>(Block.setModelBlocksPolyhedronAttributeRange),
-        getColorMap: attributeFn<AttributeColorMapFn>(
-          Block.modelBlocksPolyhedronAttributeColorMap,
-        ),
+        getColorMap: attributeFn<AttributeColorMapFn>(Block.modelBlocksPolyhedronAttributeColorMap),
         setColorMap: attributeFn<SetAttributeColorMapFn>(
           Block.setModelBlocksPolyhedronAttributeColorMap,
         ),

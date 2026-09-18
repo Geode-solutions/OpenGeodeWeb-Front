@@ -57,10 +57,7 @@ export function useModelLinesStyle(): ReturnType<typeof useModelLinesCommonStyle
     );
   }
 
-  async function applyModelLinesColoringStyle(
-    modelId: string,
-    lines_ids: string[],
-  ): Promise<void> {
+  async function applyModelLinesColoringStyle(modelId: string, lines_ids: string[]): Promise<void> {
     const activeColoringGroups: Record<string, string[]> = {};
     for (const line_id of lines_ids) {
       const activeColoring = String(modelColorStyle.modelLineActiveColoring(modelId, line_id));

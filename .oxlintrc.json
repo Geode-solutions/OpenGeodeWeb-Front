@@ -7,23 +7,22 @@
     "style": "error",
     "restriction": "error"
   },
-  "options": {
-    "typeAware": true,
-    "typeCheck": true
-  },
-  "plugins": [
-    "eslint",
-    "import",
-    "node",
-    "oxc",
-    "promise",
-    "typescript",
-    "unicorn",
-    "vitest",
-    "vue"
-  ],
+  "plugins": ["import", "node", "oxc", "promise", "unicorn", "vitest", "vue"],
   "rules": {
+    "unicorn/filename-case": [
+      "error",
+      {
+        "case": "snakeCase"
+      }
+    ],
     "eslint/func-style": ["error", "declaration"],
+    "eslint/sort-keys": "off",
+    "eslint/no-ternary": "off", // A utiliser pour des opérations simples
+    "unicorn/prefer-ternary": "off",
+    "oxc/no-async-await": "off",
+    "one-var": ["error", "never"],
+    "oxc/no-rest-spread-properties": "off", // Enable if older browser support is needed
+    "eslint/max-statements": ["warn", 20],
     "eslint/id-length": [
       "error",
       {
@@ -31,32 +30,15 @@
         "min": 3
       }
     ],
-    "eslint/max-statements": ["warn", 20],
     "eslint/no-console": "warn", // Disable for debugging. Disable later to not have browser logs
-    "eslint/no-magic-numbers": [
+    "sort-imports": [
       "error",
       {
-        "ignore": [-1, 0, 1, 2, 3, 4],
-        "ignoreArrayIndexes": true
+        "allowSeparatedGroups": true
       }
     ],
-    "eslint/no-ternary": "off", // A utiliser pour des opérations simples
     "eslint/no-undefined": "off", // Conflict with unicorn/no-typeof-undefined which prefers direct undefined comparison
-    "eslint/no-void": "off", // Conflicts with typescript/no-floating-promises, whose fix for fire-and-forget promises is the void operator
-    "eslint/no-underscore-dangle": [
-      "error",
-      {
-        "allow": ["_data", "__dirname", "__VEASE_UTILS__", "__VEASE_STORES__", "__VEASE_SCHEMAS__"]
-      }
-    ],
-    "eslint/sort-keys": "off",
-    "import/consistent-type-specifier-style": ["error", "prefer-top-level-if-only-type-imports"],
-    "import/max-dependencies": [
-      "warn",
-      {
-        "max": 10
-      }
-    ],
+    "import/prefer-default-export": "off",
     "import/no-named-export": "off",
     "import/no-namespace": [
       "error",
@@ -64,15 +46,10 @@
         "ignore": ["vuetify/*"]
       }
     ],
-    "import/no-nodejs-modules": "off",
-    "import/prefer-default-export": "off",
-    "import/unambiguous": "off",
-    "max-lines": [
-      "error",
+    "import/max-dependencies": [
+      "warn",
       {
-        "max": 310,
-        "skipBlankLines": true,
-        "skipComments": true
+        "max": 10
       }
     ],
     "max-lines-per-function": [
@@ -83,39 +60,45 @@
         "skipComments": true
       }
     ],
+    "unicorn/no-useless-undefined": "off",
+    "max-lines": [
+      "error",
+      {
+        "max": 310,
+        "skipBlankLines": true,
+        "skipComments": true
+      }
+    ],
+    "vue/max-props": [
+      "error",
+      {
+        "maxProps": 8
+      }
+    ],
+    "oxc/no-optional-chaining": "off",
+    "node/no-process-env": "off",
+    "no-continue": "off",
+    "vitest/require-hook": "off",
+    "import/unambiguous": "off",
+    "node/no-sync": "off",
     "max-params": [
       "warn",
       {
         "max": 4
       }
     ],
-    "no-continue": "off",
-    "node/no-process-env": "off",
-    "node/no-sync": "off",
-    "one-var": ["error", "never"],
-    "typescript/prefer-readonly-parameter-types": "off",
-    "oxc/no-async-await": "off",
-    "oxc/no-optional-chaining": "off",
-    "oxc/no-rest-spread-properties": "off", // Enable if older browser support is needed
-    "sort-imports": [
+    "import/no-nodejs-modules": "off",
+    "eslint/no-magic-numbers": [
       "error",
       {
-        "allowSeparatedGroups": true
+        "ignore": [-1, 0, 1, 2, 3, 4],
+        "ignoreArrayIndexes": true
       }
     ],
-    "unicorn/filename-case": [
+    "eslint/no-underscore-dangle": [
       "error",
       {
-        "case": "snakeCase"
-      }
-    ],
-    "unicorn/no-useless-undefined": "off",
-    "unicorn/prefer-ternary": "off",
-    "vitest/require-hook": "off",
-    "vue/max-props": [
-      "error",
-      {
-        "maxProps": 8
+        "allow": ["_data", "__dirname", "__VEASE_UTILS__", "__VEASE_STORES__", "__VEASE_SCHEMAS__"]
       }
     ]
   },
@@ -140,21 +123,21 @@
     {
       "files": ["tests/**"],
       "rules": {
-        "jest/consistent-test-it": "off",
+        "vitest/require-hook": "off",
+        "vitest/no-hooks": "off",
         "jest/no-hooks": "off",
-        "jest/prefer-expect-assertions": "off",
+        "vitest/no-importing-vitest-globals": "off",
         "max-lines-per-function": "off",
         "max-statements": "off",
-        "vitest/consistent-test-it": ["error", { "fn": "test", "withinDescribe": "test" }],
-        "vitest/no-hooks": "off",
-        "vitest/no-importing-vitest-globals": "off",
-        "vitest/prefer-expect-assertions": "off",
-        "vitest/prefer-importing-vitest-globals": "off",
-        "vitest/prefer-spy-on": "off",
-        "vitest/prefer-to-be-falsy": "off",
         "vitest/prefer-to-be-truthy": "off",
-        "vitest/require-hook": "off",
-        "vitest/require-test-timeout": "warn"
+        "vitest/prefer-to-be-falsy": "off",
+        "vitest/require-test-timeout": "warn",
+        "vitest/prefer-importing-vitest-globals": "off",
+        "jest/consistent-test-it": "off",
+        "vitest/consistent-test-it": ["error", { "fn": "test", "withinDescribe": "test" }],
+        "vitest/prefer-spy-on": "off",
+        "vitest/prefer-expect-assertions": "off",
+        "jest/prefer-expect-assertions": "off"
       }
     },
     {

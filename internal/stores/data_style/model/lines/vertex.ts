@@ -52,16 +52,49 @@ function isModelLinesVertexAttributeValid({
 interface UseModelLinesVertexAttributeReturn {
   modelLinesVertexAttributeName: (modelId: string, lineId?: string) => string | undefined;
   modelLinesVertexAttributeItem: (modelId: string, lineId?: string) => number;
-  modelLinesVertexAttributeRange: (modelId: string, lineId?: string) => [number | undefined, number | undefined];
+  modelLinesVertexAttributeRange: (
+    modelId: string,
+    lineId?: string,
+  ) => [number | undefined, number | undefined];
   modelLinesVertexAttributeColorMap: (modelId: string, lineId?: string) => string | undefined;
-  modelLinesVertexAttributeStoredConfig: (modelId: string, lineId: string | undefined, name: string | undefined, item: number | undefined) => AttributeStoredConfig;
-  setModelLinesVertexAttribute: (modelId: string, lineIds: string[], input: AttributeInput) => Promise<unknown>;
-  setModelLinesVertexAttributeName: (modelId: string, lineIds: string[], name: string) => Promise<unknown>;
-  setModelLinesVertexAttributeItem: (modelId: string, lineIds: string[], item: number) => Promise<unknown>;
-  setModelLinesVertexAttributeRange: (modelId: string, lineIds: string[], minimum: number, maximum: number) => Promise<unknown>;
-  setModelLinesVertexAttributeColorMap: (modelId: string, lineIds: string[], colorMap: string | undefined) => Promise<unknown>;
+  modelLinesVertexAttributeStoredConfig: (
+    modelId: string,
+    lineId: string | undefined,
+    name: string | undefined,
+    item: number | undefined,
+  ) => AttributeStoredConfig;
+  setModelLinesVertexAttribute: (
+    modelId: string,
+    lineIds: string[],
+    input: AttributeInput,
+  ) => Promise<unknown>;
+  setModelLinesVertexAttributeName: (
+    modelId: string,
+    lineIds: string[],
+    name: string,
+  ) => Promise<unknown>;
+  setModelLinesVertexAttributeItem: (
+    modelId: string,
+    lineIds: string[],
+    item: number,
+  ) => Promise<unknown>;
+  setModelLinesVertexAttributeRange: (
+    modelId: string,
+    lineIds: string[],
+    minimum: number,
+    maximum: number,
+  ) => Promise<unknown>;
+  setModelLinesVertexAttributeColorMap: (
+    modelId: string,
+    lineIds: string[],
+    colorMap: string | undefined,
+  ) => Promise<unknown>;
   modelLinesVertexAttributeNoDataColor: (modelId: string, lineId?: string) => unknown;
-  setModelLinesVertexAttributeNoDataColor: (modelId: string, lineIds: string[], no_data_color: unknown) => Promise<unknown>;
+  setModelLinesVertexAttributeNoDataColor: (
+    modelId: string,
+    lineIds: string[],
+    no_data_color: unknown,
+  ) => Promise<unknown>;
 }
 
 // oxlint-disable-next-line max-lines-per-function

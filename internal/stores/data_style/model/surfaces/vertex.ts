@@ -150,7 +150,10 @@ function useModelSurfacesVertexAttribute(): UseModelSurfacesVertexAttributeRetur
       storedConfigs: { [name ?? ""]: { lastItem: item, [item ?? 0]: config } },
     });
   }
-  function modelSurfacesVertexAttributeName(modelId: string, surfaceId?: string): string | undefined {
+  function modelSurfacesVertexAttributeName(
+    modelId: string,
+    surfaceId?: string,
+  ): string | undefined {
     return modelSurfacesVertexAttribute(modelId, surfaceId).name;
   }
   function modelSurfacesVertexAttributeLastItem(
@@ -182,7 +185,10 @@ function useModelSurfacesVertexAttribute(): UseModelSurfacesVertexAttributeRetur
     const { minimum, maximum } = storedConfig;
     return [minimum, maximum];
   }
-  function modelSurfacesVertexAttributeColorMap(modelId: string, surfaceId?: string): string | undefined {
+  function modelSurfacesVertexAttributeColorMap(
+    modelId: string,
+    surfaceId?: string,
+  ): string | undefined {
     const name = modelSurfacesVertexAttributeName(modelId, surfaceId);
     const item = modelSurfacesVertexAttributeItem(modelId, surfaceId);
     const storedConfig = modelSurfacesVertexAttributeStoredConfig(modelId, surfaceId, name, item);
@@ -191,7 +197,14 @@ function useModelSurfacesVertexAttribute(): UseModelSurfacesVertexAttributeRetur
   async function setModelSurfacesVertexAttribute(
     modelId: string,
     surfaceIds: string[],
-    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR }: AttributeInput,
+    {
+      name,
+      item,
+      minimum,
+      maximum,
+      colorMap,
+      no_data_color = DEFAULT_NO_DATA_COLOR,
+    }: AttributeInput,
   ): Promise<unknown> {
     await mutateModelSurfacesVertexStyle(modelId, surfaceIds, { name, item });
     await setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, item, {
@@ -218,7 +231,12 @@ function useModelSurfacesVertexAttribute(): UseModelSurfacesVertexAttributeRetur
   async function applyVertexAttribute(modelId: string, surfaceIds: string[]): Promise<unknown> {
     const name = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
     const item = modelSurfacesVertexAttributeItem(modelId, surfaceIds[0]);
-    const storedConfig = modelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds[0], name, item);
+    const storedConfig = modelSurfacesVertexAttributeStoredConfig(
+      modelId,
+      surfaceIds[0],
+      name,
+      item,
+    );
     const attribute: AttributeInput = {
       name,
       item,
@@ -293,7 +311,12 @@ function useModelSurfacesVertexAttribute(): UseModelSurfacesVertexAttributeRetur
   ): Promise<unknown> {
     const name = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
     const item = modelSurfacesVertexAttributeItem(modelId, surfaceIds[0]);
-    const storedConfig = modelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds[0], name, item);
+    const storedConfig = modelSurfacesVertexAttributeStoredConfig(
+      modelId,
+      surfaceIds[0],
+      name,
+      item,
+    );
     await setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, item, {
       ...storedConfig,
       no_data_color,

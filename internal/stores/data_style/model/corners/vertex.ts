@@ -184,7 +184,14 @@ function useModelCornersVertexAttribute(): ModelCornersVertexAttributeApi {
   async function setModelCornersVertexAttribute(
     modelId: string,
     cornerIds: string[],
-    { name, item, minimum, maximum, colorMap, no_data_color = DEFAULT_NO_DATA_COLOR }: AttributeInput,
+    {
+      name,
+      item,
+      minimum,
+      maximum,
+      colorMap,
+      no_data_color = DEFAULT_NO_DATA_COLOR,
+    }: AttributeInput,
   ): Promise<unknown> {
     await mutateModelCornersVertexStyle(modelId, cornerIds, { name, item });
     await setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, item, {

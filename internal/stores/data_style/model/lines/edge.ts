@@ -52,16 +52,49 @@ function isModelLinesEdgeAttributeValid({
 interface UseModelLinesEdgeAttributeReturn {
   modelLinesEdgeAttributeName: (modelId: string, lineId?: string) => string | undefined;
   modelLinesEdgeAttributeItem: (modelId: string, lineId?: string) => number;
-  modelLinesEdgeAttributeRange: (modelId: string, lineId?: string) => [number | undefined, number | undefined];
+  modelLinesEdgeAttributeRange: (
+    modelId: string,
+    lineId?: string,
+  ) => [number | undefined, number | undefined];
   modelLinesEdgeAttributeColorMap: (modelId: string, lineId?: string) => string | undefined;
-  modelLinesEdgeAttributeStoredConfig: (modelId: string, lineId: string | undefined, name: string | undefined, item: number | undefined) => AttributeStoredConfig;
-  setModelLinesEdgeAttribute: (modelId: string, lineIds: string[], input: AttributeInput) => Promise<unknown>;
-  setModelLinesEdgeAttributeName: (modelId: string, lineIds: string[], name: string) => Promise<unknown>;
-  setModelLinesEdgeAttributeItem: (modelId: string, lineIds: string[], item: number) => Promise<unknown>;
-  setModelLinesEdgeAttributeRange: (modelId: string, lineIds: string[], minimum: number, maximum: number) => Promise<unknown>;
-  setModelLinesEdgeAttributeColorMap: (modelId: string, lineIds: string[], colorMap: string | undefined) => Promise<unknown>;
+  modelLinesEdgeAttributeStoredConfig: (
+    modelId: string,
+    lineId: string | undefined,
+    name: string | undefined,
+    item: number | undefined,
+  ) => AttributeStoredConfig;
+  setModelLinesEdgeAttribute: (
+    modelId: string,
+    lineIds: string[],
+    input: AttributeInput,
+  ) => Promise<unknown>;
+  setModelLinesEdgeAttributeName: (
+    modelId: string,
+    lineIds: string[],
+    name: string,
+  ) => Promise<unknown>;
+  setModelLinesEdgeAttributeItem: (
+    modelId: string,
+    lineIds: string[],
+    item: number,
+  ) => Promise<unknown>;
+  setModelLinesEdgeAttributeRange: (
+    modelId: string,
+    lineIds: string[],
+    minimum: number,
+    maximum: number,
+  ) => Promise<unknown>;
+  setModelLinesEdgeAttributeColorMap: (
+    modelId: string,
+    lineIds: string[],
+    colorMap: string | undefined,
+  ) => Promise<unknown>;
   modelLinesEdgeAttributeNoDataColor: (modelId: string, lineId?: string) => unknown;
-  setModelLinesEdgeAttributeNoDataColor: (modelId: string, lineIds: string[], no_data_color: unknown) => Promise<unknown>;
+  setModelLinesEdgeAttributeNoDataColor: (
+    modelId: string,
+    lineIds: string[],
+    no_data_color: unknown,
+  ) => Promise<unknown>;
 }
 
 // oxlint-disable-next-line max-lines-per-function
@@ -143,8 +176,7 @@ function useModelLinesEdgeAttribute(): UseModelLinesEdgeAttributeReturn {
   function modelLinesEdgeAttributeItem(modelId: string, lineId?: string): number {
     const edgeAttribute = modelLinesEdgeAttribute(modelId, lineId);
     return (
-      edgeAttribute.item ??
-      modelLinesEdgeAttributeLastItem(modelId, lineId, edgeAttribute.name)
+      edgeAttribute.item ?? modelLinesEdgeAttributeLastItem(modelId, lineId, edgeAttribute.name)
     );
   }
   function modelLinesEdgeAttributeRange(
