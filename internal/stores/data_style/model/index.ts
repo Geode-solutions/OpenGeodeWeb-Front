@@ -1,3 +1,4 @@
+import type { ComputedRef } from "vue";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useModelBlocksStyle } from "./blocks";
@@ -10,8 +11,21 @@ import { useModelSelection } from "./selection";
 import { useModelSurfacesStyle } from "./surfaces";
 import { useModelVisibilityStyle } from "./visibility";
 
+type UseModelStyleReturn = ReturnType<typeof useModelColorStyle> &
+  ReturnType<typeof useModelVisibilityStyle> &
+  ReturnType<typeof useModelBlocksStyle> &
+  ReturnType<typeof useModelCornersStyle> &
+  ReturnType<typeof useModelEdgesStyle> &
+  ReturnType<typeof useModelLinesStyle> &
+  ReturnType<typeof useModelPointsStyle> &
+  ReturnType<typeof useModelSurfacesStyle> & {
+    visibleMeshComponents: (modelId: string) => ComputedRef<string[]>;
+    applyModelStyle: (modelId: string) => Promise<unknown[]>;
+    setModelMeshComponentsDefaultStyle: (modelId: string) => Promise<unknown[]>;
+  };
+
 // oxlint-disable-next-line max-lines-per-function, max-statements
-function useModelStyle() {
+function useModelStyle(): UseModelStyleReturn {
   const dataStore = useDataStore();
   const dataStyleState = useDataStyleState();
   const modelCornersStyle = useModelCornersStyle();
@@ -31,15 +45,15 @@ function useModelStyle() {
   const modelColorStyle = useModelColorStyle(componentStyleFunctions);
   const modelVisibilityStyle = useModelVisibilityStyle(componentStyleFunctions);
 
-  function visibleMeshComponents(modelId: string) {
+  function visibleMeshComponents(modelId: string): ComputedRef<string[]> {
     return useModelSelection(modelId, dataStyleState);
   }
 
-  async function applyModelStyle(modelId: string) {
+  async function applyModelStyle(modelId: string): Promise<unknown[]> {
     const style = dataStyleState.getStyle(modelId);
 
-    return Promise.all([
-      modelVisibilityStyle.setModelVisibility(modelId, style.visibility!),
+    const results = await Promise.all([
+      modelVisibilityStyle.setModelVisibility(modelId, style.visibility ?? false),
       modelBlocksStyle.applyModelBlocksStyle(modelId),
       modelSurfacesStyle.applyModelSurfacesStyle(modelId),
       modelLinesStyle.applyModelLinesStyle(modelId),
@@ -47,16 +61,18 @@ function useModelStyle() {
       modelPointsStyle.applyModelPointsStyle(modelId),
       modelEdgesStyle.applyModelEdgesStyle(modelId),
     ]);
+    return results;
   }
 
-  async function setModelMeshComponentsDefaultStyle(modelId: string) {
+  async function setModelMeshComponentsDefaultStyle(modelId: string): Promise<unknown[]> {
     await dataStore.item(modelId);
-    return Promise.all([
+    const results = await Promise.all([
       modelBlocksStyle.setModelBlocksDefaultStyle(modelId),
       modelSurfacesStyle.setModelSurfacesDefaultStyle(modelId),
       modelLinesStyle.setModelLinesDefaultStyle(modelId),
       modelCornersStyle.setModelCornersDefaultStyle(modelId),
     ]);
+    return results;
   }
 
   return {

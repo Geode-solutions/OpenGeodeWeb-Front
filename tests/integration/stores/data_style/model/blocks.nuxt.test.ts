@@ -7,6 +7,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 import { beforeAllTimeout, setupIntegrationTests } from "@ogw_tests/integration/setup";
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 import { Status } from "@ogw_front/utils/status";
+import { assertDefined } from "@ogw_tests/utils";
 import { cleanupBackend } from "@ogw_server/utils/cleanup";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -20,9 +21,9 @@ const SLEEP_MS = 200;
 const MINIMUM_RANGE = 10;
 const MAXIMUM_RANGE = 20;
 
-async function sleep(milliseconds: number) {
+async function sleep(milliseconds: number): Promise<void> {
   // oxlint-disable-next-line promise/avoid-new
-  return new Promise((resolve) => {
+  await new Promise<void>((resolve) => {
     setTimeout(resolve, milliseconds);
   });
 }
@@ -59,6 +60,7 @@ describe("model blocks", () => {
       expect(spy).toHaveBeenCalledWith(
         { schema, params },
         {
+          // oxlint-disable-next-line no-unsafe-assignment -- expect.any(Function) is untyped by design, this is a vitest matcher not a real callback.
           response_function: expect.any(Function),
         },
       );
@@ -85,6 +87,7 @@ describe("model blocks", () => {
       expect(spy).toHaveBeenCalledWith(
         { schema, params },
         {
+          // oxlint-disable-next-line no-unsafe-assignment -- expect.any(Function) is untyped by design, this is a vitest matcher not a real callback.
           response_function: expect.any(Function),
         },
       );
@@ -129,10 +132,9 @@ describe("model blocks", () => {
       );
       await dataStyleStore.setModelBlocksVertexAttributeColorMap(id, block_ids, "budaS");
       await sleep(SLEEP_MS);
-      const [lastCall] = spy.mock.calls.slice(-1);
-      expect(lastCall).toBeDefined();
-      expect(lastCall![0].schema).toStrictEqual(model_blocks_schemas.attribute.vertex.attribute);
-      expect(lastCall![0].params).toStrictEqual(
+      const lastCall = assertDefined(spy.mock.calls.at(-1));
+      expect(lastCall[0].schema).toStrictEqual(model_blocks_schemas.attribute.vertex.attribute);
+      expect(lastCall[0].params).toStrictEqual(
         expect.objectContaining({
           id,
           block_ids: block_viewer_ids,
@@ -150,7 +152,7 @@ describe("model blocks", () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
       const block_ids = await dataStore.getBlocksGeodeIds(id);
-      const block_id = block_ids[0]!;
+      const block_id = assertDefined(block_ids[0]);
       await dataStyleStore.setModelBlocksVertexAttributeName(id, block_ids, "points");
       await dataStyleStore.setModelBlocksVertexAttributeItem(id, block_ids, 2);
       expect(dataStyleStore.modelBlocksVertexAttributeName(id, block_id)).toBe("points");
@@ -161,7 +163,7 @@ describe("model blocks", () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
       const block_ids = await dataStore.getBlocksGeodeIds(id);
-      const block_id = block_ids[0]!;
+      const block_id = assertDefined(block_ids[0]);
       await dataStyleStore.setModelBlocksVertexAttributeRange(
         id,
         block_ids,
@@ -181,7 +183,7 @@ describe("model blocks", () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
       const block_ids = await dataStore.getBlocksGeodeIds(id);
-      const block_id = block_ids[0]!;
+      const block_id = assertDefined(block_ids[0]);
       await dataStyleStore.setModelBlocksVertexAttributeName(id, block_ids, "unique_vertices");
       await dataStyleStore.setModelBlocksVertexAttributeItem(id, block_ids, 0);
       expect(dataStyleStore.modelBlocksVertexAttributeName(id, block_id)).toBe("unique_vertices");
@@ -192,7 +194,7 @@ describe("model blocks", () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
       const block_ids = await dataStore.getBlocksGeodeIds(id);
-      const block_id = block_ids[0]!;
+      const block_id = assertDefined(block_ids[0]);
       await dataStyleStore.setModelBlocksVertexAttributeName(id, block_ids, "points");
       expect(dataStyleStore.modelBlocksVertexAttributeName(id, block_id)).toBe("points");
       expect(dataStyleStore.modelBlocksVertexAttributeItem(id, block_id)).toBe(2);
@@ -247,12 +249,9 @@ describe("model blocks", () => {
       );
       await dataStyleStore.setModelBlocksPolyhedronAttributeColorMap(id, block_ids, "budaS");
       await sleep(SLEEP_MS);
-      const [lastCall] = spy.mock.calls.slice(-1);
-      expect(lastCall).toBeDefined();
-      expect(lastCall![0].schema).toStrictEqual(
-        model_blocks_schemas.attribute.polyhedron.attribute,
-      );
-      expect(lastCall![0].params).toStrictEqual(
+      const lastCall = assertDefined(spy.mock.calls.at(-1));
+      expect(lastCall[0].schema).toStrictEqual(model_blocks_schemas.attribute.polyhedron.attribute);
+      expect(lastCall[0].params).toStrictEqual(
         expect.objectContaining({
           id,
           block_ids: block_viewer_ids,
@@ -270,7 +269,7 @@ describe("model blocks", () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
       const block_ids = await dataStore.getBlocksGeodeIds(id);
-      const block_id = block_ids[0]!;
+      const block_id = assertDefined(block_ids[0]);
       await dataStyleStore.setModelBlocksPolyhedronAttributeName(
         id,
         block_ids,
@@ -287,7 +286,7 @@ describe("model blocks", () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
       const block_ids = await dataStore.getBlocksGeodeIds(id);
-      const block_id = block_ids[0]!;
+      const block_id = assertDefined(block_ids[0]);
       await dataStyleStore.setModelBlocksPolyhedronAttributeRange(
         id,
         block_ids,
@@ -307,7 +306,7 @@ describe("model blocks", () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
       const block_ids = await dataStore.getBlocksGeodeIds(id);
-      const block_id = block_ids[0]!;
+      const block_id = assertDefined(block_ids[0]);
       await dataStyleStore.setModelBlocksPolyhedronAttributeName(
         id,
         block_ids,
@@ -324,7 +323,7 @@ describe("model blocks", () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
       const block_ids = await dataStore.getBlocksGeodeIds(id);
-      const block_id = block_ids[0]!;
+      const block_id = assertDefined(block_ids[0]);
       await dataStyleStore.setModelBlocksPolyhedronAttributeName(
         id,
         block_ids,
@@ -359,7 +358,7 @@ describe("model blocks", () => {
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();
       const block_ids = await dataStore.getBlocksGeodeIds(id);
-      const block_id = block_ids[0]!;
+      const block_id = assertDefined(block_ids[0]);
       const coloringName = "constant";
       const result = dataStyleStore.setModelComponentActiveColoring(id, block_id, coloringName);
       expect(result).toBeInstanceOf(Promise);
@@ -373,7 +372,7 @@ describe("model blocks", () => {
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();
       const block_ids = await dataStore.getBlocksGeodeIds(id);
-      const block_id = block_ids[0]!;
+      const block_id = assertDefined(block_ids[0]);
       await dataStyleStore.setModelBlocksVertexAttributeName(id, [block_id], "points");
       const coloringName = "vertex";
       const result = dataStyleStore.setModelComponentActiveColoring(id, block_id, coloringName);
@@ -388,7 +387,7 @@ describe("model blocks", () => {
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();
       const block_ids = await dataStore.getBlocksGeodeIds(id);
-      const block_id = block_ids[0]!;
+      const block_id = assertDefined(block_ids[0]);
       await dataStyleStore.setModelBlocksPolyhedronAttributeName(id, [block_id], "test_attribute");
       const coloringName = "polyhedron";
       const result = dataStyleStore.setModelComponentActiveColoring(id, block_id, coloringName);

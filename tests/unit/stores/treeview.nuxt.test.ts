@@ -5,6 +5,16 @@ import { beforeEach, describe, expect, expectTypeOf, test } from "vitest";
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
+function sortByTitle(
+  itemA: Readonly<{ title: string }>,
+  itemB: Readonly<{ title: string }>,
+): number {
+  return itemA.title.localeCompare(itemB.title, undefined, {
+    numeric: true,
+    sensitivity: "base",
+  });
+}
+
 describe("treeview store state", () => {
   beforeEach(() => {
     setupActivePinia();
@@ -48,11 +58,11 @@ describe("treeview store actions", () => {
         testItem.viewer_type,
       );
       const itemsCopy = [...treeviewStore.items];
-      expect(treeviewStore.items).toStrictEqual(itemsCopy.toSorted());
+      expect(treeviewStore.items).toStrictEqual(itemsCopy.toSorted(sortByTitle));
 
       for (const item of treeviewStore.items) {
         const childrenCopy = [...item.children];
-        expect(item.children).toStrictEqual(childrenCopy.toSorted());
+        expect(item.children).toStrictEqual(childrenCopy.toSorted(sortByTitle));
       }
     }
     expect(treeviewStore.selection).toHaveLength(testItems.length);

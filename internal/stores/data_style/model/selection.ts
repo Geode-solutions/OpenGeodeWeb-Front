@@ -1,4 +1,5 @@
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
+import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import type { Table } from "dexie";
 import { database } from "@ogw_internal/database/database";
 import type { useDataStyleState } from "@ogw_internal/stores/data_style/state";
@@ -11,6 +12,7 @@ interface ModelComponentRecord {
 
 type DataStyleState = ReturnType<typeof useDataStyleState>;
 
+// oxlint-disable-next-line no-unsafe-type-assertion -- trusted Dexie table boundary; see other database table casts in this codebase.
 const model_components_db = database.model_components as unknown as Table<
   ModelComponentRecord,
   string
@@ -23,8 +25,9 @@ function groupComponentsByType(
     MESH_COMPONENT_TYPES.map((componentType) => [componentType, []]),
   );
   for (const component of components) {
-    if (componentsByType[component.type] !== undefined) {
-      componentsByType[component.type].push(component);
+    const list = componentsByType[component.type];
+    if (list !== undefined) {
+      list.push(component);
     }
   }
   return componentsByType;
@@ -45,18 +48,24 @@ function computeTypeSelection(
   const typeKey = `${componentType.toLowerCase()}s`;
   const typeStyleKey = `${modelId}_${componentType}`;
   const typeStyle = dataStyleState.modelComponentTypeStyles.value[typeStyleKey];
+  // oxlint-disable-next-line no-unsafe-type-assertion -- dynamically-keyed lookup into StyleValues; see other database/style casts in this codebase.
+  const groupTypeStyle = (groupStyles as unknown as Record<string, StyleValues | undefined>)[
+    typeKey
+  ];
   const defaultVisibility =
+    // oxlint-disable-next-line no-unsafe-type-assertion -- visibility field is defined by the data style schema.
     (typeStyle?.visibility as boolean | undefined) ??
-    (groupStyles[typeKey]?.visibility as boolean | undefined) ??
+    // oxlint-disable-next-line no-unsafe-type-assertion -- visibility field is defined by the data style schema.
+    (groupTypeStyle?.visibility as boolean | undefined) ??
     true;
 
   const selection: string[] = [];
   let allVisible = true;
   for (const component of typeComponents) {
     const styleKey = `${modelId}_${component.geode_id}`;
-    const isVisible =
-      (dataStyleState.componentStyles.value[styleKey]?.visibility as boolean | undefined) ??
-      defaultVisibility;
+    const componentStyle = dataStyleState.componentStyles.value[styleKey];
+    // oxlint-disable-next-line no-unsafe-type-assertion -- visibility field is defined by the data style schema.
+    const isVisible = (componentStyle?.visibility as boolean | undefined) ?? defaultVisibility;
     if (isVisible) {
       selection.push(component.geode_id);
     } else {
@@ -80,7 +89,7 @@ function buildSelection(
 
   const selection: string[] = [];
   for (const componentType of MESH_COMPONENT_TYPES) {
-    const typeComponents = componentsByType[componentType];
+    const typeComponents = componentsByType[componentType] ?? [];
     if (typeComponents.length === 0) {
       continue;
     }

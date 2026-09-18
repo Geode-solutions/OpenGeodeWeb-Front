@@ -53,16 +53,21 @@ export function useModelSurfacesStyle(): UseModelSurfacesStyleReturn {
       visibilityGroups[visibility].push(surfaces_id);
     }
     await Promise.all(
-      Object.entries(visibilityGroups).map(([visibility, ids]) =>
-        modelVisibilityStyle.setModelSurfacesVisibility(modelId, ids, visibility === "true"),
-      ),
+      Object.entries(visibilityGroups).map(async ([visibility, ids]) => {
+        const result = await modelVisibilityStyle.setModelSurfacesVisibility(
+          modelId,
+          ids,
+          visibility === "true",
+        );
+        return result;
+      }),
     );
   }
 
   async function applyModelSurfacesColoringStyle(
     modelId: string,
     surfaces_ids: string[],
-  ): Promise<void> {
+  ): Promise<unknown[]> {
     const activeColoringGroups: Record<string, string[]> = {};
     for (const surfaces_id of surfaces_ids) {
       const activeColoring = String(
@@ -84,9 +89,15 @@ export function useModelSurfacesStyle(): UseModelSurfacesStyleReturn {
           colorGroups[color_key].surfaces_ids.push(surfaces_id);
         }
         coloringPromises.push(
-          ...Object.values(colorGroups).map(({ color, surfaces_ids: ids }) =>
-            modelColorStyle.setModelSurfacesColor(modelId, ids, color, "constant"),
-          ),
+          ...Object.values(colorGroups).map(async ({ color, surfaces_ids: ids }) => {
+            const result = await modelColorStyle.setModelSurfacesColor(
+              modelId,
+              ids,
+              color,
+              "constant",
+            );
+            return result;
+          }),
         );
       } else if (type === "random") {
         coloringPromises.push(
@@ -128,14 +139,20 @@ export function useModelSurfacesStyle(): UseModelSurfacesStyleReturn {
         }
         coloringPromises.push(
           ...Object.values(vertexGroups).map(
-            ({ name, item, minimum, maximum, colorMap, surfaces_ids: ids }) =>
-              modelSurfacesVertexAttribute.setModelSurfacesVertexAttribute(modelId, ids, {
-                name,
-                item,
-                minimum,
-                maximum,
-                colorMap,
-              }),
+            async ({ name, item, minimum, maximum, colorMap, surfaces_ids: ids }) => {
+              const result = await modelSurfacesVertexAttribute.setModelSurfacesVertexAttribute(
+                modelId,
+                ids,
+                {
+                  name,
+                  item,
+                  minimum,
+                  maximum,
+                  colorMap,
+                },
+              );
+              return result;
+            },
           ),
         );
       } else if (type === "polygon") {
@@ -172,22 +189,29 @@ export function useModelSurfacesStyle(): UseModelSurfacesStyleReturn {
         }
         coloringPromises.push(
           ...Object.values(polygonGroups).map(
-            async ({ name, item, minimum, maximum, colorMap, surfaces_ids: ids }) =>
-              modelSurfacesPolygonAttribute.setModelSurfacesPolygonAttribute(modelId, ids, {
-                name,
-                item,
-                minimum,
-                maximum,
-                colorMap,
-              }),
+            async ({ name, item, minimum, maximum, colorMap, surfaces_ids: ids }) => {
+              const result = await modelSurfacesPolygonAttribute.setModelSurfacesPolygonAttribute(
+                modelId,
+                ids,
+                {
+                  name,
+                  item,
+                  minimum,
+                  maximum,
+                  colorMap,
+                },
+              );
+              return result;
+            },
           ),
         );
       }
     }
-    return Promise.all(coloringPromises);
+    const results = await Promise.all(coloringPromises);
+    return results;
   }
 
-  async function applyModelSurfacesStyle(modelId: string) {
+  async function applyModelSurfacesStyle(modelId: string): Promise<void> {
     const surfaces_ids = await dataStore.getSurfacesGeodeIds(modelId);
     if (surfaces_ids.length === 0) {
       return;

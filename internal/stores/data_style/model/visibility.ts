@@ -16,6 +16,17 @@ interface ModelComponent {
   type: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function callComponentStyleFunction(
+  target: any,
+  method: string,
+  ...args: unknown[]
+): Promise<unknown> {
+  // oxlint-disable-next-line no-unsafe-call, no-unsafe-member-access, no-unsafe-argument, no-unsafe-assignment -- ComponentStyleFunctions is deliberately dynamically typed; see comment above.
+  const result = await target[method](...args);
+  return result;
+}
+
 const model_schemas = viewer_schemas.opengeodeweb_viewer.model;
 async function getModelComponentsMap(
   modelId: string,
@@ -54,15 +65,17 @@ async function dispatchToComponentTypes(
   };
   for (const id of componentIds) {
     const type = componentsMap[id]?.type;
-    if (type && type in idsByComponent) {
-      (idsByComponent as Record<string, string[]>)[type].push(id);
+    if (type !== undefined && type in idsByComponent) {
+      (idsByComponent as Record<string, string[]>)[type]?.push(id);
     }
   }
   const promises: Promise<unknown>[] = [];
   if (action === "Visibility") {
     if (idsByComponent.Block.length > 0) {
       promises.push(
-        componentStyleFunctions.Block.setModelBlocksVisibility(
+        callComponentStyleFunction(
+          componentStyleFunctions.Block,
+          "setModelBlocksVisibility",
           modelId,
           idsByComponent.Block,
           ...args,
@@ -71,7 +84,9 @@ async function dispatchToComponentTypes(
     }
     if (idsByComponent.Surface.length > 0) {
       promises.push(
-        componentStyleFunctions.Surface.setModelSurfacesVisibility(
+        callComponentStyleFunction(
+          componentStyleFunctions.Surface,
+          "setModelSurfacesVisibility",
           modelId,
           idsByComponent.Surface,
           ...args,
@@ -80,12 +95,20 @@ async function dispatchToComponentTypes(
     }
     if (idsByComponent.Line.length > 0) {
       promises.push(
-        componentStyleFunctions.Line.setModelLinesVisibility(modelId, idsByComponent.Line, ...args),
+        callComponentStyleFunction(
+          componentStyleFunctions.Line,
+          "setModelLinesVisibility",
+          modelId,
+          idsByComponent.Line,
+          ...args,
+        ),
       );
     }
     if (idsByComponent.Corner.length > 0) {
       promises.push(
-        componentStyleFunctions.Corner.setModelCornersVisibility(
+        callComponentStyleFunction(
+          componentStyleFunctions.Corner,
+          "setModelCornersVisibility",
           modelId,
           idsByComponent.Corner,
           ...args,
@@ -95,12 +118,20 @@ async function dispatchToComponentTypes(
   } else if (action === "Color") {
     if (idsByComponent.Block.length > 0) {
       promises.push(
-        componentStyleFunctions.Block.setModelBlocksColor(modelId, idsByComponent.Block, ...args),
+        callComponentStyleFunction(
+          componentStyleFunctions.Block,
+          "setModelBlocksColor",
+          modelId,
+          idsByComponent.Block,
+          ...args,
+        ),
       );
     }
     if (idsByComponent.Surface.length > 0) {
       promises.push(
-        componentStyleFunctions.Surface.setModelSurfacesColor(
+        callComponentStyleFunction(
+          componentStyleFunctions.Surface,
+          "setModelSurfacesColor",
           modelId,
           idsByComponent.Surface,
           ...args,
@@ -109,12 +140,20 @@ async function dispatchToComponentTypes(
     }
     if (idsByComponent.Line.length > 0) {
       promises.push(
-        componentStyleFunctions.Line.setModelLinesColor(modelId, idsByComponent.Line, ...args),
+        callComponentStyleFunction(
+          componentStyleFunctions.Line,
+          "setModelLinesColor",
+          modelId,
+          idsByComponent.Line,
+          ...args,
+        ),
       );
     }
     if (idsByComponent.Corner.length > 0) {
       promises.push(
-        componentStyleFunctions.Corner.setModelCornersColor(
+        callComponentStyleFunction(
+          componentStyleFunctions.Corner,
+          "setModelCornersColor",
           modelId,
           idsByComponent.Corner,
           ...args,
@@ -159,7 +198,7 @@ function useModelVisibilityStyle(
       id: modelId,
       visibility,
     };
-    return viewerStore.request(
+    const result = await viewerStore.request(
       {
         schema,
         params,
@@ -177,6 +216,7 @@ function useModelVisibilityStyle(
         },
       },
     );
+    return result;
   }
   async function setModelComponentTypeVisibility(
     modelId: string,
@@ -224,7 +264,8 @@ function useModelVisibilityStyle(
         ),
       );
     }
-    return Promise.all(promises);
+    const results = await Promise.all(promises);
+    return results;
   }
   function modelComponentVisibility(modelId: string, componentId: string): boolean {
     const selection = useModelSelection(modelId, dataStyleState);

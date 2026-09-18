@@ -8,6 +8,7 @@ import { validateSchema } from "@ogw_shared/utils/validate_schema";
 const MIN_0 = 0;
 const MAX_10 = 10;
 const VAL_5 = 5;
+const TIMEOUT_MS = 5000;
 
 describe("validate schema", () => {
   const schema = {
@@ -22,17 +23,25 @@ describe("validate schema", () => {
     additionalProperties: false,
   };
 
-  test("ajv wrong params", () => {
-    const params = {};
-    const { valid, error } = validateSchema(schema, params);
-    expect(valid).toBe(false);
-    expect(error).toBe("data must have required property 'var_1'");
-  }, 5000);
+  test(
+    "ajv wrong params",
+    () => {
+      const params = {};
+      const { valid, error } = validateSchema(schema, params);
+      expect(valid).toBe(false);
+      expect(error).toBe("data must have required property 'var_1'");
+    },
+    TIMEOUT_MS,
+  );
 
-  test("good params", () => {
-    const params = { var_1: "test", var_2: VAL_5 };
-    const { valid, error } = validateSchema(schema, params);
-    expect(valid).toBe(true);
-    expect(error).toBe("No errors");
-  }, 5000);
+  test(
+    "good params",
+    () => {
+      const params = { var_1: "test", var_2: VAL_5 };
+      const { valid, error } = validateSchema(schema, params);
+      expect(valid).toBe(true);
+      expect(error).toBe("No errors");
+    },
+    TIMEOUT_MS,
+  );
 });

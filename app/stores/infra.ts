@@ -109,5 +109,4 @@ export interface Microservice {
   is_busy?: boolean;
   launch?: (params: Readonly<Record<string, unknown>>) => Promise<unknown>;
   connect: () => Promise<void>;
-  [key: string]: unknown;
 }

@@ -1,3 +1,4 @@
+// oxlint-disable eslint/max-lines
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
@@ -104,9 +105,11 @@ function useModelSurfacesVertexAttribute(): UseModelSurfacesVertexAttributeRetur
   const modelSurfacesCommonStyle = useModelSurfacesCommonStyle();
   const viewerStore = useViewerStore();
   function modelSurfacesVertexAttribute(modelId: string, surfaceId?: string): AttributeState {
-    // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.vertex shape is defined by the data style schema.
-    return modelSurfacesCommonStyle.modelSurfaceColoring(modelId, surfaceId)
-      .vertex as AttributeState;
+    return (
+      modelSurfacesCommonStyle.modelSurfaceColoring(modelId, surfaceId)
+        // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.vertex shape is defined by the data style schema.
+        .vertex as AttributeState
+    );
   }
   function modelSurfacesVertexAttributeStoredConfig(
     modelId: string,

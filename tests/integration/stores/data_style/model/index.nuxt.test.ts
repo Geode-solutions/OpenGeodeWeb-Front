@@ -5,6 +5,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 // Local imports
 import { beforeAllTimeout, setupIntegrationTests } from "@ogw_tests/integration/setup";
 import { Status } from "@ogw_front/utils/status";
+import { assertDefined } from "@ogw_tests/utils";
 import { cleanupBackend } from "@ogw_server/utils/cleanup";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -16,9 +17,9 @@ const file_name = "test.og_brep";
 const geode_object = "BRep";
 const SLEEP_MS = 200;
 
-async function sleep(milliseconds: number) {
+async function sleep(milliseconds: number): Promise<void> {
   // oxlint-disable-next-line promise/avoid-new
-  return new Promise((resolve) => {
+  await new Promise<void>((resolve) => {
     setTimeout(resolve, milliseconds);
   });
 }
@@ -52,6 +53,7 @@ describe("model", () => {
       expect(spy).toHaveBeenCalledWith(
         { schema, params },
         {
+          // oxlint-disable-next-line no-unsafe-assignment -- expect.any(Function) is untyped by design, this is a vitest matcher not a real callback.
           response_function: expect.any(Function),
         },
       );
@@ -66,7 +68,7 @@ describe("model", () => {
       const dataStore = useDataStore();
 
       const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const surface_id = surface_ids[0]!;
+      const surface_id = assertDefined(surface_ids[0]);
 
       const red = { red: 255, green: 0, blue: 0, alpha: 1 };
       const green = { red: 0, green: 255, blue: 0, alpha: 1 };

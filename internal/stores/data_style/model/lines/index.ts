@@ -51,13 +51,21 @@ export function useModelLinesStyle(): ReturnType<typeof useModelLinesCommonStyle
       visibilityGroups[visibility].push(line_id);
     }
     await Promise.all(
-      Object.entries(visibilityGroups).map(([visibility, ids]) =>
-        modelVisibilityStyle.setModelLinesVisibility(modelId, ids, visibility === "true"),
-      ),
+      Object.entries(visibilityGroups).map(async ([visibility, ids]) => {
+        const result = await modelVisibilityStyle.setModelLinesVisibility(
+          modelId,
+          ids,
+          visibility === "true",
+        );
+        return result;
+      }),
     );
   }
 
-  async function applyModelLinesColoringStyle(modelId: string, lines_ids: string[]): Promise<void> {
+  async function applyModelLinesColoringStyle(
+    modelId: string,
+    lines_ids: string[],
+  ): Promise<unknown[]> {
     const activeColoringGroups: Record<string, string[]> = {};
     for (const line_id of lines_ids) {
       const activeColoring = String(modelColorStyle.modelLineActiveColoring(modelId, line_id));
@@ -77,9 +85,15 @@ export function useModelLinesStyle(): ReturnType<typeof useModelLinesCommonStyle
           colorGroups[color_key].lines_ids.push(line_id);
         }
         coloringPromises.push(
-          ...Object.values(colorGroups).map(async ({ color, lines_ids: ids }) =>
-            modelColorStyle.setModelLinesColor(modelId, ids, color, "constant"),
-          ),
+          ...Object.values(colorGroups).map(async ({ color, lines_ids: ids }) => {
+            const result = await modelColorStyle.setModelLinesColor(
+              modelId,
+              ids,
+              color,
+              "constant",
+            );
+            return result;
+          }),
         );
       } else if (type === "random") {
         coloringPromises.push(
@@ -115,14 +129,20 @@ export function useModelLinesStyle(): ReturnType<typeof useModelLinesCommonStyle
         }
         coloringPromises.push(
           ...Object.values(vertexGroups).map(
-            async ({ name, item, minimum, maximum, colorMap, lines_ids: ids }) =>
-              modelLinesVertexAttribute.setModelLinesVertexAttribute(modelId, ids, {
-                name,
-                item,
-                minimum,
-                maximum,
-                colorMap,
-              }),
+            async ({ name, item, minimum, maximum, colorMap, lines_ids: ids }) => {
+              const result = await modelLinesVertexAttribute.setModelLinesVertexAttribute(
+                modelId,
+                ids,
+                {
+                  name,
+                  item,
+                  minimum,
+                  maximum,
+                  colorMap,
+                },
+              );
+              return result;
+            },
           ),
         );
       } else if (type === "edge") {
@@ -155,22 +175,29 @@ export function useModelLinesStyle(): ReturnType<typeof useModelLinesCommonStyle
         }
         coloringPromises.push(
           ...Object.values(edgeGroups).map(
-            async ({ name, item, minimum, maximum, colorMap, lines_ids: ids }) =>
-              modelLinesEdgeAttribute.setModelLinesEdgeAttribute(modelId, ids, {
-                name,
-                item,
-                minimum,
-                maximum,
-                colorMap,
-              }),
+            async ({ name, item, minimum, maximum, colorMap, lines_ids: ids }) => {
+              const result = await modelLinesEdgeAttribute.setModelLinesEdgeAttribute(
+                modelId,
+                ids,
+                {
+                  name,
+                  item,
+                  minimum,
+                  maximum,
+                  colorMap,
+                },
+              );
+              return result;
+            },
           ),
         );
       }
     }
-    return Promise.all(coloringPromises);
+    const results = await Promise.all(coloringPromises);
+    return results;
   }
 
-  async function applyModelLinesStyle(modelId: string) {
+  async function applyModelLinesStyle(modelId: string): Promise<void> {
     const lines_ids = await dataStore.getLinesGeodeIds(modelId);
     if (lines_ids.length === 0) {
       return;

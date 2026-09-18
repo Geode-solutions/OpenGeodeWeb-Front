@@ -6,6 +6,12 @@ import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 const ERROR_500 = 500;
 
+function assertIsDefined<Value>(value: Value | undefined): asserts value is Value {
+  if (value === undefined) {
+    throw new Error("Expected value to be defined");
+  }
+}
+
 describe("feedback store", () => {
   beforeEach(() => {
     setupActivePinia();
@@ -30,7 +36,9 @@ describe("feedback store", () => {
         const feedbackStore = useFeedbackStore();
         feedbackStore.add_error(ERROR_500, "/test", "test message", "test description");
         expect(feedbackStore.feedbacks).toHaveLength(1);
-        expect(feedbackStore.feedbacks[0].type).toBe("error");
+        const [feedback] = feedbackStore.feedbacks;
+        assertIsDefined(feedback);
+        expect(feedback.type).toBe("error");
       });
 
       test("feedbacks_timeout", () => {
@@ -49,7 +57,9 @@ describe("feedback store", () => {
         feedbackStore.feedbacks_timeout_miliseconds = 500;
         feedbackStore.add_success("test description");
         expect(feedbackStore.feedbacks).toHaveLength(1);
-        expect(feedbackStore.feedbacks[0].type).toBe("success");
+        const [feedback] = feedbackStore.feedbacks;
+        assertIsDefined(feedback);
+        expect(feedback.type).toBe("success");
         vi.runAllTimers();
         expect(feedbackStore.feedbacks).toHaveLength(0);
       });
@@ -61,7 +71,9 @@ describe("feedback store", () => {
         feedbackStore.feedbacks_timeout_miliseconds = 500;
         feedbackStore.add_warning("test warning description");
         expect(feedbackStore.feedbacks).toHaveLength(1);
-        expect(feedbackStore.feedbacks[0].type).toBe("warning");
+        const [feedback] = feedbackStore.feedbacks;
+        assertIsDefined(feedback);
+        expect(feedback.type).toBe("warning");
         vi.runAllTimers();
         expect(feedbackStore.feedbacks).toHaveLength(0);
       });
@@ -72,8 +84,9 @@ describe("feedback store", () => {
         const feedbackStore = useFeedbackStore();
         feedbackStore.add_success("test description");
         expect(feedbackStore.feedbacks).toHaveLength(1);
-        const feedbackId = feedbackStore.feedbacks[0].id;
-        feedbackStore.delete_feedback(feedbackId);
+        const [feedback] = feedbackStore.feedbacks;
+        assertIsDefined(feedback);
+        feedbackStore.delete_feedback(feedback.id);
         expect(feedbackStore.feedbacks).toHaveLength(0);
       });
     });

@@ -10,7 +10,7 @@ import { useBackStore } from "@ogw_front/stores/back";
 import { useInfraStore } from "@ogw_front/stores/infra";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
-const dumb_obj = { dumb_method: () => true };
+const dumb_obj = { dumb_method: (): boolean => true };
 // These are assigned in beforeEach (a real defined value by the time any test runs) rather than at declaration, so a `| undefined` type would just force needless narrowing at every call site below.
 // oxlint-disable-next-line eslint/init-declarations
 let infraStore: ReturnType<typeof useInfraStore>;
@@ -36,7 +36,9 @@ describe("when_microservices_connected_run_function", () => {
 
   test("microservices not connected", () => {
     const spy = vi.spyOn(dumb_obj, "dumb_method");
-    runFunctionWhenMicroservicesConnected(dumb_obj.dumb_method);
+    runFunctionWhenMicroservicesConnected(() => {
+      dumb_obj.dumb_method();
+    });
     backStore.$patch({ status: Status.NOT_CONNECTED });
     viewerStore.$patch({ status: Status.NOT_CONNECTED });
     expect(spy).not.toHaveBeenCalled();
@@ -44,7 +46,9 @@ describe("when_microservices_connected_run_function", () => {
 
   test("microservices connected", async () => {
     const spy = vi.spyOn(dumb_obj, "dumb_method");
-    runFunctionWhenMicroservicesConnected(dumb_obj.dumb_method);
+    runFunctionWhenMicroservicesConnected(() => {
+      dumb_obj.dumb_method();
+    });
     backStore.$patch({ status: Status.CONNECTED });
     viewerStore.$patch({ status: Status.CONNECTED });
     await flushPromises();

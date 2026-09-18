@@ -1,3 +1,4 @@
+// oxlint-disable eslint/max-lines
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { dispatchToComponentTypes } from "./visibility";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -38,9 +39,10 @@ type SetAttributeColorMapFn = (
 ) => unknown;
 type DynamicStyleFunctions = Record<string, unknown>;
 
-function attributeFn<T>(method: unknown): T {
+// oxlint-disable-next-line no-unnecessary-type-parameters -- Signature narrows a dynamically-looked-up method to its known call signature; see comment above.
+function attributeFn<Signature>(method: unknown): Signature {
   // oxlint-disable-next-line no-unsafe-type-assertion -- narrowing a dynamically-looked-up method to its known call signature; see comment above.
-  return method as T;
+  return method as Signature;
 }
 
 // oxlint-disable-next-line max-lines-per-function
@@ -165,9 +167,9 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
     return coloring.constant;
   }
   function modelComponentTypeColor(modelId: string, type: string): unknown {
+    const groupStyle = dataStyleState.getModelComponentTypeStyle(modelId, type);
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
-    const groupColoring = dataStyleState.getModelComponentTypeStyle(modelId, type)
-      .coloring as StyleValues;
+    const groupColoring = groupStyle.coloring as StyleValues;
     // oxlint-disable-next-line no-unsafe-type-assertion -- style values are stored as loosely-typed StyleValues records; see StyleValues definition.
     const typeStyle = dataStyleState.getStyle(modelId)[`${type.toLowerCase()}s`] as StyleValues;
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
@@ -191,9 +193,9 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
     return coloring.active;
   }
   function getModelComponentTypeActiveColoring(modelId: string, type: string): unknown {
+    const groupStyle = dataStyleState.getModelComponentTypeStyle(modelId, type);
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
-    const groupColoring = dataStyleState.getModelComponentTypeStyle(modelId, type)
-      .coloring as StyleValues;
+    const groupColoring = groupStyle.coloring as StyleValues;
     // oxlint-disable-next-line no-unsafe-type-assertion -- style values are stored as loosely-typed StyleValues records; see StyleValues definition.
     const typeStyle = dataStyleState.getStyle(modelId)[`${type.toLowerCase()}s`] as StyleValues;
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
@@ -268,7 +270,7 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
       return;
     }
     const { getName, setName, getRange, setRange, getColorMap, setColorMap } = attributeFunctions;
-    const firstId = idsForType[0];
+    const [firstId] = idsForType;
     if (firstId === undefined) {
       return;
     }

@@ -38,6 +38,7 @@ describe("crs selector", () => {
     backStore.request = vi.fn(
       async (_request: unknown, callbacks: { response_function?: (response: unknown) => void }) => {
         callbacks.response_function?.({ crs_list });
+        await Promise.resolve();
         return { crs_list };
       },
     );

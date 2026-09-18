@@ -19,20 +19,26 @@ const mockLockRequest = vi
   .fn()
   .mockImplementation((name: string, handler: (lock: MockLock) => unknown) => handler({ name }));
 
-vi.stubGlobal(
-  "navigator",
-  Object.assign({}, navigator, {
-    locks: {
-      request: mockLockRequest,
-    },
-  }),
-);
+// The store only ever calls `navigator.locks.request`, and `vi.stubGlobal`
+// Accepts an `unknown` value, so a minimal stub (rather than spreading or
+// Mutating the real, getter-only `navigator` instance) is enough and needs
+// No type assertion.
+vi.stubGlobal("navigator", {
+  locks: {
+    request: mockLockRequest,
+  },
+});
 
 const TIMEOUT = 5000;
 
 describe("viewer store", () => {
   beforeAll(() => {
-    globalThis.WebSocket = WebSocket;
+    // The `ws` package's WebSocket class implements the same runtime behaviour
+    // The store relies on in a Node test environment, but TypeScript sees it as
+    // A structurally different class from the DOM lib's global WebSocket type,
+    // So it is stubbed through vitest's helper (typed to accept `unknown`)
+    // Instead of an unsafe type assertion.
+    vi.stubGlobal("WebSocket", WebSocket);
   });
 
   beforeEach(() => {

@@ -53,6 +53,7 @@ describe("mesh cells", () => {
       expect(spy).toHaveBeenCalledWith(
         { schema, params },
         {
+          // oxlint-disable-next-line no-unsafe-assignment -- expect.any(Function) is untyped by design, this is a vitest matcher not a real callback.
           response_function: expect.any(Function),
         },
       );
@@ -75,6 +76,7 @@ describe("mesh cells", () => {
       expect(spy).toHaveBeenCalledWith(
         { schema, params },
         {
+          // oxlint-disable-next-line no-unsafe-assignment -- expect.any(Function) is untyped by design, this is a vitest matcher not a real callback.
           response_function: expect.any(Function),
         },
       );
@@ -116,6 +118,7 @@ describe("mesh cells", () => {
       const item = dataStyleStore.meshCellsVertexAttributeItem(id);
       expect(spy).toHaveBeenCalledWith({
         schema,
+        // oxlint-disable-next-line no-unsafe-assignment -- expect.objectContaining is untyped by design, this is a vitest matcher not a plain object.
         params: expect.objectContaining({ id, name, item, minimum: range[0], maximum: range[1] }),
       });
       expect(dataStyleStore.meshCellsVertexAttributeRange(id)).toStrictEqual(range);
@@ -135,8 +138,8 @@ describe("mesh cells", () => {
         maximum: MAXIMUM_RANGE,
         colorMap: "batlow",
       });
-      dataStyleStore.setMeshCellsVertexAttributeColorMap(id, "oleron");
-      dataStyleStore.setMeshCellsVertexAttributeRange(id, MINIMUM_RANGE, ALTERNATE_RANGE_MAX);
+      await dataStyleStore.setMeshCellsVertexAttributeColorMap(id, "oleron");
+      await dataStyleStore.setMeshCellsVertexAttributeRange(id, MINIMUM_RANGE, ALTERNATE_RANGE_MAX);
       await dataStyleStore.setMeshCellsVertexAttribute(id, {
         name: "points",
         item: 0,
@@ -145,7 +148,7 @@ describe("mesh cells", () => {
         colorMap: "oleron",
       });
 
-      dataStyleStore.setMeshCellsVertexAttributeItem(id, 1);
+      await dataStyleStore.setMeshCellsVertexAttributeItem(id, 1);
       await dataStyleStore.setMeshCellsVertexAttribute(id, {
         name: "points",
         item: 1,
@@ -157,6 +160,7 @@ describe("mesh cells", () => {
       expect(dataStyleStore.meshCellsVertexAttributeRange(id)).toStrictEqual([0, MAXIMUM_RANGE]);
       expect(spy).toHaveBeenCalledWith({
         schema,
+        // oxlint-disable-next-line no-unsafe-assignment -- expect.objectContaining is untyped by design, this is a vitest matcher not a plain object.
         params: expect.objectContaining({
           id,
           name: "points",
@@ -169,7 +173,7 @@ describe("mesh cells", () => {
 
     test("stored configs - restore previous item config", async () => {
       const dataStyleStore = useDataStyleStore();
-      dataStyleStore.setMeshCellsVertexAttributeItem(id, 0);
+      await dataStyleStore.setMeshCellsVertexAttributeItem(id, 0);
       const storedConfig0 = dataStyleStore.meshCellsVertexAttributeStoredConfig(id, "points", 0);
       await dataStyleStore.setMeshCellsVertexAttribute(id, {
         name: "points",

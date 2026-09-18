@@ -57,16 +57,18 @@ function getSharedState(): SharedState {
   // Dexie's `liveQuery` returns Dexie's own `Observable` type, structurally distinct
   // From rxjs's `Observable` that `useObservable` (from @vueuse/rxjs) expects, even
   // Though they're interoperable at runtime (both are plain subscribe-based streams).
+  const dataStyleLiveQuery = liveQuery(async () => {
+    const objectStyles = await dataStyleTable.toArray();
+    const stylesByObjectId: Record<string, ObjectStyle> = {};
+    for (const objectStyle of objectStyles) {
+      stylesByObjectId[objectStyle.id] = objectStyle;
+    }
+    return stylesByObjectId;
+  });
+
   const styles = useObservable<Record<string, ObjectStyle>, Record<string, ObjectStyle>>(
     // oxlint-disable-next-line no-unsafe-type-assertion
-    liveQuery(async () => {
-      const objectStyles = await dataStyleTable.toArray();
-      const stylesByObjectId: Record<string, ObjectStyle> = {};
-      for (const objectStyle of objectStyles) {
-        stylesByObjectId[objectStyle.id] = objectStyle;
-      }
-      return stylesByObjectId;
-    }) as unknown as RxObservable<Record<string, ObjectStyle>>,
+    dataStyleLiveQuery as unknown as RxObservable<Record<string, ObjectStyle>>,
     { initialValue: {} },
   ) as Ref<Record<string, ObjectStyle>>;
 

@@ -49,9 +49,14 @@ export function useModelCornersStyle(): ModelCornersStyleApi {
       visibilityGroups[visibility].push(corner_id);
     }
     const results = await Promise.all(
-      Object.entries(visibilityGroups).map(([visibility, ids]) =>
-        modelVisibilityStyle.setModelCornersVisibility(modelId, ids, visibility === "true"),
-      ),
+      Object.entries(visibilityGroups).map(async ([visibility, ids]) => {
+        const result = await modelVisibilityStyle.setModelCornersVisibility(
+          modelId,
+          ids,
+          visibility === "true",
+        );
+        return result;
+      }),
     );
     return results;
   }
@@ -79,9 +84,15 @@ export function useModelCornersStyle(): ModelCornersStyleApi {
           colorGroups[color_key].corners_ids.push(corner_id);
         }
         coloringPromises.push(
-          ...Object.values(colorGroups).map(({ color, corners_ids: ids }) =>
-            modelColorStyle.setModelCornersColor(modelId, ids, color, "constant"),
-          ),
+          ...Object.values(colorGroups).map(async ({ color, corners_ids: ids }) => {
+            const result = await modelColorStyle.setModelCornersColor(
+              modelId,
+              ids,
+              color,
+              "constant",
+            );
+            return result;
+          }),
         );
       } else if (type === "random") {
         coloringPromises.push(
@@ -123,14 +134,20 @@ export function useModelCornersStyle(): ModelCornersStyleApi {
         }
         coloringPromises.push(
           ...Object.values(vertexGroups).map(
-            ({ name, item, minimum, maximum, colorMap, corners_ids: ids }) =>
-              modelCornersVertexAttribute.setModelCornersVertexAttribute(modelId, ids, {
-                name,
-                item,
-                minimum,
-                maximum,
-                colorMap,
-              }),
+            async ({ name, item, minimum, maximum, colorMap, corners_ids: ids }) => {
+              const result = await modelCornersVertexAttribute.setModelCornersVertexAttribute(
+                modelId,
+                ids,
+                {
+                  name,
+                  item,
+                  minimum,
+                  maximum,
+                  colorMap,
+                },
+              );
+              return result;
+            },
           ),
         );
       }

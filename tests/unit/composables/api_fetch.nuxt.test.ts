@@ -3,10 +3,9 @@
 // Third party imports
 import { beforeEach, describe, expect, test } from "vitest";
 import { registerEndpoint } from "@nuxt/test-utils/runtime";
-import type { HTTPMethod } from "h3";
 
 // Local imports
-import { setupActivePinia } from "@ogw_tests/utils";
+import { setupActivePinia, toHTTPMethod } from "@ogw_tests/utils";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
@@ -82,7 +81,7 @@ describe("backStore.request()", () => {
         },
       };
       registerEndpoint(schema.$id, {
-        method: schema.methods[FIRST_INDEX] as HTTPMethod,
+        method: toHTTPMethod(schema.methods[FIRST_INDEX]),
         handler: () => ({ result: "success" }),
       });
       await backStore.request({ schema, params }, callbacks);

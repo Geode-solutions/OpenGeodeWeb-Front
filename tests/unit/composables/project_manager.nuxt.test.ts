@@ -4,21 +4,27 @@
 // oxlint-disable jest/prefer-ending-with-an-expect
 
 // Third party imports
+import {
+  $fetch,
+  type FetchOptions,
+  type FetchRequest,
+  type FetchResponse,
+  type ResolvedFetchOptions,
+} from "ofetch";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { exportProject, importProject } from "@ogw_front/composables/project_manager";
+import type { api_fetch as apiFetchType } from "@ogw_internal/utils/api_fetch";
 import { appMode } from "@ogw_shared/app_mode";
 import { setupActivePinia } from "@ogw_tests/utils";
 
-import { $fetch } from "ofetch";
-
-vi.mock(
-  import("ofetch"),
-  () =>
-    ({
-      $fetch: vi.fn(),
-    }) as any,
-);
+vi.mock(import("ofetch"), () => ({
+  $fetch: Object.assign(vi.fn(), {
+    raw: vi.fn(),
+    native: vi.fn(),
+    create: vi.fn(),
+  }),
+}));
 
 const mockedFetch = vi.mocked($fetch);
 
@@ -160,109 +166,89 @@ const hybridViewerStoreMock = {
 };
 
 // MOCKS
-mockedFetch.mockImplementation((async (
-  _route: unknown,
-  // oxlint-disable-next-line eslint/id-length -- mirrors the real ofetch/vitest API field name (`ok`/`fn`)
-  options: { onResponse?: (context: { response: { ok: boolean; _data: unknown } }) => void },
-) => {
+// Resolves a mocked `$fetch` call's `onResponse` hook with a successful response.
+// Mirrors the pattern used in tests/unit/stores/infra.nuxt.test.ts.
+async function respondWithSuccess(
+  options: Readonly<FetchOptions> | undefined,
+  request: FetchRequest,
+  data: unknown,
+): Promise<void> {
+  const onResponse = options?.onResponse;
+  if (typeof onResponse !== "function") {
+    return;
+  }
+  const response: FetchResponse<typeof data> = Object.assign(
+    new Response(undefined, { status: 200 }),
+    { _data: data },
+  );
+  const resolvedOptions: ResolvedFetchOptions = { headers: new Headers() };
+  await onResponse({ request, options: resolvedOptions, response });
+}
+
+mockedFetch.mockImplementation(async (route, options) => {
   const data = { snapshot: snapshotMock };
-  // oxlint-disable-next-line eslint/id-length
-  options.onResponse?.({ response: { ok: true, _data: data } });
+  await respondWithSuccess(options, route, data);
   return data;
-}) as unknown as typeof $fetch);
+});
 vi.mock(import("@ogw_internal/utils/viewer_call"), () => ({
   viewer_call: viewer_call_mock_fn,
 }));
 
-interface ApiFetchOptions {
-  response_function?: (response: unknown) => Promise<void> | void;
-}
+// Derived from the real `api_fetch` signature so the mock stays structurally honest instead of redeclaring (and risking drift from) its parameter shapes.
+type ApiFetchParams = Parameters<typeof apiFetchType>[1];
+type ApiFetchHandlers = Parameters<typeof apiFetchType>[2];
 
-vi.mock(
-  import("@ogw_internal/utils/api_fetch"),
-  () =>
-    ({
-      api_fetch: vi.fn(async (_req: unknown, options: ApiFetchOptions = {}) => {
-        const response = {
-          _data: new Blob(["zipcontent"], { type: "application/zip" }),
-          headers: {
-            get: (k: string): string | undefined =>
-              k === "new-file-name" ? "project_123.vease" : undefined,
-          },
-        };
-        if (options.response_function) {
-          await options.response_function(response);
-        }
-        return response;
-      }),
-    }) as any,
-);
-vi.mock(import("js-file-download"), () => ({ default: vi.fn() }));
-vi.mock(
-  import("@ogw_front/stores/infra"),
-  () =>
-    ({
-      useInfraStore: () => infraStoreMock,
-    }) as any,
-);
-vi.mock(
-  import("@ogw_front/stores/viewer"),
-  () =>
-    ({
-      useViewerStore: () => viewerStoreMock,
-    }) as any,
-);
-vi.mock(
-  import("@ogw_front/stores/treeview"),
-  () =>
-    ({
-      useTreeviewStore: () => treeviewStoreMock,
-    }) as any,
-);
-vi.mock(
-  import("@ogw_front/stores/data"),
-  () =>
-    ({
-      useDataStore: () => dataStoreMock,
-    }) as any,
-);
-vi.mock(
-  import("@ogw_front/stores/data_style"),
-  () =>
-    ({
-      useDataStyleStore: () => dataStyleStoreMock,
-    }) as any,
-);
-vi.mock(
-  import("@ogw_front/stores/hybrid_viewer"),
-  () =>
-    ({
-      useHybridViewerStore: () => hybridViewerStoreMock,
-    }) as any,
-);
-vi.mock(
-  import("@ogw_front/stores/back"),
-  () =>
-    ({
-      useBackStore: () => backStoreMock,
-    }) as any,
-);
-vi.mock(
-  import("@ogw_front/stores/feedback"),
-  () =>
-    ({
-      useFeedbackStore: () => feedbackStoreMock,
-    }) as any,
-);
-vi.mock(
-  import("@ogw_front/stores/app"),
-  () =>
-    ({
-      useAppStore: () => ({
-        exportStores: vi.fn(() => ({ projectName: "mockedProject" })),
-      }),
-    }) as any,
-);
+vi.mock(import("@ogw_internal/utils/api_fetch"), () => ({
+  api_fetch: vi.fn(
+    async (_microservice: unknown, _params: ApiFetchParams, options: ApiFetchHandlers = {}) => {
+      const response = {
+        _data: new Blob(["zipcontent"], { type: "application/zip" }),
+        headers: {
+          get: (k: string): string | undefined =>
+            k === "new-file-name" ? "project_123.vease" : undefined,
+        },
+      };
+      if (options.response_function) {
+        await options.response_function(response);
+      }
+      return response;
+    },
+  ),
+}));
+vi.mock(import("js-file-download"), () => ({
+  default: vi.fn((): void => undefined),
+}));
+vi.mock(import("@ogw_front/stores/infra") as Promise<unknown>, () => ({
+  useInfraStore: (): typeof infraStoreMock => infraStoreMock,
+}));
+vi.mock(import("@ogw_front/stores/viewer") as Promise<unknown>, () => ({
+  useViewerStore: (): typeof viewerStoreMock => viewerStoreMock,
+}));
+vi.mock(import("@ogw_front/stores/treeview") as Promise<unknown>, () => ({
+  useTreeviewStore: (): typeof treeviewStoreMock => treeviewStoreMock,
+}));
+vi.mock(import("@ogw_front/stores/data") as Promise<unknown>, () => ({
+  useDataStore: (): typeof dataStoreMock => dataStoreMock,
+}));
+vi.mock(import("@ogw_front/stores/data_style") as Promise<unknown>, () => ({
+  useDataStyleStore: (): typeof dataStyleStoreMock => dataStyleStoreMock,
+}));
+vi.mock(import("@ogw_front/stores/hybrid_viewer") as Promise<unknown>, () => ({
+  useHybridViewerStore: (): typeof hybridViewerStoreMock => hybridViewerStoreMock,
+}));
+vi.mock(import("@ogw_front/stores/back") as Promise<unknown>, () => ({
+  useBackStore: (): typeof backStoreMock => backStoreMock,
+}));
+vi.mock(import("@ogw_front/stores/feedback") as Promise<unknown>, () => ({
+  useFeedbackStore: (): typeof feedbackStoreMock => feedbackStoreMock,
+}));
+const appStoreMock = {
+  exportStores: vi.fn(() => ({ projectName: "mockedProject" })),
+};
+
+vi.mock(import("@ogw_front/stores/app") as Promise<unknown>, () => ({
+  useAppStore: (): typeof appStoreMock => appStoreMock,
+}));
 
 vi.stubGlobal("useAppStore", () => ({
   exportStores: vi.fn(() => ({ projectName: "mockedProject" })),
@@ -274,12 +260,18 @@ const mockLockRequest = vi
     async (name: string, task: (lock: { name: string }) => unknown) => await task({ name }),
   );
 
-vi.stubGlobal("navigator", {
-  ...navigator,
-  locks: {
-    request: mockLockRequest,
-  },
-});
+// Proxies rather than spreads `navigator` so its prototype (and the private fields some getters, like `userAgent`, rely on) stays intact; only `locks` is overridden.
+vi.stubGlobal(
+  "navigator",
+  new Proxy(navigator, {
+    get(target, prop): unknown {
+      if (prop === "locks") {
+        return { request: mockLockRequest };
+      }
+      return Reflect.get(target, prop, target);
+    },
+  }),
+);
 
 function verifyViewerCalls(): void {
   expect(viewerStoreMock.ws_connect).toHaveBeenCalledWith();
@@ -325,7 +317,7 @@ describe("projectManager composable (compact)", () => {
     for (const store of storesList) {
       const values = Object.values(store);
       for (const value of values) {
-        if (typeof value === "function" && value.mockClear) {
+        if (typeof value === "function" && typeof value.mockClear === "function") {
           value.mockClear();
         }
       }

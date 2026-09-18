@@ -8,10 +8,9 @@ import { describe, expect, test, vi } from "vitest";
 import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime";
 import { flushPromises } from "@vue/test-utils";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
-import type { HTTPMethod } from "h3";
 
 // Local imports
-import { setupActivePinia, vuetify } from "@ogw_tests/utils";
+import { setupActivePinia, toHTTPMethod, vuetify } from "@ogw_tests/utils";
 import FileUploader from "@ogw_front/components/FileUploader.vue";
 import MissingFilesSelector from "@ogw_front/components/MissingFilesSelector.vue";
 import { useBackStore } from "@ogw_front/stores/back";
@@ -35,6 +34,7 @@ describe("missing files selector", () => {
           mandatory_files: ["fake_file.txt"],
           additional_files: ["fake_file_2.txt"],
         });
+        await Promise.resolve();
         return {
           has_missing_files: true,
           mandatory_files: ["fake_file.txt"],
@@ -68,7 +68,7 @@ describe("missing files selector", () => {
     const v_btn = file_uploader.findComponent(components.VBtn);
 
     registerEndpoint(upload_file_schema.$id, {
-      method: upload_file_schema.methods[SECOND_INDEX] as HTTPMethod,
+      method: toHTTPMethod(upload_file_schema.methods[SECOND_INDEX]),
       handler: () => ({}),
     });
     await v_btn.trigger("click");

@@ -100,8 +100,9 @@ export const useBackStore = defineStore("back", {
       );
       return result;
     },
-    connect() {
+    async connect(): Promise<void> {
       this.set_ping();
+      await Promise.resolve();
     },
     async request(
       {
