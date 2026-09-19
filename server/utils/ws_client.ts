@@ -36,6 +36,11 @@ function rawDataToString(raw: WebSocket.RawData): string {
 interface ServerWsRpcClient {
   call: (rpc: string, params?: Readonly<Record<string, unknown>>) => Promise<unknown>;
   close: () => void;
+  getConnection: () => {
+    getSession: () => {
+      call: (rpc: string, params: readonly [Readonly<Record<string, unknown>>]) => Promise<unknown>;
+    };
+  };
   isOpen: () => boolean;
   onConnectionClose: (callback: () => void) => void;
   onConnectionError: (callback: (error: unknown) => void) => void;
@@ -134,6 +139,15 @@ function createServerWsRpcClient(baseUrl: string): ServerWsRpcClient {
     socket.close();
   }
 
+  function getConnection(): ReturnType<ServerWsRpcClient["getConnection"]> {
+    return {
+      getSession: () => ({
+        call: (rpc: string, [params]: readonly [Readonly<Record<string, unknown>>]) =>
+          call(rpc, params),
+      }),
+    };
+  }
+
   function isOpen(): boolean {
     return socket.readyState === WebSocket.OPEN;
   }
@@ -148,7 +162,7 @@ function createServerWsRpcClient(baseUrl: string): ServerWsRpcClient {
     onErrorCallback = callback;
   }
 
-  return { call, close, isOpen, onConnectionClose, onConnectionError, ready };
+  return { call, close, getConnection, isOpen, onConnectionClose, onConnectionError, ready };
 }
 
 export { createServerWsRpcClient };
