@@ -1,17 +1,26 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
-import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import { useHybridViewerCore } from "./core";
+import { useHybridViewerHighlight } from "./highlight";
+import { useHybridViewerScene } from "./scene";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
-import type { Ref } from "vue";
-import type { HybridViewerStorePublic } from "./vtk_types";
 
 interface RulerHoverState {
   active: boolean;
   fieldType: string;
 }
 
-function useHybridViewerRuler() {
+function useHybridViewerRuler(): {
+  is_ruler_active: Ref<boolean>;
+  ruler_snap: Ref<boolean>;
+  ruler_point1: Ref<number[] | undefined>;
+  ruler_point2: Ref<number[] | undefined>;
+  ruler_distance: Ref<number | undefined>;
+  ruler_awaiting_point: Ref<number>;
+  handleRulerClick: (x: number, y: number) => Promise<void>;
+  applyRuler: () => Promise<void>;
+  clearRuler: () => Promise<void>;
+  deactivateRuler: () => void;
+} {
   const is_ruler_active = ref(false);
   const ruler_snap = ref(false);
   const ruler_point1 = ref<number[] | undefined>(undefined);
@@ -21,11 +30,8 @@ function useHybridViewerRuler() {
   const ruler_previous_hover_state = ref<RulerHoverState>({ active: false, fieldType: "CELL" });
 
   function updateRulerSnapHighlight(): void {
-    const hybridViewerStore = useHybridViewerStore();
-    const { is_hover_highlight, hover_highlight_field_type } = storeToRefs(
-      hybridViewerStore,
-    ) as unknown as { is_hover_highlight: Ref<boolean>; hover_highlight_field_type: Ref<string> };
-    const { clearHoverHighlight } = hybridViewerStore as unknown as HybridViewerStorePublic;
+    const { is_hover_highlight, hover_highlight_field_type, clearHoverHighlight } =
+      useHybridViewerHighlight();
 
     if (is_ruler_active.value && ruler_snap.value) {
       ruler_previous_hover_state.value = {
@@ -52,9 +58,10 @@ function useHybridViewerRuler() {
     const points = ruler_point2.value
       ? [ruler_point1.value, ruler_point2.value]
       : [ruler_point1.value];
-    const { remoteRender } = useHybridViewerStore() as unknown as HybridViewerStorePublic;
+    const { remoteRender } = useHybridViewerCore();
     const viewerStore = useViewerStore();
     const schema = viewer_schemas.opengeodeweb_viewer.viewer.ruler;
+    // oxlint-disable-next-line no-unsafe-type-assertion -- response shape is defined by the ruler schema.
     const response = (await viewerStore.request({ schema, params: { points } })) as {
       distance?: number;
     };
@@ -63,7 +70,7 @@ function useHybridViewerRuler() {
   }
 
   async function handleRulerClick(x: number, y: number): Promise<void> {
-    const { hybridDb } = useHybridViewerStore() as unknown as HybridViewerStorePublic;
+    const { hybridDb } = useHybridViewerScene();
     const viewerStore = useViewerStore();
     let coords: number[] | undefined = undefined;
     if (ruler_snap.value) {
@@ -74,6 +81,7 @@ function useHybridViewerRuler() {
         field_type: "POINT",
         ids: Object.keys(hybridDb),
       };
+      // oxlint-disable-next-line no-unsafe-type-assertion -- response shape is defined by the highlight schema.
       const response = (await viewerStore.request({ schema, params })) as {
         attributes?: { coordinates?: number[] };
       };
@@ -81,6 +89,7 @@ function useHybridViewerRuler() {
     } else {
       const schema = viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
       const params = { x: Math.round(x), y: Math.round(y) };
+      // oxlint-disable-next-line no-unsafe-type-assertion -- response shape is defined by the get_point_position schema.
       const response = (await viewerStore.request({ schema, params })) as {
         x: number;
         y: number;
@@ -105,7 +114,7 @@ function useHybridViewerRuler() {
   }
 
   function deactivateRuler(): void {
-    const { clearHoverHighlight } = useHybridViewerStore() as unknown as HybridViewerStorePublic;
+    const { clearHoverHighlight } = useHybridViewerHighlight();
     is_ruler_active.value = false;
     clearHoverHighlight();
   }
@@ -116,7 +125,7 @@ function useHybridViewerRuler() {
     ruler_distance.value = undefined;
     ruler_awaiting_point.value = 1;
     deactivateRuler();
-    const { remoteRender } = useHybridViewerStore() as unknown as HybridViewerStorePublic;
+    const { remoteRender } = useHybridViewerCore();
     const viewerStore = useViewerStore();
     const schema = viewer_schemas.opengeodeweb_viewer.viewer.reset_ruler;
     await viewerStore.request({ schema });

@@ -1,7 +1,7 @@
 import { BaseDatabase } from "./base_database";
 
 export class ExtendedDatabase extends BaseDatabase {
-  constructor(
+  public constructor(
     currentVersion: number,
     currentStores: Record<string, string>,
     newTables: Record<string, string>,

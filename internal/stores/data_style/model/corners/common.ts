@@ -3,12 +3,26 @@ import merge from "lodash/merge";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 
-export function useModelCornersCommonStyle() {
+export function useModelCornersCommonStyle(): {
+  modelCornersStyle: (id: string) => StyleValues;
+  modelCornerStyle: (id: string, corner_id?: string) => StyleValues;
+  modelCornerColoring: (id: string, corner_id?: string) => StyleValues;
+  mutateModelCornersColoring: (
+    id: string,
+    corners_ids: string[],
+    values: StyleValues,
+  ) => Promise<void>;
+  mutateModelCornersTypeColoring: (id: string, values: StyleValues) => Promise<void>;
+} {
   const dataStyleState = useDataStyleState();
   const modelCommonStyle = useModelCommonStyle();
 
   function modelCornersStyle(id: string): StyleValues {
-    return dataStyleState.getStyle(id).corners as StyleValues;
+    const { corners } = dataStyleState.getStyle(id);
+    if (corners === undefined) {
+      return {};
+    }
+    return corners;
   }
 
   function modelComponentTypeCornersStyle(id: string): StyleValues {
@@ -27,17 +41,22 @@ export function useModelCornersCommonStyle() {
   }
 
   function modelCornerColoring(id: string, corner_id?: string): StyleValues {
+    // oxlint-disable-next-line no-unsafe-type-assertion -- coloring is a StyleValues sub-object stored under a StyleValues index signature.
     return modelCornerStyle(id, corner_id).coloring as StyleValues;
   }
 
-  function mutateModelCornersColoring(id: string, corners_ids: string[], values: StyleValues) {
-    return modelCommonStyle.mutateComponentStyles(id, corners_ids, {
+  async function mutateModelCornersColoring(
+    id: string,
+    corners_ids: string[],
+    values: StyleValues,
+  ): Promise<void> {
+    await modelCommonStyle.mutateComponentStyles(id, corners_ids, {
       coloring: values,
     });
   }
 
-  function mutateModelCornersTypeColoring(id: string, values: StyleValues) {
-    return modelCommonStyle.mutateModelComponentTypeStyle(id, "Corner", {
+  async function mutateModelCornersTypeColoring(id: string, values: StyleValues): Promise<void> {
+    await modelCommonStyle.mutateModelComponentTypeStyle(id, "Corner", {
       coloring: values,
     });
   }

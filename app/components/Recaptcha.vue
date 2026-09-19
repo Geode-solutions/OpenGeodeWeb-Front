@@ -18,13 +18,13 @@ const email = ref("");
 const launch = ref(false);
 const valid = ref(false);
 const emailRules = [
-  (value: string) => {
+  (value: string): boolean | string => {
     if (value) {
       return true;
     }
     return "E-mail is required.";
   },
-  (value: string) => {
+  (value: string): boolean | string => {
     if (/.+@.+\..+/u.test(value)) {
       return true;
     }
@@ -32,7 +32,7 @@ const emailRules = [
   },
 ];
 
-function submit() {
+function submit(): Promise<void> {
   const infraStore = useInfraStore();
   return infraStore.create_backend(email.value);
 }

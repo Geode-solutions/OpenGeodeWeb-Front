@@ -1,13 +1,11 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
 import { HOVER_DEBOUNCE_MS, HOVER_TIMEOUT_MS } from "./constants";
+import type { HoverComponentInfo, HoverData } from "./vtk_types";
+import type { IndexableType } from "dexie";
 import { database } from "@ogw_internal/database/database.js";
-import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import { useHybridViewerCore } from "./core";
+import { useHybridViewerScene } from "./scene";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
-import type { IndexableType } from "dexie";
-import type { Ref } from "vue";
-import type { HoverComponentInfo, HoverData, HybridViewerStorePublic } from "./vtk_types";
 
 // The dynamic/RPC-shaped payload of the viewer's "highlight" schema response.
 interface HighlightResponse {
@@ -18,78 +16,65 @@ interface HighlightResponse {
   attributes?: Record<string, unknown>;
 }
 
-function createClearHoverData(
-  hoverTimeoutRef: Ref<ReturnType<typeof setTimeout> | undefined>,
-  hoverData: Ref<HoverData | undefined>,
-  currentHoverId: Ref<string | undefined>,
-) {
-  return function clearHoverData(): void {
+// Shared via createSharedComposable (rather than merged into the parent hybridViewer store) so sibling slices, e.g. ruler.ts and viewport.ts, can read hover state/clearHoverHighlight/hoverHighlight directly without importing the parent store and creating a cycle. A Pinia store would work too but its $id/$patch/... properties would leak into the composed store's spread and collapse its inferred type.
+const useHybridViewerHighlight = createSharedComposable(() => {
+  const is_hover_highlight = ref(false);
+  const hover_highlight_field_type = ref("CELL");
+  const hoverData = ref<HoverData | undefined>(undefined);
+  const hoverPosition = ref({
+    x: 0,
+    y: 0,
+  });
+  const hoverTimeoutRef = ref<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const currentHoverId = ref<string | undefined>(undefined);
+
+  function clearHoverData(): void {
     if (hoverTimeoutRef.value) {
       clearTimeout(hoverTimeoutRef.value);
       hoverTimeoutRef.value = undefined;
     }
     hoverData.value = undefined;
     currentHoverId.value = undefined;
-  };
-}
-
-function performHoverHighlight(
-  event: MouseEvent,
-  onResponse: (response: unknown) => void | Promise<void>,
-): void {
-  const hybridViewerStore = useHybridViewerStore();
-  const { genericRenderWindow, hybridDb } = hybridViewerStore as unknown as HybridViewerStorePublic;
-  const { is_hover_highlight, hover_highlight_field_type } = storeToRefs(
-    hybridViewerStore,
-  ) as unknown as { is_hover_highlight: Ref<boolean>; hover_highlight_field_type: Ref<string> };
-  if (!is_hover_highlight.value) {
-    return;
   }
-  const container = genericRenderWindow.value?.getContainer();
-  if (!container) {
-    return;
-  }
-  const viewerStore = useViewerStore();
-  const rect = container.getBoundingClientRect();
-  const schema = viewer_schemas.opengeodeweb_viewer.viewer.highlight;
-  const params = {
-    x: Math.round(event.clientX - rect.left),
-    y: Math.round(rect.height - (event.clientY - rect.top)),
-    field_type: hover_highlight_field_type.value,
-    ids: Object.keys(hybridDb),
-  };
-  viewerStore.request(
-    {
-      schema,
-      params,
-    },
-    {
-      response_function: onResponse,
-    },
-  );
-}
 
-interface CreateHoverHighlightParams {
-  hoverTimeoutRef: Ref<ReturnType<typeof setTimeout> | undefined>;
-  currentHoverId: Ref<string | undefined>;
-  clearHoverData: () => void;
-}
-
-function createHoverHighlight({
-  hoverTimeoutRef,
-  currentHoverId,
-  clearHoverData,
-}: CreateHoverHighlightParams) {
-  return useDebounceFn((event: MouseEvent) => {
-    const hybridViewerStore = useHybridViewerStore();
-    const { genericRenderWindow } = hybridViewerStore as unknown as HybridViewerStorePublic;
-    const { is_hover_highlight, hoverData, hoverPosition } = storeToRefs(
-      hybridViewerStore,
-    ) as unknown as {
-      is_hover_highlight: Ref<boolean>;
-      hoverData: Ref<HoverData | undefined>;
-      hoverPosition: Ref<{ x: number; y: number }>;
+  function requestHoverHighlight(
+    event: MouseEvent,
+    onResponse: (response: unknown) => void | Promise<void>,
+  ): void {
+    if (!is_hover_highlight.value) {
+      return;
+    }
+    const { genericRenderWindow } = useHybridViewerCore();
+    const { hybridDb } = useHybridViewerScene();
+    const container = genericRenderWindow.value?.getContainer();
+    if (!container) {
+      return;
+    }
+    const viewerStore = useViewerStore();
+    const rect = container.getBoundingClientRect();
+    const schema = viewer_schemas.opengeodeweb_viewer.viewer.highlight;
+    const params = {
+      x: Math.round(event.clientX - rect.left),
+      y: Math.round(rect.height - (event.clientY - rect.top)),
+      field_type: hover_highlight_field_type.value,
+      ids: Object.keys(hybridDb),
     };
+    viewerStore
+      .request(
+        {
+          schema,
+          params,
+        },
+        {
+          response_function: onResponse,
+        },
+      )
+      // oxlint-disable-next-line promise/prefer-await-to-then -- fire-and-forget inside a sync caller; see codebase convention in global_attribute_style.ts.
+      .catch(() => undefined);
+  }
+
+  const hoverHighlight = useDebounceFn((event: MouseEvent) => {
+    const { genericRenderWindow } = useHybridViewerCore();
     const containerElement = genericRenderWindow.value?.getContainer();
     const relativeMousePosition = containerElement
       ? {
@@ -100,11 +85,16 @@ function createHoverHighlight({
           x: event.clientX,
           y: event.clientY,
         };
-    performHoverHighlight(event, async (rawResponse: unknown) => {
+    requestHoverHighlight(event, async (rawResponse: unknown) => {
+      // oxlint-disable-next-line no-unsafe-type-assertion -- trusted viewer RPC response boundary.
       const response = rawResponse as HighlightResponse | undefined;
-      const isResponseValid =
-        response && response.id && response.picked_id !== undefined && response.picked_id !== -1;
-      if (!is_hover_highlight.value || !isResponseValid) {
+      if (
+        !is_hover_highlight.value ||
+        response === undefined ||
+        response.id === undefined ||
+        response.picked_id === undefined ||
+        response.picked_id === -1
+      ) {
         clearHoverData();
         return;
       }
@@ -120,19 +110,14 @@ function createHoverHighlight({
       currentHoverId.value = hoverKey;
       let componentInfo: HoverComponentInfo | undefined = undefined;
       let modelName: string | undefined = undefined;
-      const modelRecord = (await database.data?.get(response.id as string)) as
-        | { name?: string }
-        | undefined;
+      const modelRecord = (await database.data?.get(response.id)) as { name?: string } | undefined;
       if (modelRecord) {
         modelName = modelRecord.name;
       }
       const modelComponentsTable = database.model_components;
-      if (response.geode_id && modelComponentsTable) {
+      if (response.geode_id !== undefined && modelComponentsTable) {
         const components = modelComponentsTable.where("[id+geode_id]");
-        const query = components.equals([
-          response.id as string,
-          response.geode_id,
-        ] as IndexableType);
+        const query = components.equals([response.id, response.geode_id] as IndexableType);
         const component = (await query.first()) as
           | { name?: string; geode_id?: string; type?: string }
           | undefined;
@@ -145,13 +130,13 @@ function createHoverHighlight({
         }
       }
       const newHoverData: HoverData = {
-        modelId: response.id as string,
+        modelId: response.id,
         modelName,
         blockName: response.geode_id,
         pickedId: response.picked_id,
         fieldType: response.field_type,
         component: componentInfo,
-        attributes: response.attributes || {},
+        attributes: response.attributes ?? {},
       };
       hoverTimeoutRef.value = setTimeout(() => {
         hoverPosition.value = relativeMousePosition;
@@ -160,47 +145,29 @@ function createHoverHighlight({
       }, HOVER_TIMEOUT_MS);
     });
   }, HOVER_DEBOUNCE_MS);
-}
-function performClearHoverHighlight(): void {
-  const hybridViewerStore = useHybridViewerStore();
-  const { hybridDb } = hybridViewerStore as unknown as HybridViewerStorePublic;
-  const { hover_highlight_field_type } = storeToRefs(hybridViewerStore) as unknown as {
-    hover_highlight_field_type: Ref<string>;
-  };
-  const viewerStore = useViewerStore();
-  const schema = viewer_schemas.opengeodeweb_viewer.viewer.highlight;
-  const params = {
-    x: -1,
-    y: -1,
-    field_type: hover_highlight_field_type.value,
-    ids: Object.keys(hybridDb),
-  };
-  viewerStore.request({
-    schema,
-    params,
-  });
-}
 
-function useHybridViewerHighlight() {
-  const is_hover_highlight = ref(false);
-  const hover_highlight_field_type = ref("CELL");
-  const hoverData = ref<HoverData | undefined>(undefined);
-  const hoverPosition = ref({
-    x: 0,
-    y: 0,
-  });
-  const hoverTimeoutRef = ref<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const currentHoverId = ref<string | undefined>(undefined);
-  const clearHoverData = createClearHoverData(hoverTimeoutRef, hoverData, currentHoverId);
-  const hoverHighlight = createHoverHighlight({
-    hoverTimeoutRef,
-    currentHoverId,
-    clearHoverData,
-  });
+  function requestClearHoverHighlight(): void {
+    const { hybridDb } = useHybridViewerScene();
+    const viewerStore = useViewerStore();
+    const schema = viewer_schemas.opengeodeweb_viewer.viewer.highlight;
+    const params = {
+      x: -1,
+      y: -1,
+      field_type: hover_highlight_field_type.value,
+      ids: Object.keys(hybridDb),
+    };
+    viewerStore
+      .request({
+        schema,
+        params,
+      })
+      // oxlint-disable-next-line promise/prefer-await-to-then -- fire-and-forget inside a sync caller; see codebase convention in global_attribute_style.ts.
+      .catch(() => undefined);
+  }
 
   function clearHoverHighlight(): void {
     clearHoverData();
-    performClearHoverHighlight();
+    requestClearHoverHighlight();
   }
 
   return {
@@ -211,12 +178,6 @@ function useHybridViewerHighlight() {
     clearHoverHighlight,
     hoverHighlight,
   };
-}
+});
 
-export {
-  createClearHoverData,
-  createHoverHighlight,
-  performClearHoverHighlight,
-  performHoverHighlight,
-  useHybridViewerHighlight,
-};
+export { useHybridViewerHighlight };

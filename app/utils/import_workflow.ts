@@ -3,21 +3,21 @@
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 
 // Local imports
+import { type NewDataItem, useDataStore } from "@ogw_front/stores/data";
 import { useBackStore } from "@ogw_front/stores/back";
-import { useDataStore } from "@ogw_front/stores/data";
-// oxlint-disable-next-line eslint/no-duplicate-imports
-import type { NewDataItem } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 interface FileToImport {
-  filename: string;
-  geode_object_type: string;
+  readonly filename: string;
+  readonly geode_object_type: string;
 }
 
-async function importItem(item: NewDataItem): Promise<string> {
+// NewDataItem has mutable array fields (mesh_components, collection_components), so Readonly<>
+// Can't satisfy prefer-readonly-parameter-types deeply; left unfixed (same pattern as app/plugins/auto_store_register.ts).
+async function importItem(item: Readonly<NewDataItem>): Promise<string> {
   const dataStore = useDataStore();
   const dataStyleStore = useDataStyleStore();
   const hybridViewerStore = useHybridViewerStore();
@@ -74,10 +74,11 @@ async function importFile(filename: string, geode_object_type: string): Promise<
     schema,
     params,
   });
+  // oxlint-disable-next-line no-unsafe-type-assertion -- this is the trusted API boundary; the back-end response shape matches NewDataItem.
   return importItem(response as NewDataItem);
 }
 
-async function importWorkflow(files: FileToImport[]): Promise<string[]> {
+async function importWorkflow(files: readonly FileToImport[]): Promise<string[]> {
   const chunk_size = 5;
   const chunks: FileToImport[][] = [];
   for (let i = 0; i < files.length; i += chunk_size) {
@@ -91,19 +92,22 @@ async function importWorkflow(files: FileToImport[]): Promise<string[]> {
     }
     const chunk = chunks[chunkIndex] ?? [];
     const chunk_results = await Promise.all(
-      chunk.map(async ({ filename, geode_object_type }) =>  await importFile(filename, geode_object_type)
-      ),
+      chunk.map(async ({ filename, geode_object_type }) => {
+        const id = await importFile(filename, geode_object_type);
+        return id;
+      }),
     );
     results.push(...chunk_results);
     await processChunk(chunkIndex + 1);
   }
   await processChunk(0);
   const hybridViewerStore = useHybridViewerStore();
-  hybridViewerStore.remoteRender();
+  await hybridViewerStore.remoteRender();
   return results;
 }
 
-async function importWorkflowFromSnapshot(items: NewDataItem[]): Promise<string[]> {
+// NewDataItem has mutable array fields (mesh_components, collection_components), so a readonly array of it can't satisfy prefer-readonly-parameter-types deeply; left unfixed (same pattern as app/plugins/auto_store_register.ts).
+async function importWorkflowFromSnapshot(items: readonly NewDataItem[]): Promise<string[]> {
   console.log("[importWorkflowFromSnapshot] start", { count: items?.length });
   const hybridViewerStore = useHybridViewerStore();
   const chunk_size = 5;
@@ -117,12 +121,17 @@ async function importWorkflowFromSnapshot(items: NewDataItem[]): Promise<string[
       return;
     }
     const chunk = chunks[chunkIndex] ?? [];
-    const chunk_ids = await Promise.all(chunk.map((item) => importItem(item)));
+    const chunk_ids = await Promise.all(
+      chunk.map(async (item) => {
+        const id = await importItem(item);
+        return id;
+      }),
+    );
     ids.push(...chunk_ids);
     await processChunk(chunkIndex + 1);
   }
   await processChunk(0);
-  hybridViewerStore.remoteRender();
+  await hybridViewerStore.remoteRender();
   console.log("[importWorkflowFromSnapshot] done", {
     ids,
   });

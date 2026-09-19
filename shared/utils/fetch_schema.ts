@@ -1,32 +1,35 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
-// Third party imports
-
 // Local imports
-import { fetchRaw } from "./fetch_raw.js";
 import type { JsonRpcSchema, RequestHandlersWithValidation } from "./types.js";
+import { fetchRaw } from "./fetch_raw.js";
 import { validateSchema } from "./validate_schema.js";
 
 const ERROR_400 = 400;
 
 interface FetchSchemaOptions {
-  schema: JsonRpcSchema & { methods: string[] };
+  schema: Readonly<JsonRpcSchema & { methods: readonly string[] }>;
   params?: unknown;
   baseURL?: string;
-  headers?: Record<string, string>;
+  headers?: Readonly<Record<string, string>>;
   timeout?: number;
   expectEvent?: boolean;
 }
 
-function fetchSchema(
-  { schema, params = {}, baseURL, headers, timeout, expectEvent = false }: FetchSchemaOptions,
+async function fetchSchema(
+  {
+    schema,
+    params = {},
+    baseURL,
+    headers,
+    timeout,
+    expectEvent = false,
+  }: Readonly<FetchSchemaOptions>,
   {
     request_error_function,
     response_function,
     response_error_function,
     validation_error_function,
-  }: RequestHandlersWithValidation = {},
-) {
+  }: Readonly<RequestHandlersWithValidation> = {},
+): Promise<unknown> {
   const { valid, error: schema_error } = validateSchema(schema, params);
 
   if (!valid) {
@@ -39,7 +42,7 @@ function fetchSchema(
     throw new Error(`${schema.$id}: ${schema_error}`);
   }
 
-  return fetchRaw(
+  const result = await fetchRaw(
     {
       route: schema.$id,
       method: schema.methods.find((method) => method !== "OPTIONS"),
@@ -56,6 +59,7 @@ function fetchSchema(
       response_error_function,
     },
   );
+  return result;
 }
 
 export { fetchSchema };

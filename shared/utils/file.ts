@@ -7,7 +7,7 @@ function assertFile(file: unknown): asserts file is File {
   }
 }
 
-function hasBody(params: unknown): boolean {
+function hasBody(params: unknown): params is Blob | FormData | Record<string, unknown> {
   if (params instanceof FormData || params instanceof Blob) {
     return true;
   }

@@ -12,8 +12,9 @@ const TIMEOUTS = {
 };
 const CI_WORKERS = 2;
 
-const globalRetry = process.env.CI ? RETRIES : DEFAULT_RETRY;
-const maxWorkers = process.env.CI ? CI_WORKERS : 3;
+const isCI = process.env.CI !== undefined && process.env.CI !== "";
+const globalRetry = isCI ? RETRIES : DEFAULT_RETRY;
+const maxWorkers = isCI ? CI_WORKERS : 3;
 
 const aliases = {
   "@ogw_tests": path.resolve(__dirname, "."),

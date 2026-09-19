@@ -42,7 +42,7 @@ describe("feedback snackers", () => {
     );
 
     expect(feedbackStore.feedbacks).toHaveLength(1);
-    const v_btn = await wrapper.findComponent(components.VBtn);
+    const v_btn = wrapper.findComponent(components.VBtn);
     await v_btn.trigger("click");
     expect(feedbackStore.feedbacks).toHaveLength(0);
   });

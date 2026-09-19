@@ -1,4 +1,3 @@
-/// <reference path="../types/vendor.d.ts" />
 // Third party imports
 import { WebSocket } from "ws";
 import { v4 as uuidv4 } from "uuid";
@@ -19,9 +18,29 @@ interface WsRpcMessage {
   result?: unknown;
 }
 
+function isWsRpcMessage(value: unknown): value is WsRpcMessage {
+  return typeof value === "object" && value !== null;
+}
+
+// oxlint-disable-next-line prefer-readonly-parameter-types
+function rawDataToString(raw: WebSocket.RawData): string {
+  if (Buffer.isBuffer(raw)) {
+    return raw.toString();
+  }
+  if (Array.isArray(raw)) {
+    return Buffer.concat(raw).toString();
+  }
+  return Buffer.from(raw).toString();
+}
+
 interface ServerWsRpcClient {
-  call: (rpc: string, params?: Record<string, unknown>) => Promise<unknown>;
+  call: (rpc: string, params?: Readonly<Record<string, unknown>>) => Promise<unknown>;
   close: () => void;
+  getConnection: () => {
+    getSession: () => {
+      call: (rpc: string, params: readonly [Readonly<Record<string, unknown>>]) => Promise<unknown>;
+    };
+  };
   isOpen: () => boolean;
   onConnectionClose: (callback: () => void) => void;
   onConnectionError: (callback: (error: unknown) => void) => void;
@@ -35,7 +54,7 @@ function createServerWsRpcClient(baseUrl: string): ServerWsRpcClient {
   let onCloseCallback: (() => void) | undefined = undefined;
   let onErrorCallback: ((error: unknown) => void) | undefined = undefined;
 
-  //oxlint-disable-next-line promise/avoid-new
+  //oxlint-disable-next-line promise/avoid-new max-lines-per-function
   const ready = new Promise<void>((resolve, reject) => {
     socket.on("open", () => {
       socket.send(
@@ -47,11 +66,15 @@ function createServerWsRpcClient(baseUrl: string): ServerWsRpcClient {
       );
     });
 
-    socket.on("message", (raw) => {
-      console.log("RAW WS MESSAGE:", raw.toString());
+    // oxlint-disable-next-line prefer-readonly-parameter-types
+    socket.on("message", (raw: WebSocket.RawData) => {
       let message: WsRpcMessage | undefined = undefined;
       try {
-        message = JSON.parse(raw.toString()) as WsRpcMessage;
+        const parsed: unknown = JSON.parse(rawDataToString(raw));
+        if (!isWsRpcMessage(parsed)) {
+          return;
+        }
+        message = parsed;
       } catch {
         return;
       }
@@ -71,13 +94,13 @@ function createServerWsRpcClient(baseUrl: string): ServerWsRpcClient {
       }
       pending.delete(message.id);
       if (message.error) {
-        entry.reject(new Error(message.error.message || "wslink RPC error"));
+        entry.reject(new Error(message.error.message ?? "wslink RPC error"));
       } else {
         entry.resolve(message.result);
       }
     });
 
-    socket.on("error", (error) => {
+    socket.on("error", (error: Readonly<Error>) => {
       onErrorCallback?.(error);
       reject(error);
     });
@@ -91,7 +114,10 @@ function createServerWsRpcClient(baseUrl: string): ServerWsRpcClient {
     });
   });
 
-  async function call(rpc: string, params: Record<string, unknown> = {}): Promise<unknown> {
+  async function call(
+    rpc: string,
+    params: Readonly<Record<string, unknown>> = {},
+  ): Promise<unknown> {
     await ready;
     const id = uuidv4();
     //oxlint-disable-next-line promise/avoid-new
@@ -113,6 +139,15 @@ function createServerWsRpcClient(baseUrl: string): ServerWsRpcClient {
     socket.close();
   }
 
+  function getConnection(): ReturnType<ServerWsRpcClient["getConnection"]> {
+    return {
+      getSession: () => ({
+        call: (rpc: string, [params]: readonly [Readonly<Record<string, unknown>>]) =>
+          call(rpc, params),
+      }),
+    };
+  }
+
   function isOpen(): boolean {
     return socket.readyState === WebSocket.OPEN;
   }
@@ -127,7 +162,7 @@ function createServerWsRpcClient(baseUrl: string): ServerWsRpcClient {
     onErrorCallback = callback;
   }
 
-  return { call, close, isOpen, onConnectionClose, onConnectionError, ready };
+  return { call, close, getConnection, isOpen, onConnectionClose, onConnectionError, ready };
 }
 
 export { createServerWsRpcClient };

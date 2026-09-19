@@ -8,9 +8,9 @@ const hybridViewerStore = useHybridViewerStore();
 const savedPositions = cameraManagerStore.refAllCameraPositions();
 
 const editingId = ref<number | undefined>(undefined);
-const editingName = ref("");
+const editingName = ref<string>("");
 
-async function restorePosition(positionId: number) {
+async function restorePosition(positionId: number): void {
   const position = await cameraManagerStore.getCameraPosition(positionId);
   if (position) {
     if (hybridViewerStore.genericRenderWindow) {
@@ -21,16 +21,16 @@ async function restorePosition(positionId: number) {
   }
 }
 
-async function deletePosition(positionId: number) {
+async function deletePosition(positionId: number): void {
   await cameraManagerStore.deleteCameraPosition(positionId);
 }
 
-function startEditing(position: { id?: number; name?: string }) {
+function startEditing(position: { id?: number; name?: string }): void {
   editingId.value = position.id;
   editingName.value = position.name ?? "";
 }
 
-async function saveRename() {
+async function saveRename(): void {
   if (editingName.value && editingId.value !== undefined) {
     await cameraManagerStore.renameCameraPosition(editingId.value, editingName.value);
   }

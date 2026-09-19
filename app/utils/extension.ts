@@ -3,12 +3,10 @@
 // Third party imports
 
 // Local imports
+import type { RegisterableStore, useAppStore } from "@ogw_front/stores/app";
+import type { Microservice } from "@ogw_front/stores/infra";
 import { isCloudMode } from "@ogw_front/utils/stores";
 import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json" with { type: "json" };
-import { useAppStore } from "@ogw_front/stores/app";
-import { useInfraStore } from "@ogw_front/stores/infra";
-// oxlint-disable-next-line eslint/no-duplicate-imports
-import type { Microservice } from "@ogw_front/stores/infra";
 
 interface ExtensionDescriptor {
   id: string;
@@ -23,12 +21,22 @@ interface DownloadExtensionParams {
   extensionFileName: string;
 }
 
-async function uploadExtension(file: File): Promise<void> {
+type AppStoreInstance = ReturnType<typeof useAppStore>;
+type ExtensionModuleType = Awaited<ReturnType<AppStoreInstance["loadExtension"]>>;
+interface RegisteredExtension {
+  name: string;
+  version: string;
+  extensionModule: ExtensionModuleType;
+}
+
+async function uploadExtension(file: Readonly<File>): Promise<void> {
+  const { useAppStore } = await import("@ogw_front/stores/app");
   const appStore = useAppStore();
   await appStore.upload(file);
 }
 
-function runExtensions() {
+async function runExtensions(): Promise<{ extensionsArray: ExtensionDescriptor[] }> {
+  const { useAppStore } = await import("@ogw_front/stores/app");
   const appStore = useAppStore();
   const { projectFolderPath } = appStore;
   const { PROJECT: projectName } = useRuntimeConfig().public;
@@ -39,13 +47,18 @@ function runExtensions() {
     projectFolderPath,
     projectName,
   };
-  return appStore.request({
+  const result = await appStore.request<{ extensionsArray: ExtensionDescriptor[] }>({
     schema,
     params,
-  }) as Promise<{ extensionsArray: ExtensionDescriptor[] }>;
+  });
+  return result;
 }
 
-function downloadExtension({ url, extensionFileName }: DownloadExtensionParams) {
+async function downloadExtension({
+  url,
+  extensionFileName,
+}: Readonly<DownloadExtensionParams>): Promise<unknown> {
+  const { useAppStore } = await import("@ogw_front/stores/app");
   const appStore = useAppStore();
   const { PROJECT: projectName } = useRuntimeConfig().public;
   const schema = opengeodeweb_front_schemas.api.microservice.extensions.download;
@@ -54,18 +67,27 @@ function downloadExtension({ url, extensionFileName }: DownloadExtensionParams) 
     url,
     extensionFileName,
   };
-  return appStore.request({
+  const result = await appStore.request({
     schema,
     params,
   });
+  return result;
 }
 
-async function registerRunningExtensions() {
+function isMicroservice(
+  store: Readonly<RegisterableStore>,
+): store is RegisterableStore & Microservice {
+  return typeof store.connect === "function";
+}
+
+async function registerRunningExtensions(): Promise<RegisteredExtension[]> {
+  const { useAppStore } = await import("@ogw_front/stores/app");
+  const { useInfraStore } = await import("@ogw_front/stores/infra");
   const appStore = useAppStore();
   const infraStore = useInfraStore();
   const { extensionsArray } = await runExtensions();
   return Promise.all(
-    extensionsArray.map(async (extension) => {
+    extensionsArray.map(async (extension: Readonly<ExtensionDescriptor>) => {
       const { id, name, version, frontendContent, port } = extension;
       const blob = new Blob([frontendContent], {
         type: "application/javascript",
@@ -80,7 +102,11 @@ async function registerRunningExtensions() {
       // Extension-provided stores are expected to satisfy the fuller
       // Microservice contract (connect, etc.) even though the loader's own
       // RegisterableStore type only models what app.ts itself needs.
-      infraStore.register_microservice(store as unknown as Microservice);
+      if (isMicroservice(store)) {
+        infraStore.register_microservice(store);
+      } else {
+        console.warn("[ExtensionManager] Store does not implement Microservice:", store.$id);
+      }
       return {
         name,
         version,
@@ -90,17 +116,20 @@ async function registerRunningExtensions() {
   );
 }
 
-async function importExtensionFile(file: File) {
+async function importExtensionFile(file: Readonly<File>): Promise<RegisteredExtension[]> {
   await uploadExtension(file);
   return registerRunningExtensions();
 }
 
-async function importExtensionURL(url: DownloadExtensionParams) {
+async function importExtensionURL(
+  url: Readonly<DownloadExtensionParams>,
+): Promise<RegisteredExtension[]> {
   await downloadExtension(url);
   return registerRunningExtensions();
 }
 
 async function unloadExtension(extensionId: string): Promise<boolean> {
+  const { useAppStore } = await import("@ogw_front/stores/app");
   const appStore = useAppStore();
   console.log("[ExtensionManager] Unloading extension:", extensionId);
   const extensionData = appStore.getExtension(extensionId);
@@ -111,21 +140,22 @@ async function unloadExtension(extensionId: string): Promise<boolean> {
 
   // Get the store if it exists
   const storeFactory = extensionData.metadata?.store;
-  if (storeFactory) {
+  if (storeFactory !== undefined) {
     const store = storeFactory();
     // Stop the microservice if possible
-    if (typeof store.kill === "function") {
-      await (store.kill as () => Promise<void>)();
+    if (store.kill) {
+      await store.kill();
     }
   }
 
   // Unload from AppStore
-  appStore.unloadExtension(extensionId);
+  await appStore.unloadExtension(extensionId);
   console.log("[ExtensionManager] Extension unloaded:", extensionId);
   return true;
 }
 
-function killExtension(extensionId: string) {
+async function killExtension(extensionId: string): Promise<unknown> {
+  const { useAppStore } = await import("@ogw_front/stores/app");
   const appStore = useAppStore();
   const { projectFolderPath } = appStore;
   const { PROJECT: projectName } = useRuntimeConfig().public;
@@ -135,10 +165,11 @@ function killExtension(extensionId: string) {
     projectFolderPath,
     projectName,
   };
-  return appStore.request({
+  const result = await appStore.request({
     schema,
     params,
   });
+  return result;
 }
 export {
   importExtensionFile,

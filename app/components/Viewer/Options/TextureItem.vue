@@ -6,9 +6,11 @@ import { useBackStore } from "@ogw_front/stores/back";
 // Mirrors FileUploader's own (unexported) UploadFile type.
 type UploadFile = File & { isConfigured?: boolean; displayName?: string };
 
-const emit = defineEmits<{
+interface Emits {
   update_value: [payload: { key: "texture_name" | "id"; value: string }];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 
 interface Props {
   id: string;
@@ -18,8 +20,8 @@ interface Props {
 
 const { id, textureId: propTextureId, textureName: propTextureName } = defineProps<Props>();
 
-const textureName = ref(propTextureName);
-const textureId = ref(propTextureId);
+const textureName = ref<string>(propTextureName);
+const textureId = ref<string>(propTextureId);
 
 watch(
   () => propTextureName,
@@ -38,7 +40,7 @@ watch(
 const textureCoordinates = ref<string[]>([]);
 const backStore = useBackStore();
 
-function getTextureCoordinates() {
+function getTextureCoordinates(): void {
   const schema = back_schemas.opengeodeweb_back.texture_coordinates;
   const params = { id };
   backStore.request(
@@ -57,7 +59,7 @@ onMounted(() => {
   getTextureCoordinates();
 });
 
-async function files_uploaded_event(value: UploadFile[]) {
+async function files_uploaded_event(value: UploadFile[]): Promise<void> {
   if (value.length > 0 && value[0]) {
     const schema = back_schemas.opengeodeweb_back.save_viewable_file;
     const params = {

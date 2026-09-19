@@ -15,9 +15,9 @@ const file_name = "test.og_brep";
 const geode_object = "BRep";
 const SLEEP_MS = 200;
 
-function sleep(milliseconds: number) {
+async function sleep(milliseconds: number): Promise<void> {
   // oxlint-disable-next-line promise/avoid-new
-  return new Promise((resolve) => {
+  await new Promise<void>((resolve) => {
     setTimeout(resolve, milliseconds);
   });
 }
@@ -51,6 +51,7 @@ describe("model points", () => {
       expect(spy).toHaveBeenCalledWith(
         { schema, params },
         {
+          // oxlint-disable-next-line no-unsafe-assignment -- expect.any(Function) is untyped by design, this is a vitest matcher not a real callback.
           response_function: expect.any(Function),
         },
       );
@@ -75,6 +76,7 @@ describe("model points", () => {
       expect(spy).toHaveBeenCalledWith(
         { schema, params },
         {
+          // oxlint-disable-next-line no-unsafe-assignment -- expect.any(Function) is untyped by design, this is a vitest matcher not a real callback.
           response_function: expect.any(Function),
         },
       );

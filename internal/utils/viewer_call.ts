@@ -1,11 +1,9 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
+import type { JsonRpcSchema, RequestHandlersWithValidation } from "@ogw_shared/utils/types.js";
 import { endRequestLog, startRequestLog } from "@ogw_front/utils/log";
+import type { Microservice } from "./api_fetch.js";
+import type { RpcClient } from "@ogw_shared/utils/call_raw.js";
 import { callSchema } from "@ogw_shared/utils/call_schema";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
-import type { JsonRpcSchema, RequestHandlersWithValidation } from "@ogw_shared/utils/types.js";
-import type { RpcClient } from "@ogw_shared/utils/call_raw.js";
-import type { Microservice } from "./api_fetch.js";
 
 interface ViewerMicroservice extends Microservice {
   client: RpcClient;
@@ -23,7 +21,17 @@ interface RpcErrorLike {
   message?: string;
 }
 
-function viewer_call(
+function toRpcErrorLike(value: unknown): RpcErrorLike {
+  if (typeof value !== "object" || value === null) {
+    return {};
+  }
+  return {
+    code: "code" in value && typeof value.code === "number" ? value.code : undefined,
+    message: "message" in value && typeof value.message === "string" ? value.message : undefined,
+  };
+}
+
+async function viewer_call(
   microservice: ViewerMicroservice,
   { schema, params = {}, timeout }: ViewerCallParams,
   {
@@ -31,12 +39,12 @@ function viewer_call(
     response_function,
     response_error_function,
   }: RequestHandlersWithValidation = {},
-) {
+): Promise<unknown> {
   const feedbackStore = useFeedbackStore();
   const { client } = microservice;
 
   const requestStartingTime = startRequestLog(microservice, schema);
-  return callSchema(
+  const result = await callSchema(
     {
       schema,
       params,
@@ -46,7 +54,7 @@ function viewer_call(
     {
       request_error_function(error: unknown) {
         microservice.stop_request();
-        const typedError = error as RpcErrorLike;
+        const typedError = toRpcErrorLike(error);
         feedbackStore.add_error(
           typedError.code ?? 0,
           schema.$id,
@@ -66,8 +74,7 @@ function viewer_call(
       },
       response_error_function(response: unknown) {
         microservice.stop_request();
-        // Pre-existing bug: this used an undefined `error` identifier (ReferenceError at runtime); fixed to use `response`, mirroring request_error_function above.
-        const typedResponse = response as RpcErrorLike;
+        const typedResponse = toRpcErrorLike(response);
         feedbackStore.add_error(
           typedResponse.code ?? 0,
           schema.$id,
@@ -84,6 +91,7 @@ function viewer_call(
       },
     },
   );
+  return result;
 }
 
 export { viewer_call };

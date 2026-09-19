@@ -48,6 +48,7 @@ describe("mesh polyhedra", () => {
       expect(spy).toHaveBeenCalledWith(
         { schema, params },
         {
+          // oxlint-disable-next-line no-unsafe-assignment -- expect.any(Function) is untyped by design, this is a vitest matcher not a real callback.
           response_function: expect.any(Function),
         },
       );
@@ -68,6 +69,7 @@ describe("mesh polyhedra", () => {
       expect(spy).toHaveBeenCalledWith(
         { schema, params },
         {
+          // oxlint-disable-next-line no-unsafe-assignment -- expect.any(Function) is untyped by design, this is a vitest matcher not a real callback.
           response_function: expect.any(Function),
         },
       );

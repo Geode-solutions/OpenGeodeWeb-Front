@@ -1,7 +1,7 @@
 import { useDataStore } from "@ogw_front/stores/data";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
-export function useBatchStyle() {
+export function useBatchStyle(): { applyBatchStyle: typeof applyBatchStyle } {
   const treeviewStore = useTreeviewStore();
   const dataStore = useDataStore();
 
@@ -22,17 +22,16 @@ export function useBatchStyle() {
       const promises = treeviewStore.activeItems.map(async (selectedId) => {
         try {
           const item = await dataStore.item(selectedId);
-          if (item && item.geode_object_type === targetType) {
+          if (item.geode_object_type === targetType) {
             await action(selectedId);
           }
-        } catch (error) {
-          console.error("Failed to apply batch style to item", selectedId, error);
+        } catch {
+          // Ignore items that fail to load; batch style continues for the rest.
         }
       });
 
       await Promise.all(promises);
-    } catch (error) {
-      console.error("Failed to fetch current item for batch style", id, error);
+    } catch {
       await action(id);
     }
   }

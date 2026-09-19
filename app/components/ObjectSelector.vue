@@ -1,6 +1,4 @@
 <script setup lang="ts">
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
 import FetchingData from "@ogw_front/components/FetchingData.vue";
 import { geode_objects } from "@ogw_front/assets/geode_objects";
 import { resolveAllowedObjects } from "@ogw_shared/utils/response_handlers/load.js";
@@ -8,7 +6,10 @@ import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 import { useBackStore } from "@ogw_front/stores/back";
 
 // Mirrors the (unexported) shape produced by shared/utils/response_handlers/load.ts.
-type AllowedObject = { is_loadable: number; object_priority?: number };
+interface AllowedObject {
+  is_loadable: number;
+  object_priority?: number;
+}
 type AllowedObjectMap = Record<string, AllowedObject>;
 
 const schema = schemas.opengeodeweb_back.allowed_objects;
@@ -26,10 +27,10 @@ const { filenames } = defineProps<Props>();
 
 const backStore = useBackStore();
 
-const loading = ref(false);
+const loading = ref<boolean>(false);
 const allowedGeodeObjects = ref<AllowedObjectMap>({});
 const toggleLoading = useToggle(loading);
-const multipleFilesNoCommon = ref(false);
+const multipleFilesNoCommon = ref<boolean>(false);
 
 async function fetchAllowedObjectsList(): Promise<AllowedObjectMap[]> {
   const promiseArray = filenames.map((filename): Promise<{ allowed_objects: AllowedObjectMap }> => {
@@ -40,7 +41,7 @@ async function fetchAllowedObjectsList(): Promise<AllowedObjectMap[]> {
   return responses.map((response) => response.allowed_objects);
 }
 
-function setGeodeObject(geode_object_type: string | undefined) {
+function setGeodeObject(geode_object_type: string | undefined): void {
   if (geode_object_type) {
     emit("update_values", { geode_object_type });
     emit("increment_step");
@@ -48,17 +49,17 @@ function setGeodeObject(geode_object_type: string | undefined) {
 }
 
 // The geode_objects lookup is fixed and keyed by known object type names; a missing entry only happens if the backend reports a type this table doesn't know about.
-function geodeObjectTooltip(key: string, isLoadable: boolean) {
+function geodeObjectTooltip(key: string, isLoadable: boolean): string {
   return isLoadable
     ? (geode_objects[key]?.tooltip ?? key)
     : `Data not loadable with this class (${key})`;
 }
 
-function geodeObjectImage(key: string) {
+function geodeObjectImage(key: string): string | undefined {
   return geode_objects[key]?.image;
 }
 
-async function getAllowedGeodeObjects() {
+async function getAllowedGeodeObjects(): Promise<void> {
   toggleLoading();
   allowedGeodeObjects.value = {};
   multipleFilesNoCommon.value = false;

@@ -4,16 +4,16 @@ interface Loggable {
   $id: string;
 }
 
-function startRequestLog(microservice: Loggable, schema: JsonRpcSchema): Date {
+function startRequestLog(microservice: Readonly<Loggable>, schema: Readonly<JsonRpcSchema>): Date {
   console.log(`[${microservice.$id}] Request:`, schema.$id);
   const requestStartingTime = new Date(Date.now());
   return requestStartingTime;
 }
 
 function endRequestLog(
-  microservice: Loggable,
-  schema: JsonRpcSchema,
-  requestStartingTime: Date,
+  microservice: Readonly<Loggable>,
+  schema: Readonly<JsonRpcSchema>,
+  requestStartingTime: Readonly<Date>,
 ): void {
   const requestEndingTime = new Date(Date.now());
   console.log(

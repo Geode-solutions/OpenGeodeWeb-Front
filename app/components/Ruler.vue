@@ -11,8 +11,8 @@ const { escapeFunction = undefined } = defineProps<Props>();
 const show = defineModel<boolean>("show", { default: false });
 const hybridViewerStore = useHybridViewerStore();
 
-const localPoint1 = ref([0, 0, 0]);
-const localPoint2 = ref([0, 0, 0]);
+const localPoint1 = ref<number[]>([0, 0, 0]);
+const localPoint2 = ref<number[]>([0, 0, 0]);
 
 watch(
   () => hybridViewerStore.ruler_point1,
@@ -49,7 +49,7 @@ watch(
   },
 );
 
-async function applyManualCoords() {
+async function applyManualCoords(): Promise<void> {
   hybridViewerStore.ruler_point1 = [...localPoint1.value];
   hybridViewerStore.ruler_point2 = [...localPoint2.value];
   await hybridViewerStore.applyRuler();

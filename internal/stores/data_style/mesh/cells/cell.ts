@@ -49,10 +49,32 @@ function isMeshCellsCellAttributeValid({
 }
 
 // oxlint-disable-next-line max-lines-per-function
-function useMeshCellsCellAttributeStyle() {
+function useMeshCellsCellAttributeStyle(): {
+  meshCellsCellAttributeName: (id: string) => string | undefined;
+  meshCellsCellAttributeItem: (id: string) => number;
+  meshCellsCellAttributeRange: (id: string) => [number | undefined, number | undefined];
+  meshCellsCellAttributeColorMap: (id: string) => string | undefined;
+  meshCellsCellAttributeStoredConfig: (
+    id: string,
+    name: string | undefined,
+    item: number | undefined,
+  ) => AttributeStoredConfig;
+  setMeshCellsCellAttribute: (id: string, input: AttributeInput) => Promise<unknown>;
+  setMeshCellsCellAttributeName: (id: string, name: string) => Promise<unknown>;
+  setMeshCellsCellAttributeItem: (id: string, item: number) => Promise<unknown>;
+  setMeshCellsCellAttributeRange: (
+    id: string,
+    minimum: number,
+    maximum: number,
+  ) => Promise<unknown>;
+  setMeshCellsCellAttributeColorMap: (id: string, colorMap: string | undefined) => Promise<unknown>;
+  meshCellsCellAttributeNoDataColor: (id: string) => unknown;
+  setMeshCellsCellAttributeNoDataColor: (id: string, no_data_color: unknown) => Promise<unknown>;
+} {
   const viewerStore = useViewerStore();
   const meshCellsCommonStyle = useMeshCellsCommonStyle();
   function meshCellsCellAttribute(id: string): AttributeState {
+    // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.cell shape is defined by the data style schema.
     return meshCellsCommonStyle.meshCellsColoring(id).cell as AttributeState;
   }
   function meshCellsCellAttributeStoredConfig(
@@ -61,14 +83,10 @@ function useMeshCellsCellAttributeStyle() {
     item: number | undefined,
   ): AttributeStoredConfig {
     const { storedConfigs } = meshCellsCellAttribute(id);
-    if (
-      storedConfigs &&
-      name !== undefined &&
-      name in storedConfigs &&
-      item !== undefined &&
-      item in storedConfigs[name]!
-    ) {
-      return storedConfigs[name]![item]!;
+    const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
+    const itemConfig = item === undefined ? undefined : nameConfig?.[item];
+    if (itemConfig !== undefined) {
+      return itemConfig;
     }
     return {
       minimum: undefined,
@@ -77,35 +95,41 @@ function useMeshCellsCellAttributeStyle() {
       no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
-  function mutateMeshCellsCellStyle(id: string, values: Record<string, unknown>) {
-    return meshCellsCommonStyle.mutateMeshCellsStyle(id, {
+  async function mutateMeshCellsCellStyle(
+    id: string,
+    values: Record<string, unknown>,
+  ): Promise<string> {
+    const result = await meshCellsCommonStyle.mutateMeshCellsStyle(id, {
       coloring: {
         cell: values,
       },
     });
+    return result;
   }
-  function setMeshCellsCellAttributeStoredConfig(
+  async function setMeshCellsCellAttributeStoredConfig(
     id: string,
     name: string | undefined,
     item: number | undefined,
     config: Partial<AttributeStoredConfig>,
-  ) {
-    return mutateMeshCellsCellStyle(id, {
+  ): Promise<string> {
+    const result = await mutateMeshCellsCellStyle(id, {
       storedConfigs: {
-        [name as string]: {
+        [name ?? ""]: {
           lastItem: item,
-          [item as number]: config,
+          [item ?? 0]: config,
         },
       },
     });
+    return result;
   }
   function meshCellsCellAttributeName(id: string): string | undefined {
     return meshCellsCellAttribute(id).name;
   }
   function meshCellsCellAttributeLastItem(id: string, name: string | undefined): number {
     const { storedConfigs } = meshCellsCellAttribute(id);
-    if (storedConfigs && name !== undefined && name in storedConfigs) {
-      return storedConfigs[name]!.lastItem;
+    const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
+    if (nameConfig !== undefined) {
+      return nameConfig.lastItem;
     }
     return 0;
   }
@@ -113,7 +137,7 @@ function useMeshCellsCellAttributeStyle() {
     const { item, name } = meshCellsCellAttribute(id);
     return item ?? meshCellsCellAttributeLastItem(id, name);
   }
-  function setMeshCellsCellAttribute(
+  async function setMeshCellsCellAttribute(
     id: string,
     {
       name,
@@ -123,18 +147,18 @@ function useMeshCellsCellAttributeStyle() {
       colorMap,
       no_data_color = DEFAULT_NO_DATA_COLOR,
     }: AttributeInput,
-  ) {
-    mutateMeshCellsCellStyle(id, {
+  ): Promise<unknown> {
+    await mutateMeshCellsCellStyle(id, {
       name,
       item,
     });
-    setMeshCellsCellAttributeStoredConfig(id, name, item, {
+    await setMeshCellsCellAttributeStoredConfig(id, name, item, {
       minimum,
       maximum,
       colorMap,
       no_data_color,
     });
-    const points = getRGBPointsFromPreset(colorMap as string);
+    const points = getRGBPointsFromPreset(colorMap ?? "");
     const schema = meshCellsCellAttributeSchemas.attribute;
     const params = {
       id,
@@ -150,7 +174,7 @@ function useMeshCellsCellAttributeStyle() {
       params,
     });
   }
-  function applyCellAttribute(id: string) {
+  async function applyCellAttribute(id: string): Promise<unknown> {
     const name = meshCellsCellAttributeName(id);
     const item = meshCellsCellAttributeItem(id);
     const storedConfig = meshCellsCellAttributeStoredConfig(id, name, item);
@@ -163,19 +187,21 @@ function useMeshCellsCellAttributeStyle() {
       no_data_color: storedConfig.no_data_color,
     };
     if (isMeshCellsCellAttributeValid(attribute)) {
-      return setMeshCellsCellAttribute(id, attribute);
+      const result = await setMeshCellsCellAttribute(id, attribute);
+      return result;
     }
+    return undefined;
   }
-  function setMeshCellsCellAttributeName(id: string, name: string) {
+  async function setMeshCellsCellAttributeName(id: string, name: string): Promise<unknown> {
     const item = meshCellsCellAttributeLastItem(id, name);
-    mutateMeshCellsCellStyle(id, {
+    await mutateMeshCellsCellStyle(id, {
       name,
       item,
     });
     return applyCellAttribute(id);
   }
-  function setMeshCellsCellAttributeItem(id: string, item: number) {
-    mutateMeshCellsCellStyle(id, {
+  async function setMeshCellsCellAttributeItem(id: string, item: number): Promise<unknown> {
+    await mutateMeshCellsCellStyle(id, {
       item,
     });
     return applyCellAttribute(id);
@@ -186,10 +212,14 @@ function useMeshCellsCellAttributeStyle() {
     const storedConfig = meshCellsCellAttributeStoredConfig(id, name, item);
     return [storedConfig.minimum, storedConfig.maximum];
   }
-  function setMeshCellsCellAttributeRange(id: string, minimum: number, maximum: number) {
+  async function setMeshCellsCellAttributeRange(
+    id: string,
+    minimum: number,
+    maximum: number,
+  ): Promise<unknown> {
     const name = meshCellsCellAttributeName(id);
     const item = meshCellsCellAttributeItem(id);
-    setMeshCellsCellAttributeStoredConfig(id, name, item, {
+    await setMeshCellsCellAttributeStoredConfig(id, name, item, {
       minimum,
       maximum,
     });
@@ -201,10 +231,13 @@ function useMeshCellsCellAttributeStyle() {
     const storedConfig = meshCellsCellAttributeStoredConfig(id, name, item);
     return storedConfig.colorMap;
   }
-  function setMeshCellsCellAttributeColorMap(id: string, colorMap: string | undefined) {
+  async function setMeshCellsCellAttributeColorMap(
+    id: string,
+    colorMap: string | undefined,
+  ): Promise<unknown> {
     const name = meshCellsCellAttributeName(id);
     const item = meshCellsCellAttributeItem(id);
-    setMeshCellsCellAttributeStoredConfig(id, name, item, {
+    await setMeshCellsCellAttributeStoredConfig(id, name, item, {
       colorMap,
     });
     return applyCellAttribute(id);
@@ -215,7 +248,10 @@ function useMeshCellsCellAttributeStyle() {
     const storedConfig = meshCellsCellAttributeStoredConfig(id, name, item);
     return storedConfig.no_data_color;
   }
-  async function setMeshCellsCellAttributeNoDataColor(id: string, no_data_color: unknown) {
+  async function setMeshCellsCellAttributeNoDataColor(
+    id: string,
+    no_data_color: unknown,
+  ): Promise<unknown> {
     const name = meshCellsCellAttributeName(id);
     const item = meshCellsCellAttributeItem(id);
     const storedConfig = meshCellsCellAttributeStoredConfig(id, name, item);

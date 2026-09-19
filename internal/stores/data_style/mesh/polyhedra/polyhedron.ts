@@ -3,7 +3,6 @@ import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 // Local imports
-import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { useMeshPolyhedraCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -51,14 +50,39 @@ function isMeshPolyhedraPolyhedronAttributeValid({
 }
 
 // oxlint-disable-next-line max-lines-per-function
-function useMeshPolyhedraPolyhedronAttributeStyle() {
+function useMeshPolyhedraPolyhedronAttributeStyle(): {
+  meshPolyhedraPolyhedronAttributeName: (id: string) => string | undefined;
+  meshPolyhedraPolyhedronAttributeItem: (id: string) => number;
+  meshPolyhedraPolyhedronAttributeRange: (id: string) => [number | undefined, number | undefined];
+  meshPolyhedraPolyhedronAttributeColorMap: (id: string) => string | undefined;
+  meshPolyhedraPolyhedronAttributeStoredConfig: (
+    id: string,
+    name: string | undefined,
+    item: number | undefined,
+  ) => AttributeStoredConfig;
+  setMeshPolyhedraPolyhedronAttribute: (id: string, input: AttributeInput) => Promise<unknown>;
+  setMeshPolyhedraPolyhedronAttributeName: (id: string, name: string) => Promise<unknown>;
+  setMeshPolyhedraPolyhedronAttributeItem: (id: string, item: number) => Promise<unknown>;
+  setMeshPolyhedraPolyhedronAttributeRange: (
+    id: string,
+    minimum: number,
+    maximum: number,
+  ) => Promise<unknown>;
+  setMeshPolyhedraPolyhedronAttributeColorMap: (
+    id: string,
+    colorMap: string | undefined,
+  ) => Promise<unknown>;
+  meshPolyhedraPolyhedronAttributeNoDataColor: (id: string) => unknown;
+  setMeshPolyhedraPolyhedronAttributeNoDataColor: (
+    id: string,
+    no_data_color: unknown,
+  ) => Promise<unknown>;
+} {
   const viewerStore = useViewerStore();
   const meshPolyhedraCommonStyle = useMeshPolyhedraCommonStyle();
-  function meshPolyhedraColoring(id: string): StyleValues {
-    return meshPolyhedraCommonStyle.meshPolyhedraStyle(id).coloring as StyleValues;
-  }
   function meshPolyhedraPolyhedronAttribute(id: string): AttributeState {
-    return meshPolyhedraColoring(id).polyhedron as AttributeState;
+    // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.polyhedron shape is defined by the data style schema.
+    return meshPolyhedraCommonStyle.meshPolyhedraColoring(id).polyhedron as AttributeState;
   }
   function meshPolyhedraPolyhedronAttributeStoredConfig(
     id: string,
@@ -66,14 +90,10 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
     item: number | undefined,
   ): AttributeStoredConfig {
     const { storedConfigs } = meshPolyhedraPolyhedronAttribute(id);
-    if (
-      storedConfigs &&
-      name !== undefined &&
-      name in storedConfigs &&
-      item !== undefined &&
-      item in storedConfigs[name]!
-    ) {
-      return storedConfigs[name]![item]!;
+    const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
+    const itemConfig = item === undefined ? undefined : nameConfig?.[item];
+    if (itemConfig !== undefined) {
+      return itemConfig;
     }
     return {
       minimum: undefined,
@@ -82,35 +102,41 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
       no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
-  function mutateMeshPolyhedraPolyhedronStyle(id: string, values: Record<string, unknown>) {
-    return meshPolyhedraCommonStyle.mutateMeshPolyhedraStyle(id, {
+  async function mutateMeshPolyhedraPolyhedronStyle(
+    id: string,
+    values: Record<string, unknown>,
+  ): Promise<string> {
+    const result = await meshPolyhedraCommonStyle.mutateMeshPolyhedraStyle(id, {
       coloring: {
         polyhedron: values,
       },
     });
+    return result;
   }
-  function setMeshPolyhedraPolyhedronAttributeStoredConfig(
+  async function setMeshPolyhedraPolyhedronAttributeStoredConfig(
     id: string,
     name: string | undefined,
     item: number | undefined,
     config: Partial<AttributeStoredConfig>,
-  ) {
-    return mutateMeshPolyhedraPolyhedronStyle(id, {
+  ): Promise<string> {
+    const result = await mutateMeshPolyhedraPolyhedronStyle(id, {
       storedConfigs: {
-        [name as string]: {
+        [name ?? ""]: {
           lastItem: item,
-          [item as number]: config,
+          [item ?? 0]: config,
         },
       },
     });
+    return result;
   }
   function meshPolyhedraPolyhedronAttributeName(id: string): string | undefined {
     return meshPolyhedraPolyhedronAttribute(id).name;
   }
   function meshPolyhedraPolyhedronAttributeLastItem(id: string, name: string | undefined): number {
     const { storedConfigs } = meshPolyhedraPolyhedronAttribute(id);
-    if (storedConfigs && name !== undefined && name in storedConfigs) {
-      return storedConfigs[name]!.lastItem;
+    const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
+    if (nameConfig !== undefined) {
+      return nameConfig.lastItem;
     }
     return 0;
   }
@@ -118,7 +144,7 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
     const { item, name } = meshPolyhedraPolyhedronAttribute(id);
     return item ?? meshPolyhedraPolyhedronAttributeLastItem(id, name);
   }
-  function setMeshPolyhedraPolyhedronAttribute(
+  async function setMeshPolyhedraPolyhedronAttribute(
     id: string,
     {
       name,
@@ -128,18 +154,18 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
       colorMap,
       no_data_color = DEFAULT_NO_DATA_COLOR,
     }: AttributeInput,
-  ) {
-    mutateMeshPolyhedraPolyhedronStyle(id, {
+  ): Promise<unknown> {
+    await mutateMeshPolyhedraPolyhedronStyle(id, {
       name,
       item,
     });
-    setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, item, {
+    await setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, item, {
       minimum,
       maximum,
       colorMap,
       no_data_color,
     });
-    const points = getRGBPointsFromPreset(colorMap as string);
+    const points = getRGBPointsFromPreset(colorMap ?? "");
     const schema = meshPolyhedraPolyhedronAttributeSchemas.attribute;
     const params = {
       id,
@@ -155,7 +181,7 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
       params,
     });
   }
-  function applyPolyhedronAttribute(id: string) {
+  async function applyPolyhedronAttribute(id: string): Promise<unknown> {
     const name = meshPolyhedraPolyhedronAttributeName(id);
     const item = meshPolyhedraPolyhedronAttributeItem(id);
     const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name, item);
@@ -168,19 +194,27 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
       no_data_color: storedConfig.no_data_color,
     };
     if (isMeshPolyhedraPolyhedronAttributeValid(attribute)) {
-      return setMeshPolyhedraPolyhedronAttribute(id, attribute);
+      const result = await setMeshPolyhedraPolyhedronAttribute(id, attribute);
+      return result;
     }
+    return undefined;
   }
-  function setMeshPolyhedraPolyhedronAttributeName(id: string, name: string) {
+  async function setMeshPolyhedraPolyhedronAttributeName(
+    id: string,
+    name: string,
+  ): Promise<unknown> {
     const item = meshPolyhedraPolyhedronAttributeLastItem(id, name);
-    mutateMeshPolyhedraPolyhedronStyle(id, {
+    await mutateMeshPolyhedraPolyhedronStyle(id, {
       name,
       item,
     });
     return applyPolyhedronAttribute(id);
   }
-  function setMeshPolyhedraPolyhedronAttributeItem(id: string, item: number) {
-    mutateMeshPolyhedraPolyhedronStyle(id, {
+  async function setMeshPolyhedraPolyhedronAttributeItem(
+    id: string,
+    item: number,
+  ): Promise<unknown> {
+    await mutateMeshPolyhedraPolyhedronStyle(id, {
       item,
     });
     return applyPolyhedronAttribute(id);
@@ -193,10 +227,14 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
     const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name, item);
     return [storedConfig.minimum, storedConfig.maximum];
   }
-  function setMeshPolyhedraPolyhedronAttributeRange(id: string, minimum: number, maximum: number) {
+  async function setMeshPolyhedraPolyhedronAttributeRange(
+    id: string,
+    minimum: number,
+    maximum: number,
+  ): Promise<unknown> {
     const name = meshPolyhedraPolyhedronAttributeName(id);
     const item = meshPolyhedraPolyhedronAttributeItem(id);
-    setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, item, {
+    await setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, item, {
       minimum,
       maximum,
     });
@@ -208,10 +246,13 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
     const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name, item);
     return storedConfig.colorMap;
   }
-  function setMeshPolyhedraPolyhedronAttributeColorMap(id: string, colorMap: string | undefined) {
+  async function setMeshPolyhedraPolyhedronAttributeColorMap(
+    id: string,
+    colorMap: string | undefined,
+  ): Promise<unknown> {
     const name = meshPolyhedraPolyhedronAttributeName(id);
     const item = meshPolyhedraPolyhedronAttributeItem(id);
-    setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, item, {
+    await setMeshPolyhedraPolyhedronAttributeStoredConfig(id, name, item, {
       colorMap,
     });
     return applyPolyhedronAttribute(id);
@@ -225,7 +266,7 @@ function useMeshPolyhedraPolyhedronAttributeStyle() {
   async function setMeshPolyhedraPolyhedronAttributeNoDataColor(
     id: string,
     no_data_color: unknown,
-  ) {
+  ): Promise<unknown> {
     const name = meshPolyhedraPolyhedronAttributeName(id);
     const item = meshPolyhedraPolyhedronAttributeItem(id);
     const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(id, name, item);

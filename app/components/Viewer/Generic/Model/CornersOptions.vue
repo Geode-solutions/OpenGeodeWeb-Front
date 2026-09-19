@@ -1,13 +1,11 @@
 <script setup lang="ts">
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
 import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
+import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 interface Props {
   modelId: string;
@@ -21,7 +19,7 @@ const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
 // Visibility
-const cornersVisibility = computed({
+const cornersVisibility = computed<boolean>({
   get: () => dataStyleStore.modelComponentTypeVisibility(modelId, "Corner"),
   set: async (newValue) => {
     await dataStyleStore.setModelCornersVisibility(modelId, targetCornerIds, newValue);
@@ -29,7 +27,7 @@ const cornersVisibility = computed({
   },
 });
 
-const cornerVisibility = computed({
+const cornerVisibility = computed<boolean | undefined>({
   get: () => dataStyleStore.modelCornerVisibility(modelId, cornerId) as boolean | undefined,
   set: async (newValue) => {
     if (cornerId === undefined) {
@@ -84,7 +82,7 @@ const cornerActiveColoring = computed<string | undefined>({
 });
 
 // Group Attributes
-const cornersVertexAttributeName = computed({
+const cornersVertexAttributeName = computed<string | undefined>({
   get: () => dataStyleStore.modelCornersVertexAttributeName(modelId),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -95,7 +93,7 @@ const cornersVertexAttributeName = computed({
   },
 });
 
-const cornersVertexAttributeItem = computed({
+const cornersVertexAttributeItem = computed<string | undefined>({
   get: () => dataStyleStore.modelCornersVertexAttributeItem(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelCornersVertexAttributeItem(modelId, targetCornerIds, newValue);
@@ -103,7 +101,7 @@ const cornersVertexAttributeItem = computed({
   },
 });
 
-const cornersVertexAttributeRange = computed({
+const cornersVertexAttributeRange = computed<[number, number] | undefined>({
   get: () => dataStyleStore.modelCornersVertexAttributeRange(modelId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -120,7 +118,7 @@ const cornersVertexAttributeRange = computed({
   },
 });
 
-const cornersVertexAttributeColorMap = computed({
+const cornersVertexAttributeColorMap = computed<ColorMap | undefined>({
   get: () => dataStyleStore.modelCornersVertexAttributeColorMap(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelCornersVertexAttributeColorMap(modelId, targetCornerIds, newValue);
@@ -142,7 +140,7 @@ const cornersVertexAttributeNoDataColor = computed<RGBAColor | undefined>({
 });
 
 // Individual Attributes
-const vertexAttributeName = computed({
+const vertexAttributeName = computed<string | undefined>({
   get: () => dataStyleStore.modelCornersVertexAttributeName(modelId, cornerId),
   set: async (newValue) => {
     if (cornerId === undefined || newValue === undefined) {
@@ -153,7 +151,7 @@ const vertexAttributeName = computed({
   },
 });
 
-const vertexAttributeItem = computed({
+const vertexAttributeItem = computed<string | undefined>({
   get: () => dataStyleStore.modelCornersVertexAttributeItem(modelId, cornerId),
   set: async (newValue) => {
     if (cornerId === undefined) {
@@ -164,7 +162,7 @@ const vertexAttributeItem = computed({
   },
 });
 
-const vertexAttributeRange = computed({
+const vertexAttributeRange = computed<[number, number] | undefined>({
   get: () => dataStyleStore.modelCornersVertexAttributeRange(modelId, cornerId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -176,7 +174,7 @@ const vertexAttributeRange = computed({
   },
 });
 
-const vertexAttributeColorMap = computed({
+const vertexAttributeColorMap = computed<ColorMap | undefined>({
   get: () => dataStyleStore.modelCornersVertexAttributeColorMap(modelId, cornerId),
   set: async (newValue) => {
     if (cornerId === undefined) {

@@ -8,27 +8,33 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 // Local constants
 const schema = viewer_schemas.opengeodeweb_viewer.mesh.apply_textures;
 
-export function useMeshPolygonsTexturesStyle() {
+export function useMeshPolygonsTexturesStyle(): {
+  meshPolygonsTextures: (id: string) => unknown;
+  setMeshPolygonsTextures: (id: string, textures: unknown) => Promise<unknown>;
+} {
   const viewerStore = useViewerStore();
   const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle();
 
   function meshPolygonsTextures(id: string): unknown {
     return meshPolygonsCommonStyle.meshPolygonsColoring(id).textures;
   }
-  function setMeshPolygonsTextures(id: string, textures: unknown) {
+  async function setMeshPolygonsTextures(id: string, textures: unknown): Promise<unknown> {
     const params = { id, textures };
-    return viewerStore.request(
+    const result = await viewerStore.request(
       {
         schema,
         params,
       },
       {
-        response_function: () =>
-          meshPolygonsCommonStyle.mutateMeshPolygonsStyle(id, {
+        response_function: async () => {
+          const mutateResult = await meshPolygonsCommonStyle.mutateMeshPolygonsStyle(id, {
             coloring: { textures },
-          }),
+          });
+          return mutateResult;
+        },
       },
     );
+    return result;
   }
 
   return {

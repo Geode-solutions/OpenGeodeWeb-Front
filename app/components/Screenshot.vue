@@ -19,14 +19,14 @@ const { width = DEFAULT_PANEL_WIDTH, escapeFunction = undefined } = defineProps<
 
 const output_extensions =
   viewer_schemas.opengeodeweb_viewer.viewer.take_screenshot.properties.output_extension.enum;
-const filename = ref("");
-const output_extension = ref("png");
-const include_background = ref(true);
-const screenshot_type = ref("file");
+const filename = ref<string>("");
+const output_extension = ref<string>("png");
+const include_background = ref<boolean>(true);
+const screenshot_type = ref<string>("file");
 
 const { copy } = useClipboardItems();
 
-async function takeScreenshot() {
+async function takeScreenshot(): Promise<void> {
   const viewerStore = useViewerStore();
   const feedbackStore = useFeedbackStore();
   const current_filename = screenshot_type.value === "file" ? filename.value : "screenshot";
@@ -80,7 +80,7 @@ watch(screenshot_type, (value) => {
   }
 });
 
-function handleClose() {
+function handleClose(): void {
   if (escapeFunction) {
     escapeFunction();
   }
