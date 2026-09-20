@@ -40,7 +40,7 @@ export default defineConfig({
   platform: "node",
   external: isExternal,
   output: {
-    dir: ".",
+    dir: ".build",
     format: "esm",
     preserveModules: true,
     preserveModulesRoot: ".",

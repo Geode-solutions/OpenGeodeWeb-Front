@@ -21,6 +21,7 @@
     "internal",
     "server",
     "shared",
+    ".build",
     "nuxt.config.ts",
     "opengeodeweb_front_schemas.json",
     "opengeodeweb_front_schemas.js",
@@ -32,7 +33,8 @@
   "main": "./nuxt.config.ts",
   "exports": {
     ".": "./nuxt.config.ts",
-    "./*.js": "./*.ts",
+    "./server/utils/*.js": "./.build/server/utils/*.js",
+    "./shared/*.js": "./.build/shared/*.js",
     "./*": "./*"
   },
   "publishConfig": {
