@@ -91,9 +91,9 @@ export const useBackStore = defineStore("back", {
               typeof response === "object" &&
               response !== null &&
               "port" in response &&
-              typeof response.port === "string"
+              (typeof response.port === "string" || typeof response.port === "number")
             ) {
-              this.default_local_port = response.port;
+              this.default_local_port = String(response.port);
             }
           },
         },
