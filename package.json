@@ -32,6 +32,7 @@
   "main": "./nuxt.config.ts",
   "exports": {
     ".": "./nuxt.config.ts",
+    "./*.js": "./*.ts",
     "./*": "./*"
   },
   "publishConfig": {
