@@ -5,6 +5,11 @@
 .cache
 dist
 
+# Regenerated on every `nuxt prepare` by whichever app extends this layer
+# (see nuxt.config.ts in Vease/Vease-Modeling for why it must be self-contained);
+# its content depends on the consumer that generated it, so it can't be committed.
+/tsconfig.json
+
 # Node dependencies
 node_modules
 
