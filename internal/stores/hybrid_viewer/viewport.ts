@@ -43,7 +43,10 @@ async function performResize(width: number, height: number): Promise<void> {
   await remoteRender();
 }
 
-async function performClickPicking(event: MouseEvent, containerElement: HTMLElement): Promise<void> {
+async function performClickPicking(
+  event: MouseEvent,
+  containerElement: HTMLElement,
+): Promise<void> {
   const { genericRenderWindow, syncRemoteCamera } =
     useHybridViewerStore() as unknown as HybridViewerStorePublic;
   const viewerStore = useViewerStore();
