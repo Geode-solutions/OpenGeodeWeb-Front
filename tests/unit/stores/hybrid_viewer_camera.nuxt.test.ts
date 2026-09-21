@@ -1,9 +1,8 @@
-// oxlint-disable eslint/sort-imports
 import { describe, expect, test } from "vitest";
 
-import { newInstance as vtkCamera } from "@kitware/vtk.js/Rendering/Core/Camera";
-import { centerCameraOnPosition } from "@ogw_internal/stores/hybrid_viewer/camera";
 import type { Vector3 } from "@ogw_internal/stores/hybrid_viewer/vtk_types";
+import { centerCameraOnPosition } from "@ogw_internal/stores/hybrid_viewer/camera";
+import { newInstance as vtkCamera } from "@kitware/vtk.js/Rendering/Core/Camera";
 
 const INITIAL_CAMERA_Z = 100;
 const PICKED_X = 20;
