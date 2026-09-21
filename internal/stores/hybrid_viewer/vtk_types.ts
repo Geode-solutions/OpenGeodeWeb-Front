@@ -51,7 +51,7 @@ interface HybridViewerStorePublic {
   camera_options: Record<string, unknown>;
   remoteRender: () => Promise<void> | void;
   clearHoverHighlight: () => void;
-  syncRemoteCamera: () => Promise<unknown>;
+  syncRemoteCamera: () => void;
   hoverHighlight: (event: MouseEvent) => void;
   setZScaling: (value: number) => Promise<void>;
   setCamera: (options: CameraOptions) => void;

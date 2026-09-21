@@ -79,7 +79,7 @@ function getCameraOptions(camera: vtkCamera | undefined): CameraOptions | undefi
   };
 }
 
-function performSyncRemoteCamera(): Promise<unknown> {
+function performSyncRemoteCamera(): void {
   const { genericRenderWindow, camera_options, remoteRender } =
     useHybridViewerStore() as unknown as HybridViewerStorePublic;
   const viewerStore = useViewerStore();
@@ -90,7 +90,7 @@ function performSyncRemoteCamera(): Promise<unknown> {
   const params = {
     camera_options: options_camera,
   };
-  return viewerStore.request(
+  viewerStore.request(
     {
       schema,
       params,
@@ -231,8 +231,8 @@ function performCameraOrientation(orientation: string): void {
 
 function useHybridViewerCamera() {
   const camera_options = reactive<Record<string, unknown>>({});
-  function syncRemoteCamera(): Promise<unknown> {
-    return performSyncRemoteCamera();
+  function syncRemoteCamera(): void {
+    performSyncRemoteCamera();
   }
   function setCamera(targetCameraOptions: CameraOptions): void {
     performSetCamera(targetCameraOptions);
@@ -268,13 +268,21 @@ function centerCameraOnPosition(
   if (!camera || !pickedPosition) {
     return;
   }
-  const focalPoint = camera.getFocalPoint();
   const position = camera.getPosition();
+  const directionOfProjection = camera.getDirectionOfProjection();
+  const distance = dot(
+    [
+      pickedPosition[0] - position[0],
+      pickedPosition[1] - position[1],
+      pickedPosition[2] - position[2],
+    ],
+    directionOfProjection,
+  );
   camera.setFocalPoint(...pickedPosition);
   camera.setPosition(
-    position[0] + pickedPosition[0] - focalPoint[0],
-    position[1] + pickedPosition[1] - focalPoint[1],
-    position[2] + pickedPosition[2] - focalPoint[2],
+    pickedPosition[0] - distance * directionOfProjection[0],
+    pickedPosition[1] - distance * directionOfProjection[1],
+    pickedPosition[2] - distance * directionOfProjection[2],
   );
 }
 
