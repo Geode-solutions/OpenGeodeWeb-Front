@@ -27,12 +27,7 @@ const vuetifyColor = ref({
   a: initialColor.alpha,
 });
 
-function updateInputTextFromColor(
-  red: number,
-  green: number,
-  blue: number,
-  alpha: number,
-) {
+function updateInputTextFromColor(red: number, green: number, blue: number, alpha: number) {
   colorInputText.value =
     disabledAlpha || currentMode.value === "rgb"
       ? `${red}, ${green}, ${blue}`
