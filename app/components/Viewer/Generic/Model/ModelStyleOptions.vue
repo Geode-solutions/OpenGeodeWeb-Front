@@ -1,11 +1,16 @@
-<script setup>
+<script setup lang="ts">
 import ModelColor from "@ogw_front/assets/viewer_svgs/model_component_color.svg";
 import ModelStyleCard from "./ModelStyleCard.vue";
-import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem";
+// oxlint-disable import/consistent-type-specifier-style -- combining the default import with the type import avoids a duplicate-imports violation on this same module; using disable-next-line here is fragile because a formatter can re-wrap the import onto multiple lines and shift the flagged line
+import ViewerContextMenuItem, {
+  type ItemProps,
+} from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 
-const { itemProps } = defineProps({
-  itemProps: { type: Object, required: true },
-});
+interface Props {
+  itemProps: ItemProps & { index: number };
+}
+
+const { itemProps } = defineProps<Props>();
 </script>
 
 <template>

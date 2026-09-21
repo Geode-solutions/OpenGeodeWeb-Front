@@ -16,27 +16,41 @@
     "type": "git",
     "url": "git+https://github.com/Geode-solutions/OpenGeodeWeb-Front.git"
   },
+  "files": [
+    "app",
+    "internal",
+    "server",
+    "shared",
+    "nuxt.config.ts",
+    "opengeodeweb_front_schemas.json",
+    "opengeodeweb_front_schemas.js",
+    "COPYLEFT",
+    "LICENSE",
+    "README.md"
+  ],
   "type": "module",
-  "main": "./nuxt.config.js",
+  "main": "./nuxt.config.ts",
   "exports": {
-    ".": "./nuxt.config.js",
+    ".": "./nuxt.config.ts",
     "./*": "./*"
   },
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
-    "lint": "eslint --fix --ext .js,.vue --ignore-path .gitignore .",
+    "lint": "oxlint --fix .",
+    "typecheck": "nuxt typecheck && tsc -p tsconfig.tests.json --noEmit",
     "build:back": "npx opengeodeweb-microservice-pyinstaller ../OpenGeodeWeb-Back",
     "build:viewer": "npx opengeodeweb-microservice-pyinstaller ../OpenGeodeWeb-Viewer",
     "build:microservices": "concurrently \"npm run build:back\" \"npm run build:viewer\"",
     "json": "npx opengeodeweb-microservice-generate --startDir server/api --key route --separator / --prefix api",
     "test": "npm run test:unit",
-    "tests": "vitest --config ./tests/vitest.config.js",
+    "tests": "nuxt prepare && vitest --config ./tests/vitest.config.ts",
     "test:unit": "npm run tests -- --project unit",
     "test:integration": "npm run tests -- --project integration",
-    "geode_objects": "node scripts/generate_geode_objects.js && prettier ./assets/geode_objects.js --write",
-    "build": ""
+    "geode_objects": "tsx scripts/generate_geode_objects.ts && prettier ./assets/geode_objects.ts --write",
+    "build": "nuxt prepare && rolldown -c rolldown.config.ts",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@geode/opengeodeweb-back": "0.0.0",
@@ -47,6 +61,7 @@
     "@pinia/nuxt": "1.0.1",
     "@types/node": "22.15.3",
     "@vueuse/components": "13.1.0",
+    "@vueuse/core": "13.1.0",
     "@vueuse/nuxt": "13.1.0",
     "@vueuse/rxjs": "14.1.0",
     "ajv": "8.17.1",
@@ -58,8 +73,10 @@
     "googleapis": "171.4.0",
     "js-file-download": "0.4.12",
     "jszip": "3.10.1",
+    "lodash": "4.18.1",
     "node-stream-zip": "1.15.0",
     "nuxt": "4.5.1",
+    "ofetch": "1.5.1",
     "p-timeout": "7.0.1",
     "pinia": "4.0.2",
     "rimraf": "6.1.3",
@@ -67,27 +84,35 @@
     "sanitize-filename": "1.6.3",
     "sass": "1.87.0",
     "semver": "7.7.1",
+    "tar": "7.5.22",
     "uuid": "11.1.0",
-    "vuetify": "3.12.5",
-    "vuetify-nuxt-module": "0.18.7",
+    "vuetify": "4.2.0",
+    "vuetify-nuxt-module": "1.0.0-rc.5",
     "ws": "8.21.2",
     "wslink": "1.12.4"
   },
   "devDependencies": {
     "@nuxt/test-utils": "4.1.0",
     "@pinia/testing": "2.0.1",
+    "@types/lodash": "4.17.25",
     "@vitejs/plugin-vue": "6.0.8",
     "@vue/test-utils": "2.4.11",
     "happy-dom": "20.0.11",
     "msw": "2.11.1",
+    "oxlint": "1.82.0",
     "playwright-core": "1.52.0",
+    "prettier": "3.8.1",
     "resize-observer-polyfill": "1.5.1",
+    "rolldown": "1.2.8",
+    "tsx": "4.23.13",
+    "typescript": "5.9.3",
     "unplugin-auto-import": "20.0.0",
     "vite": "8.2.0",
     "vite-plugin-vuetify": "2.1.3",
     "vitest": "4.1.10",
     "vitest-environment-nuxt": "2.0.0",
-    "vitest-indexeddb": "0.0.1"
+    "vitest-indexeddb": "0.0.1",
+    "vue-tsc": "3.3.11"
   },
   "overrides": {
     "vue": "3.5.40"

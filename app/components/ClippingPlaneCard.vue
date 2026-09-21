@@ -1,18 +1,17 @@
-<script setup>
+<script setup lang="ts">
 import { getPlaneCssColor } from "@ogw_front/utils/clipping_planes";
 
-const { plane, index } = defineProps({
-  plane: {
-    type: Object,
-    required: true,
-  },
-  index: {
-    type: Number,
-    required: true,
-  },
-});
+interface Props {
+  plane: { origin?: number[]; normal: number[] };
+  index: number;
+}
 
-const emit = defineEmits(["remove", "flipNormal"]);
+const { plane, index } = defineProps<Props>();
+
+const emit = defineEmits<{
+  remove: [];
+  flipNormal: [];
+}>();
 </script>
 
 <template>

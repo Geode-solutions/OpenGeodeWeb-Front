@@ -1,19 +1,33 @@
-<script setup>
+<script setup lang="ts">
 // oxlint-disable id-length
-const colorPickerRef = useTemplateRef("colorPickerRef");
-const model = defineModel({ type: Object });
+import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+
+interface Props {
+  disabledAlpha?: boolean;
+}
+
+const { disabledAlpha = false } = defineProps<Props>();
+
+// The useMousePressed composable only needs the underlying DOM element (it unwraps a component ref's $el at runtime); typing this as the actual Vuetify component instance produces a union too complex for TS to represent.
+const colorPickerRef = useTemplateRef<HTMLElement>("colorPickerRef");
+const model = defineModel<RGBAColor>();
 const { pressed } = useMousePressed({ target: colorPickerRef });
 
+// The model is always bound by every current caller (ColoringTypeSelector.vue, AttributeSelector.vue); defineModel can't express that as a required prop without breaking its optional v-model contract, so this reads it as defined here.
+const initialColor = model.value as RGBAColor;
 const vuetifyColor = ref({
-  r: model.value.red,
-  g: model.value.green,
-  b: model.value.blue,
-  a: model.value.alpha,
+  r: initialColor.red,
+  g: initialColor.green,
+  b: initialColor.blue,
+  a: initialColor.alpha,
 });
 
 watch(
   model,
   (newValue) => {
+    if (!newValue) {
+      return;
+    }
     const hasChanged =
       newValue.red !== vuetifyColor.value.r ||
       newValue.green !== vuetifyColor.value.g ||
@@ -53,8 +67,9 @@ watch(pressed, (value) => {
     canvas-height="75"
     hide-inputs
     hide-eye-dropper
+    :disabled-alpha="disabledAlpha"
     width="220"
-    mode="rgba"
+    :mode="disabledAlpha ? 'rgb' : 'rgba'"
     class="mx-auto"
   />
 </template>

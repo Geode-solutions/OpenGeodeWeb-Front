@@ -1,28 +1,36 @@
-<script setup>
-import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem";
-import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector";
-import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch";
+<script setup lang="ts">
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
+// oxlint-disable import/consistent-type-specifier-style -- combining the default import with the type import avoids a duplicate-imports violation on this same module; using disable-next-line here is fragile because a formatter can re-wrap the import onto multiple lines and shift the flagged line
+import ViewerContextMenuItem, {
+  type ItemProps,
+} from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
+import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const { applyBatchStyle } = useBatchStyle();
 
-const { itemProps, btnImage, tooltip } = defineProps({
-  itemProps: { type: Object, required: true },
-  btnImage: { type: String, required: true },
-  tooltip: { type: String, required: false, default: "Polyhedra options" },
-});
+interface Props {
+  itemProps: ItemProps & { index?: number };
+  btnImage: string;
+  tooltip?: string;
+}
+
+const { itemProps, btnImage, tooltip = "Polyhedra options" } = defineProps<Props>();
 
 const id = toRef(() => itemProps.id);
 
 const visibility = computed({
   get: () => dataStyleStore.meshPolyhedraVisibility(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
+    await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPolyhedraVisibility(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -31,16 +39,16 @@ const visibility = computed({
 const coloring_style_key = computed({
   get: () => dataStyleStore.meshPolyhedraActiveColoring(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
+    await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPolyhedraActiveColoring(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
 });
-const color = computed({
-  get: () => dataStyleStore.meshPolyhedraColor(id.value),
+const color = computed<RGBAColor | undefined>({
+  get: () => dataStyleStore.meshPolyhedraColor(id.value) as RGBAColor | undefined,
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
+    await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPolyhedraColor(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -49,8 +57,11 @@ const color = computed({
 const vertex_attribute_name = computed({
   get: () => dataStyleStore.meshPolyhedraVertexAttributeName(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshPolyhedraVertexAttributeName(targetId, newValue),
+    if (newValue === undefined) {
+      return;
+    }
+    await applyBatchStyle(id.value, (targetId: string) =>
+      Promise.resolve(dataStyleStore.setMeshPolyhedraVertexAttributeName(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -58,8 +69,8 @@ const vertex_attribute_name = computed({
 const vertex_attribute_item = computed({
   get: () => dataStyleStore.meshPolyhedraVertexAttributeItem(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshPolyhedraVertexAttributeItem(targetId, newValue),
+    await applyBatchStyle(id.value, (targetId: string) =>
+      Promise.resolve(dataStyleStore.setMeshPolyhedraVertexAttributeItem(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -67,8 +78,14 @@ const vertex_attribute_item = computed({
 const vertex_attribute_range = computed({
   get: () => dataStyleStore.meshPolyhedraVertexAttributeRange(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshPolyhedraVertexAttributeRange(targetId, newValue[0], newValue[1]),
+    const [minimum, maximum] = newValue;
+    if (minimum === undefined || maximum === undefined) {
+      return;
+    }
+    await applyBatchStyle(id.value, (targetId: string) =>
+      Promise.resolve(
+        dataStyleStore.setMeshPolyhedraVertexAttributeRange(targetId, minimum, maximum),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
@@ -76,8 +93,18 @@ const vertex_attribute_range = computed({
 const vertex_attribute_color_map = computed({
   get: () => dataStyleStore.meshPolyhedraVertexAttributeColorMap(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshPolyhedraVertexAttributeColorMap(targetId, newValue),
+    await applyBatchStyle(id.value, (targetId: string) =>
+      Promise.resolve(dataStyleStore.setMeshPolyhedraVertexAttributeColorMap(targetId, newValue)),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const vertex_attribute_no_data_color = computed<RGBAColor | undefined>({
+  get: () =>
+    dataStyleStore.meshPolyhedraVertexAttributeNoDataColor(id.value) as RGBAColor | undefined,
+  set: async (newValue) => {
+    await applyBatchStyle(id.value, (targetId: string) =>
+      dataStyleStore.setMeshPolyhedraVertexAttributeNoDataColor(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
@@ -85,8 +112,11 @@ const vertex_attribute_color_map = computed({
 const polyhedron_attribute_name = computed({
   get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeName(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(targetId, newValue),
+    if (newValue === undefined) {
+      return;
+    }
+    await applyBatchStyle(id.value, (targetId: string) =>
+      Promise.resolve(dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -94,8 +124,8 @@ const polyhedron_attribute_name = computed({
 const polyhedron_attribute_item = computed({
   get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeItem(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshPolyhedraPolyhedronAttributeItem(targetId, newValue),
+    await applyBatchStyle(id.value, (targetId: string) =>
+      Promise.resolve(dataStyleStore.setMeshPolyhedraPolyhedronAttributeItem(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -103,10 +133,14 @@ const polyhedron_attribute_item = computed({
 const polyhedron_attribute_range = computed({
   get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeRange(id.value),
   set: async (newValue) => {
-    await dataStyleStore.setMeshPolyhedraPolyhedronAttributeRange(
-      id.value,
-      newValue[0],
-      newValue[1],
+    const [minimum, maximum] = newValue;
+    if (minimum === undefined || maximum === undefined) {
+      return;
+    }
+    await applyBatchStyle(id.value, (targetId: string) =>
+      Promise.resolve(
+        dataStyleStore.setMeshPolyhedraPolyhedronAttributeRange(targetId, minimum, maximum),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
@@ -114,8 +148,20 @@ const polyhedron_attribute_range = computed({
 const polyhedron_attribute_color_map = computed({
   get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeColorMap(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshPolyhedraPolyhedronAttributeColorMap(targetId, newValue),
+    await applyBatchStyle(id.value, (targetId: string) =>
+      Promise.resolve(
+        dataStyleStore.setMeshPolyhedraPolyhedronAttributeColorMap(targetId, newValue),
+      ),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+const polyhedron_attribute_no_data_color = computed<RGBAColor | undefined>({
+  get: () =>
+    dataStyleStore.meshPolyhedraPolyhedronAttributeNoDataColor(id.value) as RGBAColor | undefined,
+  set: async (newValue) => {
+    await applyBatchStyle(id.value, (targetId: string) =>
+      dataStyleStore.setMeshPolyhedraPolyhedronAttributeNoDataColor(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
@@ -125,6 +171,7 @@ const polyhedron_attribute_color_map = computed({
 <template>
   <ViewerContextMenuItem
     data-testid="meshPolyhedraMenu"
+    :index="itemProps.index!"
     :itemProps="itemProps"
     :tooltip="tooltip"
     :btnImage="btnImage"
@@ -144,10 +191,12 @@ const polyhedron_attribute_color_map = computed({
           v-model:vertex_attribute_item="vertex_attribute_item"
           v-model:vertex_attribute_range="vertex_attribute_range"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
+          v-model:vertex_attribute_no_data_color="vertex_attribute_no_data_color"
           v-model:polyhedron_attribute_name="polyhedron_attribute_name"
           v-model:polyhedron_attribute_item="polyhedron_attribute_item"
           v-model:polyhedron_attribute_range="polyhedron_attribute_range"
           v-model:polyhedron_attribute_color_map="polyhedron_attribute_color_map"
+          v-model:polyhedron_attribute_no_data_color="polyhedron_attribute_no_data_color"
           :capabilities="{
             vertex: { available: true, hasColorMap: true },
             polyhedron: { available: true, hasColorMap: true },

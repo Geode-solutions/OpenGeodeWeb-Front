@@ -1,17 +1,21 @@
-<script setup>
+<script setup lang="ts">
 import { drawCanvasForPreset, getPresetsWithCurrentAtTop } from "@ogw_front/utils/colormap";
 import ColorMapList from "./ColorMapList.vue";
 import GlassCard from "@ogw_front/components/GlassCard.vue";
 
-const { max, min } = defineProps({
-  min: { type: Number, required: true },
-  max: { type: Number, required: true },
+interface Props {
+  min: number;
+  max: number;
+}
+
+const { max, min } = defineProps<Props>();
+
+const selectedPresetName = defineModel<string>("selectedPresetName", {
+  default: "batlow",
 });
 
-const selectedPresetName = defineModel("selectedPresetName", { type: String, default: "batlow" });
-
 const menuOpen = ref(false);
-const lutCanvas = ref();
+const lutCanvas = ref<HTMLCanvasElement | undefined>(undefined);
 
 const presets = computed(() => getPresetsWithCurrentAtTop(selectedPresetName.value));
 
@@ -19,7 +23,7 @@ function drawLutCanvas() {
   drawCanvasForPreset(selectedPresetName.value, lutCanvas.value);
 }
 
-function onSelectPreset(preset) {
+function onSelectPreset(preset: { Name: string }) {
   selectedPresetName.value = preset.Name;
   menuOpen.value = false;
 }

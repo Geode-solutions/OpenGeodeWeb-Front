@@ -1,0 +1,70 @@
+// Only ever fires now that tests are .ts; asks every bare `vi.fn()` mock to carry an explicit call-signature type parameter. Real value for a handful of mocks, but for the many plain mock objects across this test suite it would mean guessing a signature that's already implied by how the mock is used (risking a type that quietly doesn't match, which defeats the point) rather than deriving it from each real function - left off rather than doing that at scale.
+// oxlint-disable vitest/require-mock-type-parameters
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
+// Third party imports
+import * as components from "vuetify/components";
+import { beforeEach, describe, expect, test, vi } from "vitest";
+import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime";
+import { nextTick } from "vue";
+import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import type { HTTPMethod } from "h3";
+
+// Local imports
+import { setupActivePinia, vuetify } from "@ogw_tests/utils";
+import ExtensionSelector from "@ogw_front/components/ExtensionSelector.vue";
+import { useBackStore } from "@ogw_front/stores/back";
+
+const EXPECTED_LENGTH = 1;
+const FIRST_INDEX = 0;
+const SECOND_INDEX = 1;
+
+const schema = schemas.opengeodeweb_back.geode_objects_and_output_extensions;
+
+const pinia = setupActivePinia();
+const backStore = useBackStore();
+
+describe("extension selector", () => {
+  beforeEach(() => {
+    (backStore as { base_url: string }).base_url = "/";
+
+    backStore.request = vi.fn(() => {
+      const response = {
+        geode_objects_and_output_extensions: {
+          BRep: { msh: { is_saveable: true } },
+        },
+      };
+      return Promise.resolve(response);
+    });
+  });
+
+  test("select geode_object & extension", async () => {
+    const output_geode_object = "BRep";
+    const output_extension = "msh";
+
+    registerEndpoint(schema.$id, {
+      method: schema.methods[FIRST_INDEX] as HTTPMethod,
+      handler: () => ({
+        geode_objects_and_output_extensions: {
+          BRep: { msh: { is_saveable: true } },
+        },
+      }),
+    });
+    const wrapper = await mountSuspended(ExtensionSelector, {
+      global: {
+        plugins: [vuetify, pinia],
+      },
+      props: { geode_object_type: "BRep", filenames: ["test.toto"] },
+    });
+    await nextTick();
+    expect(wrapper.exists()).toBe(true);
+    const v_card = await wrapper.findAllComponents(components.VCard);
+    await v_card[SECOND_INDEX]?.trigger("click");
+    expect(wrapper.emitted()).toHaveProperty("update_values");
+    expect(wrapper.emitted<unknown[]>().update_values).toHaveLength(EXPECTED_LENGTH);
+    expect(wrapper.emitted<unknown[]>().update_values?.[FIRST_INDEX]?.[FIRST_INDEX]).toStrictEqual({
+      output_geode_object,
+      output_extension,
+    });
+  });
+});

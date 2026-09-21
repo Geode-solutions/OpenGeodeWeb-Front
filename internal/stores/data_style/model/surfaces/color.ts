@@ -1,0 +1,117 @@
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
+import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
+import { isModelSurfacesPolygonAttributeValid, useModelSurfacesPolygonAttribute } from "./polygon";
+import { isModelSurfacesVertexAttributeValid, useModelSurfacesVertexAttribute } from "./vertex";
+import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
+import { useModelSurfacesCommonStyle } from "./common";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+
+const schema = viewer_schemas.opengeodeweb_viewer.model.surfaces.color;
+
+export function useModelSurfacesColor() {
+  const modelCommonStyle = useModelCommonStyle();
+  const modelSurfacesCommonStyle = useModelSurfacesCommonStyle();
+  const modelSurfacesVertexAttribute = useModelSurfacesVertexAttribute();
+  const modelSurfacesPolygonAttribute = useModelSurfacesPolygonAttribute();
+
+  function modelSurfaceColoring(id: string, surface_id?: string): StyleValues {
+    return modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id).coloring as StyleValues;
+  }
+
+  function modelSurfaceColor(id: string, surface_id?: string): unknown {
+    return modelSurfaceColoring(id, surface_id).constant;
+  }
+
+  function setModelSurfacesColor(
+    modelId: string,
+    surfaces_ids: string[],
+    color: unknown,
+    activeColoring = "constant",
+  ) {
+    return modelCommonStyle.setModelTypeColor(modelId, surfaces_ids, color, schema, activeColoring);
+  }
+
+  function modelSurfaceActiveColoring(id: string, surface_id?: string): unknown {
+    return modelSurfaceColoring(id, surface_id).active;
+  }
+
+  async function setModelSurfacesActiveColoring(
+    modelId: string,
+    surfaces_ids: string[],
+    activeColoring: string,
+  ) {
+    if (surfaces_ids.length > 1) {
+      modelSurfacesCommonStyle.mutateModelSurfacesTypeColoring(modelId, {
+        active: activeColoring,
+      });
+    }
+    await modelCommonStyle.mutateComponentStyles(modelId, surfaces_ids, {
+      coloring: { active: activeColoring },
+    });
+    if (activeColoring === "constant" || activeColoring === "random") {
+      const color = modelSurfaceColor(modelId, surfaces_ids[0]);
+      return setModelSurfacesColor(modelId, surfaces_ids, color, activeColoring);
+    }
+
+    if (activeColoring === "vertex") {
+      const name = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeName(
+        modelId,
+        surfaces_ids[0],
+      );
+      const item = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeItem(
+        modelId,
+        surfaces_ids[0],
+      );
+      const [minimum, maximum] = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeRange(
+        modelId,
+        surfaces_ids[0],
+      );
+      const colorMap = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeColorMap(
+        modelId,
+        surfaces_ids[0],
+      );
+      const attribute = { name, item, minimum, maximum, colorMap };
+      if (isModelSurfacesVertexAttributeValid(attribute)) {
+        return modelSurfacesVertexAttribute.setModelSurfacesVertexAttribute(
+          modelId,
+          surfaces_ids,
+          attribute,
+        );
+      }
+    } else if (activeColoring === "polygon") {
+      const name = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeName(
+        modelId,
+        surfaces_ids[0],
+      );
+      const item = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeItem(
+        modelId,
+        surfaces_ids[0],
+      );
+      const [minimum, maximum] = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeRange(
+        modelId,
+        surfaces_ids[0],
+      );
+      const colorMap = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeColorMap(
+        modelId,
+        surfaces_ids[0],
+      );
+      const attribute = { name, item, minimum, maximum, colorMap };
+      if (isModelSurfacesPolygonAttributeValid(attribute)) {
+        return modelSurfacesPolygonAttribute.setModelSurfacesPolygonAttribute(
+          modelId,
+          surfaces_ids,
+          attribute,
+        );
+      }
+    }
+  }
+
+  return {
+    setModelSurfacesColor,
+    modelSurfaceColoring,
+    modelSurfaceColor,
+    modelSurfaceActiveColoring,
+    setModelSurfacesActiveColoring,
+  };
+}

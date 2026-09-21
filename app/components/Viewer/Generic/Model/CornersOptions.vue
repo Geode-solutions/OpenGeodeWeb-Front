@@ -1,16 +1,21 @@
-<script setup>
+<script setup lang="ts">
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
 import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
-const { modelId, cornerId, targetCornerIds } = defineProps({
-  modelId: { type: String, required: true },
-  cornerId: { type: String, default: undefined },
-  targetCornerIds: { type: Array, required: true },
-});
+interface Props {
+  modelId: string;
+  cornerId?: string;
+  targetCornerIds: string[];
+}
+
+const { modelId, cornerId = undefined, targetCornerIds } = defineProps<Props>();
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
@@ -25,41 +30,54 @@ const cornersVisibility = computed({
 });
 
 const cornerVisibility = computed({
-  get: () => dataStyleStore.modelCornerVisibility(modelId, cornerId),
+  get: () => dataStyleStore.modelCornerVisibility(modelId, cornerId) as boolean | undefined,
   set: async (newValue) => {
+    if (cornerId === undefined) {
+      return;
+    }
     await dataStyleStore.setModelCornersVisibility(modelId, [cornerId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
 
 // Color
-const cornersColor = computed({
-  get: () => dataStyleStore.modelComponentTypeColor(modelId, "Corner"),
+const cornersColor = computed<RGBAColor | undefined>({
+  get: () => dataStyleStore.modelComponentTypeColor(modelId, "Corner") as RGBAColor | undefined,
   set: async (color) => {
     await dataStyleStore.setModelCornersColor(modelId, targetCornerIds, color);
     hybridViewerStore.remoteRender();
   },
 });
 
-const cornerColor = computed({
-  get: () => dataStyleStore.modelCornerColor(modelId, cornerId),
+const cornerColor = computed<RGBAColor | undefined>({
+  get: () => dataStyleStore.modelCornerColor(modelId, cornerId) as RGBAColor | undefined,
   set: async (color) => {
+    if (cornerId === undefined) {
+      return;
+    }
     await dataStyleStore.setModelCornersColor(modelId, [cornerId], color);
     hybridViewerStore.remoteRender();
   },
 });
 
-const cornersActiveColoring = computed({
-  get: () => dataStyleStore.getModelComponentTypeActiveColoring(modelId, "Corner"),
+const cornersActiveColoring = computed<string | undefined>({
+  get: () =>
+    dataStyleStore.getModelComponentTypeActiveColoring(modelId, "Corner") as string | undefined,
   set: async (coloringType) => {
+    if (typeof coloringType !== "string") {
+      return;
+    }
     await dataStyleStore.setModelCornersActiveColoring(modelId, targetCornerIds, coloringType);
     hybridViewerStore.remoteRender();
   },
 });
 
-const cornerActiveColoring = computed({
-  get: () => dataStyleStore.modelCornerActiveColoring(modelId, cornerId),
+const cornerActiveColoring = computed<string | undefined>({
+  get: () => dataStyleStore.modelCornerActiveColoring(modelId, cornerId) as string | undefined,
   set: async (coloringType) => {
+    if (cornerId === undefined || typeof coloringType !== "string") {
+      return;
+    }
     await dataStyleStore.setModelCornersActiveColoring(modelId, [cornerId], coloringType);
     hybridViewerStore.remoteRender();
   },
@@ -69,6 +87,9 @@ const cornerActiveColoring = computed({
 const cornersVertexAttributeName = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeName(modelId),
   set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
     await dataStyleStore.setModelCornersVertexAttributeName(modelId, targetCornerIds, newValue);
     hybridViewerStore.remoteRender();
   },
@@ -85,11 +106,15 @@ const cornersVertexAttributeItem = computed({
 const cornersVertexAttributeRange = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeRange(modelId),
   set: async (newValue) => {
+    const [minimum, maximum] = newValue;
+    if (minimum === undefined || maximum === undefined) {
+      return;
+    }
     await dataStyleStore.setModelCornersVertexAttributeRange(
       modelId,
       targetCornerIds,
-      newValue[0],
-      newValue[1],
+      minimum,
+      maximum,
     );
     hybridViewerStore.remoteRender();
   },
@@ -103,10 +128,26 @@ const cornersVertexAttributeColorMap = computed({
   },
 });
 
+const cornersVertexAttributeNoDataColor = computed<RGBAColor | undefined>({
+  get: () =>
+    dataStyleStore.modelCornersVertexAttributeNoDataColor(modelId) as RGBAColor | undefined,
+  set: async (newValue) => {
+    await dataStyleStore.setModelCornersVertexAttributeNoDataColor(
+      modelId,
+      targetCornerIds,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+
 // Individual Attributes
 const vertexAttributeName = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeName(modelId, cornerId),
   set: async (newValue) => {
+    if (cornerId === undefined || newValue === undefined) {
+      return;
+    }
     await dataStyleStore.setModelCornersVertexAttributeName(modelId, [cornerId], newValue);
     hybridViewerStore.remoteRender();
   },
@@ -115,6 +156,9 @@ const vertexAttributeName = computed({
 const vertexAttributeItem = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeItem(modelId, cornerId),
   set: async (newValue) => {
+    if (cornerId === undefined) {
+      return;
+    }
     await dataStyleStore.setModelCornersVertexAttributeItem(modelId, [cornerId], newValue);
     hybridViewerStore.remoteRender();
   },
@@ -123,12 +167,11 @@ const vertexAttributeItem = computed({
 const vertexAttributeRange = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeRange(modelId, cornerId),
   set: async (newValue) => {
-    await dataStyleStore.setModelCornersVertexAttributeRange(
-      modelId,
-      [cornerId],
-      newValue[0],
-      newValue[1],
-    );
+    const [minimum, maximum] = newValue;
+    if (cornerId === undefined || minimum === undefined || maximum === undefined) {
+      return;
+    }
+    await dataStyleStore.setModelCornersVertexAttributeRange(modelId, [cornerId], minimum, maximum);
     hybridViewerStore.remoteRender();
   },
 });
@@ -136,7 +179,24 @@ const vertexAttributeRange = computed({
 const vertexAttributeColorMap = computed({
   get: () => dataStyleStore.modelCornersVertexAttributeColorMap(modelId, cornerId),
   set: async (newValue) => {
+    if (cornerId === undefined) {
+      return;
+    }
     await dataStyleStore.setModelCornersVertexAttributeColorMap(modelId, [cornerId], newValue);
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const vertexAttributeNoDataColor = computed<RGBAColor | undefined>({
+  get: () =>
+    dataStyleStore.modelCornersVertexAttributeNoDataColor(modelId, cornerId) as
+      | RGBAColor
+      | undefined,
+  set: async (newValue) => {
+    if (cornerId === undefined) {
+      return;
+    }
+    await dataStyleStore.setModelCornersVertexAttributeNoDataColor(modelId, [cornerId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -166,6 +226,7 @@ const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attri
       v-model:vertex_attribute_item="cornersVertexAttributeItem"
       v-model:vertex_attribute_range="cornersVertexAttributeRange"
       v-model:vertex_attribute_color_map="cornersVertexAttributeColorMap"
+      v-model:vertex_attribute_no_data_color="cornersVertexAttributeNoDataColor"
       :capabilities="capabilities"
       :schemas="{ vertex: vertexSchema }"
       :allowRandom="true"
@@ -188,6 +249,7 @@ const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attri
       v-model:vertex_attribute_item="vertexAttributeItem"
       v-model:vertex_attribute_range="vertexAttributeRange"
       v-model:vertex_attribute_color_map="vertexAttributeColorMap"
+      v-model:vertex_attribute_no_data_color="vertexAttributeNoDataColor"
       :capabilities="capabilities"
       :schemas="{ vertex: vertexSchema }"
       :allowRandom="true"
