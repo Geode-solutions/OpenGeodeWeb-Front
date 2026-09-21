@@ -33,8 +33,14 @@
   "main": "./nuxt.config.ts",
   "exports": {
     ".": "./nuxt.config.ts",
-    "./server/utils/*.js": "./.build/server/utils/*.js",
-    "./shared/*.js": "./.build/shared/*.js",
+    "./server/utils/*.js": {
+      "types": "./server/utils/*.ts",
+      "default": "./.build/server/utils/*.js"
+    },
+    "./shared/*.js": {
+      "types": "./shared/*.ts",
+      "default": "./.build/shared/*.js"
+    },
     "./*": "./*"
   },
   "publishConfig": {
