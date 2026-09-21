@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from "uuid";
 
 // Local imports
 import { appMode } from "@geode/opengeodeweb-front/shared/app_mode.ts";
-import { commandExistsSync } from "./scripts.js";
+import { commandExistsSync } from "./scripts.ts";
 
 function executableName(execName: string): string {
   if (process.platform === "win32") {

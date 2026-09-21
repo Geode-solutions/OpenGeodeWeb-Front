@@ -94,7 +94,7 @@ async function copyToClipboard(text: string, label: string): Promise<void> {
       <div class="d-flex flex-column ga-1">
         <span class="text-caption d-flex align-center">
           <strong class="text-white mr-1">ID:</strong>
-          <span>{{ actualItem.id }}</span>
+          <span data-testid="tooltipIdValue">{{ actualItem.id }}</span>
           <v-btn
             data-testid="copyIdBtn"
             icon
