@@ -43,10 +43,11 @@ async function performResize(width: number, height: number): Promise<void> {
   await remoteRender();
 }
 
-function performClickPicking(event: MouseEvent, containerElement: HTMLElement): void {
+async function performClickPicking(event: MouseEvent, containerElement: HTMLElement): Promise<void> {
   const { genericRenderWindow, syncRemoteCamera } =
     useHybridViewerStore() as unknown as HybridViewerStorePublic;
   const viewerStore = useViewerStore();
+  await syncRemoteCamera();
   const rect = containerElement.getBoundingClientRect();
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
   const params = {

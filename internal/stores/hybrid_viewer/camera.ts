@@ -79,7 +79,7 @@ function getCameraOptions(camera: vtkCamera | undefined): CameraOptions | undefi
   };
 }
 
-function performSyncRemoteCamera(): void {
+function performSyncRemoteCamera(): Promise<unknown> {
   const { genericRenderWindow, camera_options, remoteRender } =
     useHybridViewerStore() as unknown as HybridViewerStorePublic;
   const viewerStore = useViewerStore();
@@ -231,7 +231,7 @@ function performCameraOrientation(orientation: string): void {
 
 function useHybridViewerCamera() {
   const camera_options = reactive<Record<string, unknown>>({});
-  function syncRemoteCamera(): void {
+  function syncRemoteCamera(): Promise<unknown> {
     return performSyncRemoteCamera();
   }
   function setCamera(targetCameraOptions: CameraOptions): void {
