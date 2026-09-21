@@ -1,23 +1,40 @@
-<script setup>
+<script setup lang="ts">
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
 import { middleTruncate } from "@ogw_front/utils/string";
 import { useClipboard } from "@vueuse/core";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useResponsiveMiddleTruncate } from "@ogw_front/composables/responsive_middle_truncate";
+import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 
 const feedbackStore = useFeedbackStore();
 const { copy } = useClipboard();
 
-const { item, isLeaf } = defineProps({
-  item: { type: Object, required: true },
-  isLeaf: { type: Boolean, required: false, default: undefined },
-});
+interface Props {
+  item: DisplayItem;
+  isLeaf?: boolean;
+}
 
-const emit = defineEmits(["contextmenu", "mouseenter", "mouseleave"]);
+const { item, isLeaf } = defineProps<Props>();
+
+const emit = defineEmits<{
+  contextmenu: [event: MouseEvent];
+  mouseenter: [];
+  mouseleave: [];
+}>();
 
 const labelContainer = useTemplateRef("label-container");
 const { width: containerWidth } = useElementSize(labelContainer);
 
-const actualItem = computed(() => item.raw || item);
+// The item prop can be either a DisplayItem wrapper (with a `.raw` domain object) or the domain object itself when this component is used outside CommonTreeView's slot machinery; the domain object always carries an id/title at runtime.
+interface LabeledItem {
+  id: string;
+  title?: string;
+  is_active?: boolean;
+  children?: unknown[];
+}
+
+const actualItem = computed(() => (item.raw || item) as unknown as LabeledItem);
 
 const TOOLTIP_NAME_MAX_LENGTH = 40;
 const TOOLTIP_NAME_START_CHARS = 10;
@@ -41,7 +58,7 @@ const tooltipDisabled = computed(() => {
   return actualItem.value.children && actualItem.value.children.length > 0;
 });
 
-async function copyToClipboard(text, label) {
+async function copyToClipboard(text: string, label: string) {
   await copy(text);
   feedbackStore.add_success(`${label} copied to clipboard`);
 }
@@ -77,29 +94,33 @@ async function copyToClipboard(text, label) {
       <div class="d-flex flex-column ga-1">
         <span class="text-caption d-flex align-center">
           <strong class="text-white mr-1">ID:</strong>
-          <span>{{ actualItem.id }}</span>
+          <span data-testid="tooltipIdValue">{{ actualItem.id }}</span>
           <v-btn
             data-testid="copyIdBtn"
-            icon="mdi-content-copy"
+            icon
             variant="text"
-            size="x-small"
             density="compact"
             class="ml-1 text-white"
+            style="width: 18px; height: 18px; min-width: 18px; min-height: 18px"
             @click.stop="copyToClipboard(actualItem.id, 'ID')"
-          />
+          >
+            <v-icon size="12">mdi-content-copy</v-icon>
+          </v-btn>
         </span>
         <span v-if="actualItem.title" class="text-caption d-flex align-center">
           <strong class="text-white mr-1">Name:</strong>
           <span>{{ tooltipTitle }}</span>
           <v-btn
             data-testid="copyNameBtn"
-            icon="mdi-content-copy"
+            icon
             variant="text"
-            size="x-small"
             density="compact"
             class="ml-1 text-white"
+            style="width: 18px; height: 18px; min-width: 18px; min-height: 18px"
             @click.stop="copyToClipboard(actualItem.title, 'Name')"
-          />
+          >
+            <v-icon size="12">mdi-content-copy</v-icon>
+          </v-btn>
         </span>
         <span v-if="actualItem.is_active !== undefined" class="text-caption d-flex align-center">
           <strong class="text-white mr-1">Status:</strong>

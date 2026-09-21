@@ -1,5 +1,5 @@
-<script setup>
-import GlassCard from "@ogw_front/components/GlassCard";
+<script setup lang="ts">
+import GlassCard from "@ogw_front/components/GlassCard.vue";
 import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
 import { useMenuStore } from "@ogw_front/stores/menu";
 import { useTheme } from "vuetify";
@@ -15,12 +15,22 @@ const menuStore = useMenuStore();
 const theme = useTheme();
 const primaryColor = computed(() => theme.current.value.colors.primary);
 
-const { index, itemProps, tooltip, btnImage } = defineProps({
-  index: { type: Number, required: true },
-  itemProps: { type: Object, required: true },
-  tooltip: { type: String, required: true },
-  btnImage: { type: String, required: true },
-});
+interface ItemProps {
+  id: string;
+  meta_data: Record<string, unknown>;
+  tooltip_location: "right" | "top" | "left" | "bottom";
+  tooltip_origin: "right" | "top" | "left" | "bottom";
+  totalItems: number;
+}
+
+interface Props {
+  index: number;
+  itemProps: ItemProps;
+  tooltip: string;
+  btnImage: string;
+}
+
+const { index, itemProps, tooltip, btnImage } = defineProps<Props>();
 
 const buttonCoords = computed(() => {
   const angle = (index / itemProps.totalItems) * 2 * Math.PI;
@@ -86,7 +96,7 @@ const computedItemStyles = computed(() => {
 });
 
 const is_active = computed(() => menuStore.active_item_index === index);
-const optionsRef = ref(undefined);
+const optionsRef = ref<HTMLElement | undefined>(undefined);
 const { height: optionsHeight } = useElementSize(optionsRef);
 
 const maxCardHeight = computed(() => Math.min(CARD_HEIGHT, menuStore.containerHeight - OFFSET));
@@ -125,6 +135,8 @@ const optionsClass = computed(() => {
 function toggleOptions() {
   menuStore.toggleItemOptions(index);
 }
+
+export type { ItemProps };
 </script>
 <template>
   <v-sheet class="menu-item-container transition-swing" color="transparent">

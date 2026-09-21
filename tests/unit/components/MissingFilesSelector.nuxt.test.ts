@@ -1,0 +1,84 @@
+// Only ever fires now that tests are .ts; asks every bare `vi.fn()` mock to carry an explicit call-signature type parameter. Real value for a handful of mocks, but for the many plain mock objects across this test suite it would mean guessing a signature that's already implied by how the mock is used (risking a type that quietly doesn't match, which defeats the point) rather than deriving it from each real function - left off rather than doing that at scale.
+// oxlint-disable vitest/require-mock-type-parameters
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
+// Third party imports
+import * as components from "vuetify/components";
+import { describe, expect, test, vi } from "vitest";
+import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime";
+import { flushPromises } from "@vue/test-utils";
+import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import type { HTTPMethod } from "h3";
+
+// Local imports
+import { setupActivePinia, vuetify } from "@ogw_tests/utils";
+import FileUploader from "@ogw_front/components/FileUploader.vue";
+import MissingFilesSelector from "@ogw_front/components/MissingFilesSelector.vue";
+import { useBackStore } from "@ogw_front/stores/back";
+
+const EXPECTED_LENGTH = 1;
+const FIRST_INDEX = 0;
+const SECOND_INDEX = 1;
+
+const upload_file_schema = schemas.opengeodeweb_back.upload_file;
+
+describe("missing files selector", () => {
+  const pinia = setupActivePinia();
+  const backStore = useBackStore();
+  (backStore as { base_url: string }).base_url = "/";
+
+  test("select file", async () => {
+    backStore.request = vi.fn(
+      (_request: unknown, callbacks: { response_function?: (response: unknown) => void }) => {
+        callbacks?.response_function?.({
+          has_missing_files: true,
+          mandatory_files: ["fake_file.txt"],
+          additional_files: ["fake_file_2.txt"],
+        });
+        return Promise.resolve({
+          has_missing_files: true,
+          mandatory_files: ["fake_file.txt"],
+          additional_files: ["fake_file_2.txt"],
+        });
+      },
+    );
+
+    const wrapper = await mountSuspended(MissingFilesSelector, {
+      global: {
+        plugins: [vuetify, pinia],
+      },
+      props: {
+        multiple: false,
+        geode_object_type: "BRep",
+        filenames: ["fake_file.txt"],
+      },
+    });
+
+    const file_uploader = wrapper.findComponent(FileUploader);
+    expect(file_uploader.exists()).toBe(true);
+
+    const v_file_input = file_uploader.find('input[type="file"]');
+    const files = [new File(["fake_file"], "fake_file.txt")];
+    Object.defineProperty(v_file_input.element, "files", {
+      value: files,
+      writable: true,
+    });
+    await v_file_input.trigger("change");
+    await flushPromises();
+    const v_btn = file_uploader.findComponent(components.VBtn);
+
+    registerEndpoint(upload_file_schema.$id, {
+      method: upload_file_schema.methods[SECOND_INDEX] as HTTPMethod,
+      handler: () => ({}),
+    });
+    await v_btn.trigger("click");
+    await flushPromises();
+    await flushPromises();
+    expect(wrapper.emitted()).toHaveProperty("update_values");
+    expect(wrapper.emitted<unknown[]>().update_values).toHaveLength(EXPECTED_LENGTH);
+    expect(wrapper.emitted<unknown[]>().update_values?.[FIRST_INDEX]?.[FIRST_INDEX]).toStrictEqual({
+      additional_files: files,
+    });
+    expect(wrapper.emitted().increment_step).toHaveLength(EXPECTED_LENGTH);
+  });
+});

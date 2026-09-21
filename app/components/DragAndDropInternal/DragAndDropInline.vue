@@ -1,22 +1,35 @@
-<script setup>
-import GlassCard from "@ogw_front/components/GlassCard";
+<script setup lang="ts">
+import GlassCard from "@ogw_front/components/GlassCard.vue";
 
-const { isDragging, loading, texts, accept, showExtensions } = defineProps({
-  isDragging: { type: Boolean, required: true },
-  loading: { type: Boolean, required: true },
-  texts: {
-    type: Object,
-    default: () => ({
-      idle: "Click or drag and drop",
-      drop: "Drop files here",
-      loading: "Loading...",
-    }),
+interface DragAndDropTexts {
+  idle: string;
+  drop: string;
+  loading: string;
+}
+
+interface Props {
+  isDragging: boolean;
+  loading: boolean;
+  texts?: DragAndDropTexts;
+  accept?: string | string[];
+  showExtensions: boolean;
+}
+
+const {
+  isDragging,
+  loading,
+  texts = {
+    idle: "Click or drag and drop",
+    drop: "Drop files here",
+    loading: "Loading...",
   },
-  accept: { type: [String, Array], default: "" },
-  showExtensions: { type: Boolean, required: true },
-});
+  accept = "",
+  showExtensions,
+} = defineProps<Props>();
 
-const emit = defineEmits(["click"]);
+const emit = defineEmits<{
+  click: [];
+}>();
 </script>
 
 <template>

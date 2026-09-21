@@ -1,10 +1,14 @@
-<script setup>
-const { modelValue, label } = defineProps({
-  modelValue: { type: String, default: "" },
-  label: { type: String, default: "" },
-});
+<script setup lang="ts">
+interface Props {
+  modelValue?: string;
+  label?: string;
+}
 
-const emit = defineEmits(["update:modelValue"]);
+const { modelValue = "", label = "" } = defineProps<Props>();
+
+const emit = defineEmits<{
+  "update:modelValue": [value: string];
+}>();
 </script>
 
 <template>

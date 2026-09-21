@@ -1,20 +1,26 @@
-<script setup>
+<script setup lang="ts">
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 
-import FetchingData from "@ogw_front/components/FetchingData";
-import FileUploader from "@ogw_front/components/FileUploader";
+import FetchingData from "@ogw_front/components/FetchingData.vue";
+import FileUploader from "@ogw_front/components/FileUploader.vue";
 import { useBackStore } from "@ogw_front/stores/back";
 
 const schema = schemas.opengeodeweb_back.allowed_files;
 
-const emit = defineEmits(["update_values", "increment_step", "decrement_step"]);
+const emit = defineEmits<{
+  update_values: [values: { files: unknown[]; autoUpload: boolean }];
+  increment_step: [];
+  decrement_step: [];
+}>();
 
-const { multiple, files, autoUpload, showOverlay } = defineProps({
-  multiple: { type: Boolean, required: true },
-  files: { type: Array, default: () => [] },
-  autoUpload: { type: Boolean, default: true },
-  showOverlay: { type: Boolean, default: true },
-});
+interface Props {
+  multiple: boolean;
+  files?: File[];
+  autoUpload?: boolean;
+  showOverlay?: boolean;
+}
+
+const { multiple, files = [], autoUpload = true, showOverlay = true } = defineProps<Props>();
 
 const internal_files = ref(files);
 const internal_auto_upload = ref(autoUpload);
@@ -37,7 +43,7 @@ watch(
 
 const toggle_loading = useToggle(loading);
 
-function files_uploaded_event(value) {
+function files_uploaded_event(value: unknown[]) {
   if (value.length > 0) {
     emit("update_values", { files: value, autoUpload: false });
     emit("increment_step");
@@ -47,7 +53,9 @@ function files_uploaded_event(value) {
 async function get_allowed_files() {
   toggle_loading();
   const backStore = useBackStore();
-  const response = await backStore.request({ schema });
+  const response = (await backStore.request({ schema })) as {
+    extensions: string[];
+  };
   accept.value = response.extensions.map((extension) => `.${extension}`).join(",");
   toggle_loading();
 }

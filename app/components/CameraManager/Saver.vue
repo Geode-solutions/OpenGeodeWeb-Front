@@ -1,6 +1,9 @@
-<script setup>
+<script setup lang="ts">
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports
 import { useCameraManagerStore } from "@ogw_front/stores/camera_manager";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types.js";
 
 const cameraManagerStore = useCameraManagerStore();
 const hybridViewerStore = useHybridViewerStore();
@@ -13,7 +16,10 @@ async function saveCurrentPosition() {
   }
   await cameraManagerStore.saveCameraPosition(
     newPositionName.value,
-    toRaw(hybridViewerStore.camera_options),
+    // HybridViewerStore.camera_options is a loosely-typed reactive object (it's
+    // Populated dynamically from the viewer's camera state), but is always a
+    // CameraOptions shape at runtime once the viewer has synced a camera.
+    toRaw(hybridViewerStore.camera_options) as unknown as CameraOptions,
   );
   newPositionName.value = "";
 }

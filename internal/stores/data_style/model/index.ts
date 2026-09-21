@@ -1,0 +1,80 @@
+import { useDataStore } from "@ogw_front/stores/data";
+import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
+import { useModelBlocksStyle } from "./blocks";
+import { useModelColorStyle } from "./color";
+import { useModelCornersStyle } from "./corners";
+import { useModelEdgesStyle } from "./edges";
+import { useModelLinesStyle } from "./lines";
+import { useModelPointsStyle } from "./points";
+import { useModelSelection } from "./selection";
+import { useModelSurfacesStyle } from "./surfaces";
+import { useModelVisibilityStyle } from "./visibility";
+
+// oxlint-disable-next-line max-lines-per-function, max-statements
+function useModelStyle() {
+  const dataStore = useDataStore();
+  const dataStyleState = useDataStyleState();
+  const modelCornersStyle = useModelCornersStyle();
+  const modelBlocksStyle = useModelBlocksStyle();
+  const modelEdgesStyle = useModelEdgesStyle();
+  const modelLinesStyle = useModelLinesStyle();
+  const modelPointsStyle = useModelPointsStyle();
+  const modelSurfacesStyle = useModelSurfacesStyle();
+
+  const componentStyleFunctions = {
+    Corner: modelCornersStyle,
+    Line: modelLinesStyle,
+    Surface: modelSurfacesStyle,
+    Block: modelBlocksStyle,
+  };
+
+  const modelColorStyle = useModelColorStyle(componentStyleFunctions);
+  const modelVisibilityStyle = useModelVisibilityStyle(componentStyleFunctions);
+
+  function visibleMeshComponents(modelId: string) {
+    return useModelSelection(modelId, dataStyleState);
+  }
+
+  function applyModelStyle(modelId: string) {
+    const style = dataStyleState.getStyle(modelId);
+
+    return Promise.all([
+      modelVisibilityStyle.setModelVisibility(modelId, style.visibility as boolean),
+      modelBlocksStyle.applyModelBlocksStyle(modelId),
+      modelSurfacesStyle.applyModelSurfacesStyle(modelId),
+      modelLinesStyle.applyModelLinesStyle(modelId),
+      modelCornersStyle.applyModelCornersStyle(modelId),
+      modelPointsStyle.applyModelPointsStyle(modelId),
+      modelEdgesStyle.applyModelEdgesStyle(modelId),
+    ]);
+  }
+
+  async function setModelMeshComponentsDefaultStyle(modelId: string) {
+    const item = await dataStore.item(modelId);
+    if (!item) {
+      return;
+    }
+    return await Promise.all([
+      modelBlocksStyle.setModelBlocksDefaultStyle(modelId),
+      modelSurfacesStyle.setModelSurfacesDefaultStyle(modelId),
+      modelLinesStyle.setModelLinesDefaultStyle(modelId),
+      modelCornersStyle.setModelCornersDefaultStyle(modelId),
+    ]);
+  }
+
+  return {
+    visibleMeshComponents,
+    applyModelStyle,
+    setModelMeshComponentsDefaultStyle,
+    ...modelColorStyle,
+    ...modelVisibilityStyle,
+    ...modelBlocksStyle,
+    ...modelCornersStyle,
+    ...modelEdgesStyle,
+    ...modelLinesStyle,
+    ...modelPointsStyle,
+    ...modelSurfacesStyle,
+  };
+}
+
+export { useModelStyle };

@@ -1,18 +1,38 @@
-<script setup>
-const { headers, rows, loading, coordinates, separator, headerRow, firstRow } = defineProps({
-  headers: { type: Array, required: true },
-  rows: { type: Array, required: true },
-  loading: { type: Boolean, default: false },
-  coordinates: {
-    type: Object,
-    default: () => ({ x: undefined, y: undefined, z: undefined }),
-  },
-  separator: { type: String, default: "," },
-  headerRow: { type: Number, default: 0 },
-  firstRow: { type: Number, default: 1 },
-});
+<script setup lang="ts">
+interface CsvHeader {
+  title: string;
+  key: string;
+  align: "start" | "end" | "center";
+  sortable: boolean;
+}
+type CsvRow = Record<string, string>;
+interface CsvCoordinates {
+  x?: string;
+  y?: string;
+  z?: string;
+}
 
-function getColumnClass(key) {
+interface Props {
+  headers: CsvHeader[];
+  rows: CsvRow[];
+  loading?: boolean;
+  coordinates?: CsvCoordinates;
+  separator?: string;
+  headerRow?: number;
+  firstRow?: number;
+}
+
+const {
+  headers,
+  rows,
+  loading = false,
+  coordinates = { x: undefined, y: undefined, z: undefined },
+  separator = ",",
+  headerRow = 0,
+  firstRow = 1,
+} = defineProps<Props>();
+
+function getColumnClass(key: string) {
   if (key === coordinates.x) {
     return "x-col-highlight";
   }

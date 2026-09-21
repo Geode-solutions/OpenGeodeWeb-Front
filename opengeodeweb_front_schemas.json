@@ -183,8 +183,8 @@
           "additionalProperties": false
         },
         "get_is_app_ready": {
-          "$id": "api/microservice/app/api/microservice/app/get_is_app_ready",
-          "route": "/api/microservice/app/get_is_app_ready",
+          "$id": "api/microservice/app/get_is_app_ready",
+          "route": "/get_is_app_ready",
           "methods": ["GET"],
           "type": "object",
           "properties": {},

@@ -1,18 +1,33 @@
-<script setup>
+<script setup lang="ts">
 import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
 
 const SCROLL_SYNC_DELAY = 50;
 const SCROLL_THRESHOLD = 1;
-const { title, closable, icon, mdiIcon, scrollTop, borderRadius } = defineProps({
-  title: { type: String, required: true },
-  closable: { type: Boolean, required: false, default: false },
-  icon: { type: String, required: false, default: "" },
-  mdiIcon: { type: String, required: false, default: "" },
-  scrollTop: { type: Number, required: false, default: 0 },
-  borderRadius: { type: String, required: false, default: "16px" },
-  borderLeft: { type: Boolean, required: false, default: true },
-});
-const emit = defineEmits(["close", "dragstart", "update:scrollTop"]);
+interface Props {
+  title: string;
+  closable?: boolean;
+  icon?: string;
+  mdiIcon?: string;
+  scrollTop?: number;
+  borderRadius?: string;
+  borderLeft?: boolean;
+}
+
+const {
+  title,
+  closable = false,
+  icon = "",
+  mdiIcon = "",
+  scrollTop = 0,
+  borderRadius = "16px",
+  borderLeft = true,
+} = defineProps<Props>();
+
+const emit = defineEmits<{
+  close: [];
+  dragstart: [event: DragEvent];
+  "update:scrollTop": [value: number];
+}>();
 
 const scrollContainer = useTemplateRef("scroll-container");
 const treeviewBox = useTemplateRef("treeview-box");
@@ -20,16 +35,16 @@ const treeviewBox = useTemplateRef("treeview-box");
 const { adaptiveStyles } = useAdaptiveStyles(treeviewBox);
 
 let isApplyingScroll = false;
-let resizeObserver = undefined;
+let resizeObserver: ResizeObserver | undefined = undefined;
 
-function handleScroll(event) {
+function handleScroll(event: Event) {
   if (isApplyingScroll) {
     return;
   }
-  emit("update:scrollTop", event.target.scrollTop);
+  emit("update:scrollTop", (event.target as HTMLElement).scrollTop);
 }
 
-function applyScrollTop(val) {
+function applyScrollTop(val: number) {
   if (scrollContainer.value) {
     isApplyingScroll = true;
     scrollContainer.value.scrollTop = val;

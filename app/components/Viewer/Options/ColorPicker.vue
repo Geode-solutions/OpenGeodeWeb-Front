@@ -1,46 +1,56 @@
-<script setup>
+<script setup lang="ts">
 // oxlint-disable id-length since vuetify require { r,g,b} format to work
-import { formatColorString, parseColorString } from "@ogw_front/utils/color_picker";
 import { useClipboard } from "@vueuse/core";
+
+import { formatColorString, parseColorString } from "@ogw_front/utils/color_picker";
+import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 const COPIED_TIMEOUT = 1500;
 
-const { disabledAlpha = false } = defineProps({
-  disabledAlpha: {
-    type: Boolean,
-    default: false,
-  },
-});
+interface Props {
+  disabledAlpha?: boolean;
+}
 
-const model = defineModel({ type: Object, required: true });
+const { disabledAlpha = false } = defineProps<Props>();
+
+const model = defineModel<RGBAColor>();
 const { copy, copied } = useClipboard({ copiedDuring: COPIED_TIMEOUT });
 
 const currentMode = ref(disabledAlpha ? "rgb" : "rgba");
 const colorInputText = ref("");
 
+const initialColor = model.value as RGBAColor;
 const vuetifyColor = ref({
-  r: model.value?.red ?? 0,
-  g: model.value?.green ?? 0,
-  b: model.value?.blue ?? 0,
-  a: model.value?.alpha ?? 1,
+  r: initialColor.red,
+  g: initialColor.green,
+  b: initialColor.blue,
+  a: initialColor.alpha,
 });
 
-function updateInputTextFromColor(red, green, blue, alpha) {
+function updateInputTextFromColor(
+  red: number,
+  green: number,
+  blue: number,
+  alpha: number,
+) {
   colorInputText.value =
     disabledAlpha || currentMode.value === "rgb"
       ? `${red}, ${green}, ${blue}`
       : `${red}, ${green}, ${blue}, ${alpha}`;
 }
 
-function onPickerUpdate(val) {
-  if (!val) {
-    return;
-  }
+interface VuetifyColor {
+  r: number;
+  g: number;
+  b: number;
+  a: number;
+}
 
-  const red = Math.round(val.r ?? 0);
-  const green = Math.round(val.g ?? 0);
-  const blue = Math.round(val.b ?? 0);
-  const alpha = disabledAlpha ? 1 : Number((val.a ?? 1).toFixed(2));
+function onPickerUpdate(color: VuetifyColor) {
+  const red = Math.round(color.r);
+  const green = Math.round(color.g);
+  const blue = Math.round(color.b);
+  const alpha = disabledAlpha ? 1 : Number(color.a.toFixed(2));
 
   vuetifyColor.value = { r: red, g: green, b: blue, a: alpha };
   model.value = { red, green, blue, alpha };
@@ -52,7 +62,7 @@ function toggleMode() {
     return;
   }
   currentMode.value = currentMode.value === "rgba" ? "rgb" : "rgba";
-  const { red = 0, green = 0, blue = 0, alpha = 1 } = model.value ?? {};
+  const { r: red, g: green, b: blue, a: alpha } = vuetifyColor.value;
   updateInputTextFromColor(red, green, blue, alpha);
 }
 
@@ -61,7 +71,7 @@ async function copyToClipboard() {
   await copy(formatColorString({ red, green, blue, alpha }, currentMode.value));
 }
 
-function parseAndApplyText(text) {
+function parseAndApplyText(text: string) {
   const parsed = parseColorString(text);
   if (!parsed) {
     return false;
@@ -80,26 +90,26 @@ function parseAndApplyText(text) {
   return true;
 }
 
-function onInputPaste(event) {
+function onInputPaste(event: ClipboardEvent) {
   event.preventDefault();
-  const text = event.clipboardData?.getData("text/plain") || "";
+  const text = event.clipboardData!.getData("text/plain");
   parseAndApplyText(text);
 }
 
 function onInputCommit() {
   if (!parseAndApplyText(colorInputText.value)) {
-    const { red = 0, green = 0, blue = 0, alpha = 1 } = model.value ?? {};
+    const { r: red, g: green, b: blue, a: alpha } = vuetifyColor.value;
     updateInputTextFromColor(red, green, blue, alpha);
   }
 }
 
 watch(
-  () => model.value,
-  (newVal) => {
-    if (!newVal) {
+  model,
+  (newValue) => {
+    if (!newValue) {
       return;
     }
-    const { red = 0, green = 0, blue = 0, alpha = 1 } = newVal;
+    const { red, green, blue, alpha } = newValue;
     if (
       vuetifyColor.value.r !== red ||
       vuetifyColor.value.g !== green ||
