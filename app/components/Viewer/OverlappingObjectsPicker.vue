@@ -5,7 +5,7 @@ import { geode_objects } from "@ogw_front/assets/geode_objects";
 
 interface IntermediateItem {
   id: string;
-  viewer_id: number;
+  viewer_id: number | undefined;
   name: string;
   viewer_type: string | undefined;
   geode_object_type: string | undefined;

@@ -7,12 +7,12 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 interface PickedItem {
   id: string;
-  viewer_id: number;
+  viewer_id: number | undefined;
 }
 
 interface ProposedItem {
   id: string;
-  viewer_id: number;
+  viewer_id: number | undefined;
   name: string;
   viewer_type: string | undefined;
   geode_object_type: string | undefined;
@@ -20,7 +20,7 @@ interface ProposedItem {
 
 interface PickedResponse {
   array_ids: string[];
-  viewer_id: number;
+  viewer_id: number | null;
   picked_data?: PickedItem[];
 }
 
@@ -53,9 +53,10 @@ function isPickedItem(entry: unknown): entry is PickedItem {
     typeof entry === "object" &&
     entry !== null &&
     "id" in entry &&
-    "viewer_id" in entry &&
     typeof entry.id === "string" &&
-    typeof entry.viewer_id === "number"
+    (!("viewer_id" in entry) ||
+      entry.viewer_id === undefined ||
+      typeof entry.viewer_id === "number")
   );
 }
 
@@ -74,7 +75,7 @@ function isPickedResponse(value: unknown): value is PickedResponse {
   if (
     !Array.isArray(array_ids) ||
     !array_ids.every((entry) => typeof entry === "string") ||
-    typeof viewer_id !== "number"
+    (typeof viewer_id !== "number" && viewer_id !== null)
   ) {
     return false;
   }
@@ -203,7 +204,7 @@ export function useOverlappingPicker(): UseOverlappingPickerReturn {
       pickedList.push(...picked_data);
     } else {
       for (const pickId of array_ids) {
-        pickedList.push({ id: pickId, viewer_id });
+        pickedList.push({ id: pickId, viewer_id: viewer_id ?? undefined });
       }
     }
 
