@@ -1,9 +1,7 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
+import type { JsonRpcSchema, RequestHandlersWithValidation } from "@ogw_shared/utils/types.js";
 import { endRequestLog, startRequestLog } from "@ogw_front/utils/log";
 import { fetchSchema } from "@ogw_shared/utils/fetch_schema";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
-import type { JsonRpcSchema, RequestHandlersWithValidation } from "@ogw_shared/utils/types.js";
 
 // The microservice-backed Pinia stores (back/app/...) all expose this shape; only the slice actually used here needs to be declared.
 interface Microservice {
@@ -33,7 +31,33 @@ interface FetchErrorResponseLike {
   description?: string;
 }
 
-function api_fetch(
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function toFetchErrorLike(error: unknown): FetchErrorLike {
+  if (!isRecord(error)) {
+    return {};
+  }
+  return {
+    code: typeof error.code === "number" ? error.code : undefined,
+    message: typeof error.message === "string" ? error.message : undefined,
+    stack: typeof error.stack === "string" ? error.stack : undefined,
+  };
+}
+
+function toFetchErrorResponseLike(response: unknown): FetchErrorResponseLike {
+  if (!isRecord(response)) {
+    return {};
+  }
+  return {
+    status: typeof response.status === "number" ? response.status : undefined,
+    name: typeof response.name === "string" ? response.name : undefined,
+    description: typeof response.description === "string" ? response.description : undefined,
+  };
+}
+
+async function api_fetch(
   microservice: Microservice,
   { schema, params = {}, headers = {} }: ApiFetchParams,
   {
@@ -42,13 +66,13 @@ function api_fetch(
     response_error_function,
     timeout,
   }: RequestHandlersWithValidation & { timeout?: number } = {},
-) {
+): Promise<unknown> {
   console.log("[API] Fetching", microservice.base_url);
   const feedbackStore = useFeedbackStore();
   microservice.start_request();
 
   const requestStartingTime = startRequestLog(microservice, schema);
-  return fetchSchema(
+  const result = await fetchSchema(
     {
       schema,
       params,
@@ -59,7 +83,7 @@ function api_fetch(
     {
       request_error_function(error: unknown) {
         microservice.stop_request();
-        const typedError = error as FetchErrorLike;
+        const typedError = toFetchErrorLike(error);
         feedbackStore.add_error(
           typedError.code ?? 0,
           schema.$id,
@@ -79,7 +103,7 @@ function api_fetch(
       },
       response_error_function(response: unknown) {
         microservice.stop_request();
-        const typedResponse = response as FetchErrorResponseLike;
+        const typedResponse = toFetchErrorResponseLike(response);
         feedbackStore.add_error(
           typedResponse.status ?? 0,
           schema.$id,
@@ -96,6 +120,7 @@ function api_fetch(
       },
     },
   );
+  return result;
 }
 
 export { api_fetch };

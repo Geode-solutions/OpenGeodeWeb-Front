@@ -1,14 +1,11 @@
 <script setup lang="ts">
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
 import GlassCard from "@ogw_front/components/GlassCard.vue";
 import { formatListId } from "@ogw_front/utils/name_cleaner";
 import { geode_objects } from "@ogw_front/assets/geode_objects";
 
-// Mirrors the use_overlapping_picker composable's (unexported) ProposedItem type.
 interface IntermediateItem {
   id: string;
-  viewer_id: number;
+  viewer_id: number | undefined;
   name: string;
   viewer_type: string | undefined;
   geode_object_type: string | undefined;
@@ -17,21 +14,23 @@ interface IntermediateItem {
 interface Props {
   displayIntermediate: boolean;
   intermediateItems: IntermediateItem[];
-  menuStyle: Record<string, any>;
+  menuStyle: Record<string, unknown>;
 }
 
 const { displayIntermediate, intermediateItems, menuStyle } = defineProps<Props>();
 
-const emit = defineEmits<{
+interface Emits {
   select: [item: IntermediateItem];
   "update:displayIntermediate": [val: boolean];
-}>();
+}
 
-function selectItem(item: IntermediateItem) {
+const emit = defineEmits<Emits>();
+
+function selectItem(item: IntermediateItem): void {
   emit("select", item);
 }
 
-function handleUpdate(val: boolean) {
+function handleUpdate(val: boolean): void {
   emit("update:displayIntermediate", val);
 }
 </script>

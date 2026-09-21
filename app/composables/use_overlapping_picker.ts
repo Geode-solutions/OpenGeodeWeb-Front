@@ -1,17 +1,18 @@
 import { ref } from "vue";
-import { useDataStore } from "@ogw_front/stores/data";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+
+import { type DataItem, useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useViewerStore } from "@ogw_front/stores/viewer";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 interface PickedItem {
   id: string;
-  viewer_id: number;
+  viewer_id: number | undefined;
 }
 
 interface ProposedItem {
   id: string;
-  viewer_id: number;
+  viewer_id: number | undefined;
   name: string;
   viewer_type: string | undefined;
   geode_object_type: string | undefined;
@@ -19,7 +20,7 @@ interface ProposedItem {
 
 interface PickedResponse {
   array_ids: string[];
-  viewer_id: number;
+  viewer_id: number | null;
   picked_data?: PickedItem[];
 }
 
@@ -33,10 +34,58 @@ interface GetViewerIdParams {
   y: number;
   containerWidth: number;
   containerHeight: number;
-  containerRect: { left: number; top: number };
+  containerRect: Readonly<{ left: number; top: number }>;
 }
 
-export function useOverlappingPicker() {
+interface UseOverlappingPickerReturn {
+  displayIntermediate: Ref<boolean>;
+  intermediateItems: Ref<ProposedItem[]>;
+  intermediateMenuX: Ref<number>;
+  intermediateMenuY: Ref<number>;
+  getIntermediateMenuStyle: () => { position: string; left: string; top: string };
+  selectIntermediateItem: (item: Readonly<ProposedItem> | undefined) => void;
+  handleIntermediateMenuUpdate: (val: boolean) => void;
+  get_viewer_id: (params: Readonly<GetViewerIdParams>) => Promise<ViewerIdResult>;
+}
+
+function isPickedItem(entry: unknown): entry is PickedItem {
+  return (
+    typeof entry === "object" &&
+    entry !== null &&
+    "id" in entry &&
+    typeof entry.id === "string" &&
+    (!("viewer_id" in entry) ||
+      entry.viewer_id === undefined ||
+      typeof entry.viewer_id === "number")
+  );
+}
+
+function isPickedItemArray(value: unknown): value is PickedItem[] {
+  return Array.isArray(value) && value.every((entry) => isPickedItem(entry));
+}
+
+function isPickedResponse(value: unknown): value is PickedResponse {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+  if (!("array_ids" in value) || !("viewer_id" in value)) {
+    return false;
+  }
+  const { array_ids, viewer_id } = value;
+  if (
+    !Array.isArray(array_ids) ||
+    !array_ids.every((entry) => typeof entry === "string") ||
+    (typeof viewer_id !== "number" && viewer_id !== null)
+  ) {
+    return false;
+  }
+  if ("picked_data" in value) {
+    return value.picked_data === undefined || isPickedItemArray(value.picked_data);
+  }
+  return true;
+}
+
+export function useOverlappingPicker(): UseOverlappingPickerReturn {
   const dataStore = useDataStore();
   const dataStyleStore = useDataStyleStore();
   const viewerStore = useViewerStore();
@@ -46,11 +95,14 @@ export function useOverlappingPicker() {
   const intermediateItems = ref<ProposedItem[]>([]);
   const intermediateMenuX = ref(0);
   const intermediateMenuY = ref(0);
-  let resolveIntermediate: ((item: ProposedItem | undefined) => void) | undefined = undefined;
+  let resolveIntermediate: ((item: Readonly<ProposedItem> | undefined) => void) | undefined =
+    undefined;
 
-  function fetchProposedItems(pickedList: PickedItem[]): Promise<ProposedItem[]> {
-    return Promise.all(
-      pickedList.map(async (pick) => {
+  async function fetchProposedItems(
+    pickedList: readonly Readonly<PickedItem>[],
+  ): Promise<ProposedItem[]> {
+    const proposedItems = await Promise.all(
+      pickedList.map(async (pick: Readonly<PickedItem>) => {
         try {
           const item = await dataStore.item(pick.id);
           return {
@@ -71,9 +123,10 @@ export function useOverlappingPicker() {
         }
       }),
     );
+    return proposedItems;
   }
 
-  function getIntermediateMenuStyle() {
+  function getIntermediateMenuStyle(): { position: string; left: string; top: string } {
     return {
       position: "fixed",
       left: `${intermediateMenuX.value}px`,
@@ -81,7 +134,7 @@ export function useOverlappingPicker() {
     };
   }
 
-  function selectIntermediateItem(item: ProposedItem | undefined): void {
+  function selectIntermediateItem(item: Readonly<ProposedItem> | undefined): void {
     if (resolveIntermediate) {
       resolveIntermediate(item);
       resolveIntermediate = undefined;
@@ -101,10 +154,10 @@ export function useOverlappingPicker() {
     containerWidth,
     containerHeight,
     containerRect,
-  }: GetViewerIdParams): Promise<ViewerIdResult> {
-    const activeIds = new Set(dataItems.value.map((i) => i.id));
+  }: Readonly<GetViewerIdParams>): Promise<ViewerIdResult> {
+    const activeIds = new Set(dataItems.value.map((i: Readonly<DataItem>) => i.id));
     const visibleStyleIds = Object.keys(dataStyleStore.styles).filter(
-      (styleId) => activeIds.has(styleId) && dataStyleStore.objectVisibility(styleId),
+      (styleId) => activeIds.has(styleId) && dataStyleStore.objectVisibility(styleId) === true,
     );
 
     const viewableChecks = await Promise.all(
@@ -134,13 +187,13 @@ export function useOverlappingPicker() {
       },
       {
         response_function: (response: unknown) => {
-          responseHolder.pickedResponse = response as PickedResponse;
+          responseHolder.pickedResponse = isPickedResponse(response) ? response : undefined;
         },
       },
     );
     const { pickedResponse } = responseHolder;
 
-    if (!pickedResponse || !pickedResponse.array_ids || pickedResponse.array_ids.length === 0) {
+    if (!pickedResponse || pickedResponse.array_ids.length === 0) {
       return result;
     }
 
@@ -151,7 +204,7 @@ export function useOverlappingPicker() {
       pickedList.push(...picked_data);
     } else {
       for (const pickId of array_ids) {
-        pickedList.push({ id: pickId, viewer_id });
+        pickedList.push({ id: pickId, viewer_id: viewer_id ?? undefined });
       }
     }
 
@@ -189,7 +242,7 @@ export function useOverlappingPicker() {
 
     /* eslint-disable-next-line promise/avoid-new */
     return new Promise<ViewerIdResult>((resolve) => {
-      resolveIntermediate = (chosenResult) => {
+      resolveIntermediate = (chosenResult: Readonly<ProposedItem> | undefined): void => {
         displayIntermediate.value = false;
         resolve(
           chosenResult

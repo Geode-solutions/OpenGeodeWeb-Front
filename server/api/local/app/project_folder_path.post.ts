@@ -1,7 +1,7 @@
 // Node imports
 
 // Third party imports
-import { createError, defineEventHandler, readBody } from "h3";
+import { type H3Event, createError, defineEventHandler, readBody } from "h3";
 
 // Local imports
 import {
@@ -13,11 +13,11 @@ interface ProjectFolderPathBody {
   PROJECT: string;
 }
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event: H3Event) => {
   try {
     const { PROJECT } = await readBody<ProjectFolderPathBody>(event);
     const projectFolderPath = generateProjectFolderPath(PROJECT);
-    await createPath(projectFolderPath);
+    createPath(projectFolderPath);
 
     return {
       statusCode: 200,
@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
     console.log(error);
     throw createError({
       statusCode: 500,
-      statusMessage: (error as Error).message,
+      statusMessage: error instanceof Error ? error.message : String(error),
     });
   }
 });

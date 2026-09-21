@@ -8,27 +8,33 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 // Local constants
 const schema = viewer_schemas.opengeodeweb_viewer.mesh.apply_textures;
 
-export function useMeshCellsTexturesStyle() {
+export function useMeshCellsTexturesStyle(): {
+  meshCellsTextures: (id: string) => unknown;
+  setMeshCellsTextures: (id: string, textures: unknown) => Promise<unknown>;
+} {
   const viewerStore = useViewerStore();
   const meshCellsCommonStyle = useMeshCellsCommonStyle();
 
   function meshCellsTextures(id: string): unknown {
     return meshCellsCommonStyle.meshCellsColoring(id).textures;
   }
-  function setMeshCellsTextures(id: string, textures: unknown) {
+  async function setMeshCellsTextures(id: string, textures: unknown): Promise<unknown> {
     const params = { id, textures };
-    return viewerStore.request(
+    const result = await viewerStore.request(
       {
         schema,
         params,
       },
       {
-        response_function: () =>
-          meshCellsCommonStyle.mutateMeshCellsStyle(id, {
+        response_function: async () => {
+          const mutateResult = await meshCellsCommonStyle.mutateMeshCellsStyle(id, {
             coloring: { textures },
-          }),
+          });
+          return mutateResult;
+        },
       },
     );
+    return result;
   }
 
   return {

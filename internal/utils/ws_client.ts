@@ -1,14 +1,27 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
 // Third party imports
-import vtkWSLinkClient, { newInstance } from "@kitware/vtk.js/IO/Core/WSLinkClient";
-// oxlint-disable-next-line eslint/no-duplicate-imports
-import type { vtkWSLinkClient as VtkWSLinkClient } from "@kitware/vtk.js/IO/Core/WSLinkClient";
+import vtkWSLinkClient, {
+  type vtkWSLinkClient as VtkWSLinkClient,
+  newInstance,
+} from "@kitware/vtk.js/IO/Core/WSLinkClient";
 import SmartConnect from "wslink/src/SmartConnect";
-import _ from "lodash";
 
 interface WsClientCallbacks {
   onConnectionClose?: () => void;
+}
+
+// Wslink's connection event shape is untyped upstream; this describes the fields we read.
+interface WsConnectionEvent {
+  response?: { error?: string };
+}
+
+function isVtkWSLinkClient(value: unknown): value is VtkWSLinkClient {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "connect" in value &&
+    "onConnectionError" in value &&
+    "onConnectionClose" in value
+  );
 }
 
 async function initWebSocketClient(
@@ -17,16 +30,14 @@ async function initWebSocketClient(
   { onConnectionClose }: WsClientCallbacks = {},
 ): Promise<VtkWSLinkClient> {
   vtkWSLinkClient.setSmartConnectClass(SmartConnect);
-  const client = (_.isEmpty(initialClient) ? newInstance() : initialClient) as VtkWSLinkClient;
+  const client = isVtkWSLinkClient(initialClient) ? initialClient : newInstance();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- wslink's httpReq shape is untyped upstream.
-  client.onConnectionError((httpReq: any) => {
-    const message = httpReq?.response?.error || `Connection error`;
+  client.onConnectionError((httpReq: WsConnectionEvent) => {
+    const message = httpReq.response?.error ?? "Connection error";
     console.error(message);
   });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- wslink's httpReq shape is untyped upstream.
-  client.onConnectionClose((httpReq: any) => {
-    const message = httpReq?.response?.error || `Connection close`;
+  client.onConnectionClose((httpReq: WsConnectionEvent) => {
+    const message = httpReq.response?.error ?? "Connection close";
     onConnectionClose?.();
     console.error(message);
   });

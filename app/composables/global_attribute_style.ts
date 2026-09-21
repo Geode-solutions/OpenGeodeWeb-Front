@@ -1,8 +1,5 @@
+import type { JsonRpcSchema } from "@ogw_shared/utils/types";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
-import { computed } from "vue";
-// oxlint-disable-next-line eslint/no-duplicate-imports
-import type { Ref } from "vue";
-
 import { getAttributeRange } from "@ogw_front/utils/attributes";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -19,26 +16,67 @@ interface ActiveComponent extends ComponentNameEntry {
   attributeType: string;
 }
 
-// This composable resolves a batch of dynamically-named getter/setter methods on the data style store (e.g. "meshPointsVertexAttributeRange", "setMeshPointsVertexAttributeRange", ...) - the store's real, fully-typed surface has no index signature for this, so dynamic lookups are cast through this loosely-typed view of it, matching how these methods are actually shaped (getters take an id and return a value, setters take an id plus arbitrary arguments).
-type DynamicStore = Record<string, ((...args: unknown[]) => unknown) | undefined>;
+// This composable resolves a batch of dynamically-named getter/setter methods on the data style store (e.g. "meshPointsVertexAttributeRange", "setMeshPointsVertexAttributeRange", ...) - the store's real, fully-typed surface has no index signature for this, so dynamic lookups go through this type guard instead of an unsafe cast of the whole store (which mixes these methods with state refs and other members), matching how these methods are actually shaped (getters take an id and return a value, setters take an id plus arbitrary arguments).
+type DynamicStoreMethod = (...args: readonly unknown[]) => unknown;
+
+function isDynamicStoreMethod(value: unknown): value is DynamicStoreMethod {
+  return typeof value === "function";
+}
+
+function getDynamicStoreMethod(store: object, key: string): DynamicStoreMethod | undefined {
+  const value: unknown = Reflect.get(store, key);
+  return isDynamicStoreMethod(value) ? value : undefined;
+}
 
 interface AttributeStyleComponent {
   coloring?: { active?: string };
 }
 
 interface AttributeResponse {
-  attributes?: {
-    attribute_name?: string;
-    min_values?: number[];
-    max_values?: number[];
-    min_value?: number;
-    max_value?: number;
+  readonly attributes?: readonly {
+    readonly attribute_name?: string;
+    readonly min_values?: readonly number[];
+    readonly max_values?: readonly number[];
+    readonly min_value?: number;
+    readonly max_value?: number;
   }[];
 }
 
-export function useGlobalAttributeStyle(dataIdRef: Ref<string | undefined>) {
+function isColoringValue(
+  value: unknown,
+): value is NonNullable<AttributeStyleComponent["coloring"]> {
+  return typeof value === "object" && value !== null;
+}
+
+function isJsonRpcSchema(value: unknown): value is JsonRpcSchema {
+  return (
+    typeof value === "object" && value !== null && "$id" in value && typeof value.$id === "string"
+  );
+}
+
+function isAttributeResponse(value: unknown): value is AttributeResponse {
+  return typeof value === "object" && value !== null;
+}
+
+function isNumberArray(value: unknown): value is number[] {
+  return Array.isArray(value) && value.every((item) => typeof item === "number");
+}
+
+function isStringOrUndefined(value: unknown): value is string | undefined {
+  return value === undefined || typeof value === "string";
+}
+
+function isNumberOrUndefined(value: unknown): value is number | undefined {
+  return value === undefined || typeof value === "number";
+}
+
+export function useGlobalAttributeStyle(dataIdRef: Readonly<Ref<string | undefined>>): {
+  currentColormap: typeof currentColormap;
+  currentRange: typeof currentRange;
+  applyGlobalColormap: typeof applyGlobalColormap;
+  resetGlobalRange: typeof resetGlobalRange;
+} {
   const dataStyleStore = useDataStyleStore();
-  const dynamicDataStyleStore = dataStyleStore as unknown as DynamicStore;
   const hybridViewerStore = useHybridViewerStore();
   const backStore = useBackStore();
 
@@ -51,23 +89,47 @@ export function useGlobalAttributeStyle(dataIdRef: Ref<string | undefined>) {
   ];
 
   function getActiveComponents(targetId: string): ActiveComponent[] {
-    const style = dataStyleStore.getStyle(targetId) as unknown as Record<
-      string,
-      AttributeStyleComponent | undefined
-    >;
+    const style = dataStyleStore.getStyle(targetId);
     const activeComponents: ActiveComponent[] = [];
-    if (!style) {
-      return activeComponents;
-    }
     for (const { key, getterKey, setterKey } of componentNames) {
-      const componentStyle = style[key];
-      if (!componentStyle || !componentStyle.coloring) {
+      let componentStyle: Record<string, unknown> | undefined = undefined;
+      switch (key) {
+        case "points": {
+          componentStyle = style.points;
+          break;
+        }
+        case "edges": {
+          componentStyle = style.edges;
+          break;
+        }
+        case "polygons": {
+          componentStyle = style.polygons;
+          break;
+        }
+        case "cells": {
+          componentStyle = style.cells;
+          break;
+        }
+        case "polyhedra": {
+          componentStyle = style.polyhedra;
+          break;
+        }
+        default: {
+          componentStyle = undefined;
+        }
+      }
+      if (componentStyle === undefined) {
         continue;
       }
 
-      const activeColoring = componentStyle.coloring.active;
+      const { coloring } = componentStyle;
+      if (!isColoringValue(coloring)) {
+        continue;
+      }
+
+      const { active: activeColoring } = coloring;
       if (
-        !activeColoring ||
+        activeColoring === undefined ||
         !["vertex", "edge", "polygon", "cell", "polyhedron"].includes(activeColoring)
       ) {
         continue;
@@ -79,19 +141,19 @@ export function useGlobalAttributeStyle(dataIdRef: Ref<string | undefined>) {
     return activeComponents;
   }
 
-  const currentColormap = computed(() => {
+  const currentColormap = computed((): string => {
     const targetId = dataIdRef.value;
-    if (!targetId) {
+    if (targetId === undefined || targetId === "") {
       return "batlow";
     }
 
     for (const comp of getActiveComponents(targetId)) {
       const getterName = `${comp.getterKey}${comp.attributeType}ColorMap`;
-      const getter = dynamicDataStyleStore[getterName];
+      const getter = getDynamicStoreMethod(dataStyleStore, getterName);
       if (getter) {
         const colorMap = getter(targetId);
-        if (colorMap) {
-          return colorMap as string;
+        if (typeof colorMap === "string" && colorMap.length > 0) {
+          return colorMap;
         }
       }
     }
@@ -99,18 +161,39 @@ export function useGlobalAttributeStyle(dataIdRef: Ref<string | undefined>) {
     return "batlow";
   });
 
-  const currentRange = computed<[number, number]>({
-    get() {
+  async function applyCurrentRange(newValue: readonly [number, number]): Promise<void> {
+    const targetId = dataIdRef.value;
+    if (targetId === undefined || targetId === "") {
+      return;
+    }
+
+    let updated = false;
+    for (const comp of getActiveComponents(targetId)) {
+      const setterName = `set${comp.setterKey}${comp.attributeType}Range`;
+      const setter = getDynamicStoreMethod(dataStyleStore, setterName);
+      if (setter) {
+        setter(targetId, newValue[0], newValue[1]);
+        updated = true;
+      }
+    }
+    if (updated) {
+      await hybridViewerStore.remoteRender();
+    }
+  }
+
+  const currentRange = computed<readonly [number, number]>({
+    get(): readonly [number, number] {
       const targetId = dataIdRef.value;
-      if (!targetId) {
+      if (targetId === undefined || targetId === "") {
         return [0, 1];
       }
 
       for (const comp of getActiveComponents(targetId)) {
         const getterName = `${comp.getterKey}${comp.attributeType}Range`;
-        const getter = dynamicDataStyleStore[getterName];
+        const getter = getDynamicStoreMethod(dataStyleStore, getterName);
         if (getter) {
-          const range = getter(targetId) as number[] | undefined;
+          const rawRange = getter(targetId);
+          const range = isNumberArray(rawRange) ? rawRange : undefined;
           if (range && range.length === 2) {
             return [range[0] ?? 0, range[1] ?? 1];
           }
@@ -118,30 +201,16 @@ export function useGlobalAttributeStyle(dataIdRef: Ref<string | undefined>) {
       }
       return [0, 1];
     },
-    set(newValue) {
-      const targetId = dataIdRef.value;
-      if (!targetId) {
-        return;
-      }
-
-      let updated = false;
-      for (const comp of getActiveComponents(targetId)) {
-        const setterName = `set${comp.setterKey}${comp.attributeType}Range`;
-        const setter = dynamicDataStyleStore[setterName];
-        if (setter) {
-          setter(targetId, newValue[0], newValue[1]);
-          updated = true;
-        }
-      }
-      if (updated) {
-        hybridViewerStore.remoteRender();
-      }
+    // Vue's WritableComputedOptions setter is strictly `(v: T) => void`, so the async render call is delegated to a helper (see the same trade-off in `app/composables/hover_highlight.ts`'s `onHoverEnter`).
+    set: (newValue: readonly [number, number]): void => {
+      /* oxlint-disable-next-line promise/prefer-await-to-then -- setter cannot be async; see comment above. */
+      applyCurrentRange(newValue).catch(() => undefined);
     },
   });
 
   async function applyGlobalColormap(newMap: string): Promise<void> {
     const targetId = dataIdRef.value;
-    if (!targetId) {
+    if (targetId === undefined || targetId === "") {
       return;
     }
 
@@ -149,7 +218,7 @@ export function useGlobalAttributeStyle(dataIdRef: Ref<string | undefined>) {
 
     for (const comp of getActiveComponents(targetId)) {
       const setterName = `set${comp.setterKey}${comp.attributeType}ColorMap`;
-      const setter = dynamicDataStyleStore[setterName];
+      const setter = getDynamicStoreMethod(dataStyleStore, setterName);
 
       if (setter) {
         promises.push(Promise.resolve(setter(targetId, newMap)));
@@ -157,61 +226,72 @@ export function useGlobalAttributeStyle(dataIdRef: Ref<string | undefined>) {
     }
 
     await Promise.all(promises);
-    hybridViewerStore.remoteRender();
+    await hybridViewerStore.remoteRender();
   }
 
-  function resetGlobalRange(): void {
+  async function resetGlobalRange(): Promise<void> {
     const targetId = dataIdRef.value;
-    if (!targetId) {
+    if (targetId === undefined || targetId === "") {
       return;
     }
+
+    const requestPromises: Promise<unknown>[] = [];
 
     for (const comp of getActiveComponents(targetId)) {
       const { activeColoring, attributeType, getterKey, setterKey } = comp;
 
-      const nameGetter = dynamicDataStyleStore[`${getterKey}${attributeType}Name`];
-      const itemGetter = dynamicDataStyleStore[`${getterKey}${attributeType}Item`];
+      const nameGetter = getDynamicStoreMethod(dataStyleStore, `${getterKey}${attributeType}Name`);
+      const itemGetter = getDynamicStoreMethod(dataStyleStore, `${getterKey}${attributeType}Item`);
       if (!nameGetter || !itemGetter) {
         continue;
       }
 
-      const attrName = nameGetter(targetId) as string | undefined;
-      const attrItem = (itemGetter(targetId) as number | undefined) ?? 0;
+      const rawAttrName = nameGetter(targetId);
+      const attrName = isStringOrUndefined(rawAttrName) ? rawAttrName : undefined;
+      const rawAttrItem = itemGetter(targetId);
+      const attrItem = (isNumberOrUndefined(rawAttrItem) ? rawAttrItem : undefined) ?? 0;
 
-      if (!attrName) {
+      if (attrName === undefined || attrName === "") {
         continue;
       }
 
       const schemaName = `${activeColoring}_attribute_names`;
       const backSchemas = back_schemas.opengeodeweb_back as Record<string, unknown>;
       const schema = backSchemas[schemaName];
-      if (!schema) {
+      if (schema === undefined || !isJsonRpcSchema(schema)) {
         continue;
       }
 
-      backStore.request(
-        {
-          schema: schema as Parameters<typeof backStore.request>[0]["schema"],
-          params: { id: targetId },
-        },
-        {
-          response_function: (response: unknown) => {
-            const attributes = (response as AttributeResponse).attributes || [];
-            const currentAttribute = attributes.find((attr) => attr.attribute_name === attrName);
-            if (currentAttribute) {
-              const { min, max } = getAttributeRange(currentAttribute, attrItem);
-
-              const setterName = `set${setterKey}${attributeType}Range`;
-              const setter = dynamicDataStyleStore[setterName];
-              if (setter) {
-                setter(targetId, min, max);
-                hybridViewerStore.remoteRender();
-              }
-            }
+      requestPromises.push(
+        backStore.request(
+          {
+            schema,
+            params: { id: targetId },
           },
-        },
+          {
+            response_function: async (response: unknown): Promise<void> => {
+              if (!isAttributeResponse(response)) {
+                return;
+              }
+              const attributes = response.attributes ?? [];
+              const currentAttribute = attributes.find((attr) => attr.attribute_name === attrName);
+              if (currentAttribute) {
+                const { min, max } = getAttributeRange(currentAttribute, attrItem);
+
+                const setterName = `set${setterKey}${attributeType}Range`;
+                const setter = getDynamicStoreMethod(dataStyleStore, setterName);
+                if (setter) {
+                  setter(targetId, min, max);
+                  await hybridViewerStore.remoteRender();
+                }
+              }
+            },
+          },
+        ),
       );
     }
+
+    await Promise.all(requestPromises);
   }
 
   return {

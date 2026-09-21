@@ -8,7 +8,7 @@ function formatListId(
   sliceStart: number = DEFAULT_SLICE_START,
   sliceEndOffset: number = DEFAULT_SLICE_END_OFFSET,
 ): string {
-  if (!id) {
+  if (id === undefined || id === null || id === "") {
     return "";
   }
   if (id.length <= maxLength) {

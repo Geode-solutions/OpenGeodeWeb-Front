@@ -23,11 +23,13 @@ const {
   borderLeft = true,
 } = defineProps<Props>();
 
-const emit = defineEmits<{
+interface Emits {
   close: [];
   dragstart: [event: DragEvent];
   "update:scrollTop": [value: number];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 
 const scrollContainer = useTemplateRef("scroll-container");
 const treeviewBox = useTemplateRef("treeview-box");
@@ -37,14 +39,14 @@ const { adaptiveStyles } = useAdaptiveStyles(treeviewBox);
 let isApplyingScroll = false;
 let resizeObserver: ResizeObserver | undefined = undefined;
 
-function handleScroll(event: Event) {
+function handleScroll(event: Event): void {
   if (isApplyingScroll) {
     return;
   }
   emit("update:scrollTop", (event.target as HTMLElement).scrollTop);
 }
 
-function applyScrollTop(val: number) {
+function applyScrollTop(val: number): void {
   if (scrollContainer.value) {
     isApplyingScroll = true;
     scrollContainer.value.scrollTop = val;

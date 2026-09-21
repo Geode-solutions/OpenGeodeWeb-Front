@@ -16,13 +16,13 @@ const { escapeFunction = undefined } = defineProps<Props>();
 const show = defineModel<boolean>("show", { default: false });
 const dataStore = useDataStore();
 const hybridViewerStore = useHybridViewerStore();
-const targetAllVisible = ref(true);
+const targetAllVisible = ref<boolean>(true);
 const selectedDatasetIds = ref<string[]>([]);
 const planes = ref<{ origin?: number[]; normal: number[] }[]>([
   { origin: undefined, normal: [1, 0, 0] },
 ]);
 const allItems = dataStore.refAllItems();
-const availableDatasets = computed(() =>
+const availableDatasets = computed<{ title: string; value: string }[]>(() =>
   allItems.value.map((item) => ({
     title: item.name || item.id,
     value: item.id,
@@ -49,7 +49,7 @@ const {
   debouncedApply: (...args: unknown[]) => debouncedApply?.(...args),
 });
 
-async function applyClippingPlanes() {
+async function applyClippingPlanes(): Promise<void> {
   const allIds = allItems.value.map((item) => item.id);
   if (allIds.length === 0) {
     return;
@@ -72,7 +72,7 @@ async function applyClippingPlanes() {
 
 debouncedApply = useDebounceFn(() => applyClippingPlanes(), DEBOUNCE_DELAY);
 
-function addPlane() {
+function addPlane(): void {
   // Index is always in-bounds (modulo the fixed-size list); the fallbacks only
   // Satisfy noUncheckedIndexedAccess and are never hit at runtime.
   const normal = DEFAULT_NORMALS[planes.value.length % DEFAULT_NORMALS.length] ??
@@ -80,17 +80,17 @@ function addPlane() {
   planes.value.push({ origin: getSceneCenter(), normal });
 }
 
-function removePlane(index: number) {
+function removePlane(index: number): void {
   planes.value.splice(index, 1);
 }
 
-function flipNormal(plane: { normal: number[] }) {
+function flipNormal(plane: { normal: number[] }): void {
   plane.normal = plane.normal.map((component) => -component);
   syncWidgets();
   applyClippingPlanes();
 }
 
-async function resetClippingPlanes() {
+async function resetClippingPlanes(): Promise<void> {
   setFromWidget(true);
   planes.value = [{ origin: undefined, normal: [1, 0, 0] }];
   updateWidgetPlacement({ isReset: true });
@@ -98,7 +98,7 @@ async function resetClippingPlanes() {
   await applyClippingPlanes();
 }
 
-async function removeClippingPlanes() {
+async function removeClippingPlanes(): Promise<void> {
   const allIds = allItems.value.map((item) => item.id);
   await hybridViewerStore.setClippingPlanes(allIds, []);
 }

@@ -32,7 +32,7 @@ const {
   firstRow = 1,
 } = defineProps<Props>();
 
-function getColumnClass(key: string) {
+function getColumnClass(key: string): string {
   if (key === coordinates.x) {
     return "x-col-highlight";
   }

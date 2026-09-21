@@ -1,12 +1,10 @@
 <script setup lang="ts">
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
 import { sortAndFormatItems, useTreeFilter } from "@ogw_front/composables/tree_filter";
 import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
+import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
-import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useModelCollections } from "@ogw_front/composables/model_collections";
@@ -31,7 +29,8 @@ interface CollectionTreeItem {
 
 const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 const hybridViewerStore = useHybridViewerStore();
-const emit = defineEmits<{
+
+interface Emits {
   "show-menu": [
     payload: {
       event: unknown;
@@ -41,7 +40,9 @@ const emit = defineEmits<{
       modelComponentType: string | undefined;
     },
   ];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 
 const treeviewStore = useTreeviewStore();
 const {
@@ -52,11 +53,11 @@ const {
   updateVisibility,
 } = useModelCollections(id);
 
-const currentView = computed(() =>
+const currentView = computed<TreeViewItem | undefined>(() =>
   treeviewStore.opened_views.find((view) => view.id === actualViewId),
 );
 
-const opened = computed({
+const opened = computed<string[]>({
   get: () => currentView.value?.opened || [],
   set: (val) => treeviewStore.setOpened(actualViewId, val),
 });
@@ -72,12 +73,12 @@ const {
   applySearchFilter,
 } = useTreeFilter(localCategories);
 
-function onUpdateSelection(newSelection: string[]) {
+function onUpdateSelection(newSelection: string[]): void {
   const finalSelection = applySearchFilter(newSelection, visibleComponents.value);
   updateVisibility(finalSelection as string[]);
 }
 
-const visibleSelection = computed(() => applySearchFilter(visibleComponents.value, []));
+const visibleSelection = computed<string[]>(() => applySearchFilter(visibleComponents.value, []));
 
 const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
   if (search.value && componentsCache.value) {
@@ -115,7 +116,7 @@ const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
   return result;
 });
 
-function showContextMenu(event: unknown, item: CollectionTreeItem) {
+function showContextMenu(event: unknown, item: CollectionTreeItem): void {
   const actualItem = item.raw || item;
   emit("show-menu", {
     event,
@@ -142,7 +143,7 @@ function handleHoverEnter({
 }: {
   item: CollectionTreeItem;
   immediate?: boolean;
-}) {
+}): void {
   const actualItem = item.raw || item;
 
   if (!actualItem.category && (!actualItem.children || actualItem.children.length === 0)) {
@@ -154,13 +155,13 @@ function handleHoverEnter({
   onHoverEnter(id, () => viewerIdsToHover, "model", immediate);
 }
 
-function handleHoverLeave() {
+function handleHoverLeave(): void {
   onHoverLeave(id);
 }
 
-function expandAll() {
+function expandAll(): void {
   const allIds: string[] = [];
-  function traverse(itemsList: CollectionTreeItem[]) {
+  function traverse(itemsList: CollectionTreeItem[]): void {
     for (const item of itemsList) {
       if (item.children && item.children.length > 0) {
         allIds.push(item.id);
@@ -172,12 +173,11 @@ function expandAll() {
   opened.value = allIds;
 }
 
-function getLeafViewerIds(item: CollectionTreeItem) {
+function getLeafViewerIds(item: CollectionTreeItem): number[] {
   const actualItem = item.raw || item;
   return extractIds(actualItem);
 }
 
-// The focusCameraOnObject composable's block_ids parameter is declared as string[], but this view (like the sibling ModelComponents view) has always focused the camera using the numeric viewer/actor ids collected by extractIds; that pre-dates this typing pass, so the ids are passed through as-is (no Number/String conversion) rather than changed here.
 function getLeafViewerIdsForFocus(item: CollectionTreeItem): string[] {
   return getLeafViewerIds(item) as unknown as string[];
 }

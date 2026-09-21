@@ -36,9 +36,10 @@ describe("crs selector", () => {
 
     // Mock backStore.request instead of registerEndpoint
     backStore.request = vi.fn(
-      (_request: unknown, callbacks: { response_function?: (response: unknown) => void }) => {
+      async (_request: unknown, callbacks: { response_function?: (response: unknown) => void }) => {
         callbacks.response_function?.({ crs_list });
-        return Promise.resolve({ crs_list });
+        await Promise.resolve();
+        return { crs_list };
       },
     );
 
@@ -49,9 +50,9 @@ describe("crs selector", () => {
       },
       props: { geodeObjectType: "BRep", keyToUpdate: key_to_update },
     });
-    const td_wrapper = await wrapper.find("td");
+    const td_wrapper = wrapper.find("td");
     await wrapper.vm.$nextTick();
-    const input = await td_wrapper.find("input");
+    const input = td_wrapper.find("input");
     await input.trigger("click");
     expect(wrapper.emitted()).toHaveProperty("update_values");
     expect(wrapper.emitted<unknown[]>().update_values).toHaveLength(EXPECTED_LENGTH);

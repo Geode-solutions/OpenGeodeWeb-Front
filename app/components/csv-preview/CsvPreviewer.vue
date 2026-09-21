@@ -33,26 +33,28 @@ const MIN_AVG_COUNT = 1.5;
 const MAX_VARIANCE = 0.5;
 const PREVIEW_ROWS_LIMIT = 101;
 
-const emit = defineEmits<{
+interface Emits {
   "update:modelValue": [value: boolean];
   confirm: [result: CsvParseResult];
-}>();
+}
 
-const separator = ref(",");
-const headerRow = ref(0);
-const firstRow = ref(1);
+const emit = defineEmits<Emits>();
+
+const separator = ref<string>(",");
+const headerRow = ref<number>(0);
+const firstRow = ref<number>(1);
 
 const xColumn = ref<string | undefined>(undefined);
 const yColumn = ref<string | undefined>(undefined);
 const zColumn = ref<string | undefined>(undefined);
 
-const rawContent = ref("");
+const rawContent = ref<string>("");
 const previewRows = ref<CsvRow[]>([]);
 const previewHeaders = ref<CsvHeader[]>([]);
-const loading = ref(false);
+const loading = ref<boolean>(false);
 const toggleLoading = useToggle(loading);
 
-function autoDetectSeparator(content: string) {
+function autoDetectSeparator(content: string): string {
   const lines = content
     .slice(0, MAX_CONTENT_SLICE)
     .split(/\r?\n/u)
@@ -75,9 +77,9 @@ function autoDetectSeparator(content: string) {
   return best;
 }
 
-function parseContent() {
+function parseContent(): string[] {
   if (!rawContent.value) {
-    return;
+    return [];
   }
 
   const allLines = rawContent.value.split(/\r?\n/u).filter((line) => line.trim() !== "");
@@ -89,8 +91,7 @@ function parseContent() {
     const result = [];
     let current = "";
     let inQuotes = false;
-    for (let index = 0; index < line.length; index += 1) {
-      const char = line[index];
+    for (const char of line) {
       if (char === '"') {
         inQuotes = !inQuotes;
       } else if (char === separator.value && !inQuotes) {
@@ -125,7 +126,7 @@ function parseContent() {
   });
 }
 
-function readAndParse() {
+function readAndParse(): void {
   if (!file) {
     return;
   }
@@ -145,7 +146,8 @@ function readAndParse() {
   });
   reader.readAsText(file, "utf8");
 }
-const computedResult = computed(() => {
+
+const computedResult = computed<CsvParseResult>(() => {
   const xIndex = previewHeaders.value.findIndex((header) => header.key === xColumn.value);
   const yIndex = previewHeaders.value.findIndex((header) => header.key === yColumn.value);
   const zIndex = previewHeaders.value.findIndex((header) => header.key === zColumn.value);
@@ -160,7 +162,7 @@ const computedResult = computed(() => {
   };
 });
 
-const isFormValid = computed(
+const isFormValid = computed<boolean>(
   () =>
     separator.value !== "" &&
     separator.value !== undefined &&
@@ -197,7 +199,7 @@ watch(
   },
 );
 
-function onConfirm() {
+function onConfirm(): void {
   emit("confirm", computedResult.value);
   emit("update:modelValue", false);
 }

@@ -15,7 +15,7 @@ import {
   surfaceDefaultStyle,
 } from "./meshes";
 
-function default_styles() {
+function default_styles(): Record<string, unknown> {
   return {
     BRep: brepDefaultStyle(),
     CrossSection: crossSectionDefaultStyle(),
@@ -45,7 +45,7 @@ function default_styles() {
   };
 }
 
-function getDefaultStyle(type: string) {
+function getDefaultStyle(type: string): unknown {
   const styles: Record<string, unknown> = default_styles();
   return styles[type];
 }

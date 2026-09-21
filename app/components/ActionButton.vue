@@ -6,10 +6,8 @@ interface Props {
   tooltip: string;
   color?: string;
   size?: string | number;
-  // Vuetify's variant/density accept narrow literal unions; kept loose here since
-  // Callers pass plain strings and this is only a typing widening, not a behavior change.
-  variant?: any;
-  density?: any;
+  variant?: unknown;
+  density?: unknown;
   tooltipLocation?: string;
   iconSize?: string | number;
 }
@@ -25,9 +23,11 @@ const {
   iconSize = DEFAULT_ICON_SIZE,
 } = defineProps<Props>();
 
-const emit = defineEmits<{
+interface Emits {
   click: [event: MouseEvent];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 </script>
 
 <template>

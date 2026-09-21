@@ -6,10 +6,9 @@ import { describe, expect, test, vi } from "vitest";
 import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime";
 import { flushPromises } from "@vue/test-utils";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
-import type { HTTPMethod } from "h3";
 
 // Local imports
-import { setupActivePinia, vuetify } from "@ogw_tests/utils";
+import { setupActivePinia, toHTTPMethod, vuetify } from "@ogw_tests/utils";
 import FileSelector from "@ogw_front/components/FileSelector.vue";
 import FileUploader from "@ogw_front/components/FileUploader.vue";
 import { useBackStore } from "@ogw_front/stores/back";
@@ -28,7 +27,7 @@ describe("file selector", () => {
 
   test("select file", async () => {
     registerEndpoint(allowed_files_schema.$id, {
-      method: allowed_files_schema.methods[FIRST_INDEX] as HTTPMethod,
+      method: toHTTPMethod(allowed_files_schema.methods[FIRST_INDEX]),
       handler: () => ({
         extensions: ["1", "2", "3"],
       }),
@@ -43,7 +42,7 @@ describe("file selector", () => {
     const file_uploader = wrapper.findComponent(FileUploader);
 
     registerEndpoint(upload_file_schema.$id, {
-      method: upload_file_schema.methods[SECOND_INDEX] as HTTPMethod,
+      method: toHTTPMethod(upload_file_schema.methods[SECOND_INDEX]),
       handler: () => ({}),
     });
 
@@ -70,14 +69,14 @@ describe("file selector", () => {
 
   describe("file selector", () => {
     registerEndpoint(allowed_files_schema.$id, {
-      method: allowed_files_schema.methods[FIRST_INDEX] as HTTPMethod,
+      method: toHTTPMethod(allowed_files_schema.methods[FIRST_INDEX]),
       handler: () => ({
         extensions: ["1", "2", "3"],
       }),
     });
 
     registerEndpoint(upload_file_schema.$id, {
-      method: upload_file_schema.methods[SECOND_INDEX] as HTTPMethod,
+      method: toHTTPMethod(upload_file_schema.methods[SECOND_INDEX]),
       handler: () => ({}),
     });
     const files = [new File(["fake_file"], "fake_file.txt")];

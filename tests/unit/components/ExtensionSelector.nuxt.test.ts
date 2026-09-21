@@ -8,10 +8,9 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime";
 import { nextTick } from "vue";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
-import type { HTTPMethod } from "h3";
 
 // Local imports
-import { setupActivePinia, vuetify } from "@ogw_tests/utils";
+import { setupActivePinia, toHTTPMethod, vuetify } from "@ogw_tests/utils";
 import ExtensionSelector from "@ogw_front/components/ExtensionSelector.vue";
 import { useBackStore } from "@ogw_front/stores/back";
 
@@ -28,13 +27,10 @@ describe("extension selector", () => {
   beforeEach(() => {
     (backStore as { base_url: string }).base_url = "/";
 
-    backStore.request = vi.fn(() => {
-      const response = {
-        geode_objects_and_output_extensions: {
-          BRep: { msh: { is_saveable: true } },
-        },
-      };
-      return Promise.resolve(response);
+    backStore.request = vi.fn<typeof backStore.request>().mockResolvedValue({
+      geode_objects_and_output_extensions: {
+        BRep: { msh: { is_saveable: true } },
+      },
     });
   });
 
@@ -43,7 +39,7 @@ describe("extension selector", () => {
     const output_extension = "msh";
 
     registerEndpoint(schema.$id, {
-      method: schema.methods[FIRST_INDEX] as HTTPMethod,
+      method: toHTTPMethod(schema.methods[FIRST_INDEX]),
       handler: () => ({
         geode_objects_and_output_extensions: {
           BRep: { msh: { is_saveable: true } },
@@ -58,7 +54,7 @@ describe("extension selector", () => {
     });
     await nextTick();
     expect(wrapper.exists()).toBe(true);
-    const v_card = await wrapper.findAllComponents(components.VCard);
+    const v_card = wrapper.findAllComponents(components.VCard);
     await v_card[SECOND_INDEX]?.trigger("click");
     expect(wrapper.emitted()).toHaveProperty("update_values");
     expect(wrapper.emitted<unknown[]>().update_values).toHaveLength(EXPECTED_LENGTH);

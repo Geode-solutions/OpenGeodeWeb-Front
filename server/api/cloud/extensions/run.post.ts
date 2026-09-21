@@ -2,7 +2,7 @@
 import fs from "node:fs";
 
 // Third party imports
-import { createError, defineEventHandler, readBody } from "h3";
+import { type H3Event, createError, defineEventHandler, readBody } from "h3";
 
 // Local imports
 import {
@@ -25,15 +25,13 @@ interface RunExtensionsBody {
   projectName: string;
 }
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event: H3Event) => {
   try {
     console.log("NITRO: runExtensions", event);
     const { projectFolderPath, projectName } = await readBody<RunExtensionsBody>(event);
     const extensionsConfig = extensionsConf(projectName);
     const extensionsArray = await Promise.all(
-      Object.keys(extensionsConfig).map(async (extensionId) => {
-        // Safe: extensionId comes from Object.keys(extensionsConfig) itself.
-        const extensionPath = extensionsConfig[extensionId]!.path;
+      Object.entries(extensionsConfig).map(async ([extensionId, { path: extensionPath }]) => {
         const unzippedExtensionPath = await unzipFile(
           extensionPath,
           extensionFolderPath(projectFolderPath, extensionId),
@@ -49,12 +47,10 @@ export default defineEventHandler(async (event) => {
         const port = await runExtension(id, backendExecutable, unzippedExtensionPath, {
           projectFolderPath,
         });
-        await addMicroserviceMetadatas(projectFolderPath, {
+        addMicroserviceMetadatas(projectFolderPath, {
           type: "back",
           name,
-          // RunExtension can exhaust its port-conflict retries and return undefined
-          // (pre-existing bug: addMicroserviceMetadatas/URLs then embed "undefined").
-          port: port as number,
+          port,
         });
         return {
           id,
@@ -74,7 +70,7 @@ export default defineEventHandler(async (event) => {
     console.error("Error running extensions:", error);
     throw createError({
       statusCode: 500,
-      statusMessage: (error as Error).message,
+      statusMessage: error instanceof Error ? error.message : String(error),
     });
   }
 });

@@ -6,10 +6,9 @@ import { describe, expect, test } from "vitest";
 import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime";
 import { flushPromises } from "@vue/test-utils";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
-import type { HTTPMethod } from "h3";
 
 // Local imports
-import { setupActivePinia, vuetify } from "@ogw_tests/utils";
+import { setupActivePinia, toHTTPMethod, vuetify } from "@ogw_tests/utils";
 import FileUploader from "@ogw_front/components/FileUploader.vue";
 import { useBackStore } from "@ogw_front/stores/back";
 
@@ -24,11 +23,11 @@ describe("file uploader", () => {
   (backStore as { base_url: string }).base_url = "/";
 
   registerEndpoint(upload_file_schema.$id, {
-    method: upload_file_schema.methods[FIRST_INDEX] as HTTPMethod,
+    method: toHTTPMethod(upload_file_schema.methods[FIRST_INDEX]),
     handler: () => ({}),
   });
   registerEndpoint(upload_file_schema.$id, {
-    method: upload_file_schema.methods[SECOND_INDEX] as HTTPMethod,
+    method: toHTTPMethod(upload_file_schema.methods[SECOND_INDEX]),
     handler: () => ({}),
   });
 

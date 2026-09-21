@@ -8,7 +8,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 // The four per-component-type style composables (Surface/Line/Block/Corner) each expose a different, large set of methods (color, visibility, per-attribute-kind getters/setters...). This module only cares about looking a handful of them up dynamically by name, so a precise structural type for componentStyleFunctions isn't worth modelling here; `any` keeps the dynamic dispatch table honest about that.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line no-explicit-any
 type ComponentStyleFunctions = Record<"Surface" | "Line" | "Block" | "Corner", any>;
 
 interface ModelComponent {
@@ -16,8 +16,21 @@ interface ModelComponent {
   type: string;
 }
 
+async function callComponentStyleFunction(
+  // oxlint-disable-next-line no-explicit-any
+  target: any,
+  method: string,
+  ...args: unknown[]
+): Promise<unknown> {
+  // oxlint-disable-next-line no-unsafe-call, no-unsafe-member-access, no-unsafe-argument, no-unsafe-assignment -- ComponentStyleFunctions is deliberately dynamically typed; see comment above.
+  const result = await target[method](...args);
+  return result;
+}
+
 const model_schemas = viewer_schemas.opengeodeweb_viewer.model;
-async function getModelComponentsMap(modelId: string) {
+async function getModelComponentsMap(
+  modelId: string,
+): Promise<{ allComponents: ModelComponent[]; componentsMap: Record<string, ModelComponent> }> {
   const dataStore = useDataStore();
   const results = await Promise.all(
     MESH_COMPONENT_TYPES.map(async (type) => {
@@ -42,7 +55,7 @@ async function dispatchToComponentTypes(
   action: string,
   { componentStyleFunctions }: { componentStyleFunctions: ComponentStyleFunctions },
   ...args: unknown[]
-) {
+): Promise<unknown[]> {
   const { componentsMap } = await getModelComponentsMap(modelId);
   const idsByComponent: { Block: string[]; Surface: string[]; Line: string[]; Corner: string[] } = {
     Block: [],
@@ -52,15 +65,17 @@ async function dispatchToComponentTypes(
   };
   for (const id of componentIds) {
     const type = componentsMap[id]?.type;
-    if (type && type in idsByComponent) {
-      (idsByComponent as Record<string, string[]>)[type]!.push(id);
+    if (type !== undefined && type in idsByComponent) {
+      (idsByComponent as Record<string, string[]>)[type]?.push(id);
     }
   }
   const promises: Promise<unknown>[] = [];
   if (action === "Visibility") {
     if (idsByComponent.Block.length > 0) {
       promises.push(
-        componentStyleFunctions.Block.setModelBlocksVisibility(
+        callComponentStyleFunction(
+          componentStyleFunctions.Block,
+          "setModelBlocksVisibility",
           modelId,
           idsByComponent.Block,
           ...args,
@@ -69,7 +84,9 @@ async function dispatchToComponentTypes(
     }
     if (idsByComponent.Surface.length > 0) {
       promises.push(
-        componentStyleFunctions.Surface.setModelSurfacesVisibility(
+        callComponentStyleFunction(
+          componentStyleFunctions.Surface,
+          "setModelSurfacesVisibility",
           modelId,
           idsByComponent.Surface,
           ...args,
@@ -78,12 +95,20 @@ async function dispatchToComponentTypes(
     }
     if (idsByComponent.Line.length > 0) {
       promises.push(
-        componentStyleFunctions.Line.setModelLinesVisibility(modelId, idsByComponent.Line, ...args),
+        callComponentStyleFunction(
+          componentStyleFunctions.Line,
+          "setModelLinesVisibility",
+          modelId,
+          idsByComponent.Line,
+          ...args,
+        ),
       );
     }
     if (idsByComponent.Corner.length > 0) {
       promises.push(
-        componentStyleFunctions.Corner.setModelCornersVisibility(
+        callComponentStyleFunction(
+          componentStyleFunctions.Corner,
+          "setModelCornersVisibility",
           modelId,
           idsByComponent.Corner,
           ...args,
@@ -93,12 +118,20 @@ async function dispatchToComponentTypes(
   } else if (action === "Color") {
     if (idsByComponent.Block.length > 0) {
       promises.push(
-        componentStyleFunctions.Block.setModelBlocksColor(modelId, idsByComponent.Block, ...args),
+        callComponentStyleFunction(
+          componentStyleFunctions.Block,
+          "setModelBlocksColor",
+          modelId,
+          idsByComponent.Block,
+          ...args,
+        ),
       );
     }
     if (idsByComponent.Surface.length > 0) {
       promises.push(
-        componentStyleFunctions.Surface.setModelSurfacesColor(
+        callComponentStyleFunction(
+          componentStyleFunctions.Surface,
+          "setModelSurfacesColor",
           modelId,
           idsByComponent.Surface,
           ...args,
@@ -107,12 +140,20 @@ async function dispatchToComponentTypes(
     }
     if (idsByComponent.Line.length > 0) {
       promises.push(
-        componentStyleFunctions.Line.setModelLinesColor(modelId, idsByComponent.Line, ...args),
+        callComponentStyleFunction(
+          componentStyleFunctions.Line,
+          "setModelLinesColor",
+          modelId,
+          idsByComponent.Line,
+          ...args,
+        ),
       );
     }
     if (idsByComponent.Corner.length > 0) {
       promises.push(
-        componentStyleFunctions.Corner.setModelCornersColor(
+        callComponentStyleFunction(
+          componentStyleFunctions.Corner,
+          "setModelCornersColor",
           modelId,
           idsByComponent.Corner,
           ...args,
@@ -122,8 +163,27 @@ async function dispatchToComponentTypes(
   }
   return Promise.all(promises);
 }
+interface UseModelVisibilityStyleReturn {
+  modelVisibility: (modelId: string) => boolean | undefined;
+  setModelVisibility: (modelId: string, visibility: boolean) => Promise<unknown>;
+  setModelComponentsVisibility: (
+    modelId: string,
+    componentIds: string[],
+    visibility: boolean,
+  ) => Promise<unknown[]>;
+  setModelComponentTypeVisibility: (
+    modelId: string,
+    componentType: string,
+    visibility: boolean,
+  ) => Promise<void>;
+  modelComponentVisibility: (modelId: string, componentId: string) => boolean;
+  modelComponentTypeVisibility: (modelId: string, componentType: string) => boolean;
+}
+
 // oxlint-disable-next-line max-lines-per-function
-function useModelVisibilityStyle(componentStyleFunctions: ComponentStyleFunctions) {
+function useModelVisibilityStyle(
+  componentStyleFunctions: ComponentStyleFunctions,
+): UseModelVisibilityStyleReturn {
   const dataStore = useDataStore();
   const dataStyleState = useDataStyleState();
   const hybridViewerStore = useHybridViewerStore();
@@ -132,20 +192,20 @@ function useModelVisibilityStyle(componentStyleFunctions: ComponentStyleFunction
   function modelVisibility(modelId: string): boolean | undefined {
     return dataStyleState.getStyle(modelId).visibility;
   }
-  function setModelVisibility(modelId: string, visibility: boolean) {
+  async function setModelVisibility(modelId: string, visibility: boolean): Promise<unknown> {
     const schema = model_schemas.visibility;
     const params = {
       id: modelId,
       visibility,
     };
-    return viewerStore.request(
+    const result = await viewerStore.request(
       {
         schema,
         params,
       },
       {
         response_function: async () => {
-          await hybridViewerStore.setVisibility(modelId, visibility);
+          hybridViewerStore.setVisibility(modelId, visibility);
           await dataStyleState.mutateStyle(modelId, {
             visibility,
           });
@@ -156,12 +216,13 @@ function useModelVisibilityStyle(componentStyleFunctions: ComponentStyleFunction
         },
       },
     );
+    return result;
   }
   async function setModelComponentTypeVisibility(
     modelId: string,
     componentType: string,
     visibility: boolean,
-  ) {
+  ): Promise<void> {
     await modelCommonStyle.mutateModelComponentTypeStyle(modelId, componentType, {
       visibility,
     });
@@ -183,7 +244,7 @@ function useModelVisibilityStyle(componentStyleFunctions: ComponentStyleFunction
     modelId: string,
     componentIds: string[],
     visibility: boolean,
-  ) {
+  ): Promise<unknown[]> {
     const typeIds = componentIds.filter((id) => MESH_COMPONENT_TYPES.includes(id));
     const individualIds = componentIds.filter((id) => !MESH_COMPONENT_TYPES.includes(id));
     const promises: Promise<unknown>[] = [];
@@ -203,7 +264,8 @@ function useModelVisibilityStyle(componentStyleFunctions: ComponentStyleFunction
         ),
       );
     }
-    return await Promise.all(promises);
+    const results = await Promise.all(promises);
+    return results;
   }
   function modelComponentVisibility(modelId: string, componentId: string): boolean {
     const selection = useModelSelection(modelId, dataStyleState);

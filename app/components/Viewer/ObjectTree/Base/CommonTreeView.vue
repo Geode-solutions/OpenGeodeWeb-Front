@@ -1,11 +1,9 @@
 <script setup lang="ts">
+import { type DisplayItem, type EmitFn, useVirtualTree } from "@ogw_front/composables/virtual_tree";
 import StickyHeader from "@ogw_front/components/Viewer/ObjectTree/Base/StickyHeader.vue";
 import TreeRow from "@ogw_front/components/Viewer/ObjectTree/Base/TreeRow.vue";
 import { useTreeKeyboardNav } from "@ogw_front/composables/tree_keyboard_nav";
 import { useTreeScroll } from "@ogw_front/composables/tree_scroll";
-import { useVirtualTree } from "@ogw_front/composables/virtual_tree";
-// oxlint-disable-next-line eslint/no-duplicate-imports
-import type { DisplayItem, EmitFn } from "@ogw_front/composables/virtual_tree";
 
 // The useVirtualTree composable's own props type (VirtualTreeProps) isn't exported; this component intentionally stays generic over whatever item shape callers use (plain treeview groups, model component groups, ...), so it is extracted from the composable's signature instead of re-declared here.
 type UnwrapMaybeRefOrGetter<Source> = Source extends () => infer Result
@@ -35,7 +33,7 @@ const {
 
 const treeWrapper = ref<HTMLDivElement | undefined>(undefined);
 
-const emit = defineEmits<{
+interface Emits {
   "update:opened": [value: unknown[]];
   "update:selected": [value: unknown[]];
   "update:active": [value: unknown[]];
@@ -44,7 +42,9 @@ const emit = defineEmits<{
   "hover:enter": [payload: { item: DisplayItem }];
   "hover:leave": [payload: { item: DisplayItem }];
   contextmenu: [payload: { event: MouseEvent; item: DisplayItem["raw"] }];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 
 const {
   actualItemProps,
@@ -76,57 +76,75 @@ const { virtualScrollRef, stickyHeader, handleScroll, scrollToIndex, getScrollIn
     actualItemProps,
   );
 
-const focusedIndex = ref(-1);
-const lastActiveIndex = ref(-1);
+const focusedIndex = ref<number>(-1);
+const lastActiveIndex = ref<number>(-1);
+
+function applyRangeSelect(newActive: Set<unknown>, index: number): void {
+  const start = Math.min(lastActiveIndex.value, index);
+  const end = Math.max(lastActiveIndex.value, index);
+  for (let i = start; i <= end; i += 1) {
+    const rowItem = displayItems.value[i];
+    if (rowItem && rowItem.isLeaf) {
+      newActive.add(rowItem.raw[actualItemProps.value.value]);
+    }
+  }
+}
+
+function applyToggleActive(newActive: Set<unknown>, id: unknown, index: number | undefined): void {
+  if (newActive.has(id)) {
+    newActive.delete(id);
+  } else {
+    newActive.add(id);
+  }
+  if (index !== undefined) {
+    lastActiveIndex.value = index;
+  }
+}
+
+function handleMultiSelectClick(
+  item: DisplayItem,
+  index: number | undefined,
+  event: MouseEvent | KeyboardEvent,
+): void {
+  const newActive = new Set(active);
+  const id = item.raw[actualItemProps.value.value];
+  if (event.shiftKey && lastActiveIndex.value !== -1 && index !== undefined) {
+    applyRangeSelect(newActive, index);
+  } else {
+    applyToggleActive(newActive, id, index);
+  }
+  emit("update:active", [...newActive]);
+}
+
+function handleNormalClick(item: DisplayItem, index: number | undefined): void {
+  if (!item.isLeaf) {
+    toggleOpen(item.raw);
+    return;
+  }
+  emit("update:active", [item.raw[actualItemProps.value.value]]);
+  if (index !== undefined) {
+    lastActiveIndex.value = index;
+  }
+  toggleSelect(item.raw);
+  emit("click:item", item.raw);
+}
+
+function isMultiSelectEvent(event: MouseEvent | KeyboardEvent): void {
+  return event.ctrlKey || event.metaKey || event.shiftKey;
+}
 
 function handleItemClick(
   item: DisplayItem,
   index: number | undefined,
   event?: MouseEvent | KeyboardEvent,
-) {
+): void {
   if (index !== undefined) {
     focusedIndex.value = index;
   }
-
-  if (event && (event.ctrlKey || event.metaKey || event.shiftKey)) {
-    const newActive = new Set(active);
-    const id = item.raw[actualItemProps.value.value];
-
-    if (event.shiftKey && lastActiveIndex.value !== -1 && index !== undefined) {
-      const start = Math.min(lastActiveIndex.value, index);
-      const end = Math.max(lastActiveIndex.value, index);
-      for (let i = start; i <= end; i += 1) {
-        const rowItem = displayItems.value[i];
-        if (rowItem && rowItem.isLeaf) {
-          newActive.add(rowItem.raw[actualItemProps.value.value]);
-        }
-      }
-    } else {
-      if (newActive.has(id)) {
-        newActive.delete(id);
-      } else {
-        newActive.add(id);
-      }
-      if (index !== undefined) {
-        lastActiveIndex.value = index;
-      }
-    }
-    emit("update:active", [...newActive]);
-    return;
-  }
-
-  // Normal click
-  if (item.isLeaf) {
-    const newActive = [item.raw[actualItemProps.value.value]];
-    emit("update:active", newActive);
-    if (index !== undefined) {
-      lastActiveIndex.value = index;
-    }
-
-    toggleSelect(item.raw);
-    emit("click:item", item.raw);
+  if (Boolean(event) && isMultiSelectEvent(event)) {
+    handleMultiSelectClick(item, index, event);
   } else {
-    toggleOpen(item.raw);
+    handleNormalClick(item, index);
   }
 }
 

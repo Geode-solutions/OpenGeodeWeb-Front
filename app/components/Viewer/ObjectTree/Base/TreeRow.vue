@@ -1,13 +1,11 @@
 <script setup lang="ts">
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
-import { useDataStore } from "@ogw_front/stores/data";
 import type {
   DisplayItem,
   ItemPropsConfig,
   SelectionConfig,
   TreeItem,
 } from "@ogw_front/composables/virtual_tree";
+import { useDataStore } from "@ogw_front/stores/data";
 
 const dataStore = useDataStore();
 
@@ -21,25 +19,27 @@ interface Props {
 
 const { item, itemProps, selection, isSelected, getIndeterminate } = defineProps<Props>();
 
-const emit = defineEmits<{
+interface Emits {
   "toggle-open": [item: TreeItem];
   "toggle-select": [item: TreeItem];
   "hover-eye-enter": [item: unknown];
   "hover-eye-leave": [item: unknown];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 
 const INDENT_STEP = 10;
 
-function triggerHorizonStackModal(rawItem: unknown) {
+function triggerHorizonStackModal(rawItem: unknown): void {
   globalThis.dispatchEvent(new CustomEvent("open-horizon-stack-modal", { detail: rawItem }));
 }
-const isHorizonStack = computed(() => item.raw.geode_object_type === "HorizonStack3D");
-const isViewable = computed(() => dataStore.isItemViewable(item.raw));
-const showEyeButton = computed(
+const isHorizonStack = computed<boolean>(() => item.raw.geode_object_type === "HorizonStack3D");
+const isViewable = computed<boolean>(() => dataStore.isItemViewable(item.raw));
+const showEyeButton = computed<boolean>(
   () => !isHorizonStack.value && item.raw.title !== "HorizonStack3D" && isViewable.value,
 );
 
-function handleRowClick(event: MouseEvent) {
+function handleRowClick(event: MouseEvent): void {
   if (isHorizonStack.value) {
     if (!item.isLeaf) {
       return;

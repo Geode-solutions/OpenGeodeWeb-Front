@@ -3,7 +3,6 @@ import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 // Local imports
-import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { useMeshEdgesCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -50,14 +49,33 @@ function isMeshEdgesEdgeAttributeValid({
 }
 
 // oxlint-disable-next-line max-lines-per-function
-function useMeshEdgesEdgeAttributeStyle() {
+function useMeshEdgesEdgeAttributeStyle(): {
+  meshEdgesEdgeAttributeName: (id: string) => string | undefined;
+  meshEdgesEdgeAttributeItem: (id: string) => number;
+  meshEdgesEdgeAttributeRange: (id: string) => [number | undefined, number | undefined];
+  meshEdgesEdgeAttributeColorMap: (id: string) => string | undefined;
+  meshEdgesEdgeAttributeStoredConfig: (
+    id: string,
+    name: string | undefined,
+    item: number | undefined,
+  ) => AttributeStoredConfig;
+  setMeshEdgesEdgeAttribute: (id: string, input: AttributeInput) => Promise<unknown>;
+  setMeshEdgesEdgeAttributeName: (id: string, name: string) => Promise<unknown>;
+  setMeshEdgesEdgeAttributeItem: (id: string, item: number) => Promise<unknown>;
+  setMeshEdgesEdgeAttributeRange: (
+    id: string,
+    minimum: number,
+    maximum: number,
+  ) => Promise<unknown>;
+  setMeshEdgesEdgeAttributeColorMap: (id: string, colorMap: string | undefined) => Promise<unknown>;
+  meshEdgesEdgeAttributeNoDataColor: (id: string) => unknown;
+  setMeshEdgesEdgeAttributeNoDataColor: (id: string, no_data_color: unknown) => Promise<unknown>;
+} {
   const viewerStore = useViewerStore();
   const meshEdgesCommonStyle = useMeshEdgesCommonStyle();
-  function meshEdgesColoring(id: string): StyleValues {
-    return meshEdgesCommonStyle.meshEdgesStyle(id).coloring as StyleValues;
-  }
   function meshEdgesEdgeAttribute(id: string): AttributeState {
-    return meshEdgesColoring(id).edge as AttributeState;
+    // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.edge shape is defined by the data style schema.
+    return meshEdgesCommonStyle.meshEdgesColoring(id).edge as AttributeState;
   }
   function meshEdgesEdgeAttributeStoredConfig(
     id: string,
@@ -65,14 +83,10 @@ function useMeshEdgesEdgeAttributeStyle() {
     item: number | undefined,
   ): AttributeStoredConfig {
     const { storedConfigs } = meshEdgesEdgeAttribute(id);
-    if (
-      storedConfigs &&
-      name !== undefined &&
-      name in storedConfigs &&
-      item !== undefined &&
-      item in storedConfigs[name]!
-    ) {
-      return storedConfigs[name]![item]!;
+    const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
+    const itemConfig = item === undefined ? undefined : nameConfig?.[item];
+    if (itemConfig !== undefined) {
+      return itemConfig;
     }
     return {
       minimum: undefined,
@@ -81,35 +95,41 @@ function useMeshEdgesEdgeAttributeStyle() {
       no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
-  function mutateMeshEdgesEdgeStyle(id: string, values: Record<string, unknown>) {
-    return meshEdgesCommonStyle.mutateMeshEdgesStyle(id, {
+  async function mutateMeshEdgesEdgeStyle(
+    id: string,
+    values: Record<string, unknown>,
+  ): Promise<string> {
+    const result = await meshEdgesCommonStyle.mutateMeshEdgesStyle(id, {
       coloring: {
         edge: values,
       },
     });
+    return result;
   }
-  function setMeshEdgesEdgeAttributeStoredConfig(
+  async function setMeshEdgesEdgeAttributeStoredConfig(
     id: string,
     name: string | undefined,
     item: number | undefined,
     config: Partial<AttributeStoredConfig>,
-  ) {
-    return mutateMeshEdgesEdgeStyle(id, {
+  ): Promise<string> {
+    const result = await mutateMeshEdgesEdgeStyle(id, {
       storedConfigs: {
-        [name as string]: {
+        [name ?? ""]: {
           lastItem: item,
-          [item as number]: config,
+          [item ?? 0]: config,
         },
       },
     });
+    return result;
   }
   function meshEdgesEdgeAttributeName(id: string): string | undefined {
     return meshEdgesEdgeAttribute(id).name;
   }
   function meshEdgesEdgeAttributeLastItem(id: string, name: string | undefined): number {
     const { storedConfigs } = meshEdgesEdgeAttribute(id);
-    if (storedConfigs && name !== undefined && name in storedConfigs) {
-      return storedConfigs[name]!.lastItem;
+    const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
+    if (nameConfig !== undefined) {
+      return nameConfig.lastItem;
     }
     return 0;
   }
@@ -117,7 +137,7 @@ function useMeshEdgesEdgeAttributeStyle() {
     const { item, name } = meshEdgesEdgeAttribute(id);
     return item ?? meshEdgesEdgeAttributeLastItem(id, name);
   }
-  function setMeshEdgesEdgeAttribute(
+  async function setMeshEdgesEdgeAttribute(
     id: string,
     {
       name,
@@ -127,18 +147,18 @@ function useMeshEdgesEdgeAttributeStyle() {
       colorMap,
       no_data_color = DEFAULT_NO_DATA_COLOR,
     }: AttributeInput,
-  ) {
-    mutateMeshEdgesEdgeStyle(id, {
+  ): Promise<unknown> {
+    await mutateMeshEdgesEdgeStyle(id, {
       name,
       item,
     });
-    setMeshEdgesEdgeAttributeStoredConfig(id, name, item, {
+    await setMeshEdgesEdgeAttributeStoredConfig(id, name, item, {
       minimum,
       maximum,
       colorMap,
       no_data_color,
     });
-    const points = getRGBPointsFromPreset(colorMap as string);
+    const points = getRGBPointsFromPreset(colorMap ?? "");
     const schema = meshEdgesEdgeAttributeSchemas.attribute;
     const params = {
       id,
@@ -154,7 +174,7 @@ function useMeshEdgesEdgeAttributeStyle() {
       params,
     });
   }
-  function applyEdgeAttribute(id: string) {
+  async function applyEdgeAttribute(id: string): Promise<unknown> {
     const name = meshEdgesEdgeAttributeName(id);
     const item = meshEdgesEdgeAttributeItem(id);
     const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name, item);
@@ -167,19 +187,21 @@ function useMeshEdgesEdgeAttributeStyle() {
       no_data_color: storedConfig.no_data_color,
     };
     if (isMeshEdgesEdgeAttributeValid(attribute)) {
-      return setMeshEdgesEdgeAttribute(id, attribute);
+      const result = await setMeshEdgesEdgeAttribute(id, attribute);
+      return result;
     }
+    return undefined;
   }
-  function setMeshEdgesEdgeAttributeName(id: string, name: string) {
+  async function setMeshEdgesEdgeAttributeName(id: string, name: string): Promise<unknown> {
     const item = meshEdgesEdgeAttributeLastItem(id, name);
-    mutateMeshEdgesEdgeStyle(id, {
+    await mutateMeshEdgesEdgeStyle(id, {
       name,
       item,
     });
     return applyEdgeAttribute(id);
   }
-  function setMeshEdgesEdgeAttributeItem(id: string, item: number) {
-    mutateMeshEdgesEdgeStyle(id, {
+  async function setMeshEdgesEdgeAttributeItem(id: string, item: number): Promise<unknown> {
+    await mutateMeshEdgesEdgeStyle(id, {
       item,
     });
     return applyEdgeAttribute(id);
@@ -190,10 +212,14 @@ function useMeshEdgesEdgeAttributeStyle() {
     const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name, item);
     return [storedConfig.minimum, storedConfig.maximum];
   }
-  function setMeshEdgesEdgeAttributeRange(id: string, minimum: number, maximum: number) {
+  async function setMeshEdgesEdgeAttributeRange(
+    id: string,
+    minimum: number,
+    maximum: number,
+  ): Promise<unknown> {
     const name = meshEdgesEdgeAttributeName(id);
     const item = meshEdgesEdgeAttributeItem(id);
-    setMeshEdgesEdgeAttributeStoredConfig(id, name, item, {
+    await setMeshEdgesEdgeAttributeStoredConfig(id, name, item, {
       minimum,
       maximum,
     });
@@ -205,10 +231,13 @@ function useMeshEdgesEdgeAttributeStyle() {
     const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name, item);
     return storedConfig.colorMap;
   }
-  function setMeshEdgesEdgeAttributeColorMap(id: string, colorMap: string | undefined) {
+  async function setMeshEdgesEdgeAttributeColorMap(
+    id: string,
+    colorMap: string | undefined,
+  ): Promise<unknown> {
     const name = meshEdgesEdgeAttributeName(id);
     const item = meshEdgesEdgeAttributeItem(id);
-    setMeshEdgesEdgeAttributeStoredConfig(id, name, item, {
+    await setMeshEdgesEdgeAttributeStoredConfig(id, name, item, {
       colorMap,
     });
     return applyEdgeAttribute(id);
@@ -219,7 +248,10 @@ function useMeshEdgesEdgeAttributeStyle() {
     const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name, item);
     return storedConfig.no_data_color;
   }
-  async function setMeshEdgesEdgeAttributeNoDataColor(id: string, no_data_color: unknown) {
+  async function setMeshEdgesEdgeAttributeNoDataColor(
+    id: string,
+    no_data_color: unknown,
+  ): Promise<unknown> {
     const name = meshEdgesEdgeAttributeName(id);
     const item = meshEdgesEdgeAttributeItem(id);
     const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name, item);

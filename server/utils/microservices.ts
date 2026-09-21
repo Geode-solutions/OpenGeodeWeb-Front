@@ -1,5 +1,3 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
 // Node imports
 import child_process from "node:child_process";
 import fs from "node:fs";
@@ -9,13 +7,9 @@ import path from "node:path";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json" with { type: "json" };
 
 // Local imports
+import { type Microservice, microservicesMetadatasPath, projectMicroservices } from "./cleanup.js";
+import { type NamedChildProcess, getAvailablePort, waitForReady } from "./scripts.js";
 import { addNginxLocation, addSupervisorProgram } from "./cloud.js";
-import { getAvailablePort, waitForReady } from "./scripts.js";
-// oxlint-disable-next-line eslint/no-duplicate-imports
-import type { NamedChildProcess } from "./scripts.js";
-import { microservicesMetadatasPath, projectMicroservices } from "./cleanup.js";
-// oxlint-disable-next-line eslint/no-duplicate-imports
-import type { Microservice } from "./cleanup.js";
 import { executablePath } from "./path.js";
 
 interface RunArgs {
@@ -27,11 +21,12 @@ interface RunArgs {
 const MILLISECONDS_PER_SECOND = 1000;
 const DEFAULT_TIMEOUT_SECONDS = 45;
 const MAX_PORT_RETRIES = 1;
-const DEFAULT_RUN_ARGS: RunArgs = { projectFolderPath: "" };
+const DEFAULT_RUN_ARGS: Readonly<RunArgs> = { projectFolderPath: "" };
+
 async function runScript(
   execPath: string,
   execName: string,
-  args: string[],
+  args: readonly string[],
   expectedResponse: string,
   timeoutSeconds = DEFAULT_TIMEOUT_SECONDS,
 ): Promise<NamedChildProcess> {
@@ -45,7 +40,9 @@ async function runScript(
     console.log(`[${child.name}] spawned, pid=${child.pid}`);
   });
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutSeconds * MILLISECONDS_PER_SECOND);
+  const timer = setTimeout(() => {
+    controller.abort();
+  }, timeoutSeconds * MILLISECONDS_PER_SECOND);
   if (typeof timer.unref === "function") {
     timer.unref();
   }
@@ -59,16 +56,20 @@ async function runScript(
     throw error;
   }
 }
+
 function isPortInUseError(error: unknown): boolean {
   return /EADDRINUSE|address already in use|port already in use/iu.test(String(error));
 }
 
-function backArgs(args: RunArgs, port: number): string[] {
+function backArgs(args: Readonly<RunArgs>, port: number): string[] {
   const { projectFolderPath } = args;
   if (!projectFolderPath) {
     throw new Error("projectFolderPath is required");
   }
-  const uploadFolderPath = args.uploadFolderPath || path.join(projectFolderPath, "uploads");
+  const uploadFolderPath =
+    args.uploadFolderPath !== undefined && args.uploadFolderPath !== ""
+      ? args.uploadFolderPath
+      : path.join(projectFolderPath, "uploads");
   const executableArgs = [
     "--port",
     String(port),
@@ -81,7 +82,7 @@ function backArgs(args: RunArgs, port: number): string[] {
     "--timeout",
     "0",
   ];
-  if (process.env.NODE_ENV === "development" || !process.env.NODE_ENV) {
+  if (process.env.NODE_ENV === undefined || process.env.NODE_ENV === "development") {
     executableArgs.push("--debug");
   }
   return executableArgs;
@@ -90,9 +91,9 @@ function backArgs(args: RunArgs, port: number): string[] {
 async function runBack(
   execName: string,
   execPath: string,
-  args: RunArgs = DEFAULT_RUN_ARGS,
+  args: Readonly<RunArgs> = DEFAULT_RUN_ARGS,
   attempts = 0,
-): Promise<number | undefined> {
+): Promise<number> {
   let port: number | undefined = undefined;
   try {
     port = await getAvailablePort();
@@ -111,15 +112,15 @@ async function runBack(
       return newPort;
     }
   }
-  return undefined;
+  throw new Error(`runBack failed to run ${execName}`);
 }
 
 async function runViewer(
   execName: string,
   execPath: string,
-  args: RunArgs = DEFAULT_RUN_ARGS,
+  args: Readonly<RunArgs> = DEFAULT_RUN_ARGS,
   attempts = 0,
-): Promise<number | undefined> {
+): Promise<number> {
   const { projectFolderPath } = args;
   if (!projectFolderPath) {
     throw new Error("projectFolderPath is required");
@@ -140,7 +141,7 @@ async function runViewer(
     return port;
   } catch (error) {
     if (!isPortInUseError(error)) {
-      console.log("runBack error", error);
+      console.log("runViewer error", error);
       throw error;
     }
     if (attempts <= MAX_PORT_RETRIES) {
@@ -149,16 +150,16 @@ async function runViewer(
       return newPort;
     }
   }
-  return undefined;
+  throw new Error(`runViewer failed to run ${execName}`);
 }
 
 async function runExtension(
   extensionId: string,
   execName: string,
   execPath: string,
-  args: RunArgs = DEFAULT_RUN_ARGS,
+  args: Readonly<RunArgs> = DEFAULT_RUN_ARGS,
   attempts = 0,
-): Promise<number | undefined> {
+): Promise<number> {
   let port: number | undefined = undefined;
   try {
     port = await getAvailablePort();
@@ -170,7 +171,7 @@ async function runExtension(
     return port;
   } catch (error) {
     if (!isPortInUseError(error)) {
-      console.log("runBack error", error);
+      console.log("runExtension error", error);
       throw error;
     }
     if (attempts <= MAX_PORT_RETRIES) {
@@ -179,19 +180,29 @@ async function runExtension(
       return newPort;
     }
   }
-  return undefined;
+  throw new Error(`runExtension failed to run ${extensionId}`);
 }
-function addMicroserviceMetadatas(projectFolderPath: string, serviceObj: Microservice): void {
+function addMicroserviceMetadatas(
+  projectFolderPath: string,
+  serviceObj: Readonly<Microservice>,
+): void {
   const microservices = projectMicroservices(projectFolderPath);
+  let enriched: Microservice = { ...serviceObj };
   if (serviceObj.type === "back") {
     const schema = back_schemas.opengeodeweb_back.kill;
-    serviceObj.url = `http://localhost:${serviceObj.port}/${schema.$id}`;
     const [method] = schema.methods;
-    serviceObj.method = method;
+    enriched = {
+      ...enriched,
+      url: `http://localhost:${serviceObj.port}/${schema.$id}`,
+      method,
+    };
   } else if (serviceObj.type === "viewer") {
-    serviceObj.url = `ws://localhost:${serviceObj.port}/ws`;
+    enriched = {
+      ...enriched,
+      url: `ws://localhost:${serviceObj.port}/ws`,
+    };
   }
-  microservices.push(serviceObj);
+  microservices.push(enriched);
   fs.writeFileSync(
     microservicesMetadatasPath(projectFolderPath),
     JSON.stringify(
@@ -203,4 +214,5 @@ function addMicroserviceMetadatas(projectFolderPath: string, serviceObj: Microse
     ),
   );
 }
+
 export { addMicroserviceMetadatas, runBack, runExtension, runViewer };

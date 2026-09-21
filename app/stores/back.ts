@@ -42,15 +42,17 @@ export const useBackStore = defineStore("back", {
   },
   actions: {
     set_ping() {
+      // oxlint-disable-next-line typescript/no-floating-promises
       this.ping();
       setInterval(() => {
+        // oxlint-disable-next-line typescript/no-floating-promises
         this.ping();
       }, DEFAULT_PING_INTERVAL_SECONDS * MILLISECONDS_IN_SECOND);
     },
-    ping() {
+    async ping() {
       const feedbackStore = useFeedbackStore();
       const schema = back_schemas.opengeodeweb_back.ping;
-      return this.request(
+      const result = await this.request(
         { schema },
         {
           request_error_function: () => {
@@ -67,6 +69,7 @@ export const useBackStore = defineStore("back", {
           },
         },
       );
+      return result;
     },
     start_request() {
       this.request_counter += 1;
@@ -74,39 +77,46 @@ export const useBackStore = defineStore("back", {
     stop_request() {
       this.request_counter -= 1;
     },
-    launch(args: Record<string, unknown>) {
-      console.log("[GEODE] Launching back microservice...", { args });
+    async launch(args: Readonly<Record<string, unknown>>) {
       const appStore = useAppStore();
       const { COMMAND_BACK, NUXT_ROOT_PATH } = useRuntimeConfig().public;
       const schema = opengeodeweb_front_schemas.api.local.app.run_back;
       const params = { COMMAND_BACK, NUXT_ROOT_PATH, args };
 
-      console.log("[GEODE] params", params);
-      return appStore.request(
+      const result = await appStore.request(
         { schema, params },
         {
           response_function: (response: unknown) => {
-            const { port } = response as { port: string };
-            console.log(`[GEODE] Back launched on port ${port}`);
-            this.default_local_port = port;
+            if (
+              typeof response === "object" &&
+              response !== null &&
+              "port" in response &&
+              (typeof response.port === "string" || typeof response.port === "number")
+            ) {
+              this.default_local_port = String(response.port);
+            }
           },
         },
       );
+      return result;
     },
-    connect() {
-      console.log("[GEODE] Connecting to geode microservice...");
+    async connect(): Promise<void> {
       this.set_ping();
-      return Promise.resolve();
+      await Promise.resolve();
     },
-    request(
-      { schema, params = {} }: { schema: JsonRpcSchema; params?: Record<string, unknown> },
+    async request(
+      {
+        schema,
+        params = {},
+      }: Readonly<{ schema: JsonRpcSchema; params?: Record<string, unknown> }>,
       callbacks: RequestHandlers = {},
     ) {
-      return api_fetch(
+      const result = await api_fetch(
         this,
         // The back store is only ever used with HTTP ("front"/"back") schemas,
         // Which always carry `methods`; the wider JsonRpcSchema param above is
         // Kept as-is to match this action's public signature.
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion
         { schema: schema as JsonRpcSchema & { methods: string[] }, params, headers: {} },
         {
           ...callbacks,
@@ -117,10 +127,11 @@ export const useBackStore = defineStore("back", {
           },
         },
       );
+      return result;
     },
-    upload(file: File, callbacks: RequestHandlers = {}) {
+    async upload(file: Readonly<File>, callbacks: RequestHandlers = {}) {
       const schema = back_schemas.opengeodeweb_back.upload_file;
-      return upload_file(
+      const result = await upload_file(
         this,
         {
           schema,
@@ -135,20 +146,28 @@ export const useBackStore = defineStore("back", {
           },
         },
       );
+      return result;
     },
-    get_version(schema: JsonRpcSchema | undefined) {
+    async get_version(schema: JsonRpcSchema | undefined) {
       if (!schema) {
-        return;
+        return undefined;
       }
-      return this.request(
+      const result = await this.request(
         { schema },
         {
           response_function: (response: unknown) => {
-            const { microservice_version } = response as { microservice_version: string };
-            this.version = microservice_version;
+            if (
+              typeof response === "object" &&
+              response !== null &&
+              "microservice_version" in response &&
+              typeof response.microservice_version === "string"
+            ) {
+              this.version = response.microservice_version;
+            }
           },
         },
       );
+      return result;
     },
   },
   share: {

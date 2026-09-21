@@ -11,9 +11,11 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 const DEFAULT_ELEMENT_HEIGHT = 100;
 
-const emit = defineEmits<{
+interface Emits {
   click: [event: PointerEvent];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 
 const container = useTemplateRef("viewer");
 const hybridViewerStore = useHybridViewerStore();
@@ -26,8 +28,8 @@ const { width: windowWidth, height: windowHeight } = useWindowSize();
 
 function debounce<Callback extends (...args: unknown[]) => void>(func: Callback, wait: number) {
   let timeout: ReturnType<typeof setTimeout> | undefined = undefined;
-  return function executedFunction(...args: Parameters<Callback>) {
-    function later() {
+  return function executedFunction(...args: Parameters<Callback>): void {
+    function later(): void {
       clearTimeout(timeout);
       func(...args);
     }
@@ -58,7 +60,7 @@ onMounted(async () => {
 
 const { pickColormap, quickColormap } = useQuickColormap();
 
-async function handleClick(event: PointerEvent) {
+async function handleClick(event: PointerEvent): Promise<void> {
   const { offsetX, offsetY, clientX, clientY } = event;
   // Only ever fired from the pointerup handler bound to this same element.
   const containerEl = container.value;

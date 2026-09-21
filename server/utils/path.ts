@@ -53,13 +53,13 @@ function executablePath(execPath: string, execName: string): string {
   }
 
   const foundAtExecPath = findExecutableInDir(execPath, execName, osExecutableName);
-  if (foundAtExecPath) {
+  if (foundAtExecPath !== undefined && foundAtExecPath !== "") {
     return foundAtExecPath;
   }
   if (mode === appMode.DESKTOP && nodeEnv === "production") {
-    if (resourcesPath) {
+    if (resourcesPath !== undefined && resourcesPath !== "") {
       const foundInResources = findExecutableInDir(resourcesPath, execName, osExecutableName);
-      if (foundInResources) {
+      if (foundInResources !== undefined && foundInResources !== "") {
         return foundInResources;
       }
     }
@@ -140,7 +140,7 @@ async function extensionFrontendPath(
     extentionRepoName,
     frontendFile,
   );
-  if (localFilePath) {
+  if (localFilePath !== undefined && localFilePath !== "") {
     return localFilePath;
   }
   const unzippedfrontendFilePath = path.join(unzippedExtensionPath, frontendFile);
