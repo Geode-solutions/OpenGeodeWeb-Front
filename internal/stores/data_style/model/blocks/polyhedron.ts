@@ -132,14 +132,19 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
     blockIds: string[],
     values: Record<string, unknown>,
   ): Promise<void> {
-    if (blockIds.length > 1) {
-      await modelBlocksCommonStyle.mutateModelBlocksTypeColoring(modelId, {
+    const tasks: Promise<void>[] = [
+      modelBlocksCommonStyle.mutateModelBlocksColoring(modelId, blockIds, {
         polyhedron: values,
-      });
+      }),
+    ];
+    if (blockIds.length > 1) {
+      tasks.push(
+        modelBlocksCommonStyle.mutateModelBlocksTypeColoring(modelId, {
+          polyhedron: values,
+        }),
+      );
     }
-    await modelBlocksCommonStyle.mutateModelBlocksColoring(modelId, blockIds, {
-      polyhedron: values,
-    });
+    await Promise.all(tasks);
   }
   async function setModelBlocksPolyhedronAttributeStoredConfig(
     modelId: string,

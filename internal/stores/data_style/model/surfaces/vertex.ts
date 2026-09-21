@@ -135,12 +135,17 @@ function useModelSurfacesVertexAttribute(): UseModelSurfacesVertexAttributeRetur
     surfaceIds: string[],
     values: Record<string, unknown>,
   ): Promise<void> {
+    const tasks: Promise<void>[] = [
+      modelSurfacesCommonStyle.mutateModelSurfacesColoring(modelId, surfaceIds, {
+        vertex: values,
+      }),
+    ];
     if (surfaceIds.length > 1) {
-      await modelSurfacesCommonStyle.mutateModelSurfacesTypeColoring(modelId, { vertex: values });
+      tasks.push(
+        modelSurfacesCommonStyle.mutateModelSurfacesTypeColoring(modelId, { vertex: values }),
+      );
     }
-    await modelSurfacesCommonStyle.mutateModelSurfacesColoring(modelId, surfaceIds, {
-      vertex: values,
-    });
+    await Promise.all(tasks);
   }
   async function setModelSurfacesVertexAttributeStoredConfig(
     modelId: string,

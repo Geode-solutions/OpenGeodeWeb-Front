@@ -138,12 +138,17 @@ function useModelSurfacesPolygonAttribute(): UseModelSurfacesPolygonAttributeRet
     surfaceIds: string[],
     values: Record<string, unknown>,
   ): Promise<void> {
+    const tasks: Promise<void>[] = [
+      modelSurfacesCommonStyle.mutateModelSurfacesColoring(modelId, surfaceIds, {
+        polygon: values,
+      }),
+    ];
     if (surfaceIds.length > 1) {
-      await modelSurfacesCommonStyle.mutateModelSurfacesTypeColoring(modelId, { polygon: values });
+      tasks.push(
+        modelSurfacesCommonStyle.mutateModelSurfacesTypeColoring(modelId, { polygon: values }),
+      );
     }
-    await modelSurfacesCommonStyle.mutateModelSurfacesColoring(modelId, surfaceIds, {
-      polygon: values,
-    });
+    await Promise.all(tasks);
   }
   async function setModelSurfacesPolygonAttributeStoredConfig(
     modelId: string,

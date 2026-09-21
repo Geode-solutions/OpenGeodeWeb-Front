@@ -131,14 +131,19 @@ function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
     blockIds: string[],
     values: Record<string, unknown>,
   ): Promise<void> {
-    if (blockIds.length > 1) {
-      await modelBlocksCommonStyle.mutateModelBlocksTypeColoring(modelId, {
+    const tasks: Promise<void>[] = [
+      modelBlocksCommonStyle.mutateModelBlocksColoring(modelId, blockIds, {
         vertex: values,
-      });
+      }),
+    ];
+    if (blockIds.length > 1) {
+      tasks.push(
+        modelBlocksCommonStyle.mutateModelBlocksTypeColoring(modelId, {
+          vertex: values,
+        }),
+      );
     }
-    await modelBlocksCommonStyle.mutateModelBlocksColoring(modelId, blockIds, {
-      vertex: values,
-    });
+    await Promise.all(tasks);
   }
   async function setModelBlocksVertexAttributeStoredConfig(
     modelId: string,

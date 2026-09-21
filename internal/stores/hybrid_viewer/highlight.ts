@@ -12,7 +12,7 @@ interface HighlightResponse {
   id?: string;
   picked_id?: number;
   field_type?: string;
-  geode_id?: string;
+  geode_id?: string | null;
   attributes?: Record<string, unknown>;
 }
 
@@ -115,7 +115,7 @@ const useHybridViewerHighlight = createSharedComposable(() => {
         modelName = modelRecord.name;
       }
       const modelComponentsTable = database.model_components;
-      if (response.geode_id !== undefined && modelComponentsTable) {
+      if (response.geode_id !== undefined && response.geode_id !== null && modelComponentsTable) {
         const components = modelComponentsTable.where("[id+geode_id]");
         const query = components.equals([response.id, response.geode_id] as IndexableType);
         const component = (await query.first()) as
@@ -132,7 +132,7 @@ const useHybridViewerHighlight = createSharedComposable(() => {
       const newHoverData: HoverData = {
         modelId: response.id,
         modelName,
-        blockName: response.geode_id,
+        blockName: response.geode_id ?? undefined,
         pickedId: response.picked_id,
         fieldType: response.field_type,
         component: componentInfo,

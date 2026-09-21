@@ -131,14 +131,19 @@ function useModelLinesEdgeAttribute(): UseModelLinesEdgeAttributeReturn {
     lineIds: string[],
     values: Record<string, unknown>,
   ): Promise<void> {
-    if (lineIds.length > 1) {
-      await modelLinesCommonStyle.mutateModelLinesTypeColoring(modelId, {
+    const tasks: Promise<void>[] = [
+      modelLinesCommonStyle.mutateModelLinesColoring(modelId, lineIds, {
         edge: values,
-      });
+      }),
+    ];
+    if (lineIds.length > 1) {
+      tasks.push(
+        modelLinesCommonStyle.mutateModelLinesTypeColoring(modelId, {
+          edge: values,
+        }),
+      );
     }
-    await modelLinesCommonStyle.mutateModelLinesColoring(modelId, lineIds, {
-      edge: values,
-    });
+    await Promise.all(tasks);
   }
   async function setModelLinesEdgeAttributeStoredConfig(
     modelId: string,

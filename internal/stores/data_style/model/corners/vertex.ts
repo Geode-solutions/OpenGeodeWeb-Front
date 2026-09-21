@@ -117,12 +117,17 @@ function useModelCornersVertexAttribute(): ModelCornersVertexAttributeApi {
     cornerIds: string[],
     values: Record<string, unknown>,
   ): Promise<void> {
+    const tasks: Promise<void>[] = [
+      modelCornersCommonStyle.mutateModelCornersColoring(modelId, cornerIds, {
+        vertex: values,
+      }),
+    ];
     if (cornerIds.length > 1) {
-      await modelCornersCommonStyle.mutateModelCornersTypeColoring(modelId, { vertex: values });
+      tasks.push(
+        modelCornersCommonStyle.mutateModelCornersTypeColoring(modelId, { vertex: values }),
+      );
     }
-    await modelCornersCommonStyle.mutateModelCornersColoring(modelId, cornerIds, {
-      vertex: values,
-    });
+    await Promise.all(tasks);
   }
   async function setModelCornersVertexAttributeStoredConfig(
     modelId: string,
