@@ -10,10 +10,10 @@ const TIMEOUTS = {
   unit: 5000,
   integration: 15_000,
 };
-const CI_WORKERS = 2;
+const CI_WORKERS = 4;
 
 const globalRetry = process.env.CI ? RETRIES : DEFAULT_RETRY;
-const maxWorkers = process.env.CI ? CI_WORKERS : 3;
+const maxWorkers = process.env.CI ? CI_WORKERS : undefined;
 
 const aliases = {
   "@ogw_tests": path.resolve(__dirname, "."),
