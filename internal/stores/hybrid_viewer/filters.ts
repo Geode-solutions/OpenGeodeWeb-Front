@@ -34,15 +34,9 @@ function useHybridViewerFilters(): {
   setClippingPlanes: (ids: string[], planes: unknown) => Promise<void>;
   setShrink: (ids: string[], shrink_factor: number) => Promise<void>;
 } {
-  async function setClippingPlanes(ids: string[], planes: unknown): Promise<void> {
-    await performSetClippingPlanes(ids, planes);
-  }
-  async function setShrink(ids: string[], shrink_factor: number): Promise<void> {
-    await performSetShrink(ids, shrink_factor);
-  }
   return {
-    setClippingPlanes,
-    setShrink,
+    setClippingPlanes: performSetClippingPlanes,
+    setShrink: performSetShrink,
   };
 }
 export { performSetClippingPlanes, performSetShrink, useHybridViewerFilters };
