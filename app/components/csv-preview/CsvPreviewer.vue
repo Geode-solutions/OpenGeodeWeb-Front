@@ -77,14 +77,7 @@ function autoDetectSeparator(content: string): string {
   return best;
 }
 
-function parseContent(): string[] {
-  if (!rawContent.value) {
-    return [];
-  }
-
-  const allLines = rawContent.value.split(/\r?\n/u).filter((line) => line.trim() !== "");
-
-  function splitLine(line: string): string[] {
+function splitLine(line: string): string[] {
     if (!separator.value) {
       return [line];
     }
@@ -105,6 +98,12 @@ function parseContent(): string[] {
     return result;
   }
 
+function parseContent(): string[] {
+  if (!rawContent.value) {
+    return [];
+  }
+
+  const allLines = rawContent.value.split(/\r?\n/u).filter((line) => line.trim() !== "");
   const headerLine = allLines[headerRow.value];
   const rawHeaders = headerLine ? splitLine(headerLine) : [];
 
