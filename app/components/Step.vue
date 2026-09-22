@@ -1,22 +1,42 @@
-<script setup>
-function truncate(text, maxLength) {
+<script setup lang="ts">
+import type { useStepperTree } from "@ogw_front/composables/stepper_tree";
+
+interface StepConfig {
+  step_title: string;
+  chips?: string[];
+  component: {
+    component_name: string;
+    component_options?: Record<string, unknown>;
+  };
+}
+
+function truncate(text: string, maxLength: number): string {
   if (text.length > maxLength) {
     return `${text.slice(0, maxLength)}...`;
   }
   return text;
 }
 
-const { stepIndex, stepperTree } = defineProps({
-  stepIndex: { type: Number, required: true },
-  stepperTree: { type: Object, required: true },
-});
+interface Props {
+  stepIndex: number;
+  stepperTree: ReturnType<typeof useStepperTree>;
+}
 
-const emit = defineEmits(["reset_values"]);
+const { stepIndex, stepperTree } = defineProps<Props>();
+
+interface Emits {
+  reset_values: [];
+}
+
+const emit = defineEmits<Emits>();
 
 const { state, increment_step, decrement_step, update_values } = stepperTree;
-const { current_step_index, steps } = toRefs(state);
+const { current_step_index, steps } = toRefs(state) as unknown as {
+  current_step_index: Ref<number>;
+  steps: Ref<StepConfig[]>;
+};
 
-const sortedChips = computed(() => {
+const sortedChips = computed<string[]>(() => {
   const chips = steps.value[stepIndex]?.chips || [];
   return chips.toSorted((chipA, chipB) =>
     chipA.localeCompare(chipB, undefined, {
@@ -41,7 +61,7 @@ const sortedChips = computed(() => {
           class="text-subtitle-1 font-weight-bold mb-0 transition-swing"
           :class="current_step_index === stepIndex ? 'text-primary' : 'text-grey-darken-1'"
         >
-          {{ steps[stepIndex].step_title }}
+          {{ steps[stepIndex]!.step_title }}
         </p>
 
         <v-sheet
@@ -69,8 +89,8 @@ const sortedChips = computed(() => {
       <component
         v-if="stepIndex === current_step_index"
         :key="stepIndex"
-        :is="steps[stepIndex].component.component_name"
-        v-bind="steps[stepIndex].component.component_options"
+        :is="steps[stepIndex]!.component.component_name"
+        v-bind="steps[stepIndex]!.component.component_options"
         @increment_step="increment_step"
         @decrement_step="decrement_step"
         @update_values="update_values"

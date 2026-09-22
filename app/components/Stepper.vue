@@ -1,12 +1,24 @@
-<script setup>
-import Step from "@ogw_front/components/Step";
+<script setup lang="ts">
+import Step from "@ogw_front/components/Step.vue";
+import type { useStepperTree } from "@ogw_front/composables/stepper_tree";
 
-const emit = defineEmits(["reset_values", "close"]);
-const { stepperTree } = defineProps({
-  stepperTree: { type: Object, required: true },
-});
+interface Emits {
+  reset_values: [];
+  close: [];
+}
+
+const emit = defineEmits<Emits>();
+
+interface Props {
+  stepperTree: ReturnType<typeof useStepperTree>;
+}
+
+const { stepperTree } = defineProps<Props>();
 const { state } = stepperTree;
-const { steps, current_step_index } = toRefs(state);
+const { steps, current_step_index } = toRefs(state) as unknown as {
+  steps: Ref<unknown[]>;
+  current_step_index: Ref<number>;
+};
 </script>
 
 <template>

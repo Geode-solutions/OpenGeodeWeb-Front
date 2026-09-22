@@ -1,20 +1,28 @@
-<script setup>
+<script setup lang="ts">
+import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
 import { Status } from "@ogw_front/utils/status";
 import { useBackStore } from "@ogw_front/stores/back";
 
-const { schema } = defineProps({
-  schema: { type: Object, required: true },
-});
+interface Props {
+  schema: JsonRpcSchema;
+}
+
+const { schema } = defineProps<Props>();
+
+interface PackageVersion {
+  package: string;
+  version: string;
+}
 
 const backStore = useBackStore();
-const packages_versions = ref([]);
+const packages_versions = ref<PackageVersion[]>([]);
 
-async function get_packages_versions() {
+async function get_packages_versions(): Promise<void> {
   await backStore.request(
     { schema },
     {
-      response_function: (response) => {
-        packages_versions.value = response.versions;
+      response_function: (response: unknown) => {
+        packages_versions.value = (response as { versions: PackageVersion[] }).versions;
       },
     },
   );

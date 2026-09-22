@@ -1,0 +1,65 @@
+// Local imports
+import type { JsonRpcSchema, RequestHandlersWithValidation } from "./types.js";
+import { fetchRaw } from "./fetch_raw.js";
+import { validateSchema } from "./validate_schema.js";
+
+const ERROR_400 = 400;
+
+interface FetchSchemaOptions {
+  schema: Readonly<JsonRpcSchema & { methods: readonly string[] }>;
+  params?: unknown;
+  baseURL?: string;
+  headers?: Readonly<Record<string, string>>;
+  timeout?: number;
+  expectEvent?: boolean;
+}
+
+async function fetchSchema(
+  {
+    schema,
+    params = {},
+    baseURL,
+    headers,
+    timeout,
+    expectEvent = false,
+  }: Readonly<FetchSchemaOptions>,
+  {
+    request_error_function,
+    response_function,
+    response_error_function,
+    validation_error_function,
+  }: Readonly<RequestHandlersWithValidation> = {},
+): Promise<unknown> {
+  const { valid, error: schema_error } = validateSchema(schema, params);
+
+  if (!valid) {
+    if (process.env.NODE_ENV !== "production") {
+      console.log("Bad request", schema_error, schema, params);
+    }
+    if (validation_error_function) {
+      validation_error_function({ code: ERROR_400, name: "Bad request", error: schema_error });
+    }
+    throw new Error(`${schema.$id}: ${schema_error}`);
+  }
+
+  const result = await fetchRaw(
+    {
+      route: schema.$id,
+      method: schema.methods.find((method) => method !== "OPTIONS"),
+      params,
+      baseURL,
+      headers,
+      max_retry: schema.max_retry,
+      timeout,
+      expectEvent,
+    },
+    {
+      request_error_function,
+      response_function,
+      response_error_function,
+    },
+  );
+  return result;
+}
+
+export { fetchSchema };

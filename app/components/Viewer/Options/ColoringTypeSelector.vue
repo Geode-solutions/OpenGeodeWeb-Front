@@ -1,68 +1,83 @@
-<script setup>
+<script setup lang="ts">
+import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
+import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsAttributeSelector from "@ogw_front/components/Viewer/Options/AttributeSelector.vue";
 import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
 import ViewerOptionsTexturesSelector from "@ogw_front/components/Viewer/Options/TexturesSelector.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 
-const coloring_style_key = defineModel("coloring_style_key", { type: String });
+interface Texture {
+  id: string;
+  texture_name: string;
+}
 
-const color = defineModel("color", { type: Object });
-const textures = defineModel("textures", { type: Array });
+interface CapabilityConfig {
+  available?: boolean;
+  hasColorMap?: boolean;
+}
 
-const vertex_attribute_name = defineModel("vertex_attribute_name", { type: String });
-const vertex_attribute_item = defineModel("vertex_attribute_item", { type: Number });
-const vertex_attribute_range = defineModel("vertex_attribute_range", { type: Array });
-const vertex_attribute_color_map = defineModel("vertex_attribute_color_map", { type: String });
-const vertex_attribute_no_data_color = defineModel("vertex_attribute_no_data_color", {
-  type: Object,
-});
+interface Schemas {
+  vertex?: JsonRpcSchema;
+  edge?: JsonRpcSchema;
+  cell?: JsonRpcSchema;
+  polygon?: JsonRpcSchema;
+  polyhedron?: JsonRpcSchema;
+}
 
-const edge_attribute_name = defineModel("edge_attribute_name", { type: String });
-const edge_attribute_item = defineModel("edge_attribute_item", { type: Number });
-const edge_attribute_range = defineModel("edge_attribute_range", { type: Array });
-const edge_attribute_color_map = defineModel("edge_attribute_color_map", { type: String });
-const edge_attribute_no_data_color = defineModel("edge_attribute_no_data_color", { type: Object });
+const coloring_style_key = defineModel<string>("coloring_style_key");
 
-const cell_attribute_name = defineModel("cell_attribute_name", { type: String });
-const cell_attribute_item = defineModel("cell_attribute_item", { type: Number });
-const cell_attribute_range = defineModel("cell_attribute_range", { type: Array });
-const cell_attribute_color_map = defineModel("cell_attribute_color_map", { type: String });
-const cell_attribute_no_data_color = defineModel("cell_attribute_no_data_color", { type: Object });
+const color = defineModel<RGBAColor>("color");
+const textures = defineModel<Texture[]>("textures");
 
-const polygon_attribute_name = defineModel("polygon_attribute_name", { type: String });
-const polygon_attribute_item = defineModel("polygon_attribute_item", { type: Number });
-const polygon_attribute_range = defineModel("polygon_attribute_range", { type: Array });
-const polygon_attribute_color_map = defineModel("polygon_attribute_color_map", { type: String });
-const polygon_attribute_no_data_color = defineModel("polygon_attribute_no_data_color", {
-  type: Object,
-});
+const vertex_attribute_name = defineModel<string>("vertex_attribute_name");
+const vertex_attribute_item = defineModel<number>("vertex_attribute_item");
+const vertex_attribute_range = defineModel<(number | undefined)[]>("vertex_attribute_range");
+const vertex_attribute_color_map = defineModel<string>("vertex_attribute_color_map");
+const vertex_attribute_no_data_color = defineModel<RGBAColor>("vertex_attribute_no_data_color");
 
-const polyhedron_attribute_name = defineModel("polyhedron_attribute_name", { type: String });
-const polyhedron_attribute_item = defineModel("polyhedron_attribute_item", { type: Number });
-const polyhedron_attribute_range = defineModel("polyhedron_attribute_range", { type: Array });
-const polyhedron_attribute_color_map = defineModel("polyhedron_attribute_color_map", {
-  type: String,
-});
-const polyhedron_attribute_no_data_color = defineModel("polyhedron_attribute_no_data_color", {
-  type: Object,
-});
+const edge_attribute_name = defineModel<string>("edge_attribute_name");
+const edge_attribute_item = defineModel<number>("edge_attribute_item");
+const edge_attribute_range = defineModel<(number | undefined)[]>("edge_attribute_range");
+const edge_attribute_color_map = defineModel<string>("edge_attribute_color_map");
+const edge_attribute_no_data_color = defineModel<RGBAColor>("edge_attribute_no_data_color");
 
-const { id, componentIds, capabilities, schemas, allowRandom } = defineProps({
-  id: { type: String, required: true },
-  componentIds: { type: Array, default: undefined },
-  capabilities: {
-    type: Object,
-    default: () => ({}),
-  },
-  schemas: {
-    type: Object,
-    default: () => ({}),
-  },
-  allowRandom: {
-    type: Boolean,
-    default: false,
-  },
-});
+const cell_attribute_name = defineModel<string>("cell_attribute_name");
+const cell_attribute_item = defineModel<number>("cell_attribute_item");
+const cell_attribute_range = defineModel<(number | undefined)[]>("cell_attribute_range");
+const cell_attribute_color_map = defineModel<string>("cell_attribute_color_map");
+const cell_attribute_no_data_color = defineModel<RGBAColor>("cell_attribute_no_data_color");
+
+const polygon_attribute_name = defineModel<string>("polygon_attribute_name");
+const polygon_attribute_item = defineModel<number>("polygon_attribute_item");
+const polygon_attribute_range = defineModel<(number | undefined)[]>("polygon_attribute_range");
+const polygon_attribute_color_map = defineModel<string>("polygon_attribute_color_map");
+const polygon_attribute_no_data_color = defineModel<RGBAColor>("polygon_attribute_no_data_color");
+
+const polyhedron_attribute_name = defineModel<string>("polyhedron_attribute_name");
+const polyhedron_attribute_item = defineModel<number>("polyhedron_attribute_item");
+const polyhedron_attribute_range = defineModel<(number | undefined)[]>(
+  "polyhedron_attribute_range",
+);
+const polyhedron_attribute_color_map = defineModel<string>("polyhedron_attribute_color_map");
+const polyhedron_attribute_no_data_color = defineModel<RGBAColor>(
+  "polyhedron_attribute_no_data_color",
+);
+
+interface Props {
+  id: string;
+  componentIds?: string[];
+  capabilities?: Record<string, CapabilityConfig>;
+  schemas?: Schemas;
+  allowRandom?: boolean;
+}
+
+const {
+  id,
+  componentIds = undefined,
+  capabilities = {},
+  schemas = {},
+  allowRandom = false,
+} = defineProps<Props>();
 
 const vertexSchema = schemas.vertex || back_schemas.opengeodeweb_back.vertex_attribute_names;
 const edgeSchema = schemas.edge || back_schemas.opengeodeweb_back.edge_attribute_names;
@@ -71,37 +86,39 @@ const polygonSchema = schemas.polygon || back_schemas.opengeodeweb_back.polygon_
 const polyhedronSchema =
   schemas.polyhedron || back_schemas.opengeodeweb_back.polyhedron_attribute_names;
 
-function isAvailable(key) {
+function isAvailable(key: string): boolean {
   if (capabilities[key] && capabilities[key].available === false) {
     return false;
   }
   return true;
 }
 
-function hasColorMap(key) {
+function hasColorMap(key: string): boolean {
   if (capabilities[key] && capabilities[key].hasColorMap === false) {
     return false;
   }
   return true;
 }
 
-const has_color = computed(() => color.value !== undefined && isAvailable("color"));
-const has_textures = computed(() => textures.value !== undefined && isAvailable("textures"));
-const has_vertex = computed(
+const has_color = computed<boolean>(() => color.value !== undefined && isAvailable("color"));
+const has_textures = computed<boolean>(
+  () => textures.value !== undefined && isAvailable("textures"),
+);
+const has_vertex = computed<boolean>(
   () =>
     vertex_attribute_range.value !== undefined && isAvailable("vertex") && hasColorMap("vertex"),
 );
-const has_edge = computed(
+const has_edge = computed<boolean>(
   () => edge_attribute_range.value !== undefined && isAvailable("edge") && hasColorMap("edge"),
 );
-const has_cells = computed(
+const has_cells = computed<boolean>(
   () => cell_attribute_range.value !== undefined && isAvailable("cell") && hasColorMap("cell"),
 );
-const has_polygons = computed(
+const has_polygons = computed<boolean>(
   () =>
     polygon_attribute_range.value !== undefined && isAvailable("polygon") && hasColorMap("polygon"),
 );
-const has_polyhedra = computed(
+const has_polyhedra = computed<boolean>(
   () =>
     polyhedron_attribute_range.value !== undefined &&
     isAvailable("polyhedron") &&
@@ -119,7 +136,7 @@ const polyhedron_dict = {
   name: "Polyhedron attribute",
   value: "polyhedron",
 };
-const coloring_styles = computed(() => {
+const coloring_styles = computed<{ labels: string[]; values: string[] }>(() => {
   const array = [];
   if (has_color.value) {
     array.push(color_dict);
@@ -152,9 +169,9 @@ const coloring_styles = computed(() => {
   return { labels, values };
 });
 
-const coloring_style_label = ref("");
+const coloring_style_label = ref<string>("");
 
-const active_key = computed(() => {
+const active_key = computed<string | undefined>(() => {
   const index = coloring_styles.value.labels.indexOf(coloring_style_label.value);
   return index === -1 ? coloring_style_key.value : coloring_styles.value.values[index];
 });
@@ -177,7 +194,7 @@ watch(
       polygon: polygon_attribute_name.value,
       polyhedron: polyhedron_attribute_name.value,
     };
-    if (!(key in names) || names[key]) {
+    if (key === undefined || !(key in names) || names[key as keyof typeof names]) {
       coloring_style_key.value = key;
     }
   },
@@ -186,9 +203,12 @@ watch(
 watch(
   coloring_style_key,
   (value) => {
+    if (value === undefined) {
+      return;
+    }
     const index = coloring_styles.value.values.indexOf(value);
     if (index !== -1) {
-      coloring_style_label.value = coloring_styles.value.labels[index];
+      coloring_style_label.value = coloring_styles.value.labels[index] ?? "";
     }
   },
   { immediate: true },

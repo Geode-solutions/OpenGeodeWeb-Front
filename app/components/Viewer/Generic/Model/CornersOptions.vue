@@ -1,22 +1,25 @@
-<script setup>
+<script setup lang="ts">
 import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
+import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
-const { modelId, cornerId, targetCornerIds } = defineProps({
-  modelId: { type: String, required: true },
-  cornerId: { type: String, default: undefined },
-  targetCornerIds: { type: Array, required: true },
-});
+interface Props {
+  modelId: string;
+  cornerId?: string;
+  targetCornerIds: string[];
+}
+
+const { modelId, cornerId = undefined, targetCornerIds } = defineProps<Props>();
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
 // Visibility
-const cornersVisibility = computed({
+const cornersVisibility = computed<boolean>({
   get: () => dataStyleStore.modelComponentTypeVisibility(modelId, "Corner"),
   set: async (newValue) => {
     await dataStyleStore.setModelCornersVisibility(modelId, targetCornerIds, newValue);
@@ -24,57 +27,73 @@ const cornersVisibility = computed({
   },
 });
 
-const cornerVisibility = computed({
-  get: () => dataStyleStore.modelCornerVisibility(modelId, cornerId),
+const cornerVisibility = computed<boolean | undefined>({
+  get: () => dataStyleStore.modelCornerVisibility(modelId, cornerId) as boolean | undefined,
   set: async (newValue) => {
+    if (cornerId === undefined) {
+      return;
+    }
     await dataStyleStore.setModelCornersVisibility(modelId, [cornerId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
 
 // Color
-const cornersColor = computed({
-  get: () => dataStyleStore.modelComponentTypeColor(modelId, "Corner"),
+const cornersColor = computed<RGBAColor | undefined>({
+  get: () => dataStyleStore.modelComponentTypeColor(modelId, "Corner") as RGBAColor | undefined,
   set: async (color) => {
     await dataStyleStore.setModelCornersColor(modelId, targetCornerIds, color);
     hybridViewerStore.remoteRender();
   },
 });
 
-const cornerColor = computed({
-  get: () => dataStyleStore.modelCornerColor(modelId, cornerId),
+const cornerColor = computed<RGBAColor | undefined>({
+  get: () => dataStyleStore.modelCornerColor(modelId, cornerId) as RGBAColor | undefined,
   set: async (color) => {
+    if (cornerId === undefined) {
+      return;
+    }
     await dataStyleStore.setModelCornersColor(modelId, [cornerId], color);
     hybridViewerStore.remoteRender();
   },
 });
 
-const cornersActiveColoring = computed({
-  get: () => dataStyleStore.getModelComponentTypeActiveColoring(modelId, "Corner"),
+const cornersActiveColoring = computed<string | undefined>({
+  get: () =>
+    dataStyleStore.getModelComponentTypeActiveColoring(modelId, "Corner") as string | undefined,
   set: async (coloringType) => {
+    if (typeof coloringType !== "string") {
+      return;
+    }
     await dataStyleStore.setModelCornersActiveColoring(modelId, targetCornerIds, coloringType);
     hybridViewerStore.remoteRender();
   },
 });
 
-const cornerActiveColoring = computed({
-  get: () => dataStyleStore.modelCornerActiveColoring(modelId, cornerId),
+const cornerActiveColoring = computed<string | undefined>({
+  get: () => dataStyleStore.modelCornerActiveColoring(modelId, cornerId) as string | undefined,
   set: async (coloringType) => {
+    if (cornerId === undefined || typeof coloringType !== "string") {
+      return;
+    }
     await dataStyleStore.setModelCornersActiveColoring(modelId, [cornerId], coloringType);
     hybridViewerStore.remoteRender();
   },
 });
 
 // Group Attributes
-const cornersVertexAttributeName = computed({
+const cornersVertexAttributeName = computed<string | undefined>({
   get: () => dataStyleStore.modelCornersVertexAttributeName(modelId),
   set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
     await dataStyleStore.setModelCornersVertexAttributeName(modelId, targetCornerIds, newValue);
     hybridViewerStore.remoteRender();
   },
 });
 
-const cornersVertexAttributeItem = computed({
+const cornersVertexAttributeItem = computed<string | undefined>({
   get: () => dataStyleStore.modelCornersVertexAttributeItem(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelCornersVertexAttributeItem(modelId, targetCornerIds, newValue);
@@ -82,20 +101,24 @@ const cornersVertexAttributeItem = computed({
   },
 });
 
-const cornersVertexAttributeRange = computed({
+const cornersVertexAttributeRange = computed<[number, number] | undefined>({
   get: () => dataStyleStore.modelCornersVertexAttributeRange(modelId),
   set: async (newValue) => {
+    const [minimum, maximum] = newValue;
+    if (minimum === undefined || maximum === undefined) {
+      return;
+    }
     await dataStyleStore.setModelCornersVertexAttributeRange(
       modelId,
       targetCornerIds,
-      newValue[0],
-      newValue[1],
+      minimum,
+      maximum,
     );
     hybridViewerStore.remoteRender();
   },
 });
 
-const cornersVertexAttributeColorMap = computed({
+const cornersVertexAttributeColorMap = computed<ColorMap | undefined>({
   get: () => dataStyleStore.modelCornersVertexAttributeColorMap(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelCornersVertexAttributeColorMap(modelId, targetCornerIds, newValue);
@@ -103,8 +126,9 @@ const cornersVertexAttributeColorMap = computed({
   },
 });
 
-const cornersVertexAttributeNoDataColor = computed({
-  get: () => dataStyleStore.modelCornersVertexAttributeNoDataColor(modelId),
+const cornersVertexAttributeNoDataColor = computed<RGBAColor | undefined>({
+  get: () =>
+    dataStyleStore.modelCornersVertexAttributeNoDataColor(modelId) as RGBAColor | undefined,
   set: async (newValue) => {
     await dataStyleStore.setModelCornersVertexAttributeNoDataColor(
       modelId,
@@ -116,46 +140,60 @@ const cornersVertexAttributeNoDataColor = computed({
 });
 
 // Individual Attributes
-const vertexAttributeName = computed({
+const vertexAttributeName = computed<string | undefined>({
   get: () => dataStyleStore.modelCornersVertexAttributeName(modelId, cornerId),
   set: async (newValue) => {
+    if (cornerId === undefined || newValue === undefined) {
+      return;
+    }
     await dataStyleStore.setModelCornersVertexAttributeName(modelId, [cornerId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
 
-const vertexAttributeItem = computed({
+const vertexAttributeItem = computed<string | undefined>({
   get: () => dataStyleStore.modelCornersVertexAttributeItem(modelId, cornerId),
   set: async (newValue) => {
+    if (cornerId === undefined) {
+      return;
+    }
     await dataStyleStore.setModelCornersVertexAttributeItem(modelId, [cornerId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
 
-const vertexAttributeRange = computed({
+const vertexAttributeRange = computed<[number, number] | undefined>({
   get: () => dataStyleStore.modelCornersVertexAttributeRange(modelId, cornerId),
   set: async (newValue) => {
-    await dataStyleStore.setModelCornersVertexAttributeRange(
-      modelId,
-      [cornerId],
-      newValue[0],
-      newValue[1],
-    );
+    const [minimum, maximum] = newValue;
+    if (cornerId === undefined || minimum === undefined || maximum === undefined) {
+      return;
+    }
+    await dataStyleStore.setModelCornersVertexAttributeRange(modelId, [cornerId], minimum, maximum);
     hybridViewerStore.remoteRender();
   },
 });
 
-const vertexAttributeColorMap = computed({
+const vertexAttributeColorMap = computed<ColorMap | undefined>({
   get: () => dataStyleStore.modelCornersVertexAttributeColorMap(modelId, cornerId),
   set: async (newValue) => {
+    if (cornerId === undefined) {
+      return;
+    }
     await dataStyleStore.setModelCornersVertexAttributeColorMap(modelId, [cornerId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
 
-const vertexAttributeNoDataColor = computed({
-  get: () => dataStyleStore.modelCornersVertexAttributeNoDataColor(modelId, cornerId),
+const vertexAttributeNoDataColor = computed<RGBAColor | undefined>({
+  get: () =>
+    dataStyleStore.modelCornersVertexAttributeNoDataColor(modelId, cornerId) as
+      | RGBAColor
+      | undefined,
   set: async (newValue) => {
+    if (cornerId === undefined) {
+      return;
+    }
     await dataStyleStore.setModelCornersVertexAttributeNoDataColor(modelId, [cornerId], newValue);
     hybridViewerStore.remoteRender();
   },

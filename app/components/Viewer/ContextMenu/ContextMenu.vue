@@ -1,18 +1,21 @@
-<script setup>
-import CenterButton from "@ogw_front/components/Viewer/ContextMenu/CenterButton";
-import CircularItems from "@ogw_front/components/Viewer/ContextMenu/CircularItems";
-import InfoCard from "@ogw_front/components/Viewer/ContextMenu/InfoCard";
+<script setup lang="ts">
+import CenterButton from "@ogw_front/components/Viewer/ContextMenu/CenterButton.vue";
+import CircularItems from "@ogw_front/components/Viewer/ContextMenu/CircularItems.vue";
+import type { Component } from "vue";
+import InfoCard from "@ogw_front/components/Viewer/ContextMenu/InfoCard.vue";
 import { useEventListener } from "@vueuse/core";
 import { useMenuStore } from "@ogw_front/stores/menu";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
-const { id, x, y, containerWidth, containerHeight } = defineProps({
-  id: { type: String, required: true },
-  x: { type: Number, required: true },
-  y: { type: Number, required: true },
-  containerWidth: { type: Number, required: true },
-  containerHeight: { type: Number, required: true },
-});
+interface Props {
+  id: string;
+  x: number;
+  y: number;
+  containerWidth: number;
+  containerHeight: number;
+}
+
+const { id, x, y, containerWidth, containerHeight } = defineProps<Props>();
 
 const RADIUS = 80;
 const MARGIN_OFFSET = 40;
@@ -28,15 +31,20 @@ const treeviewStore = useTreeviewStore();
 
 const meta_data = computed(() => menuStore.current_meta_data || {});
 
-const show_menu = ref(true);
-const showName = ref(false);
-const isDragging = ref(false);
-const dragStartX = ref(0);
-const dragStartY = ref(0);
-const menuX = ref(x);
-const menuY = ref(y);
+const show_menu = ref<boolean>(true);
+const showName = ref<boolean>(false);
+const isDragging = ref<boolean>(false);
+const dragStartX = ref<number>(0);
+const dragStartY = ref<number>(0);
+const menuX = ref<number>(x);
+const menuY = ref<number>(y);
 
-function clampPosition(posX, posY) {
+interface Position {
+  x: number;
+  y: number;
+}
+
+function clampPosition(posX: number, posY: number): Position {
   const margin = RADIUS + MARGIN_OFFSET;
   return {
     x: Math.min(Math.max(posX, margin), containerWidth - margin),
@@ -44,13 +52,13 @@ function clampPosition(posX, posY) {
   };
 }
 
-function startDrag(event) {
+function startDrag(event: MouseEvent): void {
   isDragging.value = true;
   dragStartX.value = event.clientX - menuX.value;
   dragStartY.value = event.clientY - menuY.value;
 }
 
-function handleDrag(event) {
+function handleDrag(event: MouseEvent): void {
   const { x: clampedX, y: clampedY } = clampPosition(
     event.clientX - dragStartX.value,
     event.clientY - dragStartY.value,
@@ -60,7 +68,7 @@ function handleDrag(event) {
   menuStore.setMenuPosition(clampedX, clampedY);
 }
 
-function stopDrag(event) {
+function stopDrag(event: MouseEvent): void {
   isDragging.value = false;
   event.stopPropagation();
   menuStore.setMenuPosition(menuX.value, menuY.value);
@@ -73,7 +81,7 @@ watch(show_menu, (newVal) => {
 });
 
 watch(
-  () => [x, y, containerWidth, containerHeight],
+  () => [x, y, containerWidth, containerHeight] as const,
   ([newX, newY]) => {
     const { x: clampedX, y: clampedY } = clampPosition(newX, newY);
     menuX.value = clampedX;
@@ -86,7 +94,7 @@ watch(
 useEventListener(
   globalThis,
   "mousemove",
-  (event) => {
+  (event: MouseEvent) => {
     if (!isDragging.value) {
       return;
     }
@@ -95,14 +103,14 @@ useEventListener(
   { passive: true },
 );
 
-useEventListener(globalThis, "mouseup", (event) => {
+useEventListener(globalThis, "mouseup", (event: MouseEvent) => {
   if (!isDragging.value) {
     return;
   }
   stopDrag(event);
 });
 
-const menu_items = shallowRef([]);
+const menu_items = shallowRef<Component[]>([]);
 watch(
   () => [meta_data.value.viewer_type, meta_data.value.geode_object_type],
   ([viewer_type, geode_object_type]) => {
@@ -111,9 +119,9 @@ watch(
   { immediate: true },
 );
 
-const menuItemCount = computed(() => menu_items.value.length);
+const menuItemCount = computed<number>(() => menu_items.value.length);
 
-const isOverTreeview = computed(() => {
+const isOverTreeview = computed<boolean>(() => {
   const hasAdditional = treeviewStore.opened_views.some((view) => view.id !== "main");
   const hasMain = treeviewStore.opened_views.some((view) => view.id === "main");
   const firstColWidth = hasMain ? treeviewStore.panelWidth : 0;
@@ -127,7 +135,7 @@ const isOverTreeview = computed(() => {
   return menuX.value < treeviewWidth;
 });
 
-const isOverToolbar = computed(() => {
+const isOverToolbar = computed<boolean>(() => {
   const toolbarEl = document.querySelector(".view-toolbar");
   if (!toolbarEl) {
     return false;
@@ -145,15 +153,15 @@ const isOverToolbar = computed(() => {
   );
 });
 
-function getMenuStyle() {
+function getMenuStyle(): Record<string, string> {
   return {
-    position: "fixed",
+    position: "fixed" as const,
     left: `${menuStore.containerLeft + menuX.value - RADIUS}px`,
     top: `${menuStore.containerTop + menuY.value - RADIUS}px`,
   };
 }
 
-function toggleShowName() {
+function toggleShowName(): void {
   showName.value = !showName.value;
 }
 </script>

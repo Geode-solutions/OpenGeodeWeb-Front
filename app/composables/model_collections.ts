@@ -1,0 +1,91 @@
+import type {
+  CollectionComponent,
+  CollectionComponentGroup,
+} from "@ogw_front/stores/data_helpers/collections";
+import { compareSelections } from "@ogw_front/utils/treeview";
+import { useDataStore } from "@ogw_front/stores/data";
+import { useDataStyleStore } from "@ogw_front/stores/data_style";
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+
+// The `watch` callback receives the freshly-fetched collection groups purely for reading (matching against and copying into `localCategories`, never mutated in place), so it's typed with its own fully-readonly mirror of `CollectionComponentGroup` rather than that (intentionally mutable, see `existing.title` below) store type directly.
+interface ReadonlyCollectionComponentGroup {
+  readonly id: string;
+  readonly title: string;
+  readonly children: readonly CollectionComponent[];
+}
+
+export function useModelCollections(viewId: string): {
+  items: typeof items;
+  collectionsCache: typeof collectionsCache;
+  localCategories: typeof localCategories;
+  selection: typeof selection;
+  updateVisibility: typeof updateVisibility;
+} {
+  const dataStore = useDataStore();
+  const dataStyleStore = useDataStyleStore();
+  const hybridViewerStore = useHybridViewerStore();
+
+  const items = dataStore.refFormatedCollectionComponents(viewId);
+  const collectionsCache = ref<Record<string, CollectionComponent[]> | undefined>(undefined);
+  const localCategories = ref<CollectionComponentGroup[]>([]);
+
+  onMounted(async () => {
+    const data = await dataStore.fetchAllCollectionComponents(viewId);
+    collectionsCache.value = markRaw(data);
+  });
+
+  watch(
+    items,
+    async (newItems: readonly ReadonlyCollectionComponentGroup[] | undefined) => {
+      if (!newItems) {
+        localCategories.value = [];
+        return;
+      }
+
+      const data = await dataStore.fetchAllCollectionComponents(viewId);
+      collectionsCache.value = markRaw(data);
+
+      localCategories.value = newItems.map((newCategory: ReadonlyCollectionComponentGroup) => {
+        const existing = localCategories.value.find(
+          (category: ReadonlyCollectionComponentGroup) => category.id === newCategory.id,
+        );
+        if (existing) {
+          existing.title = newCategory.title || newCategory.id;
+          return existing;
+        }
+        return reactive({
+          ...newCategory,
+          title: newCategory.title || newCategory.id,
+        });
+      });
+    },
+    { immediate: true },
+  );
+
+  const selection = dataStyleStore.visibleMeshComponents(viewId);
+
+  async function updateVisibility(current: readonly string[]): Promise<void> {
+    const previous = selection.value;
+    const { added, removed } = compareSelections([...current], previous);
+
+    if (added.length === 0 && removed.length === 0) {
+      return;
+    }
+
+    if (added.length > 0) {
+      await dataStyleStore.setModelComponentsVisibility(viewId, added, true);
+    }
+    if (removed.length > 0) {
+      await dataStyleStore.setModelComponentsVisibility(viewId, removed, false);
+    }
+    await hybridViewerStore.remoteRender();
+  }
+
+  return {
+    items,
+    collectionsCache,
+    localCategories,
+    selection,
+    updateVisibility,
+  };
+}

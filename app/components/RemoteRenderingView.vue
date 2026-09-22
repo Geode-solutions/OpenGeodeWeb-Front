@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useElementSize, useWindowSize } from "@vueuse/core";
 
 import { Status } from "@ogw_front/utils/status";
@@ -8,13 +8,15 @@ import { useQuickColormap } from "@ogw_front/composables/use_quick_colormap";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 import ColormapQuickPicker from "@ogw_front/components/Viewer/Options/ColormapQuickPicker.vue";
-import ViewToolbar from "@ogw_front/components/ViewToolbar";
+import ViewToolbar from "@ogw_front/components/ViewToolbar.vue";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
-import vtkRemoteView from "@kitware/vtk.js/Rendering/Misc/RemoteView";
+import { newInstance as vtkRemoteView } from "@kitware/vtk.js/Rendering/Misc/RemoteView";
 
-const { viewId } = defineProps({
-  viewId: { type: String, default: "-1" },
-});
+interface Props {
+  viewId?: string;
+}
+
+const { viewId = "-1" } = defineProps<Props>();
 
 const viewerStore = useViewerStore();
 const menuStore = useMenuStore();
@@ -26,7 +28,7 @@ const { width: windowWidth, height: windowHeight } = useWindowSize();
 
 const { pickColormap, quickColormap } = useQuickColormap();
 
-async function get_x_y(event) {
+async function get_x_y(event: PointerEvent): Promise<void> {
   const { offsetX, offsetY, clientX, clientY } = event;
   if (viewerStore.picking_mode === true) {
     viewerStore.set_picked_point(offsetX, offsetY);
@@ -38,9 +40,8 @@ async function get_x_y(event) {
   }
 }
 
-const connected = ref(false);
-// oxlint-disable-next-line import/no-named-as-default-member
-const view = vtkRemoteView.newInstance({
+const connected = ref<boolean>(false);
+const view = vtkRemoteView({
   rpcWheelEvent: "viewport.mouse.zoom.wheel",
 });
 
@@ -48,7 +49,7 @@ if (location.hostname.split(".")[0] === "localhost") {
   view.setInteractiveRatio(1);
 }
 
-function resize() {
+function resize(): void {
   if (view) {
     view.getCanvasView().setSize(0, 0);
     view.resize();
@@ -71,13 +72,16 @@ watch([width, height], () => {
   resize();
 });
 
-function connect() {
+function connect(): void {
   if (viewerStore.status !== Status.CONNECTED) {
     return;
   }
   const session = viewerStore.client.getConnection().getSession();
   view.setSession(session);
-  view.setViewId(props.viewId);
+  // Pre-existing bug fixed: `props` was never defined here (props were destructured
+  // Directly from defineProps above), so this threw a ReferenceError whenever
+  // Connect() ran. `viewId` is the same (reactive) destructured prop value.
+  view.setViewId(viewId);
   connected.value = true;
   view.render();
 }
@@ -90,7 +94,7 @@ watch(
 );
 
 watch(
-  () => props.viewId,
+  () => viewId,
   (id) => {
     if (connected.value) {
       view.setViewId(id);
@@ -103,7 +107,9 @@ onMounted(async () => {
   if (import.meta.client) {
     window.addEventListener("resize", resize);
     await nextTick();
-    view.setContainer(viewer.value.$el);
+    if (viewer.value) {
+      view.setContainer(viewer.value.$el);
+    }
     connect();
     resize();
   }

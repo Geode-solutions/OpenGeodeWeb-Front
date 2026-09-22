@@ -1,28 +1,35 @@
-<script setup>
+<script setup lang="ts">
 import { DEBOUNCE_DELAY, DEFAULT_NORMALS } from "@ogw_front/utils/clipping_planes";
-import ClippingPlaneCard from "@ogw_front/components/ClippingPlaneCard";
-import ToolPanel from "@ogw_front/components/ToolPanel";
+import ClippingPlaneCard from "@ogw_front/components/ClippingPlaneCard.vue";
+import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import { useClippingPlanesWidget } from "@ogw_front/composables/clipping_planes_widget";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDebounceFn } from "@vueuse/core";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
-const { escapeFunction } = defineProps({
-  escapeFunction: { type: Function, default: undefined },
-});
+interface Props {
+  escapeFunction?: () => void;
+}
 
-const show = defineModel("show", { type: Boolean, default: false });
+const { escapeFunction = undefined } = defineProps<Props>();
+
+const show = defineModel<boolean>("show", { default: false });
 const dataStore = useDataStore();
 const hybridViewerStore = useHybridViewerStore();
-const targetAllVisible = ref(true);
-const selectedDatasetIds = ref([]);
-const planes = ref([{ origin: undefined, normal: [1, 0, 0] }]);
+const targetAllVisible = ref<boolean>(true);
+const selectedDatasetIds = ref<string[]>([]);
+const planes = ref<{ origin?: number[]; normal: number[] }[]>([
+  { origin: undefined, normal: [1, 0, 0] },
+]);
 const allItems = dataStore.refAllItems();
-const availableDatasets = computed(() =>
-  allItems.value.map((item) => ({ title: item.name || item.id, value: item.id })),
+const availableDatasets = computed<{ title: string; value: string }[]>(() =>
+  allItems.value.map((item) => ({
+    title: item.name || item.id,
+    value: item.id,
+  })),
 );
 const widgetContainer = useTemplateRef("widgetContainer");
-let debouncedApply = undefined;
+let debouncedApply: ((...args: unknown[]) => void) | undefined = undefined;
 
 const {
   getSceneCenter,
@@ -39,10 +46,10 @@ const {
   selectedDatasetIds,
   allItems,
   hybridViewerStore,
-  debouncedApply: (...args) => debouncedApply?.(...args),
+  debouncedApply: (...args: unknown[]) => debouncedApply?.(...args),
 });
 
-async function applyClippingPlanes() {
+async function applyClippingPlanes(): Promise<void> {
   const allIds = allItems.value.map((item) => item.id);
   if (allIds.length === 0) {
     return;
@@ -65,22 +72,25 @@ async function applyClippingPlanes() {
 
 debouncedApply = useDebounceFn(() => applyClippingPlanes(), DEBOUNCE_DELAY);
 
-function addPlane() {
-  const normal = DEFAULT_NORMALS[planes.value.length % DEFAULT_NORMALS.length];
+function addPlane(): void {
+  // Index is always in-bounds (modulo the fixed-size list); the fallbacks only
+  // Satisfy noUncheckedIndexedAccess and are never hit at runtime.
+  const normal = DEFAULT_NORMALS[planes.value.length % DEFAULT_NORMALS.length] ??
+    DEFAULT_NORMALS[0] ?? [1, 0, 0];
   planes.value.push({ origin: getSceneCenter(), normal });
 }
 
-function removePlane(index) {
+function removePlane(index: number): void {
   planes.value.splice(index, 1);
 }
 
-function flipNormal(plane) {
+function flipNormal(plane: { normal: number[] }): void {
   plane.normal = plane.normal.map((component) => -component);
   syncWidgets();
   applyClippingPlanes();
 }
 
-async function resetClippingPlanes() {
+async function resetClippingPlanes(): Promise<void> {
   setFromWidget(true);
   planes.value = [{ origin: undefined, normal: [1, 0, 0] }];
   updateWidgetPlacement({ isReset: true });
@@ -88,7 +98,7 @@ async function resetClippingPlanes() {
   await applyClippingPlanes();
 }
 
-async function removeClippingPlanes() {
+async function removeClippingPlanes(): Promise<void> {
   const allIds = allItems.value.map((item) => item.id);
   await hybridViewerStore.setClippingPlanes(allIds, []);
 }

@@ -1,5 +1,6 @@
-<script setup>
+<script setup lang="ts">
 import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
+import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { compareSelections } from "@ogw_front/utils/treeview";
@@ -16,12 +17,25 @@ const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 
-const emit = defineEmits(["show-menu"]);
+interface Emits {
+  "show-menu": [payload: { event: MouseEvent; itemId: string }];
+}
+
+const emit = defineEmits<Emits>();
+
+interface TreeGroupItem {
+  raw?: TreeGroupItem;
+  id: string;
+  title?: string;
+  viewer_type?: string;
+  geode_object_type?: string;
+  children?: TreeGroupItem[];
+}
 
 const mainView = computed(() => treeviewStore.opened_views[0]);
-const opened = computed({
+const opened = computed<string[]>({
   get: () => mainView.value?.opened || [],
-  set: (val) => treeviewStore.setOpened(mainView.value.id, val),
+  set: (val) => treeviewStore.setOpened(mainView.value?.id ?? "", val),
 });
 
 const {
@@ -35,11 +49,13 @@ const {
   applySearchFilter,
 } = useTreeFilter(() => treeviewStore.items, { recursiveSort: true });
 
-function onUpdateSelection(val) {
-  treeviewStore.selection = applySearchFilter(val, treeviewStore.selection);
+function onUpdateSelection(val: string[]): void {
+  treeviewStore.selection = applySearchFilter(val, treeviewStore.selection) as string[];
 }
 
-const visibleSelection = computed(() => applySearchFilter(treeviewStore.selection, []));
+const visibleSelection = computed<string[]>(
+  () => applySearchFilter(treeviewStore.selection, []) as string[],
+);
 
 watch(
   () => treeviewStore.selection,
@@ -68,14 +84,15 @@ watch(
   },
 );
 
-function isModel(item) {
+function isModel(item: TreeGroupItem): boolean {
   const actualItem = item.raw || item;
   return (
-    actualItem.viewer_type === "model" || ["BRep", "Section"].includes(actualItem.geode_object_type)
+    actualItem.viewer_type === "model" ||
+    ["BRep", "Section"].includes(actualItem.geode_object_type ?? "")
   );
 }
 
-const hasCollectionsMap = reactive({});
+const hasCollectionsMap = reactive<Record<string, boolean>>({});
 
 watch(
   () => treeviewStore.items,
@@ -100,7 +117,13 @@ watch(
   { immediate: true, deep: true },
 );
 
-function handleHoverEnter({ item, immediate = false }) {
+function handleHoverEnter({
+  item,
+  immediate = false,
+}: {
+  item: TreeGroupItem;
+  immediate?: boolean;
+}): void {
   const actualItem = item.raw || item;
 
   if (!actualItem.viewer_type) {
@@ -117,7 +140,7 @@ function handleHoverEnter({ item, immediate = false }) {
   );
 }
 
-function handleHoverLeave({ item }) {
+function handleHoverLeave({ item }: { item: TreeGroupItem }): void {
   const actualItem = item.raw || item;
   if (!actualItem.viewer_type) {
     return;
@@ -125,9 +148,9 @@ function handleHoverLeave({ item }) {
   onHoverLeave(actualItem.id);
 }
 
-function expandAll() {
-  const allIds = [];
-  function traverse(itemsList) {
+function expandAll(): void {
+  const allIds: string[] = [];
+  function traverse(itemsList: TreeGroupItem[]): void {
     for (const item of itemsList) {
       if (item.children && item.children.length > 0) {
         allIds.push(item.id);
@@ -165,17 +188,22 @@ function expandAll() {
       }"
       :scroll-top="mainView?.scrollTop || 0"
       class="transparent-treeview virtual-tree-height"
-      @update:selected="onUpdateSelection"
-      @update:scroll-top="treeviewStore.setScrollTop(mainView.id, $event)"
-      @hover:enter="handleHoverEnter"
-      @hover:leave="handleHoverLeave"
-      @contextmenu="emit('show-menu', { event: $event.event, itemId: $event.item.id })"
+      @update:selected="(val) => onUpdateSelection(val as string[])"
+      @update:scroll-top="treeviewStore.setScrollTop(mainView?.id ?? '', $event)"
+      @hover:enter="({ item }) => handleHoverEnter({ item: item as unknown as TreeGroupItem })"
+      @hover:leave="({ item }) => handleHoverLeave({ item: item as unknown as TreeGroupItem })"
+      @contextmenu="
+        emit('show-menu', {
+          event: $event.event,
+          itemId: $event.item.id as string,
+        })
+      "
     >
       <template #title="{ item, isLeaf }">
         <ObjectTreeItemLabel
-          :item="item"
+          :item="item as unknown as DisplayItem"
           :is-leaf="isLeaf"
-          @contextmenu="emit('show-menu', { event: $event, itemId: item.id })"
+          @contextmenu="emit('show-menu', { event: $event, itemId: item.id as string })"
         />
       </template>
 
@@ -188,21 +216,22 @@ function expandAll() {
             size="medium"
             variant="text"
             v-tooltip="'Focus camera on object'"
-            @click.stop="hybridViewerStore.focusCameraOnObject(item.id)"
+            @click.stop="hybridViewerStore.focusCameraOnObject(item.id as string)"
           />
           <v-btn
-            v-if="isModel(item)"
+            v-if="isModel(item as unknown as TreeGroupItem)"
             data-testid="expandModelComponentsButton"
             icon
             size="medium"
+            style="height: 23px; width: 23px"
             class="ml-2"
             variant="text"
             v-tooltip="'Model\'s mesh components'"
             @click.stop="
               treeviewStore.displayAdditionalTree(
-                item.id,
-                item.title,
-                item.geode_object_type,
+                item.id as string,
+                item.title as string | undefined,
+                item.geode_object_type as string,
                 'model_components',
               )
             "
@@ -210,7 +239,7 @@ function expandAll() {
             <v-icon size="20">mdi-magnify-expand</v-icon>
           </v-btn>
           <v-btn
-            v-if="isModel(item) && hasCollectionsMap[item.id]"
+            v-if="isModel(item as unknown as TreeGroupItem) && hasCollectionsMap[item.id as string]"
             data-testid="expandModelCollectionsButton"
             icon="mdi-format-list-group"
             size="medium"
@@ -219,9 +248,9 @@ function expandAll() {
             v-tooltip="'Model\'s collections'"
             @click.stop="
               treeviewStore.displayAdditionalTree(
-                item.id,
-                item.title,
-                item.geode_object_type,
+                item.id as string,
+                item.title as string | undefined,
+                item.geode_object_type as string,
                 'model_collections',
               )
             "

@@ -1,5 +1,6 @@
-<script setup>
+<script setup lang="ts">
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
+import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
 import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar.vue";
 import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
 import { getAttributeRange } from "@ogw_front/utils/attributes";
@@ -7,51 +8,74 @@ import { useBackStore } from "@ogw_front/stores/back";
 
 const backStore = useBackStore();
 
-const attributeName = defineModel("attributeName", { type: String });
-const attributeItem = defineModel("attributeItem", { type: Number });
-const attributeRange = defineModel("attributeRange", { type: Array });
-const attributeColorMap = defineModel("attributeColorMap", { type: String });
-const attributeNoDataColor = defineModel("attributeNoDataColor", { type: Object });
+const attributeName = defineModel<string>("attributeName");
+const attributeItem = defineModel<number>("attributeItem");
+const attributeRange = defineModel<(number | undefined)[]>("attributeRange");
+const attributeColorMap = defineModel<string>("attributeColorMap");
+const attributeNoDataColor = defineModel<typeof DEFAULT_NO_DATA_COLOR>("attributeNoDataColor");
 
-const { id, componentIds, schema } = defineProps({
-  id: { type: String, required: true },
-  componentIds: { type: Array, default: undefined },
-  schema: { type: Object, required: true },
-});
+interface Props {
+  id: string;
+  componentIds?: string[];
+  schema: JsonRpcSchema;
+}
 
-const attributes = ref([]);
+const { id, componentIds = undefined, schema } = defineProps<Props>();
 
-const currentAttribute = computed(() =>
+interface AttributeInfo {
+  attribute_name: string;
+  nb_items: number;
+  no_data?: boolean;
+  [key: string]: unknown;
+}
+
+const attributes = ref<AttributeInfo[]>([]);
+
+const currentAttribute = computed<AttributeInfo | undefined>(() =>
   attributes.value.find((attr) => attr.attribute_name === attributeName.value),
 );
-const cssNoDataColor = computed(() => {
+const cssNoDataColor = computed<string>(() => {
   const { red, green, blue, alpha } = attributeNoDataColor.value ?? DEFAULT_NO_DATA_COLOR;
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 });
-const rangeMin = computed({
-  get: () => (attributeRange.value ? attributeRange.value[0] : undefined),
-  set: (val) => {
-    const currentMax = attributeRange.value ? attributeRange.value[1] : undefined;
+const rangeMin = computed<number | undefined>({
+  get: () => {
+    const range = attributeRange.value as number[] | undefined;
+    return range ? range[0] : undefined;
+  },
+  set: (val: number | undefined) => {
+    if (val === undefined) {
+      return;
+    }
+    const range = attributeRange.value as number[] | undefined;
+    const currentMax = range ? range[1] : undefined;
     let newMin = val;
-    if (currentMax !== undefined && val > currentMax) {
+    if (typeof currentMax === "number" && val > currentMax) {
       newMin = currentMax;
     }
     attributeRange.value = [newMin, currentMax];
   },
 });
-const rangeMax = computed({
-  get: () => (attributeRange.value ? attributeRange.value[1] : undefined),
-  set: (val) => {
-    const currentMin = attributeRange.value ? attributeRange.value[0] : undefined;
+const rangeMax = computed<number | undefined>({
+  get: () => {
+    const range = attributeRange.value as number[] | undefined;
+    return range ? range[1] : undefined;
+  },
+  set: (val: number | undefined) => {
+    if (val === undefined) {
+      return;
+    }
+    const range = attributeRange.value as number[] | undefined;
+    const currentMin = range ? range[0] : undefined;
     let newMax = val;
-    if (currentMin !== undefined && val < currentMin) {
+    if (typeof currentMin === "number" && val < currentMin) {
       newMax = currentMin;
     }
     attributeRange.value = [currentMin, newMax];
   },
 });
 
-const componentItems = computed(() => {
+const componentItems = computed<{ title: string; value: number }[]>(() => {
   if (!currentAttribute.value) {
     return [];
   }
@@ -61,25 +85,32 @@ const componentItems = computed(() => {
   }));
 });
 
-function resetRange() {
+function resetRange(): void {
   if (currentAttribute.value) {
     const comp = attributeItem.value ?? 0;
-    const { min, max } = getAttributeRange(currentAttribute.value, comp);
+    // GetAttributeRange's parameter type (AttributeRangeSource) isn't exported;
+    // AttributeInfo's index signature covers its optional min/max fields at
+    // Runtime (they come from the same backend attribute response shape).
+    const { min, max } = getAttributeRange(
+      currentAttribute.value as unknown as Parameters<typeof getAttributeRange>[0],
+      comp,
+    );
     attributeRange.value = [min, max];
   }
 }
 
-function hasSelectedComponent(components) {
+function hasSelectedComponent(components: unknown): boolean {
   return Array.isArray(components) && components.length > 0;
 }
 
-function getAttributes() {
-  const requiresComponent = schema.properties.component_ids !== undefined;
+function getAttributes(): void {
+  const schemaProperties = schema.properties as Record<string, unknown> | undefined;
+  const requiresComponent = schemaProperties?.component_ids !== undefined;
   if (requiresComponent && !hasSelectedComponent(componentIds)) {
     return;
   }
 
-  const params = { id };
+  const params: { id: string; component_ids?: unknown } = { id };
   if (requiresComponent) {
     params.component_ids = componentIds;
   }
@@ -87,8 +118,8 @@ function getAttributes() {
   backStore.request(
     { schema, params },
     {
-      response_function: (response) => {
-        attributes.value = response.attributes;
+      response_function: (response: unknown) => {
+        attributes.value = (response as { attributes: AttributeInfo[] }).attributes;
       },
     },
   );

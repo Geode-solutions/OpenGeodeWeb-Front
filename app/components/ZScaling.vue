@@ -1,17 +1,25 @@
-<script setup>
-import ToolPanel from "@ogw_front/components/ToolPanel";
+<script setup lang="ts">
+import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 
-const zScale = defineModel({ type: Number, default: 1 });
-const show = defineModel("show", { type: Boolean, default: false });
+const zScale = defineModel<number>({ default: 1 });
+const show = defineModel<boolean>("show", { default: false });
 
-const { width, escapeFunction } = defineProps({
-  width: { type: Number, default: 260 },
-  escapeFunction: { type: Function, default: undefined },
-});
+const DEFAULT_PANEL_WIDTH = 260;
 
-const emit = defineEmits(["apply"]);
+interface Props {
+  width?: number;
+  escapeFunction?: () => void;
+}
 
-function apply() {
+const { width = DEFAULT_PANEL_WIDTH, escapeFunction = undefined } = defineProps<Props>();
+
+interface Emits {
+  apply: [];
+}
+
+const emit = defineEmits<Emits>();
+
+function apply(): void {
   emit("apply");
   show.value = false;
 }

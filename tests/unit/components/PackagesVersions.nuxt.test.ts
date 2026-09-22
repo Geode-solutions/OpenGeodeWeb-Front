@@ -1,0 +1,42 @@
+import { describe, expect, test } from "vitest";
+import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime";
+
+import { setupActivePinia, toHTTPMethod, vuetify } from "@ogw_tests/utils";
+import PackagesVersions from "@ogw_front/components/PackagesVersions.vue";
+import { useBackStore } from "@ogw_front/stores/back";
+
+const FIRST_INDEX = 0;
+
+describe("packages versions", () => {
+  test("mount", async () => {
+    const pinia = setupActivePinia();
+    const backStore = useBackStore();
+    (backStore as { base_url: string }).base_url = "/";
+
+    const schema = {
+      $id: "/versions",
+      methods: ["GET"],
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    };
+    registerEndpoint(schema.$id, {
+      method: toHTTPMethod(schema.methods[FIRST_INDEX]),
+      handler: () => ({
+        versions: [
+          {
+            package: "package",
+            version: "version",
+          },
+        ],
+      }),
+    });
+    const wrapper = await mountSuspended(PackagesVersions, {
+      global: {
+        plugins: [vuetify, pinia],
+      },
+      props: { schema },
+    });
+    expect(wrapper.exists()).toBe(true);
+  });
+});

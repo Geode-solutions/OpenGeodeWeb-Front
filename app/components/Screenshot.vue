@@ -1,28 +1,32 @@
-<script setup>
-import ToolPanel from "@ogw_front/components/ToolPanel";
+<script setup lang="ts">
+import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import fileDownload from "js-file-download";
 import { useClipboardItems } from "@vueuse/core";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
-const show = defineModel({ type: Boolean, default: false });
+const DEFAULT_PANEL_WIDTH = 260;
 
-const { width, escapeFunction } = defineProps({
-  width: { type: Number, default: 260 },
-  escapeFunction: { type: Function, default: undefined },
-});
+const show = defineModel<boolean>({ default: false });
+
+interface Props {
+  width?: number;
+  escapeFunction?: () => void;
+}
+
+const { width = DEFAULT_PANEL_WIDTH, escapeFunction = undefined } = defineProps<Props>();
 
 const output_extensions =
   viewer_schemas.opengeodeweb_viewer.viewer.take_screenshot.properties.output_extension.enum;
-const filename = ref("");
-const output_extension = ref("png");
-const include_background = ref(true);
-const screenshot_type = ref("file");
+const filename = ref<string>("");
+const output_extension = ref<string>("png");
+const include_background = ref<boolean>(true);
+const screenshot_type = ref<string>("file");
 
 const { copy } = useClipboardItems();
 
-async function takeScreenshot() {
+async function takeScreenshot(): Promise<void> {
   const viewerStore = useViewerStore();
   const feedbackStore = useFeedbackStore();
   const current_filename = screenshot_type.value === "file" ? filename.value : "screenshot";
@@ -38,21 +42,23 @@ async function takeScreenshot() {
       params,
     },
     {
-      response_function: async (response) => {
+      response_function: async (response: unknown) => {
+        const { blob } = response as { blob: BlobPart };
         if (screenshot_type.value === "file") {
-          fileDownload(response.blob, `${current_filename}.${output_extension.value}`);
+          fileDownload(blob, `${current_filename}.${output_extension.value}`);
           feedbackStore.add_success("Screenshot downloaded");
         } else {
           try {
-            const pngBlob = new Blob([response.blob], { type: "image/png" });
+            const pngBlob = new Blob([blob], { type: "image/png" });
             await copy([new ClipboardItem({ "image/png": pngBlob })]);
             feedbackStore.add_success("Screenshot copied to clipboard");
           } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
             feedbackStore.add_error(
-              undefined,
-              undefined,
+              0,
+              "",
               "Clipboard Error",
-              `Failed to copy screenshot to clipboard: ${error.message}`,
+              `Failed to copy screenshot to clipboard: ${message}`,
             );
           }
         }
@@ -74,7 +80,7 @@ watch(screenshot_type, (value) => {
   }
 });
 
-function handleClose() {
+function handleClose(): void {
   if (escapeFunction) {
     escapeFunction();
   }

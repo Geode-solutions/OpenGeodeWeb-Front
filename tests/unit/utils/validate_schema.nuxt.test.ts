@@ -1,0 +1,47 @@
+// Third party imports
+import { describe, expect, test } from "vitest";
+
+// Local imports
+import { validateSchema } from "@ogw_shared/utils/validate_schema";
+
+// CONSTANTS
+const MIN_0 = 0;
+const MAX_10 = 10;
+const VAL_5 = 5;
+const TIMEOUT_MS = 5000;
+
+describe("validate schema", () => {
+  const schema = {
+    $id: "/test",
+    type: "object",
+    methods: ["POST"],
+    properties: {
+      var_1: { type: "string" },
+      var_2: { type: "integer", minimum: MIN_0, maximum: MAX_10 },
+    },
+    required: ["var_1", "var_2"],
+    additionalProperties: false,
+  };
+
+  test(
+    "ajv wrong params",
+    () => {
+      const params = {};
+      const { valid, error } = validateSchema(schema, params);
+      expect(valid).toBe(false);
+      expect(error).toBe("data must have required property 'var_1'");
+    },
+    TIMEOUT_MS,
+  );
+
+  test(
+    "good params",
+    () => {
+      const params = { var_1: "test", var_2: VAL_5 };
+      const { valid, error } = validateSchema(schema, params);
+      expect(valid).toBe(true);
+      expect(error).toBe("No errors");
+    },
+    TIMEOUT_MS,
+  );
+});

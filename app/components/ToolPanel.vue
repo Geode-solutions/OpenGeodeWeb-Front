@@ -1,19 +1,35 @@
-<script setup>
-import GlassCard from "@ogw_front/components/GlassCard";
+<script setup lang="ts">
+import GlassCard from "@ogw_front/components/GlassCard.vue";
 
-const { title, width, closeLabel, actionLabel, clickOutside, escapeFunction } = defineProps({
-  title: { type: String, default: "" },
-  width: { type: Number, default: 260 },
-  closeLabel: { type: String, default: "Close" },
-  actionLabel: { type: String, default: undefined },
-  clickOutside: { type: Boolean, default: true },
-  escapeFunction: { type: Function, default: undefined },
-});
+const DEFAULT_PANEL_WIDTH = 260;
 
-const model = defineModel({ type: Boolean, default: false });
-const emit = defineEmits(["action"]);
+interface Props {
+  title?: string;
+  width?: number;
+  closeLabel?: string;
+  actionLabel?: string;
+  clickOutside?: boolean;
+  escapeFunction?: () => void;
+}
 
-function close() {
+const {
+  title = "",
+  width = DEFAULT_PANEL_WIDTH,
+  closeLabel = "Close",
+  actionLabel = undefined,
+  clickOutside = true,
+  escapeFunction = undefined,
+} = defineProps<Props>();
+
+const model = defineModel<boolean>({ default: false });
+
+interface Emits {
+  action: [];
+}
+
+const emit = defineEmits<Emits>();
+
+function close(): void {
   if (escapeFunction) {
     escapeFunction();
   }

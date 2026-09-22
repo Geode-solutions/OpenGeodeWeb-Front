@@ -1,12 +1,15 @@
-<script setup>
+<script setup lang="ts">
+import type { Component } from "vue";
 import { useMenuStore } from "@ogw_front/stores/menu";
 
-const { menuItems, id, metaData, menuItemCount } = defineProps({
-  menuItems: { type: Array, required: true },
-  id: { type: String, required: true },
-  metaData: { type: Object, required: true },
-  menuItemCount: { type: Number, required: true },
-});
+interface Props {
+  menuItems: Component[];
+  id: string;
+  metaData: Record<string, unknown>;
+  menuItemCount: number;
+}
+
+const { menuItems, id, metaData, menuItemCount } = defineProps<Props>();
 
 const RADIUS = 80;
 const Z_INDEX_ACTIVE_ITEM = 10;
@@ -19,7 +22,7 @@ const ANGLE_315 = 315;
 
 const menuStore = useMenuStore();
 
-function getItemStyle(index) {
+function getItemStyle(index: number): Record<string, string> {
   const angle = (index / menuItemCount) * 2 * Math.PI;
   return {
     transform: `translate(${Math.cos(angle) * RADIUS}px, ${Math.sin(angle) * RADIUS}px)`,
@@ -29,7 +32,7 @@ function getItemStyle(index) {
   };
 }
 
-function getTooltipLocation(index) {
+function getTooltipLocation(index: number): string {
   const angle = (index / menuItemCount) * FULL_ANGLE;
   if (angle < ANGLE_45 || angle >= ANGLE_315) {
     return "right";
@@ -43,7 +46,7 @@ function getTooltipLocation(index) {
   return "bottom";
 }
 
-function getTooltipOrigin(index) {
+function getTooltipOrigin(index: number): string {
   const angle = (index / menuItemCount) * FULL_ANGLE;
   if (angle < ANGLE_45 || angle >= ANGLE_315) {
     return "left";

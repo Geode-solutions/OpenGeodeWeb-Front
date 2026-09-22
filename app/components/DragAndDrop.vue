@@ -1,37 +1,52 @@
-<script setup>
+<script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
 import DragAndDropInline from "./DragAndDropInternal/DragAndDropInline.vue";
 import DragAndDropOverlay from "./DragAndDropInternal/DragAndDropOverlay.vue";
 
-const { multiple, accept, loading, showExtensions, fullscreen, inline, showOverlay, texts } =
-  defineProps({
-    multiple: { type: Boolean, default: false },
-    accept: { type: [String, Array], default: "" },
-    loading: { type: Boolean, default: false },
-    showExtensions: { type: Boolean, default: true },
-    fullscreen: { type: Boolean, default: false },
-    inline: { type: Boolean, default: true },
-    showOverlay: { type: Boolean, default: true },
-    texts: {
-      type: Object,
-      default: () => ({
-        idle: "Click or drag and drop",
-        drop: "Drop files here",
-        loading: "Loading...",
-      }),
-    },
-  });
+interface DragAndDropTexts {
+  idle: string;
+  drop: string;
+  loading: string;
+}
 
-const emit = defineEmits(["files-selected"]);
+interface Props {
+  multiple?: boolean;
+  accept?: string | string[];
+  loading?: boolean;
+  showExtensions?: boolean;
+  fullscreen?: boolean;
+  inline?: boolean;
+  showOverlay?: boolean;
+  texts?: DragAndDropTexts;
+}
+
+const {
+  multiple = false,
+  accept = "",
+  loading = false,
+  showExtensions = true,
+  fullscreen = false,
+  inline = true,
+  showOverlay = true,
+  texts = {
+    idle: "Click or drag and drop",
+    drop: "Drop files here",
+    loading: "Loading...",
+  },
+} = defineProps<Props>();
+
+const emit = defineEmits<{
+  "files-selected": [files: File[]];
+}>();
 
 const isDragging = ref(false);
 const isInternalDrag = ref(false);
 const dragCounter = ref(0);
-const fileInput = ref(undefined);
+const fileInput = ref<HTMLInputElement | undefined>(undefined);
 
 const WILDCARD_SUFFIX_LENGTH = 2;
 
-function isFileAccepted(file, acceptValue) {
+function isFileAccepted(file: File, acceptValue: string | string[] | undefined): boolean {
   const fileName = (file.name || "").toLowerCase();
   const fileType = (file.type || "").toLowerCase();
   const isVext = fileName.endsWith(".vext");
@@ -39,7 +54,7 @@ function isFileAccepted(file, acceptValue) {
   if (!acceptValue) {
     return !isVext;
   }
-  let rules = [];
+  let rules: string[] = [];
   if (Array.isArray(acceptValue)) {
     rules = acceptValue;
   } else if (typeof acceptValue === "string") {
@@ -75,18 +90,18 @@ function isFileAccepted(file, acceptValue) {
   });
 }
 
-function triggerFileDialog() {
+function triggerFileDialog(): void {
   fileInput.value?.click();
 }
 
-function onDragEnter(event) {
-  if (!isInternalDrag.value && event.dataTransfer.types.includes("Files")) {
+function onDragEnter(event: DragEvent): void {
+  if (!isInternalDrag.value && event.dataTransfer?.types.includes("Files")) {
     dragCounter.value += 1;
     isDragging.value = true;
   }
 }
 
-function onDragLeave() {
+function onDragLeave(): void {
   dragCounter.value -= 1;
   if (dragCounter.value <= 0) {
     isDragging.value = false;
@@ -94,23 +109,25 @@ function onDragLeave() {
   }
 }
 
-function onDragOver(event) {
-  if (!isInternalDrag.value && event.dataTransfer.types.includes("Files")) {
+function onDragOver(event: DragEvent): void {
+  if (!isInternalDrag.value && event.dataTransfer?.types.includes("Files")) {
     event.preventDefault();
   }
 }
 
-function onDrop(event) {
+function onDrop(event: DragEvent): void {
   event.preventDefault();
   dragCounter.value = 0;
   isDragging.value = false;
-  const files = [...event.dataTransfer.files].filter((file) => isFileAccepted(file, accept));
+  const files = [...(event.dataTransfer?.files ?? [])].filter((file) =>
+    isFileAccepted(file, accept),
+  );
   if (files.length > 0) {
     emit("files-selected", files);
   }
 }
 
-function onKeyDown(event) {
+function onKeyDown(event: KeyboardEvent): void {
   if (event.key === "Escape") {
     event.preventDefault();
     event.stopPropagation();
@@ -119,19 +136,20 @@ function onKeyDown(event) {
   }
 }
 
-function handleFileSelect(event) {
-  const files = [...event.target.files];
+function handleFileSelect(event: Event): void {
+  const target = event.target as HTMLInputElement;
+  const files = [...(target.files ?? [])];
   if (files.length > 0) {
     emit("files-selected", files);
   }
-  event.target.value = "";
+  target.value = "";
 }
 
-function onInternalDragStart() {
+function onInternalDragStart(): void {
   isInternalDrag.value = true;
 }
 
-function onInternalDragEnd() {
+function onInternalDragEnd(): void {
   isInternalDrag.value = false;
 }
 

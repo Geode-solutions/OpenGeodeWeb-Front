@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import GlobalObjects from "@ogw_front/components/Viewer/ObjectTree/Views/GlobalObjects.vue";
 import ModelTree from "@ogw_front/components/Viewer/ObjectTree/Views/ModelTree.vue";
 import ViewerObjectTreeBox from "@ogw_front/components/Viewer/ObjectTree/Box.vue";
@@ -15,24 +15,31 @@ const TOTAL_PERCENT = 100;
 const MAX_PANEL_WIDTH_RATIO = 0.8;
 const AUTO_CLOSE_THRESHOLD = 80;
 
-const { containerWidth } = defineProps({
-  containerWidth: { type: Number, required: true },
-});
+interface Props {
+  containerWidth: number;
+}
+
+const { containerWidth } = defineProps<Props>();
 
 const treeviewStore = useTreeviewStore();
-const emit = defineEmits(["show-menu"]);
+
+interface Emits {
+  "show-menu": [payload: Record<string, unknown>];
+}
+
+const emit = defineEmits<Emits>();
 
 const activityBar = useTemplateRef("activity-bar");
 const { adaptiveStyles: activityBarAdaptiveStyles } = useAdaptiveStyles(activityBar);
 
-const maxWidth = computed(() => containerWidth * MAX_PANEL_WIDTH_RATIO);
+const maxWidth = computed<number>(() => containerWidth * MAX_PANEL_WIDTH_RATIO);
 
 const mainView = computed(() => treeviewStore.opened_views.find((view) => view.id === "main"));
 const additionalViews = computed(() =>
   treeviewStore.opened_views.filter((view) => view.id !== "main"),
 );
 
-const totalWidth = computed(() => {
+const totalWidth = computed<string>(() => {
   const hasAdditional = additionalViews.value.length > 0;
   const hasMain = Boolean(mainView.value);
   const gap = hasAdditional && hasMain ? GAP_WIDTH : 0;
@@ -41,23 +48,23 @@ const totalWidth = computed(() => {
   return `${firstColWidth + secondColWidth + gap}px`;
 });
 
-const rowHeights = computed({
+const rowHeights = computed<number[]>({
   get: () => treeviewStore.rowHeights,
   set: (val) => treeviewStore.setRowHeights(val),
 });
-const draggedIndex = ref(undefined);
+const draggedIndex = ref<number | undefined>(undefined);
 
 watch(
   () => additionalViews.value.length,
   (newLength) => {
     if (newLength > 0 && rowHeights.value.length !== newLength) {
-      treeviewStore.setRowHeights(Array.from({ length: newLength }).fill(PERCENT_100 / newLength));
+      treeviewStore.setRowHeights(Array.from({ length: newLength }, () => PERCENT_100 / newLength));
     }
   },
   { immediate: true },
 );
 
-watch([maxWidth, () => additionalViews.value.length], ([newMax]) => {
+watch([maxWidth, (): number => additionalViews.value.length], ([newMax]): void => {
   const hasAdditional = additionalViews.value.length > 0;
   const gap = hasAdditional ? GAP_WIDTH : 0;
   const total =
@@ -79,25 +86,25 @@ watch([maxWidth, () => additionalViews.value.length], ([newMax]) => {
   }
 });
 
-function onDragStart(index) {
+function onDragStart(index: number): void {
   draggedIndex.value = index;
 }
 
-function onDragOver(event) {
+function onDragOver(event: DragEvent): void {
   event.preventDefault();
 }
 
-function onDrop(targetIndex) {
+function onDrop(targetIndex: number): void {
   if (draggedIndex.value !== undefined && draggedIndex.value !== targetIndex) {
     treeviewStore.moveView(draggedIndex.value, targetIndex);
   }
   draggedIndex.value = undefined;
 }
 
-function onResizeStart(event) {
+function onResizeStart(event: MouseEvent): void {
   const startWidth = treeviewStore.panelWidth;
   const startX = event.clientX;
-  function resize(move_event) {
+  function resize(move_event: MouseEvent): void {
     const deltaX = move_event.clientX - startX;
     let newWidth = startWidth + deltaX;
     const hasAdditional = additionalViews.value.length > 0;
@@ -116,7 +123,7 @@ function onResizeStart(event) {
     treeviewStore.setPanelWidth(Math.max(WIDTH_MIN, newWidth));
     document.body.style.userSelect = "none";
   }
-  function stopResize() {
+  function stopResize(): void {
     document.removeEventListener("mousemove", resize);
     document.removeEventListener("mouseup", stopResize);
     document.body.style.userSelect = "";
@@ -125,22 +132,25 @@ function onResizeStart(event) {
   document.addEventListener("mouseup", stopResize);
 }
 
-function onAdditionalResizeStart(event) {
+function onAdditionalResizeStart(event: MouseEvent): void {
   const startWidth = treeviewStore.additionalPanelWidth;
   const startX = event.clientX;
-  function resize(move_event) {
+  function resize(move_event: MouseEvent): void {
     const deltaX = move_event.clientX - startX;
     const newWidth = startWidth + deltaX;
     const currentTotalWidth = treeviewStore.panelWidth + newWidth + GAP_WIDTH;
     if (newWidth < AUTO_CLOSE_THRESHOLD) {
-      treeviewStore.closeView(additionalViews.value.at(-1).id);
+      const lastAdditionalView = additionalViews.value.at(-1);
+      if (lastAdditionalView) {
+        treeviewStore.closeView(lastAdditionalView.id);
+      }
       return;
     }
 
     treeviewStore.setAdditionalPanelWidth(Math.max(WIDTH_MIN, newWidth));
     document.body.style.userSelect = "none";
   }
-  function stopResize() {
+  function stopResize(): void {
     document.removeEventListener("mousemove", resize);
     document.removeEventListener("mouseup", stopResize);
     document.body.style.userSelect = "";
@@ -149,13 +159,13 @@ function onAdditionalResizeStart(event) {
   document.addEventListener("mouseup", stopResize);
 }
 
-function onVerticalResizeStart(event, index) {
+function onVerticalResizeStart(event: MouseEvent, index: number): void {
   const startY = event.clientY;
-  const startHeight1 = rowHeights.value[index];
-  const startHeight2 = rowHeights.value[index + 1];
-  const containerHeight = event.currentTarget.parentElement.offsetHeight;
+  const startHeight1 = rowHeights.value[index] ?? 0;
+  const startHeight2 = rowHeights.value[index + 1] ?? 0;
+  const containerHeight = (event.currentTarget as HTMLElement).parentElement?.offsetHeight ?? 0;
 
-  function resize(move_event) {
+  function resize(move_event: MouseEvent): void {
     const deltaY = move_event.clientY - startY;
     const deltaPercent = (deltaY / containerHeight) * PERCENT_100;
     const minHeightPercent = (HEIGHT_MIN / containerHeight) * PERCENT_100;
@@ -180,7 +190,7 @@ function onVerticalResizeStart(event, index) {
     document.body.style.cursor = "ns-resize";
   }
 
-  function stopResize() {
+  function stopResize(): void {
     document.removeEventListener("mousemove", resize);
     document.removeEventListener("mouseup", stopResize);
     document.body.style.userSelect = "";
@@ -201,6 +211,7 @@ function onVerticalResizeStart(event, index) {
     <div
       ref="activity-bar"
       class="activity-bar d-flex flex-column align-center py-2"
+      :class="{ 'is-closed': treeviewStore.opened_views.length === 0 }"
       :style="activityBarAdaptiveStyles"
     >
       <v-btn
@@ -261,7 +272,7 @@ function onVerticalResizeStart(event, index) {
           >
             <ViewerObjectTreeBox
               :title="view.title"
-              :icon="geode_objects[view.geode_object_type]?.image"
+              :icon="geode_objects[view.geode_object_type ?? '']?.image"
               :scroll-top="view.scrollTop"
               closable
               :border-radius="`0 ${index === 0 ? '16px' : '0'} ${index === additionalViews.length - 1 ? '16px' : '0'} 0`"
@@ -306,9 +317,8 @@ function onVerticalResizeStart(event, index) {
   position: absolute;
   z-index: 1;
   left: 0;
-  top: 0;
-  height: calc(100vh - 100px);
-  margin-top: 8px;
+  top: 8px;
+  height: calc(100% - 16px);
   pointer-events: auto;
 }
 
@@ -317,9 +327,20 @@ function onVerticalResizeStart(event, index) {
   height: 100%;
   border-radius: 16px 0 0 16px;
   margin-left: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-right: none;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
   position: relative;
   overflow: hidden;
+  transition:
+    background-color 0.3s ease,
+    backdrop-filter 0.3s ease,
+    border-radius 0.2s ease;
+}
+
+.activity-bar.is-closed {
+  border-radius: 16px;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .activity-bar::before {

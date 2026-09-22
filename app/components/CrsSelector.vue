@@ -1,27 +1,35 @@
-<script setup>
+<script setup lang="ts">
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 import { useBackStore } from "@ogw_front/stores/back";
 
 const schema = schemas.opengeodeweb_back.geographic_coordinate_systems;
 
-const emit = defineEmits(["update_values", "increment_step", "decrement_step"]);
+interface Emits {
+  update_values: [values: Record<string, unknown>];
+  increment_step: [];
+  decrement_step: [];
+}
 
-const { geodeObjectType, keyToUpdate } = defineProps({
-  geodeObjectType: { type: String, required: true },
-  keyToUpdate: { type: String, required: true },
-});
+const emit = defineEmits<Emits>();
 
-const search = ref("");
-const data_table_loading = ref(false);
-const crs_list = ref([]);
-const selected_crs = ref([]);
+interface Props {
+  geodeObjectType: string;
+  keyToUpdate: string;
+}
+
+const { geodeObjectType, keyToUpdate } = defineProps<Props>();
+
+const search = ref<string>("");
+const data_table_loading = ref<boolean>(false);
+const crs_list = ref<Record<string, unknown>[]>([]);
+const selected_crs = ref<unknown[]>([]);
 const toggle_loading = useToggle(data_table_loading);
 const backStore = useBackStore();
 
-function get_selected_crs(crs_code) {
-  for (let i = 0; i <= crs_list.value.length; i += 1) {
-    if (crs_list.value[i]["code"] === crs_code) {
-      return crs_list.value[i];
+function get_selected_crs(crs_code: unknown): unknown {
+  for (const crs of crs_list.value) {
+    if (crs && crs["code"] === crs_code) {
+      return crs;
     }
   }
 }
@@ -35,14 +43,14 @@ watch(selected_crs, (new_value) => {
   emit("increment_step");
 });
 
-async function get_crs_table() {
+async function get_crs_table(): void {
   const params = { geode_object_type: geodeObjectType };
   toggle_loading();
   await backStore.request(
     { schema, params },
     {
-      response_function: (response) => {
-        crs_list.value = response.crs_list;
+      response_function: (response: unknown) => {
+        crs_list.value = (response as { crs_list: Record<string, unknown>[] }).crs_list;
       },
     },
   );
@@ -58,7 +66,7 @@ const headers = [
   },
   { title: "Code", align: "end", key: "code" },
   { title: "Name", align: "end", key: "name" },
-];
+] as const;
 
 // oxlint-disable-next-line no-top-level-await
 await get_crs_table();

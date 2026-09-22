@@ -1,9 +1,11 @@
-<script setup>
-import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem";
-import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector";
-import ViewerOptionsSizeSlider from "@ogw_front/components/Viewer/Options/Sliders/Size";
-import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch";
-
+<script setup lang="ts">
+import ViewerContextMenuItem, {
+  type ItemProps,
+} from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
+import ViewerOptionsSizeSlider from "@ogw_front/components/Viewer/Options/Sliders/Size.vue";
+import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -12,90 +14,99 @@ const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const { applyBatchStyle } = useBatchStyle();
 
-const { itemProps, btnImage, tooltip } = defineProps({
-  itemProps: { type: Object, required: true },
-  btnImage: { type: String, required: true },
-  tooltip: { type: String, required: false, default: "Points options" },
-});
+interface Props {
+  itemProps: ItemProps & { index?: number };
+  btnImage: string;
+  tooltip?: string;
+}
+
+const { itemProps, btnImage, tooltip = "Points options" } = defineProps<Props>();
 
 const id = toRef(() => itemProps.id);
 
-const visibility = computed({
+const visibility = computed<boolean>({
   get: () => dataStyleStore.meshPointsVisibility(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
+    await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPointsVisibility(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
 });
-const size = computed({
+const size = computed<number>({
   get: () => dataStyleStore.meshPointsSize(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
+    await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPointsSize(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
 });
-const coloring_style_key = computed({
+const coloring_style_key = computed<string>({
   get: () => dataStyleStore.meshPointsActiveColoring(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
+    await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPointsActiveColoring(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
 });
-const color = computed({
-  get: () => dataStyleStore.meshPointsColor(id.value),
+const color = computed<RGBAColor | undefined>({
+  get: () => dataStyleStore.meshPointsColor(id.value) as RGBAColor | undefined,
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
+    await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPointsColor(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_name = computed({
+const vertex_attribute_name = computed<string | undefined>({
   get: () => dataStyleStore.meshPointsVertexAttributeName(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshPointsVertexAttributeName(targetId, newValue),
+    if (newValue === undefined) {
+      return;
+    }
+    await applyBatchStyle(id.value, (targetId: string) =>
+      Promise.resolve(dataStyleStore.setMeshPointsVertexAttributeName(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_item = computed({
+const vertex_attribute_item = computed<string | undefined>({
   get: () => dataStyleStore.meshPointsVertexAttributeItem(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshPointsVertexAttributeItem(targetId, newValue),
+    await applyBatchStyle(id.value, (targetId: string) =>
+      Promise.resolve(dataStyleStore.setMeshPointsVertexAttributeItem(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_range = computed({
+const vertex_attribute_range = computed<[number, number] | undefined>({
   get: () => dataStyleStore.meshPointsVertexAttributeRange(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshPointsVertexAttributeRange(targetId, newValue[0], newValue[1]),
+    const [minimum, maximum] = newValue;
+    if (minimum === undefined || maximum === undefined) {
+      return;
+    }
+    await applyBatchStyle(id.value, (targetId: string) =>
+      Promise.resolve(dataStyleStore.setMeshPointsVertexAttributeRange(targetId, minimum, maximum)),
     );
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_color_map = computed({
+const vertex_attribute_color_map = computed<Map<string, RGBAColor>>({
   get: () => dataStyleStore.meshPointsVertexAttributeColorMap(id.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
-      dataStyleStore.setMeshPointsVertexAttributeColorMap(targetId, newValue),
+    await applyBatchStyle(id.value, (targetId: string) =>
+      Promise.resolve(dataStyleStore.setMeshPointsVertexAttributeColorMap(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_no_data_color = computed({
-  get: () => dataStyleStore.meshPointsVertexAttributeNoDataColor(id.value),
+const vertex_attribute_no_data_color = computed<RGBAColor | undefined>({
+  get: () => dataStyleStore.meshPointsVertexAttributeNoDataColor(id.value) as RGBAColor | undefined,
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId) =>
+    await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPointsVertexAttributeNoDataColor(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -106,6 +117,7 @@ const vertex_attribute_no_data_color = computed({
 <template>
   <ViewerContextMenuItem
     data-testid="meshPointsMenu"
+    :index="itemProps.index!"
     :itemProps="itemProps"
     :tooltip="tooltip"
     :btnImage="btnImage"

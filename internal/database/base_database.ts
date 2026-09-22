@@ -1,0 +1,31 @@
+import { Dexie } from "dexie";
+import { cameraPositionsTable } from "./tables/camera_positions";
+import { dataStyleTable } from "./tables/data_style";
+import { dataTable } from "./tables/data";
+import { modelComponentDataStyleTable } from "./tables/model_component_datastyle";
+import { modelComponentTypeDataStyleTable } from "./tables/model_component_type_datastyle";
+import { modelComponentsRelationTable } from "./tables/model_components_relation";
+import { modelComponentsTable } from "./tables/model_components";
+
+export class BaseDatabase extends Dexie {
+  public static get initialStores(): Record<string, string> {
+    return {
+      [dataTable.name]: dataTable.schema,
+      [modelComponentsTable.name]: modelComponentsTable.schema,
+      [dataStyleTable.name]: dataStyleTable.schema,
+      [modelComponentDataStyleTable.name]: modelComponentDataStyleTable.schema,
+      [modelComponentTypeDataStyleTable.name]: modelComponentTypeDataStyleTable.schema,
+      [modelComponentsRelationTable.name]: modelComponentsRelationTable.schema,
+      [cameraPositionsTable.name]: cameraPositionsTable.schema,
+      treeview_config: "id",
+    };
+  }
+
+  public async clear(): Promise<void> {
+    await Promise.all(
+      this.tables.map(async (table) => {
+        await table.clear();
+      }),
+    );
+  }
+}

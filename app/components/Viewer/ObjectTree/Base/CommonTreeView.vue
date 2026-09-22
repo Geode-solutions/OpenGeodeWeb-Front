@@ -1,31 +1,50 @@
-<script setup>
+<script setup lang="ts">
+import { type DisplayItem, type EmitFn, useVirtualTree } from "@ogw_front/composables/virtual_tree";
 import StickyHeader from "@ogw_front/components/Viewer/ObjectTree/Base/StickyHeader.vue";
 import TreeRow from "@ogw_front/components/Viewer/ObjectTree/Base/TreeRow.vue";
 import { useTreeKeyboardNav } from "@ogw_front/composables/tree_keyboard_nav";
 import { useTreeScroll } from "@ogw_front/composables/tree_scroll";
-import { useVirtualTree } from "@ogw_front/composables/virtual_tree";
 
-const { items, opened, selected, active, scrollTop, options } = defineProps({
-  items: { type: Array, required: true },
-  opened: { type: Array, required: false, default: () => [] },
-  selected: { type: Array, required: false, default: () => [] },
-  active: { type: Array, required: false, default: () => [] },
-  scrollTop: { type: Number, required: false, default: 0 },
-  options: { type: Object, required: false, default: () => ({}) },
-});
+// The useVirtualTree composable's own props type (VirtualTreeProps) isn't exported; this component intentionally stays generic over whatever item shape callers use (plain treeview groups, model component groups, ...), so it is extracted from the composable's signature instead of re-declared here.
+type UnwrapMaybeRefOrGetter<Source> = Source extends () => infer Result
+  ? Result
+  : Source extends { value: infer Result }
+    ? Result
+    : Source;
+type VirtualTreeProps = UnwrapMaybeRefOrGetter<Parameters<typeof useVirtualTree>[0]>;
 
-const treeWrapper = ref(undefined);
+interface Props {
+  items: unknown[];
+  opened?: unknown[];
+  selected?: unknown[];
+  active?: unknown[];
+  scrollTop?: number;
+  options?: Record<string, unknown>;
+}
 
-const emit = defineEmits([
-  "update:opened",
-  "update:selected",
-  "update:active",
-  "click:item",
-  "update:scrollTop",
-  "hover:enter",
-  "hover:leave",
-  "contextmenu",
-]);
+const {
+  items,
+  opened = [],
+  selected = [],
+  active = [],
+  scrollTop = 0,
+  options = {},
+} = defineProps<Props>();
+
+const treeWrapper = ref<HTMLDivElement | undefined>(undefined);
+
+interface Emits {
+  "update:opened": [value: unknown[]];
+  "update:selected": [value: unknown[]];
+  "update:active": [value: unknown[]];
+  "click:item": [item: DisplayItem["raw"]];
+  "update:scrollTop": [value: number];
+  "hover:enter": [payload: { item: DisplayItem }];
+  "hover:leave": [payload: { item: DisplayItem }];
+  contextmenu: [payload: { event: MouseEvent; item: DisplayItem["raw"] }];
+}
+
+const emit = defineEmits<Emits>();
 
 const {
   actualItemProps,
@@ -36,77 +55,102 @@ const {
   isSelected,
   getIndeterminate,
 } = useVirtualTree(
-  computed(() => ({
-    items,
-    opened,
-    selected,
-    active,
-    ...options,
-  })),
-  emit,
+  computed(
+    () =>
+      ({
+        items,
+        opened,
+        selected,
+        active,
+        ...options,
+      }) as unknown as VirtualTreeProps,
+  ),
+  emit as EmitFn,
 );
 
 const { virtualScrollRef, stickyHeader, handleScroll, scrollToIndex, getScrollInfo } =
   useTreeScroll(
     computed(() => ({ scrollTop })),
-    emit,
+    emit as EmitFn,
     displayItems,
     actualItemProps,
   );
 
-const focusedIndex = ref(-1);
-const lastActiveIndex = ref(-1);
+const focusedIndex = ref<number>(-1);
+const lastActiveIndex = ref<number>(-1);
 
-function handleItemClick(item, index, event) {
+function applyRangeSelect(newActive: Set<unknown>, index: number): void {
+  const start = Math.min(lastActiveIndex.value, index);
+  const end = Math.max(lastActiveIndex.value, index);
+  for (let i = start; i <= end; i += 1) {
+    const rowItem = displayItems.value[i];
+    if (rowItem && rowItem.isLeaf) {
+      newActive.add(rowItem.raw[actualItemProps.value.value]);
+    }
+  }
+}
+
+function applyToggleActive(newActive: Set<unknown>, id: unknown, index: number | undefined): void {
+  if (newActive.has(id)) {
+    newActive.delete(id);
+  } else {
+    newActive.add(id);
+  }
+  if (index !== undefined) {
+    lastActiveIndex.value = index;
+  }
+}
+
+function handleMultiSelectClick(
+  item: DisplayItem,
+  index: number | undefined,
+  event: MouseEvent | KeyboardEvent,
+): void {
+  const newActive = new Set(active);
+  const id = item.raw[actualItemProps.value.value];
+  if (event.shiftKey && lastActiveIndex.value !== -1 && index !== undefined) {
+    applyRangeSelect(newActive, index);
+  } else {
+    applyToggleActive(newActive, id, index);
+  }
+  emit("update:active", [...newActive]);
+}
+
+function handleNormalClick(item: DisplayItem, index: number | undefined): void {
+  if (!item.isLeaf) {
+    toggleOpen(item.raw);
+    return;
+  }
+  emit("update:active", [item.raw[actualItemProps.value.value]]);
+  if (index !== undefined) {
+    lastActiveIndex.value = index;
+  }
+  toggleSelect(item.raw);
+  emit("click:item", item.raw);
+}
+
+function isMultiSelectEvent(event: MouseEvent | KeyboardEvent): void {
+  return event.ctrlKey || event.metaKey || event.shiftKey;
+}
+
+function handleItemClick(
+  item: DisplayItem,
+  index: number | undefined,
+  event?: MouseEvent | KeyboardEvent,
+): void {
   if (index !== undefined) {
     focusedIndex.value = index;
   }
-
-  if (event && (event.ctrlKey || event.metaKey || event.shiftKey)) {
-    const newActive = new Set(active);
-    const id = item.raw[actualItemProps.value.value];
-
-    if (event.shiftKey && lastActiveIndex.value !== -1 && index !== undefined) {
-      const start = Math.min(lastActiveIndex.value, index);
-      const end = Math.max(lastActiveIndex.value, index);
-      for (let i = start; i <= end; i += 1) {
-        const rowItem = displayItems.value[i];
-        if (rowItem && rowItem.isLeaf) {
-          newActive.add(rowItem.raw[actualItemProps.value.value]);
-        }
-      }
-    } else {
-      if (newActive.has(id)) {
-        newActive.delete(id);
-      } else {
-        newActive.add(id);
-      }
-      if (index !== undefined) {
-        lastActiveIndex.value = index;
-      }
-    }
-    emit("update:active", [...newActive]);
-    return;
-  }
-
-  // Normal click
-  if (item.isLeaf) {
-    const newActive = [item.raw[actualItemProps.value.value]];
-    emit("update:active", newActive);
-    if (index !== undefined) {
-      lastActiveIndex.value = index;
-    }
-
-    toggleSelect(item.raw);
-    emit("click:item", item.raw);
+  if (Boolean(event) && isMultiSelectEvent(event)) {
+    handleMultiSelectClick(item, index, event);
   } else {
-    toggleOpen(item.raw);
+    handleNormalClick(item, index);
   }
 }
 
 const { handleKeyDown } = useTreeKeyboardNav(
   displayItems,
-  emit,
+  emit as EmitFn,
   scrollToIndex,
   toggleOpen,
   handleItemClick,
@@ -121,8 +165,8 @@ const { handleKeyDown } = useTreeKeyboardNav(
     class="common-tree-view-wrapper"
     tabindex="0"
     @keydown="handleKeyDown"
-    @mousedown="treeWrapper.focus()"
-    @mouseenter="treeWrapper.focus()"
+    @mousedown="treeWrapper?.focus()"
+    @mouseenter="treeWrapper?.focus()"
   >
     <StickyHeader
       v-if="stickyHeader"
@@ -162,11 +206,11 @@ const { handleKeyDown } = useTreeKeyboardNav(
           @mousedown.prevent
           @click="
             handleItemClick(item, index, $event);
-            treeWrapper.focus();
+            treeWrapper?.focus();
           "
           @contextmenu.prevent.stop="
             emit('contextmenu', { event: $event, item: item.raw });
-            treeWrapper.focus();
+            treeWrapper?.focus();
           "
           @mouseenter="emit('hover:enter', { item })"
           @mouseleave="emit('hover:leave', { item })"

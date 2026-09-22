@@ -1,13 +1,13 @@
-<script setup>
-import ActionButton from "@ogw_front/components/ActionButton";
+<script setup lang="ts">
+import ActionButton from "@ogw_front/components/ActionButton.vue";
 import CameraBookmarkIcon from "@ogw_front/assets/viewer_svgs/camera-bookmark.svg";
-import CameraManager from "@ogw_front/components/CameraManager";
-import CameraOrientation from "@ogw_front/components/CameraOrientation";
-import ClippingPlanes from "@ogw_front/components/ClippingPlanes";
-import Ruler from "@ogw_front/components/Ruler";
-import Screenshot from "@ogw_front/components/Screenshot";
-import ShrinkFilter from "@ogw_front/components/ShrinkFilter";
-import ZScaling from "@ogw_front/components/ZScaling";
+import CameraManager from "@ogw_front/components/CameraManager.vue";
+import CameraOrientation from "@ogw_front/components/CameraOrientation.vue";
+import ClippingPlanes from "@ogw_front/components/ClippingPlanes.vue";
+import Ruler from "@ogw_front/components/Ruler.vue";
+import Screenshot from "@ogw_front/components/Screenshot.vue";
+import ShrinkFilter from "@ogw_front/components/ShrinkFilter.vue";
+import ZScaling from "@ogw_front/components/ZScaling.vue";
 import { onKeyStroke } from "@vueuse/core";
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -15,16 +15,27 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 const hybridViewerStore = useHybridViewerStore();
 const viewerStore = useViewerStore();
-const showScreenshot = ref(false);
-const showCameraManager = ref(false);
-const showCameraOrientation = ref(false);
-const showZScaling = ref(false);
-const showClippingPlanes = ref(false);
-const showShrinkFilter = ref(false);
-const showRuler = ref(false);
-const gridScale = ref(false);
-const zScale = ref(hybridViewerStore.zScale);
-const openSubMenus = ref({});
+const showScreenshot = ref<boolean>(false);
+const showCameraManager = ref<boolean>(false);
+const showCameraOrientation = ref<boolean>(false);
+const showZScaling = ref<boolean>(false);
+const showClippingPlanes = ref<boolean>(false);
+const showShrinkFilter = ref<boolean>(false);
+const showRuler = ref<boolean>(false);
+const gridScale = ref<boolean>(false);
+const zScale = ref<number>(hybridViewerStore.zScale);
+const openSubMenus = ref<Record<string, boolean>>({});
+
+interface CameraOptionAction {
+  title?: string;
+  testId: string;
+  tooltip?: string;
+  icon: string;
+  iconSize?: number;
+  color?: string;
+  action?: () => void;
+  menu?: CameraOptionAction[];
+}
 
 watch(
   () => hybridViewerStore.zScale,
@@ -33,7 +44,7 @@ watch(
   },
 );
 
-async function handleZScalingClose() {
+async function handleZScalingClose(): Promise<void> {
   await hybridViewerStore.setZScaling(zScale.value);
   showZScaling.value = false;
 }
@@ -47,7 +58,7 @@ onKeyStroke("Escape", () => {
   }
 });
 
-function closeAllToolsExcept(toolRef) {
+function closeAllToolsExcept(toolRef: Ref<boolean>): void {
   const tools = [
     showCameraOrientation,
     showCameraManager,
@@ -64,17 +75,17 @@ function closeAllToolsExcept(toolRef) {
   }
 }
 
-function toggleTool(toolRef) {
+function toggleTool(toolRef: Ref<boolean>): void {
   closeAllToolsExcept(toolRef);
   toolRef.value = !toolRef.value;
 }
 
-const camera_options = computed(() => [
+const camera_options = computed<CameraOptionAction[]>(() => [
   {
     testId: "resetCameraButton",
     tooltip: "Reset camera",
     icon: "mdi-cube-scan",
-    action: () => {
+    action: (): void => {
       hybridViewerStore.resetCamera();
     },
   },
@@ -83,7 +94,7 @@ const camera_options = computed(() => [
     tooltip: "Center on click",
     icon: "mdi-crosshairs-question",
     color: hybridViewerStore.is_picking ? "primary" : undefined,
-    action: () => {
+    action: (): void => {
       hybridViewerStore.is_picking = !hybridViewerStore.is_picking;
     },
   },
@@ -93,7 +104,7 @@ const camera_options = computed(() => [
     icon: "mdi-cursor-default-click",
     color: hybridViewerStore.is_hover_highlight ? "primary" : undefined,
     action: hybridViewerStore.is_hover_highlight
-      ? () => {
+      ? (): void => {
           hybridViewerStore.is_hover_highlight = false;
           hybridViewerStore.clearHoverHighlight();
         }
@@ -103,7 +114,7 @@ const camera_options = computed(() => [
         title: "Cells",
         testId: "highlightOnHoverCellsButton",
         icon: "mdi-select-all",
-        action: () => {
+        action: (): void => {
           if (
             hybridViewerStore.is_hover_highlight &&
             hybridViewerStore.hover_highlight_field_type === "CELL"
@@ -120,7 +131,7 @@ const camera_options = computed(() => [
         title: "Points",
         testId: "highlightOnHoverPointsButton",
         icon: "mdi-select-drag",
-        action: () => {
+        action: (): void => {
           if (
             hybridViewerStore.is_hover_highlight &&
             hybridViewerStore.hover_highlight_field_type === "POINT"
@@ -139,7 +150,7 @@ const camera_options = computed(() => [
     testId: "cameraOrientationButton",
     tooltip: "Camera orientation",
     icon: "mdi-rotate-3d",
-    action: () => {
+    action: (): void => {
       toggleTool(showCameraOrientation);
     },
   },
@@ -148,7 +159,7 @@ const camera_options = computed(() => [
     tooltip: "Manage camera positions",
     icon: CameraBookmarkIcon,
     iconSize: 34,
-    action: () => {
+    action: (): void => {
       toggleTool(showCameraManager);
     },
   },
@@ -156,7 +167,7 @@ const camera_options = computed(() => [
     testId: "screenshotButton",
     tooltip: "Take a screenshot",
     icon: "mdi-camera",
-    action: () => {
+    action: (): void => {
       toggleTool(showScreenshot);
     },
   },
@@ -165,7 +176,7 @@ const camera_options = computed(() => [
     tooltip: "Toggle grid scale",
     icon: "mdi-ruler-square",
     color: gridScale.value ? "primary" : undefined,
-    action: () => {
+    action: (): void => {
       const schema = schemas.opengeodeweb_viewer.viewer.grid_scale;
       const params = { visibility: !gridScale.value };
       viewerStore.request(
@@ -186,7 +197,7 @@ const camera_options = computed(() => [
     testId: "zScalingButton",
     tooltip: "Z Scaling Control",
     icon: "mdi-sort",
-    action: () => {
+    action: (): void => {
       toggleTool(showZScaling);
     },
   },
@@ -195,7 +206,7 @@ const camera_options = computed(() => [
     tooltip: "Clipping Planes",
     icon: "mdi-content-cut",
     color: showClippingPlanes.value ? "primary" : undefined,
-    action: () => {
+    action: (): void => {
       toggleTool(showClippingPlanes);
     },
   },
@@ -204,7 +215,7 @@ const camera_options = computed(() => [
     tooltip: "Shrink Filter",
     icon: "mdi-arrow-collapse-all",
     color: showShrinkFilter.value ? "primary" : undefined,
-    action: () => {
+    action: (): void => {
       toggleTool(showShrinkFilter);
     },
   },
@@ -213,7 +224,7 @@ const camera_options = computed(() => [
     tooltip: "Ruler",
     icon: "mdi-ruler",
     color: showRuler.value ? "primary" : undefined,
-    action: () => {
+    action: (): void => {
       toggleTool(showRuler);
     },
   },
@@ -234,10 +245,8 @@ const camera_options = computed(() => [
             <ActionButton
               v-bind="props"
               :data-testid="camera_option.testId"
-              :icon="
-                typeof camera_option.icon === 'function' ? camera_option.icon() : camera_option.icon
-              "
-              :tooltip="camera_option.tooltip"
+              :icon="camera_option.icon"
+              :tooltip="camera_option.tooltip ?? ''"
               :color="camera_option.color"
               :icon-size="camera_option.iconSize"
               tooltip-location="left"
@@ -249,16 +258,16 @@ const camera_options = computed(() => [
                 <ActionButton
                   :data-testid="item.testId"
                   :icon="item.icon"
-                  :tooltip="item.title"
+                  :tooltip="item.title ?? ''"
                   :color="
                     hybridViewerStore.is_hover_highlight &&
                     hybridViewerStore.hover_highlight_field_type ===
-                      item.title.toUpperCase().slice(0, -1)
+                      item.title?.toUpperCase().slice(0, -1)
                       ? 'primary'
                       : undefined
                   "
                   tooltip-location="top"
-                  @click="item.action"
+                  @click="item.action?.()"
                 />
               </v-col>
             </v-row>
@@ -268,7 +277,7 @@ const camera_options = computed(() => [
           v-else
           :data-testid="camera_option.testId"
           :icon="camera_option.icon"
-          :tooltip="camera_option.tooltip"
+          :tooltip="camera_option.tooltip ?? ''"
           :color="camera_option.color"
           :icon-size="camera_option.iconSize"
           tooltip-location="left"

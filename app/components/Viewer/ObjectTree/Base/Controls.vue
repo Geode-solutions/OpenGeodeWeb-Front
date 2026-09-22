@@ -1,18 +1,33 @@
-<script setup>
+<script setup lang="ts">
 import ActionButton from "@ogw_front/components/ActionButton.vue";
 import SearchBar from "@ogw_front/components/SearchBar.vue";
 
-const { search, sortType, filterOptions, availableFilterOptions, isCollapsed } = defineProps({
-  search: { type: String, required: true },
-  sortType: { type: String, required: true },
-  filterOptions: { type: Object, required: true },
-  availableFilterOptions: { type: Array, required: true },
-  isCollapsed: { type: Boolean, required: false, default: false },
-});
+interface Props {
+  search: string;
+  sortType: string;
+  filterOptions: Record<string, boolean>;
+  availableFilterOptions: string[];
+  isCollapsed?: boolean;
+}
 
-const emit = defineEmits(["update:search", "toggle-sort", "collapse-all", "expand-all"]);
+const {
+  search,
+  sortType,
+  filterOptions,
+  availableFilterOptions,
+  isCollapsed = false,
+} = defineProps<Props>();
 
-const showSearch = ref(false);
+interface Emits {
+  "update:search": [value: string];
+  "toggle-sort": [];
+  "collapse-all": [];
+  "expand-all": [];
+}
+
+const emit = defineEmits<Emits>();
+
+const showSearch = ref<boolean>(false);
 
 watch(
   () => showSearch.value,

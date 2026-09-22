@@ -1,10 +1,9 @@
-<script setup>
-const { logo } = defineProps({
-  logo: {
-    type: String,
-    default: "",
-  },
-});
+<script setup lang="ts">
+interface Props {
+  logo?: string;
+}
+
+const { logo = "" } = defineProps<Props>();
 </script>
 
 <template>

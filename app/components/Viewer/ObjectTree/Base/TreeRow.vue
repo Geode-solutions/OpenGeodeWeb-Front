@@ -1,30 +1,45 @@
-<script setup>
+<script setup lang="ts">
+import type {
+  DisplayItem,
+  ItemPropsConfig,
+  SelectionConfig,
+  TreeItem,
+} from "@ogw_front/composables/virtual_tree";
 import { useDataStore } from "@ogw_front/stores/data";
 
 const dataStore = useDataStore();
 
-const { item, itemProps, selection, isSelected, getIndeterminate } = defineProps({
-  item: { type: Object, required: true },
-  itemProps: { type: Object, required: true },
-  selection: { type: Object, required: true },
-  isSelected: { type: Function, required: true },
-  getIndeterminate: { type: Function, required: true },
-});
+interface Props {
+  item: DisplayItem;
+  itemProps: ItemPropsConfig;
+  selection: SelectionConfig;
+  isSelected: (item: TreeItem) => boolean;
+  getIndeterminate: (item: TreeItem) => boolean;
+}
 
-const emit = defineEmits(["toggle-open", "toggle-select", "hover-eye-enter", "hover-eye-leave"]);
+const { item, itemProps, selection, isSelected, getIndeterminate } = defineProps<Props>();
+
+interface Emits {
+  "toggle-open": [item: TreeItem];
+  "toggle-select": [item: TreeItem];
+  "hover-eye-enter": [item: unknown];
+  "hover-eye-leave": [item: unknown];
+}
+
+const emit = defineEmits<Emits>();
 
 const INDENT_STEP = 10;
 
-function triggerHorizonStackModal(rawItem) {
+function triggerHorizonStackModal(rawItem: unknown): void {
   globalThis.dispatchEvent(new CustomEvent("open-horizon-stack-modal", { detail: rawItem }));
 }
-const isHorizonStack = computed(() => item.raw.geode_object_type === "HorizonStack3D");
-const isViewable = computed(() => dataStore.isItemViewable(item.raw));
-const showEyeButton = computed(
+const isHorizonStack = computed<boolean>(() => item.raw.geode_object_type === "HorizonStack3D");
+const isViewable = computed<boolean>(() => dataStore.isItemViewable(item.raw));
+const showEyeButton = computed<boolean>(
   () => !isHorizonStack.value && item.raw.title !== "HorizonStack3D" && isViewable.value,
 );
 
-function handleRowClick(event) {
+function handleRowClick(event: MouseEvent): void {
   if (isHorizonStack.value) {
     if (!item.isLeaf) {
       return;

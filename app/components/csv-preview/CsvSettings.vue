@@ -1,22 +1,27 @@
-<script setup>
-const { separator, headerRow, firstRow, xColumn, yColumn, zColumn, headers } = defineProps({
-  separator: { type: String, required: true },
-  headerRow: { type: Number, required: true },
-  firstRow: { type: Number, required: true },
-  xColumn: { type: String, default: undefined },
-  yColumn: { type: String, default: undefined },
-  zColumn: { type: String, default: undefined },
-  headers: { type: Array, default: () => [] },
-});
+<script setup lang="ts">
+interface HeaderOption {
+  title: string;
+  key: string;
+}
 
-const emit = defineEmits([
-  "update:separator",
-  "update:headerRow",
-  "update:firstRow",
-  "update:xColumn",
-  "update:yColumn",
-  "update:zColumn",
-]);
+interface Props {
+  separator: string;
+  headers?: HeaderOption[];
+}
+
+const { separator, headers = [] } = defineProps<Props>();
+
+const headerRow = defineModel<number>("headerRow", { required: true });
+const firstRow = defineModel<number>("firstRow", { required: true });
+const xColumn = defineModel<string>("xColumn");
+const yColumn = defineModel<string>("yColumn");
+const zColumn = defineModel<string>("zColumn");
+
+interface Emits {
+  "update:separator": [value: string];
+}
+
+const emit = defineEmits<Emits>();
 
 const separators = [
   { title: "Comma (,)", value: "," },
@@ -27,8 +32,8 @@ const separators = [
   { title: "Custom", value: "custom" },
 ];
 
-const selectedType = ref(",");
-const customValue = ref("");
+const selectedType = ref<string>(",");
+const customValue = ref<string>("");
 
 watch(
   () => separator,
@@ -58,31 +63,6 @@ watch(customValue, (newVal) => {
   if (selectedType.value === "custom") {
     emit("update:separator", newVal);
   }
-});
-
-const internalHeaderRow = computed({
-  get: () => headerRow,
-  set: (value) => emit("update:headerRow", value),
-});
-
-const internalFirstRow = computed({
-  get: () => firstRow,
-  set: (value) => emit("update:firstRow", value),
-});
-
-const internalXColumn = computed({
-  get: () => xColumn,
-  set: (value) => emit("update:xColumn", value),
-});
-
-const internalYColumn = computed({
-  get: () => yColumn,
-  set: (value) => emit("update:yColumn", value),
-});
-
-const internalZColumn = computed({
-  get: () => zColumn,
-  set: (value) => emit("update:zColumn", value),
 });
 </script>
 
@@ -118,7 +98,7 @@ const internalZColumn = computed({
     <div class="text-overline mb-4 text-primary font-weight-bold">Row Configuration</div>
 
     <v-text-field
-      v-model.number="internalHeaderRow"
+      v-model.number="headerRow"
       type="number"
       label="Header Row"
       variant="outlined"
@@ -131,7 +111,7 @@ const internalZColumn = computed({
     />
 
     <v-text-field
-      v-model.number="internalFirstRow"
+      v-model.number="firstRow"
       type="number"
       label="First Data Row"
       variant="outlined"
@@ -148,7 +128,7 @@ const internalZColumn = computed({
     <div class="text-overline mb-4 text-primary font-weight-bold">Spatial Mapping</div>
 
     <v-select
-      v-model="internalXColumn"
+      v-model="xColumn"
       :items="headers"
       item-title="title"
       item-value="key"
@@ -163,7 +143,7 @@ const internalZColumn = computed({
     />
 
     <v-select
-      v-model="internalYColumn"
+      v-model="yColumn"
       :items="headers"
       item-title="title"
       item-value="key"
@@ -178,7 +158,7 @@ const internalZColumn = computed({
     />
 
     <v-select
-      v-model="internalZColumn"
+      v-model="zColumn"
       :items="headers"
       item-title="title"
       item-value="key"

@@ -1,26 +1,22 @@
-<script setup>
-import GlassCard from "@ogw_front/components/GlassCard";
+<script setup lang="ts">
+import GlassCard from "@ogw_front/components/GlassCard.vue";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 const TOOLTIP_SCREEN_MARGIN = 10;
 
-const { containerWidth, containerHeight } = defineProps({
-  containerWidth: {
-    type: Number,
-    required: true,
-  },
-  containerHeight: {
-    type: Number,
-    required: true,
-  },
-});
+interface Props {
+  containerWidth: number;
+  containerHeight: number;
+}
+
+const { containerWidth, containerHeight } = defineProps<Props>();
 
 const hybridViewerStore = useHybridViewerStore();
 
 const tooltipRef = useTemplateRef("tooltip");
 const { width: tooltipWidth, height: tooltipHeight } = useElementSize(tooltipRef);
 
-const tooltipStyle = computed(() => {
+const tooltipStyle = computed<Record<string, string>>(() => {
   if (!hybridViewerStore.hoverData) {
     return {};
   }
@@ -52,7 +48,7 @@ const tooltipStyle = computed(() => {
   };
 });
 
-const originalIndex = computed(() => {
+const originalIndex = computed<number | undefined>(() => {
   const attributes = hybridViewerStore.hoverData?.attributes || {};
   const originalId =
     attributes.vtkOriginalCellIds ??
@@ -69,14 +65,14 @@ const RESERVED_ATTRIBUTE_KEYS = new Set([
   "vtkOriginalPointIds",
 ]);
 
-const hasOtherAttributes = computed(() => {
+const hasOtherAttributes = computed<boolean>(() => {
   const attributes = hybridViewerStore.hoverData?.attributes || {};
   return Object.keys(attributes).some(
     (key) => key !== "vtkOriginalCellIds" && key !== "vtkOriginalPointIds",
   );
 });
 
-const sortedAttributes = computed(() => {
+const sortedAttributes = computed<[string, unknown][]>(() => {
   const attributes = hybridViewerStore.hoverData?.attributes || {};
   return (
     Object.entries(attributes)
@@ -86,7 +82,7 @@ const sortedAttributes = computed(() => {
   );
 });
 
-function capitalize(val) {
+function capitalize(val: string): string {
   if (!val) {
     return "";
   }
@@ -94,7 +90,17 @@ function capitalize(val) {
   return spaced.charAt(0).toUpperCase() + spaced.slice(1);
 }
 
-function formatAttributeValue(val) {
+const fieldTypeLabel = computed<string>(() => {
+  const fieldType = hybridViewerStore.hoverData?.fieldType;
+  return typeof fieldType === "string" ? capitalize(fieldType.toLowerCase()) : "";
+});
+
+const coordinates = computed<number[] | undefined>(() => {
+  const value = hybridViewerStore.hoverData?.attributes.coordinates;
+  return Array.isArray(value) ? (value as number[]) : undefined;
+});
+
+function formatAttributeValue(val: unknown): string {
   if (Array.isArray(val)) {
     const formattedValues = val.map((value) => {
       if (typeof value === "number") {
@@ -134,7 +140,7 @@ function formatAttributeValue(val) {
               hybridViewerStore.hoverData.component?.id ||
               hybridViewerStore.hoverData.blockName ||
               hybridViewerStore.hoverData.modelName ||
-              `${capitalize(hybridViewerStore.hoverData.fieldType.toLowerCase())} #${hybridViewerStore.hoverData.pickedId}`
+              `${fieldTypeLabel} #${hybridViewerStore.hoverData.pickedId}`
             }}
           </span>
         </v-col>
@@ -160,15 +166,11 @@ function formatAttributeValue(val) {
       <template v-if="hasOtherAttributes">
         <v-divider class="my-2" opacity="0.15" />
         <v-row no-gutters class="flex-column ga-1">
-          <v-col
-            v-if="hybridViewerStore.hoverData.attributes.coordinates"
-            class="d-flex justify-space-between ga-3"
-          >
+          <v-col v-if="coordinates" class="d-flex justify-space-between ga-3">
             <span class="tooltip-label">Position:</span>
             <span class="tooltip-value font-mono">
-              [ {{ Number(hybridViewerStore.hoverData.attributes.coordinates[0]).toFixed(3) }},
-              {{ Number(hybridViewerStore.hoverData.attributes.coordinates[1]).toFixed(3) }},
-              {{ Number(hybridViewerStore.hoverData.attributes.coordinates[2]).toFixed(3) }} ]
+              [ {{ Number(coordinates[0]).toFixed(3) }}, {{ Number(coordinates[1]).toFixed(3) }},
+              {{ Number(coordinates[2]).toFixed(3) }} ]
             </span>
           </v-col>
           <template v-for="[name, val] in sortedAttributes" :key="name">

@@ -1,16 +1,21 @@
-<script setup>
-import GlassCard from "@ogw_front/components/GlassCard";
+<script setup lang="ts">
+import GlassCard from "@ogw_front/components/GlassCard.vue";
 import { middleTruncate } from "@ogw_front/utils/string";
 import { useClipboard } from "@vueuse/core";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useMenuStore } from "@ogw_front/stores/menu";
 
-const { show, metaData } = defineProps({
-  show: { type: Boolean, required: true },
-  metaData: { type: Object, required: true },
-});
+interface Props {
+  show: boolean;
+  // oxlint-disable-next-line @typescript-eslint/no-explicit-any
+  metaData: Record<string, any>;
+}
 
-const emit = defineEmits(["update:show"]);
+const { show, metaData } = defineProps<Props>();
+
+const emit = defineEmits<{
+  "update:show": [value: boolean];
+}>();
 
 const COPIED_TIMEOUT = 1500;
 const MAX_SHORT_ID_LENGTH = 15;
@@ -23,15 +28,25 @@ const TRUNCATE_END_CHARS = 7;
 const { copy, copied } = useClipboard({ copiedDuring: COPIED_TIMEOUT });
 const copiedId = ref("");
 
-function isCopied(id) {
+function isCopied(id: string | undefined): boolean {
   return copied.value && copiedId.value === id;
 }
 
 const menuStore = useMenuStore();
 const dataStore = useDataStore();
 
-const componentName = ref("");
-const componentItem = ref(undefined);
+interface MeshComponentInfo {
+  id?: string;
+  title?: string;
+  category?: string;
+}
+
+const componentName = ref<string>("");
+const componentItem = ref<MeshComponentInfo | undefined>(undefined);
+
+function asString(value: unknown): string | undefined {
+  return typeof value === "string" ? value : undefined;
+}
 
 watch(
   () => menuStore.current_meta_data,
@@ -42,10 +57,12 @@ watch(
       return;
     }
 
-    const modelId = newMeta.modelId || newMeta.id;
+    const modelId = asString(newMeta.modelId) ?? asString(newMeta.id);
     if (newMeta.pickedComponentId && modelId) {
       const components = await dataStore.getAllMeshComponents(modelId);
-      const comp = components.find((component) => component.id === newMeta.pickedComponentId);
+      const comp = components.find(
+        (component: MeshComponentInfo) => component.id === newMeta.pickedComponentId,
+      );
       if (comp) {
         componentName.value = comp.title;
         componentItem.value = comp;
@@ -55,7 +72,7 @@ watch(
   { immediate: true },
 );
 
-const cleanName = computed(() => {
+const cleanName = computed<string>(() => {
   const meta = menuStore.current_meta_data;
   if (!meta) {
     return "Unnamed Object";
@@ -63,10 +80,10 @@ const cleanName = computed(() => {
   if (componentName.value && meta.viewer_type === "model_component") {
     return componentName.value;
   }
-  return meta.name || "Unnamed Object";
+  return asString(meta.name) ?? "Unnamed Object";
 });
 
-const displayTitle = computed(() => {
+const displayTitle = computed<string>(() => {
   const name = cleanName.value;
   if (!name) {
     return "";
@@ -74,7 +91,7 @@ const displayTitle = computed(() => {
   return middleTruncate(name, TRUNCATE_MAX_LENGTH, TRUNCATE_START_CHARS, TRUNCATE_END_CHARS);
 });
 
-const displayComponentTitle = computed(() => {
+const displayComponentTitle = computed<string>(() => {
   if (!componentItem.value) {
     return "";
   }
@@ -86,7 +103,7 @@ const displayComponentTitle = computed(() => {
   );
 });
 
-async function copyId(targetId) {
+async function copyId(targetId: string | undefined): Promise<void> {
   if (!targetId) {
     return;
   }
@@ -98,7 +115,7 @@ async function copyId(targetId) {
   }
 }
 
-function formatId(id) {
+function formatId(id: string | undefined): string {
   if (!id) {
     return "";
   }
@@ -108,7 +125,7 @@ function formatId(id) {
   return `${id.slice(0, ID_SLICE_START)}...${id.slice(id.length - ID_SLICE_END_OFFSET)}`;
 }
 
-const formattedId = computed(() => formatId(metaData.id));
+const formattedId = computed<string>(() => formatId(metaData.id));
 </script>
 
 <template>

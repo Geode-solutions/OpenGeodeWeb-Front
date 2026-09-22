@@ -1,21 +1,25 @@
-<script setup>
+<script setup lang="ts">
 import { computed, useAttrs } from "vue";
 import { onKeyStroke } from "@vueuse/core";
 
-const { variant, rounded, padding, theme, escapeFunction } = defineProps({
-  variant: {
-    type: String,
-    default: "panel",
-    validator: (valid) => ["panel", "ui"].includes(valid),
-  },
-  rounded: { type: String, default: "xl" },
-  padding: { type: String, default: "pa-6" },
-  theme: { type: String, default: undefined },
-  escapeFunction: { type: Function, default: undefined },
-});
+interface Props {
+  variant?: "panel" | "ui";
+  rounded?: string;
+  padding?: string;
+  theme?: string;
+  escapeFunction?: () => void;
+}
+
+const {
+  variant = "panel",
+  rounded = "xl",
+  padding = "pa-6",
+  theme = undefined,
+  escapeFunction = undefined,
+} = defineProps<Props>();
 
 const attrs = useAttrs();
-const isInteractive = computed(() => Boolean(attrs.onClick));
+const isInteractive = computed<boolean>(() => Boolean(attrs.onClick));
 
 onKeyStroke("Escape", () => {
   if (escapeFunction) {

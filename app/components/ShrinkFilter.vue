@@ -1,5 +1,5 @@
-<script setup>
-import ToolPanel from "@ogw_front/components/ToolPanel";
+<script setup lang="ts">
+import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDebounceFn } from "@vueuse/core";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -8,23 +8,28 @@ const DEFAULT_SHRINK_VALUE = 0.8;
 const MAX_SHRINK_VALUE = 1;
 const DEBOUNCE_DELAY = 100;
 
-const { escapeFunction } = defineProps({
-  escapeFunction: { type: Function, default: undefined },
-});
+interface Props {
+  escapeFunction?: () => void;
+}
 
-const show = defineModel("show", { type: Boolean, default: false });
+const { escapeFunction = undefined } = defineProps<Props>();
+
+const show = defineModel<boolean>("show", { default: false });
 const dataStore = useDataStore();
 const hybridViewerStore = useHybridViewerStore();
-const targetAllVisible = ref(true);
-const selectedDatasetIds = ref([]);
-const shrinkFactor = ref(DEFAULT_SHRINK_VALUE);
+const targetAllVisible = ref<boolean>(true);
+const selectedDatasetIds = ref<string[]>([]);
+const shrinkFactor = ref<number>(DEFAULT_SHRINK_VALUE);
 
 const allItems = dataStore.refAllItems();
-const availableDatasets = computed(() =>
-  allItems.value.map((item) => ({ title: item.name || item.id, value: item.id })),
+const availableDatasets = computed<{ title: string; value: string }[]>(() =>
+  allItems.value.map((item) => ({
+    title: item.name || item.id,
+    value: item.id,
+  })),
 );
 
-async function applyShrink() {
+async function applyShrink(): Promise<void> {
   const allIds = allItems.value.map((item) => item.id);
   if (allIds.length === 0) {
     return;
@@ -42,12 +47,12 @@ async function applyShrink() {
 
 const debouncedApply = useDebounceFn(() => applyShrink(), DEBOUNCE_DELAY);
 
-async function resetShrink() {
+async function resetShrink(): Promise<void> {
   shrinkFactor.value = DEFAULT_SHRINK_VALUE;
   await applyShrink();
 }
 
-async function removeShrink() {
+async function removeShrink(): Promise<void> {
   shrinkFactor.value = MAX_SHRINK_VALUE;
   const allIds = allItems.value.map((item) => item.id);
   if (allIds.length > 0) {

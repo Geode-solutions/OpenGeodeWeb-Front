@@ -1,22 +1,24 @@
-<script setup>
+<script setup lang="ts">
 import GlassCard from "./GlassCard.vue";
 
-const { show, item, selectedCount } = defineProps({
-  show: {
-    type: Boolean,
-    default: false,
-  },
-  item: {
-    type: Object,
-    default: undefined,
-  },
-  selectedCount: {
-    type: Number,
-    default: 0,
-  },
-});
+interface DeleteItem {
+  name: string;
+}
 
-const emit = defineEmits(["update:show", "confirm"]);
+interface Props {
+  show?: boolean;
+  item?: DeleteItem;
+  selectedCount?: number;
+}
+
+const { show = false, item = undefined, selectedCount = 0 } = defineProps<Props>();
+
+interface Emits {
+  "update:show": [value: boolean];
+  confirm: [];
+}
+
+const emit = defineEmits<Emits>();
 </script>
 
 <template>

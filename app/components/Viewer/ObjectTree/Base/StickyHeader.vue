@@ -1,15 +1,28 @@
-<script setup>
+<script setup lang="ts">
+import type {
+  DisplayItem,
+  ItemPropsConfig,
+  SelectionConfig,
+  TreeItem,
+} from "@ogw_front/composables/virtual_tree";
 import TreeRow from "@ogw_front/components/Viewer/ObjectTree/Base/TreeRow.vue";
 
-const { item, itemProps, selection, isSelected, getIndeterminate } = defineProps({
-  item: { type: Object, required: true },
-  itemProps: { type: Object, required: true },
-  selection: { type: Object, required: true },
-  isSelected: { type: Function, required: true },
-  getIndeterminate: { type: Function, required: true },
-});
+interface Props {
+  item: DisplayItem;
+  itemProps: ItemPropsConfig;
+  selection: SelectionConfig;
+  isSelected: (item: TreeItem) => boolean;
+  getIndeterminate: (item: TreeItem) => boolean;
+}
 
-const emit = defineEmits(["toggle-open", "toggle-select"]);
+const { item, itemProps, selection, isSelected, getIndeterminate } = defineProps<Props>();
+
+interface Emits {
+  "toggle-open": [item: TreeItem];
+  "toggle-select": [item: TreeItem];
+}
+
+const emit = defineEmits<Emits>();
 </script>
 
 <template>

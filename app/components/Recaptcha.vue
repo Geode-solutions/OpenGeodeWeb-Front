@@ -1,36 +1,30 @@
-<script setup>
+<script setup lang="ts">
 import { useInfraStore } from "@ogw_front/stores/infra";
 
-const { buttonLabel, buttonColor, color } = defineProps({
-  buttonLabel: {
-    type: String,
-    required: false,
-    default: "Load the app",
-  },
-  buttonColor: {
-    type: String,
-    required: false,
-    default: "white",
-  },
-  color: {
-    type: String,
-    required: false,
-    default: undefined,
-  },
-});
+interface Props {
+  buttonLabel?: string;
+  buttonColor?: string;
+  color?: string;
+}
+
+const {
+  buttonLabel = "Load the app",
+  buttonColor = "white",
+  color = undefined,
+} = defineProps<Props>();
 
 const name = ref("");
 const email = ref("");
 const launch = ref(false);
 const valid = ref(false);
 const emailRules = [
-  (value) => {
+  (value: string): boolean | string => {
     if (value) {
       return true;
     }
     return "E-mail is required.";
   },
-  (value) => {
+  (value: string): boolean | string => {
     if (/.+@.+\..+/u.test(value)) {
       return true;
     }
@@ -38,9 +32,9 @@ const emailRules = [
   },
 ];
 
-function submit() {
+function submit(): Promise<void> {
   const infraStore = useInfraStore();
-  return infraStore.create_backend(name.value, email.value, launch.value);
+  return infraStore.create_backend(email.value);
 }
 </script>
 
@@ -61,7 +55,7 @@ function submit() {
           </VRow>
           <VRow>
             <VCol>
-              <VCheckbox label="Load the app" v-model="load" />
+              <VCheckbox label="Load the app" v-model="launch" />
             </VCol>
           </VRow>
         </VContainer>

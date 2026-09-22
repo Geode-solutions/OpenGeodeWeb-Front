@@ -1,41 +1,57 @@
-<script setup>
+<script setup lang="ts">
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 
-import FetchingData from "@ogw_front/components/FetchingData";
+import FetchingData from "@ogw_front/components/FetchingData.vue";
 import { useBackStore } from "@ogw_front/stores/back";
 
 const schema = schemas.opengeodeweb_back.geode_objects_and_output_extensions;
-const emit = defineEmits(["update_values", "increment_step", "decrement_step"]);
+const emit = defineEmits<{
+  update_values: [values: { output_geode_object: string; output_extension: string }];
+  increment_step: [];
+  decrement_step: [];
+}>();
 
-const { geodeObjectType, filenames } = defineProps({
-  geodeObjectType: { type: String, required: true },
-  filenames: { type: Array, required: true },
-});
-const geode_objects_and_output_extensions = ref({});
-const loading = ref(false);
+interface Props {
+  geodeObjectType: string;
+  filenames: string[];
+}
+
+const { geodeObjectType, filenames } = defineProps<Props>();
+type OutputExtensions = Record<string, { is_saveable: boolean }>;
+
+const geode_objects_and_output_extensions = ref<Record<string, OutputExtensions>>({});
+const loading = ref<boolean>(false);
 
 const toggle_loading = useToggle(loading);
 
-async function get_output_file_extensions() {
+async function get_output_file_extensions(): Promise<void> {
   toggle_loading();
   geode_objects_and_output_extensions.value = {};
   const backStore = useBackStore();
-  const values = await Promise.all(
-    filenames.map(async (filename) => {
+  const values: Record<string, OutputExtensions>[] = await Promise.all(
+    filenames.map(async (filename): Promise<Record<string, OutputExtensions>> => {
       const params = { geode_object_type: geodeObjectType, filename };
       const response = await backStore.request({ schema, params });
-      return response.geode_objects_and_output_extensions;
+      return (
+        response as {
+          geode_objects_and_output_extensions: Record<string, OutputExtensions>;
+        }
+      ).geode_objects_and_output_extensions;
     }),
   );
   const all_keys = [...new Set(values.flatMap((value) => Object.keys(value)))];
   const common_keys = all_keys.filter((i) => !values.some((j) => !Object.keys(j).includes(i)));
-  const final_object = {};
+  const final_object: Record<string, OutputExtensions> = {};
   for (const key of common_keys) {
     final_object[key] = {};
     for (const value of values) {
-      for (const extension of Object.keys(value[key])) {
+      const extensions = value[key];
+      if (!extensions) {
+        continue;
+      }
+      for (const extension of Object.keys(extensions)) {
         final_object[key][extension] = {
-          is_saveable: value[key][extension].is_saveable,
+          is_saveable: extensions[extension].is_saveable,
         };
       }
     }
@@ -44,7 +60,7 @@ async function get_output_file_extensions() {
   toggle_loading();
 }
 
-function update_values(output_geode_object, output_extension) {
+function update_values(output_geode_object: string, output_extension: string): void {
   if (output_geode_object !== "" && output_extension !== "") {
     emit("update_values", {
       output_geode_object,
@@ -67,7 +83,7 @@ await get_output_file_extensions();
       class="justify-left"
     >
       <v-card class="card ma-2 pa-2" width="100%">
-        <v-card-title v-tooltip:bottom="`Export as a ${output_geode_object}`" v-bind="props">
+        <v-card-title v-tooltip:bottom="`Export as a ${output_geode_object}`">
           {{ output_geode_object }}
         </v-card-title>
         <v-card-text>

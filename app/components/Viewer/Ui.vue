@@ -1,25 +1,29 @@
-<script setup>
-import OverlappingObjectsPicker from "@ogw_front/components/Viewer/OverlappingObjectsPicker";
-import ViewerContextMenu from "@ogw_front/components/Viewer/ContextMenu/ContextMenu";
-import ViewerObjectTreeLayout from "@ogw_front/components/Viewer/ObjectTree/Layout";
+<script setup lang="ts">
+import OverlappingObjectsPicker from "@ogw_front/components/Viewer/OverlappingObjectsPicker.vue";
+import ViewerContextMenu from "@ogw_front/components/Viewer/ContextMenu/ContextMenu.vue";
+import ViewerObjectTreeLayout from "@ogw_front/components/Viewer/ObjectTree/Layout.vue";
 import { getCurrentInstance } from "vue";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useMenuStore } from "@ogw_front/stores/menu";
 import { useOverlappingPicker } from "@ogw_front/composables/use_overlapping_picker";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
-const { displayMenu, containerWidth, containerHeight } = defineProps({
-  displayMenu: { type: Boolean, required: true },
-  containerWidth: { type: Number, required: true },
-  containerHeight: { type: Number, required: true },
-});
+interface Props {
+  displayMenu: boolean;
+  containerWidth: number;
+  containerHeight: number;
+}
 
-const emit = defineEmits(["show-menu"]);
+const { displayMenu, containerWidth, containerHeight } = defineProps<Props>();
+
+const emit = defineEmits<{
+  "show-menu": [args: unknown];
+}>();
 const menuStore = useMenuStore();
 const viewerStore = useViewerStore();
 const hybridViewerStore = useHybridViewerStore();
 
-function stopHoverHighlight() {
+function stopHoverHighlight(): void {
   hybridViewerStore.is_hover_highlight = false;
   hybridViewerStore.clearHoverHighlight();
 }
@@ -53,7 +57,7 @@ const {
   get_viewer_id: trigger_picker,
 } = useOverlappingPicker();
 
-function get_viewer_id(x, y) {
+function get_viewer_id(x: number, y: number): string {
   const instance = getCurrentInstance();
   const containerRect = instance?.proxy?.$el
     ?.closest?.('[data-testid="hybridViewer"]')
@@ -82,7 +86,7 @@ defineExpose({ get_viewer_id });
   />
   <ViewerContextMenu
     v-if="displayMenu"
-    :id="menuStore.current_id"
+    :id="menuStore.current_id ?? ''"
     :x="menuStore.menuX"
     :y="menuStore.menuY"
     :container-width="containerWidth"
@@ -160,7 +164,8 @@ defineExpose({ get_viewer_id });
         prepend-icon="mdi-ruler"
         @click="hybridViewerStore.clearRuler()"
       >
-        Ruler &mdash; click to set point {{ hybridViewerStore.ruler_awaiting_point }}
+        Ruler &mdash; click to set point
+        {{ hybridViewerStore.ruler_awaiting_point }}
         &middot; Esc to stop
         <v-divider vertical class="mx-2 my-1" opacity="0.3" />
         <v-icon icon="mdi-close" size="small" />
