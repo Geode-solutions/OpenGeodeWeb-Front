@@ -5,7 +5,7 @@ import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 // The microservice-backed Pinia stores (back/app/...) all expose this shape; only the slice actually used here needs to be declared.
 interface Microservice {
-  $id?: string;
+  $id: string;
   base_url: string;
   start_request: () => void;
   stop_request: () => void;
