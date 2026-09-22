@@ -145,7 +145,10 @@ watch(
 </script>
 
 <template>
-  <div ref="colorPickerWrapperRef" class="color-picker-wrapper mx-auto rounded-lg overflow-hidden border">
+  <div
+    ref="colorPickerWrapperRef"
+    class="color-picker-wrapper mx-auto rounded-lg overflow-hidden border"
+  >
     <v-color-picker
       data-testid="colorPicker"
       :model-value="vuetifyColor"
