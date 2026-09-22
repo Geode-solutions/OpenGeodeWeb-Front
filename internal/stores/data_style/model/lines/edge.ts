@@ -136,7 +136,8 @@ function useModelLinesEdgeAttribute(): UseModelLinesEdgeAttributeReturn {
         edge: values,
       }),
     ];
-    if (lineIds.length > 1) {
+    const totalLineIds = await dataStore.getLinesGeodeIds(modelId);
+    if (lineIds.length === totalLineIds.length) {
       tasks.push(
         modelLinesCommonStyle.mutateModelLinesTypeColoring(modelId, {
           edge: values,

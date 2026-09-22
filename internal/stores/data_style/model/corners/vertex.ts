@@ -122,7 +122,8 @@ function useModelCornersVertexAttribute(): ModelCornersVertexAttributeApi {
         vertex: values,
       }),
     ];
-    if (cornerIds.length > 1) {
+    const totalCornerIds = await dataStore.getCornersGeodeIds(modelId);
+    if (cornerIds.length === totalCornerIds.length) {
       tasks.push(
         modelCornersCommonStyle.mutateModelCornersTypeColoring(modelId, { vertex: values }),
       );

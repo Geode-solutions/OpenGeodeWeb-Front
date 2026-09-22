@@ -1,6 +1,7 @@
 import { isModelLinesEdgeAttributeValid, useModelLinesEdgeAttribute } from "./edge";
 import { isModelLinesVertexAttributeValid, useModelLinesVertexAttribute } from "./vertex";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
+import { useDataStore } from "@ogw_front/stores/data";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 import { useModelLinesCommonStyle } from "./common";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
@@ -23,6 +24,7 @@ export function useModelLinesColor(): {
     activeColoring: string,
   ) => Promise<unknown>;
 } {
+  const dataStore = useDataStore();
   const modelCommonStyle = useModelCommonStyle();
   const modelLinesCommonStyle = useModelLinesCommonStyle();
   const modelLinesVertexAttribute = useModelLinesVertexAttribute();
@@ -62,7 +64,8 @@ export function useModelLinesColor(): {
     lines_ids: string[],
     activeColoring: string,
   ): Promise<unknown> {
-    if (lines_ids.length > 1) {
+    const totalLineIds = await dataStore.getLinesGeodeIds(modelId);
+    if (lines_ids.length === totalLineIds.length) {
       await modelLinesCommonStyle.mutateModelLinesTypeColoring(modelId, {
         active: activeColoring,
       });
