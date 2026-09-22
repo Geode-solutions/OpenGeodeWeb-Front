@@ -8,10 +8,12 @@ interface Props {
 
 const { plane, index } = defineProps<Props>();
 
-const emit = defineEmits<{
+interface Emits {
   remove: [];
   flipNormal: [];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 </script>
 
 <template>

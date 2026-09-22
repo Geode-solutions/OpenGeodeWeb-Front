@@ -22,14 +22,14 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const beforeAllTimeout = 40_000;
 const data_folder = path.join("tests", "integration", "data", "uploads");
 
-async function runMicroservices() {
+async function runMicroservices(): Promise<{ projectFolderPath: string }> {
   const backStore = useBackStore();
   const infraStore = useInfraStore();
   const viewerStore = useViewerStore();
   infraStore.app_mode = appMode.BROWSER;
   const { COMMAND_BACK, PROJECT, COMMAND_VIEWER, NUXT_ROOT_PATH } = useRuntimeConfig().public;
   const projectFolderPath = generateProjectFolderPath(PROJECT);
-  await createPath(projectFolderPath);
+  createPath(projectFolderPath);
 
   const [back_port, viewer_port] = await Promise.all([
     runBack(COMMAND_BACK, NUXT_ROOT_PATH, {
@@ -46,12 +46,12 @@ async function runMicroservices() {
     throw new Error("Failed to start microservices: back_port or viewer_port is undefined");
   }
 
-  await addMicroserviceMetadatas(projectFolderPath, {
+  addMicroserviceMetadatas(projectFolderPath, {
     type: "back",
     name: COMMAND_BACK,
     port: back_port,
   });
-  await addMicroserviceMetadatas(projectFolderPath, {
+  addMicroserviceMetadatas(projectFolderPath, {
     type: "viewer",
     name: COMMAND_VIEWER,
     port: viewer_port,
@@ -65,7 +65,10 @@ async function runMicroservices() {
   };
 }
 
-async function setupIntegrationTests(file_name: string, geode_object: string) {
+async function setupIntegrationTests(
+  file_name: string,
+  geode_object: string,
+): Promise<{ id: string; projectFolderPath: string }> {
   setupActivePinia();
   const viewerStore = useViewerStore();
   const { projectFolderPath } = await runMicroservices();
@@ -76,16 +79,21 @@ async function setupIntegrationTests(file_name: string, geode_object: string) {
   return { id, projectFolderPath };
 }
 
-const mockLockRequest = vi.fn().mockImplementation(async (name, task) => await task({ name }));
+const mockLockRequest = vi
+  .fn()
+  .mockImplementation(async (name: string, task: (lock: { name: string }) => Promise<unknown>) => {
+    const result = await task({ name });
+    return result;
+  });
 
-vi.stubGlobal("navigator", {
-  ...navigator,
-  locks: {
-    request: mockLockRequest,
-  },
+Object.defineProperty(navigator, "locks", {
+  value: { request: mockLockRequest },
+  configurable: true,
 });
+vi.stubGlobal("navigator", navigator);
 
 beforeAll(() => {
+  // oxlint-disable-next-line no-unsafe-type-assertion -- Node's "ws" WebSocket is used as a browser WebSocket polyfill in tests.
   globalThis.WebSocket = WebSocket as unknown as typeof globalThis.WebSocket;
 });
 

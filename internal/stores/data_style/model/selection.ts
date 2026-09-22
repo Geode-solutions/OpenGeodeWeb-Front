@@ -1,14 +1,7 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
-import type {
-  ModelComponentStyle,
-  ModelComponentTypeStyle,
-  StyleValues,
-} from "@ogw_internal/stores/data_style/types.js";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
-import { database } from "@ogw_internal/database/database";
+import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import type { Table } from "dexie";
-import type { ComputedRef, Ref } from "vue";
+import { database } from "@ogw_internal/database/database";
 import type { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 
 interface ModelComponentRecord {
@@ -19,80 +12,115 @@ interface ModelComponentRecord {
 
 type DataStyleState = ReturnType<typeof useDataStyleState>;
 
+// oxlint-disable-next-line no-unsafe-type-assertion -- trusted Dexie table boundary; see other database table casts in this codebase.
 const model_components_db = database.model_components as unknown as Table<
   ModelComponentRecord,
   string
 >;
 
-function buildSelection(
-  modelId: string,
-  components: ModelComponentRecord[],
-  componentStyles: Ref<Record<string, ModelComponentStyle>>,
-  modelComponentTypeStyles: Ref<Record<string, ModelComponentTypeStyle>>,
-  dataStyleState: DataStyleState,
-): string[] {
+function groupComponentsByType(
+  components: readonly ModelComponentRecord[],
+): Record<string, ModelComponentRecord[]> {
   const componentsByType: Record<string, ModelComponentRecord[]> = Object.fromEntries(
     MESH_COMPONENT_TYPES.map((componentType) => [componentType, []]),
   );
   for (const component of components) {
-    if (componentsByType[component.type]) {
-      componentsByType[component.type]!.push(component);
+    const list = componentsByType[component.type];
+    if (list !== undefined) {
+      list.push(component);
     }
   }
+  return componentsByType;
+}
 
+interface TypeSelectionContext {
+  readonly modelId: string;
+  readonly groupStyles: ReturnType<DataStyleState["getStyle"]>;
+  readonly dataStyleState: DataStyleState;
+}
+
+function computeTypeSelection(
+  componentType: string,
+  typeComponents: readonly ModelComponentRecord[],
+  context: TypeSelectionContext,
+): string[] {
+  const { modelId, groupStyles, dataStyleState } = context;
+  const typeKey = `${componentType.toLowerCase()}s`;
+  const typeStyleKey = `${modelId}_${componentType}`;
+  const typeStyle = dataStyleState.modelComponentTypeStyles.value[typeStyleKey];
+  // oxlint-disable-next-line no-unsafe-type-assertion -- dynamically-keyed lookup into StyleValues; see other database/style casts in this codebase.
+  const groupTypeStyle = (groupStyles as unknown as Record<string, StyleValues | undefined>)[
+    typeKey
+  ];
+  const defaultVisibility =
+    // oxlint-disable-next-line no-unsafe-type-assertion -- visibility field is defined by the data style schema.
+    (typeStyle?.visibility as boolean | undefined) ??
+    // oxlint-disable-next-line no-unsafe-type-assertion -- visibility field is defined by the data style schema.
+    (groupTypeStyle?.visibility as boolean | undefined) ??
+    true;
+
+  const selection: string[] = [];
+  let allVisible = true;
+  for (const component of typeComponents) {
+    const styleKey = `${modelId}_${component.geode_id}`;
+    const componentStyle = dataStyleState.componentStyles.value[styleKey];
+    // oxlint-disable-next-line no-unsafe-type-assertion -- visibility field is defined by the data style schema.
+    const isVisible = (componentStyle?.visibility as boolean | undefined) ?? defaultVisibility;
+    if (isVisible) {
+      selection.push(component.geode_id);
+    } else {
+      allVisible = false;
+    }
+  }
+  if (allVisible) {
+    selection.push(componentType);
+  }
+  return selection;
+}
+
+function buildSelection(
+  modelId: string,
+  components: readonly ModelComponentRecord[],
+  dataStyleState: DataStyleState,
+): string[] {
+  const componentsByType = groupComponentsByType(components);
   const groupStyles = dataStyleState.getStyle(modelId);
+  const context: TypeSelectionContext = { modelId, groupStyles, dataStyleState };
+
   const selection: string[] = [];
   for (const componentType of MESH_COMPONENT_TYPES) {
-    const typeComponents = componentsByType[componentType];
-    if (!typeComponents || typeComponents.length === 0) {
+    const typeComponents = componentsByType[componentType] ?? [];
+    if (typeComponents.length === 0) {
       continue;
     }
-
-    const typeKey = `${componentType.toLowerCase()}s`;
-    const typeStyleKey = `${modelId}_${componentType}`;
-    const typeStyle = modelComponentTypeStyles.value[typeStyleKey];
-    const defaultVisibility =
-      (typeStyle?.visibility as boolean | undefined) ??
-      ((groupStyles[typeKey] as StyleValues | undefined)?.visibility as boolean | undefined) ??
-      true;
-
-    let allVisible = true;
-    for (const component of typeComponents) {
-      const styleKey = `${modelId}_${component.geode_id}`;
-      const isVisible =
-        (componentStyles.value[styleKey]?.visibility as boolean | undefined) ?? defaultVisibility;
-      if (isVisible) {
-        selection.push(component.geode_id);
-      } else {
-        allVisible = false;
-      }
-    }
-    if (allVisible) {
-      selection.push(componentType);
-    }
+    selection.push(...computeTypeSelection(componentType, typeComponents, context));
   }
   return selection;
 }
 
 const selectionCache = new Map<string, ComputedRef<string[]>>();
 
-function useModelSelection(modelId: string | undefined, dataStyleState: DataStyleState) {
-  if (!modelId) {
+function useModelSelection(
+  modelId: string | undefined,
+  dataStyleState: DataStyleState,
+): ComputedRef<string[]> {
+  if (modelId === undefined || modelId === "") {
     return computed<string[]>(() => []);
   }
 
-  const cacheKey = `${modelId}`;
-  if (selectionCache.has(cacheKey)) {
-    return selectionCache.get(cacheKey)!;
+  const cacheKey = modelId;
+  const cachedSelection = selectionCache.get(cacheKey);
+  if (cachedSelection !== undefined) {
+    return cachedSelection;
   }
 
   const allComponents = ref<ModelComponentRecord[]>([]);
 
-  (async () => {
+  void (async (): Promise<void> => {
     try {
       allComponents.value = await model_components_db.where("id").equals(modelId).toArray();
-    } catch (error) {
-      console.error("Error fetching model components:", error);
+    } catch {
+      allComponents.value = [];
     }
   })();
 
@@ -100,13 +128,7 @@ function useModelSelection(modelId: string | undefined, dataStyleState: DataStyl
     if (allComponents.value.length === 0) {
       return [];
     }
-    return buildSelection(
-      modelId,
-      allComponents.value,
-      dataStyleState.componentStyles,
-      dataStyleState.modelComponentTypeStyles,
-      dataStyleState,
-    );
+    return buildSelection(modelId, allComponents.value, dataStyleState);
   });
 
   selectionCache.set(cacheKey, computedSelection);

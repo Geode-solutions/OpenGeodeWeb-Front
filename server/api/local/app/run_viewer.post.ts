@@ -1,7 +1,7 @@
 // Node imports
 
 // Third party imports
-import { createError, defineEventHandler, readBody } from "h3";
+import { type H3Event, createError, defineEventHandler, readBody } from "h3";
 
 // Local imports
 import {
@@ -15,16 +15,14 @@ interface RunViewerBody {
   args: { projectFolderPath: string; [key: string]: unknown };
 }
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event: H3Event) => {
   try {
     const { COMMAND_VIEWER, NUXT_ROOT_PATH, args } = await readBody<RunViewerBody>(event);
     const port = await runViewer(COMMAND_VIEWER, NUXT_ROOT_PATH, args);
-    await addMicroserviceMetadatas(args.projectFolderPath, {
+    addMicroserviceMetadatas(args.projectFolderPath, {
       type: "viewer",
       name: COMMAND_VIEWER,
-      // RunViewer can exhaust its port-conflict retries and return undefined
-      // (pre-existing bug: addMicroserviceMetadatas/URLs then embed "undefined").
-      port: port as number,
+      port,
     });
 
     return {
@@ -35,7 +33,7 @@ export default defineEventHandler(async (event) => {
     console.log(error);
     throw createError({
       statusCode: 500,
-      statusMessage: (error as Error).message,
+      statusMessage: error instanceof Error ? error.message : String(error),
     });
   }
 });

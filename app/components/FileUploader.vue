@@ -32,26 +32,26 @@ const {
 } = defineProps<Props>();
 
 const backStore = useBackStore();
-const internal_files = ref(files);
+const internal_files = ref<UploadFile[]>(files);
 const dragAndDropRef = useTemplateRef("dragAndDropRef");
-const csv_dialog = ref(false);
+const csv_dialog = ref<boolean>(false);
 const current_csv_file = ref<UploadFile | undefined>(undefined);
-const current_csv_index = ref(-1);
-const loading = ref(false);
-const files_uploaded = ref(false);
+const current_csv_index = ref<number>(-1);
+const loading = ref<boolean>(false);
+const files_uploaded = ref<boolean>(false);
 const toggle_loading = useToggle(loading);
 
-function isCsv(file: UploadFile) {
+function isCsv(file: UploadFile): boolean {
   return file.name.toLowerCase().endsWith(".csv");
 }
 
-function openCsvPreviewer(file: UploadFile, index: number) {
+function openCsvPreviewer(file: UploadFile, index: number): void {
   current_csv_file.value = file;
   current_csv_index.value = index;
   csv_dialog.value = true;
 }
 
-async function onCsvConfirm(result: unknown) {
+async function onCsvConfirm(result: unknown): Promise<void> {
   // Only reachable while the CsvPreviewer dialog (gated on current_csv_file) is open.
   const currentFile = current_csv_file.value;
   if (!currentFile) {
@@ -72,7 +72,7 @@ async function onCsvConfirm(result: unknown) {
   csv_dialog.value = false;
 }
 
-function processSelectedFiles(selected_files: UploadFile[]) {
+function processSelectedFiles(selected_files: UploadFile[]): void {
   if (multiple) {
     internal_files.value = [...internal_files.value, ...selected_files];
   } else {
@@ -83,7 +83,7 @@ function processSelectedFiles(selected_files: UploadFile[]) {
   }
 }
 
-function removeFile(index: number) {
+function removeFile(index: number): void {
   internal_files.value.splice(index, 1);
   if (internal_files.value.length === 0) {
     files_uploaded.value = false;
@@ -91,7 +91,7 @@ function removeFile(index: number) {
   }
 }
 
-async function upload_files() {
+async function upload_files(): Promise<void> {
   toggle_loading();
   const promise_array = internal_files.value.map((file) => backStore.upload(file));
   await Promise.all(promise_array);

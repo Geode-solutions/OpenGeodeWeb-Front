@@ -5,9 +5,9 @@ const MARGIN_BETWEEN_SNACKERS = 60;
 const FIRST_SNACKER_MARGIN = 8;
 
 const feedbackStore = useFeedbackStore();
-const show = ref(true);
+const show = ref<boolean>(true);
 
-function calc_margin(index: number) {
+function calc_margin(index: number): string {
   return `${index * MARGIN_BETWEEN_SNACKERS + FIRST_SNACKER_MARGIN}px`;
 }
 </script>

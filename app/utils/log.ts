@@ -1,23 +1,23 @@
 import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
 
 interface Loggable {
-  $id: string;
+  $id?: string;
 }
 
-function startRequestLog(microservice: Loggable, schema: JsonRpcSchema): Date {
-  console.log(`[${microservice.$id}] Request:`, schema.$id);
+function startRequestLog(microservice: Readonly<Loggable>, schema: Readonly<JsonRpcSchema>): Date {
+  console.log(`[${microservice.$id ?? "API"}] Request:`, schema.$id);
   const requestStartingTime = new Date(Date.now());
   return requestStartingTime;
 }
 
 function endRequestLog(
-  microservice: Loggable,
-  schema: JsonRpcSchema,
-  requestStartingTime: Date,
+  microservice: Readonly<Loggable>,
+  schema: Readonly<JsonRpcSchema>,
+  requestStartingTime: Readonly<Date>,
 ): void {
   const requestEndingTime = new Date(Date.now());
   console.log(
-    `[${microservice.$id}] Request completed:`,
+    `[${microservice.$id ?? "API"}] Request completed:`,
     schema.$id,
     "in",
     requestEndingTime.getSeconds() - requestStartingTime.getSeconds(),

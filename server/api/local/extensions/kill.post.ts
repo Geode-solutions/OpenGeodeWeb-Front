@@ -1,7 +1,7 @@
 // Node imports
 
 // Third party imports
-import { createError, defineEventHandler, readBody } from "h3";
+import { type H3Event, createError, defineEventHandler, readBody } from "h3";
 
 // Local imports
 import {
@@ -19,7 +19,7 @@ interface KillExtensionBody {
   extensionId: string;
 }
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event: H3Event) => {
   try {
     const body = await readBody<KillExtensionBody>(event);
     const { projectFolderPath, projectName, extensionId } = body;
@@ -43,7 +43,8 @@ export default defineEventHandler(async (event) => {
     console.error("Error killing extension:", error);
     throw createError({
       statusCode: 500,
-      statusMessage: (error as Error).message,
+
+      statusMessage: error instanceof Error ? error.message : String(error),
     });
   }
 });

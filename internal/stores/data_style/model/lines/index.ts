@@ -19,12 +19,19 @@ interface AttributeGroup {
   lines_ids: string[];
 }
 
-async function setModelLinesDefaultStyle(_id: string) {
+async function setModelLinesDefaultStyle(_id: string): Promise<void> {
   // Placeholder
 }
 
 // oxlint-disable-next-line max-lines-per-function
-export function useModelLinesStyle() {
+export function useModelLinesStyle(): ReturnType<typeof useModelLinesCommonStyle> &
+  ReturnType<typeof useModelLinesVisibility> &
+  ReturnType<typeof useModelLinesColor> &
+  ReturnType<typeof useModelLinesVertexAttribute> &
+  ReturnType<typeof useModelLinesEdgeAttribute> & {
+    applyModelLinesStyle: (modelId: string) => Promise<void>;
+    setModelLinesDefaultStyle: (id: string) => Promise<void>;
+  } {
   const dataStore = useDataStore();
   const modelCommonStyle = useModelLinesCommonStyle();
   const modelVisibilityStyle = useModelLinesVisibility();
@@ -32,30 +39,37 @@ export function useModelLinesStyle() {
   const modelLinesVertexAttribute = useModelLinesVertexAttribute();
   const modelLinesEdgeAttribute = useModelLinesEdgeAttribute();
 
-  function applyModelLinesVisibilityStyle(modelId: string, lines_ids: string[]) {
+  async function applyModelLinesVisibilityStyle(
+    modelId: string,
+    lines_ids: string[],
+  ): Promise<void> {
     const visibilityGroups: Record<string, string[]> = {};
     for (const line_id of lines_ids) {
       const style = modelCommonStyle.modelLineStyle(modelId, line_id);
       const visibility = String(style.visibility);
-      if (!visibilityGroups[visibility]) {
-        visibilityGroups[visibility] = [];
-      }
+      visibilityGroups[visibility] ??= [];
       visibilityGroups[visibility].push(line_id);
     }
-    return Promise.all(
-      Object.entries(visibilityGroups).map(([visibility, ids]) =>
-        modelVisibilityStyle.setModelLinesVisibility(modelId, ids, visibility === "true"),
-      ),
+    await Promise.all(
+      Object.entries(visibilityGroups).map(async ([visibility, ids]) => {
+        const result = await modelVisibilityStyle.setModelLinesVisibility(
+          modelId,
+          ids,
+          visibility === "true",
+        );
+        return result;
+      }),
     );
   }
 
-  function applyModelLinesColoringStyle(modelId: string, lines_ids: string[]) {
+  async function applyModelLinesColoringStyle(
+    modelId: string,
+    lines_ids: string[],
+  ): Promise<unknown[]> {
     const activeColoringGroups: Record<string, string[]> = {};
     for (const line_id of lines_ids) {
       const activeColoring = String(modelColorStyle.modelLineActiveColoring(modelId, line_id));
-      if (!activeColoringGroups[activeColoring]) {
-        activeColoringGroups[activeColoring] = [];
-      }
+      activeColoringGroups[activeColoring] ??= [];
       activeColoringGroups[activeColoring].push(line_id);
     }
 
@@ -67,15 +81,19 @@ export function useModelLinesStyle() {
         for (const line_id of type_lines_ids) {
           const color = modelColorStyle.modelLineColor(modelId, line_id);
           const color_key = JSON.stringify(color);
-          if (!colorGroups[color_key]) {
-            colorGroups[color_key] = { color, lines_ids: [] };
-          }
+          colorGroups[color_key] ??= { color, lines_ids: [] };
           colorGroups[color_key].lines_ids.push(line_id);
         }
         coloringPromises.push(
-          ...Object.values(colorGroups).map(({ color, lines_ids: ids }) =>
-            modelColorStyle.setModelLinesColor(modelId, ids, color, "constant"),
-          ),
+          ...Object.values(colorGroups).map(async ({ color, lines_ids: ids }) => {
+            const result = await modelColorStyle.setModelLinesColor(
+              modelId,
+              ids,
+              color,
+              "constant",
+            );
+            return result;
+          }),
         );
       } else if (type === "random") {
         coloringPromises.push(
@@ -99,28 +117,32 @@ export function useModelLinesStyle() {
             continue;
           }
           const key = `${name}_${item}_${colorMap}_${minimum}_${maximum}`;
-          if (!vertexGroups[key]) {
-            vertexGroups[key] = {
-              name,
-              item,
-              minimum,
-              maximum,
-              colorMap,
-              lines_ids: [],
-            };
-          }
+          vertexGroups[key] ??= {
+            name,
+            item,
+            minimum,
+            maximum,
+            colorMap,
+            lines_ids: [],
+          };
           vertexGroups[key].lines_ids.push(line_id);
         }
         coloringPromises.push(
           ...Object.values(vertexGroups).map(
-            ({ name, item, minimum, maximum, colorMap, lines_ids: ids }) =>
-              modelLinesVertexAttribute.setModelLinesVertexAttribute(modelId, ids, {
-                name,
-                item,
-                minimum,
-                maximum,
-                colorMap,
-              }),
+            async ({ name, item, minimum, maximum, colorMap, lines_ids: ids }) => {
+              const result = await modelLinesVertexAttribute.setModelLinesVertexAttribute(
+                modelId,
+                ids,
+                {
+                  name,
+                  item,
+                  minimum,
+                  maximum,
+                  colorMap,
+                },
+              );
+              return result;
+            },
           ),
         );
       } else if (type === "edge") {
@@ -141,41 +163,46 @@ export function useModelLinesStyle() {
             continue;
           }
           const key = `${name}_${item}_${colorMap}_${minimum}_${maximum}`;
-          if (!edgeGroups[key]) {
-            edgeGroups[key] = {
-              name,
-              item,
-              minimum,
-              maximum,
-              colorMap,
-              lines_ids: [],
-            };
-          }
+          edgeGroups[key] ??= {
+            name,
+            item,
+            minimum,
+            maximum,
+            colorMap,
+            lines_ids: [],
+          };
           edgeGroups[key].lines_ids.push(line_id);
         }
         coloringPromises.push(
           ...Object.values(edgeGroups).map(
-            ({ name, item, minimum, maximum, colorMap, lines_ids: ids }) =>
-              modelLinesEdgeAttribute.setModelLinesEdgeAttribute(modelId, ids, {
-                name,
-                item,
-                minimum,
-                maximum,
-                colorMap,
-              }),
+            async ({ name, item, minimum, maximum, colorMap, lines_ids: ids }) => {
+              const result = await modelLinesEdgeAttribute.setModelLinesEdgeAttribute(
+                modelId,
+                ids,
+                {
+                  name,
+                  item,
+                  minimum,
+                  maximum,
+                  colorMap,
+                },
+              );
+              return result;
+            },
           ),
         );
       }
     }
-    return Promise.all(coloringPromises);
+    const results = await Promise.all(coloringPromises);
+    return results;
   }
 
-  async function applyModelLinesStyle(modelId: string) {
+  async function applyModelLinesStyle(modelId: string): Promise<void> {
     const lines_ids = await dataStore.getLinesGeodeIds(modelId);
     if (lines_ids.length === 0) {
       return;
     }
-    return Promise.all([
+    await Promise.all([
       applyModelLinesVisibilityStyle(modelId, lines_ids),
       applyModelLinesColoringStyle(modelId, lines_ids),
     ]);

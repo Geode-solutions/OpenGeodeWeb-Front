@@ -27,9 +27,11 @@ const {
   showExtensions,
 } = defineProps<Props>();
 
-const emit = defineEmits<{
+interface Emits {
   click: [];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 </script>
 
 <template>

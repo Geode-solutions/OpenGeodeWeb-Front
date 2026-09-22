@@ -4,7 +4,14 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 const schema = viewer_schemas.opengeodeweb_viewer.model.blocks.visibility;
 
-export function useModelBlocksVisibility() {
+export function useModelBlocksVisibility(): {
+  setModelBlocksVisibility: (
+    modelId: string,
+    blocks_ids: string[],
+    visibility: boolean | undefined,
+  ) => Promise<unknown>;
+  modelBlockVisibility: (id: string, block_id?: string) => unknown;
+} {
   const modelCommonStyle = useModelCommonStyle();
   const modelBlocksCommonStyle = useModelBlocksCommonStyle();
 
@@ -12,12 +19,18 @@ export function useModelBlocksVisibility() {
     return modelBlocksCommonStyle.modelBlockStyle(id, block_id).visibility;
   }
 
-  function setModelBlocksVisibility(
+  async function setModelBlocksVisibility(
     modelId: string,
     blocks_ids: string[],
     visibility: boolean | undefined,
-  ) {
-    return modelCommonStyle.setModelTypeVisibility(modelId, blocks_ids, visibility, schema);
+  ): Promise<unknown> {
+    const result = await modelCommonStyle.setModelTypeVisibility(
+      modelId,
+      blocks_ids,
+      visibility,
+      schema,
+    );
+    return result;
   }
 
   return { setModelBlocksVisibility, modelBlockVisibility };

@@ -7,11 +7,13 @@ import { useBackStore } from "@ogw_front/stores/back";
 
 const schema = schemas.opengeodeweb_back.allowed_files;
 
-const emit = defineEmits<{
+interface Emits {
   update_values: [values: { files: unknown[]; autoUpload: boolean }];
   increment_step: [];
   decrement_step: [];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 
 interface Props {
   multiple: boolean;
@@ -22,10 +24,10 @@ interface Props {
 
 const { multiple, files = [], autoUpload = true, showOverlay = true } = defineProps<Props>();
 
-const internal_files = ref(files);
-const internal_auto_upload = ref(autoUpload);
-const accept = ref("");
-const loading = ref(false);
+const internal_files = ref<File[]>(files);
+const internal_auto_upload = ref<boolean>(autoUpload);
+const accept = ref<string>("");
+const loading = ref<boolean>(false);
 
 watch(
   () => files,
@@ -43,14 +45,14 @@ watch(
 
 const toggle_loading = useToggle(loading);
 
-function files_uploaded_event(value: unknown[]) {
+function files_uploaded_event(value: unknown[]): void {
   if (value.length > 0) {
     emit("update_values", { files: value, autoUpload: false });
     emit("increment_step");
   }
 }
 
-async function get_allowed_files() {
+async function get_allowed_files(): Promise<void> {
   toggle_loading();
   const backStore = useBackStore();
   const response = (await backStore.request({ schema })) as {

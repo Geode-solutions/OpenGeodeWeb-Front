@@ -4,7 +4,16 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 const schema = viewer_schemas.opengeodeweb_viewer.model.corners.visibility;
 
-export function useModelCornersVisibility() {
+interface ModelCornersVisibilityApi {
+  setModelCornersVisibility: (
+    modelId: string,
+    corners_ids: string[],
+    visibility: boolean | undefined,
+  ) => Promise<unknown>;
+  modelCornerVisibility: (id: string, corner_id?: string) => unknown;
+}
+
+export function useModelCornersVisibility(): ModelCornersVisibilityApi {
   const modelCommonStyle = useModelCommonStyle();
   const modelCornersCommonStyle = useModelCornersCommonStyle();
 
@@ -12,12 +21,18 @@ export function useModelCornersVisibility() {
     return modelCornersCommonStyle.modelCornerStyle(id, corner_id).visibility;
   }
 
-  function setModelCornersVisibility(
+  async function setModelCornersVisibility(
     modelId: string,
     corners_ids: string[],
     visibility: boolean | undefined,
-  ) {
-    return modelCommonStyle.setModelTypeVisibility(modelId, corners_ids, visibility, schema);
+  ): Promise<unknown> {
+    const result = await modelCommonStyle.setModelTypeVisibility(
+      modelId,
+      corners_ids,
+      visibility,
+      schema,
+    );
+    return result;
   }
 
   return { setModelCornersVisibility, modelCornerVisibility };

@@ -8,27 +8,33 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 // Local constants
 const schema = viewer_schemas.opengeodeweb_viewer.mesh.polyhedra.color;
 
-export function useMeshPolyhedraColorStyle() {
+export function useMeshPolyhedraColorStyle(): {
+  meshPolyhedraColor: (id: string) => unknown;
+  setMeshPolyhedraColor: (id: string, color: unknown) => Promise<unknown>;
+} {
   const viewerStore = useViewerStore();
   const meshPolyhedraCommonStyle = useMeshPolyhedraCommonStyle();
 
   function meshPolyhedraColor(id: string): unknown {
     return meshPolyhedraCommonStyle.meshPolyhedraColoring(id).constant;
   }
-  function setMeshPolyhedraColor(id: string, color: unknown) {
+  async function setMeshPolyhedraColor(id: string, color: unknown): Promise<unknown> {
     const params = { id, color };
-    return viewerStore.request(
+    const result = await viewerStore.request(
       {
         schema,
         params,
       },
       {
-        response_function: () =>
-          meshPolyhedraCommonStyle.mutateMeshPolyhedraColoring(id, {
+        response_function: async () => {
+          const mutation_result = await meshPolyhedraCommonStyle.mutateMeshPolyhedraColoring(id, {
             constant: color,
-          }),
+          });
+          return mutation_result;
+        },
       },
     );
+    return result;
   }
 
   return {

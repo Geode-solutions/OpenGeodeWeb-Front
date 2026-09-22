@@ -7,27 +7,44 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 // Local constants
 const schema = viewer_schemas.opengeodeweb_viewer.model.edges.visibility;
 
-export function useModelEdgesVisibilityStyle() {
+interface ModelEdgesVisibilityStyleApi {
+  modelEdgesVisibility: (id: string) => boolean | undefined;
+  setModelEdgesVisibility: (id: string, visibility: boolean | undefined) => Promise<unknown>;
+  applyModelEdgesStyle: (id: string) => Promise<unknown[]>;
+}
+
+export function useModelEdgesVisibilityStyle(): ModelEdgesVisibilityStyleApi {
   const viewerStore = useViewerStore();
   const modelEdgesCommonStyle = useModelEdgesCommonStyle();
 
   function modelEdgesVisibility(id: string): boolean | undefined {
-    return modelEdgesCommonStyle.modelEdgesStyle(id).visibility as boolean | undefined;
+    const { visibility } = modelEdgesCommonStyle.modelEdgesStyle(id);
+    if (typeof visibility === "boolean") {
+      return visibility;
+    }
+    return undefined;
   }
 
-  function setModelEdgesVisibility(id: string, visibility: boolean | undefined) {
+  async function setModelEdgesVisibility(
+    id: string,
+    visibility: boolean | undefined,
+  ): Promise<unknown> {
     const params = { id, visibility };
-    return viewerStore.request(
+    const result = await viewerStore.request(
       { schema, params },
       {
-        response_function: () => modelEdgesCommonStyle.mutateModelEdgesStyle(id, { visibility }),
+        response_function: async () => {
+          await modelEdgesCommonStyle.mutateModelEdgesStyle(id, { visibility });
+        },
       },
     );
+    return result;
   }
 
-  function applyModelEdgesStyle(id: string) {
+  async function applyModelEdgesStyle(id: string): Promise<unknown[]> {
     const visibility = modelEdgesVisibility(id);
-    return Promise.resolve([setModelEdgesVisibility(id, visibility)]);
+    const result = await setModelEdgesVisibility(id, visibility);
+    return [result];
   }
 
   return {

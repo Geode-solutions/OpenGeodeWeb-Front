@@ -16,7 +16,17 @@ import { useMeshPolyhedraStyle } from "./polyhedra";
 const meshSchemas = viewer_schemas.opengeodeweb_viewer.mesh;
 
 // oxlint-disable-next-line max-lines-per-function
-export function useMeshStyle() {
+export function useMeshStyle(): {
+  meshVisibility: (id: string) => boolean | undefined;
+  setMeshVisibility: (id: string, visibility: boolean | undefined) => Promise<unknown>;
+  meshColor: (id: string) => unknown;
+  setMeshColor: (id: string, color: unknown) => Promise<unknown>;
+  applyMeshStyle: (id: string) => Promise<unknown[]>;
+} & ReturnType<typeof useMeshPointsStyle> &
+  ReturnType<typeof useMeshEdgesStyle> &
+  ReturnType<typeof useMeshCellsStyle> &
+  ReturnType<typeof useMeshPolygonsStyle> &
+  ReturnType<typeof useMeshPolyhedraStyle> {
   const hybridViewerStore = useHybridViewerStore();
   const viewerStore = useViewerStore();
   const dataStyleState = useDataStyleState();
@@ -29,47 +39,55 @@ export function useMeshStyle() {
   function meshVisibility(id: string): boolean | undefined {
     return dataStyleState.getStyle(id).visibility;
   }
-  function setMeshVisibility(id: string, visibility: boolean | undefined) {
+  async function setMeshVisibility(id: string, visibility: boolean | undefined): Promise<unknown> {
     const schema = meshSchemas.visibility;
     const params = { id, visibility };
-    return viewerStore.request(
+    const result = await viewerStore.request(
       {
         schema,
         params,
       },
       {
         response_function: async () => {
-          await hybridViewerStore.setVisibility(id, visibility as boolean);
-          return dataStyleState.mutateStyle(id, { visibility });
+          if (visibility !== undefined) {
+            hybridViewerStore.setVisibility(id, visibility);
+          }
+          const mutatedId = await dataStyleState.mutateStyle(id, { visibility });
+          return mutatedId;
         },
       },
     );
+    return result;
   }
 
   function meshColor(id: string): unknown {
     return dataStyleState.getStyle(id).color;
   }
 
-  function setMeshColor(id: string, color: unknown) {
+  async function setMeshColor(id: string, color: unknown): Promise<unknown> {
     const schema = meshSchemas.color;
     const params = { id, color };
-    return viewerStore.request(
+    const result = await viewerStore.request(
       {
         schema,
         params,
       },
       {
-        response_function: () => dataStyleState.mutateStyle(id, { color }),
+        response_function: async () => {
+          const mutatedId = await dataStyleState.mutateStyle(id, { color });
+          return mutatedId;
+        },
       },
     );
+    return result;
   }
 
-  function applyMeshStyle(id: string) {
+  async function applyMeshStyle(id: string): Promise<unknown[]> {
     const style = dataStyleState.getStyle(id);
     const promise_array: unknown[] = [];
     for (const [key, value] of Object.entries(style)) {
       if (key === "visibility") {
-        promise_array.push(setMeshVisibility(id, value as boolean | undefined));
+        promise_array.push(setMeshVisibility(id, style.visibility));
       } else if (key === "color") {
         promise_array.push(setMeshColor(id, value));
       } else if (key === "points") {
@@ -96,7 +114,8 @@ export function useMeshStyle() {
         throw new Error(`Unknown mesh key: ${key}`);
       }
     }
-    return Promise.all(promise_array);
+    const results = await Promise.all(promise_array);
+    return results;
   }
 
   return {

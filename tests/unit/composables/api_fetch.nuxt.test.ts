@@ -3,14 +3,14 @@
 // Third party imports
 import { beforeEach, describe, expect, test } from "vitest";
 import { registerEndpoint } from "@nuxt/test-utils/runtime";
-import type { HTTPMethod } from "h3";
 
 // Local imports
-import { setupActivePinia } from "@ogw_tests/utils";
+import { setupActivePinia, toHTTPMethod } from "@ogw_tests/utils";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 const FIRST_INDEX = 0;
+const TIMEOUT = 5000;
 
 describe("backStore.request()", () => {
   setupActivePinia();
@@ -31,48 +31,62 @@ describe("backStore.request()", () => {
     additionalProperties: false,
   };
 
-  beforeEach(async () => {
-    await feedbackStore.$reset();
-    await backStore.$reset();
+  beforeEach(() => {
+    feedbackStore.$reset();
+    backStore.$reset();
     (backStore as { base_url: string }).base_url = "";
   });
 
-  test("invalid schema", () => {
-    const invalid_schema = {
-      $id: "/test",
-      type: "object",
-      methods: ["POST"],
-      properties: {
-        test: {
-          type: "number",
+  test(
+    "invalid schema",
+    async () => {
+      const invalid_schema = {
+        $id: "/test",
+        type: "object",
+        methods: ["POST"],
+        properties: {
+          test: {
+            type: "number",
+          },
         },
-      },
-      required: ["test"],
-      additionalProperties: false,
-    };
-    const params = { test: "hello" };
-    expect(() => backStore.request({ schema: invalid_schema, params })).toThrow(
-      "data/test must be number",
-    );
-  });
+        required: ["test"],
+        additionalProperties: false,
+      };
+      const params = { test: "hello" };
+      await expect(backStore.request({ schema: invalid_schema, params })).rejects.toThrow(
+        "data/test must be number",
+      );
+    },
+    TIMEOUT,
+  );
 
-  test("invalid params", () => {
-    expect(() => backStore.request({ schema })).toThrow("data must have required property 'test'");
-  });
+  test(
+    "invalid params",
+    async () => {
+      await expect(backStore.request({ schema })).rejects.toThrow(
+        "data must have required property 'test'",
+      );
+    },
+    TIMEOUT,
+  );
 
-  test("request with callbacks", async () => {
-    const params = { test: "hello" };
-    let errorCalled = false;
-    const callbacks = {
-      request_error_function: () => {
-        errorCalled = true;
-      },
-    };
-    registerEndpoint(schema.$id, {
-      method: schema.methods[FIRST_INDEX] as HTTPMethod,
-      handler: () => ({ result: "success" }),
-    });
-    await backStore.request({ schema, params }, callbacks);
-    expect(errorCalled).toBe(false);
-  });
+  test(
+    "request with callbacks",
+    async () => {
+      const params = { test: "hello" };
+      let errorCalled = false;
+      const callbacks = {
+        request_error_function: (): void => {
+          errorCalled = true;
+        },
+      };
+      registerEndpoint(schema.$id, {
+        method: toHTTPMethod(schema.methods[FIRST_INDEX]),
+        handler: () => ({ result: "success" }),
+      });
+      await backStore.request({ schema, params }, callbacks);
+      expect(errorCalled).toBe(false);
+    },
+    TIMEOUT,
+  );
 });

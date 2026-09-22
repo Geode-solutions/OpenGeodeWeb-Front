@@ -6,9 +6,11 @@ interface Props {
 
 const { modelValue = "", label = "" } = defineProps<Props>();
 
-const emit = defineEmits<{
+interface Emits {
   "update:modelValue": [value: string];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 </script>
 
 <template>

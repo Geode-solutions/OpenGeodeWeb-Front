@@ -7,7 +7,7 @@ import { useMenuStore } from "@ogw_front/stores/menu";
 
 interface Props {
   show: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // oxlint-disable-next-line @typescript-eslint/no-explicit-any
   metaData: Record<string, any>;
 }
 
@@ -28,7 +28,7 @@ const TRUNCATE_END_CHARS = 7;
 const { copy, copied } = useClipboard({ copiedDuring: COPIED_TIMEOUT });
 const copiedId = ref("");
 
-function isCopied(id: string | undefined) {
+function isCopied(id: string | undefined): boolean {
   return copied.value && copiedId.value === id;
 }
 
@@ -41,7 +41,7 @@ interface MeshComponentInfo {
   category?: string;
 }
 
-const componentName = ref("");
+const componentName = ref<string>("");
 const componentItem = ref<MeshComponentInfo | undefined>(undefined);
 
 function asString(value: unknown): string | undefined {
@@ -72,7 +72,7 @@ watch(
   { immediate: true },
 );
 
-const cleanName = computed(() => {
+const cleanName = computed<string>(() => {
   const meta = menuStore.current_meta_data;
   if (!meta) {
     return "Unnamed Object";
@@ -83,7 +83,7 @@ const cleanName = computed(() => {
   return asString(meta.name) ?? "Unnamed Object";
 });
 
-const displayTitle = computed(() => {
+const displayTitle = computed<string>(() => {
   const name = cleanName.value;
   if (!name) {
     return "";
@@ -91,7 +91,7 @@ const displayTitle = computed(() => {
   return middleTruncate(name, TRUNCATE_MAX_LENGTH, TRUNCATE_START_CHARS, TRUNCATE_END_CHARS);
 });
 
-const displayComponentTitle = computed(() => {
+const displayComponentTitle = computed<string>(() => {
   if (!componentItem.value) {
     return "";
   }
@@ -103,7 +103,7 @@ const displayComponentTitle = computed(() => {
   );
 });
 
-async function copyId(targetId: string | undefined) {
+async function copyId(targetId: string | undefined): Promise<void> {
   if (!targetId) {
     return;
   }
@@ -115,7 +115,7 @@ async function copyId(targetId: string | undefined) {
   }
 }
 
-function formatId(id: string | undefined) {
+function formatId(id: string | undefined): string {
   if (!id) {
     return "";
   }
@@ -125,7 +125,7 @@ function formatId(id: string | undefined) {
   return `${id.slice(0, ID_SLICE_START)}...${id.slice(id.length - ID_SLICE_END_OFFSET)}`;
 }
 
-const formattedId = computed(() => formatId(metaData.id));
+const formattedId = computed<string>(() => formatId(metaData.id));
 </script>
 
 <template>

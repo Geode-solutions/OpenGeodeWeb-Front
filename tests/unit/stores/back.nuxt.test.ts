@@ -137,12 +137,12 @@ describe("geode store actions", () => {
   });
 
   describe("request counter", () => {
-    test("increment/decrement", async () => {
+    test("increment/decrement", () => {
       const backStore = useBackStore();
       expect(backStore.request_counter).toBe(EXPECTED_NO_REQUEST);
-      await backStore.start_request();
+      backStore.start_request();
       expect(backStore.request_counter).toBe(EXPECTED_ONE_REQUEST);
-      await backStore.stop_request();
+      backStore.stop_request();
       expect(backStore.request_counter).toBe(EXPECTED_NO_REQUEST);
     });
   });
