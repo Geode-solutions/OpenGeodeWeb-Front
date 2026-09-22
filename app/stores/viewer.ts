@@ -80,7 +80,13 @@ export const useViewerStore = defineStore(
       }>,
       callbacks: RequestHandlers = {},
     ): Promise<unknown> {
-      const microservice = { $id: "viewer", base_url: base_url.value, start_request, stop_request };
+      const microservice = {
+        $id: "viewer",
+        client: client.value,
+        base_url: base_url.value,
+        start_request,
+        stop_request,
+      };
       const result = await viewer_call(
         microservice,
         {
