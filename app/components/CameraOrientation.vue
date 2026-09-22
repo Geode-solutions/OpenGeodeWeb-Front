@@ -1,10 +1,8 @@
 <script setup lang="ts">
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
+import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types.js";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import { applyCameraOptions } from "@ogw_internal/stores/hybrid_viewer/camera";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types.js";
 import { newInstance as vtkAnnotatedCubeActor } from "@kitware/vtk.js/Rendering/Core/AnnotatedCubeActor";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 
@@ -22,10 +20,13 @@ const {
   escapeFunction = undefined,
 } = defineProps<Props>();
 
-const show = defineModel<boolean>("show", { default: false });
-const emit = defineEmits<{
+interface Emits {
   select: [value: string];
-}>();
+}
+
+const emit = defineEmits<Emits>();
+
+const show = defineModel<boolean>("show", { default: false });
 
 const orientations = [
   {
@@ -82,12 +83,11 @@ const hoveredFace = ref<string | undefined>(undefined);
 const hybridViewerStore = useHybridViewerStore();
 const cubeContainer = useTemplateRef("cubeContainer");
 
-// VTK.js objects have no usable type declarations here; `any` is the pragmatic choice.
-let genericRenderWindow: any = undefined;
-let cubeActor: any = undefined;
+let genericRenderWindow: unknown = undefined;
+let cubeActor: unknown = undefined;
 let isInteracting = false;
 
-function initVTK() {
+function initVTK(): void {
   if (genericRenderWindow) {
     return;
   }
@@ -132,7 +132,7 @@ function initVTK() {
   renderer.resetCamera();
 }
 
-function syncCubeCamera() {
+function syncCubeCamera(): void {
   const options = hybridViewerStore.camera_options;
   if (!genericRenderWindow || isInteracting || !options.position) {
     return;
@@ -165,7 +165,7 @@ watch(hoveredFace, (newFace, oldFace) => {
   if (!cubeActor) {
     return;
   }
-  function updateFace(face: string | undefined, active: boolean) {
+  function updateFace(face: string | undefined, active: boolean): void {
     const config = orientations.find((orientation) => orientation.face === face);
     if (config) {
       cubeActor[`set${config.vtkKey}FaceProperty`]({

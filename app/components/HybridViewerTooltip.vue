@@ -16,7 +16,7 @@ const hybridViewerStore = useHybridViewerStore();
 const tooltipRef = useTemplateRef("tooltip");
 const { width: tooltipWidth, height: tooltipHeight } = useElementSize(tooltipRef);
 
-const tooltipStyle = computed(() => {
+const tooltipStyle = computed<Record<string, string>>(() => {
   if (!hybridViewerStore.hoverData) {
     return {};
   }
@@ -48,7 +48,7 @@ const tooltipStyle = computed(() => {
   };
 });
 
-const originalIndex = computed(() => {
+const originalIndex = computed<number | undefined>(() => {
   const attributes = hybridViewerStore.hoverData?.attributes || {};
   const originalId =
     attributes.vtkOriginalCellIds ??
@@ -65,14 +65,14 @@ const RESERVED_ATTRIBUTE_KEYS = new Set([
   "vtkOriginalPointIds",
 ]);
 
-const hasOtherAttributes = computed(() => {
+const hasOtherAttributes = computed<boolean>(() => {
   const attributes = hybridViewerStore.hoverData?.attributes || {};
   return Object.keys(attributes).some(
     (key) => key !== "vtkOriginalCellIds" && key !== "vtkOriginalPointIds",
   );
 });
 
-const sortedAttributes = computed(() => {
+const sortedAttributes = computed<[string, unknown][]>(() => {
   const attributes = hybridViewerStore.hoverData?.attributes || {};
   return (
     Object.entries(attributes)
@@ -82,7 +82,7 @@ const sortedAttributes = computed(() => {
   );
 });
 
-function capitalize(val: string) {
+function capitalize(val: string): string {
   if (!val) {
     return "";
   }
@@ -90,7 +90,7 @@ function capitalize(val: string) {
   return spaced.charAt(0).toUpperCase() + spaced.slice(1);
 }
 
-const fieldTypeLabel = computed(() => {
+const fieldTypeLabel = computed<string>(() => {
   const fieldType = hybridViewerStore.hoverData?.fieldType;
   return typeof fieldType === "string" ? capitalize(fieldType.toLowerCase()) : "";
 });
@@ -100,7 +100,7 @@ const coordinates = computed<number[] | undefined>(() => {
   return Array.isArray(value) ? (value as number[]) : undefined;
 });
 
-function formatAttributeValue(val: unknown) {
+function formatAttributeValue(val: unknown): string {
   if (Array.isArray(val)) {
     const formattedValues = val.map((value) => {
       if (typeof value === "number") {

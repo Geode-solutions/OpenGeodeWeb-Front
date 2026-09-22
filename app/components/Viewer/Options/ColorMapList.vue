@@ -17,29 +17,31 @@ interface Props {
 
 const { presets, selectedPresetName = "" } = defineProps<Props>();
 
-const emit = defineEmits<{
+interface Emits {
   select: [preset: ColorMapPreset];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 
 interface CanvasRefEntry {
   element: HTMLCanvasElement;
   presetName: string;
 }
 
-const filterText = ref("");
-const canvasRefs = ref<Record<string, CanvasRefEntry>>({});
-const loading = ref(true);
-const renderJobId = ref(0);
+const filterText = ref<string>("");
+const canvasRefs = ref<Map<string, CanvasRefEntry>>(new Map());
+const loading = ref<boolean>(true);
+const renderJobId = ref<number>(0);
 const openedGroups = ref<string[]>([]);
 
-function setCanvasRef(presetName: string, element: Element | null, id: string) {
+function setCanvasRef(presetName: string, element: Element | null, id: string): void {
   if (element) {
-    canvasRefs.value[id] = {
+    canvasRefs.value.set(id, {
       element: element as HTMLCanvasElement,
       presetName,
-    };
+    });
   } else {
-    delete canvasRefs.value[id];
+    canvasRefs.value.delete(id);
   }
 }
 
@@ -74,7 +76,7 @@ watch(filterText, (newFilterText) => {
   }
 });
 
-function processChunk(entries: [string, CanvasRefEntry][], index: number, jobId: number) {
+function processChunk(entries: [string, CanvasRefEntry][], index: number, jobId: number): void {
   if (jobId !== renderJobId.value || index >= entries.length) {
     if (jobId === renderJobId.value) {
       loading.value = false;
@@ -95,13 +97,13 @@ function processChunk(entries: [string, CanvasRefEntry][], index: number, jobId:
   setTimeout(() => processChunk(entries, end, jobId), ZERO);
 }
 
-function drawAllCanvases() {
+function drawAllCanvases(): void {
   renderJobId.value += 1;
   const jobId = renderJobId.value;
   loading.value = true;
   nextTick(() => {
     const WAIT_MS = 50;
-    setTimeout(() => processChunk(Object.entries(canvasRefs.value), 0, jobId), WAIT_MS);
+    setTimeout(() => processChunk([...canvasRefs.value.entries()], 0, jobId), WAIT_MS);
   });
 }
 

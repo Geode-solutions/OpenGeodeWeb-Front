@@ -6,35 +6,51 @@ import pTimeout from "p-timeout";
 import type { RequestHandlers } from "./types.js";
 
 interface RpcSession {
-  call: (rpc: string, params: [Record<string, unknown>]) => Promise<unknown>;
+  readonly call: (
+    rpc: string,
+    params: readonly [Readonly<Record<string, unknown>>],
+  ) => Promise<unknown>;
 }
 interface RpcConnection {
-  getSession: () => RpcSession;
+  readonly getSession: () => RpcSession;
 }
 interface RpcClient {
-  call: (rpc: string, params: Record<string, unknown>) => Promise<unknown>;
-  getConnection: () => RpcConnection;
+  readonly call: (rpc: string, params: Readonly<Record<string, unknown>>) => Promise<unknown>;
+  readonly getConnection: () => RpcConnection;
 }
 
-interface CallRawOptions {
+interface CallClientOptions {
   rpc: string;
-  params?: Record<string, unknown>;
-  client: RpcClient;
+  params?: Readonly<Record<string, unknown>>;
+  client: Readonly<RpcClient>;
+}
+
+interface CallRawOptions extends CallClientOptions {
   timeout?: number;
 }
 
-function callClient({ rpc, params = {}, client }: Omit<CallRawOptions, "timeout">) {
+async function callClient({
+  rpc,
+  params = {},
+  client,
+}: Readonly<CallClientOptions>): Promise<unknown> {
   if (globalThis.window !== undefined) {
-    return client.getConnection().getSession().call(rpc, [params]);
+    const response = await client.getConnection().getSession().call(rpc, [params]);
+    return response;
   }
-  return client.call(rpc, params);
+  const response = await client.call(rpc, params);
+  return response;
 }
 
-function callRaw(
-  { rpc, params = {}, client, timeout }: CallRawOptions,
-  { request_error_function, response_function, response_error_function }: RequestHandlers = {},
-) {
-  async function performCall() {
+async function callRaw(
+  { rpc, params = {}, client, timeout }: Readonly<CallRawOptions>,
+  {
+    request_error_function,
+    response_function,
+    response_error_function,
+  }: Readonly<RequestHandlers> = {},
+): Promise<unknown> {
+  async function performCall(): Promise<unknown> {
     try {
       const response = await callClient({ rpc, params, client });
       if (response_function) {
@@ -52,14 +68,16 @@ function callRaw(
     }
   }
 
-  if (timeout && timeout > 0) {
-    return pTimeout(performCall(), {
+  if (timeout !== undefined && timeout > 0) {
+    const result = await pTimeout(performCall(), {
       milliseconds: timeout,
       message: `${rpc}: Timed out after ${timeout}ms`,
     });
+    return result;
   }
 
-  return performCall();
+  const result = await performCall();
+  return result;
 }
 
 export { callRaw };

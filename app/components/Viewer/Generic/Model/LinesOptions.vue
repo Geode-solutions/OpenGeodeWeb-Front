@@ -1,15 +1,11 @@
 <script setup lang="ts">
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
-// This file exhaustively wires group- and per-component style properties (visibility/color/coloring/vertex+polyhedron attributes) to the style store; the formatter's line-wrapping of the resulting store calls pushes the file past max-lines even though no logic was added.
-// oxlint-disable eslint/max-lines
 import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
+import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 interface Props {
   modelId: string;
@@ -23,7 +19,7 @@ const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
 // Visibility
-const linesVisibility = computed({
+const linesVisibility = computed<boolean>({
   get: () => dataStyleStore.modelComponentTypeVisibility(modelId, "Line"),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesVisibility(modelId, targetLineIds, newValue);
@@ -31,7 +27,7 @@ const linesVisibility = computed({
   },
 });
 
-const lineVisibility = computed({
+const lineVisibility = computed<boolean | undefined>({
   get: () => dataStyleStore.modelLineVisibility(modelId, lineId) as boolean | undefined,
   set: async (newValue) => {
     if (lineId === undefined) {
@@ -86,7 +82,7 @@ const lineActiveColoring = computed<string | undefined>({
 });
 
 // Group Attributes
-const linesVertexAttributeName = computed({
+const linesVertexAttributeName = computed<string | undefined>({
   get: () => dataStyleStore.modelLinesVertexAttributeName(modelId),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -97,7 +93,7 @@ const linesVertexAttributeName = computed({
   },
 });
 
-const linesVertexAttributeItem = computed({
+const linesVertexAttributeItem = computed<string | undefined>({
   get: () => dataStyleStore.modelLinesVertexAttributeItem(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesVertexAttributeItem(modelId, targetLineIds, newValue);
@@ -105,7 +101,7 @@ const linesVertexAttributeItem = computed({
   },
 });
 
-const linesVertexAttributeRange = computed({
+const linesVertexAttributeRange = computed<[number, number] | undefined>({
   get: () => dataStyleStore.modelLinesVertexAttributeRange(modelId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -122,7 +118,7 @@ const linesVertexAttributeRange = computed({
   },
 });
 
-const linesVertexAttributeColorMap = computed({
+const linesVertexAttributeColorMap = computed<RGBAColorMap | undefined>({
   get: () => dataStyleStore.modelLinesVertexAttributeColorMap(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesVertexAttributeColorMap(modelId, targetLineIds, newValue);
@@ -138,7 +134,7 @@ const linesVertexAttributeNoDataColor = computed<RGBAColor | undefined>({
   },
 });
 
-const linesEdgeAttributeName = computed({
+const linesEdgeAttributeName = computed<string | undefined>({
   get: () => dataStyleStore.modelLinesEdgeAttributeName(modelId),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -149,7 +145,7 @@ const linesEdgeAttributeName = computed({
   },
 });
 
-const linesEdgeAttributeItem = computed({
+const linesEdgeAttributeItem = computed<string | undefined>({
   get: () => dataStyleStore.modelLinesEdgeAttributeItem(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesEdgeAttributeItem(modelId, targetLineIds, newValue);
@@ -157,7 +153,7 @@ const linesEdgeAttributeItem = computed({
   },
 });
 
-const linesEdgeAttributeRange = computed({
+const linesEdgeAttributeRange = computed<[number, number] | undefined>({
   get: () => dataStyleStore.modelLinesEdgeAttributeRange(modelId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -169,7 +165,7 @@ const linesEdgeAttributeRange = computed({
   },
 });
 
-const linesEdgeAttributeColorMap = computed({
+const linesEdgeAttributeColorMap = computed<Map<string, RGBAColor> | undefined>({
   get: () => dataStyleStore.modelLinesEdgeAttributeColorMap(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesEdgeAttributeColorMap(modelId, targetLineIds, newValue);
@@ -186,7 +182,7 @@ const linesEdgeAttributeNoDataColor = computed<RGBAColor | undefined>({
 });
 
 // Individual Attributes
-const vertexAttributeName = computed({
+const vertexAttributeName = computed<string | undefined>({
   get: () => dataStyleStore.modelLinesVertexAttributeName(modelId, lineId),
   set: async (newValue) => {
     if (lineId === undefined || newValue === undefined) {
@@ -197,7 +193,7 @@ const vertexAttributeName = computed({
   },
 });
 
-const vertexAttributeItem = computed({
+const vertexAttributeItem = computed<string | undefined>({
   get: () => dataStyleStore.modelLinesVertexAttributeItem(modelId, lineId),
   set: async (newValue) => {
     if (lineId === undefined) {
@@ -208,7 +204,7 @@ const vertexAttributeItem = computed({
   },
 });
 
-const vertexAttributeRange = computed({
+const vertexAttributeRange = computed<[number, number] | undefined>({
   get: () => dataStyleStore.modelLinesVertexAttributeRange(modelId, lineId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -220,7 +216,7 @@ const vertexAttributeRange = computed({
   },
 });
 
-const vertexAttributeColorMap = computed({
+const vertexAttributeColorMap = computed<ColorMap | undefined>({
   get: () => dataStyleStore.modelLinesVertexAttributeColorMap(modelId, lineId),
   set: async (newValue) => {
     if (lineId === undefined) {
@@ -243,7 +239,7 @@ const vertexAttributeNoDataColor = computed<RGBAColor | undefined>({
   },
 });
 
-const edgeAttributeName = computed({
+const edgeAttributeName = computed<string | undefined>({
   get: () => dataStyleStore.modelLinesEdgeAttributeName(modelId, lineId),
   set: async (newValue) => {
     if (lineId === undefined || newValue === undefined) {
@@ -254,7 +250,7 @@ const edgeAttributeName = computed({
   },
 });
 
-const edgeAttributeItem = computed({
+const edgeAttributeItem = computed<string | undefined>({
   get: () => dataStyleStore.modelLinesEdgeAttributeItem(modelId, lineId),
   set: async (newValue) => {
     if (lineId === undefined) {
@@ -265,7 +261,7 @@ const edgeAttributeItem = computed({
   },
 });
 
-const edgeAttributeRange = computed({
+const edgeAttributeRange = computed<[number, number] | undefined>({
   get: () => dataStyleStore.modelLinesEdgeAttributeRange(modelId, lineId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -277,7 +273,7 @@ const edgeAttributeRange = computed({
   },
 });
 
-const edgeAttributeColorMap = computed({
+const edgeAttributeColorMap = computed<Map<string, RGBAColor> | undefined>({
   get: () => dataStyleStore.modelLinesEdgeAttributeColorMap(modelId, lineId),
   set: async (newValue) => {
     if (lineId === undefined) {

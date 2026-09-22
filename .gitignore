@@ -5,6 +5,11 @@
 .cache
 dist
 
+# Regenerated on every `nuxt prepare` by whichever app extends this layer
+# (see nuxt.config.ts in Vease/Vease-Modeling for why it must be self-contained);
+# its content depends on the consumer that generated it, so it can't be committed.
+/tsconfig.json
+
 # Node dependencies
 node_modules
 
@@ -36,7 +41,6 @@ pnpm-lock.yaml
 VTK.txt
 *.nuxtrc
 
-# Compiled Node-safe siblings of server/utils/ and shared/ (see scripts/build_node_utils.ts)
-/server/**/*.js
-/shared/**/*.js
+# Compiled Node-safe build of server/utils/ and shared/ (see rolldown.config.ts)
+/.build
 /opengeodeweb_front_schemas.js

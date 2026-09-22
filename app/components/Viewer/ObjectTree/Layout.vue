@@ -23,21 +23,26 @@ interface Props {
 const { containerWidth } = defineProps<Props>();
 
 const treeviewStore = useTreeviewStore();
-const emit = defineEmits<{
+
+interface Emits {
   "show-menu": [payload: Record<string, unknown>];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 
 const activityBar = useTemplateRef("activity-bar");
 const { adaptiveStyles: activityBarAdaptiveStyles } = useAdaptiveStyles(activityBar);
 
-const maxWidth = computed(() => containerWidth * MAX_PANEL_WIDTH_RATIO);
+const maxWidth = computed<number>(() => containerWidth * MAX_PANEL_WIDTH_RATIO);
 
-const mainView = computed(() => treeviewStore.opened_views.find((view) => view.id === "main"));
-const additionalViews = computed(() =>
+const mainView = computed<TreeViewItem | undefined>(() =>
+  treeviewStore.opened_views.find((view) => view.id === "main"),
+);
+const additionalViews = computed<TreeViewItem[]>(() =>
   treeviewStore.opened_views.filter((view) => view.id !== "main"),
 );
 
-const totalWidth = computed(() => {
+const totalWidth = computed<string>(() => {
   const hasAdditional = additionalViews.value.length > 0;
   const hasMain = Boolean(mainView.value);
   const gap = hasAdditional && hasMain ? GAP_WIDTH : 0;
@@ -62,7 +67,7 @@ watch(
   { immediate: true },
 );
 
-watch([maxWidth, () => additionalViews.value.length], ([newMax]) => {
+watch([maxWidth, (): number => additionalViews.value.length], ([newMax]): void => {
   const hasAdditional = additionalViews.value.length > 0;
   const gap = hasAdditional ? GAP_WIDTH : 0;
   const total =
@@ -84,25 +89,25 @@ watch([maxWidth, () => additionalViews.value.length], ([newMax]) => {
   }
 });
 
-function onDragStart(index: number) {
+function onDragStart(index: number): void {
   draggedIndex.value = index;
 }
 
-function onDragOver(event: DragEvent) {
+function onDragOver(event: DragEvent): void {
   event.preventDefault();
 }
 
-function onDrop(targetIndex: number) {
+function onDrop(targetIndex: number): void {
   if (draggedIndex.value !== undefined && draggedIndex.value !== targetIndex) {
     treeviewStore.moveView(draggedIndex.value, targetIndex);
   }
   draggedIndex.value = undefined;
 }
 
-function onResizeStart(event: MouseEvent) {
+function onResizeStart(event: MouseEvent): void {
   const startWidth = treeviewStore.panelWidth;
   const startX = event.clientX;
-  function resize(move_event: MouseEvent) {
+  function resize(move_event: MouseEvent): void {
     const deltaX = move_event.clientX - startX;
     let newWidth = startWidth + deltaX;
     const hasAdditional = additionalViews.value.length > 0;
@@ -121,7 +126,7 @@ function onResizeStart(event: MouseEvent) {
     treeviewStore.setPanelWidth(Math.max(WIDTH_MIN, newWidth));
     document.body.style.userSelect = "none";
   }
-  function stopResize() {
+  function stopResize(): void {
     document.removeEventListener("mousemove", resize);
     document.removeEventListener("mouseup", stopResize);
     document.body.style.userSelect = "";
@@ -130,10 +135,10 @@ function onResizeStart(event: MouseEvent) {
   document.addEventListener("mouseup", stopResize);
 }
 
-function onAdditionalResizeStart(event: MouseEvent) {
+function onAdditionalResizeStart(event: MouseEvent): void {
   const startWidth = treeviewStore.additionalPanelWidth;
   const startX = event.clientX;
-  function resize(move_event: MouseEvent) {
+  function resize(move_event: MouseEvent): void {
     const deltaX = move_event.clientX - startX;
     const newWidth = startWidth + deltaX;
     const currentTotalWidth = treeviewStore.panelWidth + newWidth + GAP_WIDTH;
@@ -148,7 +153,7 @@ function onAdditionalResizeStart(event: MouseEvent) {
     treeviewStore.setAdditionalPanelWidth(Math.max(WIDTH_MIN, newWidth));
     document.body.style.userSelect = "none";
   }
-  function stopResize() {
+  function stopResize(): void {
     document.removeEventListener("mousemove", resize);
     document.removeEventListener("mouseup", stopResize);
     document.body.style.userSelect = "";
@@ -157,13 +162,13 @@ function onAdditionalResizeStart(event: MouseEvent) {
   document.addEventListener("mouseup", stopResize);
 }
 
-function onVerticalResizeStart(event: MouseEvent, index: number) {
+function onVerticalResizeStart(event: MouseEvent, index: number): void {
   const startY = event.clientY;
   const startHeight1 = rowHeights.value[index] ?? 0;
   const startHeight2 = rowHeights.value[index + 1] ?? 0;
   const containerHeight = (event.currentTarget as HTMLElement).parentElement?.offsetHeight ?? 0;
 
-  function resize(move_event: MouseEvent) {
+  function resize(move_event: MouseEvent): void {
     const deltaY = move_event.clientY - startY;
     const deltaPercent = (deltaY / containerHeight) * PERCENT_100;
     const minHeightPercent = (HEIGHT_MIN / containerHeight) * PERCENT_100;
@@ -188,7 +193,7 @@ function onVerticalResizeStart(event: MouseEvent, index: number) {
     document.body.style.cursor = "ns-resize";
   }
 
-  function stopResize() {
+  function stopResize(): void {
     document.removeEventListener("mousemove", resize);
     document.removeEventListener("mouseup", stopResize);
     document.body.style.userSelect = "";

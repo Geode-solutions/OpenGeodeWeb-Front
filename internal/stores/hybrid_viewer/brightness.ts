@@ -1,9 +1,5 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
 import { BACKGROUND_GREY_VALUE, RGB_MAX } from "./constants";
-import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import type { Ref } from "vue";
-import type { HybridViewerStorePublic } from "./vtk_types";
+import { useHybridViewerCore } from "./core";
 
 const RGBA_CHANNELS = 4;
 const SAMPLE_SIZE = 10;
@@ -25,7 +21,18 @@ interface BrightnessOptions {
   offscreenCanvas: HTMLCanvasElement | undefined;
 }
 
-function mapRect(rect: Rect, latestImage: DrawableImage, canvasRect: DOMRect) {
+interface RelativeRect {
+  relX: number;
+  relY: number;
+  relW: number;
+  relH: number;
+}
+
+function mapRect(
+  rect: Readonly<Rect>,
+  latestImage: Readonly<DrawableImage>,
+  canvasRect: Readonly<DOMRect>,
+): RelativeRect {
   const scaleX = latestImage.width / canvasRect.width;
   const scaleY = latestImage.height / canvasRect.height;
   return {
@@ -35,53 +42,71 @@ function mapRect(rect: Rect, latestImage: DrawableImage, canvasRect: DOMRect) {
     relH: rect.height * scaleY,
   };
 }
-function computeAverageBrightness(rect: Rect, options: BrightnessOptions): number {
+
+function sampleMinBrightness(
+  ctx: CanvasRenderingContext2D,
+  image: Readonly<DrawableImage>,
+  relRect: Readonly<RelativeRect>,
+): number {
+  ctx.drawImage(
+    image,
+    Math.max(0, relRect.relX),
+    Math.max(0, relRect.relY),
+    Math.min(image.width, relRect.relW),
+    Math.min(image.height, relRect.relH),
+    0,
+    0,
+    SAMPLE_SIZE,
+    SAMPLE_SIZE,
+  );
+  const { data } = ctx.getImageData(0, 0, SAMPLE_SIZE, SAMPLE_SIZE);
+  let minBrightness = 1;
+  for (let i = 0; i < TOTAL_CHANNELS; i += RGBA_CHANNELS) {
+    const brightness = ((data[i] ?? 0) + (data[i + 1] ?? 0) + (data[i + 2] ?? 0)) / (3 * RGB_MAX);
+    if (brightness < minBrightness) {
+      minBrightness = brightness;
+    }
+  }
+  return minBrightness;
+}
+
+function computeAverageBrightness(
+  rect: Readonly<Rect>,
+  options: Readonly<BrightnessOptions>,
+): number {
   const { latestImage, offscreenCtx, offscreenCanvas } = options;
-  const { genericRenderWindow } = useHybridViewerStore() as unknown as HybridViewerStorePublic;
+  const { genericRenderWindow } = useHybridViewerCore();
   if (!latestImage || !offscreenCtx || !offscreenCanvas || !genericRenderWindow.value) {
     return BACKGROUND_GREY_VALUE / RGB_MAX;
   }
-  const canvas = genericRenderWindow.value.getApiSpecificRenderWindow().getCanvas();
-  if (!canvas) {
+  // oxlint-disable-next-line no-unsafe-assignment -- vtk.js has no types for getApiSpecificRenderWindow(); narrowed below.
+  const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
+  // oxlint-disable-next-line no-unsafe-type-assertion -- trusted vtk.js OpenGL render window API boundary.
+  const apiSpecificRenderWindow = webGLRenderWindow as unknown as {
+    getCanvas: () => HTMLCanvasElement | null | undefined;
+  };
+  const canvas = apiSpecificRenderWindow.getCanvas();
+  if (canvas === undefined || canvas === null) {
     return BACKGROUND_GREY_VALUE / RGB_MAX;
   }
   if (rect.width <= 0 || rect.height <= 0) {
     return BACKGROUND_GREY_VALUE / RGB_MAX;
   }
-  const { relX, relY, relW, relH } = mapRect(rect, latestImage, canvas.getBoundingClientRect());
-  if (relW <= 0 || relH <= 0) {
+  const relRect = mapRect(rect, latestImage, canvas.getBoundingClientRect());
+  if (relRect.relW <= 0 || relRect.relH <= 0) {
     return BACKGROUND_GREY_VALUE / RGB_MAX;
   }
   offscreenCanvas.width = SAMPLE_SIZE;
   offscreenCanvas.height = SAMPLE_SIZE;
   try {
-    offscreenCtx.drawImage(
-      latestImage,
-      Math.max(0, relX),
-      Math.max(0, relY),
-      Math.min(latestImage.width, relW),
-      Math.min(latestImage.height, relH),
-      0,
-      0,
-      SAMPLE_SIZE,
-      SAMPLE_SIZE,
-    );
-    const { data } = offscreenCtx.getImageData(0, 0, SAMPLE_SIZE, SAMPLE_SIZE);
-    let minBrightness = 1;
-    for (let i = 0; i < TOTAL_CHANNELS; i += RGBA_CHANNELS) {
-      const brightness = (data[i]! + data[i + 1]! + data[i + 2]!) / (3 * RGB_MAX);
-      if (brightness < minBrightness) {
-        minBrightness = brightness;
-      }
-    }
-    return minBrightness;
+    return sampleMinBrightness(offscreenCtx, latestImage, relRect);
   } catch {
     return BACKGROUND_GREY_VALUE / RGB_MAX;
   }
 }
 function useHybridViewerBrightness(): {
   latestImage: Ref<DrawableImage | undefined>;
-  getAverageBrightness: (rect: Rect) => number;
+  getAverageBrightness: (rect: Readonly<Rect>) => number;
 } {
   const latestImage = ref<DrawableImage | undefined>(undefined);
   const offscreenCanvas: HTMLCanvasElement | undefined =
@@ -91,7 +116,7 @@ function useHybridViewerBrightness(): {
         willReadFrequently: true,
       }) ?? undefined)
     : undefined;
-  function getAverageBrightness(rect: Rect): number {
+  function getAverageBrightness(rect: Readonly<Rect>): number {
     return computeAverageBrightness(rect, {
       latestImage: latestImage.value,
       offscreenCtx,

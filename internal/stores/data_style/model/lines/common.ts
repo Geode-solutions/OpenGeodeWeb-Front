@@ -3,12 +3,18 @@ import merge from "lodash/merge";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 
-export function useModelLinesCommonStyle() {
+export function useModelLinesCommonStyle(): {
+  modelLinesStyle: (id: string) => StyleValues;
+  modelLineStyle: (id: string, line_id?: string) => StyleValues;
+  modelLineColoring: (id: string, line_id?: string) => StyleValues;
+  mutateModelLinesColoring: (id: string, lines_ids: string[], values: StyleValues) => Promise<void>;
+  mutateModelLinesTypeColoring: (id: string, values: StyleValues) => Promise<void>;
+} {
   const dataStyleState = useDataStyleState();
   const modelCommonStyle = useModelCommonStyle();
 
   function modelLinesStyle(id: string): StyleValues {
-    return dataStyleState.getStyle(id).lines as StyleValues;
+    return dataStyleState.getStyle(id).lines ?? {};
   }
 
   function modelComponentTypeLinesStyle(id: string): StyleValues {
@@ -27,17 +33,22 @@ export function useModelLinesCommonStyle() {
   }
 
   function modelLineColoring(id: string, line_id?: string): StyleValues {
+    // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
     return modelLineStyle(id, line_id).coloring as StyleValues;
   }
 
-  function mutateModelLinesColoring(id: string, lines_ids: string[], values: StyleValues) {
-    return modelCommonStyle.mutateComponentStyles(id, lines_ids, {
+  async function mutateModelLinesColoring(
+    id: string,
+    lines_ids: string[],
+    values: StyleValues,
+  ): Promise<void> {
+    await modelCommonStyle.mutateComponentStyles(id, lines_ids, {
       coloring: values,
     });
   }
 
-  function mutateModelLinesTypeColoring(id: string, values: StyleValues) {
-    return modelCommonStyle.mutateModelComponentTypeStyle(id, "Line", {
+  async function mutateModelLinesTypeColoring(id: string, values: StyleValues): Promise<void> {
+    await modelCommonStyle.mutateModelComponentTypeStyle(id, "Line", {
       coloring: values,
     });
   }

@@ -1,6 +1,6 @@
 interface AttributeRangeSource {
-  min_values?: number[];
-  max_values?: number[];
+  min_values?: readonly number[];
+  max_values?: readonly number[];
   min_value?: number;
   max_value?: number;
 }
@@ -11,8 +11,8 @@ interface AttributeRange {
 }
 
 export function getAttributeRange(
-  currentAttribute: AttributeRangeSource | undefined | null,
-  compIndex: number = 0,
+  currentAttribute: Readonly<AttributeRangeSource> | undefined | null,
+  compIndex = 0,
 ): AttributeRange {
   if (!currentAttribute) {
     return { min: 0, max: 1 };

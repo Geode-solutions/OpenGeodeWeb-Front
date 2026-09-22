@@ -1,11 +1,7 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
-import { liveQuery } from "dexie";
-// oxlint-disable-next-line eslint/no-duplicate-imports
-import type { Table } from "dexie";
+import { type Table, liveQuery } from "dexie";
+import type { Observable } from "rxjs";
 import { database } from "@ogw_internal/database/database.js";
 import { useObservable } from "@vueuse/rxjs";
-import type { Observable } from "rxjs";
 
 interface ModelComponentRecord {
   id: string;
@@ -17,20 +13,20 @@ interface ModelComponentRecord {
 }
 
 interface FormattedComponent {
-  id: string;
-  title: string;
-  category: string;
-  viewer_id: number;
-  is_active: boolean;
+  readonly id: string;
+  readonly title: string;
+  readonly category: string;
+  readonly viewer_id: number;
+  readonly is_active: boolean;
 }
 
 interface FormattedComponentGroup {
   id: string;
   title: string;
-  children: FormattedComponent[];
+  readonly children: readonly FormattedComponent[];
 }
 
-function toFormattedComponent(meshComponent: ModelComponentRecord): FormattedComponent {
+function toFormattedComponent(meshComponent: Readonly<ModelComponentRecord>): FormattedComponent {
   return {
     id: meshComponent.geode_id,
     title: meshComponent.name,
@@ -40,7 +36,20 @@ function toFormattedComponent(meshComponent: ModelComponentRecord): FormattedCom
   };
 }
 
-export function useDataMesh() {
+// oxlint-disable-next-line eslint/max-lines-per-function
+export function useDataMesh(): {
+  formatedMeshComponents: typeof formatedMeshComponents;
+  refFormatedMeshComponents: typeof refFormatedMeshComponents;
+  getMeshComponentsByType: typeof getMeshComponentsByType;
+  getAllMeshComponents: typeof getAllMeshComponents;
+  fetchAllMeshComponents: typeof fetchAllMeshComponents;
+  getMeshComponentGeodeIds: typeof getMeshComponentGeodeIds;
+  getCornersGeodeIds: typeof getCornersGeodeIds;
+  getLinesGeodeIds: typeof getLinesGeodeIds;
+  getSurfacesGeodeIds: typeof getSurfacesGeodeIds;
+  getBlocksGeodeIds: typeof getBlocksGeodeIds;
+} {
+  // oxlint-disable-next-line no-unsafe-type-assertion -- database's table map is dynamically typed at runtime.
   const model_components_db = database.model_components as unknown as Table<
     ModelComponentRecord,
     string
@@ -57,10 +66,8 @@ export function useDataMesh() {
 
     const componentsByType: Record<string, ModelComponentRecord[]> = {};
     for (const component_item of items) {
-      if (componentTitles[component_item.type]) {
-        if (!componentsByType[component_item.type]) {
-          componentsByType[component_item.type] = [];
-        }
+      if (componentTitles[component_item.type] !== undefined) {
+        componentsByType[component_item.type] ??= [];
         componentsByType[component_item.type]?.push(component_item);
       }
     }
@@ -70,19 +77,21 @@ export function useDataMesh() {
       .map((type) => ({
         id: type,
         title: componentTitles[type] ?? type,
-        children: (componentsByType[type] ?? []).map((item) => toFormattedComponent(item)),
+        children: (componentsByType[type] ?? []).map((item: Readonly<ModelComponentRecord>) =>
+          toFormattedComponent(item),
+        ),
       }));
   }
 
-  function refFormatedMeshComponents(modelId: string) {
-    // Dexie's liveQuery() returns Dexie's own minimal Observable shape, not an
-    // Actual rxjs Observable instance (useObservable's declared parameter type);
-    // The two are structurally close enough at runtime (vueuse only calls
-    // `.subscribe`) but not identical, hence the cast.
+  function refFormatedMeshComponents(
+    modelId: string,
+  ): Readonly<Ref<FormattedComponentGroup[] | undefined>> {
     return useObservable(
-      liveQuery(() => formatedMeshComponents(modelId)) as unknown as Observable<
-        FormattedComponentGroup[]
-      >,
+      liveQuery(async () => {
+        const components = await formatedMeshComponents(modelId);
+        return components;
+        // oxlint-disable-next-line no-unsafe-type-assertion
+      }) as unknown as Observable<FormattedComponentGroup[]>,
       {
         initialValue: undefined,
       },
@@ -97,12 +106,12 @@ export function useDataMesh() {
       .where("[id+type]")
       .equals([modelId, type])
       .toArray();
-    return components.map((item) => toFormattedComponent(item));
+    return components.map((item: Readonly<ModelComponentRecord>) => toFormattedComponent(item));
   }
 
   async function getAllMeshComponents(modelId: string): Promise<FormattedComponent[]> {
     const items = await model_components_db.where("id").equals(modelId).toArray();
-    return items.map((item) => toFormattedComponent(item));
+    return items.map((item: Readonly<ModelComponentRecord>) => toFormattedComponent(item));
   }
 
   async function fetchAllMeshComponents(
@@ -111,9 +120,7 @@ export function useDataMesh() {
     const components = await getAllMeshComponents(modelId);
     const byType: Record<string, FormattedComponent[]> = {};
     for (const component of components) {
-      if (!byType[component.category]) {
-        byType[component.category] = [];
-      }
+      byType[component.category] ??= [];
       byType[component.category]?.push(component);
     }
     return byType;
@@ -124,23 +131,27 @@ export function useDataMesh() {
       .where("[id+type]")
       .equals([modelId, type])
       .toArray();
-    return components.map((component) => component.geode_id);
+    return components.map((component: Readonly<ModelComponentRecord>) => component.geode_id);
   }
 
   async function getCornersGeodeIds(modelId: string): Promise<string[]> {
-    return await getMeshComponentGeodeIds(modelId, "Corner");
+    const geodeIds = await getMeshComponentGeodeIds(modelId, "Corner");
+    return geodeIds;
   }
 
   async function getLinesGeodeIds(modelId: string): Promise<string[]> {
-    return await getMeshComponentGeodeIds(modelId, "Line");
+    const geodeIds = await getMeshComponentGeodeIds(modelId, "Line");
+    return geodeIds;
   }
 
   async function getSurfacesGeodeIds(modelId: string): Promise<string[]> {
-    return await getMeshComponentGeodeIds(modelId, "Surface");
+    const geodeIds = await getMeshComponentGeodeIds(modelId, "Surface");
+    return geodeIds;
   }
 
   async function getBlocksGeodeIds(modelId: string): Promise<string[]> {
-    return await getMeshComponentGeodeIds(modelId, "Block");
+    const geodeIds = await getMeshComponentGeodeIds(modelId, "Block");
+    return geodeIds;
   }
 
   return {

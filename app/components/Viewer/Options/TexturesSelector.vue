@@ -24,7 +24,7 @@ onMounted(() => {
   }
 });
 
-function update_value_event($event: { key: keyof Texture; value: string }, index: number) {
+function update_value_event($event: { key: keyof Texture; value: string }, index: number): void {
   const texture = internal_textures.value[index];
   if (!texture) {
     return;

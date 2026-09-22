@@ -5,7 +5,7 @@ import { describe, expect, test, vi } from "vitest";
 import { ref } from "vue";
 
 // Local imports
-import { useVirtualTree } from "@ogw_front/composables/virtual_tree";
+import { type EmitFn, useVirtualTree } from "@ogw_front/composables/virtual_tree";
 
 describe("virtual tree composable", () => {
   test("correctly handles empty collections without treating them as leaf nodes", () => {
@@ -39,7 +39,7 @@ describe("virtual tree composable", () => {
       selection: { selectable: true, strategy: "classic" },
     });
 
-    const emit = vi.fn();
+    const emit = vi.fn<EmitFn>();
     const { isSelected, getIndeterminate } = useVirtualTree(props, emit);
 
     // 1. The empty collection has no leaf children, so it should not be considered selected

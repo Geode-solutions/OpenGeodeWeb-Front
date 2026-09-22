@@ -1,18 +1,14 @@
 <script setup lang="ts">
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
-import PolygonalSurfacePolygons from "@ogw_front/assets/viewer_svgs/surface_triangles.svg";
-// oxlint-disable import/consistent-type-specifier-style -- combining the default import with the type import avoids a duplicate-imports violation on this same module; using disable-next-line here is fragile because a formatter can re-wrap the import onto multiple lines and shift the flagged line
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import PolygonalSurfacePolygons from "@ogw_front/assets/viewer_svgs/surface_triangles.svg";
+import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
-
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
@@ -32,7 +28,7 @@ const { itemProps, tooltip = "Polygons options" } = defineProps<Props>();
 
 const id = toRef(() => itemProps.id);
 
-const visibility = computed({
+const visibility = computed<boolean>({
   get: () => dataStyleStore.meshPolygonsVisibility(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
@@ -41,7 +37,7 @@ const visibility = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const coloring_style_key = computed({
+const coloring_style_key = computed<string>({
   get: () => dataStyleStore.meshPolygonsActiveColoring(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
@@ -68,7 +64,7 @@ const textures = computed<Texture[] | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_name = computed({
+const vertex_attribute_name = computed<string | undefined>({
   get: () => dataStyleStore.meshPolygonsVertexAttributeName(id.value),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -80,7 +76,7 @@ const vertex_attribute_name = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_item = computed({
+const vertex_attribute_item = computed<string | undefined>({
   get: () => dataStyleStore.meshPolygonsVertexAttributeItem(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
@@ -89,7 +85,7 @@ const vertex_attribute_item = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_range = computed({
+const vertex_attribute_range = computed<[number, number] | undefined>({
   get: () => dataStyleStore.meshPolygonsVertexAttributeRange(id.value),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -104,7 +100,7 @@ const vertex_attribute_range = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_color_map = computed({
+const vertex_attribute_color_map = computed<Map<string, RGBAColor> | undefined>({
   get: () => dataStyleStore.meshPolygonsVertexAttributeColorMap(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
@@ -123,7 +119,7 @@ const vertex_attribute_no_data_color = computed<RGBAColor | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
-const polygon_attribute_name = computed({
+const polygon_attribute_name = computed<string | undefined>({
   get: () => dataStyleStore.meshPolygonsPolygonAttributeName(id.value),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -135,7 +131,7 @@ const polygon_attribute_name = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const polygon_attribute_item = computed({
+const polygon_attribute_item = computed<string | undefined>({
   get: () => dataStyleStore.meshPolygonsPolygonAttributeItem(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
@@ -144,7 +140,7 @@ const polygon_attribute_item = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const polygon_attribute_range = computed({
+const polygon_attribute_range = computed<[number, number] | undefined>({
   get: () => dataStyleStore.meshPolygonsPolygonAttributeRange(id.value),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -159,7 +155,7 @@ const polygon_attribute_range = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const polygon_attribute_color_map = computed({
+const polygon_attribute_color_map = computed<Map<string, RGBAColor> | undefined>({
   get: () => dataStyleStore.meshPolygonsPolygonAttributeColorMap(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>

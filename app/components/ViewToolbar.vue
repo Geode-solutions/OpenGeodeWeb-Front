@@ -1,7 +1,4 @@
 <script setup lang="ts">
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
-import type { Ref } from "vue";
 import ActionButton from "@ogw_front/components/ActionButton.vue";
 import CameraBookmarkIcon from "@ogw_front/assets/viewer_svgs/camera-bookmark.svg";
 import CameraManager from "@ogw_front/components/CameraManager.vue";
@@ -18,15 +15,15 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 const hybridViewerStore = useHybridViewerStore();
 const viewerStore = useViewerStore();
-const showScreenshot = ref(false);
-const showCameraManager = ref(false);
-const showCameraOrientation = ref(false);
-const showZScaling = ref(false);
-const showClippingPlanes = ref(false);
-const showShrinkFilter = ref(false);
-const showRuler = ref(false);
-const gridScale = ref(false);
-const zScale = ref(hybridViewerStore.zScale);
+const showScreenshot = ref<boolean>(false);
+const showCameraManager = ref<boolean>(false);
+const showCameraOrientation = ref<boolean>(false);
+const showZScaling = ref<boolean>(false);
+const showClippingPlanes = ref<boolean>(false);
+const showShrinkFilter = ref<boolean>(false);
+const showRuler = ref<boolean>(false);
+const gridScale = ref<boolean>(false);
+const zScale = ref<number>(hybridViewerStore.zScale);
 const openSubMenus = ref<Record<string, boolean>>({});
 
 interface CameraOptionAction {
@@ -47,7 +44,7 @@ watch(
   },
 );
 
-async function handleZScalingClose() {
+async function handleZScalingClose(): Promise<void> {
   await hybridViewerStore.setZScaling(zScale.value);
   showZScaling.value = false;
 }
@@ -61,7 +58,7 @@ onKeyStroke("Escape", () => {
   }
 });
 
-function closeAllToolsExcept(toolRef: Ref<boolean>) {
+function closeAllToolsExcept(toolRef: Ref<boolean>): void {
   const tools = [
     showCameraOrientation,
     showCameraManager,
@@ -78,7 +75,7 @@ function closeAllToolsExcept(toolRef: Ref<boolean>) {
   }
 }
 
-function toggleTool(toolRef: Ref<boolean>) {
+function toggleTool(toolRef: Ref<boolean>): void {
   closeAllToolsExcept(toolRef);
   toolRef.value = !toolRef.value;
 }
@@ -88,7 +85,7 @@ const camera_options = computed<CameraOptionAction[]>(() => [
     testId: "resetCameraButton",
     tooltip: "Reset camera",
     icon: "mdi-cube-scan",
-    action: () => {
+    action: (): void => {
       hybridViewerStore.resetCamera();
     },
   },
@@ -97,7 +94,7 @@ const camera_options = computed<CameraOptionAction[]>(() => [
     tooltip: "Center on click",
     icon: "mdi-crosshairs-question",
     color: hybridViewerStore.is_picking ? "primary" : undefined,
-    action: () => {
+    action: (): void => {
       hybridViewerStore.is_picking = !hybridViewerStore.is_picking;
     },
   },
@@ -107,7 +104,7 @@ const camera_options = computed<CameraOptionAction[]>(() => [
     icon: "mdi-cursor-default-click",
     color: hybridViewerStore.is_hover_highlight ? "primary" : undefined,
     action: hybridViewerStore.is_hover_highlight
-      ? () => {
+      ? (): void => {
           hybridViewerStore.is_hover_highlight = false;
           hybridViewerStore.clearHoverHighlight();
         }
@@ -117,7 +114,7 @@ const camera_options = computed<CameraOptionAction[]>(() => [
         title: "Cells",
         testId: "highlightOnHoverCellsButton",
         icon: "mdi-select-all",
-        action: () => {
+        action: (): void => {
           if (
             hybridViewerStore.is_hover_highlight &&
             hybridViewerStore.hover_highlight_field_type === "CELL"
@@ -134,7 +131,7 @@ const camera_options = computed<CameraOptionAction[]>(() => [
         title: "Points",
         testId: "highlightOnHoverPointsButton",
         icon: "mdi-select-drag",
-        action: () => {
+        action: (): void => {
           if (
             hybridViewerStore.is_hover_highlight &&
             hybridViewerStore.hover_highlight_field_type === "POINT"
@@ -153,7 +150,7 @@ const camera_options = computed<CameraOptionAction[]>(() => [
     testId: "cameraOrientationButton",
     tooltip: "Camera orientation",
     icon: "mdi-rotate-3d",
-    action: () => {
+    action: (): void => {
       toggleTool(showCameraOrientation);
     },
   },
@@ -162,7 +159,7 @@ const camera_options = computed<CameraOptionAction[]>(() => [
     tooltip: "Manage camera positions",
     icon: CameraBookmarkIcon,
     iconSize: 34,
-    action: () => {
+    action: (): void => {
       toggleTool(showCameraManager);
     },
   },
@@ -170,7 +167,7 @@ const camera_options = computed<CameraOptionAction[]>(() => [
     testId: "screenshotButton",
     tooltip: "Take a screenshot",
     icon: "mdi-camera",
-    action: () => {
+    action: (): void => {
       toggleTool(showScreenshot);
     },
   },
@@ -179,7 +176,7 @@ const camera_options = computed<CameraOptionAction[]>(() => [
     tooltip: "Toggle grid scale",
     icon: "mdi-ruler-square",
     color: gridScale.value ? "primary" : undefined,
-    action: () => {
+    action: (): void => {
       const schema = schemas.opengeodeweb_viewer.viewer.grid_scale;
       const params = { visibility: !gridScale.value };
       viewerStore.request(
@@ -200,7 +197,7 @@ const camera_options = computed<CameraOptionAction[]>(() => [
     testId: "zScalingButton",
     tooltip: "Z Scaling Control",
     icon: "mdi-sort",
-    action: () => {
+    action: (): void => {
       toggleTool(showZScaling);
     },
   },
@@ -209,7 +206,7 @@ const camera_options = computed<CameraOptionAction[]>(() => [
     tooltip: "Clipping Planes",
     icon: "mdi-content-cut",
     color: showClippingPlanes.value ? "primary" : undefined,
-    action: () => {
+    action: (): void => {
       toggleTool(showClippingPlanes);
     },
   },
@@ -218,7 +215,7 @@ const camera_options = computed<CameraOptionAction[]>(() => [
     tooltip: "Shrink Filter",
     icon: "mdi-arrow-collapse-all",
     color: showShrinkFilter.value ? "primary" : undefined,
-    action: () => {
+    action: (): void => {
       toggleTool(showShrinkFilter);
     },
   },
@@ -227,7 +224,7 @@ const camera_options = computed<CameraOptionAction[]>(() => [
     tooltip: "Ruler",
     icon: "mdi-ruler",
     color: showRuler.value ? "primary" : undefined,
-    action: () => {
+    action: (): void => {
       toggleTool(showRuler);
     },
   },

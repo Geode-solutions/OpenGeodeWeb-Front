@@ -3,7 +3,6 @@ import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 // Local imports
-import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { useMeshPolygonsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -51,14 +50,39 @@ function isMeshPolygonsPolygonAttributeValid({
 }
 
 // oxlint-disable-next-line max-lines-per-function
-function useMeshPolygonsPolygonAttributeStyle() {
+function useMeshPolygonsPolygonAttributeStyle(): {
+  meshPolygonsPolygonAttributeName: (id: string) => string | undefined;
+  meshPolygonsPolygonAttributeItem: (id: string) => number;
+  meshPolygonsPolygonAttributeRange: (id: string) => [number | undefined, number | undefined];
+  meshPolygonsPolygonAttributeColorMap: (id: string) => string | undefined;
+  meshPolygonsPolygonAttributeStoredConfig: (
+    id: string,
+    name: string | undefined,
+    item: number | undefined,
+  ) => AttributeStoredConfig;
+  setMeshPolygonsPolygonAttribute: (id: string, input: AttributeInput) => Promise<unknown>;
+  setMeshPolygonsPolygonAttributeName: (id: string, name: string) => Promise<unknown>;
+  setMeshPolygonsPolygonAttributeItem: (id: string, item: number) => Promise<unknown>;
+  setMeshPolygonsPolygonAttributeRange: (
+    id: string,
+    minimum: number,
+    maximum: number,
+  ) => Promise<unknown>;
+  setMeshPolygonsPolygonAttributeColorMap: (
+    id: string,
+    colorMap: string | undefined,
+  ) => Promise<unknown>;
+  meshPolygonsPolygonAttributeNoDataColor: (id: string) => unknown;
+  setMeshPolygonsPolygonAttributeNoDataColor: (
+    id: string,
+    no_data_color: unknown,
+  ) => Promise<unknown>;
+} {
   const viewerStore = useViewerStore();
   const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle();
-  function meshPolygonsColoring(id: string): StyleValues {
-    return meshPolygonsCommonStyle.meshPolygonsStyle(id).coloring as StyleValues;
-  }
   function meshPolygonsPolygonAttribute(id: string): AttributeState {
-    return meshPolygonsColoring(id).polygon as AttributeState;
+    // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.polygon shape is defined by the data style schema.
+    return meshPolygonsCommonStyle.meshPolygonsColoring(id).polygon as AttributeState;
   }
   function meshPolygonsPolygonAttributeStoredConfig(
     id: string,
@@ -66,14 +90,10 @@ function useMeshPolygonsPolygonAttributeStyle() {
     item: number | undefined,
   ): AttributeStoredConfig {
     const { storedConfigs } = meshPolygonsPolygonAttribute(id);
-    if (
-      storedConfigs &&
-      name !== undefined &&
-      name in storedConfigs &&
-      item !== undefined &&
-      item in storedConfigs[name]!
-    ) {
-      return storedConfigs[name]![item]!;
+    const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
+    const itemConfig = item === undefined ? undefined : nameConfig?.[item];
+    if (itemConfig !== undefined) {
+      return itemConfig;
     }
     return {
       minimum: undefined,
@@ -82,35 +102,37 @@ function useMeshPolygonsPolygonAttributeStyle() {
       no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
-  function mutateMeshPolygonsPolygonStyle(id: string, values: Record<string, unknown>) {
-    return meshPolygonsCommonStyle.mutateMeshPolygonsStyle(id, {
-      coloring: {
-        polygon: values,
-      },
-    });
+  async function mutateMeshPolygonsPolygonStyle(
+    id: string,
+    values: Record<string, unknown>,
+  ): Promise<string> {
+    const result = await meshPolygonsCommonStyle.mutateMeshPolygonsPolygonStyle(id, values);
+    return result;
   }
-  function setMeshPolygonsPolygonAttributeStoredConfig(
+  async function setMeshPolygonsPolygonAttributeStoredConfig(
     id: string,
     name: string | undefined,
     item: number | undefined,
     config: Partial<AttributeStoredConfig>,
-  ) {
-    return mutateMeshPolygonsPolygonStyle(id, {
+  ): Promise<string> {
+    const result = await mutateMeshPolygonsPolygonStyle(id, {
       storedConfigs: {
-        [name as string]: {
+        [name ?? ""]: {
           lastItem: item,
-          [item as number]: config,
+          [item ?? 0]: config,
         },
       },
     });
+    return result;
   }
   function meshPolygonsPolygonAttributeName(id: string): string | undefined {
     return meshPolygonsPolygonAttribute(id).name;
   }
   function meshPolygonsPolygonAttributeLastItem(id: string, name: string | undefined): number {
     const { storedConfigs } = meshPolygonsPolygonAttribute(id);
-    if (storedConfigs && name !== undefined && name in storedConfigs) {
-      return storedConfigs[name]!.lastItem;
+    const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
+    if (nameConfig !== undefined) {
+      return nameConfig.lastItem;
     }
     return 0;
   }
@@ -118,7 +140,7 @@ function useMeshPolygonsPolygonAttributeStyle() {
     const { item, name } = meshPolygonsPolygonAttribute(id);
     return item ?? meshPolygonsPolygonAttributeLastItem(id, name);
   }
-  function setMeshPolygonsPolygonAttribute(
+  async function setMeshPolygonsPolygonAttribute(
     id: string,
     {
       name,
@@ -128,18 +150,18 @@ function useMeshPolygonsPolygonAttributeStyle() {
       colorMap,
       no_data_color = DEFAULT_NO_DATA_COLOR,
     }: AttributeInput,
-  ) {
-    mutateMeshPolygonsPolygonStyle(id, {
+  ): Promise<unknown> {
+    await mutateMeshPolygonsPolygonStyle(id, {
       name,
       item,
     });
-    setMeshPolygonsPolygonAttributeStoredConfig(id, name, item, {
+    await setMeshPolygonsPolygonAttributeStoredConfig(id, name, item, {
       minimum,
       maximum,
       colorMap,
       no_data_color,
     });
-    const points = getRGBPointsFromPreset(colorMap as string);
+    const points = getRGBPointsFromPreset(colorMap ?? "");
     const schema = meshPolygonsPolygonAttributeSchemas.attribute;
     const params = {
       id,
@@ -155,7 +177,7 @@ function useMeshPolygonsPolygonAttributeStyle() {
       params,
     });
   }
-  function applyPolygonAttribute(id: string) {
+  async function applyPolygonAttribute(id: string): Promise<unknown> {
     const name = meshPolygonsPolygonAttributeName(id);
     const item = meshPolygonsPolygonAttributeItem(id);
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name, item);
@@ -168,19 +190,21 @@ function useMeshPolygonsPolygonAttributeStyle() {
       no_data_color: storedConfig.no_data_color,
     };
     if (isMeshPolygonsPolygonAttributeValid(attribute)) {
-      return setMeshPolygonsPolygonAttribute(id, attribute);
+      const result = await setMeshPolygonsPolygonAttribute(id, attribute);
+      return result;
     }
+    return undefined;
   }
-  function setMeshPolygonsPolygonAttributeName(id: string, name: string) {
+  async function setMeshPolygonsPolygonAttributeName(id: string, name: string): Promise<unknown> {
     const item = meshPolygonsPolygonAttributeLastItem(id, name);
-    mutateMeshPolygonsPolygonStyle(id, {
+    await mutateMeshPolygonsPolygonStyle(id, {
       name,
       item,
     });
     return applyPolygonAttribute(id);
   }
-  function setMeshPolygonsPolygonAttributeItem(id: string, item: number) {
-    mutateMeshPolygonsPolygonStyle(id, {
+  async function setMeshPolygonsPolygonAttributeItem(id: string, item: number): Promise<unknown> {
+    await mutateMeshPolygonsPolygonStyle(id, {
       item,
     });
     return applyPolygonAttribute(id);
@@ -191,10 +215,14 @@ function useMeshPolygonsPolygonAttributeStyle() {
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name, item);
     return [storedConfig.minimum, storedConfig.maximum];
   }
-  function setMeshPolygonsPolygonAttributeRange(id: string, minimum: number, maximum: number) {
+  async function setMeshPolygonsPolygonAttributeRange(
+    id: string,
+    minimum: number,
+    maximum: number,
+  ): Promise<unknown> {
     const name = meshPolygonsPolygonAttributeName(id);
     const item = meshPolygonsPolygonAttributeItem(id);
-    setMeshPolygonsPolygonAttributeStoredConfig(id, name, item, {
+    await setMeshPolygonsPolygonAttributeStoredConfig(id, name, item, {
       minimum,
       maximum,
     });
@@ -206,10 +234,13 @@ function useMeshPolygonsPolygonAttributeStyle() {
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name, item);
     return storedConfig.colorMap;
   }
-  function setMeshPolygonsPolygonAttributeColorMap(id: string, colorMap: string | undefined) {
+  async function setMeshPolygonsPolygonAttributeColorMap(
+    id: string,
+    colorMap: string | undefined,
+  ): Promise<unknown> {
     const name = meshPolygonsPolygonAttributeName(id);
     const item = meshPolygonsPolygonAttributeItem(id);
-    setMeshPolygonsPolygonAttributeStoredConfig(id, name, item, {
+    await setMeshPolygonsPolygonAttributeStoredConfig(id, name, item, {
       colorMap,
     });
     return applyPolygonAttribute(id);
@@ -220,7 +251,10 @@ function useMeshPolygonsPolygonAttributeStyle() {
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name, item);
     return storedConfig.no_data_color;
   }
-  async function setMeshPolygonsPolygonAttributeNoDataColor(id: string, no_data_color: unknown) {
+  async function setMeshPolygonsPolygonAttributeNoDataColor(
+    id: string,
+    no_data_color: unknown,
+  ): Promise<unknown> {
     const name = meshPolygonsPolygonAttributeName(id);
     const item = meshPolygonsPolygonAttributeItem(id);
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name, item);

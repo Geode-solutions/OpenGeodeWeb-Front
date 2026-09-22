@@ -5,10 +5,9 @@ import { describe, expect, test } from "vitest";
 import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime";
 import { flushPromises } from "@vue/test-utils";
 
-import { setupActivePinia, vuetify } from "@ogw_tests/utils";
+import { setupActivePinia, toHTTPMethod, vuetify } from "@ogw_tests/utils";
 import ObjectSelector from "@ogw_front/components/ObjectSelector.vue";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
-import type { HTTPMethod } from "h3";
 import { useBackStore } from "@ogw_front/stores/back";
 
 const EXPECTED_LENGTH = 1;
@@ -37,9 +36,9 @@ describe("object selector", () => {
       allowed_objects: {},
     };
     const geode_object_1 = "BRep";
-    response["allowed_objects"][geode_object_1] = { is_loadable: true };
+    response.allowed_objects[geode_object_1] = { is_loadable: true };
     registerEndpoint(allowed_objects.$id, {
-      method: allowed_objects.methods[FIRST_INDEX] as HTTPMethod,
+      method: toHTTPMethod(allowed_objects.methods[FIRST_INDEX]),
       handler: () => response,
     });
     const wrapper = await mountSuspended(ObjectSelector, {
@@ -66,10 +65,10 @@ describe("object selector", () => {
     };
     const geode_object_1 = "BRep";
     const geode_object_2 = "EdgedCurve3D";
-    response["allowed_objects"][geode_object_1] = { is_loadable: true };
-    response["allowed_objects"][geode_object_2] = { is_loadable: true };
+    response.allowed_objects[geode_object_1] = { is_loadable: true };
+    response.allowed_objects[geode_object_2] = { is_loadable: true };
     registerEndpoint(allowed_objects.$id, {
-      method: allowed_objects.methods[FIRST_INDEX] as HTTPMethod,
+      method: toHTTPMethod(allowed_objects.methods[FIRST_INDEX]),
       handler: () => response,
     });
     const wrapper = await mountSuspended(ObjectSelector, {
@@ -98,16 +97,16 @@ describe("object selector", () => {
     const response: AllowedObjectsResponse = { allowed_objects: {} };
     const geode_object_1 = "BRep";
     const geode_object_2 = "EdgedCurve3D";
-    response["allowed_objects"][geode_object_1] = {
+    response.allowed_objects[geode_object_1] = {
       is_loadable: LOADABLE_SCORE,
       object_priority: PRIORITY_2,
     };
-    response["allowed_objects"][geode_object_2] = {
+    response.allowed_objects[geode_object_2] = {
       is_loadable: LOADABLE_SCORE,
       object_priority: PRIORITY_1,
     };
     registerEndpoint(allowed_objects.$id, {
-      method: allowed_objects.methods[FIRST_INDEX] as HTTPMethod,
+      method: toHTTPMethod(allowed_objects.methods[FIRST_INDEX]),
       handler: () => response,
     });
     const wrapper = await mountSuspended(ObjectSelector, {

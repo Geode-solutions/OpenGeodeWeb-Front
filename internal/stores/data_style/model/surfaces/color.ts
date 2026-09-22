@@ -1,21 +1,35 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
-import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { isModelSurfacesPolygonAttributeValid, useModelSurfacesPolygonAttribute } from "./polygon";
 import { isModelSurfacesVertexAttributeValid, useModelSurfacesVertexAttribute } from "./vertex";
+import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 import { useModelSurfacesCommonStyle } from "./common";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 const schema = viewer_schemas.opengeodeweb_viewer.model.surfaces.color;
 
-export function useModelSurfacesColor() {
+export function useModelSurfacesColor(): {
+  setModelSurfacesColor: (
+    modelId: string,
+    surfaces_ids: string[],
+    color: unknown,
+    activeColoring?: string,
+  ) => Promise<unknown>;
+  modelSurfaceColoring: (id: string, surface_id?: string) => StyleValues;
+  modelSurfaceColor: (id: string, surface_id?: string) => unknown;
+  modelSurfaceActiveColoring: (id: string, surface_id?: string) => unknown;
+  setModelSurfacesActiveColoring: (
+    modelId: string,
+    surfaces_ids: string[],
+    activeColoring: string,
+  ) => Promise<unknown>;
+} {
   const modelCommonStyle = useModelCommonStyle();
   const modelSurfacesCommonStyle = useModelSurfacesCommonStyle();
   const modelSurfacesVertexAttribute = useModelSurfacesVertexAttribute();
   const modelSurfacesPolygonAttribute = useModelSurfacesPolygonAttribute();
 
   function modelSurfaceColoring(id: string, surface_id?: string): StyleValues {
+    // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
     return modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id).coloring as StyleValues;
   }
 
@@ -23,13 +37,20 @@ export function useModelSurfacesColor() {
     return modelSurfaceColoring(id, surface_id).constant;
   }
 
-  function setModelSurfacesColor(
+  async function setModelSurfacesColor(
     modelId: string,
     surfaces_ids: string[],
     color: unknown,
     activeColoring = "constant",
-  ) {
-    return modelCommonStyle.setModelTypeColor(modelId, surfaces_ids, color, schema, activeColoring);
+  ): Promise<unknown> {
+    const result = await modelCommonStyle.setModelTypeColor(
+      modelId,
+      surfaces_ids,
+      color,
+      schema,
+      activeColoring,
+    );
+    return result;
   }
 
   function modelSurfaceActiveColoring(id: string, surface_id?: string): unknown {
@@ -40,9 +61,9 @@ export function useModelSurfacesColor() {
     modelId: string,
     surfaces_ids: string[],
     activeColoring: string,
-  ) {
+  ): Promise<unknown> {
     if (surfaces_ids.length > 1) {
-      modelSurfacesCommonStyle.mutateModelSurfacesTypeColoring(modelId, {
+      await modelSurfacesCommonStyle.mutateModelSurfacesTypeColoring(modelId, {
         active: activeColoring,
       });
     }
@@ -105,6 +126,7 @@ export function useModelSurfacesColor() {
         );
       }
     }
+    return undefined;
   }
 
   return {

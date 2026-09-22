@@ -21,9 +21,9 @@ export const useFeedbackStore = defineStore("feedback", {
     feedbacks_timeout_miliseconds: DEFAULT_FEEDBACKS_TIMEOUT_SECONDS * MILLISECONDS_IN_SECOND,
   }),
   actions: {
-    async add_error(code: number, route: string, name: string, description: string) {
+    add_error(code: number, route: string, name: string, description: string) {
       const feedbackId = uuidv4();
-      await this.feedbacks.push({
+      this.feedbacks.push({
         id: feedbackId,
         type: "error",
         code,
@@ -35,9 +35,9 @@ export const useFeedbackStore = defineStore("feedback", {
         this.delete_feedback(feedbackId);
       }, this.feedbacks_timeout_miliseconds);
     },
-    async add_success(description: string) {
+    add_success(description: string) {
       const feedbackId = uuidv4();
-      await this.feedbacks.push({
+      this.feedbacks.push({
         id: feedbackId,
         type: "success",
         description,
@@ -46,9 +46,9 @@ export const useFeedbackStore = defineStore("feedback", {
         this.delete_feedback(feedbackId);
       }, this.feedbacks_timeout_miliseconds);
     },
-    async add_warning(description: string) {
+    add_warning(description: string) {
       const feedbackId = uuidv4();
-      await this.feedbacks.push({
+      this.feedbacks.push({
         id: feedbackId,
         type: "warning",
         description,

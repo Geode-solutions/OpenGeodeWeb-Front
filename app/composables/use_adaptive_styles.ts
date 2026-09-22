@@ -1,3 +1,4 @@
+import type { MaybeComputedElementRef } from "@vueuse/core";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
@@ -29,45 +30,72 @@ interface CoordinatesLike {
   height?: unknown;
 }
 
+interface RefLike {
+  value?: unknown;
+  x?: unknown;
+}
+
+function isRefLike(value: unknown): value is RefLike {
+  return typeof value === "object" && value !== null;
+}
+
+function isCoordinatesGetter(value: unknown): value is () => CoordinatesLike | undefined {
+  return typeof value === "function";
+}
+
+function isCoordinatesLike(value: unknown): value is CoordinatesLike {
+  return typeof value === "object" && value !== null;
+}
+
 function getValue(val: unknown): number {
   if (typeof val === "object" && val !== null && "value" in val) {
     const wrapped = (val as { value?: unknown }).value;
-    if (wrapped !== undefined) {
-      return wrapped as number;
+    if (typeof wrapped === "number") {
+      return wrapped;
     }
   }
-  return (val as number | undefined) ?? 0;
+  return typeof val === "number" ? val : 0;
 }
 
 // oxlint-disable max-lines-per-function
 export function useAdaptiveStyles(
   target: AdaptiveStylesTarget,
-  options: AdaptiveStylesOptions = {},
-) {
+  options: Readonly<AdaptiveStylesOptions> = {},
+): {
+  adaptiveStyles: ComputedRef<{
+    "--adaptive-blur": string;
+    "--adaptive-opacity": number;
+    "--adaptive-brightness": number;
+  }>;
+  brightness: Ref<number>;
+} {
   const hybridViewerStore = useHybridViewerStore();
   const treeviewStore = useTreeviewStore();
 
-  const targetAsRefLike = target as { value?: unknown; x?: unknown } | undefined;
-  const isCoordinates = Boolean(
-    target &&
+  const targetAsRefLike = isRefLike(target) ? target : undefined;
+  const isCoordinates =
+    target !== undefined &&
+    target !== null &&
     (typeof target === "function" ||
       (targetAsRefLike?.value !== undefined &&
         targetAsRefLike.value !== null &&
         (targetAsRefLike.value as { x?: unknown }).x !== undefined) ||
-      (targetAsRefLike?.x !== undefined && targetAsRefLike.value === undefined)),
-  );
+      (targetAsRefLike?.x !== undefined && targetAsRefLike.value === undefined));
 
-  const bounding = useElementBounding(isCoordinates ? undefined : (target as never));
+  const bounding = useElementBounding(
+    // oxlint-disable-next-line no-unsafe-type-assertion -- duck-typed target; see comment above.
+    isCoordinates ? undefined : (target as MaybeComputedElementRef),
+  );
 
   const unwrapped = computed(() => {
     if (isCoordinates) {
       let val: CoordinatesLike | undefined = undefined;
-      if (typeof target === "function") {
-        val = (target as () => CoordinatesLike | undefined)();
+      if (isCoordinatesGetter(target)) {
+        val = target();
       } else if (targetAsRefLike?.value === undefined) {
         val = targetAsRefLike;
-      } else {
-        val = targetAsRefLike.value as CoordinatesLike | undefined;
+      } else if (isCoordinatesLike(targetAsRefLike.value)) {
+        val = targetAsRefLike.value;
       }
       return {
         x: getValue(val?.x),
@@ -91,7 +119,7 @@ export function useAdaptiveStyles(
 
   const brightness = ref(LUMINANCE_THRESHOLD);
 
-  function calculateBrightness() {
+  function calculateBrightness(): void {
     brightness.value = hybridViewerStore.getAverageBrightness({
       x: x.value,
       y: y.value,
@@ -102,19 +130,33 @@ export function useAdaptiveStyles(
 
   const updateBrightness = useThrottleFn(calculateBrightness, ADAPTIVE_REFRESH_RATE);
 
-  watch([x, y, width, height, () => hybridViewerStore.latestImage], updateBrightness, {
-    immediate: true,
-  });
+  watch(
+    [
+      x,
+      y,
+      width,
+      height,
+      (): typeof hybridViewerStore.latestImage => hybridViewerStore.latestImage,
+    ],
+    updateBrightness,
+    {
+      immediate: true,
+    },
+  );
 
-  async function forceRefresh() {
+  async function forceRefresh(): Promise<void> {
     await nextTick();
     bounding.update?.();
     calculateBrightness();
   }
 
   if (getCurrentInstance()) {
-    onMounted(() => {
-      forceRefresh();
+    onMounted(async () => {
+      try {
+        await forceRefresh();
+      } catch (error) {
+        console.error("forceRefresh failed:", error);
+      }
     });
   }
 

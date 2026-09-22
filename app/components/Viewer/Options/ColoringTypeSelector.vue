@@ -1,12 +1,10 @@
 <script setup lang="ts">
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
+import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
+import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsAttributeSelector from "@ogw_front/components/Viewer/Options/AttributeSelector.vue";
 import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
 import ViewerOptionsTexturesSelector from "@ogw_front/components/Viewer/Options/TexturesSelector.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
-import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 interface Texture {
   id: string;
@@ -88,37 +86,39 @@ const polygonSchema = schemas.polygon || back_schemas.opengeodeweb_back.polygon_
 const polyhedronSchema =
   schemas.polyhedron || back_schemas.opengeodeweb_back.polyhedron_attribute_names;
 
-function isAvailable(key: string) {
+function isAvailable(key: string): boolean {
   if (capabilities[key] && capabilities[key].available === false) {
     return false;
   }
   return true;
 }
 
-function hasColorMap(key: string) {
+function hasColorMap(key: string): boolean {
   if (capabilities[key] && capabilities[key].hasColorMap === false) {
     return false;
   }
   return true;
 }
 
-const has_color = computed(() => color.value !== undefined && isAvailable("color"));
-const has_textures = computed(() => textures.value !== undefined && isAvailable("textures"));
-const has_vertex = computed(
+const has_color = computed<boolean>(() => color.value !== undefined && isAvailable("color"));
+const has_textures = computed<boolean>(
+  () => textures.value !== undefined && isAvailable("textures"),
+);
+const has_vertex = computed<boolean>(
   () =>
     vertex_attribute_range.value !== undefined && isAvailable("vertex") && hasColorMap("vertex"),
 );
-const has_edge = computed(
+const has_edge = computed<boolean>(
   () => edge_attribute_range.value !== undefined && isAvailable("edge") && hasColorMap("edge"),
 );
-const has_cells = computed(
+const has_cells = computed<boolean>(
   () => cell_attribute_range.value !== undefined && isAvailable("cell") && hasColorMap("cell"),
 );
-const has_polygons = computed(
+const has_polygons = computed<boolean>(
   () =>
     polygon_attribute_range.value !== undefined && isAvailable("polygon") && hasColorMap("polygon"),
 );
-const has_polyhedra = computed(
+const has_polyhedra = computed<boolean>(
   () =>
     polyhedron_attribute_range.value !== undefined &&
     isAvailable("polyhedron") &&
@@ -136,7 +136,7 @@ const polyhedron_dict = {
   name: "Polyhedron attribute",
   value: "polyhedron",
 };
-const coloring_styles = computed(() => {
+const coloring_styles = computed<{ labels: string[]; values: string[] }>(() => {
   const array = [];
   if (has_color.value) {
     array.push(color_dict);
@@ -169,9 +169,9 @@ const coloring_styles = computed(() => {
   return { labels, values };
 });
 
-const coloring_style_label = ref("");
+const coloring_style_label = ref<string>("");
 
-const active_key = computed(() => {
+const active_key = computed<string | undefined>(() => {
   const index = coloring_styles.value.labels.indexOf(coloring_style_label.value);
   return index === -1 ? coloring_style_key.value : coloring_styles.value.values[index];
 });

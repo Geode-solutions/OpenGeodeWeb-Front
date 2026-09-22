@@ -1,13 +1,10 @@
 <script setup lang="ts">
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
+import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
 import Launcher from "@ogw_front/components/Launcher.vue";
 import PackagesVersions from "@ogw_front/components/PackagesVersions.vue";
 import Stepper from "@ogw_front/components/Stepper.vue";
-
 import { useInfraStore } from "@ogw_front/stores/infra";
 import { useStepperTree } from "@ogw_front/composables/stepper_tree";
-import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
 
 const infraStore = useInfraStore();
 

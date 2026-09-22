@@ -1,6 +1,7 @@
 // Node imports
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import { z } from "zod";
 
 // Third party imports
 import { createError } from "h3";
@@ -8,14 +9,17 @@ import { createError } from "h3";
 // Local imports
 import { extensionFrontendPath } from "@geode/opengeodeweb-front/server/utils/path.ts";
 
-interface ExtensionMetadata {
-  id: string;
-  name: string;
-  version: string;
-  frontendFile: string;
-  backendExecutable: string;
-  [key: string]: unknown;
-}
+const extensionMetadataSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    version: z.string(),
+    frontendFile: z.string(),
+    backendExecutable: z.string(),
+  })
+  .loose();
+
+type ExtensionMetadata = z.infer<typeof extensionMetadataSchema>;
 
 async function readExtensionMetadata(unzippedExtensionPath: string): Promise<ExtensionMetadata> {
   const metadataPath = path.join(unzippedExtensionPath, "metadata.json");
@@ -26,7 +30,17 @@ async function readExtensionMetadata(unzippedExtensionPath: string): Promise<Ext
       statusMessage: "Invalid extension file: missing metadata.json",
     });
   }
-  const metadata = JSON.parse(metadataContent) as ExtensionMetadata;
+
+  const parsed: unknown = JSON.parse(metadataContent);
+  const result = extensionMetadataSchema.safeParse(parsed);
+  if (!result.success) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Invalid extension file: malformed metadata.json",
+    });
+  }
+  const metadata = result.data;
+
   console.log("readExtensionMetadata", { metadata });
   if (!metadata.frontendFile) {
     throw createError({

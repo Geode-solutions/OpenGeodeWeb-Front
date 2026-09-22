@@ -1,4 +1,3 @@
-/// <reference path="../types/vendor.d.ts" />
 // Node imports
 import fs from "node:fs";
 import path from "node:path";
@@ -18,6 +17,7 @@ interface Microservice {
 }
 
 const MAX_DELETE_FOLDER_RETRIES = 5;
+
 async function deleteFolderRecursive(folderPath: string): Promise<void> {
   if (!fs.existsSync(folderPath)) {
     console.log(`Folder ${folderPath} does not exist.`);
@@ -32,7 +32,6 @@ async function deleteFolderRecursive(folderPath: string): Promise<void> {
       return;
     } catch (error) {
       console.error(`Error deleting folder ${folderPath}:`, error);
-      // Wait before retrying
       const MILLISECONDS_PER_RETRY = 1000;
       const DELAY = MILLISECONDS_PER_RETRY * (i + 1);
       // oxlint-disable-next-line no-await-in-loop
@@ -44,35 +43,54 @@ async function deleteFolderRecursive(folderPath: string): Promise<void> {
     `Failed to delete folder ${folderPath} after ${MAX_DELETE_FOLDER_RETRIES} retries`,
   );
 }
-function killHttpMicroservice(microservice: Microservice): Promise<void> {
+
+function isErrorWithMessage(error: unknown): error is { message: string } {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error &&
+    typeof error.message === "string"
+  );
+}
+
+async function killHttpMicroservice(microservice: Readonly<Microservice>): Promise<void> {
   console.log("killHttpMicroservice", {
     ...microservice,
   });
   const failMessage = `Failed to kill ${microservice.name}`;
-  async function do_kill() {
+  async function do_kill(): Promise<void> {
+    if (microservice.url === undefined) {
+      return;
+    }
     try {
-      await fetch(microservice.url as string, {
+      await fetch(microservice.url, {
         method: microservice.method,
       });
     } catch (error) {
-      console.log(`Expected error during kill of ${microservice.name}:`, (error as Error).message);
+      const message = isErrorWithMessage(error) ? error.message : String(error);
+      console.log(`Expected error during kill of ${microservice.name}:`, message);
     }
   }
-  return pTimeout(do_kill(), {
+  await pTimeout(do_kill(), {
     milliseconds: 5000,
     message: failMessage,
   });
 }
-function killWebsocketMicroservice(microservice: Microservice): Promise<void> {
+
+async function killWebsocketMicroservice(microservice: Readonly<Microservice>): Promise<void> {
   console.log("killWebsocketMicroservice", {
     ...microservice,
   });
   const failMessage = `Failed to kill ${microservice.name}`;
   const successMessage = `Disconnected from ${microservice.name} WebSocket server`;
-  function do_kill() {
+  async function do_kill(): Promise<void> {
+    if (microservice.url === undefined) {
+      return;
+    }
+    const socketUrl = microservice.url;
     // oxlint-disable-next-line promise/avoid-new
-    return new Promise<void>((resolve) => {
-      const socket = new WebSocket(microservice.url as string);
+    await new Promise<void>((resolve) => {
+      const socket = new WebSocket(socketUrl);
       socket.on("open", () => {
         console.log("Connected to WebSocket server");
         socket.send(
@@ -87,7 +105,7 @@ function killWebsocketMicroservice(microservice: Microservice): Promise<void> {
           }),
         );
       });
-      socket.on("message", (data) => {
+      socket.on("message", (data: Buffer | string) => {
         const message = data.toString();
         console.log("Received from server:", message);
         if (message.includes("hello")) {
@@ -106,44 +124,54 @@ function killWebsocketMicroservice(microservice: Microservice): Promise<void> {
         console.log(successMessage);
         resolve();
       });
-      socket.on("error", (error) => {
+      socket.on("error", (error: Readonly<Error>) => {
         console.error("WebSocket error:", error);
         socket.close();
         resolve();
       });
     });
   }
-  return pTimeout(do_kill(), {
+  await pTimeout(do_kill(), {
     milliseconds: 5000,
     message: failMessage,
   });
 }
-async function killMicroservice(microservice: Microservice): Promise<void> {
+
+async function killMicroservice(microservice: Readonly<Microservice>): Promise<void> {
   if (microservice.type === "back") {
     await killHttpMicroservice(microservice);
   } else if (microservice.type === "viewer") {
     await killWebsocketMicroservice(microservice);
   } else {
-    throw new Error(`Unknown microservice type: ${microservice.type}`);
+    const exhaustiveCheck: never = microservice.type;
+    throw new Error(`Unknown microservice type: ${String(exhaustiveCheck)}`);
   }
 }
-async function killMicroservices(microservices: Microservice[]): Promise<void> {
+
+async function killMicroservices(
+  microservices: readonly Readonly<Microservice>[],
+): Promise<Readonly<Microservice>[]> {
   console.log("killMicroservices", {
     microservices,
   });
   const results = await Promise.allSettled(
-    microservices.map((microservice) => killMicroservice(microservice)),
+    microservices.map(async (microservice) => {
+      await killMicroservice(microservice);
+    }),
   );
-  const killed = microservices.filter((_, index) => results[index]?.status === "fulfilled");
-  for (let i = 0; i < killed.length; i += 1) {
-    const microservice = microservices[i];
-    if (microservice) {
-      microservices.splice(microservices.indexOf(microservice), 1);
-    }
-  }
+  return microservices.filter((_, index) => results[index]?.status !== "fulfilled");
 }
+
 function microservicesMetadatasPath(projectFolderPath: string): string {
   return path.join(projectFolderPath, "microservices.json");
+}
+
+function isMicroservicesMetadatas(value: unknown): value is { microservices: Microservice[] } {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    Array.isArray((value as { microservices?: unknown }).microservices)
+  );
 }
 
 function projectMicroservices(projectFolderPath: string): Microservice[] {
@@ -157,11 +185,13 @@ function projectMicroservices(projectFolderPath: string): Microservice[] {
     };
     fs.writeFileSync(filePath, JSON.stringify(microservicesMetadatas, undefined, 2), "utf8");
   }
-  const content = JSON.parse(fs.readFileSync(filePath, "utf8")) as {
-    microservices: Microservice[];
-  };
-  return content.microservices;
+  const parsed: unknown = JSON.parse(fs.readFileSync(filePath, "utf8"));
+  if (!isMicroservicesMetadatas(parsed)) {
+    throw new Error(`Invalid microservices metadata file: ${filePath}`);
+  }
+  return parsed.microservices;
 }
+
 async function cleanupBackend(projectFolderPath: string): Promise<void> {
   if (!fs.existsSync(projectFolderPath)) {
     console.log(`Folder ${projectFolderPath} does not exist. Skipping cleanup.`);
@@ -171,11 +201,13 @@ async function cleanupBackend(projectFolderPath: string): Promise<void> {
   await killMicroservices(microservices);
   await deleteFolderRecursive(projectFolderPath);
 }
+
 function getMicroserviceByName(
-  microservices: Microservice[],
+  microservices: readonly Readonly<Microservice>[],
   name: string,
 ): Microservice | undefined {
-  return microservices.find((microservice) => microservice.name === name);
+  const found = microservices.find((microservice) => microservice.name === name);
+  return found === undefined ? undefined : { ...found };
 }
 
 export {

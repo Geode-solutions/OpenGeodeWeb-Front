@@ -1,15 +1,11 @@
 <script setup lang="ts">
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
-// This file exhaustively wires group- and per-component style properties (visibility/color/coloring/vertex+polyhedron attributes) to the style store; the formatter's line-wrapping of the resulting store calls pushes the file past max-lines even though no logic was added.
-// oxlint-disable eslint/max-lines
 import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
+import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 interface Props {
   modelId: string;
@@ -23,7 +19,7 @@ const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
 // Visibility
-const surfacesVisibility = computed({
+const surfacesVisibility = computed<boolean>({
   get: () => dataStyleStore.modelComponentTypeVisibility(modelId, "Surface"),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesVisibility(modelId, targetSurfaceIds, newValue);
@@ -31,7 +27,7 @@ const surfacesVisibility = computed({
   },
 });
 
-const surfaceVisibility = computed({
+const surfaceVisibility = computed<boolean>({
   get: () => dataStyleStore.modelSurfaceVisibility(modelId, surfaceId) as boolean | undefined,
   set: async (newValue) => {
     if (surfaceId === undefined) {
@@ -86,7 +82,7 @@ const surfaceActiveColoring = computed<string | undefined>({
 });
 
 // Group Attributes
-const surfacesVertexAttributeName = computed({
+const surfacesVertexAttributeName = computed<string | undefined>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeName(modelId),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -97,7 +93,7 @@ const surfacesVertexAttributeName = computed({
   },
 });
 
-const surfacesVertexAttributeItem = computed({
+const surfacesVertexAttributeItem = computed<string | undefined>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeItem(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesVertexAttributeItem(modelId, targetSurfaceIds, newValue);
@@ -105,7 +101,7 @@ const surfacesVertexAttributeItem = computed({
   },
 });
 
-const surfacesVertexAttributeRange = computed({
+const surfacesVertexAttributeRange = computed<[number, number] | undefined>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeRange(modelId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -122,7 +118,7 @@ const surfacesVertexAttributeRange = computed({
   },
 });
 
-const surfacesVertexAttributeColorMap = computed({
+const surfacesVertexAttributeColorMap = computed<Map<string, RGBAColor> | undefined>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeColorMap(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesVertexAttributeColorMap(
@@ -147,7 +143,7 @@ const surfacesVertexAttributeNoDataColor = computed<RGBAColor | undefined>({
   },
 });
 
-const surfacesPolygonAttributeName = computed({
+const surfacesPolygonAttributeName = computed<string | undefined>({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeName(modelId),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -158,7 +154,7 @@ const surfacesPolygonAttributeName = computed({
   },
 });
 
-const surfacesPolygonAttributeItem = computed({
+const surfacesPolygonAttributeItem = computed<string | undefined>({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeItem(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesPolygonAttributeItem(modelId, targetSurfaceIds, newValue);
@@ -166,7 +162,7 @@ const surfacesPolygonAttributeItem = computed({
   },
 });
 
-const surfacesPolygonAttributeRange = computed({
+const surfacesPolygonAttributeRange = computed<[number, number] | undefined>({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeRange(modelId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -183,7 +179,7 @@ const surfacesPolygonAttributeRange = computed({
   },
 });
 
-const surfacesPolygonAttributeColorMap = computed({
+const surfacesPolygonAttributeColorMap = computed<Map<string, RGBAColor> | undefined>({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeColorMap(modelId),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesPolygonAttributeColorMap(
@@ -209,7 +205,7 @@ const surfacesPolygonAttributeNoDataColor = computed<RGBAColor | undefined>({
 });
 
 // Individual Attributes
-const vertexAttributeName = computed({
+const vertexAttributeName = computed<string | undefined>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeName(modelId, surfaceId),
   set: async (newValue) => {
     if (surfaceId === undefined || newValue === undefined) {
@@ -220,7 +216,7 @@ const vertexAttributeName = computed({
   },
 });
 
-const vertexAttributeItem = computed({
+const vertexAttributeItem = computed<string | undefined>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeItem(modelId, surfaceId),
   set: async (newValue) => {
     if (surfaceId === undefined) {
@@ -231,7 +227,7 @@ const vertexAttributeItem = computed({
   },
 });
 
-const vertexAttributeRange = computed({
+const vertexAttributeRange = computed<[number, number] | undefined>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeRange(modelId, surfaceId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -248,7 +244,7 @@ const vertexAttributeRange = computed({
   },
 });
 
-const vertexAttributeColorMap = computed({
+const vertexAttributeColorMap = computed<Map<string, RGBAColor> | undefined>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeColorMap(modelId, surfaceId),
   set: async (newValue) => {
     if (surfaceId === undefined) {
@@ -273,7 +269,7 @@ const vertexAttributeNoDataColor = computed<RGBAColor | undefined>({
   },
 });
 
-const polygonAttributeName = computed({
+const polygonAttributeName = computed<string | undefined>({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeName(modelId, surfaceId),
   set: async (newValue) => {
     if (surfaceId === undefined || newValue === undefined) {
@@ -284,7 +280,7 @@ const polygonAttributeName = computed({
   },
 });
 
-const polygonAttributeItem = computed({
+const polygonAttributeItem = computed<string | undefined>({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeItem(modelId, surfaceId),
   set: async (newValue) => {
     if (surfaceId === undefined) {
@@ -295,7 +291,7 @@ const polygonAttributeItem = computed({
   },
 });
 
-const polygonAttributeRange = computed({
+const polygonAttributeRange = computed<[number, number] | undefined>({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeRange(modelId, surfaceId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -312,7 +308,7 @@ const polygonAttributeRange = computed({
   },
 });
 
-const polygonAttributeColorMap = computed({
+const polygonAttributeColorMap = computed<Map<string, RGBAColor> | undefined>({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeColorMap(modelId, surfaceId),
   set: async (newValue) => {
     if (surfaceId === undefined) {

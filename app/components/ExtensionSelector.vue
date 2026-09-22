@@ -20,11 +20,11 @@ const { geodeObjectType, filenames } = defineProps<Props>();
 type OutputExtensions = Record<string, { is_saveable: boolean }>;
 
 const geode_objects_and_output_extensions = ref<Record<string, OutputExtensions>>({});
-const loading = ref(false);
+const loading = ref<boolean>(false);
 
 const toggle_loading = useToggle(loading);
 
-async function get_output_file_extensions() {
+async function get_output_file_extensions(): Promise<void> {
   toggle_loading();
   geode_objects_and_output_extensions.value = {};
   const backStore = useBackStore();
@@ -51,7 +51,7 @@ async function get_output_file_extensions() {
       }
       for (const extension of Object.keys(extensions)) {
         final_object[key][extension] = {
-          is_saveable: extensions[extension]!.is_saveable,
+          is_saveable: extensions[extension].is_saveable,
         };
       }
     }
@@ -60,7 +60,7 @@ async function get_output_file_extensions() {
   toggle_loading();
 }
 
-function update_values(output_geode_object: string, output_extension: string) {
+function update_values(output_geode_object: string, output_extension: string): void {
   if (output_geode_object !== "" && output_extension !== "") {
     emit("update_values", {
       output_geode_object,
