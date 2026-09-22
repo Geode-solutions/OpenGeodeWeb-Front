@@ -78,25 +78,25 @@ function autoDetectSeparator(content: string): string {
 }
 
 function splitLine(line: string): string[] {
-    if (!separator.value) {
-      return [line];
-    }
-    const result = [];
-    let current = "";
-    let inQuotes = false;
-    for (const char of line) {
-      if (char === '"') {
-        inQuotes = !inQuotes;
-      } else if (char === separator.value && !inQuotes) {
-        result.push(current.trim());
-        current = "";
-      } else {
-        current += char;
-      }
-    }
-    result.push(current.trim());
-    return result;
+  if (!separator.value) {
+    return [line];
   }
+  const result = [];
+  let current = "";
+  let inQuotes = false;
+  for (const char of line) {
+    if (char === '"') {
+      inQuotes = !inQuotes;
+    } else if (char === separator.value && !inQuotes) {
+      result.push(current.trim());
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+  result.push(current.trim());
+  return result;
+}
 
 function parseContent(): string[] {
   if (!rawContent.value) {

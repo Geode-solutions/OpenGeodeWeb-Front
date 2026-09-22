@@ -142,7 +142,7 @@ export const useAppStore = defineStore("app", () => {
     getExtensionEnabled,
   } = useAppExtensions();
 
-// oxlint-disable-next-line unicorn/consistent-function-scoping
+  // oxlint-disable-next-line unicorn/consistent-function-scoping
   async function upload(file: Readonly<File>, callbacks: RequestHandlers = {}): Promise<unknown> {
     const store = useAppStore();
     const schema = opengeodeweb_front_schemas.api.local.extensions.upload;
