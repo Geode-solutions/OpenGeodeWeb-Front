@@ -1,11 +1,8 @@
 <script setup lang="ts">
 // oxlint-disable id-length since vuetify require { r,g,b} format to work
-import { useClipboard } from "@vueuse/core";
-
 import { formatColorString, parseColorString } from "@ogw_front/utils/color_picker";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
-
-const COPIED_TIMEOUT = 1500;
+import { useCopyToClipboard } from "@ogw_front/composables/copy_to_clipboard";
 
 interface Props {
   disabledAlpha?: boolean;
@@ -13,8 +10,11 @@ interface Props {
 
 const { disabledAlpha = false } = defineProps<Props>();
 
+const colorPickerWrapperRef = useTemplateRef<HTMLElement>("colorPickerWrapperRef");
+const { pressed } = useMousePressed({ target: colorPickerWrapperRef });
+
 const model = defineModel<RGBAColor>();
-const { copy, copied } = useClipboard({ copiedDuring: COPIED_TIMEOUT });
+const { copy, copied } = useCopyToClipboard();
 
 const currentMode = ref(disabledAlpha ? "rgb" : "rgba");
 const colorInputText = ref("");
@@ -41,6 +41,11 @@ interface VuetifyColor {
   a: number;
 }
 
+function commitColorToModel() {
+  const { r: red, g: green, b: blue, a: alpha } = vuetifyColor.value;
+  model.value = { red, green, blue, alpha };
+}
+
 function onPickerUpdate(color: VuetifyColor) {
   const red = Math.round(color.r);
   const green = Math.round(color.g);
@@ -48,8 +53,10 @@ function onPickerUpdate(color: VuetifyColor) {
   const alpha = disabledAlpha ? 1 : Number(color.a.toFixed(2));
 
   vuetifyColor.value = { r: red, g: green, b: blue, a: alpha };
-  model.value = { red, green, blue, alpha };
   updateInputTextFromColor(red, green, blue, alpha);
+  if (!pressed.value) {
+    commitColorToModel();
+  }
 }
 
 function toggleMode() {
@@ -118,6 +125,12 @@ watch(
   { deep: true, immediate: true },
 );
 
+watch(pressed, (isPressed) => {
+  if (!isPressed) {
+    commitColorToModel();
+  }
+});
+
 watch(
   () => disabledAlpha,
   (disabled) => {
@@ -132,7 +145,7 @@ watch(
 </script>
 
 <template>
-  <div class="color-picker-wrapper mx-auto rounded-lg overflow-hidden border">
+  <div ref="colorPickerWrapperRef" class="color-picker-wrapper mx-auto rounded-lg overflow-hidden border">
     <v-color-picker
       data-testid="colorPicker"
       :model-value="vuetifyColor"
