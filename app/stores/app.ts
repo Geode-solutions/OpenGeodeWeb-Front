@@ -142,6 +142,7 @@ export const useAppStore = defineStore("app", () => {
     getExtensionEnabled,
   } = useAppExtensions();
 
+  // oxlint-disable-next-line unicorn/consistent-function-scoping -- calls useAppStore(), which is only defined once this defineStore() call returns, so it can't be hoisted above it.
   async function upload(file: Readonly<File>, callbacks: RequestHandlers = {}): Promise<unknown> {
     const store = useAppStore();
     const schema = opengeodeweb_front_schemas.api.local.extensions.upload;
@@ -163,6 +164,7 @@ export const useAppStore = defineStore("app", () => {
   }
 
   // `TResult` is asserted, not verified, at the single `return result as TResult` boundary below: the backend response is only checked against `schema` at runtime, so callers' `TResult` is a contract with the schema, not something this function can prove.
+  // oxlint-disable-next-line unicorn/consistent-function-scoping -- calls useAppStore(), which is only defined once this defineStore() call returns, so it can't be hoisted above it.
   async function request<TResult = unknown>(
     {
       schema,

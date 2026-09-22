@@ -62,6 +62,7 @@ export const useViewerStore = defineStore(
     function toggle_picking_mode(value: boolean): void {
       picking_mode.value = value;
     }
+    // oxlint-disable-next-line unicorn/consistent-function-scoping -- calls useViewerStore(), which is only defined once this defineStore() call returns, so it can't be hoisted above it.
     async function request(
       {
         schema,

@@ -167,15 +167,9 @@ function performSetContainer(container: ContainerRef | undefined): void {
 }
 function useHybridViewerViewport(): HybridViewerViewport {
   const { viewStream } = useHybridViewerCore();
-  function setContainer(container: ContainerRef | undefined): void {
-    performSetContainer(container);
-  }
-  async function resize(width: number, height: number): Promise<void> {
-    await performResize(width, height);
-  }
   return {
-    setContainer,
-    resize,
+    setContainer: performSetContainer,
+    resize: performResize,
     viewStream,
   };
 }
