@@ -1,12 +1,10 @@
 <script setup lang="ts">
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
+import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
 import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar.vue";
 import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
 import { getAttributeRange } from "@ogw_front/utils/attributes";
 import { useBackStore } from "@ogw_front/stores/back";
-import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
 
 const backStore = useBackStore();
 
@@ -33,10 +31,10 @@ interface AttributeInfo {
 
 const attributes = ref<AttributeInfo[]>([]);
 
-const currentAttribute = computed(() =>
+const currentAttribute = computed<AttributeInfo | undefined>(() =>
   attributes.value.find((attr) => attr.attribute_name === attributeName.value),
 );
-const cssNoDataColor = computed(() => {
+const cssNoDataColor = computed<string>(() => {
   const { red, green, blue, alpha } = attributeNoDataColor.value ?? DEFAULT_NO_DATA_COLOR;
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 });
@@ -77,7 +75,7 @@ const rangeMax = computed<number | undefined>({
   },
 });
 
-const componentItems = computed(() => {
+const componentItems = computed<{ title: string; value: number }[]>(() => {
   if (!currentAttribute.value) {
     return [];
   }
@@ -87,7 +85,7 @@ const componentItems = computed(() => {
   }));
 });
 
-function resetRange() {
+function resetRange(): void {
   if (currentAttribute.value) {
     const comp = attributeItem.value ?? 0;
     // GetAttributeRange's parameter type (AttributeRangeSource) isn't exported;
@@ -101,11 +99,11 @@ function resetRange() {
   }
 }
 
-function hasSelectedComponent(components: unknown) {
+function hasSelectedComponent(components: unknown): boolean {
   return Array.isArray(components) && components.length > 0;
 }
 
-function getAttributes() {
+function getAttributes(): void {
   const schemaProperties = schema.properties as Record<string, unknown> | undefined;
   const requiresComponent = schemaProperties?.component_ids !== undefined;
   if (requiresComponent && !hasSelectedComponent(componentIds)) {

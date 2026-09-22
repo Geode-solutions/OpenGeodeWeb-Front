@@ -1,6 +1,3 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
-import type { Ref } from "vue";
 import type { DisplayItem, EmitFn } from "./virtual_tree";
 
 interface VisibleBounds {
@@ -14,10 +11,24 @@ interface ScrollInfo {
   itemHeight: number;
 }
 
+type ReadonlyDisplayItem = Readonly<Omit<DisplayItem, "raw">> & {
+  readonly raw: Readonly<Record<string, unknown>>;
+};
+
+interface KeyboardEventLike {
+  readonly key: string;
+  preventDefault: () => void;
+}
+
+interface UseTreeKeyboardNavReturn {
+  focusedIndex: Ref<number>;
+  handleKeyDown: (event: Readonly<KeyboardEventLike>) => void;
+}
+
 function getBaseIndex(
   currentIndex: number,
   lastIndex: number,
-  bounds: VisibleBounds | undefined,
+  bounds: Readonly<VisibleBounds> | undefined,
   key: string,
 ): number {
   if (currentIndex < 0 || currentIndex > lastIndex) {
@@ -38,17 +49,17 @@ function getBaseIndex(
 }
 
 export function useTreeKeyboardNav(
-  displayItems: Ref<DisplayItem[]>,
+  displayItems: Readonly<Ref<readonly ReadonlyDisplayItem[]>>,
   emit: EmitFn,
   scrollToIndex: (index: number) => void,
-  toggleOpen: (raw: Record<string, unknown>) => void,
-  handleItemClick: (item: DisplayItem, index: number) => void,
+  toggleOpen: (raw: Readonly<Record<string, unknown>>) => void,
+  handleItemClick: (item: ReadonlyDisplayItem, index: number) => void,
   getScrollInfo: (() => ScrollInfo | undefined) | undefined,
-  externalFocusedIndex: Ref<number> | undefined,
-) {
-  const focusedIndex = externalFocusedIndex || ref(-1);
+  externalFocusedIndex: Readonly<Ref<number>> | undefined,
+): UseTreeKeyboardNavReturn {
+  const focusedIndex = externalFocusedIndex ?? ref(-1);
 
-  function findParentIndex(item: DisplayItem, currentIndex: number): number {
+  function findParentIndex(item: ReadonlyDisplayItem, currentIndex: number): number {
     for (let index = currentIndex - 1; index >= 0; index -= 1) {
       const candidate = displayItems.value[index];
       if (candidate && candidate.depth < item.depth) {
@@ -74,7 +85,7 @@ export function useTreeKeyboardNav(
   }
 
   function handleExpandOrNext(
-    item: DisplayItem | undefined,
+    item: ReadonlyDisplayItem | undefined,
     currentIndex: number,
     lastIndex: number,
   ): number {
@@ -85,7 +96,10 @@ export function useTreeKeyboardNav(
     return Math.min(currentIndex + 1, lastIndex);
   }
 
-  function handleCollapseOrParent(item: DisplayItem | undefined, currentIndex: number): number {
+  function handleCollapseOrParent(
+    item: ReadonlyDisplayItem | undefined,
+    currentIndex: number,
+  ): number {
     if (item && !item.isLeaf && item.isOpen) {
       toggleOpen(item.raw);
       return currentIndex;
@@ -129,7 +143,7 @@ export function useTreeKeyboardNav(
     return currentIndex;
   }
 
-  function handleKeyDown(event: KeyboardEvent): void {
+  function handleKeyDown(event: Readonly<KeyboardEventLike>): void {
     if (displayItems.value.length === 0) {
       return;
     }
@@ -137,7 +151,7 @@ export function useTreeKeyboardNav(
     if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) {
       event.preventDefault();
       const prevIndex = focusedIndex.value;
-      focusedIndex.value = getNextIndex(event.key);
+      (focusedIndex as Ref<number>).value = getNextIndex(event.key);
 
       if (focusedIndex.value !== prevIndex) {
         if (prevIndex >= 0 && prevIndex < displayItems.value.length) {

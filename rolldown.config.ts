@@ -3,6 +3,8 @@ import path from "node:path";
 
 import { defineConfig } from "rolldown";
 
+import package_json from "./package.json" with { type: "json" };
+
 // Server/utils/extension.ts relies on Nitro's "#imports" auto-import alias and cannot run outside a Nitro server, so it is excluded from this build.
 const EXCLUDED_FILES = new Set(["server/utils/extension.ts"]);
 
@@ -20,7 +22,7 @@ function collectTsFiles(dir: string): string[] {
   return files;
 }
 
-const ownPackageName = JSON.parse(fs.readFileSync("package.json", "utf8")).name as string;
+const ownPackageName = package_json.name;
 
 function isExternal(id: string): boolean {
   if (id.startsWith(".") || path.isAbsolute(id)) {
@@ -38,7 +40,7 @@ export default defineConfig({
   platform: "node",
   external: isExternal,
   output: {
-    dir: ".",
+    dir: ".build",
     format: "esm",
     preserveModules: true,
     preserveModulesRoot: ".",

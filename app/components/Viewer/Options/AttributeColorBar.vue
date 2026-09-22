@@ -2,9 +2,11 @@
 import AttributeRangeSelector from "./AttributeRangeSelector.vue";
 import ColorMapPicker from "./ColorMapPicker.vue";
 
-const emit = defineEmits<{
+interface Emits {
   reset: [];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 
 const minimum = defineModel<number>("minimum");
 const maximum = defineModel<number>("maximum");

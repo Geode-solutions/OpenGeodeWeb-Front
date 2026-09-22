@@ -1,12 +1,10 @@
 <script setup lang="ts">
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
 import { sortAndFormatItems, useTreeFilter } from "@ogw_front/composables/tree_filter";
 import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
+import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
-import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useModelComponents } from "@ogw_front/composables/model_components";
@@ -31,7 +29,8 @@ interface TreeViewItem {
 
 const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 const hybridViewerStore = useHybridViewerStore();
-const emit = defineEmits<{
+
+interface Emits {
   "show-menu": [
     payload: {
       event: unknown;
@@ -42,7 +41,9 @@ const emit = defineEmits<{
       targetComponentIds?: string[];
     },
   ];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 
 const treeviewStore = useTreeviewStore();
 const {
@@ -53,11 +54,11 @@ const {
   updateVisibility,
 } = useModelComponents(id);
 
-const currentView = computed(() =>
+const currentView = computed<TreeViewItem | undefined>(() =>
   treeviewStore.opened_views.find((view) => view.id === actualViewId),
 );
 
-const opened = computed({
+const opened = computed<string[]>({
   get: () => currentView.value?.opened || [],
   set: (val) => treeviewStore.setOpened(actualViewId, val),
 });
@@ -73,12 +74,12 @@ const {
   applySearchFilter,
 } = useTreeFilter(localCategories);
 
-function onUpdateSelection(newSelection: string[]) {
+function onUpdateSelection(newSelection: string[]): void {
   const finalSelection = applySearchFilter(newSelection, visibleComponents.value);
   updateVisibility(finalSelection as string[]);
 }
 
-const visibleSelection = computed(() => applySearchFilter(visibleComponents.value, []));
+const visibleSelection = computed<string[]>(() => applySearchFilter(visibleComponents.value, []));
 
 const itemsForTreeView = computed<TreeViewItem[]>(() => {
   if (search.value && componentsCache.value) {
@@ -116,7 +117,7 @@ const itemsForTreeView = computed<TreeViewItem[]>(() => {
   return result;
 });
 
-function showContextMenu(event: unknown, item: TreeViewItem) {
+function showContextMenu(event: unknown, item: TreeViewItem): void {
   const actualItem = item.raw || item;
   const typeId = actualItem.category || actualItem.id;
   const typeItem = itemsForTreeView.value.find((type) => type.id === typeId);
@@ -139,7 +140,7 @@ function handleHoverEnter({
 }: {
   item: TreeViewItem;
   immediate?: boolean;
-}) {
+}): void {
   const actualItem = item.raw || item;
 
   if (!actualItem.category && (!actualItem.children || actualItem.children.length === 0)) {
@@ -157,7 +158,7 @@ function handleHoverEnter({
   );
 }
 
-function handleHoverLeave() {
+function handleHoverLeave(): void {
   onHoverLeave(id);
 }
 
@@ -174,9 +175,9 @@ function getFocusBlockIds(item: TreeViewItem): string[] {
   return ids as unknown as string[];
 }
 
-function expandAll() {
+function expandAll(): void {
   const allIds: string[] = [];
-  function traverse(itemsList: TreeViewItem[]) {
+  function traverse(itemsList: TreeViewItem[]): void {
     for (const item of itemsList) {
       if (item.children && item.children.length > 0) {
         allIds.push(item.id);

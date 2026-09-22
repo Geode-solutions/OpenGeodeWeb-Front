@@ -1,10 +1,8 @@
 <script setup lang="ts">
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
 import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
+import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
-import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import { compareSelections } from "@ogw_front/utils/treeview";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -19,9 +17,11 @@ const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 
-const emit = defineEmits<{
+interface Emits {
   "show-menu": [payload: { event: MouseEvent; itemId: string }];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 
 interface TreeGroupItem {
   raw?: TreeGroupItem;
@@ -32,8 +32,8 @@ interface TreeGroupItem {
   children?: TreeGroupItem[];
 }
 
-const mainView = computed(() => treeviewStore.opened_views[0]);
-const opened = computed({
+const mainView = computed<TreeGroupItem>(() => treeviewStore.opened_views[0]);
+const opened = computed<string[]>({
   get: () => mainView.value?.opened || [],
   set: (val) => treeviewStore.setOpened(mainView.value?.id ?? "", val),
 });
@@ -49,11 +49,11 @@ const {
   applySearchFilter,
 } = useTreeFilter(() => treeviewStore.items, { recursiveSort: true });
 
-function onUpdateSelection(val: string[]) {
+function onUpdateSelection(val: string[]): void {
   treeviewStore.selection = applySearchFilter(val, treeviewStore.selection) as string[];
 }
 
-const visibleSelection = computed(() => applySearchFilter(treeviewStore.selection, []));
+const visibleSelection = computed<string[]>(() => applySearchFilter(treeviewStore.selection, []));
 
 watch(
   () => treeviewStore.selection,
@@ -82,7 +82,7 @@ watch(
   },
 );
 
-function isModel(item: TreeGroupItem) {
+function isModel(item: TreeGroupItem): boolean {
   const actualItem = item.raw || item;
   return (
     actualItem.viewer_type === "model" ||
@@ -121,7 +121,7 @@ function handleHoverEnter({
 }: {
   item: TreeGroupItem;
   immediate?: boolean;
-}) {
+}): void {
   const actualItem = item.raw || item;
 
   if (!actualItem.viewer_type) {
@@ -138,7 +138,7 @@ function handleHoverEnter({
   );
 }
 
-function handleHoverLeave({ item }: { item: TreeGroupItem }) {
+function handleHoverLeave({ item }: { item: TreeGroupItem }): void {
   const actualItem = item.raw || item;
   if (!actualItem.viewer_type) {
     return;
@@ -146,9 +146,9 @@ function handleHoverLeave({ item }: { item: TreeGroupItem }) {
   onHoverLeave(actualItem.id);
 }
 
-function expandAll() {
+function expandAll(): void {
   const allIds: string[] = [];
-  function traverse(itemsList: TreeGroupItem[]) {
+  function traverse(itemsList: TreeGroupItem[]): void {
     for (const item of itemsList) {
       if (item.children && item.children.length > 0) {
         allIds.push(item.id);

@@ -3,9 +3,11 @@ import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 const feedbackStore = useFeedbackStore();
 
-function reload() {
+function reload(): void {
   globalThis.location.reload();
 }
+
+defineExpose({ reload });
 </script>
 
 <template>

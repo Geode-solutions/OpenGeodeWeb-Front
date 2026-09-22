@@ -4,7 +4,14 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schem
 
 const schema = viewer_schemas.opengeodeweb_viewer.model.surfaces.visibility;
 
-export function useModelSurfacesVisibility() {
+export function useModelSurfacesVisibility(): {
+  setModelSurfacesVisibility: (
+    modelId: string,
+    surfaces_ids: readonly string[],
+    visibility: boolean | undefined,
+  ) => Promise<unknown>;
+  modelSurfaceVisibility: (id: string, surface_id?: string) => unknown;
+} {
   const modelCommonStyle = useModelCommonStyle();
   const modelSurfacesCommonStyle = useModelSurfacesCommonStyle();
 
@@ -12,12 +19,18 @@ export function useModelSurfacesVisibility() {
     return modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id).visibility;
   }
 
-  function setModelSurfacesVisibility(
+  async function setModelSurfacesVisibility(
     modelId: string,
-    surfaces_ids: string[],
+    surfaces_ids: readonly string[],
     visibility: boolean | undefined,
-  ) {
-    return modelCommonStyle.setModelTypeVisibility(modelId, surfaces_ids, visibility, schema);
+  ): Promise<unknown> {
+    const result = await modelCommonStyle.setModelTypeVisibility(
+      modelId,
+      [...surfaces_ids],
+      visibility,
+      schema,
+    );
+    return result;
   }
 
   return { setModelSurfacesVisibility, modelSurfaceVisibility };

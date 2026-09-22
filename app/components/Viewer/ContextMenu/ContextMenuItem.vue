@@ -55,7 +55,7 @@ const TREEVIEW_MARGIN_RIGHT = 20;
 const TREEVIEW_ICON_WIDTH = 48;
 
 const treeviewStore = useTreeviewStore();
-const isOverTreeview = computed(() => {
+const isOverTreeview = computed<boolean>(() => {
   const hasAdditional = treeviewStore.opened_views.some((view) => view.id !== "main");
   const hasMain = treeviewStore.opened_views.some((view) => view.id === "main");
   const firstColWidth = hasMain ? treeviewStore.panelWidth : 0;
@@ -69,7 +69,7 @@ const isOverTreeview = computed(() => {
   return buttonCoords.value.x < treeviewWidth;
 });
 
-const isOverToolbar = computed(() => {
+const isOverToolbar = computed<boolean>(() => {
   const toolbarEl = document.querySelector(".view-toolbar");
   if (!toolbarEl) {
     return false;
@@ -84,7 +84,7 @@ const isOverToolbar = computed(() => {
   );
 });
 
-const computedItemStyles = computed(() => {
+const computedItemStyles = computed<Record<string, string>>(() => {
   if (isOverTreeview.value || isOverToolbar.value) {
     return {
       "--adaptive-blur": "15px",
@@ -95,13 +95,15 @@ const computedItemStyles = computed(() => {
   return adaptiveStyles.value;
 });
 
-const is_active = computed(() => menuStore.active_item_index === index);
+const is_active = computed<boolean>(() => menuStore.active_item_index === index);
 const optionsRef = ref<HTMLElement | undefined>(undefined);
 const { height: optionsHeight } = useElementSize(optionsRef);
 
-const maxCardHeight = computed(() => Math.min(CARD_HEIGHT, menuStore.containerHeight - OFFSET));
+const maxCardHeight = computed<number>(() =>
+  Math.min(CARD_HEIGHT, menuStore.containerHeight - OFFSET),
+);
 
-const optionsStyle = computed(() => {
+const optionsStyle = computed<Record<string, string>>(() => {
   if (!is_active.value || !optionsHeight.value) {
     return {};
   }
@@ -120,7 +122,7 @@ const optionsStyle = computed(() => {
   return { top: `calc(50% + ${offsetY}px)` };
 });
 
-const optionsClass = computed(() => {
+const optionsClass = computed<string>(() => {
   const loc = itemProps.tooltip_location;
   const margin = MARGIN;
   const radius = RADIUS;
@@ -132,7 +134,7 @@ const optionsClass = computed(() => {
   return menuStore.menuX - radius - margin - CARD_WIDTH < 0 ? "options-right" : "options-left";
 });
 
-function toggleOptions() {
+function toggleOptions(): void {
   menuStore.toggleItemOptions(index);
 }
 

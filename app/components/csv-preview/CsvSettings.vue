@@ -17,9 +17,11 @@ const xColumn = defineModel<string>("xColumn");
 const yColumn = defineModel<string>("yColumn");
 const zColumn = defineModel<string>("zColumn");
 
-const emit = defineEmits<{
+interface Emits {
   "update:separator": [value: string];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 
 const separators = [
   { title: "Comma (,)", value: "," },
@@ -30,8 +32,8 @@ const separators = [
   { title: "Custom", value: "custom" },
 ];
 
-const selectedType = ref(",");
-const customValue = ref("");
+const selectedType = ref<string>(",");
+const customValue = ref<string>("");
 
 watch(
   () => separator,

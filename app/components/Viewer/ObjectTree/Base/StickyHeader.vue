@@ -1,13 +1,11 @@
 <script setup lang="ts">
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
-import TreeRow from "@ogw_front/components/Viewer/ObjectTree/Base/TreeRow.vue";
 import type {
   DisplayItem,
   ItemPropsConfig,
   SelectionConfig,
   TreeItem,
 } from "@ogw_front/composables/virtual_tree";
+import TreeRow from "@ogw_front/components/Viewer/ObjectTree/Base/TreeRow.vue";
 
 interface Props {
   item: DisplayItem;
@@ -19,10 +17,12 @@ interface Props {
 
 const { item, itemProps, selection, isSelected, getIndeterminate } = defineProps<Props>();
 
-const emit = defineEmits<{
+interface Emits {
   "toggle-open": [item: TreeItem];
   "toggle-select": [item: TreeItem];
-}>();
+}
+
+const emit = defineEmits<Emits>();
 </script>
 
 <template>

@@ -48,6 +48,17 @@ interface MenuMetaData {
   [key: string]: unknown;
 }
 
+interface OpenMenuOptions {
+  readonly id: string;
+  readonly x: number | undefined;
+  readonly y: number | undefined;
+  readonly width: number;
+  readonly height: number;
+  readonly top: number;
+  readonly left: number;
+  readonly meta_data: Readonly<MenuMetaData> | undefined;
+}
+
 const PointSet_menu = [PointSetPointsOptions];
 
 const EdgedCurve_menu = [EdgedCurvePointsOptions, EdgedCurveEdgesOptions];
@@ -146,10 +157,16 @@ export const useMenuStore = defineStore("menu", () => {
     objectType: string | undefined,
     geodeObject: string | undefined,
   ): MenuItems {
-    if (!objectType || !geodeObject || !menus.value[objectType]) {
+    if (
+      objectType === undefined ||
+      objectType === "" ||
+      geodeObject === undefined ||
+      geodeObject === "" ||
+      !menus.value[objectType]
+    ) {
       return [];
     }
-    return menus.value[objectType]?.[geodeObject] || [];
+    return menus.value[objectType]?.[geodeObject] ?? [];
   }
 
   function closeMenu(): void {
@@ -161,17 +178,9 @@ export const useMenuStore = defineStore("menu", () => {
     display_menu.value = false;
   }
 
-  async function openMenu(
-    id: string,
-    x: number | undefined,
-    y: number | undefined,
-    width: number,
-    height: number,
-    top: number,
-    left: number,
-    meta_data: MenuMetaData | undefined,
-  ): Promise<void> {
-    await closeMenu();
+  function openMenu(options: OpenMenuOptions): void {
+    const { id, x, y, width, height, top, left, meta_data } = options;
+    closeMenu();
 
     if (meta_data) {
       const items = getMenuItems(meta_data.viewer_type, meta_data.geode_object_type);
@@ -181,7 +190,7 @@ export const useMenuStore = defineStore("menu", () => {
     }
 
     current_id.value = id;
-    current_meta_data.value = meta_data || {};
+    current_meta_data.value = meta_data ?? {};
 
     if (x !== undefined && y !== undefined) {
       menuX.value = x;

@@ -23,7 +23,7 @@ const menuStore = useMenuStore();
 const viewerStore = useViewerStore();
 const hybridViewerStore = useHybridViewerStore();
 
-function stopHoverHighlight() {
+function stopHoverHighlight(): void {
   hybridViewerStore.is_hover_highlight = false;
   hybridViewerStore.clearHoverHighlight();
 }
@@ -57,7 +57,7 @@ const {
   get_viewer_id: trigger_picker,
 } = useOverlappingPicker();
 
-function get_viewer_id(x: number, y: number) {
+function get_viewer_id(x: number, y: number): string {
   const instance = getCurrentInstance();
   const containerRect = instance?.proxy?.$el
     ?.closest?.('[data-testid="hybridViewer"]')

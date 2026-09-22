@@ -14,22 +14,22 @@ const selectedPresetName = defineModel<string>("selectedPresetName", {
   default: "batlow",
 });
 
-const menuOpen = ref(false);
+const menuOpen = ref<boolean>(false);
 const lutCanvas = ref<HTMLCanvasElement | undefined>(undefined);
 
 const presets = computed(() => getPresetsWithCurrentAtTop(selectedPresetName.value));
 
-function drawLutCanvas() {
+function drawLutCanvas(): void {
   drawCanvasForPreset(selectedPresetName.value, lutCanvas.value);
 }
 
-function onSelectPreset(preset: { Name: string }) {
+function onSelectPreset(preset: { Name: string }): void {
   selectedPresetName.value = preset.Name;
   menuOpen.value = false;
 }
 
 onMounted(() => nextTick(drawLutCanvas));
-watch([lutCanvas, selectedPresetName, () => min, () => max], drawLutCanvas);
+watch([lutCanvas, selectedPresetName, (): number => min, (): number => max], drawLutCanvas);
 </script>
 
 <template>

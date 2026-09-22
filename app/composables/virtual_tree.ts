@@ -1,6 +1,13 @@
-import type { MaybeRefOrGetter } from "vue";
+import type { Ref } from "vue";
 
-type TreeItem = Record<string, unknown>;
+// Like Vue's MaybeRefOrGetter<T>, but the Ref branch is narrowed to Readonly<Ref<T>>: a plain
+// Ref<T> always fails prefer-readonly-parameter-types (its `.value` is writable) no matter how
+// Deeply readonly T itself is, and wrapping the *whole* union in Readonly<> instead would collapse
+// The getter-function branch to an uncallable `{}` (Readonly<Fn> has no keys). Callers passing an
+// Ordinary Ref<T> still type-check fine here: a mutable Ref<T> is assignable to Readonly<Ref<T>>.
+type ReadonlyMaybeRefOrGetter<Value> = Value | Readonly<Ref<Value>> | (() => Value);
+
+type TreeItem = Readonly<Record<string, unknown>>;
 
 interface ItemPropsConfig {
   value: string;
@@ -17,14 +24,18 @@ interface SelectionConfig {
 }
 
 interface VirtualTreeProps {
-  items?: TreeItem[];
-  opened?: unknown[];
-  selected?: unknown[];
-  active?: unknown[];
-  itemProps?: Partial<ItemPropsConfig>;
-  selection?: Partial<SelectionConfig>;
-  search?: string;
-  customFilter?: (id: unknown, search: string, context: { raw: TreeItem }) => boolean;
+  readonly items?: readonly TreeItem[];
+  readonly opened?: readonly unknown[];
+  readonly selected?: readonly unknown[];
+  readonly active?: readonly unknown[];
+  readonly itemProps?: Readonly<Partial<ItemPropsConfig>>;
+  readonly selection?: Readonly<Partial<SelectionConfig>>;
+  readonly search?: string;
+  readonly customFilter?: (
+    id: unknown,
+    search: string,
+    context: Readonly<{ raw: TreeItem }>,
+  ) => boolean;
 }
 
 interface DisplayItem {
@@ -36,9 +47,39 @@ interface DisplayItem {
   isLeaf: boolean;
 }
 
-type EmitFn = (event: string, ...args: unknown[]) => void;
+type EmitFn = (event: string, ...args: readonly unknown[]) => void;
 
-function useVirtualTree(propsIn: MaybeRefOrGetter<VirtualTreeProps>, emit: EmitFn) {
+interface UseVirtualTreeReturn {
+  actualItemProps: ComputedRef<ItemPropsConfig>;
+  actualSelection: ComputedRef<SelectionConfig>;
+  displayItems: ComputedRef<DisplayItem[]>;
+  toggleOpen: (item: TreeItem) => void;
+  toggleSelect: (item: TreeItem) => void;
+  isSelected: (item: TreeItem) => boolean;
+  getIndeterminate: (item: TreeItem) => boolean;
+}
+
+// Real runtime check (rather than an `as TreeItem[]` cast) for the duck-typed "children" field:
+// Item shapes vary across callers (treeview groups, model component/collection groups, ...), so
+// This only verifies it is actually an array, same as the assumption the old cast silently made.
+function isTreeItemArray(value: unknown): value is TreeItem[] {
+  return Array.isArray(value);
+}
+
+// Extracted so we never call String() directly on a value typed as `unknown` (ids and titles can
+// Be anything at runtime): only stringify primitives that have a sane toString, and fall back to
+// "" for anything else instead of risking "[object Object]".
+function toDisplayString(value: unknown): string {
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+  return "";
+}
+
+function useVirtualTree(
+  propsIn: ReadonlyMaybeRefOrGetter<VirtualTreeProps>,
+  emit: EmitFn,
+): UseVirtualTreeReturn {
   const props = toRef(propsIn);
 
   const actualItemProps = computed<ItemPropsConfig>(() => ({
@@ -57,7 +98,7 @@ function useVirtualTree(propsIn: MaybeRefOrGetter<VirtualTreeProps>, emit: EmitF
 
   const openedSet = computed(() => new Set(props.value.opened));
   const selectedSet = computed(() => new Set(props.value.selected));
-  const activeSet = computed(() => new Set(props.value.active || []));
+  const activeSet = computed(() => new Set(props.value.active));
 
   function toggleOpen(item: TreeItem): void {
     const id = item[actualItemProps.value.value];
@@ -71,16 +112,17 @@ function useVirtualTree(propsIn: MaybeRefOrGetter<VirtualTreeProps>, emit: EmitF
     emit("update:opened", [...newOpened]);
   }
 
-  function getLeafChildrenIds(item: TreeItem, ids: unknown[] = []): unknown[] {
-    const children = item[actualItemProps.value.children] as TreeItem[] | undefined;
+  function getChildrenOf(item: TreeItem): TreeItem[] | undefined {
+    const rawChildren = item[actualItemProps.value.children];
+    return isTreeItemArray(rawChildren) ? rawChildren : undefined;
+  }
+
+  function getLeafChildrenIds(item: TreeItem): unknown[] {
+    const children = getChildrenOf(item);
     if (children) {
-      for (const child of children) {
-        getLeafChildrenIds(child, ids);
-      }
-    } else {
-      ids.push(item[actualItemProps.value.value]);
+      return children.flatMap((child) => getLeafChildrenIds(child));
     }
-    return ids;
+    return [item[actualItemProps.value.value]];
   }
 
   function isSelected(item: TreeItem): boolean {
@@ -137,32 +179,28 @@ function useVirtualTree(propsIn: MaybeRefOrGetter<VirtualTreeProps>, emit: EmitF
     emit("update:selected", [...newSelected]);
   }
 
-  function flattenTree(
-    itemsList: TreeItem[],
-    depth = 0,
-    result: DisplayItem[] = [],
-  ): DisplayItem[] {
+  function flattenTree(itemsList: readonly TreeItem[], depth = 0): DisplayItem[] {
     const { search, customFilter } = props.value;
-    const lowerSearch = search ? search.toLowerCase() : "";
+    const result: DisplayItem[] = [];
 
     for (const item of itemsList) {
       const id = item[actualItemProps.value.value];
-      const children = item[actualItemProps.value.children] as TreeItem[] | undefined;
+      const children = getChildrenOf(item);
       const hasChildren = Boolean(children && children.length > 0);
 
       const isOpen = openedSet.value.has(id);
       const isActive = activeSet.value.has(id);
 
-      if (lowerSearch) {
+      if (search !== undefined && search !== "") {
+        const lowerSearch = search.toLowerCase();
         const matches = customFilter
-          ? customFilter(id, search as string, { raw: item })
-          : String(item[actualItemProps.value.title] ?? "")
+          ? customFilter(id, search, { raw: item })
+          : toDisplayString(item[actualItemProps.value.title])
               .toLowerCase()
-              .includes(lowerSearch) || String(id).toLowerCase().includes(lowerSearch);
+              .includes(lowerSearch) || toDisplayString(id).toLowerCase().includes(lowerSearch);
 
         if (hasChildren) {
-          const subtree: DisplayItem[] = [];
-          flattenTree(children ?? [], depth + 1, subtree);
+          const subtree = flattenTree(children ?? [], depth + 1);
           if (subtree.length === 0 && !matches) {
             continue;
           }
@@ -195,31 +233,33 @@ function useVirtualTree(propsIn: MaybeRefOrGetter<VirtualTreeProps>, emit: EmitF
       });
 
       if (isOpen && hasChildren) {
-        flattenTree(children ?? [], depth + 1, result);
+        result.push(...flattenTree(children ?? [], depth + 1));
       }
     }
     return result;
   }
 
-  function traverse(itemsList: TreeItem[], allIds: unknown[]): void {
+  function collectNonLeafIds(itemsList: readonly TreeItem[]): unknown[] {
+    const allIds: unknown[] = [];
     for (const item of itemsList) {
-      const children = item[actualItemProps.value.children] as TreeItem[] | undefined;
+      const children = getChildrenOf(item);
       if (children && children.length > 0) {
-        allIds.push(item[actualItemProps.value.value]);
-        traverse(children, allIds);
+        allIds.push(item[actualItemProps.value.value], ...collectNonLeafIds(children));
       }
     }
+    return allIds;
   }
 
-  const displayItems = computed(() => flattenTree(props.value.items || []));
+  const displayItems = computed(() => flattenTree(props.value.items ?? []));
 
   watch(
     () => props.value.search,
     (newSearch, oldSearch) => {
-      if (newSearch && !oldSearch) {
-        const allIds: unknown[] = [];
-        traverse(props.value.items || [], allIds);
-        emit("update:opened", [...new Set([...(props.value.opened || []), ...allIds])]);
+      const hasNewSearch = newSearch !== undefined && newSearch !== "";
+      const hadOldSearch = oldSearch !== undefined && oldSearch !== "";
+      if (hasNewSearch && !hadOldSearch) {
+        const allIds = collectNonLeafIds(props.value.items ?? []);
+        emit("update:opened", [...new Set([...(props.value.opened ?? []), ...allIds])]);
       }
     },
   );

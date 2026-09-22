@@ -1,15 +1,10 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
-import { liveQuery } from "dexie";
-// oxlint-disable-next-line eslint/no-duplicate-imports
-import type { Table } from "dexie";
+import { type FormattedComponent, type ModelComponentRecord, useDataMesh } from "./mesh.js";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
-import { database } from "@ogw_internal/database/database.js";
-import { useDataMesh } from "./mesh.js";
-// oxlint-disable-next-line eslint/no-duplicate-imports
-import type { FormattedComponent, ModelComponentRecord } from "./mesh.js";
-import { useObservable } from "@vueuse/rxjs";
 import type { Observable } from "rxjs";
+import type { Ref } from "vue";
+import { getTable } from "@ogw_internal/database/database.js";
+import { liveQuery } from "dexie";
+import { useObservable } from "@vueuse/rxjs";
 
 interface ModelComponentRelationRecord {
   id: string;
@@ -19,13 +14,13 @@ interface ModelComponentRelationRecord {
 }
 
 interface CollectionComponent extends FormattedComponent {
-  children: FormattedComponent[];
+  readonly children: readonly FormattedComponent[];
 }
 
 interface CollectionComponentGroup {
   id: string;
   title: string;
-  children: CollectionComponent[];
+  readonly children: readonly CollectionComponent[];
 }
 
 function pluralize(type: string): string {
@@ -35,22 +30,28 @@ function pluralize(type: string): string {
   return `${type}s`;
 }
 
-export function useDataCollections() {
-  const model_components_db = database.model_components as unknown as Table<
-    ModelComponentRecord,
-    string
-  >;
-  const model_components_relation_db = database.model_components_relation as unknown as Table<
-    ModelComponentRelationRecord,
-    string
-  >;
+// oxlint-disable-next-line eslint/max-lines-per-function
+export function useDataCollections(): {
+  hasCollectionComponents: typeof hasCollectionComponents;
+  getAllCollectionComponents: typeof getAllCollectionComponents;
+  fetchAllCollectionComponents: typeof fetchAllCollectionComponents;
+  formatedCollectionComponents: typeof formatedCollectionComponents;
+  refFormatedCollectionComponents: typeof refFormatedCollectionComponents;
+} {
+  const model_components_db = getTable<ModelComponentRecord>("model_components");
+  const model_components_relation_db = getTable<ModelComponentRelationRecord>(
+    "model_components_relation",
+  );
   const { getAllMeshComponents } = useDataMesh();
 
   async function hasCollectionComponents(modelId: string): Promise<boolean> {
     const count = await model_components_db
       .where("id")
       .equals(modelId)
-      .and((component) => !MESH_COMPONENT_TYPES.includes(component.type))
+      .and(
+        (component: Readonly<ModelComponentRecord>) =>
+          !MESH_COMPONENT_TYPES.includes(component.type),
+      )
       .count();
     return count > 0;
   }
@@ -58,8 +59,11 @@ export function useDataCollections() {
   async function getAllCollectionComponents(modelId: string): Promise<FormattedComponent[]> {
     const items = await model_components_db.where("id").equals(modelId).toArray();
     return items
-      .filter((component) => !MESH_COMPONENT_TYPES.includes(component.type))
-      .map((component) => ({
+      .filter(
+        (component: Readonly<ModelComponentRecord>) =>
+          !MESH_COMPONENT_TYPES.includes(component.type),
+      )
+      .map((component: Readonly<ModelComponentRecord>) => ({
         id: component.geode_id,
         title: component.name,
         category: component.type,
@@ -81,14 +85,15 @@ export function useDataCollections() {
 
     const byType: Record<string, CollectionComponent[]> = {};
     for (const component of components) {
-      if (!byType[component.category]) {
-        byType[component.category] = [];
-      }
+      byType[component.category] ??= [];
       const itemRelations = relations.filter(
-        (relation) => relation.parent === component.id && relation.type === "collection",
+        (relation: Readonly<ModelComponentRelationRecord>) =>
+          relation.parent === component.id && relation.type === "collection",
       );
       const children = itemRelations
-        .map((relation) => meshComponentsById[relation.child])
+        .map(
+          (relation: Readonly<ModelComponentRelationRecord>) => meshComponentsById[relation.child],
+        )
         .filter((child): child is FormattedComponent => Boolean(child));
       byType[component.category]?.push({
         ...component,
@@ -105,7 +110,7 @@ export function useDataCollections() {
     const collectionTypes = Object.keys(byType);
 
     return collectionTypes
-      .filter((type) => byType[type] && (byType[type]?.length ?? 0) > 0)
+      .filter((type) => (byType[type]?.length ?? 0) > 0)
       .map((type) => ({
         id: type,
         title: pluralize(type),
@@ -113,15 +118,16 @@ export function useDataCollections() {
       }));
   }
 
-  function refFormatedCollectionComponents(modelId: string) {
-    // Dexie's liveQuery() returns Dexie's own minimal Observable shape, not an
-    // Actual rxjs Observable instance (useObservable's declared parameter type);
-    // The two are structurally close enough at runtime (vueuse only calls
-    // `.subscribe`) but not identical, hence the cast.
+  function refFormatedCollectionComponents(
+    modelId: string,
+  ): Readonly<Ref<CollectionComponentGroup[] | undefined>> {
     return useObservable(
-      liveQuery(() => formatedCollectionComponents(modelId)) as unknown as Observable<
-        CollectionComponentGroup[]
-      >,
+      // Dexie's liveQuery returns its own Observable-like type, not rxjs's Observable, so bridging needs a cast.
+      liveQuery(async () => {
+        const groups = await formatedCollectionComponents(modelId);
+        return groups;
+        // oxlint-disable-next-line no-unsafe-type-assertion
+      }) as unknown as Observable<CollectionComponentGroup[]>,
       {
         initialValue: undefined,
       },

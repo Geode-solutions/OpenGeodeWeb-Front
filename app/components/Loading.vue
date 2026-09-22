@@ -15,8 +15,8 @@ const extensionStores = computed(() =>
   infraStore.microservices.filter((store) => store.$id !== "back" && store.$id !== "viewer"),
 );
 
-const show = ref(false);
-const progress = ref(0);
+const show = ref<boolean>(false);
+const progress = ref<number>(0);
 
 let progressInterval: ReturnType<typeof setInterval> | undefined = undefined;
 

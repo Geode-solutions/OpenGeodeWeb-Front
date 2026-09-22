@@ -1,9 +1,5 @@
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports
+import { Dexie, type Table } from "dexie";
 import { BaseDatabase } from "./base_database";
-import { Dexie } from "dexie";
-// oxlint-disable-next-line eslint/no-duplicate-imports
-import type { Table } from "dexie";
 import { ExtendedDatabase } from "./extended_database";
 
 interface DatabaseContainer {
@@ -13,17 +9,17 @@ interface DatabaseContainer {
 const databaseContainer: DatabaseContainer = { instance: undefined };
 
 class Database extends BaseDatabase {
-  constructor() {
+  public constructor() {
     super("Database");
 
     this.version(3).stores(BaseDatabase.initialStores);
   }
 
-  static async addTable(tableName: string, schemaDefinition: string): Promise<void> {
+  public static async addTable(tableName: string, schemaDefinition: string): Promise<void> {
     await this.addTables({ [tableName]: schemaDefinition });
   }
 
-  static async addTables(newTables: Record<string, string>): Promise<void> {
+  public static async addTables(newTables: Record<string, string>): Promise<void> {
     let currentVersion = 1;
     let currentStores: Record<string, string> = { ...BaseDatabase.initialStores };
 
@@ -44,10 +40,12 @@ class Database extends BaseDatabase {
       tempDb.close();
     }
 
-    const allExisting = Object.keys(newTables).every((tableName) => currentStores[tableName]);
+    const allExisting = Object.keys(newTables).every(
+      (tableName) => currentStores[tableName] !== undefined,
+    );
 
     // Set at module load time below; always defined by the time addTable/addTables runs.
-    databaseContainer.instance!.close();
+    databaseContainer.instance?.close();
 
     if (allExisting) {
       const existingDb = new Dexie("Database");
@@ -70,23 +68,35 @@ class Database extends BaseDatabase {
 
 // oxlint-disable-next-line no-top-level-await
 await Dexie.delete("Database");
-databaseContainer.instance = new Database();
-(databaseContainer.instance as Database).clear();
+const initialDatabase = new Database();
+databaseContainer.instance = initialDatabase;
+// oxlint-disable-next-line no-top-level-await
+await initialDatabase.clear();
 
 // The set of tables is assembled dynamically at runtime (Database.addTable/addTables add stores on the fly), so fully modelling this with Dexie's row generics isn't worth it here: the proxy target is typed loosely as "any table name maps to a Dexie Table of loosely-typed rows".
-interface DatabaseTables {
-  [tableName: string]: Table<Record<string, unknown>, string>;
+type DatabaseTables = Record<string, Table<Record<string, unknown>, string>>;
+
+const database = new Proxy<DatabaseTables>(
+  {},
+  {
+    get(_target, prop: string | symbol): unknown {
+      // The instance is a Dexie subclass whose tables are only known dynamically at runtime.
+      // oxlint-disable-next-line no-unsafe-type-assertion
+      const instance = databaseContainer.instance as unknown as Record<string | symbol, unknown>;
+      const value = instance[prop];
+      if (typeof value === "function") {
+        // oxlint-disable-next-line no-unsafe-return
+        return value.bind(databaseContainer.instance);
+      }
+      return value;
+    },
+  },
+);
+
+// The proxy only knows the loose DatabaseTables shape; callers cast to the row type they know a given table holds.
+function getTable<TRow>(tableName: string): Table<TRow, string> {
+  // oxlint-disable-next-line no-unsafe-type-assertion
+  return database[tableName] as unknown as Table<TRow, string>;
 }
 
-const database = new Proxy({} as DatabaseTables, {
-  get(_target, prop: string | symbol) {
-    const instance = databaseContainer.instance as unknown as Record<string | symbol, unknown>;
-    const value = instance[prop];
-    if (typeof value === "function") {
-      return value.bind(databaseContainer.instance);
-    }
-    return value;
-  },
-});
-
-export { Database, database };
+export { Database, database, getTable };

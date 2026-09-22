@@ -16,7 +16,7 @@ export function middleTruncate(
   startChars: number = DEFAULT_START_CHARS,
   endChars: number = DEFAULT_END_CHARS,
 ): string | undefined | null {
-  if (!text || text.length <= maxLength) {
+  if (text === undefined || text === null || text.length <= maxLength) {
     return text;
   }
 

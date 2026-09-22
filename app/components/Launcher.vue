@@ -19,7 +19,7 @@ if (infraStore.app_mode !== appMode.CLOUD) {
   infraStore.create_backend();
 }
 
-function cloudCreateBackend() {
+function cloudCreateBackend(): Promise<void> {
   return infraStore.create_backend(email);
 }
 </script>

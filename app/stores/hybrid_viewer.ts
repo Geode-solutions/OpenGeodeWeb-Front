@@ -1,35 +1,30 @@
 import {
+  type ViewStreamLike,
+  useHybridViewerViewport,
+} from "@ogw_internal/stores/hybrid_viewer/viewport";
+import {
   applySnapshot,
   getCameraOptions,
   useHybridViewerCamera,
 } from "@ogw_internal/stores/hybrid_viewer/camera";
 import { BACKGROUND_COLOR } from "@ogw_internal/stores/hybrid_viewer/constants";
+import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types";
 import { useHybridViewerBrightness } from "@ogw_internal/stores/hybrid_viewer/brightness";
+import { useHybridViewerCore } from "@ogw_internal/stores/hybrid_viewer/core";
 import { useHybridViewerFilters } from "@ogw_internal/stores/hybrid_viewer/filters";
 import { useHybridViewerHighlight } from "@ogw_internal/stores/hybrid_viewer/highlight";
 import { useHybridViewerRuler } from "@ogw_internal/stores/hybrid_viewer/ruler";
 import { useHybridViewerScene } from "@ogw_internal/stores/hybrid_viewer/scene";
-import { useHybridViewerViewport } from "@ogw_internal/stores/hybrid_viewer/viewport";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
-// oxlint-disable-next-line eslint/no-duplicate-imports
-import type { vtkGenericRenderWindow as VtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 
 import { Status } from "@ogw_front/utils/status";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
-
-interface GenericRenderWindowHolder {
-  value?: VtkGenericRenderWindow;
-}
-
 // oxlint-disable max-lines-per-function, max-statements
 export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const viewerStore = useViewerStore();
-  const genericRenderWindow = reactive<GenericRenderWindowHolder>({});
-  const status = ref(Status.NOT_CREATED);
-  const is_moving = ref(false);
-  const is_picking = ref(false);
+  const { genericRenderWindow, status, is_moving, is_picking, remoteRender } =
+    useHybridViewerCore();
   let imageStyle: CSSStyleDeclaration | undefined = undefined;
 
   const brightnessStore = useHybridViewerBrightness();
@@ -46,11 +41,14 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     if (!genericRenderWindow.value) {
       return;
     }
+    // oxlint-disable-next-line no-unsafe-assignment -- vtk.js has no types for getApiSpecificRenderWindow(); narrowed below.
     const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
-    const canvas = (
-      webGLRenderWindow as unknown as { getCanvas: () => HTMLCanvasElement }
-    ).getCanvas();
-    if (canvas && canvas.parentElement) {
+    // oxlint-disable-next-line no-unsafe-type-assertion -- trusted vtk.js OpenGL render window API boundary.
+    const openGLRenderWindow = webGLRenderWindow as unknown as {
+      getCanvas: () => HTMLCanvasElement;
+    };
+    const canvas = openGLRenderWindow.getCanvas();
+    if (canvas.parentElement) {
       canvas.parentElement.style.cursor = value ? "crosshair" : "default";
     }
   });
@@ -64,22 +62,34 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
       background: BACKGROUND_COLOR,
       listenWindowResize: false,
     });
-    const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow() as unknown as {
-      getReferenceByName: (name: string) => { style: CSSStyleDeclaration };
-      setBackgroundImage: (image: unknown) => void;
-    };
+    const webGLRenderWindow =
+      // oxlint-disable-next-line no-unsafe-type-assertion -- trusted vtk.js OpenGL render window API boundary.
+      genericRenderWindow.value.getApiSpecificRenderWindow() as unknown as {
+        getReferenceByName: (name: string) => { style: CSSStyleDeclaration };
+        setBackgroundImage: (image: unknown) => void;
+      };
     imageStyle = webGLRenderWindow.getReferenceByName("bgImage").style;
-    Object.assign(imageStyle, { transition: "opacity 0.1s ease-in", zIndex: 1 });
+    Object.assign(imageStyle, {
+      transition: "opacity 0.1s ease-in",
+      zIndex: 1,
+    });
     await viewerStore.ws_connect();
-    const imageStream = (
-      viewerStore.client as unknown as { getImageStream: () => any }
-    ).getImageStream();
+    // oxlint-disable-next-line no-unsafe-type-assertion -- trusted @kitware/vtk.js WebSocket client API boundary.
+    const clientApi = viewerStore.client as unknown as {
+      getImageStream: () => {
+        createViewStream: (id: string) => ViewStreamLike;
+      };
+    };
+    const imageStream = clientApi.getImageStream();
     viewportStore.viewStream.value = imageStream.createViewStream("-1");
-    viewportStore.viewStream.value?.onImageReady((event: { image: unknown }) => {
+    viewportStore.viewStream.value?.onImageReady((event: Readonly<{ image: unknown }>) => {
       if (is_moving.value) {
         return;
       }
-      brightnessStore.latestImage.value = event.image as typeof brightnessStore.latestImage.value;
+      // oxlint-disable no-unsafe-type-assertion -- image payload shape is guaranteed by the viewer's onImageReady contract.
+      const latestImage = event.image as typeof brightnessStore.latestImage.value;
+      // oxlint-enable no-unsafe-type-assertion
+      brightnessStore.latestImage.value = latestImage;
       webGLRenderWindow.setBackgroundImage(event.image);
       if (imageStyle) {
         imageStyle.opacity = "1";
@@ -94,36 +104,15 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     status.value = Status.CREATED;
   }
 
-  let renderPromise: Promise<void> | undefined = undefined;
-  let renderPending = false;
-
-  function remoteRender(): Promise<void> {
-    if (renderPromise) {
-      renderPending = true;
-      return renderPromise;
-    }
-
-    renderPromise = (async () => {
-      try {
-        const schema = viewer_schemas.opengeodeweb_viewer.viewer.render;
-        await viewerStore.request({ schema });
-      } finally {
-        renderPromise = undefined;
-        if (renderPending) {
-          renderPending = false;
-          await remoteRender();
-        }
-      }
-    })();
-    return renderPromise;
-  }
-
-  function exportStores() {
+  function exportStores(): {
+    zScale: number;
+    camera_options: CameraOptions | Record<string, unknown>;
+  } {
     const renderer = genericRenderWindow.value?.getRenderer();
     const camera = renderer?.getActiveCamera();
     return {
       zScale: sceneStore.zScale.value,
-      camera_options: (camera ? getCameraOptions(camera) : undefined) || cameraStore.camera_options,
+      camera_options: (camera ? getCameraOptions(camera) : undefined) ?? cameraStore.camera_options,
     };
   }
 
