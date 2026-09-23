@@ -41,9 +41,7 @@ interface WidgetEntry {
   subscription: { unsubscribe: () => void };
 }
 
-function asWidgetFactory(
-  widget: Readonly<PlaneWidget>,
-): vtkAbstractWidgetFactory<vtkAbstractWidget> {
+function asWidgetFactory(widget: PlaneWidget): vtkAbstractWidgetFactory<vtkAbstractWidget> {
   // oxlint-disable-next-line no-unsafe-type-assertion -- vtk.js's WidgetManager APIs (addWidget/removeWidget) are untyped for our custom PlaneWidget shape; narrowed once here.
   return widget as unknown as vtkAbstractWidgetFactory<vtkAbstractWidget>;
 }
@@ -54,11 +52,11 @@ interface WidgetEntryManagerParams {
 }
 
 // oxlint-disable-next-line max-lines-per-function typescript/prefer-readonly-parameter-types -- Ref-backed params are inherently mutable through .value.
-function useWidgetEntryManager({ planes, debouncedApply }: Readonly<WidgetEntryManagerParams>): {
+function useWidgetEntryManager({ planes, debouncedApply }: WidgetEntryManagerParams): {
   removeExtraWidgets: (widgetManager: WidgetManagerInstance | undefined) => void;
   updateWidgetEntry: (
     idx: number,
-    plane: Readonly<ClippingPlane>,
+    plane: ClippingPlane,
     cubicBounds: readonly number[],
     widgetManager: WidgetManagerInstance,
   ) => void;
@@ -70,8 +68,8 @@ function useWidgetEntryManager({ planes, debouncedApply }: Readonly<WidgetEntryM
   let fromWidget = false;
 
   function createWidgetEntry(
-    planeWidget: Readonly<PlaneWidget>,
-    widgetHandle: Readonly<WidgetHandle>,
+    planeWidget: PlaneWidget,
+    widgetHandle: WidgetHandle,
     planeIndex: number,
   ): WidgetEntry {
     const widgetState = planeWidget.getWidgetState();
@@ -125,7 +123,7 @@ function useWidgetEntryManager({ planes, debouncedApply }: Readonly<WidgetEntryM
 
   function updateWidgetEntry(
     idx: number,
-    plane: Readonly<ClippingPlane>,
+    plane: ClippingPlane,
     cubicBounds: readonly number[],
     widgetManager: WidgetManagerInstance,
   ): void {

@@ -1,11 +1,7 @@
 import type { Ref } from "vue";
 
-// Like Vue's MaybeRefOrGetter<T>, but the Ref branch is narrowed to Readonly<Ref<T>>: a plain
-// Ref<T> always fails prefer-readonly-parameter-types (its `.value` is writable) no matter how
-// Deeply readonly T itself is, and wrapping the *whole* union in Readonly<> instead would collapse
-// The getter-function branch to an uncallable `{}` (Readonly<Fn> has no keys). Callers passing an
-// Ordinary Ref<T> still type-check fine here: a mutable Ref<T> is assignable to Readonly<Ref<T>>.
-type ReadonlyMaybeRefOrGetter<Value> = Value | Readonly<Ref<Value>> | (() => Value);
+// Same shape as Vue's MaybeRefOrGetter<T>, kept as a local alias for readability at call sites.
+type ReadonlyMaybeRefOrGetter<Value> = Value | Ref<Value> | (() => Value);
 
 // This composable filters/sorts different flavors of "category with children" trees (treeview groups, model component/collection groups, ...); this shape captures just the fields it reads/writes, generically, across all of them.
 interface FilterableItem {
@@ -21,7 +17,7 @@ interface FilterContext {
 interface TreeFilterOptions {
   readonly recursiveSort?: boolean;
   readonly defaultSort?: string;
-  readonly defaultFilters?: Readonly<Record<string, boolean>>;
+  readonly defaultFilters?: Record<string, boolean>;
 }
 
 interface UseTreeFilterReturn {

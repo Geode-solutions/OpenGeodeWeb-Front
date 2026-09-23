@@ -55,20 +55,20 @@ function defaultOpenedViews(): OpenedView[] {
   return [{ type: "object", id: "main", title: "Objects", scrollTop: 0, opened: [] }];
 }
 
-type ReadonlyOpenedView = Readonly<Omit<OpenedView, "opened">> & {
+type ReadonlyOpenedView = Omit<OpenedView, "opened"> & {
   readonly opened: readonly string[];
 };
-type ReadonlyTreeviewGroup = Readonly<Omit<TreeviewGroup, "children">> & {
-  readonly children: readonly Readonly<TreeviewChild>[];
+type ReadonlyTreeviewGroup = Omit<TreeviewGroup, "children"> & {
+  readonly children: readonly TreeviewChild[];
 };
-type ReadonlyTreeviewSnapshot = Readonly<{
+type ReadonlyTreeviewSnapshot = {
   opened_views?: readonly ReadonlyOpenedView[];
   panelWidth?: number;
   additionalPanelWidth?: number;
   rowHeights?: readonly number[];
   selectionIds?: readonly string[];
-  selection?: readonly (string | Readonly<{ id: string }>)[];
-}>;
+  selection?: readonly (string | { id: string })[];
+};
 
 // oxlint-disable-next-line max-lines-per-function, max-statements
 export const useTreeviewStore = defineStore("treeview", () => {
@@ -260,7 +260,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     rowHeights.value = snapshot?.rowHeights ? [...snapshot.rowHeights] : [];
     pendingSelectionIds.value = snapshot?.selectionIds
       ? [...snapshot.selectionIds]
-      : (snapshot?.selection ?? []).map((selectionItem: Readonly<string | { id: string }>) =>
+      : (snapshot?.selection ?? []).map((selectionItem: string | { id: string }) =>
           typeof selectionItem === "string" ? selectionItem : selectionItem.id,
         );
   }

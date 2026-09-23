@@ -18,26 +18,26 @@ interface SharedState {
   updateComponentStyleCache: (
     modelId: string,
     componentId: string,
-    styleValues: Readonly<StyleValues>,
+    styleValues: StyleValues,
   ) => void;
   bulkUpdateComponentStyleCache: (
     modelId: string,
     componentStyleUpdates: readonly {
       readonly id_component: string;
-      readonly values: Readonly<StyleValues>;
+      readonly values: StyleValues;
     }[],
   ) => void;
   bulkUpdateComponentStylesCache: (
     modelId: string,
     componentIds: readonly string[],
-    styleValues: Readonly<StyleValues>,
+    styleValues: StyleValues,
   ) => void;
   updateModelComponentTypeStyleCache: (
     modelId: string,
     componentType: string,
-    styleValues: Readonly<StyleValues>,
+    styleValues: StyleValues,
   ) => void;
-  updateStyleCache: (objectId: string, styleValues: Readonly<StyleValues>) => void;
+  updateStyleCache: (objectId: string, styleValues: StyleValues) => void;
 }
 
 let sharedState: SharedState | undefined = undefined;
@@ -100,7 +100,7 @@ function getSharedState(): SharedState {
   function updateComponentStyleCache(
     modelId: string,
     componentId: string,
-    styleValues: Readonly<StyleValues>,
+    styleValues: StyleValues,
   ): void {
     const cacheKey = `${modelId}_${componentId}`;
     const existingStyle = componentStyles.value[cacheKey];
@@ -118,7 +118,7 @@ function getSharedState(): SharedState {
     modelId: string,
     componentStyleUpdates: readonly {
       readonly id_component: string;
-      readonly values: Readonly<StyleValues>;
+      readonly values: StyleValues;
     }[],
   ): void {
     const updatedComponentStyles = { ...componentStyles.value };
@@ -140,7 +140,7 @@ function getSharedState(): SharedState {
   function bulkUpdateComponentStylesCache(
     modelId: string,
     componentIds: readonly string[],
-    styleValues: Readonly<StyleValues>,
+    styleValues: StyleValues,
   ): void {
     const updatedComponentStyles = { ...componentStyles.value };
     for (const componentId of componentIds) {
@@ -161,14 +161,14 @@ function getSharedState(): SharedState {
   function updateModelComponentTypeStyleCache(
     modelId: string,
     componentType: string,
-    styleValues: Readonly<StyleValues>,
+    styleValues: StyleValues,
   ): void {
     const cacheKey = `${modelId}_${componentType}`;
     modelComponentTypeStyles.value[cacheKey] ??= { id_model: modelId, type: componentType };
     merge(modelComponentTypeStyles.value[cacheKey], styleValues);
   }
 
-  function updateStyleCache(objectId: string, styleValues: Readonly<StyleValues>): void {
+  function updateStyleCache(objectId: string, styleValues: StyleValues): void {
     styles.value[objectId] ??= { id: objectId };
     merge(styles.value[objectId], styleValues);
   }
@@ -192,7 +192,7 @@ interface DataStyleStateApi extends SharedState {
   getStyle: (objectId: string) => ObjectStyle;
   getComponentStyle: (modelId: string, componentId: string) => ModelComponentStyle;
   getModelComponentTypeStyle: (modelId: string, componentType: string) => ModelComponentTypeStyle;
-  mutateStyle: (objectId: string, styleValues: Readonly<StyleValues>) => Promise<string>;
+  mutateStyle: (objectId: string, styleValues: StyleValues) => Promise<string>;
   objectVisibility: ComputedRef<(objectId: string) => boolean | undefined>;
   selectedObjects: ComputedRef<string[]>;
   clear: () => Promise<void>;
@@ -235,10 +235,7 @@ export function useDataStyleState(): DataStyleStateApi {
     return { ...toRaw(style) };
   }
 
-  async function mutateStyle(
-    objectId: string,
-    styleValues: Readonly<StyleValues>,
-  ): Promise<string> {
+  async function mutateStyle(objectId: string, styleValues: StyleValues): Promise<string> {
     state.updateStyleCache(objectId, styleValues);
     const currentStyle = getStyle(objectId);
     merge(currentStyle, styleValues);

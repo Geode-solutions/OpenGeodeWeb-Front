@@ -39,4 +39,4 @@ function useHybridViewerFilters(): {
     setShrink,
   };
 }
-export { setClippingPlanes, setShrink, useHybridViewerFilters };
+export { useHybridViewerFilters };

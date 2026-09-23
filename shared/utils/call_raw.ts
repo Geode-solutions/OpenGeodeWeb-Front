@@ -6,34 +6,27 @@ import pTimeout from "p-timeout";
 import type { RequestHandlers } from "./types.js";
 
 interface RpcSession {
-  readonly call: (
-    rpc: string,
-    params: readonly [Readonly<Record<string, unknown>>],
-  ) => Promise<unknown>;
+  readonly call: (rpc: string, params: readonly [Record<string, unknown>]) => Promise<unknown>;
 }
 interface RpcConnection {
   readonly getSession: () => RpcSession;
 }
 interface RpcClient {
-  readonly call: (rpc: string, params: Readonly<Record<string, unknown>>) => Promise<unknown>;
+  readonly call: (rpc: string, params: Record<string, unknown>) => Promise<unknown>;
   readonly getConnection: () => RpcConnection;
 }
 
 interface CallClientOptions {
   rpc: string;
-  params?: Readonly<Record<string, unknown>>;
-  client: Readonly<RpcClient>;
+  params?: Record<string, unknown>;
+  client: RpcClient;
 }
 
 interface CallRawOptions extends CallClientOptions {
   timeout?: number;
 }
 
-async function callClient({
-  rpc,
-  params = {},
-  client,
-}: Readonly<CallClientOptions>): Promise<unknown> {
+async function callClient({ rpc, params = {}, client }: CallClientOptions): Promise<unknown> {
   if (globalThis.window !== undefined) {
     const response = await client.getConnection().getSession().call(rpc, [params]);
     return response;
@@ -43,12 +36,8 @@ async function callClient({
 }
 
 async function callRaw(
-  { rpc, params = {}, client, timeout }: Readonly<CallRawOptions>,
-  {
-    request_error_function,
-    response_function,
-    response_error_function,
-  }: Readonly<RequestHandlers> = {},
+  { rpc, params = {}, client, timeout }: CallRawOptions,
+  { request_error_function, response_function, response_error_function }: RequestHandlers = {},
 ): Promise<unknown> {
   async function performCall(): Promise<unknown> {
     try {

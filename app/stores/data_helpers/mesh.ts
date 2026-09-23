@@ -26,7 +26,7 @@ interface FormattedComponentGroup {
   readonly children: readonly FormattedComponent[];
 }
 
-function toFormattedComponent(meshComponent: Readonly<ModelComponentRecord>): FormattedComponent {
+function toFormattedComponent(meshComponent: ModelComponentRecord): FormattedComponent {
   return {
     id: meshComponent.geode_id,
     title: meshComponent.name,
@@ -77,15 +77,13 @@ export function useDataMesh(): {
       .map((type) => ({
         id: type,
         title: componentTitles[type] ?? type,
-        children: (componentsByType[type] ?? []).map((item: Readonly<ModelComponentRecord>) =>
+        children: (componentsByType[type] ?? []).map((item: ModelComponentRecord) =>
           toFormattedComponent(item),
         ),
       }));
   }
 
-  function refFormatedMeshComponents(
-    modelId: string,
-  ): Readonly<Ref<FormattedComponentGroup[] | undefined>> {
+  function refFormatedMeshComponents(modelId: string): Ref<FormattedComponentGroup[] | undefined> {
     return useObservable(
       liveQuery(async () => {
         const components = await formatedMeshComponents(modelId);
@@ -106,12 +104,12 @@ export function useDataMesh(): {
       .where("[id+type]")
       .equals([modelId, type])
       .toArray();
-    return components.map((item: Readonly<ModelComponentRecord>) => toFormattedComponent(item));
+    return components.map((item: ModelComponentRecord) => toFormattedComponent(item));
   }
 
   async function getAllMeshComponents(modelId: string): Promise<FormattedComponent[]> {
     const items = await model_components_db.where("id").equals(modelId).toArray();
-    return items.map((item: Readonly<ModelComponentRecord>) => toFormattedComponent(item));
+    return items.map((item: ModelComponentRecord) => toFormattedComponent(item));
   }
 
   async function fetchAllMeshComponents(
@@ -131,7 +129,7 @@ export function useDataMesh(): {
       .where("[id+type]")
       .equals([modelId, type])
       .toArray();
-    return components.map((component: Readonly<ModelComponentRecord>) => component.geode_id);
+    return components.map((component: ModelComponentRecord) => component.geode_id);
   }
 
   async function getCornersGeodeIds(modelId: string): Promise<string[]> {

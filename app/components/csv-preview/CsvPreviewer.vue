@@ -98,13 +98,12 @@ function splitLine(line: string, sep: string): string[] {
   return result;
 }
 
-function parseContent(): string[] {
+function parseContent(): void {
   if (!rawContent.value) {
-    return [];
+    return;
   }
 
   const allLines = rawContent.value.split(/\r?\n/u).filter((line) => line.trim() !== "");
-
   const headerLine = allLines[headerRow.value];
   const rawHeaders = headerLine ? splitLine(headerLine, separator.value) : [];
 

@@ -11,14 +11,14 @@ import { useMeshPointsVisibilityStyle } from "./visibility";
 // Local constants
 
 interface MeshPointsActiveColoringDeps {
-  readonly commonStyle: Readonly<ReturnType<typeof useMeshPointsCommonStyle>>;
-  readonly colorStyle: Readonly<ReturnType<typeof useMeshPointsColorStyle>>;
-  readonly vertexAttributeStyle: Readonly<ReturnType<typeof useMeshPointsVertexAttributeStyle>>;
+  readonly commonStyle: ReturnType<typeof useMeshPointsCommonStyle>;
+  readonly colorStyle: ReturnType<typeof useMeshPointsColorStyle>;
+  readonly vertexAttributeStyle: ReturnType<typeof useMeshPointsVertexAttributeStyle>;
 }
 
 function handleMeshPointsVertexColoring(
   id: string,
-  vertexAttributeStyle: Readonly<ReturnType<typeof useMeshPointsVertexAttributeStyle>>,
+  vertexAttributeStyle: ReturnType<typeof useMeshPointsVertexAttributeStyle>,
 ): Promise<unknown> | undefined {
   const name = vertexAttributeStyle.meshPointsVertexAttributeName(id);
   const item = vertexAttributeStyle.meshPointsVertexAttributeItem(id);
@@ -34,7 +34,7 @@ function handleMeshPointsVertexColoring(
 async function setMeshPointsActiveColoring(
   id: string,
   type: string | undefined,
-  deps: Readonly<MeshPointsActiveColoringDeps>,
+  deps: MeshPointsActiveColoringDeps,
 ): Promise<unknown> {
   await deps.commonStyle.mutateMeshPointsStyle(id, {
     coloring: { active: type },
@@ -55,10 +55,10 @@ async function setMeshPointsActiveColoring(
 
 async function applyMeshPointsStyle(
   id: string,
-  visibilityStyle: Readonly<ReturnType<typeof useMeshPointsVisibilityStyle>>,
-  sizeStyle: Readonly<ReturnType<typeof useMeshPointsSizeStyle>>,
+  visibilityStyle: ReturnType<typeof useMeshPointsVisibilityStyle>,
+  sizeStyle: ReturnType<typeof useMeshPointsSizeStyle>,
   activeColoringType: string | undefined,
-  deps: Readonly<MeshPointsActiveColoringDeps>,
+  deps: MeshPointsActiveColoringDeps,
 ): Promise<unknown[]> {
   const result = await Promise.all([
     visibilityStyle.setMeshPointsVisibility(id, visibilityStyle.meshPointsVisibility(id)),

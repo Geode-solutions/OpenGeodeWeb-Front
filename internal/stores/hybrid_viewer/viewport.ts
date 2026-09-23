@@ -173,5 +173,5 @@ function useHybridViewerViewport(): HybridViewerViewport {
     viewStream,
   };
 }
-export { performClickPicking, resize, setContainer, useHybridViewerViewport };
+export { performClickPicking, useHybridViewerViewport };
 export type { ViewStreamLike } from "./vtk_types";

@@ -46,7 +46,7 @@ interface NamedChildProcess extends child_process.ChildProcessByStdio<null, Read
 async function waitForReady(
   child: NamedChildProcess,
   expectedResponse: string,
-  signal?: Readonly<AbortSignal>,
+  signal?: AbortSignal,
 ): Promise<NamedChildProcess> {
   // oxlint-disable-next-line promise/avoid-new
   return new Promise((resolve, reject) => {
@@ -74,7 +74,7 @@ async function waitForReady(
     }
     let onLine: ((line: string) => void) | undefined = undefined;
     let onErrLine: ((line: string) => void) | undefined = undefined;
-    let onError: ((err: Readonly<Error>) => void) | undefined = undefined;
+    let onError: ((err: Error) => void) | undefined = undefined;
     let onClose: ((code: number | null) => void) | undefined = undefined;
     let onAbort: (() => void) | undefined = undefined;
 
