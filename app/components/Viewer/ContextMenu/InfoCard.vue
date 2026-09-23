@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import GlassCard from "@ogw_front/components/GlassCard.vue";
 import { middleTruncate } from "@ogw_front/utils/string";
-import { useClipboard } from "@vueuse/core";
+import { useCopyToClipboard } from "@ogw_front/composables/copy_to_clipboard";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useMenuStore } from "@ogw_front/stores/menu";
 
@@ -17,7 +17,6 @@ const emit = defineEmits<{
   "update:show": [value: boolean];
 }>();
 
-const COPIED_TIMEOUT = 1500;
 const MAX_SHORT_ID_LENGTH = 15;
 const ID_SLICE_START = 8;
 const ID_SLICE_END_OFFSET = 7;
@@ -25,7 +24,7 @@ const TRUNCATE_MAX_LENGTH = 22;
 const TRUNCATE_START_CHARS = 12;
 const TRUNCATE_END_CHARS = 7;
 
-const { copy, copied } = useClipboard({ copiedDuring: COPIED_TIMEOUT });
+const { copy, copied } = useCopyToClipboard();
 const copiedId = ref("");
 
 function isCopied(id: string | undefined): boolean {
