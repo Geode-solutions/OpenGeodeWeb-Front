@@ -12,13 +12,13 @@ interface ResponsiveMiddleTruncateOptions {
   readonly minStartChars?: number;
 }
 
-// Only the Ref member is wrapped in Readonly<>, so the callable getter member keeps a usable signature.
-type ReadonlyMaybeRefOrGetter<Value> = Value | Readonly<Ref<Value>> | (() => Value);
+// Same shape as Vue's MaybeRefOrGetter<T>, kept as a local alias for readability at call sites.
+type ReadonlyMaybeRefOrGetter<Value> = Value | Ref<Value> | (() => Value);
 
 export function useResponsiveMiddleTruncate(
   textRef: ReadonlyMaybeRefOrGetter<string | undefined | null>,
   containerWidthRef: ReadonlyMaybeRefOrGetter<number | undefined>,
-  options: Readonly<ResponsiveMiddleTruncateOptions> = {},
+  options: ResponsiveMiddleTruncateOptions = {},
 ): ComputedRef<string> {
   const {
     estimatedCharWidth = DEFAULT_ESTIMATED_CHAR_WIDTH,

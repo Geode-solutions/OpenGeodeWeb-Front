@@ -48,10 +48,7 @@ export function useDataCollections(): {
     const count = await model_components_db
       .where("id")
       .equals(modelId)
-      .and(
-        (component: Readonly<ModelComponentRecord>) =>
-          !MESH_COMPONENT_TYPES.includes(component.type),
-      )
+      .and((component: ModelComponentRecord) => !MESH_COMPONENT_TYPES.includes(component.type))
       .count();
     return count > 0;
   }
@@ -59,11 +56,8 @@ export function useDataCollections(): {
   async function getAllCollectionComponents(modelId: string): Promise<FormattedComponent[]> {
     const items = await model_components_db.where("id").equals(modelId).toArray();
     return items
-      .filter(
-        (component: Readonly<ModelComponentRecord>) =>
-          !MESH_COMPONENT_TYPES.includes(component.type),
-      )
-      .map((component: Readonly<ModelComponentRecord>) => ({
+      .filter((component: ModelComponentRecord) => !MESH_COMPONENT_TYPES.includes(component.type))
+      .map((component: ModelComponentRecord) => ({
         id: component.geode_id,
         title: component.name,
         category: component.type,
@@ -87,13 +81,11 @@ export function useDataCollections(): {
     for (const component of components) {
       byType[component.category] ??= [];
       const itemRelations = relations.filter(
-        (relation: Readonly<ModelComponentRelationRecord>) =>
+        (relation: ModelComponentRelationRecord) =>
           relation.parent === component.id && relation.type === "collection",
       );
       const children = itemRelations
-        .map(
-          (relation: Readonly<ModelComponentRelationRecord>) => meshComponentsById[relation.child],
-        )
+        .map((relation: ModelComponentRelationRecord) => meshComponentsById[relation.child])
         .filter((child): child is FormattedComponent => Boolean(child));
       byType[component.category]?.push({
         ...component,
@@ -120,7 +112,7 @@ export function useDataCollections(): {
 
   function refFormatedCollectionComponents(
     modelId: string,
-  ): Readonly<Ref<CollectionComponentGroup[] | undefined>> {
+  ): Ref<CollectionComponentGroup[] | undefined> {
     return useObservable(
       // Dexie's liveQuery returns its own Observable-like type, not rxjs's Observable, so bridging needs a cast.
       liveQuery(async () => {

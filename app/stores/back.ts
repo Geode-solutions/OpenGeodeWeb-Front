@@ -77,7 +77,7 @@ export const useBackStore = defineStore("back", {
     stop_request() {
       this.request_counter -= 1;
     },
-    async launch(args: Readonly<Record<string, unknown>>) {
+    async launch(args: Record<string, unknown>) {
       const appStore = useAppStore();
       const { COMMAND_BACK, NUXT_ROOT_PATH } = useRuntimeConfig().public;
       const schema = opengeodeweb_front_schemas.api.local.app.run_back;
@@ -105,10 +105,7 @@ export const useBackStore = defineStore("back", {
       await Promise.resolve();
     },
     async request(
-      {
-        schema,
-        params = {},
-      }: Readonly<{ schema: JsonRpcSchema; params?: Record<string, unknown> }>,
+      { schema, params = {} }: { schema: JsonRpcSchema; params?: Record<string, unknown> },
       callbacks: RequestHandlers = {},
     ) {
       const result = await api_fetch(
@@ -129,7 +126,7 @@ export const useBackStore = defineStore("back", {
       );
       return result;
     },
-    async upload(file: Readonly<File>, callbacks: RequestHandlers = {}) {
+    async upload(file: File, callbacks: RequestHandlers = {}) {
       const schema = back_schemas.opengeodeweb_back.upload_file;
       const result = await upload_file(
         this,

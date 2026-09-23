@@ -8,20 +8,20 @@ import { validateSchema } from "./validate_schema.js";
 const ERROR_400 = 400;
 
 interface CallSchemaOptions {
-  schema: Readonly<JsonRpcSchema>;
-  params?: Readonly<Record<string, unknown>>;
-  client: Readonly<RpcClient>;
+  schema: JsonRpcSchema;
+  params?: Record<string, unknown>;
+  client: RpcClient;
   timeout?: number;
 }
 
 async function callSchema(
-  { schema, params = {}, client, timeout }: Readonly<CallSchemaOptions>,
+  { schema, params = {}, client, timeout }: CallSchemaOptions,
   {
     request_error_function,
     response_function,
     response_error_function,
     validation_error_function,
-  }: Readonly<RequestHandlersWithValidation> = {},
+  }: RequestHandlersWithValidation = {},
 ): Promise<unknown> {
   const { valid, error: schema_error } = validateSchema(schema, params);
 

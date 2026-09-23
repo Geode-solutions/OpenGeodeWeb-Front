@@ -49,9 +49,9 @@ vi.stubGlobal(
 // Resolves a mocked `$fetch` call's `onResponse` hook with a successful response.
 // Kept outside the test bodies so no branching logic lives inside `test()` blocks.
 async function respondWithSuccess(
-  options: Readonly<FetchOptions> | undefined,
+  options: FetchOptions | undefined,
   request: FetchRequest,
-  data: Readonly<{ url: string }>,
+  data: { url: string },
 ): Promise<void> {
   const onResponse = options?.onResponse;
   if (typeof onResponse !== "function") {

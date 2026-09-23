@@ -70,7 +70,7 @@ function isNumberOrUndefined(value: unknown): value is number | undefined {
   return value === undefined || typeof value === "number";
 }
 
-export function useGlobalAttributeStyle(dataIdRef: Readonly<Ref<string | undefined>>): {
+export function useGlobalAttributeStyle(dataIdRef: Ref<string | undefined>): {
   currentColormap: typeof currentColormap;
   currentRange: typeof currentRange;
   applyGlobalColormap: typeof applyGlobalColormap;

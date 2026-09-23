@@ -55,7 +55,7 @@ function fillImageDataFromTable(
   // ImageData can't satisfy prefer-readonly-parameter-types since lib.dom.d.ts types are inherently mutable, so this finding is left unfixed (same pattern as app/plugins/auto_store_register.ts).
   imageData: ImageData,
   // Float32Array's numeric index signature is inherently mutable and can't satisfy prefer-readonly-parameter-types, so this finding is left unfixed (same pattern as app/plugins/auto_store_register.ts).
-  table: Readonly<Float32Array>,
+  table: Float32Array,
   width: number,
   height: number,
 ): void {

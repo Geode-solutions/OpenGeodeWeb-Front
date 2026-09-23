@@ -21,7 +21,7 @@ interface RunArgs {
 const MILLISECONDS_PER_SECOND = 1000;
 const DEFAULT_TIMEOUT_SECONDS = 45;
 const MAX_PORT_RETRIES = 1;
-const DEFAULT_RUN_ARGS: Readonly<RunArgs> = { projectFolderPath: "" };
+const DEFAULT_RUN_ARGS: RunArgs = { projectFolderPath: "" };
 
 async function runScript(
   execPath: string,
@@ -61,7 +61,7 @@ function isPortInUseError(error: unknown): boolean {
   return /EADDRINUSE|address already in use|port already in use/iu.test(String(error));
 }
 
-function backArgs(args: Readonly<RunArgs>, port: number): string[] {
+function backArgs(args: RunArgs, port: number): string[] {
   const { projectFolderPath } = args;
   if (!projectFolderPath) {
     throw new Error("projectFolderPath is required");
@@ -91,7 +91,7 @@ function backArgs(args: Readonly<RunArgs>, port: number): string[] {
 async function runBack(
   execName: string,
   execPath: string,
-  args: Readonly<RunArgs> = DEFAULT_RUN_ARGS,
+  args: RunArgs = DEFAULT_RUN_ARGS,
   attempts = 0,
 ): Promise<number> {
   let port: number | undefined = undefined;
@@ -118,7 +118,7 @@ async function runBack(
 async function runViewer(
   execName: string,
   execPath: string,
-  args: Readonly<RunArgs> = DEFAULT_RUN_ARGS,
+  args: RunArgs = DEFAULT_RUN_ARGS,
   attempts = 0,
 ): Promise<number> {
   const { projectFolderPath } = args;
@@ -157,7 +157,7 @@ async function runExtension(
   extensionId: string,
   execName: string,
   execPath: string,
-  args: Readonly<RunArgs> = DEFAULT_RUN_ARGS,
+  args: RunArgs = DEFAULT_RUN_ARGS,
   attempts = 0,
 ): Promise<number> {
   let port: number | undefined = undefined;
@@ -182,10 +182,7 @@ async function runExtension(
   }
   throw new Error(`runExtension failed to run ${extensionId}`);
 }
-function addMicroserviceMetadatas(
-  projectFolderPath: string,
-  serviceObj: Readonly<Microservice>,
-): void {
+function addMicroserviceMetadatas(projectFolderPath: string, serviceObj: Microservice): void {
   const microservices = projectMicroservices(projectFolderPath);
   let enriched: Microservice = { ...serviceObj };
   if (serviceObj.type === "back") {

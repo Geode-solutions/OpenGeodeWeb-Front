@@ -60,7 +60,7 @@ function getValue(val: unknown): number {
 // oxlint-disable max-lines-per-function
 export function useAdaptiveStyles(
   target: AdaptiveStylesTarget,
-  options: Readonly<AdaptiveStylesOptions> = {},
+  options: AdaptiveStylesOptions = {},
 ): {
   adaptiveStyles: ComputedRef<{
     "--adaptive-blur": string;

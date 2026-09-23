@@ -1,7 +1,7 @@
 import type { PiniaPluginContext } from "pinia";
 import { useAppStore } from "@ogw_front/stores/app";
 
-function autoStoreRegister({ store }: Readonly<PiniaPluginContext>): void {
+function autoStoreRegister({ store }: PiniaPluginContext): void {
   if (store.$id === "app") {
     return;
   }

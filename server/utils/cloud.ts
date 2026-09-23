@@ -84,7 +84,6 @@ function requestConfig(
             image,
             ports: [
               {
-                name: "h2c",
                 containerPort: 80,
               },
             ],

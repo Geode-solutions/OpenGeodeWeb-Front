@@ -9,7 +9,7 @@ interface GenericRenderWindowHolder {
 }
 
 // `genericRenderWindow.value` is only ever read from these functions after the viewer has been initialized (see app/stores/hybrid_viewer.ts's initHybridViewer), so requireRenderWindow throwing on that path would indicate a real bug rather than an expected state.
-function requireRenderWindow(holder: Readonly<GenericRenderWindowHolder>): VtkGenericRenderWindow {
+function requireRenderWindow(holder: GenericRenderWindowHolder): VtkGenericRenderWindow {
   if (!holder.value) {
     throw new Error("genericRenderWindow accessed before the viewer was initialized");
   }

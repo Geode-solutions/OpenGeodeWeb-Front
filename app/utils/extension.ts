@@ -29,7 +29,7 @@ interface RegisteredExtension {
   extensionModule: ExtensionModuleType;
 }
 
-async function uploadExtension(file: Readonly<File>): Promise<void> {
+async function uploadExtension(file: File): Promise<void> {
   const { useAppStore } = await import("@ogw_front/stores/app");
   const appStore = useAppStore();
   await appStore.upload(file);
@@ -57,7 +57,7 @@ async function runExtensions(): Promise<{ extensionsArray: ExtensionDescriptor[]
 async function downloadExtension({
   url,
   extensionFileName,
-}: Readonly<DownloadExtensionParams>): Promise<unknown> {
+}: DownloadExtensionParams): Promise<unknown> {
   const { useAppStore } = await import("@ogw_front/stores/app");
   const appStore = useAppStore();
   const { PROJECT: projectName } = useRuntimeConfig().public;
@@ -74,9 +74,7 @@ async function downloadExtension({
   return result;
 }
 
-function isMicroservice(
-  store: Readonly<RegisterableStore>,
-): store is RegisterableStore & Microservice {
+function isMicroservice(store: RegisterableStore): store is RegisterableStore & Microservice {
   return typeof store.connect === "function";
 }
 
@@ -87,7 +85,7 @@ async function registerRunningExtensions(): Promise<RegisteredExtension[]> {
   const infraStore = useInfraStore();
   const { extensionsArray } = await runExtensions();
   return Promise.all(
-    extensionsArray.map(async (extension: Readonly<ExtensionDescriptor>) => {
+    extensionsArray.map(async (extension: ExtensionDescriptor) => {
       const { id, name, version, frontendContent, port } = extension;
       const blob = new Blob([frontendContent], {
         type: "application/javascript",
@@ -116,14 +114,12 @@ async function registerRunningExtensions(): Promise<RegisteredExtension[]> {
   );
 }
 
-async function importExtensionFile(file: Readonly<File>): Promise<RegisteredExtension[]> {
+async function importExtensionFile(file: File): Promise<RegisteredExtension[]> {
   await uploadExtension(file);
   return registerRunningExtensions();
 }
 
-async function importExtensionURL(
-  url: Readonly<DownloadExtensionParams>,
-): Promise<RegisteredExtension[]> {
+async function importExtensionURL(url: DownloadExtensionParams): Promise<RegisteredExtension[]> {
   await downloadExtension(url);
   return registerRunningExtensions();
 }

@@ -6,9 +6,7 @@ export function useMeshPointsCommonStyle(): {
   meshPointsColoring: (id: string) => StyleValues;
   mutateMeshPointsColoring: (id: string, values: StyleValues) => Promise<string>;
   mutateMeshPointsStyle: (id: string, values: StyleValues) => Promise<string>;
-  mutateMeshPointsVisibility: (
-    response: Readonly<{ id: string; visibility: boolean }>,
-  ) => Promise<string>;
+  mutateMeshPointsVisibility: (response: { id: string; visibility: boolean }) => Promise<string>;
 } {
   const dataStyleState = useDataStyleState();
 
@@ -19,9 +17,10 @@ export function useMeshPointsCommonStyle(): {
     return result;
   }
 
-  async function mutateMeshPointsVisibility(
-    response: Readonly<{ id: string; visibility: boolean }>,
-  ): Promise<string> {
+  async function mutateMeshPointsVisibility(response: {
+    id: string;
+    visibility: boolean;
+  }): Promise<string> {
     const result = await mutateMeshPointsStyle(response.id, { visibility: response.visibility });
     return result;
   }

@@ -56,7 +56,7 @@ interface OpenMenuOptions {
   readonly height: number;
   readonly top: number;
   readonly left: number;
-  readonly meta_data: Readonly<MenuMetaData> | undefined;
+  readonly meta_data: MenuMetaData | undefined;
 }
 
 const PointSet_menu = [PointSetPointsOptions];

@@ -40,7 +40,7 @@ function useClippingPlanesWidget({
   allItems,
   hybridViewerStore,
   debouncedApply,
-}: Readonly<ClippingPlanesWidgetParams>): {
+}: ClippingPlanesWidgetParams): {
   getSceneCenter: typeof getSceneCenter;
   syncWidgets: typeof syncWidgets;
   syncLocalCamera: typeof syncLocalCamera;
@@ -82,7 +82,7 @@ function useClippingPlanesWidget({
     localRenderWindow.getRenderWindow().render();
   }
 
-  function limitCameraZoomOut(camera: Readonly<vtkCamera>): void {
+  function limitCameraZoomOut(camera: vtkCamera): void {
     if (maxDistance <= 0 || isLimitingCameraZoom) {
       return;
     }
@@ -128,7 +128,7 @@ function useClippingPlanesWidget({
       widgetManager = undefined;
     }
   }
-  function updateWidgetPlacement({ isReset = false }: Readonly<{ isReset?: boolean }> = {}): void {
+  function updateWidgetPlacement({ isReset = false }: { isReset?: boolean } = {}): void {
     if (!widgetManager || !localRenderWindow) {
       return;
     }
@@ -148,11 +148,11 @@ function useClippingPlanesWidget({
     }
   }
 
-  function initLocalWidget(container: Readonly<HTMLElement>): void {
+  function initLocalWidget(container: HTMLElement): void {
     cleanupLocalWidget();
     container.addEventListener(
       "wheel",
-      (event: Readonly<WheelEvent>) => {
+      (event: WheelEvent) => {
         event.stopPropagation();
       },
       { passive: true },
