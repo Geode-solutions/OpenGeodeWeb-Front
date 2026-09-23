@@ -53,7 +53,7 @@ function isErrorWithMessage(error: unknown): error is { message: string } {
   );
 }
 
-async function killHttpMicroservice(microservice: Readonly<Microservice>): Promise<void> {
+async function killHttpMicroservice(microservice: Microservice): Promise<void> {
   console.log("killHttpMicroservice", {
     ...microservice,
   });
@@ -77,7 +77,7 @@ async function killHttpMicroservice(microservice: Readonly<Microservice>): Promi
   });
 }
 
-async function killWebsocketMicroservice(microservice: Readonly<Microservice>): Promise<void> {
+async function killWebsocketMicroservice(microservice: Microservice): Promise<void> {
   console.log("killWebsocketMicroservice", {
     ...microservice,
   });
@@ -124,7 +124,7 @@ async function killWebsocketMicroservice(microservice: Readonly<Microservice>): 
         console.log(successMessage);
         resolve();
       });
-      socket.on("error", (error: Readonly<Error>) => {
+      socket.on("error", (error: Error) => {
         console.error("WebSocket error:", error);
         socket.close();
         resolve();
@@ -137,7 +137,7 @@ async function killWebsocketMicroservice(microservice: Readonly<Microservice>): 
   });
 }
 
-async function killMicroservice(microservice: Readonly<Microservice>): Promise<void> {
+async function killMicroservice(microservice: Microservice): Promise<void> {
   if (microservice.type === "back") {
     await killHttpMicroservice(microservice);
   } else if (microservice.type === "viewer") {
@@ -148,9 +148,7 @@ async function killMicroservice(microservice: Readonly<Microservice>): Promise<v
   }
 }
 
-async function killMicroservices(
-  microservices: readonly Readonly<Microservice>[],
-): Promise<Readonly<Microservice>[]> {
+async function killMicroservices(microservices: readonly Microservice[]): Promise<Microservice[]> {
   console.log("killMicroservices", {
     microservices,
   });
@@ -203,7 +201,7 @@ async function cleanupBackend(projectFolderPath: string): Promise<void> {
 }
 
 function getMicroserviceByName(
-  microservices: readonly Readonly<Microservice>[],
+  microservices: readonly Microservice[],
   name: string,
 ): Microservice | undefined {
   const found = microservices.find((microservice) => microservice.name === name);

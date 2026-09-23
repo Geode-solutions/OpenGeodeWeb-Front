@@ -28,11 +28,7 @@ interface RelativeRect {
   relH: number;
 }
 
-function mapRect(
-  rect: Readonly<Rect>,
-  latestImage: Readonly<DrawableImage>,
-  canvasRect: Readonly<DOMRect>,
-): RelativeRect {
+function mapRect(rect: Rect, latestImage: DrawableImage, canvasRect: DOMRect): RelativeRect {
   const scaleX = latestImage.width / canvasRect.width;
   const scaleY = latestImage.height / canvasRect.height;
   return {
@@ -45,8 +41,8 @@ function mapRect(
 
 function sampleMinBrightness(
   ctx: CanvasRenderingContext2D,
-  image: Readonly<DrawableImage>,
-  relRect: Readonly<RelativeRect>,
+  image: DrawableImage,
+  relRect: RelativeRect,
 ): number {
   ctx.drawImage(
     image,
@@ -70,10 +66,7 @@ function sampleMinBrightness(
   return minBrightness;
 }
 
-function computeAverageBrightness(
-  rect: Readonly<Rect>,
-  options: Readonly<BrightnessOptions>,
-): number {
+function computeAverageBrightness(rect: Rect, options: BrightnessOptions): number {
   const { latestImage, offscreenCtx, offscreenCanvas } = options;
   const { genericRenderWindow } = useHybridViewerCore();
   if (!latestImage || !offscreenCtx || !offscreenCanvas || !genericRenderWindow.value) {
@@ -106,7 +99,7 @@ function computeAverageBrightness(
 }
 function useHybridViewerBrightness(): {
   latestImage: Ref<DrawableImage | undefined>;
-  getAverageBrightness: (rect: Readonly<Rect>) => number;
+  getAverageBrightness: (rect: Rect) => number;
 } {
   const latestImage = ref<DrawableImage | undefined>(undefined);
   const offscreenCanvas: HTMLCanvasElement | undefined =
@@ -116,7 +109,7 @@ function useHybridViewerBrightness(): {
         willReadFrequently: true,
       }) ?? undefined)
     : undefined;
-  function getAverageBrightness(rect: Readonly<Rect>): number {
+  function getAverageBrightness(rect: Rect): number {
     return computeAverageBrightness(rect, {
       latestImage: latestImage.value,
       offscreenCtx,

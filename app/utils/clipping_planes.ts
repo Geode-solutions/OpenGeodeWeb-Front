@@ -79,7 +79,7 @@ function getPlaneStyle(rgb: readonly number[]): PlaneStyle {
   };
 }
 
-function computeSceneBounds(actors: readonly Readonly<vtkActor>[]): Bounds {
+function computeSceneBounds(actors: readonly vtkActor[]): Bounds {
   let bounds: Bounds = [Infinity, -Infinity, Infinity, -Infinity, Infinity, -Infinity];
   for (const actor of actors) {
     const boundsOfActor = actor.getBounds();
@@ -100,7 +100,7 @@ interface SceneBoundsInfo {
   readonly cubicBounds: readonly number[];
 }
 
-function computeSceneBoundsInfo(actors: readonly Readonly<vtkActor>[]): SceneBoundsInfo {
+function computeSceneBoundsInfo(actors: readonly vtkActor[]): SceneBoundsInfo {
   if (actors.length === 0) {
     return { center: [0, 0, 0], cubicBounds: [-1, 1, -1, 1, -1, 1] };
   }
@@ -112,7 +112,7 @@ function computeSceneBoundsInfo(actors: readonly Readonly<vtkActor>[]): SceneBou
   ];
 
   const maxActorExtent = Math.max(
-    ...actors.map((actor: Readonly<vtkActor>) => {
+    ...actors.map((actor: vtkActor) => {
       const bounds = actor.getBounds();
       return Math.max(bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4]);
     }),
@@ -131,7 +131,7 @@ function computeSceneBoundsInfo(actors: readonly Readonly<vtkActor>[]): SceneBou
 }
 
 interface ActorEntry {
-  readonly actor: Readonly<vtkActor>;
+  readonly actor: vtkActor;
 }
 
 interface MainCameraOptions {
@@ -144,25 +144,20 @@ function resolveActiveActors(
   targetAllVisible: boolean,
   allItems: readonly { readonly id: string }[],
   selectedDatasetIds: readonly string[],
-  hybridDb: Readonly<Record<string, ActorEntry | undefined>>,
-): Readonly<vtkActor>[] {
+  hybridDb: Record<string, ActorEntry | undefined>,
+): vtkActor[] {
   const targetIds = targetAllVisible
-    ? allItems.map((item: Readonly<{ id: string }>) => item.id)
+    ? allItems.map((item: { id: string }) => item.id)
     : selectedDatasetIds;
   const targeted = targetIds
     .map((id) => hybridDb[id]?.actor)
-    .filter(
-      (actor: Readonly<vtkActor> | undefined): actor is Readonly<vtkActor> => actor !== undefined,
-    );
+    .filter((actor: vtkActor | undefined): actor is vtkActor => actor !== undefined);
   if (targeted.length > 0) {
     return targeted;
   }
   return Object.values(hybridDb)
-    .filter(
-      (entry: Readonly<ActorEntry> | undefined): entry is Readonly<ActorEntry> =>
-        entry !== undefined,
-    )
-    .map((entry: Readonly<ActorEntry>) => entry.actor);
+    .filter((entry: ActorEntry | undefined): entry is ActorEntry => entry !== undefined)
+    .map((entry: ActorEntry) => entry.actor);
 }
 
 function computeNormalizedViewDirection(
@@ -184,8 +179,8 @@ function computeNormalizedViewDirection(
 // Aligns the local clipping-plane preview camera onto the same viewing direction as the
 // Main viewer camera, re-centered on the clipped scene's bounds.
 function alignCameraToMainCamera(
-  camera: Readonly<vtkCamera>,
-  mainCam: Readonly<MainCameraOptions>,
+  camera: vtkCamera,
+  mainCam: MainCameraOptions,
   center: readonly number[],
 ): void {
   if (!mainCam.focal_point || !mainCam.position) {

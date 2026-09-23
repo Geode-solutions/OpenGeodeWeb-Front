@@ -12,9 +12,9 @@ import { useMeshStyle } from "@ogw_internal/stores/data_style/mesh/index";
 import { useModelStyle } from "@ogw_internal/stores/data_style/model/index";
 
 interface DataStyleSnapshot {
-  readonly styles: Readonly<Record<string, Readonly<ObjectStyle>>>;
-  readonly componentStyles: Readonly<Record<string, Readonly<ModelComponentStyle>>>;
-  readonly modelComponentTypeStyles: Readonly<Record<string, Readonly<ModelComponentTypeStyle>>>;
+  readonly styles: Record<string, ObjectStyle>;
+  readonly componentStyles: Record<string, ModelComponentStyle>;
+  readonly modelComponentTypeStyles: Record<string, ModelComponentTypeStyle>;
 }
 
 // The database's table map is dynamically assembled at runtime (see internal/database/database.ts), so its exported type is a loose `{}`; cast it to the shape it actually has at runtime rather than widening every call site.
@@ -100,7 +100,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   }
 
   // oxlint-disable-next-line prefer-readonly-parameter-types -- ObjectStyle (external type) has a mutable index signature and mutable nested StyleValues fields that can't be marked readonly from here.
-  async function importStores(snapshot: Readonly<DataStyleSnapshot>): Promise<void> {
+  async function importStores(snapshot: DataStyleSnapshot): Promise<void> {
     const stylesSnapshot = snapshot.styles;
     const componentStylesSnapshot = snapshot.componentStyles;
     const modelComponentTypeStylesSnapshot = snapshot.modelComponentTypeStyles;
@@ -109,19 +109,19 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
     const style_promises = Object.entries(stylesSnapshot).map(
       // oxlint-disable-next-line prefer-readonly-parameter-types -- same external ObjectStyle limitation as above.
-      async ([id, style]: readonly [string, Readonly<ObjectStyle>]) => {
+      async ([id, style]: readonly [string, ObjectStyle]) => {
         const key = await data_style_db.put(structuredClone({ ...style, id }));
         return key;
       },
     );
     const component_style_promises = Object.values(componentStylesSnapshot).map(
-      async (style: Readonly<ModelComponentStyle>) => {
+      async (style: ModelComponentStyle) => {
         const key = await component_datastyle_db.put(structuredClone(style));
         return key;
       },
     );
     const model_component_type_style_promises = Object.values(modelComponentTypeStylesSnapshot).map(
-      async (style: Readonly<ModelComponentTypeStyle>) => {
+      async (style: ModelComponentTypeStyle) => {
         const key = await model_component_type_datastyle_db.put(structuredClone(style));
         return key;
       },

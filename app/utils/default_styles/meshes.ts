@@ -117,7 +117,7 @@ interface SolidStyle {
 function meshPointsDefaultStyle(
   visibility: boolean = POINTS_DEFAULT_VISIBILITY,
   size: number = POINTS_DEFAULT_SIZE,
-  constant: Readonly<RGBAColor> = POINTS_DEFAULT_COLOR,
+  constant: RGBAColor = POINTS_DEFAULT_COLOR,
 ): MeshPointsStyle {
   return {
     visibility,
@@ -133,7 +133,7 @@ function meshPointsDefaultStyle(
 function meshEdgesDefaultStyle(
   visibility: boolean = EDGES_DEFAULT_VISIBILITY,
   width: number = EDGES_DEFAULT_WIDTH,
-  constant: Readonly<RGBAColor> = EDGES_DEFAULT_COLOR,
+  constant: RGBAColor = EDGES_DEFAULT_COLOR,
 ): MeshEdgesStyle {
   return {
     visibility,
@@ -149,7 +149,7 @@ function meshEdgesDefaultStyle(
 
 function meshCellsDefaultStyle(
   visibility: boolean = CELLS_DEFAULT_VISIBILITY,
-  constant: Readonly<RGBAColor> = CELLS_DEFAULT_COLOR,
+  constant: RGBAColor = CELLS_DEFAULT_COLOR,
 ): MeshCellsStyle {
   return {
     visibility,
@@ -166,7 +166,7 @@ function meshCellsDefaultStyle(
 
 function meshPolygonsDefaultStyle(
   visibility: boolean = POLYGONS_DEFAULT_VISIBILITY,
-  constant: Readonly<RGBAColor> = POLYGONS_DEFAULT_COLOR,
+  constant: RGBAColor = POLYGONS_DEFAULT_COLOR,
 ): MeshPolygonsStyle {
   return {
     visibility,
@@ -183,7 +183,7 @@ function meshPolygonsDefaultStyle(
 
 function meshPolyhedraDefaultStyle(
   visibility: boolean = POLYHEDRA_DEFAULT_VISIBILITY,
-  constant: Readonly<RGBAColor> = POLYHEDRA_DEFAULT_COLOR,
+  constant: RGBAColor = POLYHEDRA_DEFAULT_COLOR,
 ): MeshPolyhedraStyle {
   return {
     visibility,

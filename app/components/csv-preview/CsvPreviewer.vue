@@ -77,34 +77,33 @@ function autoDetectSeparator(content: string): string {
   return best;
 }
 
+function splitLine(line: string): string[] {
+  if (!separator.value) {
+    return [line];
+  }
+  const result = [];
+  let current = "";
+  let inQuotes = false;
+  for (const char of line) {
+    if (char === '"') {
+      inQuotes = !inQuotes;
+    } else if (char === separator.value && !inQuotes) {
+      result.push(current.trim());
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+  result.push(current.trim());
+  return result;
+}
+
 function parseContent(): string[] {
   if (!rawContent.value) {
     return [];
   }
 
   const allLines = rawContent.value.split(/\r?\n/u).filter((line) => line.trim() !== "");
-
-  function splitLine(line: string): string[] {
-    if (!separator.value) {
-      return [line];
-    }
-    const result = [];
-    let current = "";
-    let inQuotes = false;
-    for (const char of line) {
-      if (char === '"') {
-        inQuotes = !inQuotes;
-      } else if (char === separator.value && !inQuotes) {
-        result.push(current.trim());
-        current = "";
-      } else {
-        current += char;
-      }
-    }
-    result.push(current.trim());
-    return result;
-  }
-
   const headerLine = allLines[headerRow.value];
   const rawHeaders = headerLine ? splitLine(headerLine) : [];
 

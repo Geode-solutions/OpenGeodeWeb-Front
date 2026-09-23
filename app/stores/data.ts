@@ -65,7 +65,7 @@ const viewer_generic_schemas = viewer_schemas.opengeodeweb_viewer.generic;
 type DatabaseTables = Record<string, unknown>;
 // oxlint-disable-next-line no-unsafe-type-assertion -- see comment above.
 const typedDatabase = database as unknown as DatabaseTables;
-function checkItemViewable(item: Readonly<ViewableItemLike> | undefined | null): boolean {
+function checkItemViewable(item: ViewableItemLike | undefined | null): boolean {
   if (!item || typeof item !== "object") {
     return false;
   }
@@ -84,7 +84,7 @@ function checkItemViewable(item: Readonly<ViewableItemLike> | undefined | null):
   }
   return true;
 }
-function isItemViewable(itemOrId: string | Readonly<ViewableItemLike>): boolean | Promise<boolean> {
+function isItemViewable(itemOrId: string | ViewableItemLike): boolean | Promise<boolean> {
   if (typeof itemOrId === "string") {
     // oxlint-disable-next-line no-unsafe-type-assertion -- database's table map is dynamically typed at runtime; see comment above.
     return (typedDatabase.data as Table<DataItem, string>).get(itemOrId).then(checkItemViewable);
@@ -134,7 +134,7 @@ export const useDataStore = defineStore("data", () => {
     const items = await data_db.toArray();
     return items;
   }
-  function refItem(id: string): Readonly<Ref<DataItem | undefined>> {
+  function refItem(id: string): Ref<DataItem | undefined> {
     // Dexie's liveQuery() returns Dexie's own minimal Observable shape, not an
     // Actual rxjs Observable instance (useObservable's declared parameter type);
     // The two are structurally close enough at runtime (vueuse only calls
@@ -151,7 +151,7 @@ export const useDataStore = defineStore("data", () => {
       },
     );
   }
-  function refAllItems(): Readonly<Ref<DataItem[]>> {
+  function refAllItems(): Ref<DataItem[]> {
     return useObservable(
       liveQuery(async () => {
         const items = await data_db.toArray();
@@ -194,9 +194,9 @@ export const useDataStore = defineStore("data", () => {
     });
     return result;
   }
-  // NewDataItem has mutable array fields (mesh_components, collection_components), so Readonly<>
-  // Can't satisfy prefer-readonly-parameter-types deeply; same pattern as app/utils/import_workflow.ts.
-  async function addItem(new_item: Readonly<NewDataItem>): Promise<string> {
+  // NewDataItem has mutable array fields (mesh_components, collection_components), so it can't
+  // Satisfy prefer-readonly-parameter-types deeply; same pattern as app/utils/import_workflow.ts.
+  async function addItem(new_item: NewDataItem): Promise<string> {
     const itemData: DataItem = {
       id: new_item.id,
       name: new_item.name ?? new_item.id,
@@ -212,9 +212,9 @@ export const useDataStore = defineStore("data", () => {
     const id = await data_db.put(itemData);
     return id;
   }
-  // NewDataItem has mutable array fields (mesh_components, collection_components), so Readonly<>
-  // Can't satisfy prefer-readonly-parameter-types deeply; same pattern as app/utils/import_workflow.ts.
-  async function addComponents(new_item: Readonly<NewDataItem>): Promise<string> {
+  // NewDataItem has mutable array fields (mesh_components, collection_components), so it can't
+  // Satisfy prefer-readonly-parameter-types deeply; same pattern as app/utils/import_workflow.ts.
+  async function addComponents(new_item: NewDataItem): Promise<string> {
     const allComponents: ModelComponentRecord[] = [];
     // ModelComponentInput has mutable array fields (boundaries, internals, items), so a readonly
     // Array of it can't satisfy prefer-readonly-parameter-types deeply; same limitation as above.
@@ -239,9 +239,9 @@ export const useDataStore = defineStore("data", () => {
     const lastKey = await model_components_db.bulkPut(allComponents);
     return lastKey;
   }
-  // NewDataItem has mutable array fields (mesh_components, collection_components), so Readonly<>
-  // Can't satisfy prefer-readonly-parameter-types deeply; same pattern as app/utils/import_workflow.ts.
-  async function addComponentRelations(new_item: Readonly<NewDataItem>): Promise<string> {
+  // NewDataItem has mutable array fields (mesh_components, collection_components), so it can't
+  // Satisfy prefer-readonly-parameter-types deeply; same pattern as app/utils/import_workflow.ts.
+  async function addComponentRelations(new_item: NewDataItem): Promise<string> {
     const relations: ModelComponentRelationRecord[] = [];
     function addModelComponentRelations(
       components: readonly string[],
@@ -284,7 +284,7 @@ export const useDataStore = defineStore("data", () => {
     const component = await model_components_db
       .where("viewer_id")
       .equals(Number(viewer_id))
-      .and((model_component: Readonly<ModelComponentRecord>) => model_component.id === modelId)
+      .and((model_component: ModelComponentRecord) => model_component.id === modelId)
       .first();
     return component;
   }
@@ -304,7 +304,7 @@ export const useDataStore = defineStore("data", () => {
 
   async function getAllModelComponentsViewerIds(modelId: string): Promise<number[]> {
     const components = await model_components_db.where("id").equals(modelId).toArray();
-    return components.map((component: Readonly<ModelComponentRecord>) =>
+    return components.map((component: ModelComponentRecord) =>
       Math.trunc(Number(component.viewer_id)),
     );
   }
@@ -316,7 +316,7 @@ export const useDataStore = defineStore("data", () => {
       .where("[id+geode_id]")
       .anyOf(meshComponentGeodeIds.map((geode_id) => [modelId, geode_id]))
       .toArray();
-    return components.map((component: Readonly<ModelComponentRecord>) =>
+    return components.map((component: ModelComponentRecord) =>
       Math.trunc(Number(component.viewer_id)),
     );
   }

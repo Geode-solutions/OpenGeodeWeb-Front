@@ -93,7 +93,7 @@ async function importProjectToViewer(
   }
 }
 
-async function importProject(file: Readonly<File>): Promise<void> {
+async function importProject(file: File): Promise<void> {
   const backStore = useBackStore();
   const dataStyleStore = useDataStyleStore();
   const viewerStore = useViewerStore();

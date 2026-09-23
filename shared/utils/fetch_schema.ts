@@ -6,29 +6,22 @@ import { validateSchema } from "./validate_schema.js";
 const ERROR_400 = 400;
 
 interface FetchSchemaOptions {
-  schema: Readonly<JsonRpcSchema & { methods: readonly string[] }>;
+  schema: JsonRpcSchema & { methods: readonly string[] };
   params?: unknown;
   baseURL?: string;
-  headers?: Readonly<Record<string, string>>;
+  headers?: Record<string, string>;
   timeout?: number;
   expectEvent?: boolean;
 }
 
 async function fetchSchema(
-  {
-    schema,
-    params = {},
-    baseURL,
-    headers,
-    timeout,
-    expectEvent = false,
-  }: Readonly<FetchSchemaOptions>,
+  { schema, params = {}, baseURL, headers, timeout, expectEvent = false }: FetchSchemaOptions,
   {
     request_error_function,
     response_function,
     response_error_function,
     validation_error_function,
-  }: Readonly<RequestHandlersWithValidation> = {},
+  }: RequestHandlersWithValidation = {},
 ): Promise<unknown> {
   const { valid, error: schema_error } = validateSchema(schema, params);
 

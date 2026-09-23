@@ -15,16 +15,16 @@ import { useMeshPolygonsVisibilityStyle } from "./visibility";
 // Local constants
 
 interface MeshPolygonsActiveColoringDeps {
-  readonly commonStyle: Readonly<ReturnType<typeof useMeshPolygonsCommonStyle>>;
-  readonly colorStyle: Readonly<ReturnType<typeof useMeshPolygonsColorStyle>>;
-  readonly texturesStyle: Readonly<ReturnType<typeof useMeshPolygonsTexturesStyle>>;
-  readonly vertexAttributeStyle: Readonly<ReturnType<typeof useMeshPolygonsVertexAttributeStyle>>;
-  readonly polygonAttributeStyle: Readonly<ReturnType<typeof useMeshPolygonsPolygonAttributeStyle>>;
+  readonly commonStyle: ReturnType<typeof useMeshPolygonsCommonStyle>;
+  readonly colorStyle: ReturnType<typeof useMeshPolygonsColorStyle>;
+  readonly texturesStyle: ReturnType<typeof useMeshPolygonsTexturesStyle>;
+  readonly vertexAttributeStyle: ReturnType<typeof useMeshPolygonsVertexAttributeStyle>;
+  readonly polygonAttributeStyle: ReturnType<typeof useMeshPolygonsPolygonAttributeStyle>;
 }
 
 function handleMeshPolygonsVertexColoring(
   id: string,
-  vertexAttributeStyle: Readonly<ReturnType<typeof useMeshPolygonsVertexAttributeStyle>>,
+  vertexAttributeStyle: ReturnType<typeof useMeshPolygonsVertexAttributeStyle>,
 ): Promise<unknown> | undefined {
   const name = vertexAttributeStyle.meshPolygonsVertexAttributeName(id);
   const item = vertexAttributeStyle.meshPolygonsVertexAttributeItem(id);
@@ -39,7 +39,7 @@ function handleMeshPolygonsVertexColoring(
 
 function handleMeshPolygonsPolygonColoring(
   id: string,
-  polygonAttributeStyle: Readonly<ReturnType<typeof useMeshPolygonsPolygonAttributeStyle>>,
+  polygonAttributeStyle: ReturnType<typeof useMeshPolygonsPolygonAttributeStyle>,
 ): Promise<unknown> | undefined {
   const name = polygonAttributeStyle.meshPolygonsPolygonAttributeName(id);
   const item = polygonAttributeStyle.meshPolygonsPolygonAttributeItem(id);
@@ -55,7 +55,7 @@ function handleMeshPolygonsPolygonColoring(
 async function setMeshPolygonsActiveColoring(
   id: string,
   type: string | undefined,
-  deps: Readonly<MeshPolygonsActiveColoringDeps>,
+  deps: MeshPolygonsActiveColoringDeps,
 ): Promise<unknown> {
   await deps.commonStyle.mutateMeshPolygonsStyle(id, {
     coloring: { active: type },
@@ -87,9 +87,9 @@ async function setMeshPolygonsActiveColoring(
 
 async function applyMeshPolygonsStyle(
   id: string,
-  visibilityStyle: Readonly<ReturnType<typeof useMeshPolygonsVisibilityStyle>>,
+  visibilityStyle: ReturnType<typeof useMeshPolygonsVisibilityStyle>,
   activeColoringType: string | undefined,
-  deps: Readonly<MeshPolygonsActiveColoringDeps>,
+  deps: MeshPolygonsActiveColoringDeps,
 ): Promise<unknown[]> {
   const result = await Promise.all([
     visibilityStyle.setMeshPolygonsVisibility(id, visibilityStyle.meshPolygonsVisibility(id)),

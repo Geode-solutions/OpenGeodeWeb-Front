@@ -45,7 +45,7 @@ function extensionsConf(projectName: string): ExtensionsConfigSchema["extensions
 
 function addExtensionToConf(
   projectName: string,
-  { extensionId, extensionPath }: Readonly<{ extensionId: string; extensionPath: string }>,
+  { extensionId, extensionPath }: { extensionId: string; extensionPath: string },
 ): void {
   const projectConfig = projectConf(projectName);
   projectConfig.set(`extensions.${extensionId}.path`, extensionPath);

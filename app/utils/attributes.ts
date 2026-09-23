@@ -11,7 +11,7 @@ interface AttributeRange {
 }
 
 export function getAttributeRange(
-  currentAttribute: Readonly<AttributeRangeSource> | undefined | null,
+  currentAttribute: AttributeRangeSource | undefined | null,
   compIndex = 0,
 ): AttributeRange {
   if (!currentAttribute) {

@@ -170,7 +170,7 @@ const hybridViewerStoreMock = {
 // Resolves a mocked `$fetch` call's `onResponse` hook with a successful response.
 // Mirrors the pattern used in tests/unit/stores/infra.nuxt.test.ts.
 async function respondWithSuccess(
-  options: Readonly<FetchOptions> | undefined,
+  options: FetchOptions | undefined,
   request: FetchRequest,
   data: unknown,
 ): Promise<void> {
