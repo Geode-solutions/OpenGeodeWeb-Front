@@ -57,6 +57,7 @@ function toFetchErrorResponseLike(response: unknown): FetchErrorResponseLike {
   };
 }
 
+// oxlint-disable-next-line max-lines-per-function
 async function api_fetch(
   microservice: Microservice,
   { schema, params = {}, headers = {} }: ApiFetchParams,
@@ -65,7 +66,8 @@ async function api_fetch(
     response_function,
     response_error_function,
     timeout,
-  }: RequestHandlersWithValidation & { timeout?: number } = {},
+    skip_feedback_error,
+  }: RequestHandlersWithValidation & { timeout?: number; skip_feedback_error?: boolean } = {},
 ): Promise<unknown> {
   console.log("[API] Fetching", microservice.base_url);
   const feedbackStore = useFeedbackStore();
@@ -84,12 +86,14 @@ async function api_fetch(
       request_error_function(error: unknown) {
         microservice.stop_request();
         const typedError = toFetchErrorLike(error);
-        feedbackStore.add_error(
-          typedError.code ?? 0,
-          schema.$id,
-          typedError.message ?? "",
-          typedError.stack ?? "",
-        );
+        if (!skip_feedback_error) {
+          feedbackStore.add_error(
+            typedError.code ?? 0,
+            schema.$id,
+            typedError.message ?? "",
+            typedError.stack ?? "",
+          );
+        }
         if (request_error_function) {
           request_error_function(error);
         }
@@ -104,12 +108,14 @@ async function api_fetch(
       response_error_function(response: unknown) {
         microservice.stop_request();
         const typedResponse = toFetchErrorResponseLike(response);
-        feedbackStore.add_error(
-          typedResponse.status ?? 0,
-          schema.$id,
-          typedResponse.name ?? "",
-          typedResponse.description ?? "",
-        );
+        if (!skip_feedback_error) {
+          feedbackStore.add_error(
+            typedResponse.status ?? 0,
+            schema.$id,
+            typedResponse.name ?? "",
+            typedResponse.description ?? "",
+          );
+        }
         if (response_error_function) {
           response_error_function(response);
         }

@@ -58,6 +58,12 @@ export const useViewerStore = defineStore(
       viewer_url += "/ws";
       return viewer_url;
     });
+    function start_request(): void {
+      request_counter.value += 1;
+    }
+    function stop_request(): void {
+      request_counter.value -= 1;
+    }
     const is_busy = computed(() => request_counter.value > 0);
     function toggle_picking_mode(value: boolean): void {
       picking_mode.value = value;
@@ -75,9 +81,15 @@ export const useViewerStore = defineStore(
       },
       callbacks: RequestHandlers = {},
     ): Promise<unknown> {
-      const store = useViewerStore();
+      const microservice = {
+        $id: "viewer",
+        client: client.value,
+        base_url: base_url.value,
+        start_request,
+        stop_request,
+      };
       const result = await viewer_call(
-        store,
+        microservice,
         {
           schema,
           params,
@@ -148,13 +160,7 @@ export const useViewerStore = defineStore(
         }
       });
     }
-    function start_request(): void {
-      request_counter.value += 1;
-    }
-    function stop_request(): void {
-      request_counter.value -= 1;
-    }
-    async function launch(args: { projectFolderPath?: string } = {}): Promise<unknown> {
+    async function launch(args: Readonly<{ projectFolderPath?: string }> = {}): Promise<unknown> {
       const appStore = useAppStore();
       const { COMMAND_VIEWER, NUXT_ROOT_PATH } = useRuntimeConfig().public;
       const schema = opengeodeweb_front_schemas.api.local.app.run_viewer;
