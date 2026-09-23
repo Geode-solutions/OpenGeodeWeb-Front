@@ -77,8 +77,8 @@ function autoDetectSeparator(content: string): string {
   return best;
 }
 
-function splitLine(line: string, sep: string): string[] {
-  if (!sep) {
+function splitLine(line: string): string[] {
+  if (!separator.value) {
     return [line];
   }
   const result = [];
@@ -87,7 +87,7 @@ function splitLine(line: string, sep: string): string[] {
   for (const char of line) {
     if (char === '"') {
       inQuotes = !inQuotes;
-    } else if (char === sep && !inQuotes) {
+    } else if (char === separator.value && !inQuotes) {
       result.push(current.trim());
       current = "";
     } else {
@@ -98,14 +98,14 @@ function splitLine(line: string, sep: string): string[] {
   return result;
 }
 
-function parseContent(): void {
+function parseContent(): string[] {
   if (!rawContent.value) {
-    return;
+    return [];
   }
 
   const allLines = rawContent.value.split(/\r?\n/u).filter((line) => line.trim() !== "");
   const headerLine = allLines[headerRow.value];
-  const rawHeaders = headerLine ? splitLine(headerLine, separator.value) : [];
+  const rawHeaders = headerLine ? splitLine(headerLine) : [];
 
   previewHeaders.value = rawHeaders.map((header, index) => ({
     title: header || `Column ${index + 1}`,
@@ -116,7 +116,7 @@ function parseContent(): void {
 
   const dataLines = allLines.slice(firstRow.value, firstRow.value + PREVIEW_ROWS_LIMIT);
   previewRows.value = dataLines.map((line) => {
-    const row = splitLine(line, separator.value);
+    const row = splitLine(line);
     const obj: CsvRow = {};
     for (let index = 0; index < row.length; index += 1) {
       obj[`col${index}`] = row[index] ?? "";
