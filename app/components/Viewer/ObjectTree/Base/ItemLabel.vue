@@ -31,6 +31,7 @@ interface LabeledItem {
   id: string;
   title?: string;
   is_active?: boolean;
+  category?: string;
   children?: unknown[];
 }
 
@@ -52,6 +53,9 @@ const tooltipTitle = computed<string>(() =>
 );
 
 const tooltipDisabled = computed<boolean>(() => {
+  if (actualItem.value.category !== undefined) {
+    return false;
+  }
   if (isLeaf !== undefined) {
     return !isLeaf;
   }
