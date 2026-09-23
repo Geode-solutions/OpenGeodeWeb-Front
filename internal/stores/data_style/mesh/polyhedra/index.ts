@@ -17,17 +17,15 @@ import { useMeshPolyhedraVisibilityStyle } from "./visibility";
 // Local constants
 
 interface MeshPolyhedraActiveColoringDeps {
-  readonly commonStyle: Readonly<ReturnType<typeof useMeshPolyhedraCommonStyle>>;
-  readonly colorStyle: Readonly<ReturnType<typeof useMeshPolyhedraColorStyle>>;
-  readonly vertexAttributeStyle: Readonly<ReturnType<typeof useMeshPolyhedraVertexAttributeStyle>>;
-  readonly polyhedronAttributeStyle: Readonly<
-    ReturnType<typeof useMeshPolyhedraPolyhedronAttributeStyle>
-  >;
+  readonly commonStyle: ReturnType<typeof useMeshPolyhedraCommonStyle>;
+  readonly colorStyle: ReturnType<typeof useMeshPolyhedraColorStyle>;
+  readonly vertexAttributeStyle: ReturnType<typeof useMeshPolyhedraVertexAttributeStyle>;
+  readonly polyhedronAttributeStyle: ReturnType<typeof useMeshPolyhedraPolyhedronAttributeStyle>;
 }
 
 function handleMeshPolyhedraVertexColoring(
   id: string,
-  vertexAttributeStyle: Readonly<ReturnType<typeof useMeshPolyhedraVertexAttributeStyle>>,
+  vertexAttributeStyle: ReturnType<typeof useMeshPolyhedraVertexAttributeStyle>,
 ): Promise<unknown> | undefined {
   const name = vertexAttributeStyle.meshPolyhedraVertexAttributeName(id);
   const item = vertexAttributeStyle.meshPolyhedraVertexAttributeItem(id);
@@ -42,7 +40,7 @@ function handleMeshPolyhedraVertexColoring(
 
 function handleMeshPolyhedraPolyhedronColoring(
   id: string,
-  polyhedronAttributeStyle: Readonly<ReturnType<typeof useMeshPolyhedraPolyhedronAttributeStyle>>,
+  polyhedronAttributeStyle: ReturnType<typeof useMeshPolyhedraPolyhedronAttributeStyle>,
 ): Promise<unknown> | undefined {
   const name = polyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeName(id);
   const item = polyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeItem(id);
@@ -58,7 +56,7 @@ function handleMeshPolyhedraPolyhedronColoring(
 async function setMeshPolyhedraActiveColoring(
   id: string,
   type: string | undefined,
-  deps: Readonly<MeshPolyhedraActiveColoringDeps>,
+  deps: MeshPolyhedraActiveColoringDeps,
 ): Promise<unknown> {
   await deps.commonStyle.mutateMeshPolyhedraStyle(id, {
     coloring: { active: type },
@@ -83,9 +81,9 @@ async function setMeshPolyhedraActiveColoring(
 
 async function applyMeshPolyhedraStyle(
   id: string,
-  visibilityStyle: Readonly<ReturnType<typeof useMeshPolyhedraVisibilityStyle>>,
+  visibilityStyle: ReturnType<typeof useMeshPolyhedraVisibilityStyle>,
   activeColoringType: string | undefined,
-  deps: Readonly<MeshPolyhedraActiveColoringDeps>,
+  deps: MeshPolyhedraActiveColoringDeps,
 ): Promise<unknown[]> {
   const result = await Promise.all([
     visibilityStyle.setMeshPolyhedraVisibility(id, visibilityStyle.meshPolyhedraVisibility(id)),

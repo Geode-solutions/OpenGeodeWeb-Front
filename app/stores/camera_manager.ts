@@ -25,7 +25,7 @@ export const useCameraManagerStore = defineStore("camera_manager", () => {
     number
   >;
 
-  function refAllCameraPositions(): Readonly<Ref<CameraPositionRecord[]>> {
+  function refAllCameraPositions(): Ref<CameraPositionRecord[]> {
     // Dexie's liveQuery() returns Dexie's own minimal Observable shape, not an
     // Actual rxjs Observable instance (useObservable's declared parameter type);
     // The two are structurally close enough at runtime (vueuse only calls
@@ -45,10 +45,7 @@ export const useCameraManagerStore = defineStore("camera_manager", () => {
     return position;
   }
 
-  async function saveCameraPosition(
-    name: string,
-    camera_options: Readonly<CameraOptions>,
-  ): Promise<void> {
+  async function saveCameraPosition(name: string, camera_options: CameraOptions): Promise<void> {
     await camera_positions_db.put({
       name,
       camera_options,

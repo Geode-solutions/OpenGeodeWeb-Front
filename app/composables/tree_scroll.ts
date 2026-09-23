@@ -14,34 +14,34 @@ interface ScrollInfo {
   itemHeight: number;
 }
 
-type ReadonlyMaybeRefOrGetter<Value> = Value | Readonly<Ref<Value>> | (() => Value);
+type ReadonlyMaybeRefOrGetter<Value> = Value | Ref<Value> | (() => Value);
 
-type ReadonlyDisplayItem = Readonly<Omit<DisplayItem, "raw">> & {
-  readonly raw: Readonly<Record<string, unknown>>;
+type ReadonlyDisplayItem = Omit<DisplayItem, "raw"> & {
+  readonly raw: Record<string, unknown>;
 };
 
 interface ScrollEventLike {
-  readonly target: Readonly<EventTarget> | null;
+  readonly target: EventTarget | null;
 }
 
 interface UseTreeScrollReturn {
   internalScrollTop: Ref<number>;
   virtualScrollRef: Ref<ScrollableElement | undefined>;
   stickyHeader: ComputedRef<ReadonlyDisplayItem | undefined>;
-  handleScroll: (event: Readonly<ScrollEventLike>) => void;
+  handleScroll: (event: ScrollEventLike) => void;
   scrollToIndex: (index: number) => void;
   getScrollInfo: () => ScrollInfo;
 }
 
-function isHtmlElement(value: Readonly<EventTarget> | null): value is HTMLElement {
+function isHtmlElement(value: EventTarget | null): value is HTMLElement {
   return value instanceof HTMLElement;
 }
 
 export function useTreeScroll(
-  propsIn: ReadonlyMaybeRefOrGetter<Readonly<TreeScrollProps>>,
+  propsIn: ReadonlyMaybeRefOrGetter<TreeScrollProps>,
   emit: EmitFn,
-  displayItems: Readonly<Ref<readonly ReadonlyDisplayItem[]>>,
-  actualItemProps: Readonly<Ref<Readonly<ItemPropsConfig>>>,
+  displayItems: Ref<readonly ReadonlyDisplayItem[]>,
+  actualItemProps: Ref<ItemPropsConfig>,
 ): UseTreeScrollReturn {
   const SCROLL_STICKY_THRESHOLD = 10;
   const DEFAULT_ITEM_HEIGHT = 28;
@@ -50,7 +50,7 @@ export function useTreeScroll(
   const internalScrollTop = ref(props.value.scrollTop ?? 0);
   const virtualScrollRef = ref<ScrollableElement | undefined>(undefined);
 
-  function handleScroll(event: Readonly<ScrollEventLike>): void {
+  function handleScroll(event: ScrollEventLike): void {
     const { target } = event;
     if (!isHtmlElement(target)) {
       return;

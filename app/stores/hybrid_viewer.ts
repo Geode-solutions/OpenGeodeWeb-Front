@@ -82,7 +82,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     };
     const imageStream = clientApi.getImageStream();
     viewportStore.viewStream.value = imageStream.createViewStream("-1");
-    viewportStore.viewStream.value?.onImageReady((event: Readonly<{ image: unknown }>) => {
+    viewportStore.viewStream.value?.onImageReady((event: { image: unknown }) => {
       if (is_moving.value) {
         return;
       }

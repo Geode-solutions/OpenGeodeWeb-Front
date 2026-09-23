@@ -12,16 +12,16 @@ import { useMeshCellsVisibilityStyle } from "./visibility";
 // Local constants
 
 interface MeshCellsActiveColoringDeps {
-  readonly commonStyle: Readonly<ReturnType<typeof useMeshCellsCommonStyle>>;
-  readonly colorStyle: Readonly<ReturnType<typeof useMeshCellsColorStyle>>;
-  readonly texturesStyle: Readonly<ReturnType<typeof useMeshCellsTexturesStyle>>;
-  readonly vertexAttributeStyle: Readonly<ReturnType<typeof useMeshCellsVertexAttributeStyle>>;
-  readonly cellAttributeStyle: Readonly<ReturnType<typeof useMeshCellsCellAttributeStyle>>;
+  readonly commonStyle: ReturnType<typeof useMeshCellsCommonStyle>;
+  readonly colorStyle: ReturnType<typeof useMeshCellsColorStyle>;
+  readonly texturesStyle: ReturnType<typeof useMeshCellsTexturesStyle>;
+  readonly vertexAttributeStyle: ReturnType<typeof useMeshCellsVertexAttributeStyle>;
+  readonly cellAttributeStyle: ReturnType<typeof useMeshCellsCellAttributeStyle>;
 }
 
 function handleMeshCellsVertexColoring(
   id: string,
-  vertexAttributeStyle: Readonly<ReturnType<typeof useMeshCellsVertexAttributeStyle>>,
+  vertexAttributeStyle: ReturnType<typeof useMeshCellsVertexAttributeStyle>,
 ): Promise<unknown> | undefined {
   const name = vertexAttributeStyle.meshCellsVertexAttributeName(id);
   const item = vertexAttributeStyle.meshCellsVertexAttributeItem(id);
@@ -36,7 +36,7 @@ function handleMeshCellsVertexColoring(
 
 function handleMeshCellsCellColoring(
   id: string,
-  cellAttributeStyle: Readonly<ReturnType<typeof useMeshCellsCellAttributeStyle>>,
+  cellAttributeStyle: ReturnType<typeof useMeshCellsCellAttributeStyle>,
 ): Promise<unknown> | undefined {
   const name = cellAttributeStyle.meshCellsCellAttributeName(id);
   const item = cellAttributeStyle.meshCellsCellAttributeItem(id);
@@ -52,7 +52,7 @@ function handleMeshCellsCellColoring(
 async function setMeshCellsActiveColoring(
   id: string,
   type: string | undefined,
-  deps: Readonly<MeshCellsActiveColoringDeps>,
+  deps: MeshCellsActiveColoringDeps,
 ): Promise<unknown> {
   await deps.commonStyle.mutateMeshCellsStyle(id, {
     coloring: { active: type },
@@ -81,9 +81,9 @@ async function setMeshCellsActiveColoring(
 
 async function applyMeshCellsStyle(
   id: string,
-  visibilityStyle: Readonly<ReturnType<typeof useMeshCellsVisibilityStyle>>,
+  visibilityStyle: ReturnType<typeof useMeshCellsVisibilityStyle>,
   activeColoringType: string | undefined,
-  deps: Readonly<MeshCellsActiveColoringDeps>,
+  deps: MeshCellsActiveColoringDeps,
 ): Promise<unknown[]> {
   const result = await Promise.all([
     visibilityStyle.setMeshCellsVisibility(id, visibilityStyle.meshCellsVisibility(id)),

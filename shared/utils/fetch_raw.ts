@@ -12,14 +12,14 @@ interface FetchRawOptions {
   method?: string;
   params?: unknown;
   baseURL?: string;
-  headers?: Readonly<Record<string, string>>;
+  headers?: Record<string, string>;
   max_retry?: number;
   timeout?: number;
   expectEvent?: boolean;
 }
 
 function resolveHeaders(
-  headers: Readonly<Record<string, string>>,
+  headers: Record<string, string>,
   expectEvent: boolean,
 ): Record<string, string> {
   const resolvedHeaders: Record<string, string> = { ...headers };
@@ -39,7 +39,7 @@ interface PerformFetchOptions extends RequestHandlers {
   method?: string;
   params?: unknown;
   baseURL?: string;
-  headers: Readonly<Record<string, string>>;
+  headers: Record<string, string>;
   max_retry?: number;
 }
 
@@ -53,29 +53,33 @@ async function performFetch({
   request_error_function,
   response_function,
   response_error_function,
-}: Readonly<PerformFetchOptions>): Promise<unknown> {
+}: PerformFetchOptions): Promise<unknown> {
   const fetchResult = await $fetch<unknown>(route, {
     baseURL,
     method,
     headers,
     ...(hasBody(params) ? { body: params } : {}),
     ...(max_retry === undefined ? {} : { retry: max_retry }),
-    onRequestError({ error }: Readonly<{ error: unknown }>) {
+    async onRequestError({ error }: { error: unknown }) {
       if (request_error_function) {
-        request_error_function(error);
+        await request_error_function(error);
       }
     },
-    onResponse({
+    async onResponse({
       response,
       // oxlint-disable-next-line eslint/id-length -- mirrors the real ofetch/vitest API field name (`ok`/`fn`)
-    }: Readonly<{ response: Readonly<{ ok: boolean; _data?: unknown }> }>) {
+    }: {
+      response: { ok: boolean; _data?: unknown };
+    }) {
       if (response.ok && response_function) {
-        response_function(response._data);
+        // Ofetch awaits whatever this hook returns; without awaiting here, callers relying on
+        // An async response_function (e.g. store patches) race the resolution of this $fetch call.
+        await response_function(response._data);
       }
     },
-    onResponseError({ response }: Readonly<{ response: unknown }>) {
+    async onResponseError({ response }: { response: unknown }) {
       if (response_error_function) {
-        response_error_function(response);
+        await response_error_function(response);
       }
     },
   });
@@ -92,14 +96,10 @@ async function fetchRaw(
     max_retry,
     timeout,
     expectEvent = false,
-  }: Readonly<FetchRawOptions>,
-  {
-    request_error_function,
-    response_function,
-    response_error_function,
-  }: Readonly<RequestHandlers> = {},
+  }: FetchRawOptions,
+  { request_error_function, response_function, response_error_function }: RequestHandlers = {},
 ): Promise<unknown> {
-  const fetchOptions: Readonly<PerformFetchOptions> = {
+  const fetchOptions: PerformFetchOptions = {
     route,
     method,
     params,

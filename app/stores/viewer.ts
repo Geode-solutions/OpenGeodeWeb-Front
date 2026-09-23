@@ -68,11 +68,11 @@ export const useViewerStore = defineStore(
         schema,
         params = {},
         timeout = request_timeout,
-      }: Readonly<{
+      }: {
         schema: JsonRpcSchema;
-        params?: Readonly<Record<string, unknown>>;
+        params?: Record<string, unknown>;
         timeout?: number;
-      }>,
+      },
       callbacks: RequestHandlers = {},
     ): Promise<unknown> {
       const store = useViewerStore();
@@ -154,7 +154,7 @@ export const useViewerStore = defineStore(
     function stop_request(): void {
       request_counter.value -= 1;
     }
-    async function launch(args: Readonly<{ projectFolderPath?: string }> = {}): Promise<unknown> {
+    async function launch(args: { projectFolderPath?: string } = {}): Promise<unknown> {
       const appStore = useAppStore();
       const { COMMAND_VIEWER, NUXT_ROOT_PATH } = useRuntimeConfig().public;
       const schema = opengeodeweb_front_schemas.api.local.app.run_viewer;

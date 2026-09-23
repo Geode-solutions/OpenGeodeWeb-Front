@@ -15,7 +15,7 @@ interface HybridViewerViewport {
   viewStream: Ref<ViewStreamLike | undefined>;
 }
 
-async function performResize(width: number, height: number): Promise<void> {
+async function resize(width: number, height: number): Promise<void> {
   const { genericRenderWindow, remoteRender, status, viewStream } = useHybridViewerCore();
   const viewerStore = useViewerStore();
   if (viewerStore.status !== Status.CONNECTED || status.value !== Status.CREATED) {
@@ -77,7 +77,7 @@ function performClickPicking(event: MouseEvent, containerElement: HTMLElement): 
   );
 }
 
-function performSetContainer(container: ContainerRef | undefined): void {
+function setContainer(container: ContainerRef | undefined): void {
   if (!container || !container.value) {
     return;
   }
@@ -102,7 +102,7 @@ function performSetContainer(container: ContainerRef | undefined): void {
     transition: "opacity 0.1s ease-in",
     zIndex: 1,
   });
-  void performResize(containerElement.offsetWidth, containerElement.offsetHeight);
+  void resize(containerElement.offsetWidth, containerElement.offsetHeight);
   let has_dragged = false;
   useMousePressed({
     target: containerElement,
@@ -173,5 +173,5 @@ function useHybridViewerViewport(): HybridViewerViewport {
     viewStream,
   };
 }
-export { performClickPicking, performResize, performSetContainer, useHybridViewerViewport };
+export { performClickPicking, useHybridViewerViewport };
 export type { ViewStreamLike } from "./vtk_types";

@@ -15,9 +15,9 @@ interface FileToImport {
   readonly geode_object_type: string;
 }
 
-// NewDataItem has mutable array fields (mesh_components, collection_components), so Readonly<>
-// Can't satisfy prefer-readonly-parameter-types deeply; left unfixed (same pattern as app/plugins/auto_store_register.ts).
-async function importItem(item: Readonly<NewDataItem>): Promise<string> {
+// NewDataItem has mutable array fields (mesh_components, collection_components), so it can't
+// Satisfy prefer-readonly-parameter-types deeply; left unfixed (same pattern as app/plugins/auto_store_register.ts).
+async function importItem(item: NewDataItem): Promise<string> {
   const dataStore = useDataStore();
   const dataStyleStore = useDataStyleStore();
   const hybridViewerStore = useHybridViewerStore();

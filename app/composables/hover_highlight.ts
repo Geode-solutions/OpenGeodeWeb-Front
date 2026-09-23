@@ -86,11 +86,11 @@ export function useHoverhighlight(): {
   async function unhighlightAction(
     type: HighlightType,
     id: string,
-    request: Readonly<{
+    request: {
       schema: JsonRpcSchema;
-      params?: Readonly<Record<string, unknown>>;
+      params?: Record<string, unknown>;
       timeout?: number;
-    }>,
+    },
   ): Promise<void> {
     try {
       await viewerStore.request(request);

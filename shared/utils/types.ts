@@ -14,14 +14,14 @@ interface ValidationError {
 }
 
 interface RequestHandlers {
-  readonly request_error_function?: (error: unknown) => void;
+  readonly request_error_function?: (error: unknown) => void | Promise<void>;
   // Return value is intentionally untyped: callers commonly return the Promise of a downstream call (e.g. a Dexie `.put()`, which resolves to a primary key) that this code chains/awaits but never inspects the resolved value of.
   readonly response_function?: (response: unknown) => unknown;
-  readonly response_error_function?: (response: unknown) => void;
+  readonly response_error_function?: (response: unknown) => void | Promise<void>;
 }
 
 interface RequestHandlersWithValidation extends RequestHandlers {
-  readonly validation_error_function?: (error: Readonly<ValidationError>) => void;
+  readonly validation_error_function?: (error: ValidationError) => void;
 }
 
 export type { JsonRpcSchema, RequestHandlers, RequestHandlersWithValidation, ValidationError };

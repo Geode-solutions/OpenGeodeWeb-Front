@@ -5,10 +5,7 @@ import { beforeEach, describe, expect, expectTypeOf, test } from "vitest";
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
-function sortByTitle(
-  itemA: Readonly<{ title: string }>,
-  itemB: Readonly<{ title: string }>,
-): number {
+function sortByTitle(itemA: { title: string }, itemB: { title: string }): number {
   return itemA.title.localeCompare(itemB.title, undefined, {
     numeric: true,
     sensitivity: "base",

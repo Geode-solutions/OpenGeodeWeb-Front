@@ -104,7 +104,6 @@ function parseContent(): string[] {
   }
 
   const allLines = rawContent.value.split(/\r?\n/u).filter((line) => line.trim() !== "");
-
   const headerLine = allLines[headerRow.value];
   const rawHeaders = headerLine ? splitLine(headerLine) : [];
 
