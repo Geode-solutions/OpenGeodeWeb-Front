@@ -35,8 +35,8 @@ function useHybridViewerFilters(): {
   setShrink: (ids: string[], shrink_factor: number) => Promise<void>;
 } {
   return {
-    setClippingPlanes: performSetClippingPlanes,
-    setShrink: performSetShrink,
+    setClippingPlanes,
+    setShrink,
   };
 }
 export { useHybridViewerFilters };

@@ -168,8 +168,8 @@ function setContainer(container: ContainerRef | undefined): void {
 function useHybridViewerViewport(): HybridViewerViewport {
   const { viewStream } = useHybridViewerCore();
   return {
-    setContainer: performSetContainer,
-    resize: performResize,
+    setContainer,
+    resize,
     viewStream,
   };
 }
