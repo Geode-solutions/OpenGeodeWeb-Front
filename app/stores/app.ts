@@ -170,6 +170,7 @@ export const useAppStore = defineStore("app", () => {
 
   // `TResult` is asserted, not verified, at the single `return result as TResult` boundary below: the backend response is only checked against `schema` at runtime, so callers' `TResult` is a contract with the schema, not something this function can prove.
   // oxlint-disable-next-line unicorn/consistent-function-scoping
+  // oxlint-disable-next-line unicorn/consistent-function-scoping
   async function request<TResult = unknown>(
     { schema, params }: { schema: JsonRpcSchema; params?: Record<string, unknown> },
     callbacks: RequestHandlers = {},
