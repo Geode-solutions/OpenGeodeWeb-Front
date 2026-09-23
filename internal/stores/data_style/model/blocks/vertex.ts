@@ -136,7 +136,8 @@ function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
         vertex: values,
       }),
     ];
-    if (blockIds.length > 1) {
+    const totalBlockIds = await dataStore.getBlocksGeodeIds(modelId);
+    if (blockIds.length === totalBlockIds.length) {
       tasks.push(
         modelBlocksCommonStyle.mutateModelBlocksTypeColoring(modelId, {
           vertex: values,

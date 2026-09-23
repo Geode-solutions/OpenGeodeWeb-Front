@@ -1,6 +1,7 @@
 import { isModelSurfacesPolygonAttributeValid, useModelSurfacesPolygonAttribute } from "./polygon";
 import { isModelSurfacesVertexAttributeValid, useModelSurfacesVertexAttribute } from "./vertex";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
+import { useDataStore } from "@ogw_front/stores/data";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 import { useModelSurfacesCommonStyle } from "./common";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
@@ -23,6 +24,7 @@ export function useModelSurfacesColor(): {
     activeColoring: string,
   ) => Promise<unknown>;
 } {
+  const dataStore = useDataStore();
   const modelCommonStyle = useModelCommonStyle();
   const modelSurfacesCommonStyle = useModelSurfacesCommonStyle();
   const modelSurfacesVertexAttribute = useModelSurfacesVertexAttribute();
@@ -62,7 +64,8 @@ export function useModelSurfacesColor(): {
     surfaces_ids: string[],
     activeColoring: string,
   ): Promise<unknown> {
-    if (surfaces_ids.length > 1) {
+    const totalSurfaceIds = await dataStore.getSurfacesGeodeIds(modelId);
+    if (surfaces_ids.length === totalSurfaceIds.length) {
       await modelSurfacesCommonStyle.mutateModelSurfacesTypeColoring(modelId, {
         active: activeColoring,
       });
