@@ -21,7 +21,7 @@ export default defineEventHandler(async (event: H3Event) => {
     const body = await readBody<DownloadExtensionBody>(event);
     const { projectName, url, extensionFileName } = body;
     console.log({ projectName, url, extensionFileName });
-    const response: Readonly<Response> = await fetch(url);
+    const response: Response = await fetch(url);
     const fileBuffer = await response.arrayBuffer();
     const filePath = targetExtensionFilePath(projectName, extensionFileName);
     await fs.writeFile(filePath, Buffer.from(fileBuffer));

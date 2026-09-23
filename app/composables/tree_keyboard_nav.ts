@@ -11,8 +11,8 @@ interface ScrollInfo {
   itemHeight: number;
 }
 
-type ReadonlyDisplayItem = Readonly<Omit<DisplayItem, "raw">> & {
-  readonly raw: Readonly<Record<string, unknown>>;
+type ReadonlyDisplayItem = Omit<DisplayItem, "raw"> & {
+  readonly raw: Record<string, unknown>;
 };
 
 interface KeyboardEventLike {
@@ -22,13 +22,13 @@ interface KeyboardEventLike {
 
 interface UseTreeKeyboardNavReturn {
   focusedIndex: Ref<number>;
-  handleKeyDown: (event: Readonly<KeyboardEventLike>) => void;
+  handleKeyDown: (event: KeyboardEventLike) => void;
 }
 
 function getBaseIndex(
   currentIndex: number,
   lastIndex: number,
-  bounds: Readonly<VisibleBounds> | undefined,
+  bounds: VisibleBounds | undefined,
   key: string,
 ): number {
   if (currentIndex < 0 || currentIndex > lastIndex) {
@@ -49,13 +49,13 @@ function getBaseIndex(
 }
 
 export function useTreeKeyboardNav(
-  displayItems: Readonly<Ref<readonly ReadonlyDisplayItem[]>>,
+  displayItems: Ref<readonly ReadonlyDisplayItem[]>,
   emit: EmitFn,
   scrollToIndex: (index: number) => void,
-  toggleOpen: (raw: Readonly<Record<string, unknown>>) => void,
+  toggleOpen: (raw: Record<string, unknown>) => void,
   handleItemClick: (item: ReadonlyDisplayItem, index: number) => void,
   getScrollInfo: (() => ScrollInfo | undefined) | undefined,
-  externalFocusedIndex: Readonly<Ref<number>> | undefined,
+  externalFocusedIndex: Ref<number> | undefined,
 ): UseTreeKeyboardNavReturn {
   const focusedIndex = externalFocusedIndex ?? ref(-1);
 
@@ -143,7 +143,7 @@ export function useTreeKeyboardNav(
     return currentIndex;
   }
 
-  function handleKeyDown(event: Readonly<KeyboardEventLike>): void {
+  function handleKeyDown(event: KeyboardEventLike): void {
     if (displayItems.value.length === 0) {
       return;
     }

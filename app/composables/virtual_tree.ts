@@ -1,13 +1,9 @@
 import type { Ref } from "vue";
 
-// Like Vue's MaybeRefOrGetter<T>, but the Ref branch is narrowed to Readonly<Ref<T>>: a plain
-// Ref<T> always fails prefer-readonly-parameter-types (its `.value` is writable) no matter how
-// Deeply readonly T itself is, and wrapping the *whole* union in Readonly<> instead would collapse
-// The getter-function branch to an uncallable `{}` (Readonly<Fn> has no keys). Callers passing an
-// Ordinary Ref<T> still type-check fine here: a mutable Ref<T> is assignable to Readonly<Ref<T>>.
-type ReadonlyMaybeRefOrGetter<Value> = Value | Readonly<Ref<Value>> | (() => Value);
+// Same shape as Vue's MaybeRefOrGetter<T>, kept as a local alias for readability at call sites.
+type ReadonlyMaybeRefOrGetter<Value> = Value | Ref<Value> | (() => Value);
 
-type TreeItem = Readonly<Record<string, unknown>>;
+type TreeItem = Record<string, unknown>;
 
 interface ItemPropsConfig {
   value: string;
@@ -28,14 +24,10 @@ interface VirtualTreeProps {
   readonly opened?: readonly unknown[];
   readonly selected?: readonly unknown[];
   readonly active?: readonly unknown[];
-  readonly itemProps?: Readonly<Partial<ItemPropsConfig>>;
-  readonly selection?: Readonly<Partial<SelectionConfig>>;
+  readonly itemProps?: Partial<ItemPropsConfig>;
+  readonly selection?: Partial<SelectionConfig>;
   readonly search?: string;
-  readonly customFilter?: (
-    id: unknown,
-    search: string,
-    context: Readonly<{ raw: TreeItem }>,
-  ) => boolean;
+  readonly customFilter?: (id: unknown, search: string, context: { raw: TreeItem }) => boolean;
 }
 
 interface DisplayItem {

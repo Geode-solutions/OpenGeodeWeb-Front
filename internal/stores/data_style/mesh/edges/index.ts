@@ -12,15 +12,15 @@ import { useMeshEdgesWidthStyle } from "./width";
 // Local constants
 
 interface MeshEdgesActiveColoringDeps {
-  readonly commonStyle: Readonly<ReturnType<typeof useMeshEdgesCommonStyle>>;
-  readonly colorStyle: Readonly<ReturnType<typeof useMeshEdgesColorStyle>>;
-  readonly vertexAttributeStyle: Readonly<ReturnType<typeof useMeshEdgesVertexAttributeStyle>>;
-  readonly edgeAttributeStyle: Readonly<ReturnType<typeof useMeshEdgesEdgeAttributeStyle>>;
+  readonly commonStyle: ReturnType<typeof useMeshEdgesCommonStyle>;
+  readonly colorStyle: ReturnType<typeof useMeshEdgesColorStyle>;
+  readonly vertexAttributeStyle: ReturnType<typeof useMeshEdgesVertexAttributeStyle>;
+  readonly edgeAttributeStyle: ReturnType<typeof useMeshEdgesEdgeAttributeStyle>;
 }
 
 function handleMeshEdgesVertexColoring(
   id: string,
-  vertexAttributeStyle: Readonly<ReturnType<typeof useMeshEdgesVertexAttributeStyle>>,
+  vertexAttributeStyle: ReturnType<typeof useMeshEdgesVertexAttributeStyle>,
 ): Promise<unknown> | undefined {
   const name = vertexAttributeStyle.meshEdgesVertexAttributeName(id);
   const item = vertexAttributeStyle.meshEdgesVertexAttributeItem(id);
@@ -35,7 +35,7 @@ function handleMeshEdgesVertexColoring(
 
 function handleMeshEdgesEdgeColoring(
   id: string,
-  edgeAttributeStyle: Readonly<ReturnType<typeof useMeshEdgesEdgeAttributeStyle>>,
+  edgeAttributeStyle: ReturnType<typeof useMeshEdgesEdgeAttributeStyle>,
 ): Promise<unknown> | undefined {
   const name = edgeAttributeStyle.meshEdgesEdgeAttributeName(id);
   const item = edgeAttributeStyle.meshEdgesEdgeAttributeItem(id);
@@ -51,7 +51,7 @@ function handleMeshEdgesEdgeColoring(
 async function setMeshEdgesActiveColoring(
   id: string,
   type: string | undefined,
-  deps: Readonly<MeshEdgesActiveColoringDeps>,
+  deps: MeshEdgesActiveColoringDeps,
 ): Promise<unknown> {
   await deps.commonStyle.mutateMeshEdgesStyle(id, {
     coloring: { active: type },
@@ -73,10 +73,10 @@ async function setMeshEdgesActiveColoring(
 
 async function applyMeshEdgesStyle(
   id: string,
-  visibilityStyle: Readonly<ReturnType<typeof useMeshEdgesVisibilityStyle>>,
-  widthStyle: Readonly<ReturnType<typeof useMeshEdgesWidthStyle>>,
+  visibilityStyle: ReturnType<typeof useMeshEdgesVisibilityStyle>,
+  widthStyle: ReturnType<typeof useMeshEdgesWidthStyle>,
   activeColoringType: string | undefined,
-  deps: Readonly<MeshEdgesActiveColoringDeps>,
+  deps: MeshEdgesActiveColoringDeps,
 ): Promise<unknown[]> {
   const result = await Promise.all([
     visibilityStyle.setMeshEdgesVisibility(id, visibilityStyle.meshEdgesVisibility(id)),

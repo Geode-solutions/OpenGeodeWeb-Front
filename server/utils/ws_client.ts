@@ -34,11 +34,11 @@ function rawDataToString(raw: WebSocket.RawData): string {
 }
 
 interface ServerWsRpcClient {
-  call: (rpc: string, params?: Readonly<Record<string, unknown>>) => Promise<unknown>;
+  call: (rpc: string, params?: Record<string, unknown>) => Promise<unknown>;
   close: () => void;
   getConnection: () => {
     getSession: () => {
-      call: (rpc: string, params: readonly [Readonly<Record<string, unknown>>]) => Promise<unknown>;
+      call: (rpc: string, params: readonly [Record<string, unknown>]) => Promise<unknown>;
     };
   };
   isOpen: () => boolean;
@@ -100,7 +100,7 @@ function createServerWsRpcClient(baseUrl: string): ServerWsRpcClient {
       }
     });
 
-    socket.on("error", (error: Readonly<Error>) => {
+    socket.on("error", (error: Error) => {
       onErrorCallback?.(error);
       reject(error);
     });
@@ -114,10 +114,7 @@ function createServerWsRpcClient(baseUrl: string): ServerWsRpcClient {
     });
   });
 
-  async function call(
-    rpc: string,
-    params: Readonly<Record<string, unknown>> = {},
-  ): Promise<unknown> {
+  async function call(rpc: string, params: Record<string, unknown> = {}): Promise<unknown> {
     await ready;
     const id = uuidv4();
     //oxlint-disable-next-line promise/avoid-new
@@ -142,8 +139,7 @@ function createServerWsRpcClient(baseUrl: string): ServerWsRpcClient {
   function getConnection(): ReturnType<ServerWsRpcClient["getConnection"]> {
     return {
       getSession: () => ({
-        call: (rpc: string, [params]: readonly [Readonly<Record<string, unknown>>]) =>
-          call(rpc, params),
+        call: (rpc: string, [params]: readonly [Record<string, unknown>]) => call(rpc, params),
       }),
     };
   }

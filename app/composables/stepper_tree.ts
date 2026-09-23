@@ -1,6 +1,6 @@
 interface StepperTreeApi {
   state: Record<string, unknown>;
-  update_values: (keys_values_object: Readonly<Record<string, unknown>>) => void;
+  update_values: (keys_values_object: Record<string, unknown>) => void;
   increment_step: () => void;
   decrement_step: () => void;
   reset_values: () => void;
@@ -10,13 +10,13 @@ function isUnknownArray(value: unknown): value is unknown[] {
   return Array.isArray(value);
 }
 
-function get_current_step_index(state: Readonly<Record<string, unknown>>): number {
+function get_current_step_index(state: Record<string, unknown>): number {
   const value = state.current_step_index;
   return typeof value === "number" ? value : 0;
 }
 
 function build_initial_state_unref(
-  initial_state: Readonly<Record<string, unknown>>,
+  initial_state: Record<string, unknown>,
 ): Record<string, unknown> {
   const initial_state_unref: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(initial_state)) {
@@ -28,7 +28,7 @@ function build_initial_state_unref(
 
 export function useStepperTree(
   steps: readonly unknown[],
-  initial_state: Readonly<Record<string, unknown>> = {},
+  initial_state: Record<string, unknown> = {},
 ): StepperTreeApi {
   const initial_state_unref = build_initial_state_unref(initial_state);
   const state = reactive<Record<string, unknown>>({
@@ -47,7 +47,7 @@ export function useStepperTree(
     },
   );
 
-  function update_values(keys_values_object: Readonly<Record<string, unknown>>): void {
+  function update_values(keys_values_object: Record<string, unknown>): void {
     for (const [key, value] of Object.entries(keys_values_object)) {
       state[key] = value;
     }

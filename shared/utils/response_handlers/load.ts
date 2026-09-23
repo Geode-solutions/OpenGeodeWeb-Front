@@ -2,7 +2,7 @@ interface AllowedObject {
   readonly is_loadable: number;
   readonly object_priority?: number;
 }
-type AllowedObjectMap = Readonly<Record<string, AllowedObject>>;
+type AllowedObjectMap = Record<string, AllowedObject>;
 
 function getFileExtension(filename: string): string {
   return filename.slice(filename.lastIndexOf(".") + 1);

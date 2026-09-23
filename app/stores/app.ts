@@ -22,8 +22,8 @@ declare module "pinia" {
 
 interface RegisterableStore {
   $id: string;
-  $patch?: (partial: Readonly<Record<string, unknown>>) => void;
-  exportStores?: (params?: Readonly<Record<string, unknown>>) => Promise<unknown>;
+  $patch?: (partial: Record<string, unknown>) => void;
+  exportStores?: (params?: Record<string, unknown>) => Promise<unknown>;
   importStores?: (snapshot: unknown) => Promise<void> | void;
   connect?: () => Promise<void>;
   kill?: () => Promise<void>;
@@ -65,9 +65,9 @@ export const useAppStore = defineStore("app", () => {
     }
   }
 
-  function registerStore(store: Readonly<RegisterableStore>): void {
+  function registerStore(store: RegisterableStore): void {
     const isAlreadyRegistered = stores.some(
-      (registeredStore: Readonly<RegisterableStore>) => registeredStore.$id === store.$id,
+      (registeredStore: RegisterableStore) => registeredStore.$id === store.$id,
     );
     if (isAlreadyRegistered) {
       return;
@@ -76,12 +76,12 @@ export const useAppStore = defineStore("app", () => {
   }
 
   async function exportStores(
-    params: Readonly<Record<string, unknown>> = {},
+    params: Record<string, unknown> = {},
   ): Promise<Record<string, unknown>> {
     const snapshot: Record<string, unknown> = {};
 
     await Promise.all(
-      stores.map(async (store: Readonly<RegisterableStore>) => {
+      stores.map(async (store: RegisterableStore) => {
         if (!store.exportStores) {
           return;
         }
@@ -96,9 +96,7 @@ export const useAppStore = defineStore("app", () => {
     return snapshot;
   }
 
-  async function importStores(
-    snapshot: Readonly<Record<string, unknown>> | undefined,
-  ): Promise<void> {
+  async function importStores(snapshot: Record<string, unknown> | undefined): Promise<void> {
     if (!snapshot) {
       return;
     }
@@ -106,7 +104,7 @@ export const useAppStore = defineStore("app", () => {
     const missingStoreIds: string[] = [];
 
     await Promise.all(
-      stores.map(async (store: Readonly<RegisterableStore>) => {
+      stores.map(async (store: RegisterableStore) => {
         if (!store.importStores) {
           return;
         }
@@ -143,7 +141,7 @@ export const useAppStore = defineStore("app", () => {
   } = useAppExtensions();
 
   // oxlint-disable-next-line unicorn/consistent-function-scoping
-  async function upload(file: Readonly<File>, callbacks: RequestHandlers = {}): Promise<unknown> {
+  async function upload(file: File, callbacks: RequestHandlers = {}): Promise<unknown> {
     const store = useAppStore();
     const schema = opengeodeweb_front_schemas.api.local.extensions.upload;
     const { PROJECT: projectName } = useRuntimeConfig().public;
@@ -166,10 +164,7 @@ export const useAppStore = defineStore("app", () => {
   // `TResult` is asserted, not verified, at the single `return result as TResult` boundary below: the backend response is only checked against `schema` at runtime, so callers' `TResult` is a contract with the schema, not something this function can prove.
   // oxlint-disable-next-line unicorn/consistent-function-scoping
   async function request<TResult = unknown>(
-    {
-      schema,
-      params,
-    }: Readonly<{ schema: JsonRpcSchema; params?: Readonly<Record<string, unknown>> }>,
+    { schema, params }: { schema: JsonRpcSchema; params?: Record<string, unknown> },
     callbacks: RequestHandlers = {},
   ): Promise<TResult> {
     const store = useAppStore();
