@@ -1,5 +1,6 @@
 import { isModelCornersVertexAttributeValid, useModelCornersVertexAttribute } from "./vertex";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
+import { useDataStore } from "@ogw_front/stores/data";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 import { useModelCornersCommonStyle } from "./common";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
@@ -24,6 +25,7 @@ interface ModelCornersColorApi {
 }
 
 export function useModelCornersColor(): ModelCornersColorApi {
+  const dataStore = useDataStore();
   const modelCommonStyle = useModelCommonStyle();
   const modelCornersCommonStyle = useModelCornersCommonStyle();
   const modelCornersVertexAttribute = useModelCornersVertexAttribute();
@@ -62,7 +64,8 @@ export function useModelCornersColor(): ModelCornersColorApi {
     corners_ids: string[],
     activeColoring: string,
   ): Promise<unknown> {
-    if (corners_ids.length > 1) {
+    const totalCornerIds = await dataStore.getCornersGeodeIds(modelId);
+    if (corners_ids.length === totalCornerIds.length) {
       await modelCornersCommonStyle.mutateModelCornersTypeColoring(modelId, {
         active: activeColoring,
       });

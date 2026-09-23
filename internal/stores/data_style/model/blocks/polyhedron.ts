@@ -137,7 +137,8 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
         polyhedron: values,
       }),
     ];
-    if (blockIds.length > 1) {
+    const totalBlockIds = await dataStore.getBlocksGeodeIds(modelId);
+    if (blockIds.length === totalBlockIds.length) {
       tasks.push(
         modelBlocksCommonStyle.mutateModelBlocksTypeColoring(modelId, {
           polyhedron: values,

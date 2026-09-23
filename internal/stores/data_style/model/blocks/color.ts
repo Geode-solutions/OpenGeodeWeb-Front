@@ -4,6 +4,7 @@ import {
 } from "./polyhedron";
 import { isModelBlocksVertexAttributeValid, useModelBlocksVertexAttribute } from "./vertex";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
+import { useDataStore } from "@ogw_front/stores/data";
 import { useModelBlocksCommonStyle } from "./common";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
@@ -26,6 +27,7 @@ export function useModelBlocksColor(): {
     activeColoring: string,
   ) => Promise<void>;
 } {
+  const dataStore = useDataStore();
   const modelCommonStyle = useModelCommonStyle();
   const modelBlocksCommonStyle = useModelBlocksCommonStyle();
   const modelBlocksVertexAttribute = useModelBlocksVertexAttribute();
@@ -65,7 +67,8 @@ export function useModelBlocksColor(): {
     blocks_ids: string[],
     activeColoring: string,
   ): Promise<void> {
-    if (blocks_ids.length > 1) {
+    const totalBlockIds = await dataStore.getBlocksGeodeIds(modelId);
+    if (blocks_ids.length === totalBlockIds.length) {
       await modelBlocksCommonStyle.mutateModelBlocksTypeColoring(modelId, {
         active: activeColoring,
       });

@@ -143,7 +143,8 @@ function useModelSurfacesPolygonAttribute(): UseModelSurfacesPolygonAttributeRet
         polygon: values,
       }),
     ];
-    if (surfaceIds.length > 1) {
+    const totalSurfaceIds = await dataStore.getSurfacesGeodeIds(modelId);
+    if (surfaceIds.length === totalSurfaceIds.length) {
       tasks.push(
         modelSurfacesCommonStyle.mutateModelSurfacesTypeColoring(modelId, { polygon: values }),
       );
