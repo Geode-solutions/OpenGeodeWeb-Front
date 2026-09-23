@@ -32,7 +32,7 @@ interface TreeGroupItem {
   children?: TreeGroupItem[];
 }
 
-const mainView = computed(() => treeviewStore.opened_views[0]);
+const mainView = computed<TreeGroupItem>(() => treeviewStore.opened_views[0]);
 const opened = computed<string[]>({
   get: () => mainView.value?.opened || [],
   set: (val) => treeviewStore.setOpened(mainView.value?.id ?? "", val),
@@ -53,9 +53,7 @@ function onUpdateSelection(val: string[]): void {
   treeviewStore.selection = applySearchFilter(val, treeviewStore.selection) as string[];
 }
 
-const visibleSelection = computed<string[]>(
-  () => applySearchFilter(treeviewStore.selection, []) as string[],
-);
+const visibleSelection = computed<string[]>(() => applySearchFilter(treeviewStore.selection, []));
 
 watch(
   () => treeviewStore.selection,
@@ -236,7 +234,7 @@ function expandAll(): void {
               )
             "
           >
-            <v-icon size="20">mdi-magnify-expand</v-icon>
+            <v-icon size="18">mdi-magnify-expand</v-icon>
           </v-btn>
           <v-btn
             v-if="isModel(item as unknown as TreeGroupItem) && hasCollectionsMap[item.id as string]"
