@@ -67,8 +67,8 @@ async function performFetch({
     },
     async onResponse({
       response,
-      // oxlint-disable-next-line eslint/id-length -- mirrors the real ofetch/vitest API field name (`ok`/`fn`)
     }: {
+      // oxlint-disable-next-line eslint/id-length -- mirrors the real ofetch/vitest API field name (`ok`/`fn`)
       response: { ok: boolean; _data?: unknown };
     }) {
       if (response.ok && response_function) {
