@@ -133,6 +133,7 @@ export const useBackStore = defineStore("back", {
         {
           schema,
           file,
+          raw: true,
         },
         {
           ...callbacks,
