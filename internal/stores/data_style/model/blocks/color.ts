@@ -19,14 +19,14 @@ export function useModelBlocksColor(): {
     blocks_ids: string[],
     color: unknown,
     activeColoring?: string,
-    colorId?: string,
+    collectionId?: string,
   ) => Promise<unknown>;
   modelBlockActiveColoring: (id: string, block_id?: string) => unknown;
   setModelBlocksActiveColoring: (
     modelId: string,
     blocks_ids: string[],
     activeColoring: string,
-    colorId?: string,
+    collectionId?: string,
   ) => Promise<void>;
 } {
   const dataStore = useDataStore();
@@ -49,7 +49,7 @@ export function useModelBlocksColor(): {
     blocks_ids: string[],
     color: unknown,
     activeColoring = "constant",
-    colorId?: string,
+    collectionId?: string,
   ): Promise<unknown> {
     const result = await modelCommonStyle.setModelTypeColor(
       modelId,
@@ -57,7 +57,7 @@ export function useModelBlocksColor(): {
       color,
       schema,
       activeColoring,
-      colorId,
+      collectionId,
     );
     return result;
   }
@@ -70,7 +70,7 @@ export function useModelBlocksColor(): {
     modelId: string,
     blocks_ids: string[],
     activeColoring: string,
-    colorId?: string,
+    collectionId?: string,
   ): Promise<void> {
     const totalBlockIds = await dataStore.getBlocksGeodeIds(modelId);
     if (blocks_ids.length === totalBlockIds.length) {
@@ -83,7 +83,7 @@ export function useModelBlocksColor(): {
     });
     if (activeColoring === "constant" || activeColoring === "random") {
       const color = modelBlockColor(modelId, blocks_ids[0]);
-      await setModelBlocksColor(modelId, blocks_ids, color, activeColoring, colorId);
+      await setModelBlocksColor(modelId, blocks_ids, color, activeColoring, collectionId);
       return;
     }
 

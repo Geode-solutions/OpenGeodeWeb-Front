@@ -48,7 +48,7 @@ interface UseModelCommonStyleReturn {
     color: unknown,
     schema: JsonRpcSchema,
     activeColoring?: string,
-    colorId?: string,
+    collectionId?: string,
   ) => Promise<unknown>;
   setModelTypeVisibility: (
     id: string,
@@ -167,7 +167,7 @@ export function useModelCommonStyle(): UseModelCommonStyleReturn {
     color: unknown,
     schema: JsonRpcSchema,
     activeColoring = "constant",
-    colorId?: string,
+    collectionId?: string,
   ): Promise<unknown> {
     if (!component_ids?.length) {
       return undefined;
@@ -182,7 +182,7 @@ export function useModelCommonStyle(): UseModelCommonStyleReturn {
       id,
       block_ids: viewer_ids,
       color_mode: activeColoring,
-      color_id: colorId,
+      collection_id: collectionId,
     };
     if (activeColoring === "constant") {
       await mutateComponentStyles(id, component_ids, {

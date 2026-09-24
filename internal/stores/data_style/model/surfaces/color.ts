@@ -14,7 +14,7 @@ export function useModelSurfacesColor(): {
     surfaces_ids: string[],
     color: unknown,
     activeColoring?: string,
-    colorId?: string,
+    collectionId?: string,
   ) => Promise<unknown>;
   modelSurfaceColoring: (id: string, surface_id?: string) => StyleValues;
   modelSurfaceColor: (id: string, surface_id?: string) => unknown;
@@ -23,7 +23,7 @@ export function useModelSurfacesColor(): {
     modelId: string,
     surfaces_ids: string[],
     activeColoring: string,
-    colorId?: string,
+    collectionId?: string,
   ) => Promise<unknown>;
 } {
   const dataStore = useDataStore();
@@ -46,7 +46,7 @@ export function useModelSurfacesColor(): {
     surfaces_ids: string[],
     color: unknown,
     activeColoring = "constant",
-    colorId?: string,
+    collectionId?: string,
   ): Promise<unknown> {
     const result = await modelCommonStyle.setModelTypeColor(
       modelId,
@@ -54,7 +54,7 @@ export function useModelSurfacesColor(): {
       color,
       schema,
       activeColoring,
-      colorId,
+      collectionId,
     );
     return result;
   }
@@ -67,7 +67,7 @@ export function useModelSurfacesColor(): {
     modelId: string,
     surfaces_ids: string[],
     activeColoring: string,
-    colorId?: string,
+    collectionId?: string,
   ): Promise<unknown> {
     const totalSurfaceIds = await dataStore.getSurfacesGeodeIds(modelId);
     if (surfaces_ids.length === totalSurfaceIds.length) {
@@ -80,7 +80,7 @@ export function useModelSurfacesColor(): {
     });
     if (activeColoring === "constant" || activeColoring === "random") {
       const color = modelSurfaceColor(modelId, surfaces_ids[0]);
-      return setModelSurfacesColor(modelId, surfaces_ids, color, activeColoring, colorId);
+      return setModelSurfacesColor(modelId, surfaces_ids, color, activeColoring, collectionId);
     }
 
     if (activeColoring === "vertex") {
