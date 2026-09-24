@@ -3,6 +3,7 @@ import { sortAndFormatItems, useTreeFilter } from "@ogw_front/composables/tree_f
 import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
+import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
@@ -129,8 +130,26 @@ const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
   return result;
 });
 
+function extractComponentIds(node: CollectionTreeItem): string[] {
+  if (node.children) {
+    return node.children.flatMap((child) => extractComponentIds(child));
+  }
+  return [node.id];
+}
+
 function showContextMenu(event: unknown, item: CollectionTreeItem): void {
   const actualItem = item.raw || item;
+  if (isCollections.value && !MESH_COMPONENT_TYPES.includes(actualItem.category ?? "")) {
+    emit("show-menu", {
+      event,
+      itemId: id,
+      context_type: "model_component_type",
+      modelId: id,
+      modelComponentType: actualItem.category ?? actualItem.id,
+      targetComponentIds: extractComponentIds(actualItem),
+    });
+    return;
+  }
   const typeId = actualItem.category || actualItem.id;
   const typeItem = itemsForTreeView.value.find((type) => type.id === typeId);
   const targetComponentIds = typeItem?.children?.map((child) => child.id);

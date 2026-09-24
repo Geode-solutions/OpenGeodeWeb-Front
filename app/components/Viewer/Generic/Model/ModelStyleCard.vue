@@ -2,6 +2,7 @@
 import BlocksOptions from "./BlocksOptions.vue";
 import CornersOptions from "./CornersOptions.vue";
 import LinesOptions from "./LinesOptions.vue";
+import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import SurfacesOptions from "./SurfacesOptions.vue";
@@ -37,6 +38,11 @@ const selection = computed<string[]>(
   () => dataStyleStore.visibleMeshComponents(modelId.value).value || [],
 );
 const componentType = ref<string | undefined>(undefined);
+const isCollection = computed<boolean>(
+  () =>
+    itemProps.meta_data.viewer_type === "model_component_type" &&
+    !MESH_COMPONENT_TYPES.includes(itemProps.meta_data.modelComponentType),
+);
 
 watch(
   () => [
@@ -48,7 +54,12 @@ watch(
   async () => {
     componentType.value = undefined;
     if (itemProps.meta_data.viewer_type === "model_component_type") {
-      componentType.value = itemProps.meta_data.modelComponentType;
+      componentType.value = isCollection.value
+        ? await dataStore.meshComponentType(
+            modelId.value,
+            itemProps.meta_data.targetComponentIds[0],
+          )
+        : itemProps.meta_data.modelComponentType;
     } else if (componentId.value && modelId.value) {
       const currentModelId = modelId.value;
       const currentCompId = componentId.value;
@@ -155,24 +166,28 @@ const modelComponentsActiveColoring = computed<string | undefined>({
       :modelId="modelId"
       :blockId="componentId"
       :targetBlockIds="targetComponentIds"
+      :isCollection="isCollection"
     />
     <SurfacesOptions
       v-else-if="componentType === 'Surface'"
       :modelId="modelId"
       :surfaceId="componentId"
       :targetSurfaceIds="targetComponentIds"
+      :isCollection="isCollection"
     />
     <LinesOptions
       v-else-if="componentType === 'Line'"
       :modelId="modelId"
       :lineId="componentId"
       :targetLineIds="targetComponentIds"
+      :isCollection="isCollection"
     />
     <CornersOptions
       v-else-if="componentType === 'Corner'"
       :modelId="modelId"
       :cornerId="componentId"
       :targetCornerIds="targetComponentIds"
+      :isCollection="isCollection"
     />
   </v-sheet>
 </template>
