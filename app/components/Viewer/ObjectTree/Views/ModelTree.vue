@@ -7,29 +7,30 @@ import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Con
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import { useModelCollections } from "@ogw_front/composables/model_collections";
 import { useModelComponents } from "@ogw_front/composables/model_components";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 interface Props {
   id: string;
   viewId?: string;
+  viewType?: string;
 }
 
-const { id, viewId = undefined } = defineProps<Props>();
+const { id, viewId = undefined, viewType = "model_components" } = defineProps<Props>();
 const actualViewId = viewId || id;
 
-interface TreeViewItem {
-  raw?: TreeViewItem;
+interface CollectionTreeItem {
+  raw?: CollectionTreeItem;
   id: string;
   category?: string;
-  children?: TreeViewItem[];
-  viewer_id?: string;
+  children?: CollectionTreeItem[];
+  viewer_id?: number;
   title?: string;
 }
 
 const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 const hybridViewerStore = useHybridViewerStore();
-
 interface Emits {
   "show-menu": [
     payload: {
@@ -46,15 +47,24 @@ interface Emits {
 const emit = defineEmits<Emits>();
 
 const treeviewStore = useTreeviewStore();
+
+const isCollections = computed(() => viewType === "model_collections");
+
+const composable = isCollections.value ? useModelCollections(id) : useModelComponents(id);
 const {
   items: rawItems,
-  componentsCache,
   localCategories,
   selection: visibleComponents,
   updateVisibility,
-} = useModelComponents(id);
+} = composable;
 
-const currentView = computed<TreeViewItem | undefined>(() =>
+const cache = computed(
+  () =>
+    ("componentsCache" in composable ? composable.componentsCache.value : undefined) ??
+    ("collectionsCache" in composable ? composable.collectionsCache.value : undefined),
+);
+
+const currentView = computed(() =>
   treeviewStore.opened_views.find((view) => view.id === actualViewId),
 );
 
@@ -79,14 +89,16 @@ function onUpdateSelection(newSelection: string[]): void {
   updateVisibility(finalSelection as string[]);
 }
 
-const visibleSelection = computed<string[]>(() => applySearchFilter(visibleComponents.value, []));
+const visibleSelection = computed<string[]>(
+  () => applySearchFilter(visibleComponents.value, []) as string[],
+);
 
-const itemsForTreeView = computed<TreeViewItem[]>(() => {
-  if (search.value && componentsCache.value) {
+const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
+  if (search.value && cache.value) {
     const query = search.value.toLowerCase();
-    const result: TreeViewItem[] = [];
-    for (const type of Object.keys(componentsCache.value)) {
-      const matches = (componentsCache.value[type] ?? []).filter(
+    const result: CollectionTreeItem[] = [];
+    for (const type of Object.keys(cache.value)) {
+      const matches = (cache.value[type] ?? []).filter(
         (component: { title: string; id: string }) =>
           component.title.toLowerCase().includes(query) ||
           component.id.toLowerCase().includes(query),
@@ -95,35 +107,33 @@ const itemsForTreeView = computed<TreeViewItem[]>(() => {
         result.push({
           id: type,
           title: `${type}s (${matches.length})`,
-          children: sortAndFormatItems(matches, sortType.value) as unknown as TreeViewItem[],
+          children: sortAndFormatItems(matches, sortType.value) as unknown as CollectionTreeItem[],
         });
       }
     }
     return result;
   }
 
-  const result: TreeViewItem[] = [];
+  const result: CollectionTreeItem[] = [];
   for (const category of filteredCategories.value) {
     const categoryId = category.id as string;
     result.push({
       ...category,
       id: categoryId,
       children: sortAndFormatItems(
-        componentsCache.value?.[categoryId],
+        cache.value?.[categoryId],
         sortType.value,
-      ) as unknown as TreeViewItem[],
+      ) as unknown as CollectionTreeItem[],
     });
   }
   return result;
 });
 
-function showContextMenu(event: unknown, item: TreeViewItem): void {
+function showContextMenu(event: unknown, item: CollectionTreeItem): void {
   const actualItem = item.raw || item;
   const typeId = actualItem.category || actualItem.id;
   const typeItem = itemsForTreeView.value.find((type) => type.id === typeId);
-  const targetComponentIds = typeItem
-    ? (typeItem.children ?? []).map((child) => child.id)
-    : undefined;
+  const targetComponentIds = typeItem?.children?.map((child) => child.id);
   emit("show-menu", {
     event,
     itemId: actualItem.category ? actualItem.id : id,
@@ -134,11 +144,21 @@ function showContextMenu(event: unknown, item: TreeViewItem): void {
   });
 }
 
+function extractIds(node: CollectionTreeItem): number[] {
+  if (node.children) {
+    return node.children.flatMap((child) => extractIds(child));
+  }
+  if (Number.isInteger(node.viewer_id)) {
+    return [node.viewer_id as number];
+  }
+  return [];
+}
+
 function handleHoverEnter({
   item,
   immediate = false,
 }: {
-  item: TreeViewItem;
+  item: CollectionTreeItem;
   immediate?: boolean;
 }): void {
   const actualItem = item.raw || item;
@@ -147,37 +167,17 @@ function handleHoverEnter({
     return;
   }
 
-  onHoverEnter(
-    id,
-    () =>
-      actualItem.category
-        ? [Number(actualItem.viewer_id)]
-        : (actualItem.children ?? []).map((child) => Number(child.viewer_id)),
-    "model",
-    immediate,
-  );
+  const viewerIdsToHover = extractIds(actualItem);
+  onHoverEnter(id, () => viewerIdsToHover, "model", immediate);
 }
 
 function handleHoverLeave(): void {
   onHoverLeave(id);
 }
 
-// CommonTreeView's #title/#append slots hand back the generic tree item it renders internally (a TreeItem); this view's tree is always built from TreeViewItem nodes (see itemsForTreeView above), so it's safe to view the slot item through that lens here.
-function asTreeViewItem(item: unknown): TreeViewItem {
-  return item as unknown as TreeViewItem;
-}
-
-// The focusCameraOnObject composable's block_ids parameter is declared as string[], but this view (like the sibling ModelCollections view) has always focused the camera using the raw viewer_id values collected here; that pre-dates this typing pass, so the ids are passed through as-is rather than changed here.
-function getFocusBlockIds(item: TreeViewItem): string[] {
-  const ids = item.category
-    ? [item.viewer_id]
-    : (item.children ?? []).map((child) => child.viewer_id);
-  return ids as unknown as string[];
-}
-
 function expandAll(): void {
   const allIds: string[] = [];
-  function traverse(itemsList: TreeViewItem[]): void {
+  function traverse(itemsList: CollectionTreeItem[]): void {
     for (const item of itemsList) {
       if (item.children && item.children.length > 0) {
         allIds.push(item.id);
@@ -187,6 +187,15 @@ function expandAll(): void {
   }
   traverse(itemsForTreeView.value);
   opened.value = allIds;
+}
+
+function getLeafViewerIds(item: CollectionTreeItem): number[] {
+  const actualItem = item.raw || item;
+  return extractIds(actualItem);
+}
+
+function getLeafViewerIdsForFocus(item: CollectionTreeItem): string[] {
+  return getLeafViewerIds(item) as unknown as string[];
 }
 </script>
 
@@ -220,9 +229,9 @@ function expandAll(): void {
       @update:selected="(val) => onUpdateSelection(val as string[])"
       @click:item="onUpdateSelection([$event.id as string, ...visibleComponents])"
       @update:scroll-top="treeviewStore.setScrollTop(actualViewId, $event)"
-      @hover:enter="({ item }) => handleHoverEnter({ item: item as unknown as TreeViewItem })"
+      @hover:enter="({ item }) => handleHoverEnter({ item: item as unknown as CollectionTreeItem })"
       @hover:leave="handleHoverLeave"
-      @contextmenu="showContextMenu($event.event, $event.item as unknown as TreeViewItem)"
+      @contextmenu="showContextMenu($event.event, $event.item as unknown as CollectionTreeItem)"
     >
       <template #title="{ item, isLeaf }">
         <ObjectTreeItemLabel
@@ -230,22 +239,22 @@ function expandAll(): void {
           :is-leaf="isLeaf"
           show-tooltip
           class="text-body-1"
-          @contextmenu="showContextMenu($event, item as unknown as TreeViewItem)"
+          @contextmenu="showContextMenu($event, item as unknown as CollectionTreeItem)"
         />
       </template>
 
-      <template #append="{ item: rawItem }">
+      <template #append="{ item }">
         <v-btn
-          v-if="
-            asTreeViewItem(rawItem).category ||
-            (asTreeViewItem(rawItem).children && asTreeViewItem(rawItem).children!.length > 0)
-          "
+          v-if="getLeafViewerIds(item as unknown as CollectionTreeItem).length > 0"
           icon="mdi-target"
           size="medium"
           variant="text"
           v-tooltip="'Focus camera on object'"
           @click.stop="
-            hybridViewerStore.focusCameraOnObject(id, getFocusBlockIds(asTreeViewItem(rawItem)))
+            hybridViewerStore.focusCameraOnObject(
+              id,
+              getLeafViewerIdsForFocus(item as unknown as CollectionTreeItem),
+            )
           "
         />
       </template>
