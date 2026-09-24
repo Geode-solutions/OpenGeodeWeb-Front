@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
@@ -11,22 +12,27 @@ interface Props {
   modelId: string;
   surfaceId?: string;
   targetSurfaceIds: string[];
-  isCollection?: boolean;
+  collections?: CollectionComponent[];
 }
 
-const { modelId, surfaceId = undefined, targetSurfaceIds, isCollection } = defineProps<Props>();
+const {
+  modelId,
+  surfaceId = undefined,
+  targetSurfaceIds,
+  collections = undefined,
+} = defineProps<Props>();
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
 const referenceSurfaceId = computed<string | undefined>(() =>
-  isCollection ? targetSurfaceIds[0] : undefined,
+  collections ? targetSurfaceIds[0] : undefined,
 );
 
 // Visibility
 const surfacesVisibility = computed<boolean>({
   get: () =>
-    isCollection
+    collections
       ? targetSurfaceIds.every((id) => dataStyleStore.modelSurfaceVisibility(modelId, id))
       : dataStyleStore.modelComponentTypeVisibility(modelId, "Surface"),
   set: async (newValue) => {
@@ -76,7 +82,20 @@ const surfacesActiveColoring = computed<string | undefined>({
     if (typeof coloringType !== "string") {
       return;
     }
-    await dataStyleStore.setModelSurfacesActiveColoring(modelId, targetSurfaceIds, coloringType);
+    if (collections && coloringType === "random") {
+      await Promise.all(
+        collections.map((collection) =>
+          dataStyleStore.setModelSurfacesActiveColoring(
+            modelId,
+            collection.children.map((child) => child.id),
+            coloringType,
+            collection.id,
+          ),
+        ),
+      );
+    } else {
+      await dataStyleStore.setModelSurfacesActiveColoring(modelId, targetSurfaceIds, coloringType);
+    }
     hybridViewerStore.remoteRender();
   },
 });

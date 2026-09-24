@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
@@ -11,22 +12,27 @@ interface Props {
   modelId: string;
   cornerId?: string;
   targetCornerIds: string[];
-  isCollection?: boolean;
+  collections?: CollectionComponent[];
 }
 
-const { modelId, cornerId = undefined, targetCornerIds, isCollection } = defineProps<Props>();
+const {
+  modelId,
+  cornerId = undefined,
+  targetCornerIds,
+  collections = undefined,
+} = defineProps<Props>();
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
 const referenceCornerId = computed<string | undefined>(() =>
-  isCollection ? targetCornerIds[0] : undefined,
+  collections ? targetCornerIds[0] : undefined,
 );
 
 // Visibility
 const cornersVisibility = computed<boolean>({
   get: () =>
-    isCollection
+    collections
       ? targetCornerIds.every((id) => dataStyleStore.modelCornerVisibility(modelId, id))
       : dataStyleStore.modelComponentTypeVisibility(modelId, "Corner"),
   set: async (newValue) => {
@@ -76,7 +82,20 @@ const cornersActiveColoring = computed<string | undefined>({
     if (typeof coloringType !== "string") {
       return;
     }
-    await dataStyleStore.setModelCornersActiveColoring(modelId, targetCornerIds, coloringType);
+    if (collections && coloringType === "random") {
+      await Promise.all(
+        collections.map((collection) =>
+          dataStyleStore.setModelCornersActiveColoring(
+            modelId,
+            collection.children.map((child) => child.id),
+            coloringType,
+            collection.id,
+          ),
+        ),
+      );
+    } else {
+      await dataStyleStore.setModelCornersActiveColoring(modelId, targetCornerIds, coloringType);
+    }
     hybridViewerStore.remoteRender();
   },
 });

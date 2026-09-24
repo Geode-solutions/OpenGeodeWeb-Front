@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
@@ -11,22 +12,27 @@ interface Props {
   modelId: string;
   blockId?: string;
   targetBlockIds: string[];
-  isCollection?: boolean;
+  collections?: CollectionComponent[];
 }
 
-const { modelId, blockId = undefined, targetBlockIds, isCollection } = defineProps<Props>();
+const {
+  modelId,
+  blockId = undefined,
+  targetBlockIds,
+  collections = undefined,
+} = defineProps<Props>();
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
 const referenceBlockId = computed<string | undefined>(() =>
-  isCollection ? targetBlockIds[0] : undefined,
+  collections ? targetBlockIds[0] : undefined,
 );
 
 // Visibility
 const blocksVisibility = computed<boolean>({
   get: () =>
-    isCollection
+    collections
       ? targetBlockIds.every((id) => dataStyleStore.modelBlockVisibility(modelId, id))
       : dataStyleStore.modelComponentTypeVisibility(modelId, "Block"),
   set: async (newValue) => {
@@ -74,7 +80,20 @@ const blocksActiveColoring = computed<string | undefined>({
     if (typeof coloringType !== "string") {
       return;
     }
-    await dataStyleStore.setModelBlocksActiveColoring(modelId, targetBlockIds, coloringType);
+    if (collections && coloringType === "random") {
+      await Promise.all(
+        collections.map((collection) =>
+          dataStyleStore.setModelBlocksActiveColoring(
+            modelId,
+            collection.children.map((child) => child.id),
+            coloringType,
+            collection.id,
+          ),
+        ),
+      );
+    } else {
+      await dataStyleStore.setModelBlocksActiveColoring(modelId, targetBlockIds, coloringType);
+    }
     hybridViewerStore.remoteRender();
   },
 });

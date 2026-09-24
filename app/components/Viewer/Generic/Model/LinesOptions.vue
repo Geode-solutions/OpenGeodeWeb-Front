@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
@@ -11,22 +12,27 @@ interface Props {
   modelId: string;
   lineId?: string;
   targetLineIds: string[];
-  isCollection?: boolean;
+  collections?: CollectionComponent[];
 }
 
-const { modelId, lineId = undefined, targetLineIds, isCollection } = defineProps<Props>();
+const {
+  modelId,
+  lineId = undefined,
+  targetLineIds,
+  collections = undefined,
+} = defineProps<Props>();
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
 const referenceLineId = computed<string | undefined>(() =>
-  isCollection ? targetLineIds[0] : undefined,
+  collections ? targetLineIds[0] : undefined,
 );
 
 // Visibility
 const linesVisibility = computed<boolean>({
   get: () =>
-    isCollection
+    collections
       ? targetLineIds.every((id) => dataStyleStore.modelLineVisibility(modelId, id))
       : dataStyleStore.modelComponentTypeVisibility(modelId, "Line"),
   set: async (newValue) => {
@@ -73,7 +79,20 @@ const linesActiveColoring = computed<string | undefined>({
     if (typeof coloringType !== "string") {
       return;
     }
-    await dataStyleStore.setModelLinesActiveColoring(modelId, targetLineIds, coloringType);
+    if (collections && coloringType === "random") {
+      await Promise.all(
+        collections.map((collection) =>
+          dataStyleStore.setModelLinesActiveColoring(
+            modelId,
+            collection.children.map((child) => child.id),
+            coloringType,
+            collection.id,
+          ),
+        ),
+      );
+    } else {
+      await dataStyleStore.setModelLinesActiveColoring(modelId, targetLineIds, coloringType);
+    }
     hybridViewerStore.remoteRender();
   },
 });
