@@ -9,6 +9,10 @@ interface UploadFileParams {
   schema: JsonRpcSchema & { methods: string[] };
   file: File;
   params?: Record<string, string | Blob>;
+  // When true, the file is sent as the raw request body instead of multipart
+  // FormData, with `params`/filename moved into the query string. See
+  // OpenGeodeWeb-Back's upload_file route, which supports both request shapes.
+  raw?: boolean;
 }
 
 // Loosely-typed shapes for the dynamic error/response values reported by fetchRaw.
@@ -34,7 +38,7 @@ function isFetchErrorResponseLike(value: unknown): value is FetchErrorResponseLi
 
 async function upload_file(
   microservice: Microservice,
-  { schema, file, params = {} }: UploadFileParams,
+  { schema, file, params = {}, raw = false }: UploadFileParams,
   { request_error_function, response_function, response_error_function }: RequestHandlers = {},
 ): Promise<unknown> {
   console.log("[UPLOAD_FILE] Uploading file", { schema, file });
@@ -44,14 +48,25 @@ async function upload_file(
     throw new Error("file must be an instance of File");
   }
 
-  const body = new FormData();
-  for (const [key, value] of Object.entries(params)) {
-    body.append(key, value);
+  let route = schema.$id;
+  let body: FormData | File = file;
+
+  if (raw) {
+    const queryEntries = Object.entries(params).filter(
+      (entry): entry is [string, string] => typeof entry[1] === "string",
+    );
+    const query = new URLSearchParams([...queryEntries, ["filename", file.name]]);
+    route = `${route}?${query.toString()}`;
+  } else {
+    const formData = new FormData();
+    for (const [key, value] of Object.entries(params)) {
+      formData.append(key, value);
+    }
+    formData.append("file", file);
+    body = formData;
   }
-  body.append("file", file);
 
   microservice.start_request();
-  const route = schema.$id;
 
   const result = await fetchRaw(
     {
