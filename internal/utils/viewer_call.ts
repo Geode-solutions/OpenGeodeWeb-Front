@@ -63,7 +63,7 @@ async function viewer_call(
           typedError.message ?? "",
         );
         if (request_error_function) {
-          request_error_function(error);
+          void request_error_function(error);
         }
       },
       response_function(data: unknown) {
@@ -83,7 +83,7 @@ async function viewer_call(
           typedResponse.message ?? "",
         );
         if (response_error_function) {
-          response_error_function(response);
+          void response_error_function(response);
         }
       },
       validation_error_function({ code, name, error }) {

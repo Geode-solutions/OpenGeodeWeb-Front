@@ -1,15 +1,17 @@
+import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+
 const RGB_MAX = 255;
 const PERCENT_MAX = 100;
 
-function parseComponent(val, max = RGB_MAX) {
+function parseComponent(val: string, max = RGB_MAX): number {
   if (val.endsWith("%")) {
     return (Number(val.slice(0, -1)) / PERCENT_MAX) * max;
   }
   return Number(val);
 }
 
-function parseColorString(colorText) {
-  if (!colorText || typeof colorText !== "string") {
+function parseColorString(colorText: string): RGBAColor | undefined {
+  if (colorText === "") {
     return undefined;
   }
 
@@ -18,17 +20,18 @@ function parseColorString(colorText) {
     return undefined;
   }
 
-  const rawRed = parseComponent(numbersMatch[0]);
-  const rawGreen = parseComponent(numbersMatch[1]);
-  const rawBlue = parseComponent(numbersMatch[2]);
+  const [redText = "", greenText = "", blueText = "", alphaText] = numbersMatch;
+  const rawRed = parseComponent(redText);
+  const rawGreen = parseComponent(greenText);
+  const rawBlue = parseComponent(blueText);
 
   const red = Math.min(RGB_MAX, Math.max(0, Math.round(rawRed)));
   const green = Math.min(RGB_MAX, Math.max(0, Math.round(rawGreen)));
   const blue = Math.min(RGB_MAX, Math.max(0, Math.round(rawBlue)));
 
   let alpha = 1;
-  if (numbersMatch.length === 4) {
-    const rawAlpha = parseComponent(numbersMatch[3], 1);
+  if (alphaText !== undefined) {
+    const rawAlpha = parseComponent(alphaText, 1);
     const calculatedAlpha = rawAlpha > 1 ? rawAlpha / RGB_MAX : rawAlpha;
     const roundedAlpha = Number(calculatedAlpha.toFixed(2));
     alpha = Math.min(1, Math.max(0, roundedAlpha));
@@ -41,7 +44,7 @@ function parseColorString(colorText) {
   return { red, green, blue, alpha };
 }
 
-function formatColorString(color, mode) {
+function formatColorString(color: RGBAColor, mode: string): string {
   const { red, green, blue, alpha } = color;
   const roundRed = Math.round(red);
   const roundGreen = Math.round(green);

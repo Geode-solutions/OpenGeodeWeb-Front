@@ -61,14 +61,14 @@ type ReadonlyOpenedView = Omit<OpenedView, "opened"> & {
 type ReadonlyTreeviewGroup = Omit<TreeviewGroup, "children"> & {
   readonly children: readonly TreeviewChild[];
 };
-type ReadonlyTreeviewSnapshot = {
+interface ReadonlyTreeviewSnapshot {
   opened_views?: readonly ReadonlyOpenedView[];
   panelWidth?: number;
   additionalPanelWidth?: number;
   rowHeights?: readonly number[];
   selectionIds?: readonly string[];
   selection?: readonly (string | { id: string })[];
-};
+}
 
 // oxlint-disable-next-line max-lines-per-function, max-statements
 export const useTreeviewStore = defineStore("treeview", () => {
