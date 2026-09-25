@@ -1,98 +1,77 @@
 // Node imports
-import { finished, pipeline } from "node:stream/promises";
-import type { IncomingHttpHeaders } from "node:http";
 import { Readable } from "node:stream";
 import fs from "node:fs";
+import { pipeline } from "node:stream/promises";
 
 // Third party imports
 import {
   type H3Event,
   createError,
   defineEventHandler,
-  getRequestHeaders,
+  getQuery,
   getRequestWebStream,
 } from "h3";
-import busboy from "busboy";
 
 // Local imports
 import {
   registerExtensionFile,
   targetExtensionFilePath,
 } from "@geode/opengeodeweb-front/server/utils/app_config.ts";
+import { BYTES_PER_KIBIBYTE } from "@ogw_shared/utils/file.js";
 import { toNodeWebStream } from "@geode/opengeodeweb-front/server/utils/stream.ts";
 
+const CODE_200 = 200;
 const CODE_201 = 201;
-const BYTES_PER_KIBIBYTE = 1024;
 const MAX_FILE_MEGABYTES = 500;
 const FILE_SIZE_LIMIT = MAX_FILE_MEGABYTES * BYTES_PER_KIBIBYTE * BYTES_PER_KIBIBYTE;
 
+function requiredQueryString(event: H3Event, key: string): string {
+  const value = getQuery(event)[key];
+  if (typeof value !== "string" || value.length === 0) {
+    throw createError({ statusCode: 400, message: `Missing "${key}" query parameter` });
+  }
+  return value;
+}
+
+function requiredQueryInt(event: H3Event, key: string): number {
+  const parsed = Math.trunc(Number(requiredQueryString(event, key)));
+  if (!Number.isInteger(parsed) || parsed < 0) {
+    throw createError({ statusCode: 400, message: `Invalid "${key}" query parameter` });
+  }
+  return parsed;
+}
+
+// The file is sent as a raw (non-multipart) body, split into sequential chunks the client uploads in order (see OpenGeodeWeb-Front's upload_file.ts and OpenGeodeWeb-Back's upload_file route, which use the same protocol). Each chunk is appended to a `.part` file; the last one triggers the existing zip-metadata registration.
 export default defineEventHandler(async (event: H3Event) => {
-  const writePromises: Promise<void>[] = [];
-  const savedFiles: string[] = [];
-
-  const headers: IncomingHttpHeaders = Object.fromEntries(
-    Object.entries(getRequestHeaders(event)).filter(
-      (entry: readonly [string, string | undefined]) => entry[1] !== undefined,
-    ),
-  );
-  const busboyInstance = busboy({
-    headers,
-    limits: {
-      fileSize: FILE_SIZE_LIMIT,
-      files: 1,
-    },
-  });
-  let projectName = "";
-  busboyInstance.on("field", (name, value) => {
-    console.log(`Field ${name}: ${value}`);
-    if (name === "projectName") {
-      projectName = value;
-    }
-  });
-
-  busboyInstance.on("file", (fieldname, fileStream, info) => {
-    if (fieldname !== "file") {
-      // Drain & ignore unwanted fields
-      fileStream.resume();
-      return;
-    }
-    const targetPath = targetExtensionFilePath(projectName, info.filename);
-    const writePromise = (async (): Promise<void> => {
-      const writeStream = fs.createWriteStream(targetPath);
-      await pipeline(fileStream, writeStream);
-      savedFiles.push(targetPath);
-      console.log("File written:", targetPath);
-    })();
-    writePromises.push(writePromise);
-    fileStream.on("limit", () => {
-      busboyInstance.destroy(new Error("File too large"));
-    });
-  });
-
-  busboyInstance.on("filesLimit", () => {
-    busboyInstance.destroy(new Error("Too many files"));
-  });
-  busboyInstance.on("partsLimit", () => {
-    busboyInstance.destroy(new Error("Too many parts"));
-  });
+  const projectName = requiredQueryString(event, "projectName");
+  const filename = requiredQueryString(event, "filename");
+  const totalChunks = requiredQueryInt(event, "total_chunks");
+  const chunkIndex = requiredQueryInt(event, "chunk_index");
+  if (chunkIndex >= totalChunks) {
+    throw createError({ statusCode: 400, message: "chunk_index must be less than total_chunks" });
+  }
 
   const webStream = getRequestWebStream(event);
   if (!webStream) {
     throw createError({ statusCode: 400, message: "No request body received" });
   }
-  Readable.fromWeb(toNodeWebStream(webStream)).pipe(busboyInstance);
-  await finished(busboyInstance);
-  if (writePromises.length > 0) {
-    await Promise.all(writePromises);
-    console.log("All disk writes completed");
+
+  const targetPath = targetExtensionFilePath(projectName, filename);
+  const partPath = `${targetPath}.part`;
+  const writeStream = fs.createWriteStream(partPath, { flags: chunkIndex === 0 ? "w" : "a" });
+  await pipeline(Readable.fromWeb(toNodeWebStream(webStream)), writeStream);
+
+  const { size } = await fs.promises.stat(partPath);
+  if (size > FILE_SIZE_LIMIT) {
+    await fs.promises.unlink(partPath);
+    throw createError({ statusCode: 400, message: "File too large" });
   }
-  if (savedFiles.length === 0) {
-    throw createError({ statusCode: 400, message: "No file received" });
+
+  if (chunkIndex < totalChunks - 1) {
+    return { statusCode: CODE_200 };
   }
-  await Promise.all(
-    savedFiles.map(async (file) => {
-      await registerExtensionFile(projectName, file);
-    }),
-  );
+
+  await fs.promises.rename(partPath, targetPath);
+  await registerExtensionFile(projectName, targetPath);
   return { statusCode: CODE_201 };
 });
