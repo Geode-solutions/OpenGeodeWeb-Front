@@ -13,6 +13,7 @@ interface ModelCornersColorApi {
     corners_ids: string[],
     color: unknown,
     activeColoring?: string,
+    collectionId?: string,
   ) => Promise<unknown>;
   modelCornerColoring: (id: string, corner_id?: string) => StyleValues;
   modelCornerColor: (id: string, corner_id?: string) => unknown;
@@ -21,6 +22,7 @@ interface ModelCornersColorApi {
     modelId: string,
     corners_ids: string[],
     activeColoring: string,
+    collectionId?: string,
   ) => Promise<unknown>;
 }
 
@@ -44,6 +46,7 @@ export function useModelCornersColor(): ModelCornersColorApi {
     corners_ids: string[],
     color: unknown,
     activeColoring = "constant",
+    collectionId?: string,
   ): Promise<unknown> {
     const result = await modelCommonStyle.setModelTypeColor(
       modelId,
@@ -51,6 +54,7 @@ export function useModelCornersColor(): ModelCornersColorApi {
       color,
       schema,
       activeColoring,
+      collectionId,
     );
     return result;
   }
@@ -63,6 +67,7 @@ export function useModelCornersColor(): ModelCornersColorApi {
     modelId: string,
     corners_ids: string[],
     activeColoring: string,
+    collectionId?: string,
   ): Promise<unknown> {
     const totalCornerIds = await dataStore.getCornersGeodeIds(modelId);
     if (corners_ids.length === totalCornerIds.length) {
@@ -75,7 +80,7 @@ export function useModelCornersColor(): ModelCornersColorApi {
     });
     if (activeColoring === "constant" || activeColoring === "random") {
       const color = modelCornerColor(modelId, corners_ids[0]);
-      return setModelCornersColor(modelId, corners_ids, color, activeColoring);
+      return setModelCornersColor(modelId, corners_ids, color, activeColoring, collectionId);
     }
 
     if (activeColoring === "vertex") {

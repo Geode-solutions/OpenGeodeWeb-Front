@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
@@ -11,16 +12,29 @@ interface Props {
   modelId: string;
   surfaceId?: string;
   targetSurfaceIds: string[];
+  collections?: CollectionComponent[];
 }
 
-const { modelId, surfaceId = undefined, targetSurfaceIds } = defineProps<Props>();
+const {
+  modelId,
+  surfaceId = undefined,
+  targetSurfaceIds,
+  collections = undefined,
+} = defineProps<Props>();
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
+const referenceSurfaceId = computed<string | undefined>(() =>
+  collections ? targetSurfaceIds[0] : undefined,
+);
+
 // Visibility
 const surfacesVisibility = computed<boolean>({
-  get: () => dataStyleStore.modelComponentTypeVisibility(modelId, "Surface"),
+  get: () =>
+    collections
+      ? targetSurfaceIds.every((id) => dataStyleStore.modelSurfaceVisibility(modelId, id))
+      : dataStyleStore.modelComponentTypeVisibility(modelId, "Surface"),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesVisibility(modelId, targetSurfaceIds, newValue);
     hybridViewerStore.remoteRender();
@@ -40,7 +54,8 @@ const surfaceVisibility = computed<boolean>({
 
 // Color
 const surfacesColor = computed<RGBAColor | undefined>({
-  get: () => dataStyleStore.modelComponentTypeColor(modelId, "Surface") as RGBAColor | undefined,
+  get: () =>
+    dataStyleStore.modelSurfaceColor(modelId, referenceSurfaceId.value) as RGBAColor | undefined,
   set: async (color) => {
     await dataStyleStore.setModelSurfacesColor(modelId, targetSurfaceIds, color);
     hybridViewerStore.remoteRender();
@@ -60,12 +75,27 @@ const surfaceColor = computed<RGBAColor | undefined>({
 
 const surfacesActiveColoring = computed<string | undefined>({
   get: () =>
-    dataStyleStore.getModelComponentTypeActiveColoring(modelId, "Surface") as string | undefined,
+    dataStyleStore.modelSurfaceActiveColoring(modelId, referenceSurfaceId.value) as
+      | string
+      | undefined,
   set: async (coloringType) => {
     if (typeof coloringType !== "string") {
       return;
     }
-    await dataStyleStore.setModelSurfacesActiveColoring(modelId, targetSurfaceIds, coloringType);
+    if (collections && coloringType === "random") {
+      await Promise.all(
+        collections.map((collection) =>
+          dataStyleStore.setModelSurfacesActiveColoring(
+            modelId,
+            collection.children.map((child) => child.id),
+            coloringType,
+            collection.id,
+          ),
+        ),
+      );
+    } else {
+      await dataStyleStore.setModelSurfacesActiveColoring(modelId, targetSurfaceIds, coloringType);
+    }
     hybridViewerStore.remoteRender();
   },
 });
@@ -83,7 +113,7 @@ const surfaceActiveColoring = computed<string | undefined>({
 
 // Group Attributes
 const surfacesVertexAttributeName = computed<string | undefined>({
-  get: () => dataStyleStore.modelSurfacesVertexAttributeName(modelId),
+  get: () => dataStyleStore.modelSurfacesVertexAttributeName(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
       return;
@@ -94,7 +124,7 @@ const surfacesVertexAttributeName = computed<string | undefined>({
 });
 
 const surfacesVertexAttributeItem = computed<string | undefined>({
-  get: () => dataStyleStore.modelSurfacesVertexAttributeItem(modelId),
+  get: () => dataStyleStore.modelSurfacesVertexAttributeItem(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesVertexAttributeItem(modelId, targetSurfaceIds, newValue);
     hybridViewerStore.remoteRender();
@@ -102,7 +132,7 @@ const surfacesVertexAttributeItem = computed<string | undefined>({
 });
 
 const surfacesVertexAttributeRange = computed<[number, number] | undefined>({
-  get: () => dataStyleStore.modelSurfacesVertexAttributeRange(modelId),
+  get: () => dataStyleStore.modelSurfacesVertexAttributeRange(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
     if (minimum === undefined || maximum === undefined) {
@@ -119,7 +149,7 @@ const surfacesVertexAttributeRange = computed<[number, number] | undefined>({
 });
 
 const surfacesVertexAttributeColorMap = computed<Map<string, RGBAColor> | undefined>({
-  get: () => dataStyleStore.modelSurfacesVertexAttributeColorMap(modelId),
+  get: () => dataStyleStore.modelSurfacesVertexAttributeColorMap(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesVertexAttributeColorMap(
       modelId,
@@ -132,7 +162,9 @@ const surfacesVertexAttributeColorMap = computed<Map<string, RGBAColor> | undefi
 
 const surfacesVertexAttributeNoDataColor = computed<RGBAColor | undefined>({
   get: () =>
-    dataStyleStore.modelSurfacesVertexAttributeNoDataColor(modelId) as RGBAColor | undefined,
+    dataStyleStore.modelSurfacesVertexAttributeNoDataColor(modelId, referenceSurfaceId.value) as
+      | RGBAColor
+      | undefined,
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesVertexAttributeNoDataColor(
       modelId,
@@ -144,7 +176,7 @@ const surfacesVertexAttributeNoDataColor = computed<RGBAColor | undefined>({
 });
 
 const surfacesPolygonAttributeName = computed<string | undefined>({
-  get: () => dataStyleStore.modelSurfacesPolygonAttributeName(modelId),
+  get: () => dataStyleStore.modelSurfacesPolygonAttributeName(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
       return;
@@ -155,7 +187,7 @@ const surfacesPolygonAttributeName = computed<string | undefined>({
 });
 
 const surfacesPolygonAttributeItem = computed<string | undefined>({
-  get: () => dataStyleStore.modelSurfacesPolygonAttributeItem(modelId),
+  get: () => dataStyleStore.modelSurfacesPolygonAttributeItem(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesPolygonAttributeItem(modelId, targetSurfaceIds, newValue);
     hybridViewerStore.remoteRender();
@@ -163,7 +195,7 @@ const surfacesPolygonAttributeItem = computed<string | undefined>({
 });
 
 const surfacesPolygonAttributeRange = computed<[number, number] | undefined>({
-  get: () => dataStyleStore.modelSurfacesPolygonAttributeRange(modelId),
+  get: () => dataStyleStore.modelSurfacesPolygonAttributeRange(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
     if (minimum === undefined || maximum === undefined) {
@@ -180,7 +212,8 @@ const surfacesPolygonAttributeRange = computed<[number, number] | undefined>({
 });
 
 const surfacesPolygonAttributeColorMap = computed<Map<string, RGBAColor> | undefined>({
-  get: () => dataStyleStore.modelSurfacesPolygonAttributeColorMap(modelId),
+  get: () =>
+    dataStyleStore.modelSurfacesPolygonAttributeColorMap(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesPolygonAttributeColorMap(
       modelId,
@@ -193,7 +226,9 @@ const surfacesPolygonAttributeColorMap = computed<Map<string, RGBAColor> | undef
 
 const surfacesPolygonAttributeNoDataColor = computed<RGBAColor | undefined>({
   get: () =>
-    dataStyleStore.modelSurfacesPolygonAttributeNoDataColor(modelId) as RGBAColor | undefined,
+    dataStyleStore.modelSurfacesPolygonAttributeNoDataColor(modelId, referenceSurfaceId.value) as
+      | RGBAColor
+      | undefined,
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesPolygonAttributeNoDataColor(
       modelId,
