@@ -42,6 +42,7 @@ async function viewer_call(
 ): Promise<unknown> {
   const feedbackStore = useFeedbackStore();
   const { client } = microservice;
+  microservice.start_request();
 
   const requestStartingTime = startRequestLog(microservice, schema);
   const result = await callSchema(
