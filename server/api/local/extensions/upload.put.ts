@@ -4,13 +4,7 @@ import fs from "node:fs";
 import { pipeline } from "node:stream/promises";
 
 // Third party imports
-import {
-  type H3Event,
-  createError,
-  defineEventHandler,
-  getQuery,
-  getRequestWebStream,
-} from "h3";
+import { type H3Event, createError, defineEventHandler, getQuery, getRequestWebStream } from "h3";
 
 // Local imports
 import {
