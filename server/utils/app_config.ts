@@ -36,11 +36,8 @@ function targetExtensionFilePath(projectName: string, filename: string): string 
 
 function extensionsConf(projectName: string): ExtensionsConfigSchema["extensions"] {
   const projectConfig = projectConf(projectName);
-  if (!projectConfig.has("extensions")) {
-    projectConfig.set("extensions", {});
-  }
-  const extensionsConfig = projectConfig.get("extensions");
-  return extensionsConfig;
+  // Read-only: concurrent app instances share this file and racing writes fail on Windows (EPERM)
+  return projectConfig.get("extensions", {});
 }
 
 function addExtensionToConf(
