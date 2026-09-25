@@ -139,7 +139,10 @@ function createServerWsRpcClient(baseUrl: string): ServerWsRpcClient {
   function getConnection(): ReturnType<ServerWsRpcClient["getConnection"]> {
     return {
       getSession: () => ({
-        call: (rpc: string, [params]: readonly [Record<string, unknown>]) => call(rpc, params),
+        call: async (rpc: string, [params]: readonly [Record<string, unknown>]) => {
+          const result = await call(rpc, params);
+          return result;
+        },
       }),
     };
   }

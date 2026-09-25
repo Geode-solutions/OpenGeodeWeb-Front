@@ -27,6 +27,23 @@ function assertIsTestResponse(value: unknown): asserts value is { test: string }
   }
 }
 
+function queryString(value: unknown): string | undefined {
+  return typeof value === "string" ? value : undefined;
+}
+
+function mockRequestBody(event: H3Event): Blob {
+  const request: unknown = event.node.req;
+  if (
+    typeof request === "object" &&
+    request !== null &&
+    "body" in request &&
+    request.body instanceof Blob
+  ) {
+    return request.body;
+  }
+  throw new Error("Mock request does not have a Blob body");
+}
+
 describe("upload_file", () => {
   beforeEach(() => {
     setupActivePinia();
@@ -73,11 +90,11 @@ describe("upload_file", () => {
       // H3's readRawBody() can't convert a Blob/File body (it only handles Buffer/stream/FormData/plain-object shapes), so this reads the mock request's raw body directly to inspect what was actually sent.
       handler: async (event: H3Event) => {
         const query = getQuery(event);
-        receivedFilename = query.filename as string | undefined;
-        const rawBody = (event.node.req as unknown as { body: Blob }).body;
+        receivedFilename = queryString(query.filename);
+        const rawBody = mockRequestBody(event);
         receivedChunks.push({
-          index: query.chunk_index as string | undefined,
-          total: query.total_chunks as string | undefined,
+          index: queryString(query.chunk_index),
+          total: queryString(query.total_chunks),
           body: await rawBody.text(),
         });
         return { test: "ok" };
@@ -101,10 +118,10 @@ describe("upload_file", () => {
       method: "PUT",
       handler: async (event: H3Event) => {
         const query = getQuery(event);
-        const rawBody = (event.node.req as unknown as { body: Blob }).body;
+        const rawBody = mockRequestBody(event);
         receivedChunks.push({
-          index: query.chunk_index as string | undefined,
-          total: query.total_chunks as string | undefined,
+          index: queryString(query.chunk_index),
+          total: queryString(query.total_chunks),
           body: await rawBody.text(),
         });
         return { test: "ok" };

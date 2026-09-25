@@ -151,7 +151,7 @@ export function useTreeKeyboardNav(
     if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) {
       event.preventDefault();
       const prevIndex = focusedIndex.value;
-      (focusedIndex as Ref<number>).value = getNextIndex(event.key);
+      focusedIndex.value = getNextIndex(event.key);
 
       if (focusedIndex.value !== prevIndex) {
         if (prevIndex >= 0 && prevIndex < displayItems.value.length) {

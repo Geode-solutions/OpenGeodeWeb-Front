@@ -16,9 +16,12 @@ function snackbarElements(): HTMLElement[] {
 export default defineNuxtPlugin({
   name: "click-outside-ignore-snackbars",
   setup() {
-    const originalMounted = ClickOutside.mounted;
+    const originalMounted = ClickOutside.mounted.bind(ClickOutside);
 
-    ClickOutside.mounted = (element: HTMLElement, binding: DirectiveBinding<ClickOutsideValue>) => {
+    ClickOutside.mounted = (
+      element: HTMLElement,
+      binding: DirectiveBinding<ClickOutsideValue>,
+    ): void => {
       const { value } = binding;
       const handler = typeof value === "function" ? value : value.handler;
       const closeConditional = typeof value === "function" ? undefined : value.closeConditional;
@@ -27,7 +30,7 @@ export default defineNuxtPlugin({
       binding.value = {
         handler,
         closeConditional,
-        include: () => [...(include?.() ?? []), ...snackbarElements()],
+        include: (): HTMLElement[] => [...(include?.() ?? []), ...snackbarElements()],
       };
 
       originalMounted(element, binding);
