@@ -158,6 +158,7 @@ function resetRange(): void {
 }
 
 async function removeThreshold(): Promise<void> {
+  attributeName.value = undefined;
   if (selectedDatasetId.value) {
     await hybridViewerStore.setThreshold([selectedDatasetId.value]);
   }
@@ -208,6 +209,7 @@ watch(show, (visible) => {
 <template>
   <ToolPanel
     v-model="show"
+    data-testid="thresholdFilterPanel"
     title="Threshold Filter"
     :width="340"
     :click-outside="false"
