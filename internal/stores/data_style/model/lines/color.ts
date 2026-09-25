@@ -14,6 +14,7 @@ export function useModelLinesColor(): {
     lines_ids: string[],
     color: unknown,
     activeColoring?: string,
+    collectionId?: string,
   ) => Promise<unknown>;
   modelLineColoring: (id: string, line_id?: string) => StyleValues;
   modelLineColor: (id: string, line_id?: string) => unknown;
@@ -22,6 +23,7 @@ export function useModelLinesColor(): {
     modelId: string,
     lines_ids: string[],
     activeColoring: string,
+    collectionId?: string,
   ) => Promise<unknown>;
 } {
   const dataStore = useDataStore();
@@ -44,6 +46,7 @@ export function useModelLinesColor(): {
     lines_ids: string[],
     color: unknown,
     activeColoring = "constant",
+    collectionId?: string,
   ): Promise<unknown> {
     const result = await modelCommonStyle.setModelTypeColor(
       modelId,
@@ -51,6 +54,7 @@ export function useModelLinesColor(): {
       color,
       schema,
       activeColoring,
+      collectionId,
     );
     return result;
   }
@@ -63,6 +67,7 @@ export function useModelLinesColor(): {
     modelId: string,
     lines_ids: string[],
     activeColoring: string,
+    collectionId?: string,
   ): Promise<unknown> {
     const totalLineIds = await dataStore.getLinesGeodeIds(modelId);
     if (lines_ids.length === totalLineIds.length) {
@@ -75,7 +80,7 @@ export function useModelLinesColor(): {
     });
     if (activeColoring === "constant" || activeColoring === "random") {
       const color = modelLineColor(modelId, lines_ids[0]);
-      return setModelLinesColor(modelId, lines_ids, color, activeColoring);
+      return setModelLinesColor(modelId, lines_ids, color, activeColoring, collectionId);
     }
 
     if (activeColoring === "vertex") {

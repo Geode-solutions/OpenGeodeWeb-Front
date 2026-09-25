@@ -1,4 +1,5 @@
 import type { JsonRpcSchema, RequestHandlers } from "@ogw_shared/utils/types.js";
+import { CHUNK_SIZE_BYTES } from "@ogw_shared/utils/file.js";
 import type { Microservice } from "./api_fetch.js";
 import { fetchRaw } from "@ogw_shared/utils/fetch_raw.js";
 import { useFeedbackStore } from "@ogw_front/stores/feedback.js";
@@ -8,11 +9,7 @@ interface UploadFileParams {
   // HTTP-flavored ("front"/"back") schemas.
   schema: JsonRpcSchema & { methods: string[] };
   file: File;
-  params?: Record<string, string | Blob>;
-  // When true, the file is sent as the raw request body instead of multipart
-  // FormData, with `params`/filename moved into the query string. See
-  // OpenGeodeWeb-Back's upload_file route, which supports both request shapes.
-  raw?: boolean;
+  params?: Record<string, string>;
 }
 
 // Loosely-typed shapes for the dynamic error/response values reported by fetchRaw.
@@ -38,7 +35,7 @@ function isFetchErrorResponseLike(value: unknown): value is FetchErrorResponseLi
 
 async function upload_file(
   microservice: Microservice,
-  { schema, file, params = {}, raw = false }: UploadFileParams,
+  { schema, file, params = {} }: UploadFileParams,
   { request_error_function, response_function, response_error_function }: RequestHandlers = {},
 ): Promise<unknown> {
   console.log("[UPLOAD_FILE] Uploading file", { schema, file });
@@ -48,68 +45,70 @@ async function upload_file(
     throw new Error("file must be an instance of File");
   }
 
-  let route = schema.$id;
-  let body: FormData | File = file;
+  const route = schema.$id;
+  const method = schema.methods.find((candidate) => candidate !== "OPTIONS");
+  const totalChunks = Math.max(1, Math.ceil(file.size / CHUNK_SIZE_BYTES));
 
-  if (raw) {
-    const queryEntries = Object.entries(params).filter(
-      (entry): entry is [string, string] => typeof entry[1] === "string",
+  function onRequestError(error: unknown): void {
+    microservice.stop_request();
+    const typedError = isFetchErrorLike(error) ? error : {};
+    feedbackStore.add_error(
+      typedError.code ?? 0,
+      route,
+      typedError.message ?? "",
+      typedError.stack ?? "",
     );
-    const query = new URLSearchParams([...queryEntries, ["filename", file.name]]);
-    route = `${route}?${query.toString()}`;
-  } else {
-    const formData = new FormData();
-    for (const [key, value] of Object.entries(params)) {
-      formData.append(key, value);
+    if (request_error_function) {
+      request_error_function(error);
     }
-    formData.append("file", file);
-    body = formData;
+  }
+
+  function onResponseError(response: unknown): void {
+    microservice.stop_request();
+    const typedResponse = isFetchErrorResponseLike(response) ? response : {};
+    feedbackStore.add_error(
+      typedResponse.status ?? 0,
+      route,
+      typedResponse.name ?? "",
+      typedResponse.description ?? "",
+    );
+    if (response_error_function) {
+      response_error_function(response);
+    }
   }
 
   microservice.start_request();
 
-  const result = await fetchRaw(
-    {
-      route,
-      method: schema.methods.find((method) => method !== "OPTIONS"),
-      params: body,
-      baseURL: microservice.base_url,
-    },
-    {
-      request_error_function(error: unknown) {
-        microservice.stop_request();
-        const typedError = isFetchErrorLike(error) ? error : {};
-        feedbackStore.add_error(
-          typedError.code ?? 0,
-          route,
-          typedError.message ?? "",
-          typedError.stack ?? "",
-        );
-        if (request_error_function) {
-          request_error_function(error);
-        }
+  let result: unknown = undefined;
+  for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex += 1) {
+    const start = chunkIndex * CHUNK_SIZE_BYTES;
+    const chunk = file.slice(start, start + CHUNK_SIZE_BYTES);
+    const query = new URLSearchParams({
+      ...params,
+      filename: file.name,
+      chunk_index: String(chunkIndex),
+      total_chunks: String(totalChunks),
+    });
+
+    // oxlint-disable-next-line no-await-in-loop -- chunks must be sent in order; the server appends each one to the file as it arrives.
+    result = await fetchRaw(
+      {
+        route: `${route}?${query.toString()}`,
+        method,
+        params: chunk,
+        baseURL: microservice.base_url,
       },
-      response_function(data: unknown) {
-        microservice.stop_request();
-        if (response_function) {
-          response_function(data);
-        }
+      {
+        request_error_function: onRequestError,
+        response_error_function: onResponseError,
       },
-      response_error_function(response: unknown) {
-        microservice.stop_request();
-        const typedResponse = isFetchErrorResponseLike(response) ? response : {};
-        feedbackStore.add_error(
-          typedResponse.status ?? 0,
-          route,
-          typedResponse.name ?? "",
-          typedResponse.description ?? "",
-        );
-        if (response_error_function) {
-          response_error_function(response);
-        }
-      },
-    },
-  );
+    );
+  }
+
+  microservice.stop_request();
+  if (response_function) {
+    response_function(result);
+  }
   return result;
 }
 
