@@ -9,6 +9,10 @@ import { createError } from "h3";
 // Local imports
 import { extensionFrontendPath } from "@geode/opengeodeweb-front/server/utils/path.ts";
 
+const extensionServerMetadataSchema = z.object({
+  entry: z.string(),
+});
+
 const extensionMetadataSchema = z
   .object({
     id: z.string(),
@@ -16,6 +20,7 @@ const extensionMetadataSchema = z
     version: z.string(),
     frontendFile: z.string(),
     backendExecutable: z.string(),
+    server: extensionServerMetadataSchema.optional(),
   })
   .loose();
 

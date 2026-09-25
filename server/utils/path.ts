@@ -162,11 +162,15 @@ function extensionBackendPath(
   });
   return backendExecutablePath;
 }
+function extensionServerEntryPath(unzippedExtensionPath: string, entry: string): string {
+  return path.join(unzippedExtensionPath, entry);
+}
 export {
   createPath,
   extensionBackendPath,
   extensionFrontendPath,
   extensionFolderPath,
+  extensionServerEntryPath,
   executablePath,
   executableName,
   generateProjectFolderPath,

@@ -58,6 +58,7 @@ export function useAppExtensions(): {
   async function loadExtension(
     path: string,
     extensionPort: string,
+    serverPort?: string,
     backendPath?: string,
   ): Promise<ExtensionModule> {
     try {
@@ -76,7 +77,10 @@ export function useAppExtensions(): {
       // oxlint-disable-next-line no-inline-comments, no-unsafe-assignment
       const extensionModule: ExtensionModule = await import(/* @vite-ignore */ finalURL);
       const store = extensionModule.metadata.store();
-      store.$patch?.({ default_local_port: extensionPort });
+      store.$patch?.({
+        default_local_port: extensionPort,
+        ...(serverPort === undefined ? {} : { nitro_port: serverPort }),
+      });
 
       if (finalURL !== path && finalURL.startsWith("blob:")) {
         URL.revokeObjectURL(finalURL);

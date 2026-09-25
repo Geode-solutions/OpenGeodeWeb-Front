@@ -22,6 +22,7 @@ const MILLISECONDS_PER_SECOND = 1000;
 const DEFAULT_TIMEOUT_SECONDS = 45;
 const MAX_PORT_RETRIES = 1;
 const DEFAULT_RUN_ARGS: RunArgs = { projectFolderPath: "" };
+const LISTENING_LOG_PATTERN = /^Listening on https?:\/\/.+:\d+\/?\s*$/mu;
 
 async function runScript(
   execPath: string,
@@ -182,6 +183,56 @@ async function runExtension(
   }
   throw new Error(`runExtension failed to run ${extensionId}`);
 }
+async function waitUntilListening(
+  child: child_process.ChildProcessWithoutNullStreams,
+): Promise<void> {
+  child.stderr.on("data", (data: Buffer) => {
+    console.log(`[${child.spawnfile}] STDERR:`, data.toString().trim());
+  });
+  child.on("close", (code) => {
+    console.log(`[${child.spawnfile}] exited with code ${code}`);
+  });
+  // oxlint-disable-next-line typescript/no-unnecessary-condition
+  for await (const chunk of child.stdout) {
+    const output = String(chunk);
+    console.log(`[${child.spawnfile}] STDOUT:`, output.trim());
+    if (LISTENING_LOG_PATTERN.test(output)) {
+      child.stdout.on("data", (data: Buffer) => {
+        console.log(`[${child.spawnfile}] STDOUT:`, data.toString().trim());
+      });
+      return;
+    }
+  }
+  throw new Error(`${child.spawnfile} exited before becoming ready`);
+}
+
+async function runExtensionServer(entryPath: string, attempts = 0): Promise<number> {
+  let port: number | undefined = undefined;
+  try {
+    port = await getAvailablePort();
+    console.log("runExtensionServer", entryPath, port);
+    const child = child_process.spawn("node", [entryPath], {
+      env: {
+        ...process.env,
+        PORT: String(port),
+      },
+    });
+    await waitUntilListening(child);
+    return port;
+  } catch (error) {
+    if (!isPortInUseError(error)) {
+      console.log("runExtensionServer error", error);
+      throw error;
+    }
+    if (attempts <= MAX_PORT_RETRIES) {
+      console.log("Retrying runExtensionServer on conflicting port", port);
+      const newPort = await runExtensionServer(entryPath, attempts + 1);
+      return newPort;
+    }
+  }
+  throw new Error(`runExtensionServer failed to run ${entryPath}`);
+}
+
 function addMicroserviceMetadatas(projectFolderPath: string, serviceObj: Microservice): void {
   const microservices = projectMicroservices(projectFolderPath);
   let enriched: Microservice = { ...serviceObj };
@@ -212,4 +263,4 @@ function addMicroserviceMetadatas(projectFolderPath: string, serviceObj: Microse
   );
 }
 
-export { addMicroserviceMetadatas, runBack, runExtension, runViewer };
+export { addMicroserviceMetadatas, runBack, runExtension, runExtensionServer, runViewer };
