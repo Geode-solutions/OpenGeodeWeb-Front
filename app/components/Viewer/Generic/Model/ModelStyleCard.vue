@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import BlocksOptions from "./BlocksOptions.vue";
+import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import CornersOptions from "./CornersOptions.vue";
 import LinesOptions from "./LinesOptions.vue";
+import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import SurfacesOptions from "./SurfacesOptions.vue";
@@ -37,6 +39,7 @@ const selection = computed<string[]>(
   () => dataStyleStore.visibleMeshComponents(modelId.value).value || [],
 );
 const componentType = ref<string | undefined>(undefined);
+const collections = ref<CollectionComponent[] | undefined>(undefined);
 
 watch(
   () => [
@@ -47,8 +50,18 @@ watch(
   ],
   async () => {
     componentType.value = undefined;
+    collections.value = undefined;
     if (itemProps.meta_data.viewer_type === "model_component_type") {
-      componentType.value = itemProps.meta_data.modelComponentType;
+      const { modelComponentType, targetComponentIds: ids } = itemProps.meta_data;
+      if (MESH_COMPONENT_TYPES.includes(modelComponentType)) {
+        componentType.value = modelComponentType;
+      } else {
+        const collectionsByType = await dataStore.fetchAllCollectionComponents(modelId.value);
+        collections.value = collectionsByType[modelComponentType].filter((collection) =>
+          collection.children.every((child) => ids.includes(child.id)),
+        );
+        componentType.value = collections.value[0].children[0].category;
+      }
     } else if (componentId.value && modelId.value) {
       const currentModelId = modelId.value;
       const currentCompId = componentId.value;
@@ -155,24 +168,28 @@ const modelComponentsActiveColoring = computed<string | undefined>({
       :modelId="modelId"
       :blockId="componentId"
       :targetBlockIds="targetComponentIds"
+      :collections="collections"
     />
     <SurfacesOptions
       v-else-if="componentType === 'Surface'"
       :modelId="modelId"
       :surfaceId="componentId"
       :targetSurfaceIds="targetComponentIds"
+      :collections="collections"
     />
     <LinesOptions
       v-else-if="componentType === 'Line'"
       :modelId="modelId"
       :lineId="componentId"
       :targetLineIds="targetComponentIds"
+      :collections="collections"
     />
     <CornersOptions
       v-else-if="componentType === 'Corner'"
       :modelId="modelId"
       :cornerId="componentId"
       :targetCornerIds="targetComponentIds"
+      :collections="collections"
     />
   </v-sheet>
 </template>

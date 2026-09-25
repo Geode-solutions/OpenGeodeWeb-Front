@@ -5,11 +5,15 @@ import { registerEndpoint } from "@nuxt/test-utils/runtime";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 
 // Local imports
+import { CHUNK_SIZE_BYTES } from "@ogw_shared/utils/file.js";
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 const ZERO = 0;
+const ONE = 1;
+const TWO = 2;
+const SECOND_CHUNK_EXTRA_BYTES = 1000;
 const schema = schemas.opengeodeweb_back.upload_file;
 
 function assertIsTestResponse(value: unknown): asserts value is { test: string } {
@@ -58,18 +62,24 @@ describe("upload_file", () => {
     expect(response_value).toBe("ok");
   });
 
-  test("raw upload sends the file as a raw body with filename in the query string", async () => {
+  test("small file uploads as a single raw-body chunk with filename in the query string", async () => {
     const feedbackStore = useFeedbackStore();
     const backStore = useBackStore();
+    const receivedChunks: { index: string | undefined; total: string | undefined; body: string }[] =
+      [];
     let receivedFilename: string | undefined = undefined;
-    let receivedBody = "";
     registerEndpoint(schema.$id, {
       method: "PUT",
       // H3's readRawBody() can't convert a Blob/File body (it only handles Buffer/stream/FormData/plain-object shapes), so this reads the mock request's raw body directly to inspect what was actually sent.
       handler: async (event: H3Event) => {
-        receivedFilename = getQuery(event).filename as string | undefined;
+        const query = getQuery(event);
+        receivedFilename = query.filename as string | undefined;
         const rawBody = (event.node.req as unknown as { body: Blob }).body;
-        receivedBody = await rawBody.text();
+        receivedChunks.push({
+          index: query.chunk_index as string | undefined,
+          total: query.total_chunks as string | undefined,
+          body: await rawBody.text(),
+        });
         return { test: "ok" };
       },
     });
@@ -79,6 +89,36 @@ describe("upload_file", () => {
 
     expect(feedbackStore.feedbacks).toHaveLength(ZERO);
     expect(receivedFilename).toBe("fake_file.txt");
-    expect(receivedBody).toBe("fake_file_content");
+    expect(receivedChunks).toStrictEqual([{ index: "0", total: "1", body: "fake_file_content" }]);
+  });
+
+  test("large file uploads sequentially as multiple chunks", async () => {
+    const feedbackStore = useFeedbackStore();
+    const backStore = useBackStore();
+    const receivedChunks: { index: string | undefined; total: string | undefined; body: string }[] =
+      [];
+    registerEndpoint(schema.$id, {
+      method: "PUT",
+      handler: async (event: H3Event) => {
+        const query = getQuery(event);
+        const rawBody = (event.node.req as unknown as { body: Blob }).body;
+        receivedChunks.push({
+          index: query.chunk_index as string | undefined,
+          total: query.total_chunks as string | undefined,
+          body: await rawBody.text(),
+        });
+        return { test: "ok" };
+      },
+    });
+    const firstChunkContent = "a".repeat(CHUNK_SIZE_BYTES);
+    const secondChunkContent = "b".repeat(SECOND_CHUNK_EXTRA_BYTES);
+    const file = new File([firstChunkContent, secondChunkContent], "big_file.bin");
+
+    await backStore.upload(file);
+
+    expect(feedbackStore.feedbacks).toHaveLength(ZERO);
+    expect(receivedChunks).toHaveLength(TWO);
+    expect(receivedChunks[0]).toStrictEqual({ index: "0", total: "2", body: firstChunkContent });
+    expect(receivedChunks[ONE]).toStrictEqual({ index: "1", total: "2", body: secondChunkContent });
   });
 });
