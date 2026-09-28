@@ -95,7 +95,21 @@ const camera_options = computed<CameraOptionAction[]>(() => [
     icon: "mdi-crosshairs-question",
     color: hybridViewerStore.is_picking ? "primary" : undefined,
     action: (): void => {
+      hybridViewerStore.deactivateZoomBox();
       hybridViewerStore.is_picking = !hybridViewerStore.is_picking;
+    },
+  },
+  {
+    testId: "zoomToBoxButton",
+    tooltip: "Zoom to box",
+    icon: "mdi-magnify-scan",
+    color: hybridViewerStore.is_zoom_box_active ? "primary" : undefined,
+    action: (): void => {
+      if (hybridViewerStore.is_zoom_box_active) {
+        hybridViewerStore.deactivateZoomBox();
+      } else {
+        hybridViewerStore.activateZoomBox();
+      }
     },
   },
   {

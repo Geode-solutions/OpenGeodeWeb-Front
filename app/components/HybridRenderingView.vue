@@ -2,6 +2,7 @@
 import ColormapQuickPicker from "@ogw_front/components/Viewer/Options/ColormapQuickPicker.vue";
 import HybridViewerTooltip from "@ogw_front/components/HybridViewerTooltip.vue";
 import ViewToolbar from "@ogw_front/components/ViewToolbar.vue";
+import ZoomBoxOverlay from "@ogw_front/components/ZoomBoxOverlay.vue";
 
 import { useDataStore } from "@ogw_front/stores/data";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -102,6 +103,7 @@ async function handleClick(event: PointerEvent): Promise<void> {
         :y="quickColormap.y"
         :data-id="quickColormap.data_id"
       />
+      <ZoomBoxOverlay />
       <ViewToolbar />
       <slot name="ui"></slot>
       <HybridViewerTooltip :container-width="elementWidth" :container-height="elementHeight" />
