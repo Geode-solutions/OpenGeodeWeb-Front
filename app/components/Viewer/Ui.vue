@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import OverlappingObjectsPicker from "@ogw_front/components/Viewer/OverlappingObjectsPicker.vue";
+import ToolActiveChip from "@ogw_front/components/Viewer/ToolActiveChip.vue";
 import ViewerContextMenu from "@ogw_front/components/Viewer/ContextMenu/ContextMenu.vue";
 import ViewerObjectTreeLayout from "@ogw_front/components/Viewer/ObjectTree/Layout.vue";
 import { getCurrentInstance } from "vue";
@@ -22,6 +23,11 @@ const emit = defineEmits<{
 const menuStore = useMenuStore();
 const viewerStore = useViewerStore();
 const hybridViewerStore = useHybridViewerStore();
+
+const hoverHighlightLabel = computed(
+  () =>
+    `Highlight active (${hybridViewerStore.hover_highlight_field_type === "CELL" ? "Cells" : "Points"})`,
+);
 
 function stopHoverHighlight(): void {
   hybridViewerStore.is_hover_highlight = false;
@@ -104,123 +110,34 @@ defineExpose({ get_viewer_id });
     @update:display-intermediate="handleIntermediateMenuUpdate"
   />
 
-  <v-fade-transition>
-    <div
-      v-if="viewerStore.picking_mode"
-      class="picking-message-container d-flex justify-center w-100 pa-4"
-    >
-      <v-chip
-        color="secondary"
-        elevation="8"
-        size="large"
-        variant="flat"
-        prepend-icon="mdi-crosshairs-gps"
-        class="pick-pulse"
-        data-testid="pickingActiveChip"
-        style="pointer-events: auto"
-        @click="viewerStore.toggle_picking_mode(false)"
-      >
-        Picking active — click in the viewer &middot; Esc to stop
-        <v-divider vertical class="mx-2 my-1" opacity="0.3" />
-        <v-icon icon="mdi-close" size="small" />
-      </v-chip>
-    </div>
-  </v-fade-transition>
-
-  <v-fade-transition>
-    <div
-      v-if="hybridViewerStore.is_hover_highlight"
-      class="picking-message-container d-flex justify-center w-100 pa-4"
-    >
-      <v-chip
-        data-testid="hoverHighlightChip"
-        color="primary"
-        elevation="8"
-        size="large"
-        variant="flat"
-        class="pick-pulse"
-        style="pointer-events: auto"
-        @click="stopHoverHighlight"
-      >
-        Highlight active ({{
-          hybridViewerStore.hover_highlight_field_type === "CELL" ? "Cells" : "Points"
-        }}) &middot; Esc to stop
-        <v-divider vertical class="mx-2 my-1" opacity="0.3" />
-        <v-icon icon="mdi-close" size="small" />
-      </v-chip>
-    </div>
-  </v-fade-transition>
-
-  <v-fade-transition>
-    <div
-      v-if="hybridViewerStore.is_ruler_active"
-      class="picking-message-container d-flex justify-center w-100 pa-4"
-    >
-      <v-chip
-        data-testid="rulerActiveChip"
-        color="secondary"
-        elevation="8"
-        size="large"
-        variant="flat"
-        class="pick-pulse"
-        style="pointer-events: auto"
-        prepend-icon="mdi-ruler"
-        @click="hybridViewerStore.clearRuler()"
-      >
-        Ruler &mdash; click to set point
-        {{ hybridViewerStore.ruler_awaiting_point }}
-        &middot; Esc to stop
-        <v-divider vertical class="mx-2 my-1" opacity="0.3" />
-        <v-icon icon="mdi-close" size="small" />
-      </v-chip>
-    </div>
-  </v-fade-transition>
-
-  <v-fade-transition>
-    <div
-      v-if="hybridViewerStore.is_zoom_box_active"
-      class="picking-message-container d-flex justify-center w-100 pa-4"
-    >
-      <v-chip
-        data-testid="zoomBoxActiveChip"
-        color="primary"
-        elevation="8"
-        size="large"
-        variant="flat"
-        class="pick-pulse"
-        style="pointer-events: auto"
-        @click="hybridViewerStore.is_zoom_box_active = false"
-      >
-        Zoom to box &middot; Esc to stop
-        <v-divider vertical class="mx-2 my-1" opacity="0.3" />
-        <v-icon icon="mdi-close" size="small" />
-      </v-chip>
-    </div>
-  </v-fade-transition>
+  <ToolActiveChip
+    data-testid="pickingActiveChip"
+    :show="viewerStore.picking_mode"
+    label="Picking active — click in the viewer"
+    color="secondary"
+    icon="mdi-crosshairs-gps"
+    @close="viewerStore.toggle_picking_mode(false)"
+  />
+  <ToolActiveChip
+    data-testid="hoverHighlightChip"
+    :show="hybridViewerStore.is_hover_highlight"
+    :label="hoverHighlightLabel"
+    color="primary"
+    @close="stopHoverHighlight"
+  />
+  <ToolActiveChip
+    data-testid="rulerActiveChip"
+    :show="hybridViewerStore.is_ruler_active"
+    :label="`Ruler — click to set point ${hybridViewerStore.ruler_awaiting_point}`"
+    color="secondary"
+    icon="mdi-ruler"
+    @close="hybridViewerStore.clearRuler()"
+  />
+  <ToolActiveChip
+    data-testid="zoomBoxActiveChip"
+    :show="hybridViewerStore.is_zoom_box_active"
+    label="Zoom to box"
+    color="primary"
+    @close="hybridViewerStore.is_zoom_box_active = false"
+  />
 </template>
-
-<style scoped>
-.picking-message-container {
-  position: absolute;
-  top: 20px;
-  left: 0;
-  pointer-events: none;
-  z-index: 3;
-}
-
-@keyframes pulse-ring {
-  0% {
-    box-shadow: 0 0 0 0 rgba(var(--v-theme-secondary), 0.7);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(var(--v-theme-secondary), 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(var(--v-theme-secondary), 0);
-  }
-}
-
-.pick-pulse {
-  animation: pulse-ring 1.5s ease-out infinite;
-}
-</style>

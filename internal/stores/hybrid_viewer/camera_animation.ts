@@ -121,8 +121,6 @@ function animateCamera(options: AnimateCameraOptions): void {
       startState.focal_point[2] + (targetState.focal_point[2] - startState.focal_point[2]) * ease,
     ];
     const viewUp = slerp(startState.view_up, targetState.view_up, ease);
-    const viewAngle =
-      startState.view_angle + (targetState.view_angle - startState.view_angle) * ease;
     camera.set({
       position: [
         focalPoint[0] + dir[0] * dist,
@@ -131,7 +129,6 @@ function animateCamera(options: AnimateCameraOptions): void {
       ],
       viewUp,
       focalPoint,
-      viewAngle,
     });
     onUpdate();
     if (progress < 1) {

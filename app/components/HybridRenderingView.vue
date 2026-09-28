@@ -103,7 +103,7 @@ async function handleClick(event: PointerEvent): Promise<void> {
         :y="quickColormap.y"
         :data-id="quickColormap.data_id"
       />
-      <ZoomBoxOverlay />
+      <ZoomBoxOverlay v-if="hybridViewerStore.is_zoom_box_active" />
       <ViewToolbar />
       <slot name="ui"></slot>
       <HybridViewerTooltip :container-width="elementWidth" :container-height="elementHeight" />

@@ -15,6 +15,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 const hybridViewerStore = useHybridViewerStore();
 const viewerStore = useViewerStore();
+const { is_picking, is_zoom_box_active } = storeToRefs(hybridViewerStore);
 const showScreenshot = ref<boolean>(false);
 const showCameraManager = ref<boolean>(false);
 const showCameraOrientation = ref<boolean>(false);
@@ -67,6 +68,8 @@ function closeAllToolsExcept(toolRef: Ref<boolean>): void {
     showClippingPlanes,
     showShrinkFilter,
     showRuler,
+    is_picking,
+    is_zoom_box_active,
   ];
   for (const tool of tools) {
     if (tool !== toolRef) {
@@ -95,8 +98,7 @@ const camera_options = computed<CameraOptionAction[]>(() => [
     icon: "mdi-crosshairs-question",
     color: hybridViewerStore.is_picking ? "primary" : undefined,
     action: (): void => {
-      hybridViewerStore.is_zoom_box_active = false;
-      hybridViewerStore.is_picking = !hybridViewerStore.is_picking;
+      toggleTool(is_picking);
     },
   },
   {
@@ -105,8 +107,7 @@ const camera_options = computed<CameraOptionAction[]>(() => [
     icon: "mdi-magnify-scan",
     color: hybridViewerStore.is_zoom_box_active ? "primary" : undefined,
     action: (): void => {
-      hybridViewerStore.is_picking = false;
-      hybridViewerStore.is_zoom_box_active = !hybridViewerStore.is_zoom_box_active;
+      toggleTool(is_zoom_box_active);
     },
   },
   {

@@ -1,54 +1,84 @@
-import { degreesFromRadians, radiansFromDegrees } from "@kitware/vtk.js/Common/Core/Math";
-import { getCameraOptions, useHybridViewerCamera } from "./camera";
+import type { CameraOptions, Vector3 } from "./vtk_types";
+import {
+  applyCameraOptions,
+  centerCameraOnPosition,
+  getCameraOptions,
+  useHybridViewerCamera,
+} from "./camera";
 import { requireRenderWindow, useHybridViewerCore } from "./core";
-import type { CameraOptions } from "./vtk_types";
+import { useViewerStore } from "@ogw_front/stores/viewer";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 import { newInstance as vtkCamera } from "@kitware/vtk.js/Rendering/Core/Camera";
 
 interface ZoomBox {
-  x_min: number;
-  y_min: number;
-  x_max: number;
-  y_max: number;
+  start_x: number;
+  start_y: number;
+  end_x: number;
+  end_y: number;
+}
+
+interface Viewport {
+  width: number;
+  height: number;
+}
+
+interface Point {
+  x: number;
+  y: number;
+}
+
+function viewportShapedBox(start: Point, end: Point, { width, height }: Viewport): ZoomBox {
+  const deltaX = end.x - start.x;
+  const deltaY = end.y - start.y;
+  const aspect = Math.max(width, 1) / Math.max(height, 1);
+  const boxWidth = Math.max(Math.abs(deltaX), Math.abs(deltaY) * aspect);
+  return {
+    start_x: start.x,
+    start_y: start.y,
+    end_x: start.x + (Math.sign(deltaX) || 1) * boxWidth,
+    end_y: start.y + (Math.sign(deltaY) || 1) * (boxWidth / aspect),
+  };
 }
 
 function computeZoomToBoxCamera(
   camera: CameraOptions,
   box: ZoomBox,
-  width: number,
-  height: number,
+  { width }: Viewport,
+  target: Vector3,
 ): CameraOptions {
-  const zoomCamera = vtkCamera({
-    position: [...camera.position],
-    focalPoint: [...camera.focal_point],
-    viewUp: [...camera.view_up],
-    viewAngle: camera.view_angle,
-    clippingRange: [...camera.clipping_range],
-  });
-  const halfTan = Math.tan(radiansFromDegrees(camera.view_angle / 2));
-  const tanPerPixel = (2 * halfTan) / height;
-  const horizontalTan = ((box.x_min + box.x_max) / 2 - width / 2) * tanPerPixel;
-  const verticalTan = (height / 2 - (box.y_min + box.y_max) / 2) * tanPerPixel;
-  const pitchTan = verticalTan / Math.hypot(1, horizontalTan);
-  zoomCamera.yaw(-degreesFromRadians(Math.atan(horizontalTan)));
-  zoomCamera.pitch(degreesFromRadians(Math.atan(pitchTan)));
-  zoomCamera.orthogonalizeViewUp();
-  const scale = Math.max(
-    Math.abs(box.x_max - box.x_min) / width,
-    Math.abs(box.y_max - box.y_min) / height,
-  );
-  zoomCamera.setViewAngle(2 * degreesFromRadians(Math.atan(halfTan * scale)));
+  const zoomCamera = vtkCamera();
+  applyCameraOptions(zoomCamera, camera);
+  centerCameraOnPosition(zoomCamera, target);
+  zoomCamera.dolly(width / Math.abs(box.end_x - box.start_x));
   return getCameraOptions(zoomCamera);
+}
+
+async function pickPointAtBoxCenter(box: ZoomBox, height: number): Promise<Vector3> {
+  const viewerStore = useViewerStore();
+  const schema = viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
+  const params = {
+    x: Math.round((box.start_x + box.end_x) / 2),
+    y: Math.round(height - (box.start_y + box.end_y) / 2),
+  };
+  // oxlint-disable-next-line no-unsafe-type-assertion
+  const { x, y, z } = (await viewerStore.request({ schema, params })) as {
+    x: number;
+    y: number;
+    z: number;
+  };
+  return [x, y, z];
 }
 
 const useHybridViewerZoomBox = createSharedComposable(() => {
   const is_zoom_box_active = ref(false);
 
-  function zoomToBox(box: ZoomBox, width: number, height: number): void {
+  async function zoomToBox(box: ZoomBox, viewport: Viewport): Promise<void> {
+    is_zoom_box_active.value = false;
+    const target = await pickPointAtBoxCenter(box, viewport.height);
     const { genericRenderWindow } = useHybridViewerCore();
     const { setCamera } = useHybridViewerCamera();
     const camera = requireRenderWindow(genericRenderWindow).getRenderer().getActiveCamera();
-    setCamera(computeZoomToBoxCamera(getCameraOptions(camera), box, width, height));
-    is_zoom_box_active.value = false;
+    setCamera(computeZoomToBoxCamera(getCameraOptions(camera), box, viewport, target));
   }
 
   return {
@@ -57,5 +87,5 @@ const useHybridViewerZoomBox = createSharedComposable(() => {
   };
 });
 
-export { computeZoomToBoxCamera, useHybridViewerZoomBox };
+export { computeZoomToBoxCamera, useHybridViewerZoomBox, viewportShapedBox };
 export type { ZoomBox };

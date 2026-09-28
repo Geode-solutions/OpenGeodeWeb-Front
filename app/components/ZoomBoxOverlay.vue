@@ -1,87 +1,45 @@
 <script setup lang="ts">
-import type { ZoomBox } from "@ogw_internal/stores/hybrid_viewer/zoom_box";
+import { type ZoomBox, viewportShapedBox } from "@ogw_internal/stores/hybrid_viewer/zoom_box";
+import type { Position } from "@vueuse/core";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 const MIN_ZOOM_BOX_PIXELS = 5;
 
 const hybridViewerStore = useHybridViewerStore();
 const overlay = useTemplateRef<HTMLDivElement>("overlay");
-const box = ref<ZoomBox | undefined>(undefined);
+const { left, top, width, height } = useElementBounding(overlay);
+const viewport = computed(() => ({ width: width.value, height: height.value }));
 
-const rectangle_style = computed(() => {
-  if (!box.value) {
-    return undefined;
-  }
-  const { x_min, y_min, x_max, y_max } = box.value;
-  return {
-    left: `${Math.min(x_min, x_max)}px`,
-    top: `${Math.min(y_min, y_max)}px`,
-    width: `${Math.abs(x_max - x_min)}px`,
-    height: `${Math.abs(y_max - y_min)}px`,
-  };
+function draggedBox(start: Position, end: Position): ZoomBox {
+  return viewportShapedBox(
+    { x: start.x - left.value, y: start.y - top.value },
+    { x: end.x - left.value, y: end.y - top.value },
+    viewport.value,
+  );
+}
+
+const { isSwiping, posStart, posEnd } = usePointerSwipe(overlay, {
+  threshold: MIN_ZOOM_BOX_PIXELS,
+  disableTextSelect: true,
+  onSwipeEnd: async () => {
+    await hybridViewerStore.zoomToBox(draggedBox(posStart, posEnd), viewport.value);
+  },
 });
 
-function overlaySize(): { width: number; height: number } {
-  const rect = overlay.value?.getBoundingClientRect();
-  return { width: rect?.width ?? 0, height: rect?.height ?? 0 };
-}
-
-function localPosition(event: PointerEvent): { x: number; y: number } {
-  const rect = overlay.value?.getBoundingClientRect();
-  return { x: event.clientX - (rect?.left ?? 0), y: event.clientY - (rect?.top ?? 0) };
-}
-
-function onPointerDown(event: PointerEvent): void {
-  if (event.button !== 0) {
-    return;
-  }
-  const { x, y } = localPosition(event);
-  box.value = { x_min: x, y_min: y, x_max: x, y_max: y };
-  overlay.value?.setPointerCapture?.(event.pointerId);
-}
-
-// Keeps the viewport aspect ratio, anchored at the drag start, so the zoomed view shows exactly what was framed.
-function onPointerMove(event: PointerEvent): void {
-  if (!box.value) {
-    return;
-  }
-  const { width, height } = overlaySize();
-  const { x, y } = localPosition(event);
-  const deltaX = x - box.value.x_min;
-  const deltaY = y - box.value.y_min;
-  const aspect = width / height;
-  const boxWidth = Math.max(Math.abs(deltaX), Math.abs(deltaY) * aspect);
-  const boxHeight = boxWidth / aspect;
-  box.value.x_max = box.value.x_min + Math.sign(deltaX || 1) * boxWidth;
-  box.value.y_max = box.value.y_min + Math.sign(deltaY || 1) * boxHeight;
-}
-
-function onPointerUp(event: PointerEvent): void {
-  if (!box.value) {
-    return;
-  }
-  onPointerMove(event);
-  overlay.value?.releasePointerCapture?.(event.pointerId);
-  const { width, height } = overlaySize();
-  if (Math.abs(box.value.x_max - box.value.x_min) >= MIN_ZOOM_BOX_PIXELS) {
-    hybridViewerStore.zoomToBox(box.value, width, height);
-  }
-  box.value = undefined;
-}
+const rectangle_style = computed(() => {
+  const { start_x, start_y, end_x, end_y } = draggedBox(posStart, posEnd);
+  return {
+    left: `${Math.min(start_x, end_x)}px`,
+    top: `${Math.min(start_y, end_y)}px`,
+    width: `${Math.abs(end_x - start_x)}px`,
+    height: `${Math.abs(end_y - start_y)}px`,
+  };
+});
 </script>
 
 <template>
-  <div
-    v-if="hybridViewerStore.is_zoom_box_active"
-    ref="overlay"
-    data-testid="zoomBoxOverlay"
-    class="zoom-box-overlay"
-    @pointerdown.stop.prevent="onPointerDown"
-    @pointermove="onPointerMove"
-    @pointerup.stop="onPointerUp"
-    @contextmenu.prevent
-  >
-    <div v-if="rectangle_style" class="zoom-box-rectangle" :style="rectangle_style" />
+  <div ref="overlay" data-testid="zoomBoxOverlay" class="zoom-box-overlay" @contextmenu.prevent>
+    <div v-if="isSwiping" class="zoom-box-rectangle" :style="rectangle_style" />
   </div>
 </template>
 
@@ -91,7 +49,6 @@ function onPointerUp(event: PointerEvent): void {
   inset: 0;
   z-index: 1;
   cursor: crosshair;
-  touch-action: none;
 }
 
 .zoom-box-rectangle {
