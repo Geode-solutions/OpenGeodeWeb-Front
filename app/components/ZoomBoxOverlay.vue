@@ -1,68 +1,72 @@
 <script setup lang="ts">
-import { constrainZoomBoxToViewport } from "@ogw_internal/stores/hybrid_viewer/zoom_box";
+import type { ZoomBox } from "@ogw_internal/stores/hybrid_viewer/zoom_box";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+
+const MIN_ZOOM_BOX_PIXELS = 5;
 
 const hybridViewerStore = useHybridViewerStore();
 const overlay = useTemplateRef<HTMLDivElement>("overlay");
-const drag_start = ref<{ x: number; y: number } | undefined>(undefined);
+const box = ref<ZoomBox | undefined>(undefined);
 
 const rectangle_style = computed(() => {
-  const box = hybridViewerStore.zoom_box;
-  if (!box) {
+  if (!box.value) {
     return undefined;
   }
+  const { x_min, y_min, x_max, y_max } = box.value;
   return {
-    left: `${Math.min(box.x_min, box.x_max)}px`,
-    top: `${Math.min(box.y_min, box.y_max)}px`,
-    width: `${Math.abs(box.x_max - box.x_min)}px`,
-    height: `${Math.abs(box.y_max - box.y_min)}px`,
+    left: `${Math.min(x_min, x_max)}px`,
+    top: `${Math.min(y_min, y_max)}px`,
+    width: `${Math.abs(x_max - x_min)}px`,
+    height: `${Math.abs(y_max - y_min)}px`,
   };
 });
 
-function localPosition(event: PointerEvent): {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-} {
-  const rect = overlay.value?.getBoundingClientRect() ?? { left: 0, top: 0, width: 0, height: 0 };
-  return {
-    x: event.clientX - rect.left,
-    y: event.clientY - rect.top,
-    width: rect.width,
-    height: rect.height,
-  };
+function overlaySize(): { width: number; height: number } {
+  const rect = overlay.value?.getBoundingClientRect();
+  return { width: rect?.width ?? 0, height: rect?.height ?? 0 };
+}
+
+function localPosition(event: PointerEvent): { x: number; y: number } {
+  const rect = overlay.value?.getBoundingClientRect();
+  return { x: event.clientX - (rect?.left ?? 0), y: event.clientY - (rect?.top ?? 0) };
 }
 
 function onPointerDown(event: PointerEvent): void {
   if (event.button !== 0) {
     return;
   }
-  const { x, y, width, height } = localPosition(event);
-  drag_start.value = { x, y };
+  const { x, y } = localPosition(event);
+  box.value = { x_min: x, y_min: y, x_max: x, y_max: y };
   overlay.value?.setPointerCapture?.(event.pointerId);
-  hybridViewerStore.setZoomBox({ x_min: x, y_min: y, x_max: x, y_max: y }, width, height);
 }
 
+// Keeps the viewport aspect ratio, anchored at the drag start, so the zoomed view shows exactly what was framed.
 function onPointerMove(event: PointerEvent): void {
-  if (!drag_start.value) {
+  if (!box.value) {
     return;
   }
-  const { x, y, width, height } = localPosition(event);
-  hybridViewerStore.setZoomBox(
-    constrainZoomBoxToViewport(drag_start.value, { x, y }, width, height),
-    width,
-    height,
-  );
+  const { width, height } = overlaySize();
+  const { x, y } = localPosition(event);
+  const deltaX = x - box.value.x_min;
+  const deltaY = y - box.value.y_min;
+  const aspect = width / height;
+  const boxWidth = Math.max(Math.abs(deltaX), Math.abs(deltaY) * aspect);
+  const boxHeight = boxWidth / aspect;
+  box.value.x_max = box.value.x_min + Math.sign(deltaX || 1) * boxWidth;
+  box.value.y_max = box.value.y_min + Math.sign(deltaY || 1) * boxHeight;
 }
 
 function onPointerUp(event: PointerEvent): void {
-  if (!drag_start.value) {
+  if (!box.value) {
     return;
   }
   onPointerMove(event);
-  drag_start.value = undefined;
   overlay.value?.releasePointerCapture?.(event.pointerId);
+  const { width, height } = overlaySize();
+  if (Math.abs(box.value.x_max - box.value.x_min) >= MIN_ZOOM_BOX_PIXELS) {
+    hybridViewerStore.zoomToBox(box.value, width, height);
+  }
+  box.value = undefined;
 }
 </script>
 
@@ -77,12 +81,7 @@ function onPointerUp(event: PointerEvent): void {
     @pointerup.stop="onPointerUp"
     @contextmenu.prevent
   >
-    <div
-      v-if="rectangle_style"
-      data-testid="zoomBoxRectangle"
-      class="zoom-box-rectangle"
-      :style="rectangle_style"
-    />
+    <div v-if="rectangle_style" class="zoom-box-rectangle" :style="rectangle_style" />
   </div>
 </template>
 

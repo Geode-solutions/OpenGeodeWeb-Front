@@ -37,10 +37,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const viewportStore = useHybridViewerViewport();
   const zoomBoxStore = useHybridViewerZoomBox();
 
-  const is_cursor_crosshair = computed(
-    () =>
-      is_picking.value || rulerStore.is_ruler_active.value || zoomBoxStore.is_zoom_box_active.value,
-  );
+  const is_cursor_crosshair = computed(() => is_picking.value || rulerStore.is_ruler_active.value);
 
   watch(is_cursor_crosshair, (value) => {
     if (!genericRenderWindow.value) {

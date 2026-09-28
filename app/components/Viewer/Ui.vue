@@ -37,7 +37,7 @@ onKeyStroke("Escape", (event) => {
     hybridViewerStore.is_picking = false;
     consumed = true;
   } else if (hybridViewerStore.is_zoom_box_active) {
-    hybridViewerStore.deactivateZoomBox();
+    hybridViewerStore.is_zoom_box_active = false;
     consumed = true;
   } else if (hybridViewerStore.is_ruler_active) {
     hybridViewerStore.deactivateRuler();
@@ -189,20 +189,9 @@ defineExpose({ get_viewer_id });
         variant="flat"
         class="pick-pulse"
         style="pointer-events: auto"
-        @click="hybridViewerStore.deactivateZoomBox()"
+        @click="hybridViewerStore.is_zoom_box_active = false"
       >
         Zoom to box &middot; Esc to stop
-        <v-divider vertical class="mx-2 my-1" opacity="0.3" />
-        <v-btn
-          data-testid="zoomBoxApplyButton"
-          variant="text"
-          size="small"
-          class="text-none"
-          :disabled="!hybridViewerStore.is_zoom_box_ready"
-          @click.stop="hybridViewerStore.applyZoomBox()"
-        >
-          Apply
-        </v-btn>
         <v-divider vertical class="mx-2 my-1" opacity="0.3" />
         <v-icon icon="mdi-close" size="small" />
       </v-chip>

@@ -95,7 +95,7 @@ const camera_options = computed<CameraOptionAction[]>(() => [
     icon: "mdi-crosshairs-question",
     color: hybridViewerStore.is_picking ? "primary" : undefined,
     action: (): void => {
-      hybridViewerStore.deactivateZoomBox();
+      hybridViewerStore.is_zoom_box_active = false;
       hybridViewerStore.is_picking = !hybridViewerStore.is_picking;
     },
   },
@@ -105,11 +105,8 @@ const camera_options = computed<CameraOptionAction[]>(() => [
     icon: "mdi-magnify-scan",
     color: hybridViewerStore.is_zoom_box_active ? "primary" : undefined,
     action: (): void => {
-      if (hybridViewerStore.is_zoom_box_active) {
-        hybridViewerStore.deactivateZoomBox();
-      } else {
-        hybridViewerStore.activateZoomBox();
-      }
+      hybridViewerStore.is_picking = false;
+      hybridViewerStore.is_zoom_box_active = !hybridViewerStore.is_zoom_box_active;
     },
   },
   {
