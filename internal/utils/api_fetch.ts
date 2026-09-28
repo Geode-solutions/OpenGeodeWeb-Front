@@ -86,7 +86,7 @@ async function api_fetch(
       request_error_function(error: unknown) {
         microservice.stop_request();
         const typedError = toFetchErrorLike(error);
-        if (!skip_feedback_error) {
+        if (skip_feedback_error !== true) {
           feedbackStore.add_error(
             typedError.code ?? 0,
             schema.$id,
@@ -95,7 +95,7 @@ async function api_fetch(
           );
         }
         if (request_error_function) {
-          request_error_function(error);
+          void request_error_function(error);
         }
       },
       response_function(data: unknown) {
@@ -108,7 +108,7 @@ async function api_fetch(
       response_error_function(response: unknown) {
         microservice.stop_request();
         const typedResponse = toFetchErrorResponseLike(response);
-        if (!skip_feedback_error) {
+        if (skip_feedback_error !== true) {
           feedbackStore.add_error(
             typedResponse.status ?? 0,
             schema.$id,
@@ -117,7 +117,7 @@ async function api_fetch(
           );
         }
         if (response_error_function) {
-          response_error_function(response);
+          void response_error_function(response);
         }
       },
       validation_error_function({ code, name, error }) {

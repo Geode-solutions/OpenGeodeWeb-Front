@@ -59,7 +59,7 @@ async function upload_file(
       typedError.stack ?? "",
     );
     if (request_error_function) {
-      request_error_function(error);
+      void request_error_function(error);
     }
   }
 
@@ -73,7 +73,7 @@ async function upload_file(
       typedResponse.description ?? "",
     );
     if (response_error_function) {
-      response_error_function(response);
+      void response_error_function(response);
     }
   }
 

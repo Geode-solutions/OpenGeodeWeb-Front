@@ -27,7 +27,7 @@ const vuetifyColor = ref({
   a: initialColor.alpha,
 });
 
-function updateInputTextFromColor(red: number, green: number, blue: number, alpha: number) {
+function updateInputTextFromColor(red: number, green: number, blue: number, alpha: number): void {
   colorInputText.value =
     disabledAlpha || currentMode.value === "rgb"
       ? `${red}, ${green}, ${blue}`
@@ -41,12 +41,12 @@ interface VuetifyColor {
   a: number;
 }
 
-function commitColorToModel() {
+function commitColorToModel(): void {
   const { r: red, g: green, b: blue, a: alpha } = vuetifyColor.value;
   model.value = { red, green, blue, alpha };
 }
 
-function onPickerUpdate(color: VuetifyColor) {
+function onPickerUpdate(color: VuetifyColor): void {
   const red = Math.round(color.r);
   const green = Math.round(color.g);
   const blue = Math.round(color.b);
@@ -59,7 +59,7 @@ function onPickerUpdate(color: VuetifyColor) {
   }
 }
 
-function toggleMode() {
+function toggleMode(): void {
   if (disabledAlpha) {
     return;
   }
@@ -68,12 +68,12 @@ function toggleMode() {
   updateInputTextFromColor(red, green, blue, alpha);
 }
 
-async function copyToClipboard() {
+async function copyToClipboard(): Promise<void> {
   const { r: red, g: green, b: blue, a: alpha } = vuetifyColor.value;
   await copy(formatColorString({ red, green, blue, alpha }, currentMode.value));
 }
 
-function parseAndApplyText(text: string) {
+function parseAndApplyText(text: string): boolean {
   const parsed = parseColorString(text);
   if (!parsed) {
     return false;
@@ -92,13 +92,13 @@ function parseAndApplyText(text: string) {
   return true;
 }
 
-function onInputPaste(event: ClipboardEvent) {
+function onInputPaste(event: ClipboardEvent): void {
   event.preventDefault();
-  const text = event.clipboardData!.getData("text/plain");
+  const text = event.clipboardData?.getData("text/plain") ?? "";
   parseAndApplyText(text);
 }
 
-function onInputCommit() {
+function onInputCommit(): void {
   if (!parseAndApplyText(colorInputText.value)) {
     const { r: red, g: green, b: blue, a: alpha } = vuetifyColor.value;
     updateInputTextFromColor(red, green, blue, alpha);

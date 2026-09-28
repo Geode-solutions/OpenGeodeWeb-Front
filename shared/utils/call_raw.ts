@@ -48,10 +48,10 @@ async function callRaw(
       return response;
     } catch (error) {
       if (request_error_function) {
-        request_error_function(error);
+        await request_error_function(error);
       }
       if (response_error_function) {
-        response_error_function(error);
+        await response_error_function(error);
       }
       throw error;
     }
