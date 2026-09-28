@@ -11,10 +11,8 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 import { newInstance as vtkCamera } from "@kitware/vtk.js/Rendering/Core/Camera";
 
 interface ZoomBox {
-  start_x: number;
-  start_y: number;
-  end_x: number;
-  end_y: number;
+  start: Position;
+  end: Position;
 }
 
 interface Viewport {
@@ -28,10 +26,11 @@ function viewportShapedBox(start: Position, end: Position, { width, height }: Vi
   const aspect = Math.max(width, 1) / Math.max(height, 1);
   const boxWidth = Math.max(Math.abs(deltaX), Math.abs(deltaY) * aspect);
   return {
-    start_x: start.x,
-    start_y: start.y,
-    end_x: start.x + (Math.sign(deltaX) || 1) * boxWidth,
-    end_y: start.y + (Math.sign(deltaY) || 1) * (boxWidth / aspect),
+    start,
+    end: {
+      x: start.x + (Math.sign(deltaX) || 1) * boxWidth,
+      y: start.y + (Math.sign(deltaY) || 1) * (boxWidth / aspect),
+    },
   };
 }
 
@@ -45,7 +44,7 @@ function computeZoomToBoxCamera(
   applyCameraOptions(zoomCamera, camera);
   centerCameraOnPosition(zoomCamera, target);
   // The box is viewport-shaped (see viewportShapedBox), so its width alone gives the zoom factor.
-  zoomCamera.dolly(width / Math.abs(box.end_x - box.start_x));
+  zoomCamera.dolly(width / Math.abs(box.end.x - box.start.x));
   return getCameraOptions(zoomCamera);
 }
 
@@ -55,14 +54,14 @@ const useHybridViewerZoomBox = createSharedComposable(() => {
   // Leaves the mode first so a second box cannot be drawn while the pick is pending. Request errors are reported by the viewer store.
   async function zoomToBox(box: ZoomBox, viewport: Viewport): Promise<void> {
     is_zoom_box_active.value = false;
-    const { x, y, z } = await useViewerStore().pick_world_position(
-      (box.start_x + box.end_x) / 2,
-      viewport.height - (box.start_y + box.end_y) / 2,
+    const target = await useViewerStore().pick_world_position(
+      (box.start.x + box.end.x) / 2,
+      viewport.height - (box.start.y + box.end.y) / 2,
     );
     const { genericRenderWindow } = useHybridViewerCore();
     const { setCamera } = useHybridViewerCamera();
     const camera = requireRenderWindow(genericRenderWindow).getRenderer().getActiveCamera();
-    setCamera(computeZoomToBoxCamera(getCameraOptions(camera), box, viewport, [x, y, z]));
+    setCamera(computeZoomToBoxCamera(getCameraOptions(camera), box, viewport, target));
   }
 
   return {

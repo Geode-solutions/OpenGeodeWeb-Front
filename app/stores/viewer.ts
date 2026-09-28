@@ -1,6 +1,7 @@
 // Third party imports
 // oxlint-disable-next-line no-unassigned-import
 import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry";
+import type { Vector3 } from "@kitware/vtk.js/types";
 import { connectImageStream } from "@kitware/vtk.js/Rendering/Misc/RemoteView";
 import { initWebSocketClient } from "@ogw_internal/utils/ws_client";
 import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json" with { type: "json" };
@@ -106,17 +107,16 @@ export const useViewerStore = defineStore(
       );
       return result;
     }
-    async function pick_world_position(
-      x: number,
-      y: number,
-    ): Promise<{ x: number; y: number; z: number }> {
+    async function pick_world_position(x: number, y: number): Promise<Vector3> {
       const schema = opengeodeweb_viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
       const response = await request({ schema, params: { x: Math.round(x), y: Math.round(y) } });
       // oxlint-disable-next-line no-unsafe-type-assertion -- response shape is defined by the get_point_position schema.
-      return response as { x: number; y: number; z: number };
+      const position = response as { x: number; y: number; z: number };
+      return [position.x, position.y, position.z];
     }
     async function set_picked_point(x: number, y: number): Promise<void> {
-      picked_point.value = await pick_world_position(x, y);
+      const [world_x, world_y, world_z] = await pick_world_position(x, y);
+      picked_point.value = { x: world_x, y: world_y, z: world_z };
     }
     async function ws_connect(): Promise<void> {
       if (status.value === Status.CONNECTED) {

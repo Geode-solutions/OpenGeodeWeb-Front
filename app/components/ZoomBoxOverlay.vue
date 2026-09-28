@@ -31,12 +31,12 @@ const { isSwiping, posStart, posEnd } = usePointerSwipe(overlay, {
 });
 
 const rectangle_style = computed(() => {
-  const { start_x, start_y, end_x, end_y } = draggedBox(posStart, posEnd);
+  const { start, end } = draggedBox(posStart, posEnd);
   return {
-    left: `${Math.min(start_x, end_x)}px`,
-    top: `${Math.min(start_y, end_y)}px`,
-    width: `${Math.abs(end_x - start_x)}px`,
-    height: `${Math.abs(end_y - start_y)}px`,
+    left: `${Math.min(start.x, end.x)}px`,
+    top: `${Math.min(start.y, end.y)}px`,
+    width: `${Math.abs(end.x - start.x)}px`,
+    height: `${Math.abs(end.y - start.y)}px`,
   };
 });
 </script>

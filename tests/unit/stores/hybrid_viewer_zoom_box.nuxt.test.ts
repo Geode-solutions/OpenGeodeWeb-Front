@@ -17,11 +17,11 @@ const DISTANCE = 100;
 const VIEW_ANGLE = 30;
 const PRECISION = 6;
 const VIEWPORT = { width: 200, height: 100 };
-const FULL_BOX = { start_x: 0, start_y: 0, end_x: 200, end_y: 100 };
-const HALF_BOX = { start_x: 100, start_y: -5, end_x: 200, end_y: 45 };
+const FULL_BOX = { start: { x: 0, y: 0 }, end: { x: 200, y: 100 } };
+const HALF_BOX = { start: { x: 100, y: -5 }, end: { x: 200, y: 45 } };
 const HALF_BOX_CENTER_X = 150;
 const HALF_BOX_CENTER_Y = 20;
-const REVERSED_HALF_BOX = { start_x: 200, start_y: 45, end_x: 100, end_y: -5 };
+const REVERSED_HALF_BOX = { start: { x: 200, y: 45 }, end: { x: 100, y: -5 } };
 const HALF = 0.5;
 const TARGET_X = 10;
 const TARGET_Y = 20;
@@ -43,9 +43,9 @@ describe("viewportShapedBox helper", () => {
   const start = { x: 10, y: 10 };
 
   test.each([
-    ["down-right", { x: 60, y: 60 }, { start_x: 10, start_y: 10, end_x: 110, end_y: 60 }],
-    ["up-left", { x: 0, y: 5 }, { start_x: 10, start_y: 10, end_x: 0, end_y: 5 }],
-    ["horizontally", { x: 50, y: 10 }, { start_x: 10, start_y: 10, end_x: 50, end_y: 30 }],
+    ["down-right", { x: 60, y: 60 }, { start: { x: 10, y: 10 }, end: { x: 110, y: 60 } }],
+    ["up-left", { x: 0, y: 5 }, { start: { x: 10, y: 10 }, end: { x: 0, y: 5 } }],
+    ["horizontally", { x: 50, y: 10 }, { start: { x: 10, y: 10 }, end: { x: 50, y: 30 } }],
   ])("grows a box dragged %s to the viewport aspect ratio", (_direction, end, expected) => {
     expect(viewportShapedBox(start, end, VIEWPORT)).toStrictEqual(expected);
   });
@@ -84,9 +84,7 @@ describe("zoomToBox", () => {
     const { genericRenderWindow } = useHybridViewerCore();
     // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     genericRenderWindow.value = renderWindow as never;
-    const pick = vi
-      .spyOn(useViewerStore(), "pick_world_position")
-      .mockResolvedValue({ x: TARGET_X, y: TARGET_Y, z: TARGET_Z });
+    const pick = vi.spyOn(useViewerStore(), "pick_world_position").mockResolvedValue(TARGET);
     const setCamera = vi.spyOn(useHybridViewerCamera(), "setCamera").mockReturnValue();
     const zoomBox = useHybridViewerZoomBox();
     zoomBox.is_zoom_box_active.value = true;

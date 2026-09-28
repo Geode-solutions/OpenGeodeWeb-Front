@@ -68,7 +68,7 @@ describe("zoom box overlay", () => {
       const zoomToBox = await mountOverlay();
       await drag(SQUARE_DRAG);
       expect(zoomToBox).toHaveBeenCalledExactlyOnceWith(
-        { start_x: 10, start_y: 10, end_x: 110, end_y: 60 },
+        { start: { x: 10, y: 10 }, end: { x: 110, y: 60 } },
         { width: WIDTH, height: HEIGHT },
       );
     },

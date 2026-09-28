@@ -27,22 +27,24 @@ function useHybridViewerRuler(): {
   const ruler_point2 = ref<number[] | undefined>(undefined);
   const ruler_distance = ref<number | undefined>(undefined);
   const ruler_awaiting_point = ref(1);
-  const ruler_previous_hover_state = ref<RulerHoverState>({ active: false, fieldType: "CELL" });
+  // Hover highlight state overridden by the snap, restored when snapping stops. Without snap the ruler leaves the hover highlight untouched.
+  let hover_state_before_snap: RulerHoverState | undefined = undefined;
 
   function updateRulerSnapHighlight(): void {
     const { is_hover_highlight, hover_highlight_field_type, clearHoverHighlight } =
       useHybridViewerHighlight();
 
     if (is_ruler_active.value && ruler_snap.value) {
-      ruler_previous_hover_state.value = {
+      hover_state_before_snap = {
         active: is_hover_highlight.value,
         fieldType: hover_highlight_field_type.value,
       };
       is_hover_highlight.value = true;
       hover_highlight_field_type.value = "POINT";
-    } else {
-      is_hover_highlight.value = ruler_previous_hover_state.value.active;
-      hover_highlight_field_type.value = ruler_previous_hover_state.value.fieldType;
+    } else if (hover_state_before_snap) {
+      is_hover_highlight.value = hover_state_before_snap.active;
+      hover_highlight_field_type.value = hover_state_before_snap.fieldType;
+      hover_state_before_snap = undefined;
       if (!is_hover_highlight.value) {
         clearHoverHighlight();
       }
@@ -87,8 +89,7 @@ function useHybridViewerRuler(): {
       };
       coords = response.attributes?.coordinates;
     } else {
-      const position = await viewerStore.pick_world_position(x, y);
-      coords = [position.x, position.y, position.z];
+      coords = await viewerStore.pick_world_position(x, y);
     }
     if (!coords) {
       return;

@@ -1,6 +1,6 @@
-import type { Vector3, ViewStreamLike } from "./vtk_types";
 import { centerCameraOnPosition, useHybridViewerCamera } from "./camera";
 import { Status } from "@ogw_front/utils/status";
+import type { ViewStreamLike } from "./vtk_types";
 import { WHEEL_TIME_OUT_MS } from "./constants";
 import { useHybridViewerCore } from "./core";
 import { useHybridViewerHighlight } from "./highlight";
@@ -51,11 +51,10 @@ async function performClickPicking(
   const { syncRemoteCamera } = useHybridViewerCamera();
   const viewerStore = useViewerStore();
   const rect = containerElement.getBoundingClientRect();
-  const { x, y, z } = await viewerStore.pick_world_position(
+  const pickedPos = await viewerStore.pick_world_position(
     event.clientX - rect.left,
     rect.height - (event.clientY - rect.top),
   );
-  const pickedPos: Vector3 = [x, y, z];
   if (!genericRenderWindow.value || !pickedPos.some((val) => val !== 0)) {
     return;
   }
