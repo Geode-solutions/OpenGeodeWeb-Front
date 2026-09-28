@@ -36,6 +36,7 @@ const targetIds = computed<string[]>(() =>
   targetAllVisible.value ? allItems.value.map((item) => item.id) : selectedDatasetIds.value,
 );
 const isAllGrid = computed<boolean>(() => areAllGrids(allItems.value, targetIds.value));
+const isSliceActive = computed<boolean>(() => isAllGrid.value && sliceEnabled.value);
 const availableDatasets = computed<{ title: string; value: string }[]>(() =>
   allItems.value.map((item) => ({
     title: item.name || item.id,
@@ -74,17 +75,18 @@ async function applyClippingPlanes(): Promise<void> {
     origin: (plane.origin || center).map(Number),
     normal: plane.normal.map(Number),
   }));
-  const isSliceActive = isAllGrid.value && sliceEnabled.value;
-
   if (targetIds.value.length > 0) {
-    await hybridViewerStore.setClippingPlanes(targetIds.value, planesData);
+    await hybridViewerStore.setClippingPlanes(
+      targetIds.value,
+      isSliceActive.value ? [] : planesData,
+    );
     const maxIndex = await hybridViewerStore.setSlice(
       targetIds.value,
       // oxlint-disable-next-line unicorn/no-null -- the slice rpc takes a null axis to remove the slice.
-      isSliceActive ? sliceAxis.value : null,
+      isSliceActive.value ? sliceAxis.value : null,
       sliceIndex.value,
     );
-    if (isSliceActive) {
+    if (isSliceActive.value) {
       sliceMaxIndex.value = maxIndex;
       sliceIndex.value = Math.min(sliceIndex.value, maxIndex);
     }
@@ -208,6 +210,7 @@ onBeforeUnmount(cleanupLocalWidget);
   >
     <v-card-text class="pa-3 max-panel-height overflow-y-auto">
       <v-sheet
+        v-show="!isSliceActive"
         ref="widgetContainer"
         height="180"
         color="transparent"
@@ -293,28 +296,30 @@ onBeforeUnmount(cleanupLocalWidget);
         <v-divider class="my-2" />
       </template>
 
-      <v-row align="center" justify="space-between" no-gutters class="mb-2">
-        <v-col class="text-caption font-weight-bold">Planes ({{ planes.length }})</v-col>
-        <v-col cols="auto">
-          <v-btn
-            data-testid="addPlaneButton"
-            size="x-small"
-            variant="tonal"
-            color="primary"
-            icon="mdi-plus"
-            @click="addPlane"
-          />
-        </v-col>
-      </v-row>
+      <template v-if="!isSliceActive">
+        <v-row align="center" justify="space-between" no-gutters class="mb-2">
+          <v-col class="text-caption font-weight-bold">Planes ({{ planes.length }})</v-col>
+          <v-col cols="auto">
+            <v-btn
+              data-testid="addPlaneButton"
+              size="x-small"
+              variant="tonal"
+              color="primary"
+              icon="mdi-plus"
+              @click="addPlane"
+            />
+          </v-col>
+        </v-row>
 
-      <ClippingPlaneCard
-        v-for="(plane, idx) in planes"
-        :key="idx"
-        :plane="plane"
-        :index="idx"
-        @remove="removePlane(idx)"
-        @flip-normal="flipNormal(plane)"
-      />
+        <ClippingPlaneCard
+          v-for="(plane, idx) in planes"
+          :key="idx"
+          :plane="plane"
+          :index="idx"
+          @remove="removePlane(idx)"
+          @flip-normal="flipNormal(plane)"
+        />
+      </template>
     </v-card-text>
 
     <template #actions>
