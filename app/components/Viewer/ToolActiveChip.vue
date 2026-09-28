@@ -2,10 +2,10 @@
 interface Props {
   label: string;
   color: string;
-  icon?: string;
+  icon: string;
 }
 
-const { label, color, icon = undefined } = defineProps<Props>();
+const { label, color, icon } = defineProps<Props>();
 
 const emit = defineEmits<{
   close: [];
