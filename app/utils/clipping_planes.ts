@@ -19,10 +19,30 @@ const NORMAL_Y = [0, 1, 0];
 const NORMAL_Z = [0, 0, 1];
 const DEFAULT_NORMALS = [NORMAL_X, NORMAL_Y, NORMAL_Z];
 const RGB_MAX_VALUE = 255;
+const GRID_TYPES = new Set([
+  "RegularGrid2D",
+  "LightRegularGrid2D",
+  "RegularGrid3D",
+  "LightRegularGrid3D",
+]);
+const SLICE_AXES = [
+  { title: "YZ", value: 0 },
+  { title: "XZ", value: 1 },
+  { title: "XY", value: 2 },
+];
+const DEFAULT_SLICE_AXIS = 2;
 
 function getPlaneCssColor(index: number): string {
   const rgb = PLANE_COLORS[index % PLANE_COLORS.length] ?? COLOR_BLUE;
   return `rgb(${rgb.map((channel) => Math.round(channel * RGB_MAX_VALUE)).join(",")})`;
+}
+
+function areAllGrids(items: { id: string; geode_object_type: string }[], ids: string[]): boolean {
+  const targetedItems = items.filter((item) => ids.includes(item.id));
+  return (
+    targetedItems.length > 0 &&
+    targetedItems.every((item) => GRID_TYPES.has(item.geode_object_type))
+  );
 }
 
 function hasPlaneChanged(
@@ -210,7 +230,10 @@ export {
   CHANGE_THRESHOLD,
   PLANE_COLORS,
   DEFAULT_NORMALS,
+  SLICE_AXES,
+  DEFAULT_SLICE_AXIS,
   getPlaneCssColor,
+  areAllGrids,
   hasPlaneChanged,
   getPlaneStyle,
   computeSceneBounds,

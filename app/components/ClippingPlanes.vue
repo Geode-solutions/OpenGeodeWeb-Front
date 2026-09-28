@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { DEBOUNCE_DELAY, DEFAULT_NORMALS } from "@ogw_front/utils/clipping_planes";
+import {
+  DEBOUNCE_DELAY,
+  DEFAULT_NORMALS,
+  DEFAULT_SLICE_AXIS,
+  SLICE_AXES,
+  areAllGrids,
+} from "@ogw_front/utils/clipping_planes";
 import ClippingPlaneCard from "@ogw_front/components/ClippingPlaneCard.vue";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import { useClippingPlanesWidget } from "@ogw_front/composables/clipping_planes_widget";
@@ -22,6 +28,14 @@ const planes = ref<{ origin?: number[]; normal: number[] }[]>([
   { origin: undefined, normal: [1, 0, 0] },
 ]);
 const allItems = dataStore.refAllItems();
+const sliceEnabled = ref<boolean>(false);
+const sliceAxis = ref<number>(DEFAULT_SLICE_AXIS);
+const sliceIndex = ref<number>(0);
+const sliceMaxIndex = ref<number>(0);
+const targetIds = computed<string[]>(() =>
+  targetAllVisible.value ? allItems.value.map((item) => item.id) : selectedDatasetIds.value,
+);
+const isAllGrid = computed<boolean>(() => areAllGrids(allItems.value, targetIds.value));
 const availableDatasets = computed<{ title: string; value: string }[]>(() =>
   allItems.value.map((item) => ({
     title: item.name || item.id,
@@ -55,18 +69,30 @@ async function applyClippingPlanes(): Promise<void> {
     return;
   }
   const center = getSceneCenter();
-  const targetIds = targetAllVisible.value ? allIds : selectedDatasetIds.value;
-  const untargetedIds = allIds.filter((id) => !targetIds.includes(id));
+  const untargetedIds = allIds.filter((id) => !targetIds.value.includes(id));
   const planesData = planes.value.map((plane) => ({
     origin: (plane.origin || center).map(Number),
     normal: plane.normal.map(Number),
   }));
+  const isSliceActive = isAllGrid.value && sliceEnabled.value;
 
-  if (targetIds.length > 0) {
-    await hybridViewerStore.setClippingPlanes(targetIds, planesData);
+  if (targetIds.value.length > 0) {
+    await hybridViewerStore.setClippingPlanes(targetIds.value, planesData);
+    const maxIndex = await hybridViewerStore.setSlice(
+      targetIds.value,
+      // oxlint-disable-next-line unicorn/no-null -- the slice rpc takes a null axis to remove the slice.
+      isSliceActive ? sliceAxis.value : null,
+      sliceIndex.value,
+    );
+    if (isSliceActive) {
+      sliceMaxIndex.value = maxIndex;
+      sliceIndex.value = Math.min(sliceIndex.value, maxIndex);
+    }
   }
   if (untargetedIds.length > 0) {
     await hybridViewerStore.setClippingPlanes(untargetedIds, []);
+    // oxlint-disable-next-line unicorn/no-null -- the slice rpc takes a null axis to remove the slice.
+    await hybridViewerStore.setSlice(untargetedIds, null, 0);
   }
 }
 
@@ -93,6 +119,9 @@ function flipNormal(plane: { normal: number[] }): void {
 async function resetClippingPlanes(): Promise<void> {
   setFromWidget(true);
   planes.value = [{ origin: undefined, normal: [1, 0, 0] }];
+  sliceEnabled.value = false;
+  sliceAxis.value = DEFAULT_SLICE_AXIS;
+  sliceIndex.value = 0;
   updateWidgetPlacement({ isReset: true });
   setFromWidget(false);
   await applyClippingPlanes();
@@ -101,6 +130,8 @@ async function resetClippingPlanes(): Promise<void> {
 async function removeClippingPlanes(): Promise<void> {
   const allIds = allItems.value.map((item) => item.id);
   await hybridViewerStore.setClippingPlanes(allIds, []);
+  // oxlint-disable-next-line unicorn/no-null -- the slice rpc takes a null axis to remove the slice.
+  await hybridViewerStore.setSlice(allIds, null, 0);
 }
 
 watch(widgetContainer, (container) => {
@@ -138,6 +169,12 @@ watch(
   },
   { deep: true },
 );
+
+watch([sliceEnabled, sliceAxis, sliceIndex], () => {
+  if (show.value) {
+    debouncedApply();
+  }
+});
 
 watch(allItems, () => {
   if (show.value) {
@@ -202,6 +239,59 @@ onBeforeUnmount(cleanupLocalWidget);
       />
 
       <v-divider class="my-2" />
+
+      <template v-if="isAllGrid">
+        <v-switch
+          v-model="sliceEnabled"
+          data-testid="sliceSwitch"
+          label="Slice"
+          color="primary"
+          density="compact"
+          hide-details
+          class="mb-2 text-caption"
+        />
+        <template v-if="sliceEnabled">
+          <v-btn-toggle
+            v-model="sliceAxis"
+            data-testid="sliceAxisToggle"
+            mandatory
+            density="compact"
+            color="primary"
+            variant="outlined"
+            divided
+            class="mb-2"
+          >
+            <v-btn
+              v-for="axis in SLICE_AXES"
+              :key="axis.value"
+              :value="axis.value"
+              size="small"
+              class="text-caption"
+            >
+              {{ axis.title }}
+            </v-btn>
+          </v-btn-toggle>
+          <div class="d-flex align-center justify-space-between mb-1">
+            <span class="text-caption font-weight-bold">Slice index</span>
+            <span class="text-caption text-primary font-weight-bold">
+              {{ sliceIndex }} / {{ sliceMaxIndex }}
+            </span>
+          </div>
+          <v-slider
+            v-model="sliceIndex"
+            data-testid="sliceIndexSlider"
+            :min="0"
+            :max="sliceMaxIndex"
+            :step="1"
+            color="primary"
+            track-color="grey-lighten-2"
+            density="compact"
+            hide-details
+            class="my-2 px-1"
+          />
+        </template>
+        <v-divider class="my-2" />
+      </template>
 
       <v-row align="center" justify="space-between" no-gutters class="mb-2">
         <v-col class="text-caption font-weight-bold">Planes ({{ planes.length }})</v-col>
