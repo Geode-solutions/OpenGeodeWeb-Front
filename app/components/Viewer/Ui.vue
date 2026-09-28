@@ -110,34 +110,40 @@ defineExpose({ get_viewer_id });
     @update:display-intermediate="handleIntermediateMenuUpdate"
   />
 
-  <ToolActiveChip
-    data-testid="pickingActiveChip"
-    :show="viewerStore.picking_mode"
-    label="Picking active — click in the viewer"
-    color="secondary"
-    icon="mdi-crosshairs-gps"
-    @close="viewerStore.toggle_picking_mode(false)"
-  />
-  <ToolActiveChip
-    data-testid="hoverHighlightChip"
-    :show="hybridViewerStore.is_hover_highlight"
-    :label="hoverHighlightLabel"
-    color="primary"
-    @close="stopHoverHighlight"
-  />
-  <ToolActiveChip
-    data-testid="rulerActiveChip"
-    :show="hybridViewerStore.is_ruler_active"
-    :label="`Ruler — click to set point ${hybridViewerStore.ruler_awaiting_point}`"
-    color="secondary"
-    icon="mdi-ruler"
-    @close="hybridViewerStore.clearRuler()"
-  />
-  <ToolActiveChip
-    data-testid="zoomBoxActiveChip"
-    :show="hybridViewerStore.is_zoom_box_active"
-    label="Zoom to box"
-    color="primary"
-    @close="hybridViewerStore.is_zoom_box_active = false"
-  />
+  <v-fade-transition group>
+    <ToolActiveChip
+      v-if="viewerStore.picking_mode"
+      key="picking"
+      data-testid="pickingActiveChip"
+      label="Picking active — click in the viewer"
+      color="secondary"
+      icon="mdi-crosshairs-gps"
+      @close="viewerStore.toggle_picking_mode(false)"
+    />
+    <ToolActiveChip
+      v-if="hybridViewerStore.is_hover_highlight"
+      key="hoverHighlight"
+      data-testid="hoverHighlightChip"
+      :label="hoverHighlightLabel"
+      color="primary"
+      @close="stopHoverHighlight"
+    />
+    <ToolActiveChip
+      v-if="hybridViewerStore.is_ruler_active"
+      key="ruler"
+      data-testid="rulerActiveChip"
+      :label="`Ruler — click to set point ${hybridViewerStore.ruler_awaiting_point}`"
+      color="secondary"
+      icon="mdi-ruler"
+      @close="hybridViewerStore.clearRuler()"
+    />
+    <ToolActiveChip
+      v-if="hybridViewerStore.is_zoom_box_active"
+      key="zoomBox"
+      data-testid="zoomBoxActiveChip"
+      label="Zoom to box"
+      color="primary"
+      @close="hybridViewerStore.is_zoom_box_active = false"
+    />
+  </v-fade-transition>
 </template>

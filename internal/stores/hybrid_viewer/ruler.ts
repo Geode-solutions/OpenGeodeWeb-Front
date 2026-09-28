@@ -87,15 +87,8 @@ function useHybridViewerRuler(): {
       };
       coords = response.attributes?.coordinates;
     } else {
-      const schema = viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
-      const params = { x: Math.round(x), y: Math.round(y) };
-      // oxlint-disable-next-line no-unsafe-type-assertion -- response shape is defined by the get_point_position schema.
-      const response = (await viewerStore.request({ schema, params })) as {
-        x: number;
-        y: number;
-        z: number;
-      };
-      coords = [response.x, response.y, response.z];
+      const position = await viewerStore.pick_world_position(x, y);
+      coords = [position.x, position.y, position.z];
     }
     if (!coords) {
       return;

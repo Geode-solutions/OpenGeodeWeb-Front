@@ -16,6 +16,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const hybridViewerStore = useHybridViewerStore();
 const viewerStore = useViewerStore();
 const { is_picking, is_zoom_box_active } = storeToRefs(hybridViewerStore);
+const { picking_mode } = storeToRefs(viewerStore);
 const showScreenshot = ref<boolean>(false);
 const showCameraManager = ref<boolean>(false);
 const showCameraOrientation = ref<boolean>(false);
@@ -70,6 +71,7 @@ function closeAllToolsExcept(toolRef: Ref<boolean>): void {
     showRuler,
     is_picking,
     is_zoom_box_active,
+    picking_mode,
   ];
   for (const tool of tools) {
     if (tool !== toolRef) {

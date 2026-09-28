@@ -6,8 +6,8 @@ import {
   useHybridViewerCamera,
 } from "./camera";
 import { requireRenderWindow, useHybridViewerCore } from "./core";
+import type { Position } from "@vueuse/core";
 import { useViewerStore } from "@ogw_front/stores/viewer";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 import { newInstance as vtkCamera } from "@kitware/vtk.js/Rendering/Core/Camera";
 
 interface ZoomBox {
@@ -22,12 +22,7 @@ interface Viewport {
   height: number;
 }
 
-interface Point {
-  x: number;
-  y: number;
-}
-
-function viewportShapedBox(start: Point, end: Point, { width, height }: Viewport): ZoomBox {
+function viewportShapedBox(start: Position, end: Position, { width, height }: Viewport): ZoomBox {
   const deltaX = end.x - start.x;
   const deltaY = end.y - start.y;
   const aspect = Math.max(width, 1) / Math.max(height, 1);
@@ -49,36 +44,25 @@ function computeZoomToBoxCamera(
   const zoomCamera = vtkCamera();
   applyCameraOptions(zoomCamera, camera);
   centerCameraOnPosition(zoomCamera, target);
+  // The box is viewport-shaped (see viewportShapedBox), so its width alone gives the zoom factor.
   zoomCamera.dolly(width / Math.abs(box.end_x - box.start_x));
   return getCameraOptions(zoomCamera);
-}
-
-async function pickPointAtBoxCenter(box: ZoomBox, height: number): Promise<Vector3> {
-  const viewerStore = useViewerStore();
-  const schema = viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
-  const params = {
-    x: Math.round((box.start_x + box.end_x) / 2),
-    y: Math.round(height - (box.start_y + box.end_y) / 2),
-  };
-  // oxlint-disable-next-line no-unsafe-type-assertion
-  const { x, y, z } = (await viewerStore.request({ schema, params })) as {
-    x: number;
-    y: number;
-    z: number;
-  };
-  return [x, y, z];
 }
 
 const useHybridViewerZoomBox = createSharedComposable(() => {
   const is_zoom_box_active = ref(false);
 
+  // Leaves the mode first so a second box cannot be drawn while the pick is pending. Request errors are reported by the viewer store.
   async function zoomToBox(box: ZoomBox, viewport: Viewport): Promise<void> {
     is_zoom_box_active.value = false;
-    const target = await pickPointAtBoxCenter(box, viewport.height);
+    const { x, y, z } = await useViewerStore().pick_world_position(
+      (box.start_x + box.end_x) / 2,
+      viewport.height - (box.start_y + box.end_y) / 2,
+    );
     const { genericRenderWindow } = useHybridViewerCore();
     const { setCamera } = useHybridViewerCamera();
     const camera = requireRenderWindow(genericRenderWindow).getRenderer().getActiveCamera();
-    setCamera(computeZoomToBoxCamera(getCameraOptions(camera), box, viewport, target));
+    setCamera(computeZoomToBoxCamera(getCameraOptions(camera), box, viewport, [x, y, z]));
   }
 
   return {

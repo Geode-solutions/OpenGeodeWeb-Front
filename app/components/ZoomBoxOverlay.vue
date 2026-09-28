@@ -22,7 +22,11 @@ const { isSwiping, posStart, posEnd } = usePointerSwipe(overlay, {
   threshold: MIN_ZOOM_BOX_PIXELS,
   disableTextSelect: true,
   onSwipeEnd: async () => {
-    await hybridViewerStore.zoomToBox(draggedBox(posStart, posEnd), viewport.value);
+    try {
+      await hybridViewerStore.zoomToBox(draggedBox(posStart, posEnd), viewport.value);
+    } catch {
+      // The viewer store already reported the failed pick request to the user.
+    }
   },
 });
 

@@ -1,5 +1,6 @@
 // Third party imports
 import { type MockInstance, afterEach, beforeAll, describe, expect, test, vi } from "vitest";
+import type { Position } from "@vueuse/core";
 import { mountSuspended } from "@nuxt/test-utils/runtime";
 import { nextTick } from "vue";
 
@@ -8,11 +9,6 @@ import ZoomBoxOverlay from "@ogw_front/components/ZoomBoxOverlay.vue";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { vuetify } from "@ogw_tests/utils";
 
-interface Point {
-  x: number;
-  y: number;
-}
-
 const WIDTH = 200;
 const HEIGHT = 100;
 const PRIMARY_BUTTON = 1;
@@ -20,11 +16,11 @@ const SECONDARY_BUTTON = 2;
 const TIMEOUT = 5000;
 const OVERLAY = '[data-testid="zoomBoxOverlay"]';
 const RECTANGLE = ".zoom-box-rectangle";
-const START: Point = { x: 10, y: 10 };
-const SQUARE_DRAG: Point = { x: 60, y: 60 };
-const TINY_DRAG: Point = { x: 12, y: 12 };
+const START: Position = { x: 10, y: 10 };
+const SQUARE_DRAG: Position = { x: 60, y: 60 };
+const TINY_DRAG: Position = { x: 12, y: 12 };
 
-function pointer(type: string, point: Point, buttons = PRIMARY_BUTTON): PointerEvent {
+function pointer(type: string, point: Position, buttons = PRIMARY_BUTTON): PointerEvent {
   return new PointerEvent(type, { clientX: point.x, clientY: point.y, buttons, bubbles: true });
 }
 
@@ -45,7 +41,7 @@ async function mountOverlay(): Promise<MockInstance> {
   return zoomToBox;
 }
 
-async function drag(target: Point, buttons = PRIMARY_BUTTON): Promise<void> {
+async function drag(target: Position, buttons = PRIMARY_BUTTON): Promise<void> {
   const overlay = getOverlay();
   overlay.dispatchEvent(pointer("pointerdown", START, buttons));
   overlay.dispatchEvent(pointer("pointermove", target, buttons));

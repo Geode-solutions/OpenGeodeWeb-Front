@@ -19,6 +19,8 @@ const PRECISION = 6;
 const VIEWPORT = { width: 200, height: 100 };
 const FULL_BOX = { start_x: 0, start_y: 0, end_x: 200, end_y: 100 };
 const HALF_BOX = { start_x: 100, start_y: -5, end_x: 200, end_y: 45 };
+const HALF_BOX_CENTER_X = 150;
+const HALF_BOX_CENTER_Y = 20;
 const REVERSED_HALF_BOX = { start_x: 200, start_y: 45, end_x: 100, end_y: -5 };
 const HALF = 0.5;
 const TARGET_X = 10;
@@ -82,8 +84,8 @@ describe("zoomToBox", () => {
     const { genericRenderWindow } = useHybridViewerCore();
     // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     genericRenderWindow.value = renderWindow as never;
-    const request = vi
-      .spyOn(useViewerStore(), "request")
+    const pick = vi
+      .spyOn(useViewerStore(), "pick_world_position")
       .mockResolvedValue({ x: TARGET_X, y: TARGET_Y, z: TARGET_Z });
     const setCamera = vi.spyOn(useHybridViewerCamera(), "setCamera").mockReturnValue();
     const zoomBox = useHybridViewerZoomBox();
@@ -92,8 +94,10 @@ describe("zoomToBox", () => {
 
     await zoomBox.zoomToBox(HALF_BOX, VIEWPORT);
 
-    expect(request).toHaveBeenCalledExactlyOnceWith(
-      expect.objectContaining({ params: { x: 150, y: 80 } }),
+    // Box center (150, 20) from the top-left corner is (150, 80) in VTK display coordinates.
+    expect(pick).toHaveBeenCalledExactlyOnceWith(
+      HALF_BOX_CENTER_X,
+      VIEWPORT.height - HALF_BOX_CENTER_Y,
     );
     expect(setCamera).toHaveBeenCalledExactlyOnceWith(expected);
     expect(zoomBox.is_zoom_box_active.value).toBe(false);

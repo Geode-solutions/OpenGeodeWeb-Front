@@ -106,27 +106,17 @@ export const useViewerStore = defineStore(
       );
       return result;
     }
-    async function set_picked_point(x: number, y: number): Promise<void> {
+    async function pick_world_position(
+      x: number,
+      y: number,
+    ): Promise<{ x: number; y: number; z: number }> {
       const schema = opengeodeweb_viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
-      const params = {
-        x: Math.round(x),
-        y: Math.round(y),
-      };
-      const response = await request({
-        schema,
-        params,
-      });
-      const {
-        x: world_x,
-        y: world_y,
-        z: world_z,
-        // oxlint-disable-next-line no-unsafe-type-assertion -- response shape is defined by the get_point_position schema.
-      } = response as { x: number; y: number; z: number };
-      picked_point.value = {
-        x: world_x,
-        y: world_y,
-        z: world_z,
-      };
+      const response = await request({ schema, params: { x: Math.round(x), y: Math.round(y) } });
+      // oxlint-disable-next-line no-unsafe-type-assertion -- response shape is defined by the get_point_position schema.
+      return response as { x: number; y: number; z: number };
+    }
+    async function set_picked_point(x: number, y: number): Promise<void> {
+      picked_point.value = await pick_world_position(x, y);
     }
     async function ws_connect(): Promise<void> {
       if (status.value === Status.CONNECTED) {
@@ -219,6 +209,7 @@ export const useViewerStore = defineStore(
       is_busy,
       toggle_picking_mode,
       set_picked_point,
+      pick_world_position,
       ws_connect,
       start_request,
       stop_request,
