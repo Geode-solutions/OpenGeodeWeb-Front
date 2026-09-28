@@ -128,7 +128,8 @@ export function useAdaptiveStyles(
     });
   }
 
-  const updateBrightness = useThrottleFn(calculateBrightness, ADAPTIVE_REFRESH_RATE);
+  // Trailing call so the last image of a burst is always sampled; otherwise the final opacity depends on image timing
+  const updateBrightness = useThrottleFn(calculateBrightness, ADAPTIVE_REFRESH_RATE, true);
 
   watch(
     [
