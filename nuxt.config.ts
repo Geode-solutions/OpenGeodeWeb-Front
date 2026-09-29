@@ -152,6 +152,7 @@ export default defineNuxtConfig({
         "@kitware/vtk.js/IO/XML/XMLPolyDataReader",
         "@kitware/vtk.js/Rendering/Core/Actor",
         "@kitware/vtk.js/Rendering/Core/AnnotatedCubeActor",
+        "@kitware/vtk.js/Rendering/Core/Camera",
         "@kitware/vtk.js/Rendering/Core/ColorTransferFunction",
         "@kitware/vtk.js/Rendering/Core/Mapper",
         "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow",

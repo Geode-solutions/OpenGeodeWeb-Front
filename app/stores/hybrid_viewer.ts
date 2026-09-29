@@ -15,6 +15,7 @@ import { useHybridViewerFilters } from "@ogw_internal/stores/hybrid_viewer/filte
 import { useHybridViewerHighlight } from "@ogw_internal/stores/hybrid_viewer/highlight";
 import { useHybridViewerRuler } from "@ogw_internal/stores/hybrid_viewer/ruler";
 import { useHybridViewerScene } from "@ogw_internal/stores/hybrid_viewer/scene";
+import { useHybridViewerZoomBox } from "@ogw_internal/stores/hybrid_viewer/zoom_box";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 
 import { Status } from "@ogw_front/utils/status";
@@ -34,6 +35,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
   const rulerStore = useHybridViewerRuler();
   const cameraStore = useHybridViewerCamera();
   const viewportStore = useHybridViewerViewport();
+  const zoomBoxStore = useHybridViewerZoomBox();
 
   const is_cursor_crosshair = computed(() => is_picking.value || rulerStore.is_ruler_active.value);
 
@@ -132,5 +134,6 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     ...highlightStore,
     ...rulerStore,
     ...cameraStore,
+    ...zoomBoxStore,
   };
 });
