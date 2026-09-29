@@ -4,11 +4,56 @@ import path from "node:path";
 
 // Third party imports
 import { defineNuxtConfig } from "nuxt/config";
+import type { Nuxt } from "nuxt/schema";
 
 // Local imports
-import package_json from "./package.json";
 
 const __dirname = import.meta.dirname;
+
+const CLOUD_API_BASE_URL = "https://europe-west9-project-98b129be-91e9-491b-8ce.cloudfunctions.net";
+const RELEASE_VERSION_REGEX = /^\d+\.\d+\.\d+$/u;
+
+// Master builds ("latest" on cloud/docker, plain semver on desktop) target the
+// Production api; next builds ("next", "x.y.z-rc.n") and local dev ("0.0.0")
+// Target api-next.
+function cloudApiUrl(version: string): string {
+  const is_master =
+    version === "latest" || (RELEASE_VERSION_REGEX.test(version) && version !== "0.0.0");
+  return `${CLOUD_API_BASE_URL}/${is_master ? "api" : "api-next"}`;
+}
+
+function isUnset(value: unknown): boolean {
+  return typeof value !== "string" || value === "";
+}
+
+function readAppPackage(root_dir: string): { name: string; version: string } {
+  const app_package: unknown = JSON.parse(
+    fs.readFileSync(path.join(root_dir, "package.json"), "utf8"),
+  );
+  if (typeof app_package !== "object" || app_package === null) {
+    return { name: "", version: "0.0.0" };
+  }
+  return {
+    name: "name" in app_package && typeof app_package.name === "string" ? app_package.name : "",
+    version:
+      "version" in app_package && typeof app_package.version === "string"
+        ? app_package.version
+        : "0.0.0",
+  };
+}
+
+// This file is also loaded as a layer, where ./package.json is the layer's own: the app's
+// Package is only reachable from a module, once nuxt.options.rootDir points at the app.
+function setAppPackageConfig(_options: unknown, nuxt: Nuxt): void {
+  const config = nuxt.options.runtimeConfig.public;
+  const { name, version } = readAppPackage(nuxt.options.rootDir);
+  if (isUnset(config.PROJECT)) {
+    config.PROJECT = name;
+  }
+  if (isUnset(config.CLOUD_API_URL)) {
+    config.CLOUD_API_URL = cloudApiUrl(version);
+  }
+}
 
 // Oxlint's type-aware linter auto-discovers each file's nearest tsconfig.json
 // By walking up directories, and any "extends" on that discovered file makes
@@ -41,7 +86,9 @@ export default defineNuxtConfig({
       COMMAND_VIEWER: "opengeodeweb-viewer",
       NUXT_ROOT_PATH: __dirname,
       MODE: process.env.MODE ?? "CLOUD",
-      PROJECT: package_json.name,
+      PROJECT: "",
+      BRANCH: process.env.NETLIFY_BRANCH ?? "next",
+      CLOUD_API_URL: process.env.CLOUD_API_URL ?? "",
     },
   },
 
@@ -49,6 +96,7 @@ export default defineNuxtConfig({
     "vuetify-nuxt-module",
     ["@pinia/nuxt", { autoImports: ["defineStore", "storeToRefs"] }],
     "@vueuse/nuxt",
+    setAppPackageConfig,
   ],
   imports: {
     scan: false,
