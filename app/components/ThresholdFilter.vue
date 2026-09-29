@@ -1,38 +1,19 @@
 <script setup lang="ts">
+import {
+  MESH_ELEMENT_KINDS,
+  MODEL_COMPONENT_KINDS,
+  getAttributeRange,
+} from "@ogw_front/utils/attributes";
 import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import ViewerOptionsAttributeRangeSelector from "@ogw_front/components/Viewer/Options/AttributeRangeSelector.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
-import { getAttributeRange } from "@ogw_front/utils/attributes";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDebounceFn } from "@vueuse/core";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 const DEBOUNCE_DELAY = 100;
-
-const MESH_ELEMENT_KINDS: Record<string, string> = {
-  EdgedCurve2D: "edge",
-  EdgedCurve3D: "edge",
-  LightRegularGrid2D: "cell",
-  LightRegularGrid3D: "cell",
-  RegularGrid2D: "cell",
-  RegularGrid3D: "cell",
-  PolygonalSurface2D: "polygon",
-  PolygonalSurface3D: "polygon",
-  TriangulatedSurface2D: "polygon",
-  TriangulatedSurface3D: "polygon",
-  HybridSolid3D: "polyhedron",
-  PolyhedralSolid3D: "polyhedron",
-  TetrahedralSolid3D: "polyhedron",
-};
-
-const MODEL_COMPONENT_KINDS: Record<string, string[]> = {
-  Corner: ["vertex"],
-  Line: ["vertex", "edge"],
-  Surface: ["vertex", "polygon"],
-  Block: ["vertex", "polyhedron"],
-};
 
 interface Props {
   escapeFunction?: () => void;
@@ -133,7 +114,8 @@ async function applyThreshold(): Promise<void> {
     !source ||
     !attributeName.value ||
     minimum.value === undefined ||
-    maximum.value === undefined
+    maximum.value === undefined ||
+    minimum.value > maximum.value
   ) {
     return;
   }
