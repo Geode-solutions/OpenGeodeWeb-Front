@@ -65,13 +65,16 @@ const {
   debouncedApply: (...args: unknown[]) => debouncedApply?.(...args),
 });
 
+function getUntargetedIds(): string[] {
+  return allItems.value.map((item) => item.id).filter((id) => !targetIds.value.includes(id));
+}
+
 async function applyClippingPlanes(): Promise<void> {
-  const allIds = allItems.value.map((item) => item.id);
-  if (allIds.length === 0) {
+  if (allItems.value.length === 0) {
     return;
   }
   const center = getSceneCenter();
-  const untargetedIds = allIds.filter((id) => !targetIds.value.includes(id));
+  const untargetedIds = getUntargetedIds();
   const planesData = planes.value.map((plane) => ({
     origin: (plane.origin || center).map(Number),
     normal: plane.normal.map(Number),
@@ -81,24 +84,40 @@ async function applyClippingPlanes(): Promise<void> {
       targetIds.value,
       isSliceActive.value ? [] : planesData,
     );
+  }
+  if (untargetedIds.length > 0) {
+    await hybridViewerStore.setClippingPlanes(untargetedIds, []);
+  }
+}
+
+async function applySlices(): Promise<void> {
+  const untargetedIds = getUntargetedIds();
+  if (targetIds.value.length > 0) {
     const maxIndices = await hybridViewerStore.setSlice(
       targetIds.value,
       isSliceActive.value ? slices.value : [],
     );
-    if (isSliceActive.value) {
+    if (isAllGrid.value) {
       sliceMaxIndices.value = maxIndices;
+    }
+    if (isSliceActive.value) {
       for (const slice of slices.value) {
         slice.index = Math.min(slice.index, maxIndices[slice.axis]);
       }
     }
   }
   if (untargetedIds.length > 0) {
-    await hybridViewerStore.setClippingPlanes(untargetedIds, []);
     await hybridViewerStore.setSlice(untargetedIds, []);
   }
 }
 
+async function applyAll(): Promise<void> {
+  await applyClippingPlanes();
+  await applySlices();
+}
+
 debouncedApply = useDebounceFn(() => applyClippingPlanes(), DEBOUNCE_DELAY);
+const debouncedApplySlices = useDebounceFn(() => applySlices(), DEBOUNCE_DELAY);
 
 function addPlane(): void {
   // Index is always in-bounds (modulo the fixed-size list); the fallbacks only
@@ -137,7 +156,7 @@ async function resetClippingPlanes(): Promise<void> {
   slices.value = [{ axis: DEFAULT_SLICE_AXIS, index: 0 }];
   updateWidgetPlacement({ isReset: true });
   setFromWidget(false);
-  await applyClippingPlanes();
+  await applyAll();
 }
 
 async function removeClippingPlanes(): Promise<void> {
@@ -167,7 +186,7 @@ watch(
 watch(show, (visible) => {
   if (visible) {
     updateWidgetPlacement({ isReset: true });
-    applyClippingPlanes();
+    applyAll();
   }
 });
 
@@ -176,17 +195,23 @@ watch(
   () => {
     if (show.value) {
       updateWidgetPlacement({ isReset: true });
-      applyClippingPlanes();
+      applyAll();
     }
   },
   { deep: true },
 );
 
+watch(sliceEnabled, () => {
+  if (show.value) {
+    applyAll();
+  }
+});
+
 watch(
-  [sliceEnabled, slices],
+  slices,
   () => {
     if (show.value) {
-      debouncedApply();
+      debouncedApplySlices();
     }
   },
   { deep: true },
@@ -195,7 +220,7 @@ watch(
 watch(allItems, () => {
   if (show.value) {
     updateWidgetPlacement({ isReset: true });
-    applyClippingPlanes();
+    applyAll();
   }
 });
 
@@ -204,7 +229,7 @@ watch(
   (actorCount) => {
     if (show.value && actorCount > 0) {
       updateWidgetPlacement({ isReset: true });
-      applyClippingPlanes();
+      applyAll();
     }
   },
 );
