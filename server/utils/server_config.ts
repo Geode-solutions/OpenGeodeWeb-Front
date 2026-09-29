@@ -3,6 +3,7 @@ import { type ServerWsRpcClient, createServerWsRpcClient } from "./ws_client.js"
 const stringStorage = new Map<string, string>();
 const booleanStorage = new Map<string, boolean>();
 const clientStorage = new Map<string, ServerWsRpcClient>();
+const extensionServerPorts = new Map<string, number>();
 
 function getAppBaseUrl(): string {
   const value = stringStorage.get("APP_BASE_URL");
@@ -60,14 +61,27 @@ async function getViewerWebSocketClient(): Promise<ServerWsRpcClient> {
   const client = await setViewerWebSocketClient(viewerBaseUrl);
   return client;
 }
+function setExtensionServerPort(extensionId: string, port: number): void {
+  extensionServerPorts.set(extensionId, port);
+}
+function getExtensionServerPort(extensionId: string): number | undefined {
+  return extensionServerPorts.get(extensionId);
+}
+function getExtensionServerPorts(): ReadonlyMap<string, number> {
+  return extensionServerPorts;
+}
+
 export {
   getAppBaseUrl,
   getBackBaseUrl,
+  getExtensionServerPort,
+  getExtensionServerPorts,
   getIsAppReady,
   getViewerBaseUrl,
   getViewerWebSocketClient,
   setAppBaseUrl,
   setBackBaseUrl,
+  setExtensionServerPort,
   setIsAppReady,
   setViewerBaseUrl,
   setViewerWebSocketClient,

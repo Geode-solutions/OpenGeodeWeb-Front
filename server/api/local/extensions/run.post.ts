@@ -20,6 +20,7 @@ import {
   readExtensionMetadata,
 } from "@geode/opengeodeweb-front/server/utils/extension.ts";
 import { extensionsConf } from "@geode/opengeodeweb-front/server/utils/app_config.ts";
+import { setExtensionServerPort } from "@geode/opengeodeweb-front/server/utils/server_config.ts";
 import { unzipFile } from "@geode/opengeodeweb-front/server/utils/server.ts";
 
 interface RunExtensionsBody {
@@ -61,6 +62,9 @@ async function runSingleExtension(
     server === undefined
       ? undefined
       : await runExtensionServer(extensionServerEntryPath(unzippedExtensionPath, server.entry));
+  if (serverPort !== undefined) {
+    setExtensionServerPort(id, serverPort);
+  }
 
   return { id, name, version, frontendContent, port, serverPort };
 }
