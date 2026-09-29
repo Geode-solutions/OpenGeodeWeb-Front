@@ -10,7 +10,7 @@ interface AttributeRange {
   max: number;
 }
 
-export function getAttributeRange(
+function getAttributeRange(
   currentAttribute: AttributeRangeSource | undefined | null,
   compIndex = 0,
 ): AttributeRange {
@@ -38,3 +38,28 @@ export function getAttributeRange(
 
   return { min, max };
 }
+
+const MESH_ELEMENT_KINDS: Record<string, string> = {
+  EdgedCurve2D: "edge",
+  EdgedCurve3D: "edge",
+  LightRegularGrid2D: "cell",
+  LightRegularGrid3D: "cell",
+  RegularGrid2D: "cell",
+  RegularGrid3D: "cell",
+  PolygonalSurface2D: "polygon",
+  PolygonalSurface3D: "polygon",
+  TriangulatedSurface2D: "polygon",
+  TriangulatedSurface3D: "polygon",
+  HybridSolid3D: "polyhedron",
+  PolyhedralSolid3D: "polyhedron",
+  TetrahedralSolid3D: "polyhedron",
+};
+
+const MODEL_COMPONENT_KINDS: Record<string, string[]> = {
+  Corner: ["vertex"],
+  Line: ["vertex", "edge"],
+  Surface: ["vertex", "polygon"],
+  Block: ["vertex", "polyhedron"],
+};
+
+export { MESH_ELEMENT_KINDS, MODEL_COMPONENT_KINDS, getAttributeRange };
