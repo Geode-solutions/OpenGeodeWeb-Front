@@ -9,6 +9,7 @@ import { Status } from "@ogw_front/utils/status";
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useCloudStore } from "@ogw_front/stores/cloud";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
+import { useInfraStore } from "@ogw_front/stores/infra";
 
 // A hand-built `$Fetch`: a mock function plus the `raw`/`native`/`create` members the real
 // `ofetch` export carries, so it satisfies the real type directly (no unsafe cast needed).
@@ -111,6 +112,8 @@ describe("cloud store", () => {
         );
         expect(cloudStore.status).toBe(Status.CONNECTED);
         expect(feedbackStore.server_error).toBe(false);
+        // Viewer/back stores build their URL from domain_name right after launch resolves.
+        expect(useInfraStore().domain_name).toBe("test.com");
       });
 
       test("failed launch - error response", async () => {

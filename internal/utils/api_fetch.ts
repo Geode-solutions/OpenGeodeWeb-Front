@@ -83,7 +83,7 @@ async function api_fetch(
       timeout,
     },
     {
-      request_error_function(error: unknown) {
+      async request_error_function(error: unknown) {
         microservice.stop_request();
         const typedError = toFetchErrorLike(error);
         if (skip_feedback_error !== true) {
@@ -95,17 +95,17 @@ async function api_fetch(
           );
         }
         if (request_error_function) {
-          void request_error_function(error);
+          await request_error_function(error);
         }
       },
-      response_function(data: unknown) {
+      async response_function(data: unknown) {
         endRequestLog(microservice, schema, requestStartingTime);
         microservice.stop_request();
         if (response_function) {
-          response_function(data);
+          await response_function(data);
         }
       },
-      response_error_function(response: unknown) {
+      async response_error_function(response: unknown) {
         microservice.stop_request();
         const typedResponse = toFetchErrorResponseLike(response);
         if (skip_feedback_error !== true) {
@@ -117,7 +117,7 @@ async function api_fetch(
           );
         }
         if (response_error_function) {
-          void response_error_function(response);
+          await response_error_function(response);
         }
       },
       validation_error_function({ code, name, error }) {
