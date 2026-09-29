@@ -3,6 +3,7 @@ import Loading from "@ogw_front/components/Loading.vue";
 import Recaptcha from "@ogw_front/components/Recaptcha.vue";
 import { Status } from "@ogw_front/utils/status";
 import { appMode } from "@ogw_shared/app_mode";
+import { cloud_url_param } from "@ogw_front/stores/cloud";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
 interface Props {
@@ -15,8 +16,9 @@ interface Props {
 const { appName, email = undefined, isUserAuthenticated = false, logo = "" } = defineProps<Props>();
 
 const infraStore = useInfraStore();
-if (infraStore.app_mode !== appMode.CLOUD) {
-  infraStore.create_backend();
+// In cloud mode, wait for the user unless the URL already points at a running service.
+if (infraStore.app_mode !== appMode.CLOUD || cloud_url_param() !== undefined) {
+  infraStore.create_backend(email);
 }
 
 function cloudCreateBackend(): Promise<void> {
