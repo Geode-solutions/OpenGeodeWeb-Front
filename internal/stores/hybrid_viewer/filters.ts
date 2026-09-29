@@ -1,3 +1,4 @@
+import type { SliceAxis } from "@ogw_front/utils/clipping_planes";
 import { useHybridViewerCore } from "./core";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
@@ -30,14 +31,16 @@ async function setShrink(ids: string[], shrink_factor: number): Promise<void> {
   });
   await remoteRender();
 }
-async function setSlice(ids: string[], axis: number | null, index: number): Promise<number> {
+async function setSlice(
+  ids: string[],
+  slices: { axis: SliceAxis; index: number }[],
+): Promise<[number, number, number]> {
   const viewerStore = useViewerStore();
   const { remoteRender } = useHybridViewerCore();
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.slice;
   const params = {
     ids,
-    axis,
-    index,
+    slices,
   };
   const response = await viewerStore.request({
     schema,
@@ -45,12 +48,15 @@ async function setSlice(ids: string[], axis: number | null, index: number): Prom
   });
   await remoteRender();
   // oxlint-disable-next-line no-unsafe-type-assertion -- response shape is defined by the slice schema.
-  return (response as { max_index: number }).max_index;
+  return (response as { max_indices: [number, number, number] }).max_indices;
 }
 function useHybridViewerFilters(): {
   setClippingPlanes: (ids: string[], planes: unknown) => Promise<void>;
   setShrink: (ids: string[], shrink_factor: number) => Promise<void>;
-  setSlice: (ids: string[], axis: number | null, index: number) => Promise<number>;
+  setSlice: (
+    ids: string[],
+    slices: { axis: SliceAxis; index: number }[],
+  ) => Promise<[number, number, number]>;
 } {
   return {
     setClippingPlanes,

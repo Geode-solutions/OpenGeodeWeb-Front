@@ -25,12 +25,14 @@ const GRID_TYPES = new Set([
   "RegularGrid3D",
   "LightRegularGrid3D",
 ]);
-const SLICE_AXES = [
+type SliceAxis = 0 | 1 | 2;
+const SLICE_AXES: { title: string; value: SliceAxis }[] = [
   { title: "YZ", value: 0 },
   { title: "XZ", value: 1 },
   { title: "XY", value: 2 },
 ];
-const DEFAULT_SLICE_AXIS = 2;
+const DEFAULT_SLICE_AXIS: SliceAxis = 2;
+const NEXT_SLICE_AXIS: Record<SliceAxis, SliceAxis> = { 2: 0, 0: 1, 1: 2 };
 
 function getPlaneCssColor(index: number): string {
   const rgb = PLANE_COLORS[index % PLANE_COLORS.length] ?? COLOR_BLUE;
@@ -232,6 +234,7 @@ export {
   DEFAULT_NORMALS,
   SLICE_AXES,
   DEFAULT_SLICE_AXIS,
+  NEXT_SLICE_AXIS,
   getPlaneCssColor,
   areAllGrids,
   hasPlaneChanged,
@@ -242,4 +245,4 @@ export {
   alignCameraToMainCamera,
 };
 
-export type { SceneBoundsInfo, MainCameraOptions };
+export type { SceneBoundsInfo, MainCameraOptions, SliceAxis };
