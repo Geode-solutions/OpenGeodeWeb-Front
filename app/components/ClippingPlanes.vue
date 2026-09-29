@@ -46,6 +46,7 @@ const availableDatasets = computed<{ title: string; value: string }[]>(() =>
 );
 const widgetContainer = useTemplateRef("widgetContainer");
 let debouncedApply: ((...args: unknown[]) => void) | undefined = undefined;
+let areSlicesApplied = false;
 
 const {
   getSceneCenter,
@@ -91,6 +92,9 @@ async function applyClippingPlanes(): Promise<void> {
 }
 
 async function applySlices(): Promise<void> {
+  if (!isAllGrid.value && !areSlicesApplied) {
+    return;
+  }
   const untargetedIds = getUntargetedIds();
   if (targetIds.value.length > 0) {
     const maxIndices = await hybridViewerStore.setSlice(
@@ -106,9 +110,10 @@ async function applySlices(): Promise<void> {
       }
     }
   }
-  if (untargetedIds.length > 0) {
+  if (areSlicesApplied && untargetedIds.length > 0) {
     await hybridViewerStore.setSlice(untargetedIds, []);
   }
+  areSlicesApplied = isSliceActive.value;
 }
 
 async function applyAll(): Promise<void> {
@@ -162,7 +167,10 @@ async function resetClippingPlanes(): Promise<void> {
 async function removeClippingPlanes(): Promise<void> {
   const allIds = allItems.value.map((item) => item.id);
   await hybridViewerStore.setClippingPlanes(allIds, []);
-  await hybridViewerStore.setSlice(allIds, []);
+  if (areSlicesApplied) {
+    await hybridViewerStore.setSlice(allIds, []);
+    areSlicesApplied = false;
+  }
 }
 
 watch(widgetContainer, (container) => {
