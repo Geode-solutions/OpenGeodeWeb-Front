@@ -55,7 +55,13 @@ export const useInfraStore = defineStore("infra", {
         this.status = Status.CREATING;
         if (this.app_mode === appMode.CLOUD) {
           const cloudStore = useCloudStore();
-          await cloudStore.start(email ?? "");
+          try {
+            await cloudStore.start(email ?? "");
+          } catch (error) {
+            // Back to the "Load the app" button so the user is not stuck on the loading screen.
+            this.status = Status.NOT_CREATED;
+            throw error;
+          }
         } else {
           const { useAppStore } = await import("@ogw_front/stores/app");
           const appStore = useAppStore();
