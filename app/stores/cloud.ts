@@ -1,8 +1,19 @@
 import { Status } from "@ogw_front/utils/status";
-import { fetchSchema } from "@ogw_shared/utils/fetch_schema";
 import { setAppBaseUrl } from "@ogw_shared/scripts";
+import { useAPIStore } from "@ogw_front/stores/api";
 
-import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json" with { type: "json" };
+const run_cloud_schema = {
+  $id: "/cloud/run",
+  methods: ["POST"],
+  type: "object",
+  properties: {
+    email: { type: "string" },
+    project: { type: "string" },
+    branch: { type: "string" },
+  },
+  required: ["email", "project", "branch"],
+  additionalProperties: false,
+};
 
 export const useCloudStore = defineStore("cloud", {
   state: () => ({
@@ -11,14 +22,15 @@ export const useCloudStore = defineStore("cloud", {
   actions: {
     async launch(email: string) {
       this.status = Status.CONNECTING;
-      const schema = opengeodeweb_front_schemas.api.serverless.run_cloud;
-      const params = { email };
+      const { PROJECT, BRANCH } = useRuntimeConfig().public;
+      const params = { email, project: PROJECT, branch: BRANCH };
       const { useAppStore } = await import("./app");
       const { useFeedbackStore } = await import("./feedback");
       const appStore = useAppStore();
       const feedbackStore = useFeedbackStore();
-      const result = await fetchSchema(
-        { schema, params },
+      const APIStore = useAPIStore();
+      const result = await APIStore.request(
+        { schema: run_cloud_schema, params },
         {
           request_error_function: () => {
             feedbackStore.$patch({ server_error: true });

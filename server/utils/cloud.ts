@@ -4,110 +4,10 @@ import fs from "node:fs";
 import path from "node:path";
 
 // Third party imports
-import type { AuthClient, OAuth2Client } from "google-auth-library";
-import { google } from "googleapis";
-import type { protos } from "@google-cloud/run";
 
 // Local imports
 
-// oxlint-disable-next-line eslint/id-length
-type CreateServiceRequest = protos.google.cloud.run.v2.ICreateServiceRequest;
-
 const LOCATIONS_DIR = "/etc/nginx/locations";
-
-async function artifactImage(parent: string, authClient: AuthClient): Promise<string> {
-  const projectName = process.env.PROJECT;
-  const registry = google.artifactregistry({
-    version: "v1",
-    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-    auth: authClient as OAuth2Client,
-  });
-  const branch = process.env.NETLIFY_BRANCH;
-  const [, projectId] = parent.split("/");
-  const repository = `${parent}/repositories/github/packages/`;
-  const name = `${repository}${projectName}/tags/${branch}`;
-  console.log({ name });
-  const response = await registry.projects.locations.repositories.packages.tags.get({
-    name,
-  });
-  console.log({ response });
-  const version = response.data.version ?? "";
-  const digest = version.split("/").pop();
-  const artifactRegistry = `europe-west9-docker.pkg.dev/${projectId}/github`;
-  const image = `${artifactRegistry}/${projectName}@${digest}`;
-  console.log("Found image for", projectName, image);
-  return image;
-}
-
-function sanitizeLabelValue(label: string): string {
-  console.log("label", label);
-  const maxLabelLength = 63;
-  return label
-    .toLowerCase()
-    .replaceAll(/[^a-z0-9_-]/gu, "_")
-    .slice(0, maxLabelLength);
-}
-
-function requestConfig(
-  parent: string,
-  image: string,
-  email: string,
-  projectName: string,
-): CreateServiceRequest {
-  const resources = {
-    limits: {
-      cpu: "2000m",
-      memory: "3Gi",
-    },
-    cpuIdle: false,
-    startupCpuBoost: true,
-  };
-  const labels = {
-    user: sanitizeLabelValue(email),
-    project: sanitizeLabelValue(projectName),
-  };
-  return {
-    parent,
-    service: {
-      ingress: "INGRESS_TRAFFIC_ALL",
-      invokerIamDisabled: true,
-      labels,
-      scaling: {
-        scalingMode: "MANUAL",
-        manualInstanceCount: 1,
-      },
-      template: {
-        labels,
-        timeout: { seconds: 3600 },
-        containers: [
-          {
-            image,
-            ports: [
-              {
-                containerPort: 80,
-              },
-            ],
-            resources,
-            env: [
-              {
-                name: "PARENT",
-                value: parent,
-              },
-            ],
-            startupProbe: {
-              httpGet: {
-                port: 80,
-                path: "/viewer/healthcheck",
-              },
-              periodSeconds: 1,
-              failureThreshold: 30,
-            },
-          },
-        ],
-      },
-    },
-  };
-}
 
 function addSupervisorProgram(
   name: string,
@@ -211,10 +111,4 @@ function removeNginxLocation(name: string): boolean {
   return true;
 }
 
-export {
-  addNginxLocation,
-  addSupervisorProgram,
-  artifactImage,
-  removeNginxLocation,
-  requestConfig,
-};
+export { addNginxLocation, addSupervisorProgram, removeNginxLocation };

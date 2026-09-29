@@ -9,6 +9,7 @@ import { Status } from "@ogw_front/utils/status";
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useCloudStore } from "@ogw_front/stores/cloud";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
+import { useInfraStore } from "@ogw_front/stores/infra";
 
 // A hand-built `$Fetch`: a mock function plus the `raw`/`native`/`create` members the real
 // `ofetch` export carries, so it satisfies the real type directly (no unsafe cast needed).
@@ -20,12 +21,17 @@ const mockedFetch = vi.mocked($fetch);
 
 // CONSTANTS
 const PROJECT = "project";
+const BRANCH = "branch";
+const CLOUD_API_URL = "https://api.example.com";
+const EMAIL = "noreply@example.com";
 const RESPONSE_OK_STATUS = 200;
 const RESPONSE_ERROR_STATUS = 500;
 
 function setupConfig(): void {
   const config = useRuntimeConfig();
   config.public.PROJECT = PROJECT;
+  config.public.BRANCH = BRANCH;
+  config.public.CLOUD_API_URL = CLOUD_API_URL;
 }
 
 // Normalizes ofetch's `MaybeArray<Hook>` option fields (a single hook or an array of hooks)
@@ -95,10 +101,19 @@ describe("cloud store", () => {
           return data;
         });
 
-        await cloudStore.launch("noreply@example.com");
+        await cloudStore.launch(EMAIL);
 
+        expect(mockedFetch).toHaveBeenCalledWith(
+          "/cloud/run",
+          expect.objectContaining({
+            baseURL: CLOUD_API_URL,
+            body: { email: EMAIL, project: PROJECT, branch: BRANCH },
+          }),
+        );
         expect(cloudStore.status).toBe(Status.CONNECTED);
         expect(feedbackStore.server_error).toBe(false);
+        // Viewer/back stores build their URL from domain_name right after launch resolves.
+        expect(useInfraStore().domain_name).toBe("test.com");
       });
 
       test("failed launch - error response", async () => {
@@ -121,9 +136,7 @@ describe("cloud store", () => {
           throw error;
         });
 
-        await expect(cloudStore.launch("noreply@example.com")).rejects.toThrow(
-          "500 Internal Server Error",
-        );
+        await expect(cloudStore.launch(EMAIL)).rejects.toThrow("500 Internal Server Error");
 
         expect(cloudStore.status).toBe(Status.NOT_CONNECTED);
         expect(feedbackStore.server_error).toBe(true);
