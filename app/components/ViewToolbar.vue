@@ -7,6 +7,7 @@ import ClippingPlanes from "@ogw_front/components/ClippingPlanes.vue";
 import Ruler from "@ogw_front/components/Ruler.vue";
 import Screenshot from "@ogw_front/components/Screenshot.vue";
 import ShrinkFilter from "@ogw_front/components/ShrinkFilter.vue";
+import ThresholdFilter from "@ogw_front/components/ThresholdFilter.vue";
 import ZScaling from "@ogw_front/components/ZScaling.vue";
 import { onKeyStroke } from "@vueuse/core";
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
@@ -23,6 +24,7 @@ const showCameraOrientation = ref<boolean>(false);
 const showZScaling = ref<boolean>(false);
 const showClippingPlanes = ref<boolean>(false);
 const showShrinkFilter = ref<boolean>(false);
+const showThresholdFilter = ref<boolean>(false);
 const showRuler = ref<boolean>(false);
 const gridScale = ref<boolean>(false);
 const zScale = ref<number>(hybridViewerStore.zScale);
@@ -73,6 +75,7 @@ function closeAllToolsExcept(toolRef: Ref<boolean>): void {
     showZScaling,
     showClippingPlanes,
     showShrinkFilter,
+    showThresholdFilter,
     showRuler,
     is_picking,
     is_zoom_box_active,
@@ -232,6 +235,15 @@ const camera_options = computed<CameraOptionAction[]>(() => [
     },
   },
   {
+    testId: "thresholdFilterButton",
+    tooltip: "Threshold Filter",
+    icon: "mdi-filter-variant",
+    color: showThresholdFilter.value ? "primary" : undefined,
+    action: (): void => {
+      toggleTool(showThresholdFilter);
+    },
+  },
+  {
     testId: "rulerButton",
     tooltip: "Ruler",
     icon: "mdi-ruler",
@@ -319,6 +331,10 @@ const camera_options = computed<CameraOptionAction[]>(() => [
   <ShrinkFilter
     v-model:show="showShrinkFilter"
     :escapeFunction="() => (showShrinkFilter = false)"
+  />
+  <ThresholdFilter
+    v-model:show="showThresholdFilter"
+    :escapeFunction="() => (showThresholdFilter = false)"
   />
   <Ruler v-model:show="showRuler" :escapeFunction="() => (showRuler = false)" />
 </template>

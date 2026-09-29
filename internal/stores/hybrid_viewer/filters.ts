@@ -50,6 +50,27 @@ async function setSlice(
   // oxlint-disable-next-line no-unsafe-type-assertion -- response shape is defined by the slice schema.
   return (response as { max_indices: [number, number, number] }).max_indices;
 }
+interface ThresholdAttribute {
+  name: string;
+  location: "point" | "cell";
+  item: number;
+  minimum: number;
+  maximum: number;
+}
+async function setThreshold(ids: string[], attribute?: ThresholdAttribute): Promise<void> {
+  const viewerStore = useViewerStore();
+  const { remoteRender } = useHybridViewerCore();
+  const schema = viewer_schemas.opengeodeweb_viewer.viewer.threshold;
+  const params = {
+    ids,
+    attribute,
+  };
+  await viewerStore.request({
+    schema,
+    params,
+  });
+  await remoteRender();
+}
 function useHybridViewerFilters(): {
   setClippingPlanes: (ids: string[], planes: unknown) => Promise<void>;
   setShrink: (ids: string[], shrink_factor: number) => Promise<void>;
@@ -57,11 +78,14 @@ function useHybridViewerFilters(): {
     ids: string[],
     slices: { axis: SliceAxis; index: number }[],
   ) => Promise<[number, number, number]>;
+  setThreshold: (ids: string[], attribute?: ThresholdAttribute) => Promise<void>;
 } {
   return {
     setClippingPlanes,
     setShrink,
     setSlice,
+    setThreshold,
   };
 }
 export { useHybridViewerFilters };
+export type { ThresholdAttribute };
