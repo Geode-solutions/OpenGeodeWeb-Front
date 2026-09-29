@@ -18,11 +18,24 @@ const emit = defineEmits<Emits>();
 
 <template>
   <v-card data-testid="sliceCard" variant="outlined" class="pa-2 mb-3 rounded-lg border-opacity-50">
-    <v-row align="center" justify="space-between" no-gutters class="mb-1">
-      <v-col cols="auto" class="d-flex align-center">
+    <v-row align="center" no-gutters class="mb-1">
+      <v-col cols="auto">
         <v-chip size="x-small" variant="flat" color="primary" class="font-weight-bold">
           Slice #{{ index + 1 }}
         </v-chip>
+      </v-col>
+      <v-col class="px-2">
+        <v-slider
+          v-model="slice.index"
+          data-testid="sliceIndexSlider"
+          :min="0"
+          :max="maxIndex"
+          :step="1"
+          color="primary"
+          track-color="grey-lighten-2"
+          density="compact"
+          hide-details
+        />
       </v-col>
       <v-col cols="auto">
         <v-btn
@@ -36,43 +49,31 @@ const emit = defineEmits<Emits>();
       </v-col>
     </v-row>
 
-    <v-btn-toggle
-      v-model="slice.axis"
-      data-testid="sliceAxisToggle"
-      mandatory
-      density="compact"
-      color="primary"
-      variant="outlined"
-      divided
-      class="mb-2"
-    >
-      <v-btn
-        v-for="axis in SLICE_AXES"
-        :key="axis.value"
-        :value="axis.value"
-        size="small"
-        class="text-caption"
-      >
-        {{ axis.title }}
-      </v-btn>
-    </v-btn-toggle>
-    <div class="d-flex align-center justify-space-between mb-1">
-      <span class="text-caption font-weight-bold">Slice index</span>
-      <span class="text-caption text-primary font-weight-bold">
+    <v-row align="center" justify="space-between" no-gutters>
+      <v-col cols="auto">
+        <v-btn-toggle
+          v-model="slice.axis"
+          data-testid="sliceAxisToggle"
+          mandatory
+          density="compact"
+          color="primary"
+          variant="outlined"
+          divided
+        >
+          <v-btn
+            v-for="axis in SLICE_AXES"
+            :key="axis.value"
+            :value="axis.value"
+            size="small"
+            class="text-caption"
+          >
+            {{ axis.title }}
+          </v-btn>
+        </v-btn-toggle>
+      </v-col>
+      <v-col cols="auto" class="text-caption text-primary font-weight-bold">
         {{ slice.index }} / {{ maxIndex }}
-      </span>
-    </div>
-    <v-slider
-      v-model="slice.index"
-      data-testid="sliceIndexSlider"
-      :min="0"
-      :max="maxIndex"
-      :step="1"
-      color="primary"
-      track-color="grey-lighten-2"
-      density="compact"
-      hide-details
-      class="my-2 px-1"
-    />
+      </v-col>
+    </v-row>
   </v-card>
 </template>
