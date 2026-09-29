@@ -1,7 +1,36 @@
 import { useDataStore } from "@ogw_front/stores/data";
+import { useMenuStore } from "@ogw_front/stores/menu";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
-export function useBatchStyle(): { applyBatchStyle: typeof applyBatchStyle } {
+let forcedTargets: readonly string[] | undefined = undefined;
+
+function runWithBatchTargets(targets: readonly string[], styleChange: () => void): void {
+  const previous = forcedTargets;
+  forcedTargets = targets;
+  try {
+    styleChange();
+  } finally {
+    forcedTargets = previous;
+  }
+}
+
+async function applyActionOn(
+  targets: readonly string[],
+  action: (id: string) => Promise<unknown>,
+): Promise<void> {
+  await Promise.all(
+    targets.map(async (targetId) => {
+      await action(targetId);
+    }),
+  );
+}
+
+function menuGroupTargets(id: string): string[] | undefined {
+  const { targetIds } = useMenuStore().current_meta_data;
+  return targetIds?.includes(id) ? targetIds : undefined;
+}
+
+function useBatchStyle(): { applyBatchStyle: typeof applyBatchStyle } {
   const treeviewStore = useTreeviewStore();
   const dataStore = useDataStore();
 
@@ -9,6 +38,17 @@ export function useBatchStyle(): { applyBatchStyle: typeof applyBatchStyle } {
     id: string,
     action: (id: string) => Promise<unknown>,
   ): Promise<void> {
+    if (forcedTargets !== undefined) {
+      await applyActionOn(forcedTargets, action);
+      return;
+    }
+
+    const groupTargets = menuGroupTargets(id);
+    if (groupTargets) {
+      await applyActionOn(groupTargets, action);
+      return;
+    }
+
     const isActive = treeviewStore.activeItems.includes(id);
     if (!isActive || treeviewStore.activeItems.length <= 1) {
       await action(id);
@@ -38,3 +78,5 @@ export function useBatchStyle(): { applyBatchStyle: typeof applyBatchStyle } {
 
   return { applyBatchStyle };
 }
+
+export { menuGroupTargets, runWithBatchTargets, useBatchStyle };

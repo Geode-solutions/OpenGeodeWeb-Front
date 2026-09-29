@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import FileUploader from "@ogw_front/components/FileUploader.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import { menuGroupTargets } from "@ogw_front/composables/batch_style";
 import { useBackStore } from "@ogw_front/stores/back";
 
 // Mirrors FileUploader's own (unexported) UploadFile type.
@@ -42,17 +43,28 @@ const backStore = useBackStore();
 
 function getTextureCoordinates(): void {
   const schema = back_schemas.opengeodeweb_back.texture_coordinates;
-  const params = { id };
-  backStore.request(
-    { schema, params },
-    {
-      response_function: (response: unknown) => {
-        textureCoordinates.value = (
-          response as { texture_coordinates: string[] }
-        ).texture_coordinates;
+  const targetIds = menuGroupTargets(id) ?? [id];
+  const coordinatesPerData: Record<string, string[]> = {};
+  for (const targetId of targetIds) {
+    backStore.request(
+      { schema, params: { id: targetId } },
+      {
+        response_function: (response: unknown) => {
+          coordinatesPerData[targetId] = (
+            response as { texture_coordinates: string[] }
+          ).texture_coordinates;
+          if (targetIds.every((target) => coordinatesPerData[target] !== undefined)) {
+            const [first = [], ...others] = targetIds.map(
+              (target) => coordinatesPerData[target] ?? [],
+            );
+            textureCoordinates.value = first.filter((name) =>
+              others.every((coordinates) => coordinates.includes(name)),
+            );
+          }
+        },
       },
-    },
-  );
+    );
+  }
 }
 
 onMounted(() => {

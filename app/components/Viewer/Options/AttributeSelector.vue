@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import { getAttributeRange, intersectAttributes } from "@ogw_front/utils/attributes";
+import { menuGroupTargets, runWithBatchTargets } from "@ogw_front/composables/batch_style";
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
 import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar.vue";
 import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
-import { getAttributeRange } from "@ogw_front/utils/attributes";
 import { useBackStore } from "@ogw_front/stores/back";
 
 const backStore = useBackStore();
@@ -22,6 +23,12 @@ interface Props {
 
 const { id, componentIds = undefined, schema } = defineProps<Props>();
 
+interface Emits {
+  "update:attributeColorMap": [colorMap: string];
+}
+
+const emit = defineEmits<Emits>();
+
 interface AttributeInfo {
   attribute_name: string;
   nb_items: number;
@@ -30,6 +37,9 @@ interface AttributeInfo {
 }
 
 const attributes = ref<AttributeInfo[]>([]);
+const attributesPerTarget = ref<Record<string, AttributeInfo[]>>({});
+
+const groupTargetIds = computed<string[] | undefined>(() => menuGroupTargets(id));
 
 const currentAttribute = computed<AttributeInfo | undefined>(() =>
   attributes.value.find((attr) => attr.attribute_name === attributeName.value),
@@ -103,7 +113,49 @@ function hasSelectedComponent(components: unknown): boolean {
   return Array.isArray(components) && components.length > 0;
 }
 
+function getGroupAttributes(targetIds: string[]): void {
+  for (const targetId of targetIds) {
+    backStore.request(
+      { schema, params: { id: targetId } },
+      {
+        response_function: (response: unknown) => {
+          attributesPerTarget.value[targetId] = (
+            response as { attributes: AttributeInfo[] }
+          ).attributes;
+          if (targetIds.every((target) => attributesPerTarget.value[target] !== undefined)) {
+            attributes.value = intersectAttributes(
+              targetIds.map((target) => attributesPerTarget.value[target] ?? []),
+            );
+          }
+        },
+      },
+    );
+  }
+}
+
+function initGroupAttribute(targetIds: string[], name: string, item: number): void {
+  emit("update:attributeColorMap", attributeColorMap.value ?? "batlow");
+  for (const targetId of targetIds) {
+    const attribute = attributesPerTarget.value[targetId]?.find(
+      (candidate) => candidate.attribute_name === name,
+    );
+    if (attribute) {
+      const { min, max } = getAttributeRange(
+        attribute as unknown as Parameters<typeof getAttributeRange>[0],
+        item,
+      );
+      runWithBatchTargets([targetId], () => {
+        attributeRange.value = [min, max];
+      });
+    }
+  }
+}
+
 function getAttributes(): void {
+  if (groupTargetIds.value) {
+    getGroupAttributes(groupTargetIds.value);
+    return;
+  }
   const schemaProperties = schema.properties as Record<string, unknown> | undefined;
   const requiresComponent = schemaProperties?.component_ids !== undefined;
   if (requiresComponent && !hasSelectedComponent(componentIds)) {
@@ -136,7 +188,16 @@ watch(
   },
 );
 
+watch([attributeName, attributeItem], ([name, item]) => {
+  if (groupTargetIds.value && name !== undefined) {
+    initGroupAttribute(groupTargetIds.value, name, item ?? 0);
+  }
+});
+
 watch([attributeName, attributeItem, currentAttribute], () => {
+  if (groupTargetIds.value) {
+    return;
+  }
   if (attributeColorMap.value === undefined) {
     attributeColorMap.value = "batlow";
   }
@@ -200,6 +261,7 @@ watch([attributeName, attributeItem, currentAttribute], () => {
     v-model:minimum="rangeMin"
     v-model:maximum="rangeMax"
     v-model:colorMap="attributeColorMap"
+    :hide-range="groupTargetIds !== undefined"
     @reset="resetRange"
   />
 </template>

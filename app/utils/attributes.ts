@@ -62,4 +62,29 @@ const MODEL_COMPONENT_KINDS: Record<string, string[]> = {
   Block: ["vertex", "polyhedron"],
 };
 
-export { MESH_ELEMENT_KINDS, MODEL_COMPONENT_KINDS, getAttributeRange };
+interface NamedAttribute {
+  attribute_name: string;
+  nb_items: number;
+}
+
+function intersectAttributes<TAttribute extends NamedAttribute>(
+  attributesPerData: readonly (readonly TAttribute[])[],
+): TAttribute[] {
+  const [first, ...others] = attributesPerData;
+  if (!first) {
+    return [];
+  }
+  const common: TAttribute[] = [];
+  for (const attribute of first) {
+    const matches = others.map((attributes) =>
+      attributes.find((other) => other.attribute_name === attribute.attribute_name),
+    );
+    if (matches.every((match) => match !== undefined)) {
+      const nb_items = Math.min(attribute.nb_items, ...matches.map((match) => match.nb_items));
+      common.push({ ...attribute, nb_items });
+    }
+  }
+  return common;
+}
+
+export { MESH_ELEMENT_KINDS, MODEL_COMPONENT_KINDS, getAttributeRange, intersectAttributes };

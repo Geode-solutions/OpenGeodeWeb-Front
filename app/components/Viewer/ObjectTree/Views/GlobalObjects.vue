@@ -17,8 +17,15 @@ const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 
+interface ShowMenuPayload {
+  event: MouseEvent;
+  itemId: string;
+  context_type?: "geode_object_type";
+  targetIds?: string[];
+}
+
 interface Emits {
-  "show-menu": [payload: { event: MouseEvent; itemId: string }];
+  "show-menu": [payload: ShowMenuPayload];
 }
 
 const emit = defineEmits<Emits>();
@@ -81,6 +88,21 @@ watch(
     hybridViewerStore.remoteRender();
   },
 );
+
+function showMenu(event: MouseEvent, item: TreeGroupItem): void {
+  const actualItem = item.raw || item;
+  if (!actualItem.children) {
+    emit("show-menu", { event, itemId: actualItem.id });
+    return;
+  }
+  const childIds = actualItem.children.map((child) => child.id);
+  emit("show-menu", {
+    event,
+    itemId: actualItem.id,
+    context_type: "geode_object_type",
+    targetIds: applySearchFilter(childIds) as string[],
+  });
+}
 
 function isModel(item: TreeGroupItem): boolean {
   const actualItem = item.raw || item;
@@ -190,18 +212,13 @@ function expandAll(): void {
       @update:scroll-top="treeviewStore.setScrollTop(mainView?.id ?? '', $event)"
       @hover:enter="({ item }) => handleHoverEnter({ item: item as unknown as TreeGroupItem })"
       @hover:leave="({ item }) => handleHoverLeave({ item: item as unknown as TreeGroupItem })"
-      @contextmenu="
-        emit('show-menu', {
-          event: $event.event,
-          itemId: $event.item.id as string,
-        })
-      "
+      @contextmenu="showMenu($event.event, $event.item as unknown as TreeGroupItem)"
     >
       <template #title="{ item, isLeaf }">
         <ObjectTreeItemLabel
           :item="item as unknown as DisplayItem"
           :is-leaf="isLeaf"
-          @contextmenu="emit('show-menu', { event: $event, itemId: item.id as string })"
+          @contextmenu="showMenu($event, item as unknown as TreeGroupItem)"
         />
       </template>
 
