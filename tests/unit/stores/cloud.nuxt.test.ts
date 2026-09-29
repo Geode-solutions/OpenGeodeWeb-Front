@@ -2,10 +2,11 @@
 // oxlint-disable vitest/require-mock-type-parameters
 // Third party imports
 import { $fetch, type FetchContext, type FetchResponse } from "ofetch";
-import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest";
 
 // Local imports
 import { Status } from "@ogw_front/utils/status";
+import { appMode } from "@ogw_shared/app_mode";
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useCloudStore } from "@ogw_front/stores/cloud";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
@@ -14,7 +15,11 @@ import { useInfraStore } from "@ogw_front/stores/infra";
 // A hand-built `$Fetch`: a mock function plus the `raw`/`native`/`create` members the real
 // `ofetch` export carries, so it satisfies the real type directly (no unsafe cast needed).
 vi.mock(import("ofetch"), () => ({
-  $fetch: Object.assign(vi.fn(), { raw: vi.fn(), native: vi.fn(), create: vi.fn() }),
+  $fetch: Object.assign(vi.fn(), {
+    raw: vi.fn(),
+    native: vi.fn(),
+    create: vi.fn(),
+  }),
 }));
 
 const mockedFetch = vi.mocked($fetch);
@@ -26,6 +31,12 @@ const CLOUD_API_URL = "https://api.example.com";
 const EMAIL = "noreply@example.com";
 const RESPONSE_OK_STATUS = 200;
 const RESPONSE_ERROR_STATUS = 500;
+const CLOUD_RUN_HOST = "vease-abc123.europe-west1.run.app";
+
+function setCloudUrlParam(value?: string): void {
+  const search = value === undefined ? "" : `?cloud_url=${encodeURIComponent(value)}`;
+  globalThis.history.replaceState(undefined, "", `/${search}`);
+}
 
 function setupConfig(): void {
   const config = useRuntimeConfig();
@@ -49,7 +60,9 @@ function buildFetchResponse<ResponseData>(
   responseData: ResponseData,
   status: number,
 ): FetchResponse<ResponseData> {
-  const response: FetchResponse<ResponseData> = Response.json(responseData, { status });
+  const response: FetchResponse<ResponseData> = Response.json(responseData, {
+    status,
+  });
   response._data = responseData;
   return response;
 }
@@ -121,7 +134,10 @@ describe("cloud store", () => {
         const cloudStore = useCloudStore();
         const feedbackStore = useFeedbackStore();
 
-        const error = createError({ statusCode: 500, statusMessage: "500 Internal Server Error" });
+        const error = createError({
+          statusCode: 500,
+          statusMessage: "500 Internal Server Error",
+        });
 
         mockedFetch.mockImplementation((_route, options) => {
           const onResponseErrorHooks = toHookArray(options?.onResponseError);
@@ -140,6 +156,130 @@ describe("cloud store", () => {
 
         expect(cloudStore.status).toBe(Status.NOT_CONNECTED);
         expect(feedbackStore.server_error).toBe(true);
+      });
+    });
+
+    describe("connect_existing", () => {
+      beforeEach(() => {
+        mockedFetch.mockReset();
+        useInfraStore().app_mode = appMode.CLOUD;
+      });
+
+      test("successful connect_existing", async () => {
+        const cloudStore = useCloudStore();
+        const feedbackStore = useFeedbackStore();
+
+        mockedFetch.mockImplementation(async (_route, options) => {
+          const data = {};
+          const onResponseHooks = toHookArray(options?.onResponse);
+          await Promise.all(
+            onResponseHooks.map(async (hook) => {
+              await hook(buildFetchContext(data, RESPONSE_OK_STATUS));
+            }),
+          );
+          return data;
+        });
+
+        await cloudStore.connect_existing(CLOUD_RUN_HOST);
+
+        expect(mockedFetch).toHaveBeenCalledWith(
+          "opengeodeweb_back/ping",
+          expect.objectContaining({
+            baseURL: `https://${CLOUD_RUN_HOST}:443/geode`,
+          }),
+        );
+        expect(mockedFetch).not.toHaveBeenCalledWith("/cloud/run", expect.anything());
+        expect(cloudStore.status).toBe(Status.CONNECTED);
+        expect(feedbackStore.server_error).toBe(false);
+        expect(useInfraStore().domain_name).toBe(CLOUD_RUN_HOST);
+      });
+
+      test("failed connect_existing - unreachable service", async () => {
+        const cloudStore = useCloudStore();
+        const feedbackStore = useFeedbackStore();
+        const infraStore = useInfraStore();
+        const previous_domain_name = infraStore.domain_name;
+
+        const error = createError({
+          statusCode: 500,
+          statusMessage: "500 Internal Server Error",
+        });
+        mockedFetch.mockImplementation((_route, options) => {
+          const onResponseErrorHooks = toHookArray(options?.onResponseError);
+          for (const hook of onResponseErrorHooks) {
+            void hook(
+              buildFetchContext(
+                { name: "Error", description: "500 Internal Server Error" },
+                RESPONSE_ERROR_STATUS,
+              ),
+            );
+          }
+          throw error;
+        });
+
+        await expect(cloudStore.connect_existing(CLOUD_RUN_HOST)).rejects.toThrow(
+          "500 Internal Server Error",
+        );
+
+        expect(cloudStore.status).toBe(Status.NOT_CONNECTED);
+        expect(feedbackStore.server_error).toBe(true);
+        expect(infraStore.domain_name).toBe(previous_domain_name);
+      });
+    });
+
+    describe("start", () => {
+      beforeEach(() => {
+        mockedFetch.mockReset();
+        useInfraStore().app_mode = appMode.CLOUD;
+        mockedFetch.mockImplementation(async (_route, options) => {
+          const data = { url: "test.com" };
+          const onResponseHooks = toHookArray(options?.onResponse);
+          await Promise.all(
+            onResponseHooks.map(async (hook) => {
+              await hook(buildFetchContext(data, RESPONSE_OK_STATUS));
+            }),
+          );
+          return data;
+        });
+      });
+      afterEach(() => {
+        setCloudUrlParam();
+      });
+
+      test("without cloud_url launches a new service", async () => {
+        setupConfig();
+        setCloudUrlParam();
+        await useCloudStore().start(EMAIL);
+
+        expect(mockedFetch).toHaveBeenCalledWith("/cloud/run", expect.anything());
+        expect(useInfraStore().domain_name).toBe("test.com");
+      });
+
+      test("with cloud_url connects to the existing service", async () => {
+        setupConfig();
+        setCloudUrlParam(CLOUD_RUN_HOST);
+        await useCloudStore().start(EMAIL);
+
+        expect(mockedFetch).not.toHaveBeenCalledWith("/cloud/run", expect.anything());
+        expect(mockedFetch).toHaveBeenCalledWith("opengeodeweb_back/ping", expect.anything());
+        expect(useInfraStore().domain_name).toBe(CLOUD_RUN_HOST);
+        expect(globalThis.location.search).toBe("");
+      });
+
+      test("failed cloud_url is cleared so a retry launches a new service", async () => {
+        setupConfig();
+        setCloudUrlParam(CLOUD_RUN_HOST);
+        const cloudStore = useCloudStore();
+        mockedFetch.mockRejectedValueOnce(new Error("unreachable"));
+
+        await expect(cloudStore.start(EMAIL)).rejects.toThrow("unreachable");
+        expect(globalThis.location.search).toBe("");
+
+        mockedFetch.mockClear();
+        await cloudStore.start(EMAIL);
+        expect(mockedFetch).toHaveBeenCalledWith("/cloud/run", expect.anything());
+        expect(mockedFetch).not.toHaveBeenCalledWith("opengeodeweb_back/ping", expect.anything());
+        expect(useInfraStore().domain_name).toBe("test.com");
       });
     });
 

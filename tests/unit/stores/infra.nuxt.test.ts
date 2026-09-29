@@ -271,5 +271,15 @@ describe("infra store", () => {
       expect(backStore.status).toBe(Status.NOT_CONNECTED);
       expect(viewerStore.status).toBe(Status.NOT_CONNECTED);
     });
+
+    test("cloud start failure resets status", async () => {
+      const infraStore = useInfraStore();
+
+      infraStore.app_mode = appMode.CLOUD;
+      vi.mocked($fetch).mockRejectedValue(new Error("unreachable"));
+
+      await expect(infraStore.create_backend("noreply@example.com")).rejects.toThrow("unreachable");
+      expect(infraStore.status).toBe(Status.NOT_CREATED);
+    });
   });
 });

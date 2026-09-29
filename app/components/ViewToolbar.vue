@@ -7,6 +7,7 @@ import ClippingPlanes from "@ogw_front/components/ClippingPlanes.vue";
 import Ruler from "@ogw_front/components/Ruler.vue";
 import Screenshot from "@ogw_front/components/Screenshot.vue";
 import ShrinkFilter from "@ogw_front/components/ShrinkFilter.vue";
+import ThresholdFilter from "@ogw_front/components/ThresholdFilter.vue";
 import ZScaling from "@ogw_front/components/ZScaling.vue";
 import { onKeyStroke } from "@vueuse/core";
 import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
@@ -15,12 +16,15 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 const hybridViewerStore = useHybridViewerStore();
 const viewerStore = useViewerStore();
+const { is_picking, is_zoom_box_active } = storeToRefs(hybridViewerStore);
+const { picking_mode } = storeToRefs(viewerStore);
 const showScreenshot = ref<boolean>(false);
 const showCameraManager = ref<boolean>(false);
 const showCameraOrientation = ref<boolean>(false);
 const showZScaling = ref<boolean>(false);
 const showClippingPlanes = ref<boolean>(false);
 const showShrinkFilter = ref<boolean>(false);
+const showThresholdFilter = ref<boolean>(false);
 const showRuler = ref<boolean>(false);
 const gridScale = ref<boolean>(false);
 const zScale = ref<number>(hybridViewerStore.zScale);
@@ -58,6 +62,11 @@ onKeyStroke("Escape", () => {
   }
 });
 
+function stopHoverHighlight(): void {
+  hybridViewerStore.is_hover_highlight = false;
+  hybridViewerStore.clearHoverHighlight();
+}
+
 function closeAllToolsExcept(toolRef: Ref<boolean>): void {
   const tools = [
     showCameraOrientation,
@@ -66,18 +75,38 @@ function closeAllToolsExcept(toolRef: Ref<boolean>): void {
     showZScaling,
     showClippingPlanes,
     showShrinkFilter,
+    showThresholdFilter,
     showRuler,
+    is_picking,
+    is_zoom_box_active,
+    picking_mode,
   ];
   for (const tool of tools) {
     if (tool !== toolRef) {
       tool.value = false;
     }
   }
+  if (toolRef !== showRuler) {
+    void nextTick(stopHoverHighlight);
+  }
 }
 
 function toggleTool(toolRef: Ref<boolean>): void {
   closeAllToolsExcept(toolRef);
   toolRef.value = !toolRef.value;
+}
+
+function toggleHoverHighlight(fieldType: string): void {
+  const activate =
+    !hybridViewerStore.is_hover_highlight ||
+    hybridViewerStore.hover_highlight_field_type !== fieldType;
+  closeAllToolsExcept(showRuler);
+  if (activate) {
+    hybridViewerStore.is_hover_highlight = true;
+    hybridViewerStore.hover_highlight_field_type = fieldType;
+  } else {
+    stopHoverHighlight();
+  }
 }
 
 const camera_options = computed<CameraOptionAction[]>(() => [
@@ -95,7 +124,16 @@ const camera_options = computed<CameraOptionAction[]>(() => [
     icon: "mdi-crosshairs-question",
     color: hybridViewerStore.is_picking ? "primary" : undefined,
     action: (): void => {
-      hybridViewerStore.is_picking = !hybridViewerStore.is_picking;
+      toggleTool(is_picking);
+    },
+  },
+  {
+    testId: "zoomToBoxButton",
+    tooltip: "Zoom to box",
+    icon: "mdi-magnify-scan",
+    color: hybridViewerStore.is_zoom_box_active ? "primary" : undefined,
+    action: (): void => {
+      toggleTool(is_zoom_box_active);
     },
   },
   {
@@ -103,28 +141,14 @@ const camera_options = computed<CameraOptionAction[]>(() => [
     tooltip: "Highlight on hover",
     icon: "mdi-cursor-default-click",
     color: hybridViewerStore.is_hover_highlight ? "primary" : undefined,
-    action: hybridViewerStore.is_hover_highlight
-      ? (): void => {
-          hybridViewerStore.is_hover_highlight = false;
-          hybridViewerStore.clearHoverHighlight();
-        }
-      : undefined,
+    action: hybridViewerStore.is_hover_highlight ? stopHoverHighlight : undefined,
     menu: [
       {
         title: "Cells",
         testId: "highlightOnHoverCellsButton",
         icon: "mdi-select-all",
         action: (): void => {
-          if (
-            hybridViewerStore.is_hover_highlight &&
-            hybridViewerStore.hover_highlight_field_type === "CELL"
-          ) {
-            hybridViewerStore.is_hover_highlight = false;
-            hybridViewerStore.clearHoverHighlight();
-          } else {
-            hybridViewerStore.is_hover_highlight = true;
-            hybridViewerStore.hover_highlight_field_type = "CELL";
-          }
+          toggleHoverHighlight("CELL");
         },
       },
       {
@@ -132,16 +156,7 @@ const camera_options = computed<CameraOptionAction[]>(() => [
         testId: "highlightOnHoverPointsButton",
         icon: "mdi-select-drag",
         action: (): void => {
-          if (
-            hybridViewerStore.is_hover_highlight &&
-            hybridViewerStore.hover_highlight_field_type === "POINT"
-          ) {
-            hybridViewerStore.is_hover_highlight = false;
-            hybridViewerStore.clearHoverHighlight();
-          } else {
-            hybridViewerStore.is_hover_highlight = true;
-            hybridViewerStore.hover_highlight_field_type = "POINT";
-          }
+          toggleHoverHighlight("POINT");
         },
       },
     ],
@@ -217,6 +232,15 @@ const camera_options = computed<CameraOptionAction[]>(() => [
     color: showShrinkFilter.value ? "primary" : undefined,
     action: (): void => {
       toggleTool(showShrinkFilter);
+    },
+  },
+  {
+    testId: "thresholdFilterButton",
+    tooltip: "Threshold Filter",
+    icon: "mdi-filter-variant",
+    color: showThresholdFilter.value ? "primary" : undefined,
+    action: (): void => {
+      toggleTool(showThresholdFilter);
     },
   },
   {
@@ -307,6 +331,10 @@ const camera_options = computed<CameraOptionAction[]>(() => [
   <ShrinkFilter
     v-model:show="showShrinkFilter"
     :escapeFunction="() => (showShrinkFilter = false)"
+  />
+  <ThresholdFilter
+    v-model:show="showThresholdFilter"
+    :escapeFunction="() => (showThresholdFilter = false)"
   />
   <Ruler v-model:show="showRuler" :escapeFunction="() => (showRuler = false)" />
 </template>
