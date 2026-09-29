@@ -182,11 +182,13 @@ const useHybridViewerCamera = createSharedComposable(() => {
       bumpMultiplier: 0,
       easeExponent: EASE_EXPONENT,
       onUpdate: () => {
+        renderer.resetCameraClippingRange();
         const renderWindow = requireRenderWindow(genericRenderWindow).getRenderWindow();
         renderWindow.render();
       },
       onEnd: () => {
         applyCameraOptions(camera, targetCameraOptions);
+        renderer.resetCameraClippingRange();
         const renderWindow = requireRenderWindow(genericRenderWindow).getRenderWindow();
         renderWindow.render();
         is_moving.value = false;
