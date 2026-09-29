@@ -29,12 +29,16 @@ export const useBackStore = defineStore("back", {
       return getRestApiPort(this.default_local_port);
     },
     base_url(): string {
-      const infraStore = useInfraStore();
-      let back_url = `${this.protocol}://${infraStore.domain_name}:${this.port}`;
-      if (isCloudMode()) {
-        back_url += `/geode`;
-      }
-      return back_url;
+      return this.base_url_for(useInfraStore().domain_name);
+    },
+    base_url_for(): (domain_name: string) => string {
+      return (domain_name: string) => {
+        let back_url = `${this.protocol}://${domain_name}:${this.port}`;
+        if (isCloudMode()) {
+          back_url += `/geode`;
+        }
+        return back_url;
+      };
     },
     is_busy(): boolean {
       return this.request_counter > 0;
