@@ -1,11 +1,10 @@
-import type { Vector3, ViewStreamLike } from "./vtk_types";
 import { centerCameraOnPosition, useHybridViewerCamera } from "./camera";
 import { Status } from "@ogw_front/utils/status";
+import type { ViewStreamLike } from "./vtk_types";
 import { WHEEL_TIME_OUT_MS } from "./constants";
 import { useHybridViewerCore } from "./core";
 import { useHybridViewerHighlight } from "./highlight";
 import { useViewerStore } from "@ogw_front/stores/viewer";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 type ContainerRef = Ref<{ $el: HTMLElement } | undefined>;
 
@@ -44,37 +43,26 @@ async function resize(width: number, height: number): Promise<void> {
   await remoteRender();
 }
 
-function performClickPicking(event: MouseEvent, containerElement: HTMLElement): void {
+async function performClickPicking(
+  event: MouseEvent,
+  containerElement: HTMLElement,
+): Promise<void> {
   const { genericRenderWindow } = useHybridViewerCore();
   const { syncRemoteCamera } = useHybridViewerCamera();
   const viewerStore = useViewerStore();
   const rect = containerElement.getBoundingClientRect();
-  const schema = viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
-  const params = {
-    x: Math.round(event.clientX - rect.left),
-    y: Math.round(rect.height - (event.clientY - rect.top)),
-  };
-  void viewerStore.request(
-    {
-      schema,
-      params,
-    },
-    {
-      response_function: (response: unknown) => {
-        // oxlint-disable-next-line no-unsafe-type-assertion -- response shape is defined by the get_point_position schema.
-        const { x, y, z } = response as { x: number; y: number; z: number };
-        const pickedPos: Vector3 = [x, y, z];
-        if (!genericRenderWindow.value || !pickedPos.some((val) => val !== 0)) {
-          return;
-        }
-        const renderer = genericRenderWindow.value.getRenderer();
-        const camera = renderer.getActiveCamera();
-        centerCameraOnPosition(camera, pickedPos);
-        genericRenderWindow.value.getRenderWindow().render();
-        syncRemoteCamera();
-      },
-    },
+  const pickedPos = await viewerStore.pick_world_position(
+    event.clientX - rect.left,
+    rect.height - (event.clientY - rect.top),
   );
+  if (!genericRenderWindow.value || !pickedPos.some((val) => val !== 0)) {
+    return;
+  }
+  const renderer = genericRenderWindow.value.getRenderer();
+  const camera = renderer.getActiveCamera();
+  centerCameraOnPosition(camera, pickedPos);
+  genericRenderWindow.value.getRenderWindow().render();
+  syncRemoteCamera();
 }
 
 function setContainer(container: ContainerRef | undefined): void {
@@ -114,7 +102,7 @@ function setContainer(container: ContainerRef | undefined): void {
         return;
       }
       if (event.button === 0 && is_picking.value) {
-        performClickPicking(event, containerElement);
+        void performClickPicking(event, containerElement);
         is_picking.value = false;
         return;
       }

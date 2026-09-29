@@ -9,7 +9,6 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 import ColormapQuickPicker from "@ogw_front/components/Viewer/Options/ColormapQuickPicker.vue";
 import ViewToolbar from "@ogw_front/components/ViewToolbar.vue";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 import { newInstance as vtkRemoteView } from "@kitware/vtk.js/Rendering/Misc/RemoteView";
 
 interface Props {
@@ -32,9 +31,6 @@ async function get_x_y(event: PointerEvent): Promise<void> {
   const { offsetX, offsetY, clientX, clientY } = event;
   if (viewerStore.picking_mode === true) {
     viewerStore.set_picked_point(offsetX, offsetY);
-    const schema = viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
-    const params = { x: offsetX, y: offsetY };
-    viewerStore.request({ schema, params });
   } else {
     await pickColormap(offsetX, offsetY, clientX, clientY);
   }
