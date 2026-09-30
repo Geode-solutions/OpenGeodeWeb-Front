@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { SLICE_AXES, type SliceAxis } from "@ogw_front/utils/clipping_planes";
+import { SLICE_AXES, type SliceAxis } from "@ogw_front/utils/slice";
 
 interface Props {
   slice: { axis: SliceAxis; index: number };

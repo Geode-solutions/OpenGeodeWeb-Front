@@ -1,4 +1,4 @@
-import type { SliceAxis } from "@ogw_front/utils/clipping_planes";
+import type { SliceAxis } from "@ogw_front/utils/slice";
 import { useHybridViewerCore } from "./core";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";

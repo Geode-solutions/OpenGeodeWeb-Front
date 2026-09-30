@@ -1,12 +1,11 @@
 <script setup lang="ts">
+import { DEBOUNCE_DELAY, DEFAULT_NORMALS } from "@ogw_front/utils/clipping_planes";
 import {
-  DEBOUNCE_DELAY,
-  DEFAULT_NORMALS,
   DEFAULT_SLICE_AXIS,
   NEXT_SLICE_AXIS,
   type SliceAxis,
   areAllGrids,
-} from "@ogw_front/utils/clipping_planes";
+} from "@ogw_front/utils/slice";
 import ClippingPlaneCard from "@ogw_front/components/ClippingPlaneCard.vue";
 import SliceCard from "@ogw_front/components/SliceCard.vue";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
@@ -47,6 +46,7 @@ const availableDatasets = computed<{ title: string; value: string }[]>(() =>
 const widgetContainer = useTemplateRef("widgetContainer");
 let debouncedApply: ((...args: unknown[]) => void) | undefined = undefined;
 let areSlicesApplied = false;
+let pendingSlices: Promise<void> = Promise.resolve();
 
 const {
   getSceneCenter,
@@ -91,20 +91,21 @@ async function applyClippingPlanes(): Promise<void> {
   }
 }
 
-async function applySlices(): Promise<void> {
+async function sendSlices(): Promise<void> {
   if (!isAllGrid.value && !areSlicesApplied) {
     return;
   }
+  const isActive = isSliceActive.value;
   const untargetedIds = getUntargetedIds();
   if (targetIds.value.length > 0) {
     const maxIndices = await hybridViewerStore.setSlice(
       targetIds.value,
-      isSliceActive.value ? slices.value : [],
+      isActive ? slices.value : [],
     );
     if (isAllGrid.value) {
       sliceMaxIndices.value = maxIndices;
     }
-    if (isSliceActive.value) {
+    if (isActive) {
       for (const slice of slices.value) {
         slice.index = Math.min(slice.index, maxIndices[slice.axis]);
       }
@@ -113,7 +114,20 @@ async function applySlices(): Promise<void> {
   if (areSlicesApplied && untargetedIds.length > 0) {
     await hybridViewerStore.setSlice(untargetedIds, []);
   }
-  areSlicesApplied = isSliceActive.value;
+  areSlicesApplied = isActive;
+}
+
+function queueSliceTask(task: () => Promise<void>): Promise<void> {
+  const previous = pendingSlices;
+  pendingSlices = (async (): Promise<void> => {
+    await Promise.allSettled([previous]);
+    await task();
+  })();
+  return pendingSlices;
+}
+
+function applySlices(): Promise<void> {
+  return queueSliceTask(sendSlices);
 }
 
 async function applyAll(): Promise<void> {
@@ -167,10 +181,12 @@ async function resetClippingPlanes(): Promise<void> {
 async function removeClippingPlanes(): Promise<void> {
   const allIds = allItems.value.map((item) => item.id);
   await hybridViewerStore.setClippingPlanes(allIds, []);
-  if (areSlicesApplied) {
-    await hybridViewerStore.setSlice(allIds, []);
-    areSlicesApplied = false;
-  }
+  await queueSliceTask(async () => {
+    if (areSlicesApplied) {
+      await hybridViewerStore.setSlice(allIds, []);
+      areSlicesApplied = false;
+    }
+  });
 }
 
 watch(widgetContainer, (container) => {
