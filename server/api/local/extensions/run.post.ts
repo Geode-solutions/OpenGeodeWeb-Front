@@ -28,7 +28,6 @@ interface RunExtensionsBody {
 
 export default defineEventHandler(async (event: H3Event) => {
   try {
-    consola.debug("NITRO: runExtensions", event);
     const { projectFolderPath, projectName } = await readBody<RunExtensionsBody>(event);
     const extensionsConfig = extensionsConf(projectName);
     const extensionsArray = await Promise.all(
