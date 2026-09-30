@@ -185,7 +185,6 @@ export const useTreeviewStore = defineStore("treeview", () => {
   }
 
   function removeItem(id: string): void {
-    closeView(id);
     for (let index = 0; index < items.value.length; index += 1) {
       const group = items.value[index];
       if (!group) {
@@ -203,7 +202,11 @@ export const useTreeviewStore = defineStore("treeview", () => {
     }
   }
 
-  function displayAdditionalTree(id: string, title: string | undefined, geodeObjectType: string): void {
+  function displayAdditionalTree(
+    id: string,
+    title: string | undefined,
+    geodeObjectType: string,
+  ): void {
     const index = opened_views.value.findIndex((view: ReadonlyOpenedView) => view.id === id);
     if (index !== -1) {
       closeView(id);

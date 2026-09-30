@@ -7,7 +7,7 @@ type ModelComponents = ReturnType<typeof useModelComponents>;
 type ModelCollections = ReturnType<typeof useModelCollections>;
 
 export function useModelTree(modelId: string): {
-  items: ModelComponents["items"];
+  isLoading: ComputedRef<boolean>;
   localCategories: ComputedRef<(FormattedComponentGroup | CollectionComponentGroup)[]>;
   meshCache: ModelComponents["componentsCache"];
   collectionsCache: ModelCollections["collectionsCache"];
@@ -23,12 +23,20 @@ export function useModelTree(modelId: string): {
     ...collections.localCategories.value,
   ]);
 
+  const isLoading = computed(
+    () =>
+      components.items.value === undefined ||
+      collections.items.value === undefined ||
+      components.componentsCache.value === undefined ||
+      collections.collectionsCache.value === undefined,
+  );
+
   const collectionTypes = computed(
     () => new Set(collections.localCategories.value.map((category) => category.id)),
   );
 
   return {
-    items: components.items,
+    isLoading,
     localCategories,
     meshCache: components.componentsCache,
     collectionsCache: collections.collectionsCache,

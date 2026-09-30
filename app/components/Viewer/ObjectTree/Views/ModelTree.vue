@@ -47,7 +47,7 @@ const emit = defineEmits<Emits>();
 const treeviewStore = useTreeviewStore();
 
 const {
-  items: rawItems,
+  isLoading,
   localCategories,
   meshCache,
   collectionsCache,
@@ -91,17 +91,25 @@ const visibleSelection = computed<string[]>(
   () => applySearchFilter(visibleComponents.value, []) as string[],
 );
 
+function matchesSearch(item: CollectionTreeItem, query: string): boolean {
+  return (
+    (item.title ?? "").toLowerCase().includes(query) ||
+    item.id.toLowerCase().includes(query) ||
+    (item.children ?? []).some((child) => matchesSearch(child, query))
+  );
+}
+
 function searchGroups(
   cache: Record<string, CollectionTreeItem[]> | undefined,
   query: string,
+  isCollection: boolean,
 ): CollectionTreeItem[] {
   const result: CollectionTreeItem[] = [];
-  for (const type of Object.keys(cache ?? {})) {
-    const matches = (cache?.[type] ?? []).filter(
-      (component) =>
-        (component.title ?? "").toLowerCase().includes(query) ||
-        component.id.toLowerCase().includes(query),
-    );
+  const types = Object.keys(cache ?? {}).filter(
+    (type) => collectionTypes.value.has(type) === isCollection,
+  );
+  for (const type of types) {
+    const matches = (cache?.[type] ?? []).filter((component) => matchesSearch(component, query));
     if (matches.length > 0) {
       result.push({
         id: type,
@@ -116,21 +124,27 @@ function searchGroups(
 const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
   if (search.value) {
     const query = search.value.toLowerCase();
-    return [
-      ...searchGroups(meshCache.value as Record<string, CollectionTreeItem[]> | undefined, query),
-      ...searchGroups(
-        collectionsCache.value as Record<string, CollectionTreeItem[]> | undefined,
-        query,
-      ),
-    ];
+    return sortAndFormatItems(
+      [
+        ...searchGroups(
+          meshCache.value as Record<string, CollectionTreeItem[]> | undefined,
+          query,
+          false,
+        ),
+        ...searchGroups(
+          collectionsCache.value as Record<string, CollectionTreeItem[]> | undefined,
+          query,
+          true,
+        ),
+      ],
+      sortType.value,
+    ) as unknown as CollectionTreeItem[];
   }
 
-  const meshGroups: CollectionTreeItem[] = [];
-  const collectionGroups: CollectionTreeItem[] = [];
+  const result: CollectionTreeItem[] = [];
   for (const category of filteredCategories.value) {
     const categoryId = category.id as string;
-    const target = collectionTypes.value.has(categoryId) ? collectionGroups : meshGroups;
-    target.push({
+    result.push({
       ...category,
       id: categoryId,
       children: sortAndFormatItems(
@@ -139,7 +153,7 @@ const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
       ) as unknown as CollectionTreeItem[],
     });
   }
-  return [...meshGroups, ...collectionGroups];
+  return result;
 });
 
 function extractComponentIds(node: CollectionTreeItem): string[] {
@@ -247,9 +261,10 @@ function getLeafViewerIdsForFocus(item: CollectionTreeItem): string[] {
       @expand-all="expandAll"
     />
 
-    <FetchingData v-if="rawItems === undefined" :size="48" :width="4" text="" />
+    <FetchingData v-if="isLoading" :size="48" :width="4" text="" />
 
     <CommonTreeView
+      v-else
       :selected="visibleSelection"
       v-model:opened="opened"
       v-model:active="treeviewStore.activeItems"
