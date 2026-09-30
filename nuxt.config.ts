@@ -90,7 +90,7 @@ export default defineNuxtConfig({
       BRANCH: process.env.NETLIFY_BRANCH ?? "next",
       CLOUD_API_URL: process.env.CLOUD_API_URL ?? "",
       // Runtime-only (NUXT_PUBLIC_PLAIN_LOGS=true): plain, unstyled browser logs for CI output
-      PLAIN_LOGS: "",
+      PLAIN_LOGS: false,
     },
   },
 
