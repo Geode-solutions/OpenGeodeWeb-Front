@@ -43,14 +43,16 @@ watch(
 const textureCoordinates = ref<string[]>([]);
 const backStore = useBackStore();
 
-const groupTargetIds = useBatchGroup(() => id);
+const { targetIds: groupTargetIds } = useBatchGroup(() => id);
 
 async function getTextureCoordinates(): Promise<void> {
   const schema = back_schemas.opengeodeweb_back.texture_coordinates;
   const targetIds = groupTargetIds.value ?? [id];
-  const responses = await requestForTargets<{ texture_coordinates: string[] }>(schema, targetIds);
+  const responses = await requestForTargets<{ texture_coordinates: string[] }>(schema, targetIds, {
+    texture_coordinates: [],
+  });
   textureCoordinates.value = intersectBy(
-    targetIds.map((targetId) => responses.get(targetId)?.texture_coordinates ?? []),
+    responses.map(([, response]) => response.texture_coordinates),
     (coordinate) => coordinate,
   );
 }

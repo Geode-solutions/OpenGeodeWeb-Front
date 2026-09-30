@@ -71,7 +71,7 @@ const vertex_attribute_item = computed<string | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_range = computed<BatchRange | undefined>({
+const vertex_attribute_range = computed<BatchRange>({
   get: () => dataStyleStore.meshPolyhedraVertexAttributeRange(id.value),
   set: async (newValue) => {
     await applyBatchRange(id.value, newValue, (targetId, minimum, maximum) =>
@@ -120,7 +120,7 @@ const polyhedron_attribute_item = computed<string | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
-const polyhedron_attribute_range = computed<BatchRange | undefined>({
+const polyhedron_attribute_range = computed<BatchRange>({
   get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeRange(id.value),
   set: async (newValue) => {
     await applyBatchRange(id.value, newValue, (targetId, minimum, maximum) =>

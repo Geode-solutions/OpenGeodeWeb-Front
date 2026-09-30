@@ -81,7 +81,7 @@ const vertex_attribute_item = computed<string | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_range = computed<BatchRange | undefined>({
+const vertex_attribute_range = computed<BatchRange>({
   get: () => dataStyleStore.meshEdgesVertexAttributeRange(id.value),
   set: async (newValue) => {
     await applyBatchRange(id.value, newValue, (targetId, minimum, maximum) =>
@@ -129,7 +129,7 @@ const edge_attribute_item = computed<string | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
-const edge_attribute_range = computed<BatchRange | undefined>({
+const edge_attribute_range = computed<BatchRange>({
   get: () => dataStyleStore.meshEdgesEdgeAttributeRange(id.value),
   set: async (newValue) => {
     await applyBatchRange(id.value, newValue, (targetId, minimum, maximum) =>

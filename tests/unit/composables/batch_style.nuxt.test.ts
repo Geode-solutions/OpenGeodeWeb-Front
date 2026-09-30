@@ -1,9 +1,14 @@
 // Third party imports
 import { type Mock, beforeEach, describe, expect, test, vi } from "vitest";
-import { computed, createApp } from "vue";
+import { createApp } from "vue";
 
 // Local imports
-import { BATCH_GROUP_KEY, useBatchStyle } from "@ogw_front/composables/batch_style";
+import {
+  BATCH_GROUP_KEY,
+  createBatchGroup,
+  useBatchGroup,
+  useBatchStyle,
+} from "@ogw_front/composables/batch_style";
 import { setupActivePinia } from "@ogw_tests/utils";
 
 const GROUP_IDS = ["surface_1", "surface_2", "surface_3"];
@@ -15,13 +20,15 @@ const SECOND_RANGE: [number, number] = [SECOND_MINIMUM, SECOND_MAXIMUM];
 
 type StyleAction = (id: string) => Promise<unknown>;
 
-function batchStyleIn(targetIds: string[] | undefined): ReturnType<typeof useBatchStyle> {
+function batchStyleIn(
+  targetIds: string[],
+): ReturnType<typeof useBatchStyle> & ReturnType<typeof useBatchGroup> {
   const app = createApp({});
   app.provide(
     BATCH_GROUP_KEY,
-    computed(() => targetIds),
+    createBatchGroup(() => targetIds),
   );
-  return app.runWithContext(() => useBatchStyle());
+  return app.runWithContext(() => ({ ...useBatchStyle(), ...useBatchGroup("surface_1") }));
 }
 
 function styleAction(): Mock<StyleAction> {
@@ -47,7 +54,7 @@ describe("batch style composable", () => {
   });
 
   test("applies the action only to the given data outside of a group", async () => {
-    const { applyBatchStyle } = batchStyleIn(undefined);
+    const { applyBatchStyle } = batchStyleIn([]);
     const action = styleAction();
 
     await applyBatchStyle("surface_1", action);
@@ -65,14 +72,15 @@ describe("batch style composable", () => {
   });
 
   test("applies each data of the group its own range", async () => {
-    const { applyBatchRange } = batchStyleIn(["surface_1", "surface_2"]);
+    const { applyBatchRange, withRangesPerData } = batchStyleIn(["surface_1", "surface_2"]);
     const ranges = new Map([
       ["surface_1", FIRST_RANGE],
       ["surface_2", SECOND_RANGE],
     ]);
+    const range = withRangesPerData([...FIRST_RANGE], ranges);
     const rangePerData: Record<string, [number, number]> = {};
 
-    await applyBatchRange("surface_1", ranges, (targetId, minimum, maximum) => {
+    await applyBatchRange("surface_1", range, (targetId, minimum, maximum) => {
       rangePerData[targetId] = [minimum, maximum];
     });
 

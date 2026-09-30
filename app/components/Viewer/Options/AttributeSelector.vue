@@ -16,7 +16,7 @@ const backStore = useBackStore();
 
 const attributeName = defineModel<string>("attributeName");
 const attributeItem = defineModel<number>("attributeItem");
-const attributeRange = defineModel<BatchRange>("attributeRange");
+const attributeRange = defineModel<BatchRange>("attributeRange", { default: () => [] });
 const attributeColorMap = defineModel<string>("attributeColorMap");
 const attributeNoDataColor = defineModel<typeof DEFAULT_NO_DATA_COLOR>("attributeNoDataColor");
 
@@ -44,7 +44,7 @@ interface AttributeInfo {
 const attributes = ref<AttributeInfo[]>([]);
 let attributesPerTarget = new Map<string, AttributeInfo[]>();
 
-const groupTargetIds = useBatchGroup(() => id);
+const { targetIds: groupTargetIds, withRangesPerData } = useBatchGroup(() => id);
 
 const currentAttribute = computed<AttributeInfo | undefined>(() =>
   attributes.value.find((attr) => attr.attribute_name === attributeName.value),
@@ -54,16 +54,12 @@ const cssNoDataColor = computed<string>(() => {
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 });
 const rangeMin = computed<number | undefined>({
-  get: () => {
-    const range = attributeRange.value as number[] | undefined;
-    return range ? range[0] : undefined;
-  },
+  get: () => attributeRange.value[0],
   set: (val: number | undefined) => {
     if (val === undefined) {
       return;
     }
-    const range = attributeRange.value as number[] | undefined;
-    const currentMax = range ? range[1] : undefined;
+    const [, currentMax] = attributeRange.value;
     let newMin = val;
     if (typeof currentMax === "number" && val > currentMax) {
       newMin = currentMax;
@@ -72,16 +68,12 @@ const rangeMin = computed<number | undefined>({
   },
 });
 const rangeMax = computed<number | undefined>({
-  get: () => {
-    const range = attributeRange.value as number[] | undefined;
-    return range ? range[1] : undefined;
-  },
+  get: () => attributeRange.value[1],
   set: (val: number | undefined) => {
     if (val === undefined) {
       return;
     }
-    const range = attributeRange.value as number[] | undefined;
-    const currentMin = range ? range[0] : undefined;
+    const [currentMin] = attributeRange.value;
     let newMax = val;
     if (typeof currentMin === "number" && val < currentMin) {
       newMax = currentMin;
@@ -119,9 +111,11 @@ function hasSelectedComponent(components: unknown): boolean {
 }
 
 async function getGroupAttributes(targetIds: string[]): Promise<void> {
-  const responses = await requestForTargets<{ attributes: AttributeInfo[] }>(schema, targetIds);
+  const responses = await requestForTargets<{ attributes: AttributeInfo[] }>(schema, targetIds, {
+    attributes: [],
+  });
   attributesPerTarget = new Map(
-    targetIds.map((targetId) => [targetId, responses.get(targetId)?.attributes ?? []]),
+    responses.map(([targetId, response]) => [targetId, response.attributes]),
   );
   attributes.value = intersectAttributes([...attributesPerTarget.values()]);
 }
@@ -139,7 +133,7 @@ function initGroupAttribute(name: string, item: number): void {
     }
   }
   emit("update:attributeColorMap", attributeColorMap.value ?? "batlow");
-  attributeRange.value = ranges;
+  attributeRange.value = withRangesPerData([...(ranges.get(id) ?? [])], ranges);
 }
 
 async function getAttributes(): Promise<void> {
@@ -195,8 +189,7 @@ watch([attributeName, attributeItem, currentAttribute], () => {
   if (attributeNoDataColor.value === undefined) {
     attributeNoDataColor.value = DEFAULT_NO_DATA_COLOR;
   }
-  const range = attributeRange.value as number[] | undefined;
-  if (range?.[0] === undefined) {
+  if (attributeRange.value[0] === undefined) {
     resetRange();
   }
 });

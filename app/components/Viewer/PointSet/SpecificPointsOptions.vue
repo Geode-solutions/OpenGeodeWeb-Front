@@ -80,7 +80,7 @@ const vertex_attribute_item = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_range = computed<BatchRange | undefined>({
+const vertex_attribute_range = computed<BatchRange>({
   get: () => dataStyleStore.meshPointsVertexAttributeRange(id.value),
   set: async (newValue) => {
     await applyBatchRange(id.value, newValue, (targetId, minimum, maximum) =>

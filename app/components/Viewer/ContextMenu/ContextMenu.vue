@@ -31,7 +31,7 @@ const menuStore = useMenuStore();
 const treeviewStore = useTreeviewStore();
 
 const meta_data = computed(() => menuStore.current_meta_data || {});
-provideBatchGroup(() => meta_data.value.targetIds);
+provideBatchGroup(() => meta_data.value.targetIds ?? []);
 
 const show_menu = ref<boolean>(true);
 const showName = ref<boolean>(false);
