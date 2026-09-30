@@ -5,6 +5,7 @@
 // Local imports
 import type { RegisterableStore, useAppStore } from "@ogw_front/stores/app";
 import type { Microservice } from "@ogw_front/stores/infra";
+import { consola } from "consola";
 import { isCloudMode } from "@ogw_front/utils/stores";
 import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json" with { type: "json" };
 
@@ -92,18 +93,18 @@ async function registerRunningExtensions(): Promise<RegisteredExtension[]> {
       });
       const blobUrl = URL.createObjectURL(blob);
       const extensionModule = await appStore.loadExtension(blobUrl, port);
-      console.log("[ExtensionManager] Extension loaded:", id);
+      consola.info("[ExtensionManager] Extension loaded:", id);
       const storeFactory = extensionModule.metadata.store;
       const store = storeFactory();
       appStore.registerStore(store);
-      console.log("[ExtensionManager] Store registered:", store.$id);
+      consola.info("[ExtensionManager] Store registered:", store.$id);
       // Extension-provided stores are expected to satisfy the fuller
       // Microservice contract (connect, etc.) even though the loader's own
       // RegisterableStore type only models what app.ts itself needs.
       if (isMicroservice(store)) {
         infraStore.register_microservice(store);
       } else {
-        console.warn("[ExtensionManager] Store does not implement Microservice:", store.$id);
+        consola.warn("[ExtensionManager] Store does not implement Microservice:", store.$id);
       }
       return {
         name,
@@ -127,10 +128,10 @@ async function importExtensionURL(url: DownloadExtensionParams): Promise<Registe
 async function unloadExtension(extensionId: string): Promise<boolean> {
   const { useAppStore } = await import("@ogw_front/stores/app");
   const appStore = useAppStore();
-  console.log("[ExtensionManager] Unloading extension:", extensionId);
+  consola.info("[ExtensionManager] Unloading extension:", extensionId);
   const extensionData = appStore.getExtension(extensionId);
   if (!extensionData) {
-    console.warn("[ExtensionManager] Extension not found:", extensionId);
+    consola.warn("[ExtensionManager] Extension not found:", extensionId);
     return false;
   }
 
@@ -146,7 +147,7 @@ async function unloadExtension(extensionId: string): Promise<boolean> {
 
   // Unload from AppStore
   await appStore.unloadExtension(extensionId);
-  console.log("[ExtensionManager] Extension unloaded:", extensionId);
+  consola.info("[ExtensionManager] Extension unloaded:", extensionId);
   return true;
 }
 

@@ -5,6 +5,7 @@ import path from "node:path";
 import { setTimeout } from "node:timers/promises";
 
 // Third party imports
+import { consola } from "consola";
 import { v4 as uuidv4 } from "uuid";
 
 // Local imports
@@ -25,15 +26,15 @@ function findExecutableInDir(
 ): string | undefined {
   const oneFilePath = path.join(baseDir, osExecutableName);
   if (fs.existsSync(oneFilePath) && fs.statSync(oneFilePath).isFile()) {
-    console.log(`[executablePath] Found OneFile executable: ${oneFilePath}`);
+    consola.info(`[executablePath] Found OneFile executable: ${oneFilePath}`);
     return oneFilePath;
   }
   const oneDirPath = path.join(baseDir, execName, osExecutableName);
   if (fs.existsSync(oneDirPath) && fs.statSync(oneDirPath).isFile()) {
-    console.log(`[executablePath] Found OneDir executable: ${oneDirPath}`);
+    consola.info(`[executablePath] Found OneDir executable: ${oneDirPath}`);
     return oneDirPath;
   }
-  console.log(
+  consola.info(
     `[executablePath] Executable not found in ${baseDir} (tried OneFile and OneDir): ${execName}`,
   );
   return undefined;
@@ -45,10 +46,10 @@ function executablePath(execPath: string, execName: string): string {
   const mode = process.env.MODE;
   const nodeEnv = process.env.NODE_ENV;
 
-  console.log("[executablePath]", { execPath, execName, mode, nodeEnv, resourcesPath });
+  consola.debug("[executablePath]", { execPath, execName, mode, nodeEnv, resourcesPath });
 
   if (commandExistsSync(osExecutableName)) {
-    console.log(`[executablePath] Found executable in PATH: ${osExecutableName}`);
+    consola.info(`[executablePath] Found executable in PATH: ${osExecutableName}`);
     return osExecutableName;
   }
 
@@ -76,7 +77,7 @@ function createPath(dirPath: string): string {
     fs.mkdirSync(dirPath, {
       recursive: true,
     });
-    console.log(`${dirPath} directory created successfully!`);
+    consola.info(`${dirPath} directory created successfully!`);
   }
   return dirPath;
 }
@@ -96,7 +97,7 @@ async function lookForLocalExtensionDistPath(
   if (!fs.existsSync(localExtensionDistPath)) {
     return undefined;
   }
-  console.log(
+  consola.info(
     `[extensionFrontendPath] Found existing folder: ${localExtensionDistPath}, deleting it...`,
   );
   fs.rmSync(localExtensionDistPath, {
@@ -110,10 +111,10 @@ async function lookForLocalExtensionDistPath(
   const MILLISECONDS_PER_RETRY = 1000;
   for (let i = 0; i <= MAX_DELETE_FOLDER_RETRIES; i += 1) {
     if (fs.existsSync(rebuiltFilePath)) {
-      console.log(`Found rebuilt file: ${rebuiltFilePath}`);
+      consola.info(`Found rebuilt file: ${rebuiltFilePath}`);
       return rebuiltFilePath;
     }
-    console.log(`Waiting for rebuild... attempt ${i}/${MAX_DELETE_FOLDER_RETRIES}`);
+    consola.info(`Waiting for rebuild... attempt ${i}/${MAX_DELETE_FOLDER_RETRIES}`);
     // oxlint-disable-next-line no-await-in-loop
     await setTimeout(MILLISECONDS_PER_RETRY);
   }
@@ -125,7 +126,7 @@ async function extensionFrontendPath(
   rootPath: string,
   extensionId: string,
 ): Promise<string> {
-  console.log("[extensionFrontendPath]", {
+  consola.debug("[extensionFrontendPath]", {
     unzippedExtensionPath,
     frontendFile,
     rootPath,
@@ -157,7 +158,7 @@ function extensionBackendPath(
     unzippedExtensionPath,
     executableName(backendExecutableName),
   );
-  console.log("runExtensions", {
+  consola.debug("runExtensions", {
     backendExecutablePath,
   });
   return backendExecutablePath;

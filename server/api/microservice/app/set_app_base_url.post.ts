@@ -1,5 +1,6 @@
 // Third party imports
 import { type H3Event, createError, defineEventHandler, readBody } from "h3";
+import { consola } from "consola";
 
 // Local imports
 import { setAppBaseUrl } from "@geode/opengeodeweb-front/server/utils/server_config.ts";
@@ -16,11 +17,11 @@ export default defineEventHandler(async (event: H3Event) => {
     }
 
     setAppBaseUrl(baseUrl);
-    console.log(`Updated APP_BASE_URL to ${baseUrl}`);
+    consola.info(`Updated APP_BASE_URL to ${baseUrl}`);
 
     return { statusCode: 200, baseUrl };
   } catch (error) {
-    console.log(error);
+    consola.error(error);
     throw createError({
       statusCode: 500,
       statusMessage: error instanceof Error ? error.message : String(error),

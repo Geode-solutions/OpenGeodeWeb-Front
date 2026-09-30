@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import GlassCard from "@ogw_front/components/GlassCard.vue";
+import { consola } from "consola";
 import { middleTruncate } from "@ogw_front/utils/string";
 import { useCopyToClipboard } from "@ogw_front/composables/copy_to_clipboard";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -110,7 +111,7 @@ async function copyId(targetId: string | undefined): Promise<void> {
     await copy(targetId);
     copiedId.value = targetId;
   } catch (error) {
-    console.error("Failed to copy ID:", error);
+    consola.error("Failed to copy ID:", error);
   }
 }
 

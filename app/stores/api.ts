@@ -1,5 +1,6 @@
 import type { RequestHandlers } from "@ogw_shared/utils/types";
 import { api_fetch } from "@ogw_internal/utils/api_fetch";
+import { consola } from "consola";
 
 interface ApiSchema {
   $id: string;
@@ -34,7 +35,7 @@ export const useAPIStore = defineStore("api", () => {
     }: { schema: ApiSchema; params?: Record<string, unknown>; headers?: Record<string, string> },
     callbacks: ApiCallbacks = {},
   ): Promise<TResult> {
-    console.log("[API] Request:", schema.$id);
+    consola.info("[API] Request:", schema.$id);
     const start = Date.now();
 
     const result = await api_fetch(
@@ -43,7 +44,7 @@ export const useAPIStore = defineStore("api", () => {
       {
         ...callbacks,
         response_function: async (response: unknown) => {
-          console.log(
+          consola.info(
             "[API] Request completed:",
             schema.$id,
             "in",

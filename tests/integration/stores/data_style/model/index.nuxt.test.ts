@@ -33,7 +33,6 @@ describe("model", () => {
   }, beforeAllTimeout);
 
   afterAll(async () => {
-    console.log("afterAll model kill", projectFolderPath);
     await cleanupBackend(projectFolderPath);
   });
 

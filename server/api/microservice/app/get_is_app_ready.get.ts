@@ -1,5 +1,6 @@
 // Third party imports
 import { createError, defineEventHandler } from "h3";
+import { consola } from "consola";
 
 // Local imports
 import { getIsAppReady } from "@geode/opengeodeweb-front/server/utils/server_config.ts";
@@ -7,10 +8,10 @@ import { getIsAppReady } from "@geode/opengeodeweb-front/server/utils/server_con
 export default defineEventHandler(() => {
   try {
     const isReady = getIsAppReady();
-    console.log(`IS_APP_READY is ${isReady}`);
+    consola.info(`IS_APP_READY is ${isReady}`);
     return { statusCode: 200, isReady };
   } catch (error) {
-    console.log(error);
+    consola.error(error);
     throw createError({
       statusCode: 500,
       statusMessage: error instanceof Error ? error.message : String(error),

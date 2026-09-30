@@ -2,7 +2,6 @@
 import { useInfraStore } from "@ogw_front/stores/infra";
 
 const infraStore = useInfraStore();
-console.log("TEST", { infraStore });
 </script>
 
 <template>
