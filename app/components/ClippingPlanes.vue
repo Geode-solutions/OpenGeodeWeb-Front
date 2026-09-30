@@ -2,10 +2,11 @@
 import { DEBOUNCE_DELAY, DEFAULT_NORMALS } from "@ogw_front/utils/clipping_planes";
 import {
   DEFAULT_SLICE_AXIS,
-  NEXT_SLICE_AXIS,
+  SLICE_AXES,
   type SliceAxis,
   areAllGrids,
 } from "@ogw_front/utils/slice";
+import type { ClippingPlane } from "@ogw_front/composables/clipping_planes_widget_entries";
 import ClippingPlaneCard from "@ogw_front/components/ClippingPlaneCard.vue";
 import SliceCard from "@ogw_front/components/SliceCard.vue";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
@@ -25,12 +26,17 @@ const dataStore = useDataStore();
 const hybridViewerStore = useHybridViewerStore();
 const targetAllVisible = ref<boolean>(true);
 const selectedDatasetIds = ref<string[]>([]);
-const planes = ref<{ origin?: number[]; normal: number[] }[]>([
-  { origin: undefined, normal: [1, 0, 0] },
-]);
+let lastItemId = 0;
+function newItemId(): number {
+  lastItemId += 1;
+  return lastItemId;
+}
+const planes = ref<ClippingPlane[]>([{ id: newItemId(), origin: undefined, normal: [1, 0, 0] }]);
 const allItems = dataStore.refAllItems();
 const sliceEnabled = ref<boolean>(false);
-const slices = ref<{ axis: SliceAxis; index: number }[]>([{ axis: DEFAULT_SLICE_AXIS, index: 0 }]);
+const slices = ref<{ id: number; axis: SliceAxis; index: number }[]>([
+  { id: newItemId(), axis: DEFAULT_SLICE_AXIS, index: 0 },
+]);
 const sliceMaxIndices = ref<[number, number, number]>([0, 0, 0]);
 const targetIds = computed<string[]>(() =>
   targetAllVisible.value ? allItems.value.map((item) => item.id) : selectedDatasetIds.value,
@@ -100,7 +106,7 @@ async function sendSlices(): Promise<void> {
   if (targetIds.value.length > 0) {
     const maxIndices = await hybridViewerStore.setSlice(
       targetIds.value,
-      isActive ? slices.value : [],
+      isActive ? slices.value.map(({ axis, index }) => ({ axis, index })) : [],
     );
     if (isAllGrid.value) {
       sliceMaxIndices.value = maxIndices;
@@ -143,7 +149,7 @@ function addPlane(): void {
   // Satisfy noUncheckedIndexedAccess and are never hit at runtime.
   const normal = DEFAULT_NORMALS[planes.value.length % DEFAULT_NORMALS.length] ??
     DEFAULT_NORMALS[0] ?? [1, 0, 0];
-  planes.value.push({ origin: getSceneCenter(), normal });
+  planes.value.push({ id: newItemId(), origin: getSceneCenter(), normal });
 }
 
 function removePlane(index: number): void {
@@ -153,7 +159,8 @@ function removePlane(index: number): void {
 function addSlice(): void {
   const lastSlice = slices.value.at(-1);
   slices.value.push({
-    axis: lastSlice ? NEXT_SLICE_AXIS[lastSlice.axis] : DEFAULT_SLICE_AXIS,
+    id: newItemId(),
+    axis: lastSlice ? SLICE_AXES[lastSlice.axis].next : DEFAULT_SLICE_AXIS,
     index: 0,
   });
 }
@@ -170,9 +177,9 @@ function flipNormal(plane: { normal: number[] }): void {
 
 async function resetClippingPlanes(): Promise<void> {
   setFromWidget(true);
-  planes.value = [{ origin: undefined, normal: [1, 0, 0] }];
+  planes.value = [{ id: newItemId(), origin: undefined, normal: [1, 0, 0] }];
   sliceEnabled.value = false;
-  slices.value = [{ axis: DEFAULT_SLICE_AXIS, index: 0 }];
+  slices.value = [{ id: newItemId(), axis: DEFAULT_SLICE_AXIS, index: 0 }];
   updateWidgetPlacement({ isReset: true });
   setFromWidget(false);
   await applyAll();
@@ -332,7 +339,7 @@ onBeforeUnmount(cleanupLocalWidget);
           </v-row>
           <SliceCard
             v-for="(slice, idx) in slices"
-            :key="idx"
+            :key="slice.id"
             :slice="slice"
             :index="idx"
             :max-index="sliceMaxIndices[slice.axis]"
@@ -359,7 +366,7 @@ onBeforeUnmount(cleanupLocalWidget);
 
         <ClippingPlaneCard
           v-for="(plane, idx) in planes"
-          :key="idx"
+          :key="plane.id"
           :plane="plane"
           :index="idx"
           @remove="removePlane(idx)"

@@ -5,13 +5,12 @@ const GRID_TYPES = new Set([
   "LightRegularGrid3D",
 ]);
 type SliceAxis = 0 | 1 | 2;
-const SLICE_AXES: { title: string; value: SliceAxis }[] = [
-  { title: "YZ", value: 0 },
-  { title: "XZ", value: 1 },
-  { title: "XY", value: 2 },
-];
+const SLICE_AXES = [
+  { title: "YZ", value: 0, next: 1 },
+  { title: "XZ", value: 1, next: 2 },
+  { title: "XY", value: 2, next: 0 },
+] as const satisfies readonly { title: string; value: SliceAxis; next: SliceAxis }[];
 const DEFAULT_SLICE_AXIS: SliceAxis = 2;
-const NEXT_SLICE_AXIS: Record<SliceAxis, SliceAxis> = { 2: 0, 0: 1, 1: 2 };
 
 function areAllGrids(items: { id: string; geode_object_type: string }[], ids: string[]): boolean {
   const targetedItems = items.filter((item) => ids.includes(item.id));
@@ -21,5 +20,5 @@ function areAllGrids(items: { id: string; geode_object_type: string }[], ids: st
   );
 }
 
-export { SLICE_AXES, DEFAULT_SLICE_AXIS, NEXT_SLICE_AXIS, areAllGrids };
+export { SLICE_AXES, DEFAULT_SLICE_AXIS, areAllGrids };
 export type { SliceAxis };
