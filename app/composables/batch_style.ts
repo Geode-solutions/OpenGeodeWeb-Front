@@ -7,64 +7,32 @@ import {
   provide,
   toValue,
 } from "vue";
-import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
-import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 type AttributeRange = [number, number];
+type BatchRange = readonly (number | undefined)[] | Map<string, AttributeRange>;
 
-interface BatchGroup {
-  targetIds: string[];
-  ranges: Map<string, AttributeRange>;
-}
-
-const BATCH_GROUP_KEY: InjectionKey<ComputedRef<BatchGroup | undefined>> = Symbol("batch_group");
-
-function createBatchGroup(
-  targetIds: () => string[] | undefined,
-): ComputedRef<BatchGroup | undefined> {
-  return computed(() => {
-    const ids = targetIds();
-    return ids ? { targetIds: ids, ranges: new Map() } : undefined;
-  });
-}
+const BATCH_GROUP_KEY: InjectionKey<ComputedRef<string[] | undefined>> = Symbol("batch_group");
 
 function provideBatchGroup(targetIds: () => string[] | undefined): void {
-  provide(BATCH_GROUP_KEY, createBatchGroup(targetIds));
+  provide(BATCH_GROUP_KEY, computed(targetIds));
 }
 
-function injectBatchGroup(): ComputedRef<BatchGroup | undefined> | undefined {
-  return inject(BATCH_GROUP_KEY, undefined);
+function groupTargetsOf(targetIds: string[] | undefined, id: string): string[] | undefined {
+  return targetIds?.includes(id) === true ? targetIds : undefined;
 }
 
-function groupTargetsOf(group: BatchGroup | undefined, id: string): string[] | undefined {
-  return group?.targetIds.includes(id) === true ? group.targetIds : undefined;
+function useBatchGroup(id: MaybeRefOrGetter<string>): ComputedRef<string[] | undefined> {
+  const group = inject(BATCH_GROUP_KEY, undefined);
+  return computed(() => groupTargetsOf(group?.value, toValue(id)));
 }
 
-function useBatchGroup(id: MaybeRefOrGetter<string>): {
-  targetIds: ComputedRef<string[] | undefined>;
-  ranges: ComputedRef<Map<string, AttributeRange> | undefined>;
-} {
-  const group = injectBatchGroup();
-  const targetIds = computed(() => groupTargetsOf(group?.value, toValue(id)));
-  const ranges = computed(() => (targetIds.value ? group?.value?.ranges : undefined));
-  return { targetIds, ranges };
-}
-
-async function requestForTargets<TResponse>(
-  schema: JsonRpcSchema,
-  targetIds: readonly string[],
-): Promise<Map<string, TResponse>> {
-  const backStore = useBackStore();
-  const responses = await Promise.all(
-    targetIds.map(async (targetId) => {
-      // oxlint-disable-next-line no-unsafe-type-assertion -- this is the trusted API boundary.
-      const response = (await backStore.request({ schema, params: { id: targetId } })) as TResponse;
-      return [targetId, response] as const;
-    }),
-  );
-  return new Map(responses);
+function rangeOf(range: BatchRange | undefined, targetId: string): readonly (number | undefined)[] {
+  if (range instanceof Map) {
+    return range.get(targetId) ?? [];
+  }
+  return range ?? [];
 }
 
 async function applyActionOn(
@@ -84,7 +52,7 @@ function useBatchStyle(): {
 } {
   const treeviewStore = useTreeviewStore();
   const dataStore = useDataStore();
-  const group = injectBatchGroup();
+  const group = inject(BATCH_GROUP_KEY, undefined);
 
   async function applyBatchStyle(
     id: string,
@@ -125,11 +93,14 @@ function useBatchStyle(): {
 
   async function applyBatchRange(
     id: string,
-    range: AttributeRange,
+    range: BatchRange | undefined,
     setRange: (id: string, minimum: number, maximum: number) => unknown,
   ): Promise<void> {
     await applyBatchStyle(id, async (targetId: string) => {
-      const [minimum, maximum] = group?.value?.ranges.get(targetId) ?? range;
+      const [minimum, maximum] = rangeOf(range, targetId);
+      if (minimum === undefined || maximum === undefined) {
+        return;
+      }
       await setRange(targetId, minimum, maximum);
     });
   }
@@ -137,12 +108,5 @@ function useBatchStyle(): {
   return { applyBatchStyle, applyBatchRange };
 }
 
-export {
-  BATCH_GROUP_KEY,
-  createBatchGroup,
-  provideBatchGroup,
-  requestForTargets,
-  useBatchGroup,
-  useBatchStyle,
-};
-export type { AttributeRange };
+export { BATCH_GROUP_KEY, provideBatchGroup, useBatchGroup, useBatchStyle };
+export type { AttributeRange, BatchRange };

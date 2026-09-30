@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import { type BatchRange, useBatchStyle } from "@ogw_front/composables/batch_style";
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
-import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
@@ -71,15 +71,11 @@ const vertex_attribute_item = computed<string | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_range = computed<[number, number] | undefined>({
+const vertex_attribute_range = computed<BatchRange | undefined>({
   get: () => dataStyleStore.meshPolyhedraVertexAttributeRange(id.value),
   set: async (newValue) => {
-    const [minimum, maximum] = newValue;
-    if (minimum === undefined || maximum === undefined) {
-      return;
-    }
-    await applyBatchRange(id.value, [minimum, maximum], (targetId, rangeMinimum, rangeMaximum) =>
-      dataStyleStore.setMeshPolyhedraVertexAttributeRange(targetId, rangeMinimum, rangeMaximum),
+    await applyBatchRange(id.value, newValue, (targetId, minimum, maximum) =>
+      dataStyleStore.setMeshPolyhedraVertexAttributeRange(targetId, minimum, maximum),
     );
     hybridViewerStore.remoteRender();
   },
@@ -124,15 +120,11 @@ const polyhedron_attribute_item = computed<string | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
-const polyhedron_attribute_range = computed<[number, number] | undefined>({
+const polyhedron_attribute_range = computed<BatchRange | undefined>({
   get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeRange(id.value),
   set: async (newValue) => {
-    const [minimum, maximum] = newValue;
-    if (minimum === undefined || maximum === undefined) {
-      return;
-    }
-    await applyBatchRange(id.value, [minimum, maximum], (targetId, rangeMinimum, rangeMaximum) =>
-      dataStyleStore.setMeshPolyhedraPolyhedronAttributeRange(targetId, rangeMinimum, rangeMaximum),
+    await applyBatchRange(id.value, newValue, (targetId, minimum, maximum) =>
+      dataStyleStore.setMeshPolyhedraPolyhedronAttributeRange(targetId, minimum, maximum),
     );
     hybridViewerStore.remoteRender();
   },

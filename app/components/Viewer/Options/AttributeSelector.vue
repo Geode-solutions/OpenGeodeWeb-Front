@@ -1,17 +1,22 @@
 <script setup lang="ts">
+import {
+  type AttributeRange,
+  type BatchRange,
+  useBatchGroup,
+} from "@ogw_front/composables/batch_style";
 import { getAttributeRange, intersectAttributes } from "@ogw_front/utils/attributes";
-import { requestForTargets, useBatchGroup } from "@ogw_front/composables/batch_style";
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
 import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar.vue";
 import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
+import { requestForTargets } from "@ogw_front/utils/request_for_targets";
 import { useBackStore } from "@ogw_front/stores/back";
 
 const backStore = useBackStore();
 
 const attributeName = defineModel<string>("attributeName");
 const attributeItem = defineModel<number>("attributeItem");
-const attributeRange = defineModel<(number | undefined)[]>("attributeRange");
+const attributeRange = defineModel<BatchRange>("attributeRange");
 const attributeColorMap = defineModel<string>("attributeColorMap");
 const attributeNoDataColor = defineModel<typeof DEFAULT_NO_DATA_COLOR>("attributeNoDataColor");
 
@@ -39,7 +44,7 @@ interface AttributeInfo {
 const attributes = ref<AttributeInfo[]>([]);
 let attributesPerTarget = new Map<string, AttributeInfo[]>();
 
-const { targetIds: groupTargetIds, ranges: groupRanges } = useBatchGroup(() => id);
+const groupTargetIds = useBatchGroup(() => id);
 
 const currentAttribute = computed<AttributeInfo | undefined>(() =>
   attributes.value.find((attr) => attr.attribute_name === attributeName.value),
@@ -116,12 +121,13 @@ function hasSelectedComponent(components: unknown): boolean {
 async function getGroupAttributes(targetIds: string[]): Promise<void> {
   const responses = await requestForTargets<{ attributes: AttributeInfo[] }>(schema, targetIds);
   attributesPerTarget = new Map(
-    [...responses].map(([targetId, response]) => [targetId, response.attributes]),
+    targetIds.map((targetId) => [targetId, responses.get(targetId)?.attributes ?? []]),
   );
   attributes.value = intersectAttributes([...attributesPerTarget.values()]);
 }
 
 function initGroupAttribute(name: string, item: number): void {
+  const ranges = new Map<string, AttributeRange>();
   for (const [targetId, targetAttributes] of attributesPerTarget) {
     const attribute = targetAttributes.find((candidate) => candidate.attribute_name === name);
     if (attribute) {
@@ -129,11 +135,11 @@ function initGroupAttribute(name: string, item: number): void {
         attribute as unknown as Parameters<typeof getAttributeRange>[0],
         item,
       );
-      groupRanges.value?.set(targetId, [min, max]);
+      ranges.set(targetId, [min, max]);
     }
   }
   emit("update:attributeColorMap", attributeColorMap.value ?? "batlow");
-  resetRange();
+  attributeRange.value = ranges;
 }
 
 async function getAttributes(): Promise<void> {
@@ -189,7 +195,8 @@ watch([attributeName, attributeItem, currentAttribute], () => {
   if (attributeNoDataColor.value === undefined) {
     attributeNoDataColor.value = DEFAULT_NO_DATA_COLOR;
   }
-  if (!attributeRange.value || attributeRange.value[0] === undefined) {
+  const range = attributeRange.value as number[] | undefined;
+  if (range?.[0] === undefined) {
     resetRange();
   }
 });

@@ -1,29 +1,27 @@
 // Third party imports
 import { type Mock, beforeEach, describe, expect, test, vi } from "vitest";
-import { createApp } from "vue";
+import { computed, createApp } from "vue";
 
 // Local imports
-import {
-  BATCH_GROUP_KEY,
-  createBatchGroup,
-  useBatchStyle,
-} from "@ogw_front/composables/batch_style";
+import { BATCH_GROUP_KEY, useBatchStyle } from "@ogw_front/composables/batch_style";
 import { setupActivePinia } from "@ogw_tests/utils";
 
 const GROUP_IDS = ["surface_1", "surface_2", "surface_3"];
-const SECOND_MAXIMUM = 20;
-const REFERENCE_RANGE: [number, number] = [0, 1];
-const SECOND_RANGE: [number, number] = [0, SECOND_MAXIMUM];
+const FIRST_MAXIMUM = 10;
+const SECOND_MINIMUM = 100;
+const SECOND_MAXIMUM = 200;
+const FIRST_RANGE: [number, number] = [0, FIRST_MAXIMUM];
+const SECOND_RANGE: [number, number] = [SECOND_MINIMUM, SECOND_MAXIMUM];
 
 type StyleAction = (id: string) => Promise<unknown>;
 
-function batchStyleIn(
-  targetIds: string[] | undefined,
-): ReturnType<typeof useBatchStyle> & { group: ReturnType<typeof createBatchGroup> } {
+function batchStyleIn(targetIds: string[] | undefined): ReturnType<typeof useBatchStyle> {
   const app = createApp({});
-  const group = createBatchGroup(() => targetIds);
-  app.provide(BATCH_GROUP_KEY, group);
-  return { ...app.runWithContext(() => useBatchStyle()), group };
+  app.provide(
+    BATCH_GROUP_KEY,
+    computed(() => targetIds),
+  );
+  return app.runWithContext(() => useBatchStyle());
 }
 
 function styleAction(): Mock<StyleAction> {
@@ -66,15 +64,29 @@ describe("batch style composable", () => {
     expect(styledIds(action)).toStrictEqual(["other_data"]);
   });
 
-  test("applies each data its own range of the group", async () => {
-    const { applyBatchRange, group } = batchStyleIn(["surface_1", "surface_2"]);
-    group.value?.ranges.set("surface_2", SECOND_RANGE);
+  test("applies each data of the group its own range", async () => {
+    const { applyBatchRange } = batchStyleIn(["surface_1", "surface_2"]);
+    const ranges = new Map([
+      ["surface_1", FIRST_RANGE],
+      ["surface_2", SECOND_RANGE],
+    ]);
     const rangePerData: Record<string, [number, number]> = {};
 
-    await applyBatchRange("surface_1", REFERENCE_RANGE, (targetId, minimum, maximum) => {
+    await applyBatchRange("surface_1", ranges, (targetId, minimum, maximum) => {
       rangePerData[targetId] = [minimum, maximum];
     });
 
-    expect(rangePerData).toStrictEqual({ surface_1: REFERENCE_RANGE, surface_2: SECOND_RANGE });
+    expect(rangePerData).toStrictEqual({ surface_1: FIRST_RANGE, surface_2: SECOND_RANGE });
+  });
+
+  test("applies the same range to every data of the group", async () => {
+    const { applyBatchRange } = batchStyleIn(["surface_1", "surface_2"]);
+    const rangePerData: Record<string, [number, number]> = {};
+
+    await applyBatchRange("surface_1", FIRST_RANGE, (targetId, minimum, maximum) => {
+      rangePerData[targetId] = [minimum, maximum];
+    });
+
+    expect(rangePerData).toStrictEqual({ surface_1: FIRST_RANGE, surface_2: FIRST_RANGE });
   });
 });

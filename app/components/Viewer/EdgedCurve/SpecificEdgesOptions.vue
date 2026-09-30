@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { type BatchRange, useBatchStyle } from "@ogw_front/composables/batch_style";
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
@@ -7,7 +8,6 @@ import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import ViewerOptionsWidthSlider from "@ogw_front/components/Viewer/Options/Sliders/Width.vue";
-import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
@@ -80,15 +80,11 @@ const vertex_attribute_item = computed<string | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_range = computed<[number, number] | undefined>({
+const vertex_attribute_range = computed<BatchRange | undefined>({
   get: () => dataStyleStore.meshEdgesVertexAttributeRange(id.value),
   set: async (newValue) => {
-    const [minimum, maximum] = newValue;
-    if (minimum === undefined || maximum === undefined) {
-      return;
-    }
-    await applyBatchRange(id.value, [minimum, maximum], (targetId, rangeMinimum, rangeMaximum) =>
-      dataStyleStore.setMeshEdgesVertexAttributeRange(targetId, rangeMinimum, rangeMaximum),
+    await applyBatchRange(id.value, newValue, (targetId, minimum, maximum) =>
+      dataStyleStore.setMeshEdgesVertexAttributeRange(targetId, minimum, maximum),
     );
     hybridViewerStore.remoteRender();
   },
@@ -132,15 +128,11 @@ const edge_attribute_item = computed<string | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
-const edge_attribute_range = computed<[number, number] | undefined>({
+const edge_attribute_range = computed<BatchRange | undefined>({
   get: () => dataStyleStore.meshEdgesEdgeAttributeRange(id.value),
   set: async (newValue) => {
-    const [minimum, maximum] = newValue;
-    if (minimum === undefined || maximum === undefined) {
-      return;
-    }
-    await applyBatchRange(id.value, [minimum, maximum], (targetId, rangeMinimum, rangeMaximum) =>
-      dataStyleStore.setMeshEdgesEdgeAttributeRange(targetId, rangeMinimum, rangeMaximum),
+    await applyBatchRange(id.value, newValue, (targetId, minimum, maximum) =>
+      dataStyleStore.setMeshEdgesEdgeAttributeRange(targetId, minimum, maximum),
     );
     hybridViewerStore.remoteRender();
   },

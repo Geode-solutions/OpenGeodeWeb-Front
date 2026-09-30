@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { BatchRange } from "@ogw_front/composables/batch_style";
 import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsAttributeSelector from "@ogw_front/components/Viewer/Options/AttributeSelector.vue";
@@ -31,33 +32,31 @@ const textures = defineModel<Texture[]>("textures");
 
 const vertex_attribute_name = defineModel<string>("vertex_attribute_name");
 const vertex_attribute_item = defineModel<number>("vertex_attribute_item");
-const vertex_attribute_range = defineModel<(number | undefined)[]>("vertex_attribute_range");
+const vertex_attribute_range = defineModel<BatchRange>("vertex_attribute_range");
 const vertex_attribute_color_map = defineModel<string>("vertex_attribute_color_map");
 const vertex_attribute_no_data_color = defineModel<RGBAColor>("vertex_attribute_no_data_color");
 
 const edge_attribute_name = defineModel<string>("edge_attribute_name");
 const edge_attribute_item = defineModel<number>("edge_attribute_item");
-const edge_attribute_range = defineModel<(number | undefined)[]>("edge_attribute_range");
+const edge_attribute_range = defineModel<BatchRange>("edge_attribute_range");
 const edge_attribute_color_map = defineModel<string>("edge_attribute_color_map");
 const edge_attribute_no_data_color = defineModel<RGBAColor>("edge_attribute_no_data_color");
 
 const cell_attribute_name = defineModel<string>("cell_attribute_name");
 const cell_attribute_item = defineModel<number>("cell_attribute_item");
-const cell_attribute_range = defineModel<(number | undefined)[]>("cell_attribute_range");
+const cell_attribute_range = defineModel<BatchRange>("cell_attribute_range");
 const cell_attribute_color_map = defineModel<string>("cell_attribute_color_map");
 const cell_attribute_no_data_color = defineModel<RGBAColor>("cell_attribute_no_data_color");
 
 const polygon_attribute_name = defineModel<string>("polygon_attribute_name");
 const polygon_attribute_item = defineModel<number>("polygon_attribute_item");
-const polygon_attribute_range = defineModel<(number | undefined)[]>("polygon_attribute_range");
+const polygon_attribute_range = defineModel<BatchRange>("polygon_attribute_range");
 const polygon_attribute_color_map = defineModel<string>("polygon_attribute_color_map");
 const polygon_attribute_no_data_color = defineModel<RGBAColor>("polygon_attribute_no_data_color");
 
 const polyhedron_attribute_name = defineModel<string>("polyhedron_attribute_name");
 const polyhedron_attribute_item = defineModel<number>("polyhedron_attribute_item");
-const polyhedron_attribute_range = defineModel<(number | undefined)[]>(
-  "polyhedron_attribute_range",
-);
+const polyhedron_attribute_range = defineModel<BatchRange>("polyhedron_attribute_range");
 const polyhedron_attribute_color_map = defineModel<string>("polyhedron_attribute_color_map");
 const polyhedron_attribute_no_data_color = defineModel<RGBAColor>(
   "polyhedron_attribute_no_data_color",

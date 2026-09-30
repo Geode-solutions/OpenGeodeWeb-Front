@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { requestForTargets, useBatchGroup } from "@ogw_front/composables/batch_style";
 import FileUploader from "@ogw_front/components/FileUploader.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
 import { intersectBy } from "@ogw_front/utils/attributes";
+import { requestForTargets } from "@ogw_front/utils/request_for_targets";
 import { useBackStore } from "@ogw_front/stores/back";
+import { useBatchGroup } from "@ogw_front/composables/batch_style";
 
 // Mirrors FileUploader's own (unexported) UploadFile type.
 type UploadFile = File & { isConfigured?: boolean; displayName?: string };
@@ -42,16 +43,14 @@ watch(
 const textureCoordinates = ref<string[]>([]);
 const backStore = useBackStore();
 
-const { targetIds: groupTargetIds } = useBatchGroup(() => id);
+const groupTargetIds = useBatchGroup(() => id);
 
 async function getTextureCoordinates(): Promise<void> {
   const schema = back_schemas.opengeodeweb_back.texture_coordinates;
-  const responses = await requestForTargets<{ texture_coordinates: string[] }>(
-    schema,
-    groupTargetIds.value ?? [id],
-  );
+  const targetIds = groupTargetIds.value ?? [id];
+  const responses = await requestForTargets<{ texture_coordinates: string[] }>(schema, targetIds);
   textureCoordinates.value = intersectBy(
-    [...responses.values()].map((response) => response.texture_coordinates),
+    targetIds.map((targetId) => responses.get(targetId)?.texture_coordinates ?? []),
     (coordinate) => coordinate,
   );
 }
