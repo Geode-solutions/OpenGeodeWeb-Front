@@ -31,7 +31,6 @@ describe("model edges", () => {
   }, beforeAllTimeout);
 
   afterAll(async () => {
-    console.log("afterAll model edges kill", projectFolderPath);
     await cleanupBackend(projectFolderPath);
   });
 

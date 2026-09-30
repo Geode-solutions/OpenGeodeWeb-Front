@@ -1,4 +1,5 @@
 import type { MaybeComputedElementRef } from "@vueuse/core";
+import { consola } from "consola";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
@@ -156,7 +157,7 @@ export function useAdaptiveStyles(
       try {
         await forceRefresh();
       } catch (error) {
-        console.error("forceRefresh failed:", error);
+        consola.error("forceRefresh failed:", error);
       }
     });
   }

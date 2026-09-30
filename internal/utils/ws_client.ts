@@ -4,6 +4,7 @@ import vtkWSLinkClient, {
   newInstance,
 } from "@kitware/vtk.js/IO/Core/WSLinkClient";
 import SmartConnect from "wslink/src/SmartConnect";
+import { consola } from "consola";
 
 interface WsClientCallbacks {
   onConnectionClose?: () => void;
@@ -34,12 +35,12 @@ async function initWebSocketClient(
 
   client.onConnectionError((httpReq: WsConnectionEvent) => {
     const message = httpReq.response?.error ?? "Connection error";
-    console.error(message);
+    consola.error(message);
   });
   client.onConnectionClose((httpReq: WsConnectionEvent) => {
     const message = httpReq.response?.error ?? "Connection close";
     onConnectionClose?.();
-    console.error(message);
+    consola.error(message);
   });
 
   client.beginBusy();

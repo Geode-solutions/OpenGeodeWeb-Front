@@ -5,6 +5,7 @@ import { setTimeout } from "node:timers/promises";
 
 // Third party imports
 import { WebSocket } from "ws";
+import { consola } from "consola";
 import pTimeout from "p-timeout";
 import { rimraf } from "rimraf";
 
@@ -20,23 +21,23 @@ const MAX_DELETE_FOLDER_RETRIES = 5;
 
 async function deleteFolderRecursive(folderPath: string): Promise<void> {
   if (!fs.existsSync(folderPath)) {
-    console.log(`Folder ${folderPath} does not exist.`);
+    consola.info(`Folder ${folderPath} does not exist.`);
     return;
   }
   for (let i = 0; i <= MAX_DELETE_FOLDER_RETRIES; i += 1) {
     try {
-      console.log(`Deleting folder: ${folderPath}`);
+      consola.info(`Deleting folder: ${folderPath}`);
       // oxlint-disable-next-line no-await-in-loop
       await rimraf(folderPath);
-      console.log(`Deleted folder: ${folderPath}`);
+      consola.info(`Deleted folder: ${folderPath}`);
       return;
     } catch (error) {
-      console.error(`Error deleting folder ${folderPath}:`, error);
+      consola.error(`Error deleting folder ${folderPath}:`, error);
       const MILLISECONDS_PER_RETRY = 1000;
       const DELAY = MILLISECONDS_PER_RETRY * (i + 1);
       // oxlint-disable-next-line no-await-in-loop
       await setTimeout(DELAY);
-      console.log("Retrying delete folder");
+      consola.info("Retrying delete folder");
     }
   }
   throw new Error(
@@ -54,7 +55,7 @@ function isErrorWithMessage(error: unknown): error is { message: string } {
 }
 
 async function killHttpMicroservice(microservice: Microservice): Promise<void> {
-  console.log("killHttpMicroservice", {
+  consola.debug("killHttpMicroservice", {
     ...microservice,
   });
   const failMessage = `Failed to kill ${microservice.name}`;
@@ -68,7 +69,7 @@ async function killHttpMicroservice(microservice: Microservice): Promise<void> {
       });
     } catch (error) {
       const message = isErrorWithMessage(error) ? error.message : String(error);
-      console.log(`Expected error during kill of ${microservice.name}:`, message);
+      consola.info(`Expected error during kill of ${microservice.name}:`, message);
     }
   }
   await pTimeout(do_kill(), {
@@ -78,7 +79,7 @@ async function killHttpMicroservice(microservice: Microservice): Promise<void> {
 }
 
 async function killWebsocketMicroservice(microservice: Microservice): Promise<void> {
-  console.log("killWebsocketMicroservice", {
+  consola.debug("killWebsocketMicroservice", {
     ...microservice,
   });
   const failMessage = `Failed to kill ${microservice.name}`;
@@ -92,7 +93,7 @@ async function killWebsocketMicroservice(microservice: Microservice): Promise<vo
     await new Promise<void>((resolve) => {
       const socket = new WebSocket(socketUrl);
       socket.on("open", () => {
-        console.log("Connected to WebSocket server");
+        consola.info("Connected to WebSocket server");
         socket.send(
           JSON.stringify({
             id: "system:hello",
@@ -107,7 +108,7 @@ async function killWebsocketMicroservice(microservice: Microservice): Promise<vo
       });
       socket.on("message", (data: Buffer | string) => {
         const message = data.toString();
-        console.log("Received from server:", message);
+        consola.debug("Received from server:", message);
         if (message.includes("hello")) {
           socket.send(
             JSON.stringify({
@@ -115,17 +116,17 @@ async function killWebsocketMicroservice(microservice: Microservice): Promise<vo
               method: "application.exit",
             }),
           );
-          console.log(successMessage);
+          consola.info(successMessage);
           socket.close();
           resolve();
         }
       });
       socket.on("close", () => {
-        console.log(successMessage);
+        consola.info(successMessage);
         resolve();
       });
       socket.on("error", (error: Error) => {
-        console.error("WebSocket error:", error);
+        consola.error("WebSocket error:", error);
         socket.close();
         resolve();
       });
@@ -149,7 +150,7 @@ async function killMicroservice(microservice: Microservice): Promise<void> {
 }
 
 async function killMicroservices(microservices: readonly Microservice[]): Promise<Microservice[]> {
-  console.log("killMicroservices", {
+  consola.debug("killMicroservices", {
     microservices,
   });
   const results = await Promise.allSettled(
@@ -173,7 +174,7 @@ function isMicroservicesMetadatas(value: unknown): value is { microservices: Mic
 }
 
 function projectMicroservices(projectFolderPath: string): Microservice[] {
-  console.log("projectMicroservices", {
+  consola.debug("projectMicroservices", {
     projectFolderPath,
   });
   const filePath = microservicesMetadatasPath(projectFolderPath);
@@ -192,7 +193,7 @@ function projectMicroservices(projectFolderPath: string): Microservice[] {
 
 async function cleanupBackend(projectFolderPath: string): Promise<void> {
   if (!fs.existsSync(projectFolderPath)) {
-    console.log(`Folder ${projectFolderPath} does not exist. Skipping cleanup.`);
+    consola.info(`Folder ${projectFolderPath} does not exist. Skipping cleanup.`);
     return;
   }
   const microservices = projectMicroservices(projectFolderPath);

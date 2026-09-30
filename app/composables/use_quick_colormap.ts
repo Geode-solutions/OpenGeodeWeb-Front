@@ -1,3 +1,4 @@
+import { consola } from "consola";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
@@ -46,7 +47,7 @@ export function useQuickColormap(): {
         return true;
       }
     } catch (error) {
-      console.error("Error picking colormap:", error);
+      consola.error("Error picking colormap:", error);
     }
     return false;
   }

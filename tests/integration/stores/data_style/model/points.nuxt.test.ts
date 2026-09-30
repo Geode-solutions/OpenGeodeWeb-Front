@@ -31,7 +31,6 @@ describe("model points", () => {
   }, beforeAllTimeout);
 
   afterAll(async () => {
-    console.log("afterAll model points kill", projectFolderPath);
     await cleanupBackend(projectFolderPath);
   });
 

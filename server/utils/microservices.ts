@@ -5,6 +5,7 @@ import path from "node:path";
 
 // Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json" with { type: "json" };
+import { consola } from "consola";
 
 // Local imports
 import { type Microservice, microservicesMetadatasPath, projectMicroservices } from "./cleanup.js";
@@ -31,13 +32,13 @@ async function runScript(
   timeoutSeconds = DEFAULT_TIMEOUT_SECONDS,
 ): Promise<NamedChildProcess> {
   const command = executablePath(execPath, execName);
-  console.log("runScript", command, args);
+  consola.debug("runScript", command, args);
   const child = child_process.spawn(command, args, {
     stdio: ["ignore", "pipe", "pipe"],
   }) as NamedChildProcess;
   child.name = command.replace(/^.*[\\/]/u, "");
   child.on("spawn", () => {
-    console.log(`[${child.name}] spawned, pid=${child.pid}`);
+    consola.info(`[${child.name}] spawned, pid=${child.pid}`);
   });
   const controller = new AbortController();
   const timer = setTimeout(() => {
@@ -98,16 +99,16 @@ async function runBack(
   try {
     port = await getAvailablePort();
     const executableArgs = backArgs(args, port);
-    console.log("runBack", execPath, execName, executableArgs);
+    consola.debug("runBack", execPath, execName, executableArgs);
     await runScript(execPath, execName, executableArgs, "Serving Flask app");
     return port;
   } catch (error) {
     if (!isPortInUseError(error)) {
-      console.log("runBack error", error);
+      consola.error("runBack error", error);
       throw error;
     }
     if (attempts <= MAX_PORT_RETRIES) {
-      console.log("Retrying runBack on conflicting port", port);
+      consola.info("Retrying runBack on conflicting port", port);
       const newPort = await runBack(execName, execPath, args, attempts + 1);
       return newPort;
     }
@@ -136,16 +137,16 @@ async function runViewer(
       "--timeout",
       "0",
     ];
-    console.log("runViewer", execPath, execName, viewerArgs);
+    consola.debug("runViewer", execPath, execName, viewerArgs);
     await runScript(execPath, execName, viewerArgs, "Starting factory");
     return port;
   } catch (error) {
     if (!isPortInUseError(error)) {
-      console.log("runViewer error", error);
+      consola.error("runViewer error", error);
       throw error;
     }
     if (attempts <= MAX_PORT_RETRIES) {
-      console.log("Retrying runViewer on conflicting port", port);
+      consola.info("Retrying runViewer on conflicting port", port);
       const newPort = await runViewer(execName, execPath, args, attempts + 1);
       return newPort;
     }
@@ -165,17 +166,17 @@ async function runExtension(
     port = await getAvailablePort();
     const executableArgs = backArgs(args, port);
     const command = executablePath(execPath, execName);
-    console.log("runExtension", execPath, execName, executableArgs);
+    consola.debug("runExtension", execPath, execName, executableArgs);
     addSupervisorProgram(extensionId, command, executableArgs);
     addNginxLocation(extensionId, port);
     return port;
   } catch (error) {
     if (!isPortInUseError(error)) {
-      console.log("runExtension error", error);
+      consola.error("runExtension error", error);
       throw error;
     }
     if (attempts <= MAX_PORT_RETRIES) {
-      console.log("Retrying runExtension on conflicting port", port);
+      consola.info("Retrying runExtension on conflicting port", port);
       const newPort = await runExtension(extensionId, execName, execPath, args, attempts + 1);
       return newPort;
     }
