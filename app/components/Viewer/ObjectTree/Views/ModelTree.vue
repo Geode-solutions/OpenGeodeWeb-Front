@@ -3,22 +3,19 @@ import { sortAndFormatItems, useTreeFilter } from "@ogw_front/composables/tree_f
 import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
-import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import { useModelCollections } from "@ogw_front/composables/model_collections";
-import { useModelComponents } from "@ogw_front/composables/model_components";
+import { useModelTree } from "@ogw_front/composables/model_tree";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 interface Props {
   id: string;
   viewId?: string;
-  viewType?: string;
 }
 
-const { id, viewId = undefined, viewType = "model_components" } = defineProps<Props>();
+const { id, viewId = undefined } = defineProps<Props>();
 const actualViewId = viewId || id;
 
 interface CollectionTreeItem {
@@ -49,21 +46,21 @@ const emit = defineEmits<Emits>();
 
 const treeviewStore = useTreeviewStore();
 
-const isCollections = computed(() => viewType === "model_collections");
-
-const composable = isCollections.value ? useModelCollections(id) : useModelComponents(id);
 const {
   items: rawItems,
   localCategories,
+  meshCache,
+  collectionsCache,
+  collectionTypes,
   selection: visibleComponents,
   updateVisibility,
-} = composable;
+} = useModelTree(id);
 
-const cache = computed(
-  () =>
-    ("componentsCache" in composable ? composable.componentsCache.value : undefined) ??
-    ("collectionsCache" in composable ? composable.collectionsCache.value : undefined),
-);
+function cacheFor(categoryId: string): Record<string, CollectionTreeItem[]> | undefined {
+  return (collectionTypes.value.has(categoryId) ? collectionsCache.value : meshCache.value) as
+    | Record<string, CollectionTreeItem[]>
+    | undefined;
+}
 
 const currentView = computed(() =>
   treeviewStore.opened_views.find((view) => view.id === actualViewId),
@@ -94,40 +91,55 @@ const visibleSelection = computed<string[]>(
   () => applySearchFilter(visibleComponents.value, []) as string[],
 );
 
-const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
-  if (search.value && cache.value) {
-    const query = search.value.toLowerCase();
-    const result: CollectionTreeItem[] = [];
-    for (const type of Object.keys(cache.value)) {
-      const matches = (cache.value[type] ?? []).filter(
-        (component: { title: string; id: string }) =>
-          component.title.toLowerCase().includes(query) ||
-          component.id.toLowerCase().includes(query),
-      );
-      if (matches.length > 0) {
-        result.push({
-          id: type,
-          title: `${type}s (${matches.length})`,
-          children: sortAndFormatItems(matches, sortType.value) as unknown as CollectionTreeItem[],
-        });
-      }
+function searchGroups(
+  cache: Record<string, CollectionTreeItem[]> | undefined,
+  query: string,
+): CollectionTreeItem[] {
+  const result: CollectionTreeItem[] = [];
+  for (const type of Object.keys(cache ?? {})) {
+    const matches = (cache?.[type] ?? []).filter(
+      (component) =>
+        (component.title ?? "").toLowerCase().includes(query) ||
+        component.id.toLowerCase().includes(query),
+    );
+    if (matches.length > 0) {
+      result.push({
+        id: type,
+        title: `${type}s (${matches.length})`,
+        children: sortAndFormatItems(matches, sortType.value) as unknown as CollectionTreeItem[],
+      });
     }
-    return result;
+  }
+  return result;
+}
+
+const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
+  if (search.value) {
+    const query = search.value.toLowerCase();
+    return [
+      ...searchGroups(meshCache.value as Record<string, CollectionTreeItem[]> | undefined, query),
+      ...searchGroups(
+        collectionsCache.value as Record<string, CollectionTreeItem[]> | undefined,
+        query,
+      ),
+    ];
   }
 
-  const result: CollectionTreeItem[] = [];
+  const meshGroups: CollectionTreeItem[] = [];
+  const collectionGroups: CollectionTreeItem[] = [];
   for (const category of filteredCategories.value) {
     const categoryId = category.id as string;
-    result.push({
+    const target = collectionTypes.value.has(categoryId) ? collectionGroups : meshGroups;
+    target.push({
       ...category,
       id: categoryId,
       children: sortAndFormatItems(
-        cache.value?.[categoryId],
+        cacheFor(categoryId)?.[categoryId],
         sortType.value,
       ) as unknown as CollectionTreeItem[],
     });
   }
-  return result;
+  return [...meshGroups, ...collectionGroups];
 });
 
 function extractComponentIds(node: CollectionTreeItem): string[] {
@@ -137,9 +149,13 @@ function extractComponentIds(node: CollectionTreeItem): string[] {
   return [node.id];
 }
 
+function isCollectionNode(item: CollectionTreeItem): boolean {
+  return collectionTypes.value.has(item.category ?? item.id);
+}
+
 function showContextMenu(event: unknown, item: CollectionTreeItem): void {
   const actualItem = item.raw || item;
-  if (isCollections.value && !MESH_COMPONENT_TYPES.includes(actualItem.category ?? "")) {
+  if (isCollectionNode(actualItem)) {
     emit("show-menu", {
       event,
       itemId: id,

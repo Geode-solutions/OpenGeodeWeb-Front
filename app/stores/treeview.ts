@@ -4,7 +4,6 @@ import { defineStore } from "pinia";
 
 import type { Table } from "dexie";
 import { ref, watch } from "vue";
-import { compareSelections } from "@ogw_front/utils/treeview";
 import { database } from "@ogw_internal/database/database";
 
 const PANEL_WIDTH = 300;
@@ -16,7 +15,6 @@ interface OpenedView {
   scrollTop: number;
   opened: string[];
   modelId?: string;
-  viewType?: string;
   geode_object_type?: string;
 }
 
@@ -142,18 +140,6 @@ export const useTreeviewStore = defineStore("treeview", () => {
     opened_views.value = opened_views.value.filter((view: ReadonlyOpenedView) => view.id !== id);
   }
 
-  watch(selection, (current: readonly string[], previous: readonly string[]) => {
-    const { removed } = compareSelections(current, previous);
-    for (const id of removed) {
-      const index = opened_views.value.findIndex(
-        (view: ReadonlyOpenedView) => view.type === "component" && view.id === id,
-      );
-      if (index !== -1) {
-        closeView(id);
-      }
-    }
-  });
-
   function toggleView(id: string): void {
     const index = opened_views.value.findIndex((view: ReadonlyOpenedView) => view.id === id);
     if (index !== -1) {
@@ -199,6 +185,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
   }
 
   function removeItem(id: string): void {
+    closeView(id);
     for (let index = 0; index < items.value.length; index += 1) {
       const group = items.value[index];
       if (!group) {
@@ -216,24 +203,17 @@ export const useTreeviewStore = defineStore("treeview", () => {
     }
   }
 
-  function displayAdditionalTree(
-    id: string,
-    title: string | undefined,
-    geodeObjectType: string,
-    viewType = "model_components",
-  ): void {
-    const viewId = `${id}_${viewType}`;
-    const index = opened_views.value.findIndex((view: ReadonlyOpenedView) => view.id === viewId);
+  function displayAdditionalTree(id: string, title: string | undefined, geodeObjectType: string): void {
+    const index = opened_views.value.findIndex((view: ReadonlyOpenedView) => view.id === id);
     if (index !== -1) {
-      closeView(viewId);
+      closeView(id);
       return;
     }
     additionalPanelWidth.value = panelWidth.value;
     opened_views.value.push({
       type: "component",
-      id: viewId,
+      id,
       modelId: id,
-      viewType,
       title: title ?? id,
       geode_object_type: geodeObjectType,
       scrollTop: 0,
