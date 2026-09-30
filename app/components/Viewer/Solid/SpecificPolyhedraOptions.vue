@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { type BatchRange, useBatchStyle } from "@ogw_front/composables/batch_style";
+import {
+  type RangesPerData,
+  applyRangesPerData,
+  useBatchStyle,
+} from "@ogw_front/composables/batch_style";
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
@@ -12,7 +16,7 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
-const { applyBatchRange, applyBatchStyle } = useBatchStyle();
+const { applyBatchStyle } = useBatchStyle();
 
 interface Props {
   itemProps: ItemProps & { index: number };
@@ -71,11 +75,17 @@ const vertex_attribute_item = computed<string | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_range = computed<BatchRange>({
+const vertex_attribute_range = computed<[number, number] | undefined>({
   get: () => dataStyleStore.meshPolyhedraVertexAttributeRange(id.value),
   set: async (newValue) => {
-    await applyBatchRange(id.value, newValue, (targetId, minimum, maximum) =>
-      dataStyleStore.setMeshPolyhedraVertexAttributeRange(targetId, minimum, maximum),
+    const [minimum, maximum] = newValue;
+    if (minimum === undefined || maximum === undefined) {
+      return;
+    }
+    await applyBatchStyle(id.value, (targetId: string) =>
+      Promise.resolve(
+        dataStyleStore.setMeshPolyhedraVertexAttributeRange(targetId, minimum, maximum),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
@@ -120,11 +130,17 @@ const polyhedron_attribute_item = computed<string | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
-const polyhedron_attribute_range = computed<BatchRange>({
+const polyhedron_attribute_range = computed<[number, number] | undefined>({
   get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeRange(id.value),
   set: async (newValue) => {
-    await applyBatchRange(id.value, newValue, (targetId, minimum, maximum) =>
-      dataStyleStore.setMeshPolyhedraPolyhedronAttributeRange(targetId, minimum, maximum),
+    const [minimum, maximum] = newValue;
+    if (minimum === undefined || maximum === undefined) {
+      return;
+    }
+    await applyBatchStyle(id.value, (targetId: string) =>
+      Promise.resolve(
+        dataStyleStore.setMeshPolyhedraPolyhedronAttributeRange(targetId, minimum, maximum),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
@@ -150,6 +166,20 @@ const polyhedron_attribute_no_data_color = computed<RGBAColor | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
+
+async function setVertexAttributeRangesPerData(ranges: RangesPerData): Promise<void> {
+  await applyRangesPerData(ranges, (targetId, minimum, maximum) =>
+    dataStyleStore.setMeshPolyhedraVertexAttributeRange(targetId, minimum, maximum),
+  );
+  hybridViewerStore.remoteRender();
+}
+
+async function setPolyhedronAttributeRangesPerData(ranges: RangesPerData): Promise<void> {
+  await applyRangesPerData(ranges, (targetId, minimum, maximum) =>
+    dataStyleStore.setMeshPolyhedraPolyhedronAttributeRange(targetId, minimum, maximum),
+  );
+  hybridViewerStore.remoteRender();
+}
 </script>
 <template>
   <ViewerContextMenuItem
@@ -172,11 +202,13 @@ const polyhedron_attribute_no_data_color = computed<RGBAColor | undefined>({
           v-model:vertex_attribute_name="vertex_attribute_name"
           v-model:vertex_attribute_item="vertex_attribute_item"
           v-model:vertex_attribute_range="vertex_attribute_range"
+          @vertex_attribute_ranges_per_data="setVertexAttributeRangesPerData"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
           v-model:vertex_attribute_no_data_color="vertex_attribute_no_data_color"
           v-model:polyhedron_attribute_name="polyhedron_attribute_name"
           v-model:polyhedron_attribute_item="polyhedron_attribute_item"
           v-model:polyhedron_attribute_range="polyhedron_attribute_range"
+          @polyhedron_attribute_ranges_per_data="setPolyhedronAttributeRangesPerData"
           v-model:polyhedron_attribute_color_map="polyhedron_attribute_color_map"
           v-model:polyhedron_attribute_no_data_color="polyhedron_attribute_no_data_color"
         />

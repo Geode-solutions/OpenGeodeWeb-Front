@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { type BatchRange, useBatchStyle } from "@ogw_front/composables/batch_style";
+import {
+  type RangesPerData,
+  applyRangesPerData,
+  useBatchStyle,
+} from "@ogw_front/composables/batch_style";
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
@@ -13,7 +17,7 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
-const { applyBatchRange, applyBatchStyle } = useBatchStyle();
+const { applyBatchStyle } = useBatchStyle();
 
 interface Props {
   itemProps: ItemProps & { index: number };
@@ -80,11 +84,15 @@ const vertex_attribute_item = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_range = computed<BatchRange>({
+const vertex_attribute_range = computed({
   get: () => dataStyleStore.meshPointsVertexAttributeRange(id.value),
   set: async (newValue) => {
-    await applyBatchRange(id.value, newValue, (targetId, minimum, maximum) =>
-      dataStyleStore.setMeshPointsVertexAttributeRange(targetId, minimum, maximum),
+    const [minimum, maximum] = newValue;
+    if (minimum === undefined || maximum === undefined) {
+      return;
+    }
+    await applyBatchStyle(id.value, (targetId: string) =>
+      Promise.resolve(dataStyleStore.setMeshPointsVertexAttributeRange(targetId, minimum, maximum)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -107,6 +115,13 @@ const vertex_attribute_no_data_color = computed<RGBAColor | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
+
+async function setVertexAttributeRangesPerData(ranges: RangesPerData): Promise<void> {
+  await applyRangesPerData(ranges, (targetId, minimum, maximum) =>
+    dataStyleStore.setMeshPointsVertexAttributeRange(targetId, minimum, maximum),
+  );
+  hybridViewerStore.remoteRender();
+}
 </script>
 <template>
   <ViewerContextMenuItem
@@ -131,6 +146,7 @@ const vertex_attribute_no_data_color = computed<RGBAColor | undefined>({
           v-model:vertex_attribute_name="vertex_attribute_name"
           v-model:vertex_attribute_item="vertex_attribute_item"
           v-model:vertex_attribute_range="vertex_attribute_range"
+          @vertex_attribute_ranges_per_data="setVertexAttributeRangesPerData"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
           v-model:vertex_attribute_no_data_color="vertex_attribute_no_data_color"
           :vertex_has_colormap="true"

@@ -11,48 +11,36 @@ import { useDataStore } from "@ogw_front/stores/data";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 type AttributeRange = [number, number];
-type BatchRange = readonly (number | undefined)[];
+type RangesPerData = ReadonlyMap<string, AttributeRange>;
 
-interface BatchGroup {
-  targetIds: ComputedRef<string[]>;
-  rangesPerData: WeakMap<BatchRange, ReadonlyMap<string, AttributeRange>>;
-}
-
-const BATCH_GROUP_KEY: InjectionKey<BatchGroup> = Symbol("batch_group");
-
-function createBatchGroup(targetIds: () => string[]): BatchGroup {
-  return { targetIds: computed(targetIds), rangesPerData: new WeakMap() };
-}
+const BATCH_GROUP_KEY: InjectionKey<ComputedRef<string[]>> = Symbol("batch_group");
 
 function provideBatchGroup(targetIds: () => string[]): void {
-  provide(BATCH_GROUP_KEY, createBatchGroup(targetIds));
+  provide(BATCH_GROUP_KEY, computed(targetIds));
 }
 
-function injectBatchGroup(): BatchGroup {
-  return inject(BATCH_GROUP_KEY, () => createBatchGroup(() => []), true);
+function injectBatchGroup(): ComputedRef<string[]> {
+  return inject(BATCH_GROUP_KEY, () => computed(() => []), true);
 }
 
-function groupTargetsOf(group: BatchGroup, id: string): string[] | undefined {
-  const targetIds = group.targetIds.value;
+function groupTargetsOf(targetIds: string[], id: string): string[] | undefined {
   return targetIds.includes(id) ? targetIds : undefined;
 }
 
-function useBatchGroup(id: MaybeRefOrGetter<string>): {
-  targetIds: ComputedRef<string[] | undefined>;
-  withRangesPerData: (range: BatchRange, ranges: ReadonlyMap<string, AttributeRange>) => BatchRange;
-} {
+function useBatchGroup(id: MaybeRefOrGetter<string>): ComputedRef<string[] | undefined> {
   const group = injectBatchGroup();
-  const targetIds = computed(() => groupTargetsOf(group, toValue(id)));
+  return computed(() => groupTargetsOf(group.value, toValue(id)));
+}
 
-  function withRangesPerData(
-    range: BatchRange,
-    ranges: ReadonlyMap<string, AttributeRange>,
-  ): BatchRange {
-    group.rangesPerData.set(range, ranges);
-    return range;
-  }
-
-  return { targetIds, withRangesPerData };
+async function applyRangesPerData(
+  ranges: RangesPerData,
+  setRange: (id: string, minimum: number, maximum: number) => unknown,
+): Promise<void> {
+  await Promise.all(
+    [...ranges].map(async ([targetId, [minimum, maximum]]) => {
+      await setRange(targetId, minimum, maximum);
+    }),
+  );
 }
 
 async function applyActionOn(
@@ -66,10 +54,7 @@ async function applyActionOn(
   );
 }
 
-function useBatchStyle(): {
-  applyBatchStyle: typeof applyBatchStyle;
-  applyBatchRange: typeof applyBatchRange;
-} {
+function useBatchStyle(): { applyBatchStyle: typeof applyBatchStyle } {
   const treeviewStore = useTreeviewStore();
   const dataStore = useDataStore();
   const group = injectBatchGroup();
@@ -78,7 +63,7 @@ function useBatchStyle(): {
     id: string,
     action: (id: string) => Promise<unknown>,
   ): Promise<void> {
-    const groupTargets = groupTargetsOf(group, id);
+    const groupTargets = groupTargetsOf(group.value, id);
     if (groupTargets) {
       await applyActionOn(groupTargets, action);
       return;
@@ -111,24 +96,8 @@ function useBatchStyle(): {
     }
   }
 
-  async function applyBatchRange(
-    id: string,
-    range: BatchRange,
-    setRange: (id: string, minimum: number, maximum: number) => unknown,
-  ): Promise<void> {
-    const rangesPerData = group.rangesPerData.get(range);
-    await applyBatchStyle(id, async (targetId: string) => {
-      const [minimum, maximum] =
-        rangesPerData === undefined ? range : (rangesPerData.get(targetId) ?? range);
-      if (minimum === undefined || maximum === undefined) {
-        return;
-      }
-      await setRange(targetId, minimum, maximum);
-    });
-  }
-
-  return { applyBatchStyle, applyBatchRange };
+  return { applyBatchStyle };
 }
 
-export { BATCH_GROUP_KEY, createBatchGroup, provideBatchGroup, useBatchGroup, useBatchStyle };
-export type { AttributeRange, BatchRange };
+export { BATCH_GROUP_KEY, applyRangesPerData, provideBatchGroup, useBatchGroup, useBatchStyle };
+export type { AttributeRange, RangesPerData };

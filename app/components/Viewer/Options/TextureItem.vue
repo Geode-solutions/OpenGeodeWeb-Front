@@ -43,7 +43,7 @@ watch(
 const textureCoordinates = ref<string[]>([]);
 const backStore = useBackStore();
 
-const { targetIds: groupTargetIds } = useBatchGroup(() => id);
+const groupTargetIds = useBatchGroup(() => id);
 
 async function getTextureCoordinates(): Promise<void> {
   const schema = back_schemas.opengeodeweb_back.texture_coordinates;

@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { type BatchRange, useBatchStyle } from "@ogw_front/composables/batch_style";
+import {
+  type RangesPerData,
+  applyRangesPerData,
+  useBatchStyle,
+} from "@ogw_front/composables/batch_style";
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
@@ -16,7 +20,7 @@ interface Texture {
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
-const { applyBatchRange, applyBatchStyle } = useBatchStyle();
+const { applyBatchStyle } = useBatchStyle();
 
 interface Props {
   itemProps: ItemProps & { index?: number };
@@ -86,11 +90,15 @@ const vertex_attribute_item = computed<string | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_range = computed<BatchRange>({
+const vertex_attribute_range = computed<[number, number] | undefined>({
   get: () => dataStyleStore.meshCellsVertexAttributeRange(id.value),
   set: async (newValue) => {
-    await applyBatchRange(id.value, newValue, (targetId, minimum, maximum) =>
-      dataStyleStore.setMeshCellsVertexAttributeRange(targetId, minimum, maximum),
+    const [minimum, maximum] = newValue;
+    if (minimum === undefined || maximum === undefined) {
+      return;
+    }
+    await applyBatchStyle(id.value, (targetId: string) =>
+      Promise.resolve(dataStyleStore.setMeshCellsVertexAttributeRange(targetId, minimum, maximum)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -134,11 +142,15 @@ const cell_attribute_item = computed<string | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
-const cell_attribute_range = computed<BatchRange>({
+const cell_attribute_range = computed<[number, number] | undefined>({
   get: () => dataStyleStore.meshCellsCellAttributeRange(id.value),
   set: async (newValue) => {
-    await applyBatchRange(id.value, newValue, (targetId, minimum, maximum) =>
-      dataStyleStore.setMeshCellsCellAttributeRange(targetId, minimum, maximum),
+    const [minimum, maximum] = newValue;
+    if (minimum === undefined || maximum === undefined) {
+      return;
+    }
+    await applyBatchStyle(id.value, (targetId: string) =>
+      Promise.resolve(dataStyleStore.setMeshCellsCellAttributeRange(targetId, minimum, maximum)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -161,6 +173,20 @@ const cell_attribute_no_data_color = computed<RGBAColor | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
+
+async function setVertexAttributeRangesPerData(ranges: RangesPerData): Promise<void> {
+  await applyRangesPerData(ranges, (targetId, minimum, maximum) =>
+    dataStyleStore.setMeshCellsVertexAttributeRange(targetId, minimum, maximum),
+  );
+  hybridViewerStore.remoteRender();
+}
+
+async function setCellAttributeRangesPerData(ranges: RangesPerData): Promise<void> {
+  await applyRangesPerData(ranges, (targetId, minimum, maximum) =>
+    dataStyleStore.setMeshCellsCellAttributeRange(targetId, minimum, maximum),
+  );
+  hybridViewerStore.remoteRender();
+}
 </script>
 
 <template>
@@ -183,11 +209,13 @@ const cell_attribute_no_data_color = computed<RGBAColor | undefined>({
           v-model:vertex_attribute_name="vertex_attribute_name"
           v-model:vertex_attribute_item="vertex_attribute_item"
           v-model:vertex_attribute_range="vertex_attribute_range"
+          @vertex_attribute_ranges_per_data="setVertexAttributeRangesPerData"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
           v-model:vertex_attribute_no_data_color="vertex_attribute_no_data_color"
           v-model:cell_attribute_name="cell_attribute_name"
           v-model:cell_attribute_item="cell_attribute_item"
           v-model:cell_attribute_range="cell_attribute_range"
+          @cell_attribute_ranges_per_data="setCellAttributeRangesPerData"
           v-model:cell_attribute_color_map="cell_attribute_color_map"
           v-model:cell_attribute_no_data_color="cell_attribute_no_data_color"
         />

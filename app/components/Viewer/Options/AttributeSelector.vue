@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {
   type AttributeRange,
-  type BatchRange,
+  type RangesPerData,
   useBatchGroup,
 } from "@ogw_front/composables/batch_style";
 import { getAttributeRange, intersectAttributes } from "@ogw_front/utils/attributes";
@@ -16,7 +16,9 @@ const backStore = useBackStore();
 
 const attributeName = defineModel<string>("attributeName");
 const attributeItem = defineModel<number>("attributeItem");
-const attributeRange = defineModel<BatchRange>("attributeRange", { default: () => [] });
+const attributeRange = defineModel<(number | undefined)[]>("attributeRange", {
+  default: () => [],
+});
 const attributeColorMap = defineModel<string>("attributeColorMap");
 const attributeNoDataColor = defineModel<typeof DEFAULT_NO_DATA_COLOR>("attributeNoDataColor");
 
@@ -30,6 +32,7 @@ const { id, componentIds = undefined, schema } = defineProps<Props>();
 
 interface Emits {
   "update:attributeColorMap": [colorMap: string];
+  ranges_per_data: [ranges: RangesPerData];
 }
 
 const emit = defineEmits<Emits>();
@@ -44,7 +47,7 @@ interface AttributeInfo {
 const attributes = ref<AttributeInfo[]>([]);
 let attributesPerTarget = new Map<string, AttributeInfo[]>();
 
-const { targetIds: groupTargetIds, withRangesPerData } = useBatchGroup(() => id);
+const groupTargetIds = useBatchGroup(() => id);
 
 const currentAttribute = computed<AttributeInfo | undefined>(() =>
   attributes.value.find((attr) => attr.attribute_name === attributeName.value),
@@ -133,7 +136,7 @@ function initGroupAttribute(name: string, item: number): void {
     }
   }
   emit("update:attributeColorMap", attributeColorMap.value ?? "batlow");
-  attributeRange.value = withRangesPerData([...(ranges.get(id) ?? [])], ranges);
+  emit("ranges_per_data", ranges);
 }
 
 async function getAttributes(): Promise<void> {
