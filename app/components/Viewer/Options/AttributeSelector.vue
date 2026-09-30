@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { getAttributeRange, intersectAttributes } from "@ogw_front/utils/attributes";
-import { menuGroupTargets, runWithBatchTargets } from "@ogw_front/composables/batch_style";
+import { requestForTargets, useBatchGroup } from "@ogw_front/composables/batch_style";
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
 import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar.vue";
@@ -37,9 +37,9 @@ interface AttributeInfo {
 }
 
 const attributes = ref<AttributeInfo[]>([]);
-const attributesPerTarget = ref<Record<string, AttributeInfo[]>>({});
+let attributesPerTarget = new Map<string, AttributeInfo[]>();
 
-const groupTargetIds = computed<string[] | undefined>(() => menuGroupTargets(id));
+const { targetIds: groupTargetIds, ranges: groupRanges } = useBatchGroup(() => id);
 
 const currentAttribute = computed<AttributeInfo | undefined>(() =>
   attributes.value.find((attr) => attr.attribute_name === attributeName.value),
@@ -113,47 +113,32 @@ function hasSelectedComponent(components: unknown): boolean {
   return Array.isArray(components) && components.length > 0;
 }
 
-function getGroupAttributes(targetIds: string[]): void {
-  for (const targetId of targetIds) {
-    backStore.request(
-      { schema, params: { id: targetId } },
-      {
-        response_function: (response: unknown) => {
-          attributesPerTarget.value[targetId] = (
-            response as { attributes: AttributeInfo[] }
-          ).attributes;
-          if (targetIds.every((target) => attributesPerTarget.value[target] !== undefined)) {
-            attributes.value = intersectAttributes(
-              targetIds.map((target) => attributesPerTarget.value[target] ?? []),
-            );
-          }
-        },
-      },
-    );
-  }
+async function getGroupAttributes(targetIds: string[]): Promise<void> {
+  const responses = await requestForTargets<{ attributes: AttributeInfo[] }>(schema, targetIds);
+  attributesPerTarget = new Map(
+    [...responses].map(([targetId, response]) => [targetId, response.attributes]),
+  );
+  attributes.value = intersectAttributes([...attributesPerTarget.values()]);
 }
 
-function initGroupAttribute(targetIds: string[], name: string, item: number): void {
-  emit("update:attributeColorMap", attributeColorMap.value ?? "batlow");
-  for (const targetId of targetIds) {
-    const attribute = attributesPerTarget.value[targetId]?.find(
-      (candidate) => candidate.attribute_name === name,
-    );
+function initGroupAttribute(name: string, item: number): void {
+  for (const [targetId, targetAttributes] of attributesPerTarget) {
+    const attribute = targetAttributes.find((candidate) => candidate.attribute_name === name);
     if (attribute) {
       const { min, max } = getAttributeRange(
         attribute as unknown as Parameters<typeof getAttributeRange>[0],
         item,
       );
-      runWithBatchTargets([targetId], () => {
-        attributeRange.value = [min, max];
-      });
+      groupRanges.value?.set(targetId, [min, max]);
     }
   }
+  emit("update:attributeColorMap", attributeColorMap.value ?? "batlow");
+  resetRange();
 }
 
-function getAttributes(): void {
+async function getAttributes(): Promise<void> {
   if (groupTargetIds.value) {
-    getGroupAttributes(groupTargetIds.value);
+    await getGroupAttributes(groupTargetIds.value);
     return;
   }
   const schemaProperties = schema.properties as Record<string, unknown> | undefined;
@@ -167,7 +152,7 @@ function getAttributes(): void {
     params.component_ids = componentIds;
   }
 
-  backStore.request(
+  await backStore.request(
     { schema, params },
     {
       response_function: (response: unknown) => {
@@ -177,20 +162,20 @@ function getAttributes(): void {
   );
 }
 
-onMounted(() => {
-  getAttributes();
+onMounted(async () => {
+  await getAttributes();
 });
 
 watch(
   () => [id, componentIds, schema],
-  () => {
-    getAttributes();
+  async () => {
+    await getAttributes();
   },
 );
 
 watch([attributeName, attributeItem], ([name, item]) => {
   if (groupTargetIds.value && name !== undefined) {
-    initGroupAttribute(groupTargetIds.value, name, item ?? 0);
+    initGroupAttribute(name, item ?? 0);
   }
 });
 

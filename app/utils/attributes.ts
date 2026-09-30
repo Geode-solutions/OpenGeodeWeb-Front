@@ -62,6 +62,16 @@ const MODEL_COMPONENT_KINDS: Record<string, string[]> = {
   Block: ["vertex", "polyhedron"],
 };
 
+function intersectBy<TItem>(
+  lists: readonly (readonly TItem[])[],
+  key: (item: TItem) => string,
+): TItem[] {
+  const [first = [], ...others] = lists;
+  return first.filter((item) =>
+    others.every((list) => list.some((other) => key(other) === key(item))),
+  );
+}
+
 interface NamedAttribute {
   attribute_name: string;
   nb_items: number;
@@ -70,21 +80,23 @@ interface NamedAttribute {
 function intersectAttributes<TAttribute extends NamedAttribute>(
   attributesPerData: readonly (readonly TAttribute[])[],
 ): TAttribute[] {
-  const [first, ...others] = attributesPerData;
-  if (!first) {
-    return [];
-  }
+  const allAttributes = attributesPerData.flat();
   const common: TAttribute[] = [];
-  for (const attribute of first) {
-    const matches = others.map((attributes) =>
-      attributes.find((other) => other.attribute_name === attribute.attribute_name),
+  for (const attribute of intersectBy(attributesPerData, (item) => item.attribute_name)) {
+    const nb_items = Math.min(
+      ...allAttributes
+        .filter((other) => other.attribute_name === attribute.attribute_name)
+        .map((other) => other.nb_items),
     );
-    if (matches.every((match) => match !== undefined)) {
-      const nb_items = Math.min(attribute.nb_items, ...matches.map((match) => match.nb_items));
-      common.push({ ...attribute, nb_items });
-    }
+    common.push({ ...attribute, nb_items });
   }
   return common;
 }
 
-export { MESH_ELEMENT_KINDS, MODEL_COMPONENT_KINDS, getAttributeRange, intersectAttributes };
+export {
+  MESH_ELEMENT_KINDS,
+  MODEL_COMPONENT_KINDS,
+  getAttributeRange,
+  intersectAttributes,
+  intersectBy,
+};

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import OverlappingObjectsPicker from "@ogw_front/components/Viewer/OverlappingObjectsPicker.vue";
 import ToolActiveChip from "@ogw_front/components/Viewer/ToolActiveChip.vue";
+import type { TreeMenuPayload } from "@ogw_front/utils/treeview";
 import ViewerContextMenu from "@ogw_front/components/Viewer/ContextMenu/ContextMenu.vue";
 import ViewerObjectTreeLayout from "@ogw_front/components/Viewer/ObjectTree/Layout.vue";
 import { getCurrentInstance } from "vue";
@@ -18,7 +19,7 @@ interface Props {
 const { displayMenu, containerWidth, containerHeight } = defineProps<Props>();
 
 const emit = defineEmits<{
-  "show-menu": [args: unknown];
+  "show-menu": [payload: TreeMenuPayload];
 }>();
 const menuStore = useMenuStore();
 const viewerStore = useViewerStore();

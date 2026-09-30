@@ -16,7 +16,7 @@ interface Texture {
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
-const { applyBatchStyle } = useBatchStyle();
+const { applyBatchRange, applyBatchStyle } = useBatchStyle();
 
 interface Props {
   itemProps: ItemProps & { index?: number };
@@ -93,8 +93,8 @@ const vertex_attribute_range = computed<[number, number] | undefined>({
     if (minimum === undefined || maximum === undefined) {
       return;
     }
-    await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshCellsVertexAttributeRange(targetId, minimum, maximum)),
+    await applyBatchRange(id.value, [minimum, maximum], (targetId, rangeMinimum, rangeMaximum) =>
+      dataStyleStore.setMeshCellsVertexAttributeRange(targetId, rangeMinimum, rangeMaximum),
     );
     hybridViewerStore.remoteRender();
   },
@@ -145,8 +145,8 @@ const cell_attribute_range = computed<[number, number] | undefined>({
     if (minimum === undefined || maximum === undefined) {
       return;
     }
-    await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshCellsCellAttributeRange(targetId, minimum, maximum)),
+    await applyBatchRange(id.value, [minimum, maximum], (targetId, rangeMinimum, rangeMaximum) =>
+      dataStyleStore.setMeshCellsCellAttributeRange(targetId, rangeMinimum, rangeMaximum),
     );
     hybridViewerStore.remoteRender();
   },

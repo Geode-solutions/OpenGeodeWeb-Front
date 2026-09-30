@@ -12,7 +12,7 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
-const { applyBatchStyle } = useBatchStyle();
+const { applyBatchRange, applyBatchStyle } = useBatchStyle();
 
 interface Props {
   itemProps: ItemProps & { index: number };
@@ -78,10 +78,8 @@ const vertex_attribute_range = computed<[number, number] | undefined>({
     if (minimum === undefined || maximum === undefined) {
       return;
     }
-    await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(
-        dataStyleStore.setMeshPolyhedraVertexAttributeRange(targetId, minimum, maximum),
-      ),
+    await applyBatchRange(id.value, [minimum, maximum], (targetId, rangeMinimum, rangeMaximum) =>
+      dataStyleStore.setMeshPolyhedraVertexAttributeRange(targetId, rangeMinimum, rangeMaximum),
     );
     hybridViewerStore.remoteRender();
   },
@@ -133,10 +131,8 @@ const polyhedron_attribute_range = computed<[number, number] | undefined>({
     if (minimum === undefined || maximum === undefined) {
       return;
     }
-    await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(
-        dataStyleStore.setMeshPolyhedraPolyhedronAttributeRange(targetId, minimum, maximum),
-      ),
+    await applyBatchRange(id.value, [minimum, maximum], (targetId, rangeMinimum, rangeMaximum) =>
+      dataStyleStore.setMeshPolyhedraPolyhedronAttributeRange(targetId, rangeMinimum, rangeMaximum),
     );
     hybridViewerStore.remoteRender();
   },

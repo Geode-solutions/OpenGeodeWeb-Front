@@ -247,3 +247,5 @@ export const useMenuStore = defineStore("menu", () => {
     toggleItemOptions,
   };
 });
+
+export type { MenuMetaData };

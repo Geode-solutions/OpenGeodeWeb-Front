@@ -21,7 +21,7 @@ interface CapabilityConfig {
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
-const { applyBatchStyle } = useBatchStyle();
+const { applyBatchRange, applyBatchStyle } = useBatchStyle();
 
 interface Props {
   itemProps: ItemProps & { index?: number };
@@ -104,10 +104,8 @@ const vertex_attribute_range = computed<[number, number] | undefined>({
     if (minimum === undefined || maximum === undefined) {
       return;
     }
-    await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(
-        dataStyleStore.setMeshPolygonsVertexAttributeRange(targetId, minimum, maximum),
-      ),
+    await applyBatchRange(id.value, [minimum, maximum], (targetId, rangeMinimum, rangeMaximum) =>
+      dataStyleStore.setMeshPolygonsVertexAttributeRange(targetId, rangeMinimum, rangeMaximum),
     );
     hybridViewerStore.remoteRender();
   },
@@ -159,10 +157,8 @@ const polygon_attribute_range = computed<[number, number] | undefined>({
     if (minimum === undefined || maximum === undefined) {
       return;
     }
-    await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(
-        dataStyleStore.setMeshPolygonsPolygonAttributeRange(targetId, minimum, maximum),
-      ),
+    await applyBatchRange(id.value, [minimum, maximum], (targetId, rangeMinimum, rangeMaximum) =>
+      dataStyleStore.setMeshPolygonsPolygonAttributeRange(targetId, rangeMinimum, rangeMaximum),
     );
     hybridViewerStore.remoteRender();
   },

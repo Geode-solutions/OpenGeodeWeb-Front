@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import {
+  type DataMenuPayload,
+  type GeodeObjectTypeMenuPayload,
+  compareSelections,
+} from "@ogw_front/utils/treeview";
 import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
-import { compareSelections } from "@ogw_front/utils/treeview";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
@@ -17,15 +21,8 @@ const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 
-interface ShowMenuPayload {
-  event: MouseEvent;
-  itemId: string;
-  context_type?: "geode_object_type";
-  targetIds?: string[];
-}
-
 interface Emits {
-  "show-menu": [payload: ShowMenuPayload];
+  "show-menu": [payload: DataMenuPayload | GeodeObjectTypeMenuPayload];
 }
 
 const emit = defineEmits<Emits>();
@@ -57,7 +54,7 @@ const {
 } = useTreeFilter(() => treeviewStore.items, { recursiveSort: true });
 
 function onUpdateSelection(val: string[]): void {
-  treeviewStore.selection = applySearchFilter(val, treeviewStore.selection) as string[];
+  treeviewStore.selection = applySearchFilter(val, treeviewStore.selection);
 }
 
 const visibleSelection = computed<string[]>(() => applySearchFilter(treeviewStore.selection, []));
@@ -100,7 +97,7 @@ function showMenu(event: MouseEvent, item: TreeGroupItem): void {
     event,
     itemId: actualItem.id,
     context_type: "geode_object_type",
-    targetIds: applySearchFilter(childIds) as string[],
+    targetIds: applySearchFilter(childIds),
   });
 }
 

@@ -28,10 +28,10 @@ interface UseTreeFilterReturn {
   availableFilterOptions: ComputedRef<string[]>;
   toggleSort: () => void;
   customFilter: typeof customFilter;
-  applySearchFilter: (
-    newSelection: readonly unknown[],
-    previousSelection?: readonly unknown[],
-  ) => unknown[];
+  applySearchFilter: <TId>(
+    newSelection: readonly TId[],
+    previousSelection?: readonly TId[],
+  ) => TId[];
 }
 
 function customFilter(
@@ -161,10 +161,10 @@ function useTreeFilter(
     return map;
   });
 
-  function applySearchFilter(
-    newSelection: readonly unknown[],
-    previousSelection: readonly unknown[] = [],
-  ): unknown[] {
+  function applySearchFilter<TId>(
+    newSelection: readonly TId[],
+    previousSelection: readonly TId[] = [],
+  ): TId[] {
     if (!search.value) {
       return [...newSelection];
     }
