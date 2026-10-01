@@ -46,7 +46,6 @@ function isFileDownloadData(
 }
 
 async function exportProject(): Promise<{ result: unknown }> {
-  console.log("[export triggered]");
   const appStore = useAppStore();
   const backStore = useBackStore();
   const feedbackStore = useFeedbackStore();

@@ -117,7 +117,7 @@ describe("cloud store", () => {
         await cloudStore.launch(EMAIL);
 
         expect(mockedFetch).toHaveBeenCalledWith(
-          "/cloud/run",
+          "cloud_api/cloud/run",
           expect.objectContaining({
             baseURL: CLOUD_API_URL,
             body: { email: EMAIL, project: PROJECT, branch: BRANCH },
@@ -188,7 +188,7 @@ describe("cloud store", () => {
             baseURL: `https://${CLOUD_RUN_HOST}:443/geode`,
           }),
         );
-        expect(mockedFetch).not.toHaveBeenCalledWith("/cloud/run", expect.anything());
+        expect(mockedFetch).not.toHaveBeenCalledWith("cloud_api/cloud/run", expect.anything());
         expect(cloudStore.status).toBe(Status.CONNECTED);
         expect(feedbackStore.server_error).toBe(false);
         expect(useInfraStore().domain_name).toBe(CLOUD_RUN_HOST);
@@ -251,7 +251,7 @@ describe("cloud store", () => {
         setCloudUrlParam();
         await useCloudStore().start(EMAIL);
 
-        expect(mockedFetch).toHaveBeenCalledWith("/cloud/run", expect.anything());
+        expect(mockedFetch).toHaveBeenCalledWith("cloud_api/cloud/run", expect.anything());
         expect(useInfraStore().domain_name).toBe("test.com");
       });
 
@@ -260,7 +260,7 @@ describe("cloud store", () => {
         setCloudUrlParam(CLOUD_RUN_HOST);
         await useCloudStore().start(EMAIL);
 
-        expect(mockedFetch).not.toHaveBeenCalledWith("/cloud/run", expect.anything());
+        expect(mockedFetch).not.toHaveBeenCalledWith("cloud_api/cloud/run", expect.anything());
         expect(mockedFetch).toHaveBeenCalledWith("opengeodeweb_back/ping", expect.anything());
         expect(useInfraStore().domain_name).toBe(CLOUD_RUN_HOST);
         expect(globalThis.location.search).toBe("");
@@ -277,7 +277,7 @@ describe("cloud store", () => {
 
         mockedFetch.mockClear();
         await cloudStore.start(EMAIL);
-        expect(mockedFetch).toHaveBeenCalledWith("/cloud/run", expect.anything());
+        expect(mockedFetch).toHaveBeenCalledWith("cloud_api/cloud/run", expect.anything());
         expect(mockedFetch).not.toHaveBeenCalledWith("opengeodeweb_back/ping", expect.anything());
         expect(useInfraStore().domain_name).toBe("test.com");
       });

@@ -2,6 +2,7 @@
 
 // Third party imports
 import { type H3Event, createError, defineEventHandler, readBody } from "h3";
+import { consola } from "consola";
 
 // Local imports
 import {
@@ -30,7 +31,7 @@ export default defineEventHandler(async (event: H3Event) => {
       port,
     };
   } catch (error) {
-    console.log(error);
+    consola.error(error);
     throw createError({
       statusCode: 500,
       statusMessage: error instanceof Error ? error.message : String(error),

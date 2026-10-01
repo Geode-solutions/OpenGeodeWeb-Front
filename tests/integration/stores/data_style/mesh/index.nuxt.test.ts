@@ -23,7 +23,6 @@ describe("mesh", () => {
   }, beforeAllTimeout);
 
   afterAll(async () => {
-    console.log("afterAll mesh index kill", projectFolderPath);
     await cleanupBackend(projectFolderPath);
   });
 

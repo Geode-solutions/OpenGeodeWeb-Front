@@ -35,7 +35,6 @@ describe("mesh cells", () => {
   }, beforeAllTimeout);
 
   afterAll(async () => {
-    console.log("afterAll mesh cells kill", projectFolderPath);
     await cleanupBackend(projectFolderPath);
   });
 

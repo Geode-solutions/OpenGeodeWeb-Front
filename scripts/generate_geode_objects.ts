@@ -1,3 +1,4 @@
+import { consola } from "consola";
 /* oxlint-disable vitest/require-hook */
 import fs from "node:fs";
 import path from "node:path";
@@ -22,4 +23,4 @@ for (const file of files) {
 geode_objects += "}\n\n export { geode_objects };";
 fs.writeFileSync(output_file, `${imports}\n${geode_objects}`);
 
-console.log("Fichier TS créé avec succès :", output_file);
+consola.info("Fichier TS créé avec succès :", output_file);

@@ -1,3 +1,5 @@
+import { consola } from "consola";
+
 const CLOUD_URL_PARAM = "cloud_url";
 const CLOUD_RUN_HOST_SUFFIX = ".run.app";
 
@@ -12,11 +14,11 @@ function getCloudUrlParam(): string | undefined {
   try {
     ({ hostname } = new URL(url_string));
   } catch {
-    console.warn(`[Cloud] Invalid ${CLOUD_URL_PARAM}:`, value);
+    consola.warn(`[Cloud] Invalid ${CLOUD_URL_PARAM}:`, value);
     return undefined;
   }
   if (!hostname.endsWith(CLOUD_RUN_HOST_SUFFIX)) {
-    console.warn(`[Cloud] Ignoring ${CLOUD_URL_PARAM}, not a Cloud Run host:`, hostname);
+    consola.warn(`[Cloud] Ignoring ${CLOUD_URL_PARAM}, not a Cloud Run host:`, hostname);
     return undefined;
   }
   return hostname;

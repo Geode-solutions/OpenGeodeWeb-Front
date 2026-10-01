@@ -1,23 +1,14 @@
 import { clearCloudUrlParam, getCloudUrlParam } from "@ogw_front/utils/cloud";
+import type { RunCloudResponse } from "@geode/cloud-api/types";
 import { Status } from "@ogw_front/utils/status";
 import { api_fetch } from "@ogw_internal/utils/api_fetch";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import cloud_api_schemas from "@geode/cloud-api/cloud_api_schemas.json";
 import { setAppBaseUrl } from "@ogw_shared/scripts";
 import { useAPIStore } from "@ogw_front/stores/api";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
-const run_cloud_schema = {
-  $id: "/cloud/run",
-  methods: ["POST"],
-  type: "object",
-  properties: {
-    email: { type: "string" },
-    project: { type: "string" },
-    branch: { type: "string" },
-  },
-  required: ["email", "project", "branch"],
-  additionalProperties: false,
-};
+const run_cloud_schema = cloud_api_schemas.cloud_api.cloud.run;
 
 export const useCloudStore = defineStore("cloud", {
   state: () => ({
@@ -44,7 +35,7 @@ export const useCloudStore = defineStore("cloud", {
       const params = { email, project: PROJECT, branch: BRANCH };
       const feedbackStore = useFeedbackStore();
       const APIStore = useAPIStore();
-      const result = await APIStore.request(
+      const result = await APIStore.request<RunCloudResponse>(
         { schema: run_cloud_schema, params },
         {
           request_error_function: () => {

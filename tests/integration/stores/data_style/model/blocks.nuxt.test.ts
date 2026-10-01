@@ -37,7 +37,6 @@ describe("model blocks", () => {
   }, beforeAllTimeout);
 
   afterAll(async () => {
-    console.log("afterAll model blocks kill", projectFolderPath);
     await cleanupBackend(projectFolderPath);
   });
 

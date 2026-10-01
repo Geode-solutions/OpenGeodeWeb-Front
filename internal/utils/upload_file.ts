@@ -1,6 +1,7 @@
 import type { JsonRpcSchema, RequestHandlers } from "@ogw_shared/utils/types.js";
 import { CHUNK_SIZE_BYTES } from "@ogw_shared/utils/file.js";
 import type { Microservice } from "./api_fetch.js";
+import { consola } from "consola";
 import { fetchRaw } from "@ogw_shared/utils/fetch_raw.js";
 import { useFeedbackStore } from "@ogw_front/stores/feedback.js";
 
@@ -38,7 +39,7 @@ async function upload_file(
   { schema, file, params = {} }: UploadFileParams,
   { request_error_function, response_function, response_error_function }: RequestHandlers = {},
 ): Promise<unknown> {
-  console.log("[UPLOAD_FILE] Uploading file", { schema, file });
+  consola.debug("[UPLOAD_FILE] Uploading file", { schema, file });
   const feedbackStore = useFeedbackStore();
 
   if (!(file instanceof File)) {
