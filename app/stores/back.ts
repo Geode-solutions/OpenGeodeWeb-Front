@@ -14,7 +14,7 @@ import type {
   ResponseOf,
 } from "@ogw_shared/utils/types.js";
 
-import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json" with { type: "json" };
+import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_typed_schemas.js";
 
 const MILLISECONDS_IN_SECOND = 1000;
 const DEFAULT_PING_INTERVAL_SECONDS = 10;
@@ -86,7 +86,7 @@ export const useBackStore = defineStore("back", {
     stop_request() {
       this.request_counter -= 1;
     },
-    async launch(args: Record<string, unknown>) {
+    async launch(args: { projectFolderPath: string }) {
       const appStore = useAppStore();
       const { COMMAND_BACK, NUXT_ROOT_PATH } = useRuntimeConfig().public;
       const schema = opengeodeweb_front_schemas.api.local.app.run_back;
@@ -95,15 +95,8 @@ export const useBackStore = defineStore("back", {
       const result = await appStore.request(
         { schema, params },
         {
-          response_function: (response: unknown) => {
-            if (
-              typeof response === "object" &&
-              response !== null &&
-              "port" in response &&
-              (typeof response.port === "string" || typeof response.port === "number")
-            ) {
-              this.default_local_port = String(response.port);
-            }
+          response_function: (response) => {
+            this.default_local_port = String(response.port);
           },
         },
       );
