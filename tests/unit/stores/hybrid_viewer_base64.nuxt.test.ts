@@ -12,7 +12,7 @@ import { base64ToArrayBuffer } from "@ogw_internal/stores/hybrid_viewer/base64";
 const NON_UTF8_BYTES = Buffer.from("C000FF802440", "hex");
 const CUBE_POINTS = 8;
 const CUBE_LINES = 12;
-const FIXTURE_PATH = path.resolve(import.meta.dirname, "data", "light_viewable_binary.vtp");
+const FIXTURE_PATH = path.resolve(import.meta.dirname, "..", "data", "light_viewable_binary.vtp");
 
 describe("light viewable base64 decoding", () => {
   test("round-trips bytes that are not valid UTF-8", () => {
