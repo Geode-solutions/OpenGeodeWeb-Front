@@ -188,18 +188,18 @@ async function waitUntilListening(
   child: child_process.ChildProcessWithoutNullStreams,
 ): Promise<void> {
   child.stderr.on("data", (data: Buffer) => {
-    consola.log(`[${child.spawnfile}] STDERR:`, data.toString().trim());
+    consola.info(`[${child.spawnfile}] STDERR:`, data.toString().trim());
   });
   child.on("close", (code) => {
-    consola.log(`[${child.spawnfile}] exited with code ${code}`);
+    consola.info(`[${child.spawnfile}] exited with code ${code}`);
   });
   // oxlint-disable-next-line typescript/no-unnecessary-condition
   for await (const chunk of child.stdout) {
     const output = String(chunk);
-    consola.log(`[${child.spawnfile}] STDOUT:`, output.trim());
+    consola.info(`[${child.spawnfile}] STDOUT:`, output.trim());
     if (LISTENING_LOG_PATTERN.test(output)) {
       child.stdout.on("data", (data: Buffer) => {
-        consola.log(`[${child.spawnfile}] STDOUT:`, data.toString().trim());
+        consola.info(`[${child.spawnfile}] STDOUT:`, data.toString().trim());
       });
       return;
     }
@@ -211,7 +211,7 @@ async function runExtensionServer(entryPath: string, attempts = 0): Promise<numb
   let port: number | undefined = undefined;
   try {
     port = await getAvailablePort();
-    consola.log("runExtensionServer", entryPath, port);
+    consola.info("runExtensionServer", entryPath, port);
     const child = child_process.spawn("node", [entryPath], {
       env: {
         ...process.env,
@@ -222,11 +222,11 @@ async function runExtensionServer(entryPath: string, attempts = 0): Promise<numb
     return port;
   } catch (error) {
     if (!isPortInUseError(error)) {
-      consola.log("runExtensionServer error", error);
+      consola.error("runExtensionServer error", error);
       throw error;
     }
     if (attempts <= MAX_PORT_RETRIES) {
-      consola.log("Retrying runExtensionServer on conflicting port", port);
+      consola.warn("Retrying runExtensionServer on conflicting port", port);
       const newPort = await runExtensionServer(entryPath, attempts + 1);
       return newPort;
     }
