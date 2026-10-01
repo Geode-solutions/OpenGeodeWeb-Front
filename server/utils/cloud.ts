@@ -1,3 +1,5 @@
+import { consola } from "consola";
+
 // Node imports
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
@@ -29,7 +31,7 @@ stderr_logfile_maxbytes=0
   execFileSync("supervisorctl", ["reread"]);
   execFileSync("supervisorctl", ["update"]);
   const stdout = execFileSync("supervisorctl", ["start", name]);
-  console.log("addSupervisorProgram", stdout);
+  consola.info("addSupervisorProgram", stdout);
 }
 
 function buildLocationBlock(routePath: string, port: number): string {

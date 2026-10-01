@@ -30,7 +30,6 @@ describe("mesh polygons", () => {
   }, beforeAllTimeout);
 
   afterAll(async () => {
-    console.log("afterAll mesh polygons kill", projectFolderPath);
     await cleanupBackend(projectFolderPath);
   });
 

@@ -1,3 +1,5 @@
+import { consola } from "consola";
+
 // Local imports
 import { getRestApiPort, getRestApiProtocol, isCloudMode } from "@ogw_front/utils/stores.js";
 import { Status } from "@ogw_front/utils/status";
@@ -122,7 +124,7 @@ export const useAppStore = defineStore("app", () => {
     );
 
     if (missingStoreIds.length > 0) {
-      console.warn(`Stores not found in snapshot: ${missingStoreIds.join(", ")}`);
+      consola.warn(`Stores not found in snapshot: ${missingStoreIds.join(", ")}`);
     }
   }
 
