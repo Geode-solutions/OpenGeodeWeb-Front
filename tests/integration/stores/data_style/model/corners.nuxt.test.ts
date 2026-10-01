@@ -37,7 +37,6 @@ describe("model corners", () => {
   }, beforeAllTimeout);
 
   afterAll(async () => {
-    console.log("afterAll model corners kill", projectFolderPath);
     await cleanupBackend(projectFolderPath);
   });
 

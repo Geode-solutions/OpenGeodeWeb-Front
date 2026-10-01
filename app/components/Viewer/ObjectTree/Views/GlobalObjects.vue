@@ -4,6 +4,7 @@ import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { compareSelections } from "@ogw_front/utils/treeview";
+import { consola } from "consola";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
@@ -105,7 +106,7 @@ watch(
           const hasCollections = await dataStore.hasCollectionComponents(model.id);
           hasCollectionsMap[model.id] = hasCollections;
         } catch (error) {
-          console.error("Failed to check collections", error);
+          consola.error("Failed to check collections", error);
         }
       }
     });

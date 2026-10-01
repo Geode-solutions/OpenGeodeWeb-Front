@@ -2,6 +2,7 @@
 
 // Third party imports
 import { type H3Event, createError, defineEventHandler, readBody } from "h3";
+import { consola } from "consola";
 
 // Local imports
 import {
@@ -24,7 +25,7 @@ export default defineEventHandler(async (event: H3Event) => {
     const body = await readBody<KillExtensionBody>(event);
     const { projectFolderPath, projectName, extensionId } = body;
 
-    console.log({ projectFolderPath, projectName, extensionId });
+    consola.debug({ projectFolderPath, projectName, extensionId });
 
     const microservices = projectMicroservices(projectFolderPath);
     const microservice = getMicroserviceByName(microservices, extensionId);
@@ -40,7 +41,7 @@ export default defineEventHandler(async (event: H3Event) => {
       statusCode: 200,
     };
   } catch (error) {
-    console.error("Error killing extension:", error);
+    consola.error("Error killing extension:", error);
     throw createError({
       statusCode: 500,
 

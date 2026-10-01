@@ -3,6 +3,7 @@ import fs from "node:fs";
 
 // Third party imports
 import { type H3Event, createError, defineEventHandler, readBody } from "h3";
+import { consola } from "consola";
 
 // Local imports
 import {
@@ -71,7 +72,6 @@ async function runSingleExtension(
 
 export default defineEventHandler(async (event: H3Event) => {
   try {
-    console.log("NITRO: runExtensions", event);
     const { projectFolderPath, projectName } = await readBody<RunExtensionsBody>(event);
     const extensionsConfig = extensionsConf(projectName);
     const extensionsArray = await Promise.all(
@@ -86,7 +86,7 @@ export default defineEventHandler(async (event: H3Event) => {
       extensionsArray,
     };
   } catch (error) {
-    console.error("Error running extensions:", error);
+    consola.error("Error running extensions:", error);
     throw createError({
       statusCode: 500,
 

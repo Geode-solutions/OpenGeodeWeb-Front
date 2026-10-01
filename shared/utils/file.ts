@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { consola } from "consola";
 
 const BYTES_PER_KIBIBYTE = 1024;
 const KIBIBYTES_PER_MEBIBYTE = 1024;
@@ -7,7 +8,7 @@ const CHUNK_SIZE_MEBIBYTES = 8;
 const CHUNK_SIZE_BYTES = CHUNK_SIZE_MEBIBYTES * KIBIBYTES_PER_MEBIBYTE * BYTES_PER_KIBIBYTE;
 
 function assertFile(file: unknown): asserts file is File {
-  console.log("[ASSERT_FILE] Asserting file", { file });
+  consola.debug("[ASSERT_FILE] Asserting file", { file });
   if (!(file instanceof File)) {
     throw new Error("file must be an instance of File");
   }

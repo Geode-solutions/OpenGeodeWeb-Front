@@ -30,7 +30,6 @@ describe("mesh edges", () => {
   }, beforeAllTimeout);
 
   afterAll(async () => {
-    console.log("afterAll mesh edges kill", projectFolderPath);
     await cleanupBackend(projectFolderPath);
   });
 

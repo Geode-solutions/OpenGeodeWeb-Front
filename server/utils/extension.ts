@@ -4,6 +4,7 @@ import path from "node:path";
 import { z } from "zod";
 
 // Third party imports
+import { consola } from "consola";
 import { createError } from "h3";
 
 // Local imports
@@ -46,7 +47,7 @@ async function readExtensionMetadata(unzippedExtensionPath: string): Promise<Ext
   }
   const metadata = result.data;
 
-  console.log("readExtensionMetadata", { metadata });
+  consola.debug("readExtensionMetadata", { metadata });
   if (!metadata.frontendFile) {
     throw createError({
       statusCode: 400,
@@ -68,14 +69,14 @@ async function readExtensionFrontend(
   frontendFile: string,
   id: string,
 ): Promise<string> {
-  console.log("readExtensionFrontend", { id });
+  consola.debug("readExtensionFrontend", { id });
   const frontendFilePath = await extensionFrontendPath(
     unzippedExtensionPath,
     frontendFile,
     path.resolve(),
     id,
   );
-  console.log("readExtensionFrontend", { frontendFilePath });
+  consola.debug("readExtensionFrontend", { frontendFilePath });
   return fs.readFile(frontendFilePath, "utf8");
 }
 

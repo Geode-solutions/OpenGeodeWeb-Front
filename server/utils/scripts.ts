@@ -7,6 +7,7 @@ import path from "node:path";
 import readline from "node:readline";
 
 // Third party imports
+import { consola } from "consola";
 import { getPort } from "get-port-please";
 
 // Local imports
@@ -99,19 +100,19 @@ async function waitForReady(
     function becomeReady(): void {
       cleanup();
       readlineStdout.on("line", (line) => {
-        console.log(`[${child.name}] ${line}`);
+        consola.info(`[${child.name}] ${line}`);
       });
       readlineStderr.on("line", (line) => {
-        console.log(`[${child.name}] ${line}`);
+        consola.info(`[${child.name}] ${line}`);
       });
       child.once("close", (code) => {
-        console.log(`[${child.name}] exited with code ${code}`);
+        consola.info(`[${child.name}] exited with code ${code}`);
       });
       resolve(child);
     }
 
     onLine = (lineOutput): void => {
-      console.log(`[${child.name}] ${lineOutput}`);
+      consola.info(`[${child.name}] ${lineOutput}`);
       recordOutput(lineOutput);
       if (lineOutput.includes(expectedResponse)) {
         becomeReady();
@@ -119,7 +120,7 @@ async function waitForReady(
     };
 
     onErrLine = (line): void => {
-      console.log(`[${child.name}] ${line}`);
+      consola.info(`[${child.name}] ${line}`);
       recordOutput(line);
       if (line.includes(expectedResponse)) {
         becomeReady();
@@ -132,7 +133,7 @@ async function waitForReady(
     };
 
     onClose = (code): void => {
-      console.log(`[${child.name}] exited with code ${code}`);
+      consola.info(`[${child.name}] exited with code ${code}`);
       cleanup();
       reject(
         new Error(
@@ -160,20 +161,20 @@ async function waitNuxt(
   nuxtProcess: child_process.ChildProcessWithoutNullStreams,
 ): Promise<string> {
   nuxtProcess.stderr.on("data", (data: Buffer) => {
-    console.log("Nuxt STDERR:", data.toString().trim());
+    consola.info("Nuxt STDERR:", data.toString().trim());
   });
   nuxtProcess.on("close", (code) => {
-    console.log(`Nuxt process closed with code ${code}`);
+    consola.info(`Nuxt process closed with code ${code}`);
   });
   for await (const [data] of on(nuxtProcess.stdout, "data")) {
     const output = String(data);
-    console.log("Nuxt STDOUT:", output.trim());
+    consola.info("Nuxt STDOUT:", output.trim());
     const portMatch = /Listening on http:\/\/\[::\]:(?<port>\d+)/u.exec(output);
     const port = portMatch?.groups?.port;
     if (port !== undefined) {
-      console.log("Nuxt listening on port", port);
+      consola.info("Nuxt listening on port", port);
       nuxtProcess.stdout.on("data", (newData: Buffer) => {
-        console.log("Nuxt STDOUT:", newData.toString().trim());
+        consola.info("Nuxt STDOUT:", newData.toString().trim());
       });
       return port;
     }

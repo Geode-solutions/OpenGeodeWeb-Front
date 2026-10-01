@@ -1,5 +1,6 @@
 import type { JsonRpcSchema, RequestHandlersWithValidation } from "@ogw_shared/utils/types.js";
 import { endRequestLog, startRequestLog } from "@ogw_front/utils/log";
+import { consola } from "consola";
 import { fetchSchema } from "@ogw_shared/utils/fetch_schema";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
@@ -69,7 +70,7 @@ async function api_fetch(
     skip_feedback_error,
   }: RequestHandlersWithValidation & { timeout?: number; skip_feedback_error?: boolean } = {},
 ): Promise<unknown> {
-  console.log("[API] Fetching", microservice.base_url);
+  consola.info("[API] Fetching", microservice.base_url);
   const feedbackStore = useFeedbackStore();
   microservice.start_request();
 

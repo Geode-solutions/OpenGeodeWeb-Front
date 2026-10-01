@@ -3,6 +3,7 @@
 // Local imports
 import type { JsonRpcSchema, RequestHandlersWithValidation } from "./types.js";
 import { type RpcClient, callRaw } from "./call_raw.js";
+import { consola } from "consola";
 import { validateSchema } from "./validate_schema.js";
 
 const ERROR_400 = 400;
@@ -27,7 +28,7 @@ async function callSchema(
 
   if (!valid) {
     if (process.env.NODE_ENV !== "production") {
-      console.log("Bad request", schema_error, schema, params);
+      consola.error("Bad request", schema_error, schema, params);
     }
     if (validation_error_function) {
       validation_error_function({ code: ERROR_400, name: "Bad request", error: schema_error });

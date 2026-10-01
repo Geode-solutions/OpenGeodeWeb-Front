@@ -29,7 +29,6 @@ describe("mesh points", () => {
   }, beforeAllTimeout);
 
   afterAll(async () => {
-    console.log("afterAll mesh points kill", projectFolderPath);
     await cleanupBackend(projectFolderPath);
   });
 
