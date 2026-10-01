@@ -1,47 +1,82 @@
-import type { CollectionComponentGroup } from "@ogw_front/stores/data_helpers/collections";
-import type { FormattedComponentGroup } from "@ogw_front/stores/data_helpers/mesh";
-import { useModelCollections } from "@ogw_front/composables/model_collections";
-import { useModelComponents } from "@ogw_front/composables/model_components";
+import type {
+  CollectionComponent,
+  CollectionComponentGroup,
+} from "@ogw_front/stores/data_helpers/collections";
+import type {
+  FormattedComponent,
+  FormattedComponentGroup,
+} from "@ogw_front/stores/data_helpers/mesh";
+import { compareSelections } from "@ogw_front/utils/treeview";
+import { useDataStore } from "@ogw_front/stores/data";
+import { useDataStyleStore } from "@ogw_front/stores/data_style";
+import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
-type ModelComponents = ReturnType<typeof useModelComponents>;
-type ModelCollections = ReturnType<typeof useModelCollections>;
+type ModelTreeCategory = FormattedComponentGroup | CollectionComponentGroup;
+type ModelTreeCache = Record<string, (FormattedComponent | CollectionComponent)[]>;
+
+function useModelVisibility(modelId: string): {
+  selection: typeof selection;
+  updateVisibility: typeof updateVisibility;
+} {
+  const dataStyleStore = useDataStyleStore();
+  const hybridViewerStore = useHybridViewerStore();
+  const selection = dataStyleStore.visibleMeshComponents(modelId);
+
+  async function updateVisibility(current: readonly string[]): Promise<void> {
+    const { added, removed } = compareSelections([...current], selection.value);
+    if (added.length > 0) {
+      await dataStyleStore.setModelComponentsVisibility(modelId, added, true);
+    }
+    if (removed.length > 0) {
+      await dataStyleStore.setModelComponentsVisibility(modelId, removed, false);
+    }
+    if (added.length > 0 || removed.length > 0) {
+      await hybridViewerStore.remoteRender();
+    }
+  }
+
+  return { selection, updateVisibility };
+}
 
 export function useModelTree(modelId: string): {
   isLoading: ComputedRef<boolean>;
-  localCategories: ComputedRef<(FormattedComponentGroup | CollectionComponentGroup)[]>;
-  meshCache: ModelComponents["componentsCache"];
-  collectionsCache: ModelCollections["collectionsCache"];
-  collectionTypes: ComputedRef<Set<string>>;
-  selection: ModelComponents["selection"];
-  updateVisibility: ModelComponents["updateVisibility"];
-} {
-  const components = useModelComponents(modelId);
-  const collections = useModelCollections(modelId);
+  localCategories: Ref<ModelTreeCategory[]>;
+  cache: Ref<ModelTreeCache | undefined>;
+  collectionTypes: Ref<Set<string>>;
+} & ReturnType<typeof useModelVisibility> {
+  const dataStore = useDataStore();
 
-  const localCategories = computed(() => [
-    ...components.localCategories.value,
-    ...collections.localCategories.value,
-  ]);
+  const meshGroups = dataStore.refFormatedMeshComponents(modelId);
+  const collectionGroups = dataStore.refFormatedCollectionComponents(modelId);
+  const cache = ref<ModelTreeCache | undefined>(undefined);
+  const localCategories = ref<ModelTreeCategory[]>([]);
+  const collectionTypes = ref<Set<string>>(new Set());
 
-  const isLoading = computed(
-    () =>
-      components.items.value === undefined ||
-      collections.items.value === undefined ||
-      components.componentsCache.value === undefined ||
-      collections.collectionsCache.value === undefined,
+  // The mesh cache also groups collection components by their type; the collections cache overrides those keys with the real collection -> mesh components hierarchy.
+  watch(
+    [meshGroups, collectionGroups],
+    async ([mesh, collections]) => {
+      if (!mesh || !collections) {
+        return;
+      }
+      const [meshByType, collectionsByType] = await Promise.all([
+        dataStore.fetchAllMeshComponents(modelId),
+        dataStore.fetchAllCollectionComponents(modelId),
+      ]);
+      cache.value = markRaw({ ...meshByType, ...collectionsByType });
+      localCategories.value = [...mesh, ...collections];
+      collectionTypes.value = new Set(Object.keys(collectionsByType));
+    },
+    { immediate: true },
   );
 
-  const collectionTypes = computed(
-    () => new Set(collections.localCategories.value.map((category) => category.id)),
-  );
+  const isLoading = computed(() => cache.value === undefined);
 
   return {
     isLoading,
     localCategories,
-    meshCache: components.componentsCache,
-    collectionsCache: collections.collectionsCache,
+    cache,
     collectionTypes,
-    selection: components.selection,
-    updateVisibility: components.updateVisibility,
+    ...useModelVisibility(modelId),
   };
 }

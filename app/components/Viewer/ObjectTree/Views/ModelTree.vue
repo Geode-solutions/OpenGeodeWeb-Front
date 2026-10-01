@@ -12,11 +12,9 @@ import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 interface Props {
   id: string;
-  viewId?: string;
 }
 
-const { id, viewId = undefined } = defineProps<Props>();
-const actualViewId = viewId || id;
+const { id } = defineProps<Props>();
 
 interface CollectionTreeItem {
   raw?: CollectionTreeItem;
@@ -49,26 +47,19 @@ const treeviewStore = useTreeviewStore();
 const {
   isLoading,
   localCategories,
-  meshCache,
-  collectionsCache,
+  cache,
   collectionTypes,
   selection: visibleComponents,
   updateVisibility,
 } = useModelTree(id);
 
-function cacheFor(categoryId: string): Record<string, CollectionTreeItem[]> | undefined {
-  return (collectionTypes.value.has(categoryId) ? collectionsCache.value : meshCache.value) as
-    | Record<string, CollectionTreeItem[]>
-    | undefined;
-}
-
 const currentView = computed(() =>
-  treeviewStore.opened_views.find((view) => view.id === actualViewId),
+  treeviewStore.opened_views.find((view) => view.id === id),
 );
 
 const opened = computed<string[]>({
   get: () => currentView.value?.opened || [],
-  set: (val) => treeviewStore.setOpened(actualViewId, val),
+  set: (val) => treeviewStore.setOpened(id, val),
 });
 
 const {
@@ -99,17 +90,11 @@ function matchesSearch(item: CollectionTreeItem, query: string): boolean {
   );
 }
 
-function searchGroups(
-  cache: Record<string, CollectionTreeItem[]> | undefined,
-  query: string,
-  isCollection: boolean,
-): CollectionTreeItem[] {
+function searchGroups(query: string): CollectionTreeItem[] {
+  const groups = (cache.value ?? {}) as Record<string, CollectionTreeItem[]>;
   const result: CollectionTreeItem[] = [];
-  const types = Object.keys(cache ?? {}).filter(
-    (type) => collectionTypes.value.has(type) === isCollection,
-  );
-  for (const type of types) {
-    const matches = (cache?.[type] ?? []).filter((component) => matchesSearch(component, query));
+  for (const [type, components] of Object.entries(groups)) {
+    const matches = components.filter((component) => matchesSearch(component, query));
     if (matches.length > 0) {
       result.push({
         id: type,
@@ -124,21 +109,7 @@ function searchGroups(
 const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
   if (search.value) {
     const query = search.value.toLowerCase();
-    return sortAndFormatItems(
-      [
-        ...searchGroups(
-          meshCache.value as Record<string, CollectionTreeItem[]> | undefined,
-          query,
-          false,
-        ),
-        ...searchGroups(
-          collectionsCache.value as Record<string, CollectionTreeItem[]> | undefined,
-          query,
-          true,
-        ),
-      ],
-      sortType.value,
-    ) as unknown as CollectionTreeItem[];
+    return sortAndFormatItems(searchGroups(query), sortType.value) as unknown as CollectionTreeItem[];
   }
 
   const result: CollectionTreeItem[] = [];
@@ -148,7 +119,7 @@ const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
       ...category,
       id: categoryId,
       children: sortAndFormatItems(
-        cacheFor(categoryId)?.[categoryId],
+        cache.value?.[categoryId],
         sortType.value,
       ) as unknown as CollectionTreeItem[],
     });
@@ -278,7 +249,7 @@ function getLeafViewerIdsForFocus(item: CollectionTreeItem): string[] {
       class="transparent-treeview virtual-tree-height"
       @update:selected="(val) => onUpdateSelection(val as string[])"
       @click:item="onUpdateSelection([$event.id as string, ...visibleComponents])"
-      @update:scroll-top="treeviewStore.setScrollTop(actualViewId, $event)"
+      @update:scroll-top="treeviewStore.setScrollTop(id, $event)"
       @hover:enter="({ item }) => handleHoverEnter({ item: item as unknown as CollectionTreeItem })"
       @hover:leave="handleHoverLeave"
       @contextmenu="showContextMenu($event.event, $event.item as unknown as CollectionTreeItem)"

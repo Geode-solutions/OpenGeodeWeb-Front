@@ -16,7 +16,6 @@ interface OpenedView {
   title: string;
   scrollTop: number;
   opened: string[];
-  modelId?: string;
   geode_object_type?: string;
 }
 
@@ -217,7 +216,6 @@ export const useTreeviewStore = defineStore("treeview", () => {
     opened_views.value.push({
       type: "component",
       id,
-      modelId: id,
       title: title ?? id,
       geode_object_type: geodeObjectType,
       scrollTop: 0,
