@@ -7,10 +7,10 @@ import * as components from "vuetify/components";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime";
 import { nextTick } from "vue";
-import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 
 // Local imports
-import { setupActivePinia, toHTTPMethod, vuetify } from "@ogw_tests/utils";
+import { mockAs, setupActivePinia, toHTTPMethod, vuetify } from "@ogw_tests/utils";
 import ExtensionSelector from "@ogw_front/components/ExtensionSelector.vue";
 import { useBackStore } from "@ogw_front/stores/back";
 
@@ -27,11 +27,13 @@ describe("extension selector", () => {
   beforeEach(() => {
     (backStore as { base_url: string }).base_url = "/";
 
-    backStore.request = vi.fn<typeof backStore.request>().mockResolvedValue({
-      geode_objects_and_output_extensions: {
-        BRep: { msh: { is_saveable: true } },
-      },
-    });
+    backStore.request = mockAs<typeof backStore.request>(
+      vi.fn().mockResolvedValue({
+        geode_objects_and_output_extensions: {
+          BRep: { msh: true },
+        },
+      }),
+    );
   });
 
   test("select geode_object & extension", async () => {
@@ -42,7 +44,7 @@ describe("extension selector", () => {
       method: toHTTPMethod(schema.methods[FIRST_INDEX]),
       handler: () => ({
         geode_objects_and_output_extensions: {
-          BRep: { msh: { is_saveable: true } },
+          BRep: { msh: true },
         },
       }),
     });

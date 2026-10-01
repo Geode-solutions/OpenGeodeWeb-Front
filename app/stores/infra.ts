@@ -107,6 +107,6 @@ export interface Microservice {
   $id: string;
   status?: string;
   is_busy?: boolean;
-  launch?: (params: Record<string, unknown>) => Promise<unknown>;
+  launch?: (params: { projectFolderPath: string }) => Promise<unknown>;
   connect: () => Promise<void>;
 }

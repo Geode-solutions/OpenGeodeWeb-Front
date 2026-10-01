@@ -1,8 +1,6 @@
 // Node imports
 
 // Third party imports
-import { type H3Event, createError, defineEventHandler, readBody } from "h3";
-import { consola } from "consola";
 
 // Local imports
 import {
@@ -10,31 +8,18 @@ import {
   runBack,
 } from "@geode/opengeodeweb-front/server/utils/microservices.ts";
 
-interface RunBackBody {
-  COMMAND_BACK: string;
-  NUXT_ROOT_PATH: string;
-  args: { projectFolderPath: string; [key: string]: unknown };
-}
+import { defineTypedEventHandler } from "@geode/opengeodeweb-front/server/utils/typed_handler.ts";
+import schemas from "@geode/opengeodeweb-front/opengeodeweb_front_typed_schemas.js";
 
-export default defineEventHandler(async (event: H3Event) => {
-  try {
-    const { COMMAND_BACK, NUXT_ROOT_PATH, args } = await readBody<RunBackBody>(event);
+export default defineTypedEventHandler(
+  schemas.api.local.app.run_back,
+  async ({ COMMAND_BACK, NUXT_ROOT_PATH, args }) => {
     const port = await runBack(COMMAND_BACK, NUXT_ROOT_PATH, args);
     addMicroserviceMetadatas(args.projectFolderPath, {
       type: "back",
       name: COMMAND_BACK,
       port,
     });
-
-    return {
-      statusCode: 200,
-      port,
-    };
-  } catch (error) {
-    consola.error(error);
-    throw createError({
-      statusCode: 500,
-      statusMessage: error instanceof Error ? error.message : String(error),
-    });
-  }
-});
+    return { statusCode: 200, port };
+  },
+);
