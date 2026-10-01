@@ -53,9 +53,7 @@ const {
   updateVisibility,
 } = useModelTree(id);
 
-const currentView = computed(() =>
-  treeviewStore.opened_views.find((view) => view.id === id),
-);
+const currentView = computed(() => treeviewStore.opened_views.find((view) => view.id === id));
 
 const opened = computed<string[]>({
   get: () => currentView.value?.opened || [],
@@ -109,7 +107,10 @@ function searchGroups(query: string): CollectionTreeItem[] {
 const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
   if (search.value) {
     const query = search.value.toLowerCase();
-    return sortAndFormatItems(searchGroups(query), sortType.value) as unknown as CollectionTreeItem[];
+    return sortAndFormatItems(
+      searchGroups(query),
+      sortType.value,
+    ) as unknown as CollectionTreeItem[];
   }
 
   const result: CollectionTreeItem[] = [];
