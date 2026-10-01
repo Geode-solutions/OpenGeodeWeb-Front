@@ -4,7 +4,7 @@ import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry";
 import type { Vector3 } from "@kitware/vtk.js/types";
 import { connectImageStream } from "@kitware/vtk.js/Rendering/Misc/RemoteView";
 import { initWebSocketClient } from "@ogw_internal/utils/ws_client";
-import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json" with { type: "json" };
+import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_typed_schemas.js";
 import opengeodeweb_viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" };
 
 // Local imports
@@ -150,7 +150,7 @@ export const useViewerStore = defineStore(
         }
       });
     }
-    async function launch(args: Readonly<{ projectFolderPath?: string }> = {}): Promise<unknown> {
+    async function launch(args: Readonly<{ projectFolderPath: string }>): Promise<unknown> {
       const appStore = useAppStore();
       const { COMMAND_VIEWER, NUXT_ROOT_PATH } = useRuntimeConfig().public;
       const schema = opengeodeweb_front_schemas.api.local.app.run_viewer;
@@ -165,10 +165,8 @@ export const useViewerStore = defineStore(
           params,
         },
         {
-          response_function: (response: unknown) => {
-            // oxlint-disable-next-line no-unsafe-type-assertion -- response shape is defined by the run_viewer schema.
-            const { port: viewerPort } = response as { port: string };
-            default_local_port.value = viewerPort;
+          response_function: (response) => {
+            default_local_port.value = String(response.port);
           },
         },
       );

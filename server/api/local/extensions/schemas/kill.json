@@ -3,10 +3,26 @@
   "methods": ["POST"],
   "type": "object",
   "properties": {
-    "extensionId": { "type": "string" },
-    "projectFolderPath": { "type": "string" },
-    "projectName": { "type": "string" }
+    "extensionId": {
+      "type": "string"
+    },
+    "projectFolderPath": {
+      "type": "string"
+    },
+    "projectName": {
+      "type": "string"
+    }
   },
   "required": ["extensionId", "projectFolderPath", "projectName"],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "response": {
+    "type": "object",
+    "properties": {
+      "statusCode": {
+        "type": "integer"
+      }
+    },
+    "required": ["statusCode"],
+    "additionalProperties": false
+  }
 }

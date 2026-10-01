@@ -3,9 +3,26 @@
   "methods": ["POST"],
   "type": "object",
   "properties": {
-    "extension": { "type": "string" },
-    "platform": { "type": "string" }
+    "projectName": {
+      "type": "string"
+    },
+    "url": {
+      "type": "string"
+    },
+    "extensionFileName": {
+      "type": "string"
+    }
   },
-  "required": ["extension", "platform"],
-  "additionalProperties": false
+  "required": ["projectName", "url", "extensionFileName"],
+  "additionalProperties": false,
+  "response": {
+    "type": "object",
+    "properties": {
+      "statusCode": {
+        "type": "integer"
+      }
+    },
+    "required": ["statusCode"],
+    "additionalProperties": false
+  }
 }

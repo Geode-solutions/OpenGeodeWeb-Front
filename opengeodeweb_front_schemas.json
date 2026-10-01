@@ -16,7 +16,42 @@
             }
           },
           "required": ["projectFolderPath", "projectName"],
-          "additionalProperties": false
+          "additionalProperties": false,
+          "response": {
+            "type": "object",
+            "properties": {
+              "statusCode": {
+                "type": "integer"
+              },
+              "extensionsArray": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "string"
+                    },
+                    "frontendContent": {
+                      "type": "string"
+                    },
+                    "port": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": ["id", "name", "version", "frontendContent", "port"],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": ["statusCode", "extensionsArray"],
+            "additionalProperties": false
+          }
         }
       }
     },
@@ -33,10 +68,33 @@
             },
             "NUXT_ROOT_PATH": {
               "type": "string"
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "projectFolderPath": {
+                  "type": "string"
+                }
+              },
+              "required": ["projectFolderPath"],
+              "additionalProperties": true
             }
           },
-          "required": ["COMMAND_VIEWER", "NUXT_ROOT_PATH"],
-          "additionalProperties": true
+          "required": ["COMMAND_VIEWER", "NUXT_ROOT_PATH", "args"],
+          "additionalProperties": true,
+          "response": {
+            "type": "object",
+            "properties": {
+              "statusCode": {
+                "type": "integer"
+              },
+              "port": {
+                "type": "integer"
+              }
+            },
+            "required": ["statusCode", "port"],
+            "additionalProperties": false
+          }
         },
         "run_back": {
           "$id": "api/local/app/run_back",
@@ -49,10 +107,33 @@
             },
             "NUXT_ROOT_PATH": {
               "type": "string"
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "projectFolderPath": {
+                  "type": "string"
+                }
+              },
+              "required": ["projectFolderPath"],
+              "additionalProperties": true
             }
           },
-          "required": ["COMMAND_BACK", "NUXT_ROOT_PATH"],
-          "additionalProperties": true
+          "required": ["COMMAND_BACK", "NUXT_ROOT_PATH", "args"],
+          "additionalProperties": true,
+          "response": {
+            "type": "object",
+            "properties": {
+              "statusCode": {
+                "type": "integer"
+              },
+              "port": {
+                "type": "integer"
+              }
+            },
+            "required": ["statusCode", "port"],
+            "additionalProperties": false
+          }
         },
         "project_folder_path": {
           "$id": "api/local/app/project_folder_path",
@@ -65,7 +146,20 @@
             }
           },
           "required": ["PROJECT"],
-          "additionalProperties": true
+          "additionalProperties": true,
+          "response": {
+            "type": "object",
+            "properties": {
+              "statusCode": {
+                "type": "integer"
+              },
+              "projectFolderPath": {
+                "type": "string"
+              }
+            },
+            "required": ["statusCode", "projectFolderPath"],
+            "additionalProperties": false
+          }
         },
         "kill": {
           "$id": "api/local/app/kill",
@@ -74,7 +168,13 @@
           "type": "object",
           "properties": {},
           "required": [],
-          "additionalProperties": false
+          "additionalProperties": false,
+          "response": {
+            "type": "object",
+            "properties": {},
+            "required": [],
+            "additionalProperties": false
+          }
         }
       },
       "extensions": {
@@ -89,7 +189,17 @@
               "minLength": 1
             }
           },
-          "additionalProperties": false
+          "additionalProperties": false,
+          "response": {
+            "type": "object",
+            "properties": {
+              "statusCode": {
+                "type": "integer"
+              }
+            },
+            "required": ["statusCode"],
+            "additionalProperties": false
+          }
         },
         "run": {
           "$id": "api/local/extensions/run",
@@ -105,7 +215,42 @@
             }
           },
           "required": ["projectFolderPath", "projectName"],
-          "additionalProperties": false
+          "additionalProperties": false,
+          "response": {
+            "type": "object",
+            "properties": {
+              "statusCode": {
+                "type": "integer"
+              },
+              "extensionsArray": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "string"
+                    },
+                    "frontendContent": {
+                      "type": "string"
+                    },
+                    "port": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": ["id", "name", "version", "frontendContent", "port"],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": ["statusCode", "extensionsArray"],
+            "additionalProperties": false
+          }
         },
         "kill": {
           "$id": "api/local/extensions/kill",
@@ -124,7 +269,17 @@
             }
           },
           "required": ["extensionId", "projectFolderPath", "projectName"],
-          "additionalProperties": false
+          "additionalProperties": false,
+          "response": {
+            "type": "object",
+            "properties": {
+              "statusCode": {
+                "type": "integer"
+              }
+            },
+            "required": ["statusCode"],
+            "additionalProperties": false
+          }
         }
       }
     },
@@ -141,7 +296,20 @@
             }
           },
           "required": ["baseUrl"],
-          "additionalProperties": false
+          "additionalProperties": false,
+          "response": {
+            "type": "object",
+            "properties": {
+              "statusCode": {
+                "type": "integer"
+              },
+              "baseUrl": {
+                "type": "string"
+              }
+            },
+            "required": ["statusCode", "baseUrl"],
+            "additionalProperties": false
+          }
         },
         "set_is_app_ready": {
           "$id": "api/microservice/app/set_is_app_ready",
@@ -154,7 +322,20 @@
             }
           },
           "required": ["isReady"],
-          "additionalProperties": false
+          "additionalProperties": false,
+          "response": {
+            "type": "object",
+            "properties": {
+              "statusCode": {
+                "type": "integer"
+              },
+              "isReady": {
+                "type": "boolean"
+              }
+            },
+            "required": ["statusCode", "isReady"],
+            "additionalProperties": false
+          }
         },
         "set_back_base_url": {
           "$id": "api/microservice/app/set_back_base_url",
@@ -167,7 +348,20 @@
             }
           },
           "required": ["baseUrl"],
-          "additionalProperties": false
+          "additionalProperties": false,
+          "response": {
+            "type": "object",
+            "properties": {
+              "statusCode": {
+                "type": "integer"
+              },
+              "baseUrl": {
+                "type": "string"
+              }
+            },
+            "required": ["statusCode", "baseUrl"],
+            "additionalProperties": false
+          }
         },
         "set_app_base_url": {
           "$id": "api/microservice/app/set_app_base_url",
@@ -180,7 +374,20 @@
             }
           },
           "required": ["baseUrl"],
-          "additionalProperties": false
+          "additionalProperties": false,
+          "response": {
+            "type": "object",
+            "properties": {
+              "statusCode": {
+                "type": "integer"
+              },
+              "baseUrl": {
+                "type": "string"
+              }
+            },
+            "required": ["statusCode", "baseUrl"],
+            "additionalProperties": false
+          }
         },
         "get_is_app_ready": {
           "$id": "api/microservice/app/get_is_app_ready",
@@ -189,7 +396,20 @@
           "type": "object",
           "properties": {},
           "required": [],
-          "additionalProperties": false
+          "additionalProperties": false,
+          "response": {
+            "type": "object",
+            "properties": {
+              "statusCode": {
+                "type": "integer"
+              },
+              "isReady": {
+                "type": "boolean"
+              }
+            },
+            "required": ["statusCode", "isReady"],
+            "additionalProperties": false
+          }
         }
       },
       "extensions": {
@@ -199,15 +419,28 @@
           "methods": ["POST"],
           "type": "object",
           "properties": {
-            "extension": {
+            "projectName": {
               "type": "string"
             },
-            "platform": {
+            "url": {
+              "type": "string"
+            },
+            "extensionFileName": {
               "type": "string"
             }
           },
-          "required": ["extension", "platform"],
-          "additionalProperties": false
+          "required": ["projectName", "url", "extensionFileName"],
+          "additionalProperties": false,
+          "response": {
+            "type": "object",
+            "properties": {
+              "statusCode": {
+                "type": "integer"
+              }
+            },
+            "required": ["statusCode"],
+            "additionalProperties": false
+          }
         }
       }
     }

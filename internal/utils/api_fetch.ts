@@ -1,5 +1,6 @@
 import type { JsonRpcSchema, RequestHandlersWithValidation } from "@ogw_shared/utils/types.js";
 import { endRequestLog, startRequestLog } from "@ogw_front/utils/log";
+import type { ErrorResponse } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { consola } from "consola";
 import { fetchSchema } from "@ogw_shared/utils/fetch_schema";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
@@ -15,7 +16,7 @@ interface Microservice {
 interface ApiFetchParams {
   // This function always forwards this schema to fetchSchema, which requires the HTTP-flavored `methods` array (as opposed to the websocket `rpc` field).
   schema: JsonRpcSchema & { methods: string[] };
-  params?: Record<string, unknown>;
+  params?: object;
   headers?: Record<string, string>;
 }
 
@@ -26,11 +27,9 @@ interface FetchErrorLike {
   stack?: string;
 }
 
-interface FetchErrorResponseLike {
-  status?: number;
-  name?: string;
-  description?: string;
-}
+type FetchErrorResponseLike = { status?: number } & Partial<
+  Pick<ErrorResponse, "name" | "description">
+>;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -51,10 +50,12 @@ function toFetchErrorResponseLike(response: unknown): FetchErrorResponseLike {
   if (!isRecord(response)) {
     return {};
   }
+  // Ofetch puts the parsed body (an ErrorResponse for Flask microservices) in `_data`
+  const body = isRecord(response._data) ? response._data : response;
   return {
     status: typeof response.status === "number" ? response.status : undefined,
-    name: typeof response.name === "string" ? response.name : undefined,
-    description: typeof response.description === "string" ? response.description : undefined,
+    name: typeof body.name === "string" ? body.name : undefined,
+    description: typeof body.description === "string" ? body.description : undefined,
   };
 }
 
