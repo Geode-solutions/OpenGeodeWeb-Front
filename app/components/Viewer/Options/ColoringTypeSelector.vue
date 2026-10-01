@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { RangesPerData } from "@ogw_front/composables/batch_style";
 import ViewerOptionsAttributeSelector from "@ogw_front/components/Viewer/Options/AttributeSelector.vue";
 import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
 import ViewerOptionsTexturesSelector from "@ogw_front/components/Viewer/Options/TexturesSelector.vue";
@@ -25,6 +26,16 @@ interface Schemas {
 }
 
 const coloring_style_key = defineModel<string>("coloring_style_key");
+
+interface Emits {
+  vertex_attribute_ranges_per_data: [ranges: RangesPerData];
+  edge_attribute_ranges_per_data: [ranges: RangesPerData];
+  cell_attribute_ranges_per_data: [ranges: RangesPerData];
+  polygon_attribute_ranges_per_data: [ranges: RangesPerData];
+  polyhedron_attribute_ranges_per_data: [ranges: RangesPerData];
+}
+
+const emit = defineEmits<Emits>();
 
 const color = defineModel<RGBAColor>("color");
 const textures = defineModel<Texture[]>("textures");
@@ -246,6 +257,7 @@ watch(
           v-model:attributeRange="vertex_attribute_range"
           v-model:attributeColorMap="vertex_attribute_color_map"
           v-model:attributeNoDataColor="vertex_attribute_no_data_color"
+          @ranges_per_data="emit('vertex_attribute_ranges_per_data', $event)"
           :id="id"
           :componentIds="componentIds"
           :schema="vertexSchema"
@@ -258,6 +270,7 @@ watch(
           v-model:attributeRange="edge_attribute_range"
           v-model:attributeColorMap="edge_attribute_color_map"
           v-model:attributeNoDataColor="edge_attribute_no_data_color"
+          @ranges_per_data="emit('edge_attribute_ranges_per_data', $event)"
           :id="id"
           :componentIds="componentIds"
           :schema="edgeSchema"
@@ -270,6 +283,7 @@ watch(
           v-model:attributeRange="cell_attribute_range"
           v-model:attributeColorMap="cell_attribute_color_map"
           v-model:attributeNoDataColor="cell_attribute_no_data_color"
+          @ranges_per_data="emit('cell_attribute_ranges_per_data', $event)"
           :id="id"
           :componentIds="componentIds"
           :schema="cellSchema"
@@ -282,6 +296,7 @@ watch(
           v-model:attributeRange="polygon_attribute_range"
           v-model:attributeColorMap="polygon_attribute_color_map"
           v-model:attributeNoDataColor="polygon_attribute_no_data_color"
+          @ranges_per_data="emit('polygon_attribute_ranges_per_data', $event)"
           :id="id"
           :componentIds="componentIds"
           :schema="polygonSchema"
@@ -294,6 +309,7 @@ watch(
           v-model:attributeRange="polyhedron_attribute_range"
           v-model:attributeColorMap="polyhedron_attribute_color_map"
           v-model:attributeNoDataColor="polyhedron_attribute_no_data_color"
+          @ranges_per_data="emit('polyhedron_attribute_ranges_per_data', $event)"
           :id="id"
           :componentIds="componentIds"
           :schema="polyhedronSchema"

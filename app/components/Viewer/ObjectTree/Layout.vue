@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import GlobalObjects from "@ogw_front/components/Viewer/ObjectTree/Views/GlobalObjects.vue";
 import ModelTree from "@ogw_front/components/Viewer/ObjectTree/Views/ModelTree.vue";
+import type { TreeMenuPayload } from "@ogw_front/utils/treeview";
 import ViewerObjectTreeBox from "@ogw_front/components/Viewer/ObjectTree/Box.vue";
 import { geode_objects } from "@ogw_front/assets/geode_objects";
 import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
@@ -24,7 +25,7 @@ const { containerWidth } = defineProps<Props>();
 const treeviewStore = useTreeviewStore();
 
 interface Emits {
-  "show-menu": [payload: Record<string, unknown>];
+  "show-menu": [payload: TreeMenuPayload];
 }
 
 const emit = defineEmits<Emits>();

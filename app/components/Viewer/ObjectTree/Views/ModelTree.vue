@@ -4,6 +4,7 @@ import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonT
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
+import type { ModelComponentMenuPayload } from "@ogw_front/utils/treeview";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
@@ -33,16 +34,7 @@ interface CollectionTreeItem {
 const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 const hybridViewerStore = useHybridViewerStore();
 interface Emits {
-  "show-menu": [
-    payload: {
-      event: unknown;
-      itemId: string;
-      context_type: "model_component" | "model_component_type";
-      modelId: string;
-      modelComponentType?: string;
-      targetComponentIds?: string[];
-    },
-  ];
+  "show-menu": [payload: ModelComponentMenuPayload];
 }
 
 const emit = defineEmits<Emits>();
@@ -87,12 +79,10 @@ const {
 
 function onUpdateSelection(newSelection: string[]): void {
   const finalSelection = applySearchFilter(newSelection, visibleComponents.value);
-  updateVisibility(finalSelection as string[]);
+  updateVisibility(finalSelection);
 }
 
-const visibleSelection = computed<string[]>(
-  () => applySearchFilter(visibleComponents.value, []) as string[],
-);
+const visibleSelection = computed<string[]>(() => applySearchFilter(visibleComponents.value, []));
 
 const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
   if (search.value && cache.value) {
@@ -137,7 +127,7 @@ function extractComponentIds(node: CollectionTreeItem): string[] {
   return [node.id];
 }
 
-function showContextMenu(event: unknown, item: CollectionTreeItem): void {
+function showContextMenu(event: MouseEvent, item: CollectionTreeItem): void {
   const actualItem = item.raw || item;
   if (isCollections.value && !MESH_COMPONENT_TYPES.includes(actualItem.category ?? "")) {
     emit("show-menu", {

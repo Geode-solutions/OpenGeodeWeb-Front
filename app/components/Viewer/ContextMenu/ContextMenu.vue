@@ -3,6 +3,7 @@ import CenterButton from "@ogw_front/components/Viewer/ContextMenu/CenterButton.
 import CircularItems from "@ogw_front/components/Viewer/ContextMenu/CircularItems.vue";
 import type { Component } from "vue";
 import InfoCard from "@ogw_front/components/Viewer/ContextMenu/InfoCard.vue";
+import { provideBatchGroup } from "@ogw_front/composables/batch_style";
 import { useEventListener } from "@vueuse/core";
 import { useMenuStore } from "@ogw_front/stores/menu";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
@@ -30,6 +31,7 @@ const menuStore = useMenuStore();
 const treeviewStore = useTreeviewStore();
 
 const meta_data = computed(() => menuStore.current_meta_data || {});
+provideBatchGroup(() => meta_data.value.targetIds ?? []);
 
 const show_menu = ref<boolean>(true);
 const showName = ref<boolean>(false);
