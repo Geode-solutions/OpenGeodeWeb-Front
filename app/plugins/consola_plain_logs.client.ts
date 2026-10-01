@@ -39,7 +39,7 @@ export default defineNuxtPlugin({
   enforce: "pre",
   setup() {
     // Nitro parses NUXT_PUBLIC_* env overrides, so "true" arrives here as the boolean true
-    if (useRuntimeConfig().public.PLAIN_LOGS) {
+    if (useRuntimeConfig().public.PLAIN_LOGS === true) {
       consola.setReporters([{ log: plainLog }]);
     }
   },
