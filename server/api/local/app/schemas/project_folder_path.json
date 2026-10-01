@@ -2,7 +2,24 @@
   "route": "/project_folder_path",
   "methods": ["POST"],
   "type": "object",
-  "properties": { "PROJECT": { "type": "string" } },
+  "properties": {
+    "PROJECT": {
+      "type": "string"
+    }
+  },
   "required": ["PROJECT"],
-  "additionalProperties": true
+  "additionalProperties": true,
+  "response": {
+    "type": "object",
+    "properties": {
+      "statusCode": {
+        "type": "integer"
+      },
+      "projectFolderPath": {
+        "type": "string"
+      }
+    },
+    "required": ["statusCode", "projectFolderPath"],
+    "additionalProperties": false
+  }
 }

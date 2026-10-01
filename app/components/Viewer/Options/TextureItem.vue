@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import FileUploader from "@ogw_front/components/FileUploader.vue";
-import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { useBackStore } from "@ogw_front/stores/back";
 
 // Mirrors FileUploader's own (unexported) UploadFile type.
@@ -46,10 +46,8 @@ function getTextureCoordinates(): void {
   backStore.request(
     { schema, params },
     {
-      response_function: (response: unknown) => {
-        textureCoordinates.value = (
-          response as { texture_coordinates: string[] }
-        ).texture_coordinates;
+      response_function: (response) => {
+        textureCoordinates.value = response.texture_coordinates;
       },
     },
   );
@@ -69,8 +67,8 @@ async function files_uploaded_event(value: UploadFile[]): Promise<void> {
     await backStore.request(
       { schema, params },
       {
-        response_function: (response: unknown) => {
-          textureId.value = (response as { id: string }).id;
+        response_function: (response) => {
+          textureId.value = response.id;
         },
       },
     );

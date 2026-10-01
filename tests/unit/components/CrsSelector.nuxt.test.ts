@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { mountSuspended } from "@nuxt/test-utils/runtime";
 
 // Local imports
-import { setupActivePinia, vuetify } from "@ogw_tests/utils";
+import { mockAs, setupActivePinia, vuetify } from "@ogw_tests/utils";
 import CrsSelector from "@ogw_front/components/CrsSelector.vue";
 import { useBackStore } from "@ogw_front/stores/back";
 
@@ -35,12 +35,17 @@ describe("crs selector", () => {
     ];
 
     // Mock backStore.request instead of registerEndpoint
-    backStore.request = vi.fn(
-      async (_request: unknown, callbacks: { response_function?: (response: unknown) => void }) => {
-        callbacks.response_function?.({ crs_list });
-        await Promise.resolve();
-        return { crs_list };
-      },
+    backStore.request = mockAs<typeof backStore.request>(
+      vi.fn(
+        async (
+          _request: unknown,
+          callbacks: { response_function?: (response: unknown) => void },
+        ) => {
+          callbacks.response_function?.({ crs_list });
+          await Promise.resolve();
+          return { crs_list };
+        },
+      ),
     );
 
     const key_to_update = "key";

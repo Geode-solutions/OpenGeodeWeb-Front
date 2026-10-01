@@ -3,8 +3,23 @@
   "methods": ["POST"],
   "type": "object",
   "properties": {
-    "isReady": { "type": "boolean" }
+    "isReady": {
+      "type": "boolean"
+    }
   },
   "required": ["isReady"],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "response": {
+    "type": "object",
+    "properties": {
+      "statusCode": {
+        "type": "integer"
+      },
+      "isReady": {
+        "type": "boolean"
+      }
+    },
+    "required": ["statusCode", "isReady"],
+    "additionalProperties": false
+  }
 }

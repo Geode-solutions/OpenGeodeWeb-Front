@@ -4,7 +4,7 @@ import type { JsonRpcSchema } from "./types.js";
 
 function validateSchema(schema: JsonRpcSchema, body: unknown): { valid: boolean; error: string } {
   const ajv = new Ajv();
-  const list_keywords = ["methods", "route", "max_retry", "rpc"];
+  const list_keywords = ["methods", "route", "max_retry", "rpc", "response"];
   for (const keyword of list_keywords) {
     ajv.addKeyword(keyword);
   }
