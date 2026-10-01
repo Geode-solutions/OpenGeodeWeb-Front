@@ -7,15 +7,15 @@ import type { RegisterableStore, useAppStore } from "@ogw_front/stores/app";
 import type { Microservice } from "@ogw_front/stores/infra";
 import { consola } from "consola";
 import { isCloudMode } from "@ogw_front/utils/stores";
-import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json" with { type: "json" };
+import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_typed_schemas.js";
 
 interface ExtensionDescriptor {
   id: string;
   name: string;
   version: string;
   frontendContent: string;
-  port: string;
-  serverPort: string | undefined;
+  port: number;
+  serverPort?: number;
 }
 
 interface DownloadExtensionParams {
@@ -49,7 +49,7 @@ async function runExtensions(): Promise<{ extensionsArray: ExtensionDescriptor[]
     projectFolderPath,
     projectName,
   };
-  const result = await appStore.request<{ extensionsArray: ExtensionDescriptor[] }>({
+  const result = await appStore.request({
     schema,
     params,
   });
@@ -93,7 +93,11 @@ async function registerRunningExtensions(): Promise<RegisteredExtension[]> {
         type: "application/javascript",
       });
       const blobUrl = URL.createObjectURL(blob);
-      const extensionModule = await appStore.loadExtension(blobUrl, port, serverPort);
+      const extensionModule = await appStore.loadExtension(
+        blobUrl,
+        String(port),
+        serverPort === undefined ? undefined : String(serverPort),
+      );
       consola.info("[ExtensionManager] Extension loaded:", id);
       const storeFactory = extensionModule.metadata.store;
       const store = storeFactory();

@@ -1,20 +1,14 @@
 // Third party imports
-import { createError, defineEventHandler } from "h3";
 import { consola } from "consola";
 
 // Local imports
 import { getIsAppReady } from "@geode/opengeodeweb-front/server/utils/server_config.ts";
 
-export default defineEventHandler(() => {
-  try {
-    const isReady = getIsAppReady();
-    consola.info(`IS_APP_READY is ${isReady}`);
-    return { statusCode: 200, isReady };
-  } catch (error) {
-    consola.error(error);
-    throw createError({
-      statusCode: 500,
-      statusMessage: error instanceof Error ? error.message : String(error),
-    });
-  }
+import { defineTypedEventHandler } from "@geode/opengeodeweb-front/server/utils/typed_handler.ts";
+import schemas from "@geode/opengeodeweb-front/opengeodeweb_front_typed_schemas.js";
+
+export default defineTypedEventHandler(schemas.api.microservice.app.get_is_app_ready, () => {
+  const isReady = getIsAppReady();
+  consola.info(`IS_APP_READY is ${isReady}`);
+  return { statusCode: 200, isReady };
 });

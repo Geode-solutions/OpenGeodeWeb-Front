@@ -44,4 +44,23 @@ describe("validate schema", () => {
     },
     TIMEOUT_MS,
   );
+
+  test(
+    "response schema is ignored for params",
+    () => {
+      const schema_with_response = {
+        ...schema,
+        response: {
+          type: "object",
+          properties: { result: { type: "string" } },
+          required: ["result"],
+        },
+      };
+      const params = { var_1: "test", var_2: VAL_5 };
+      const { valid, error } = validateSchema(schema_with_response, params);
+      expect(valid).toBe(true);
+      expect(error).toBe("No errors");
+    },
+    TIMEOUT_MS,
+  );
 });

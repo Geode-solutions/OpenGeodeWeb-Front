@@ -2,8 +2,6 @@
 import fs from "node:fs";
 
 // Third party imports
-import { type H3Event, createError, defineEventHandler, readBody } from "h3";
-import { consola } from "consola";
 
 // Local imports
 import {
@@ -24,10 +22,8 @@ import { extensionsConf } from "@geode/opengeodeweb-front/server/utils/app_confi
 import { setExtensionServerPort } from "@geode/opengeodeweb-front/server/utils/server_config.ts";
 import { unzipFile } from "@geode/opengeodeweb-front/server/utils/server.ts";
 
-interface RunExtensionsBody {
-  projectFolderPath: string;
-  projectName: string;
-}
+import { defineTypedEventHandler } from "@geode/opengeodeweb-front/server/utils/typed_handler.ts";
+import schemas from "@geode/opengeodeweb-front/opengeodeweb_front_typed_schemas.js";
 
 async function runSingleExtension(
   extensionPath: string,
@@ -70,9 +66,9 @@ async function runSingleExtension(
   return { id, name, version, frontendContent, port, serverPort };
 }
 
-export default defineEventHandler(async (event: H3Event) => {
-  try {
-    const { projectFolderPath, projectName } = await readBody<RunExtensionsBody>(event);
+export default defineTypedEventHandler(
+  schemas.api.local.extensions.run,
+  async ({ projectFolderPath, projectName }) => {
     const extensionsConfig = extensionsConf(projectName);
     const extensionsArray = await Promise.all(
       Object.entries(extensionsConfig).map(async ([extensionId, { path: extensionPath }]) => {
@@ -81,16 +77,6 @@ export default defineEventHandler(async (event: H3Event) => {
       }),
     );
 
-    return {
-      statusCode: 200,
-      extensionsArray,
-    };
-  } catch (error) {
-    consola.error("Error running extensions:", error);
-    throw createError({
-      statusCode: 500,
-
-      statusMessage: error instanceof Error ? error.message : String(error),
-    });
-  }
-});
+    return { statusCode: 200, extensionsArray };
+  },
+);

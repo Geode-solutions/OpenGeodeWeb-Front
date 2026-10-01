@@ -53,4 +53,11 @@ function assertDefined<TValue>(
   return value;
 }
 
-export { setupActivePinia, vuetify, toHTTPMethod, assertDefined };
+// Types a mock as the function it replaces when that function is generic (e.g. `backStore.request`, generic over its schema): the mock only implements it for the route under test.
+// oxlint-disable-next-line typescript/no-unnecessary-type-parameters
+function mockAs<TTarget>(mock: unknown): TTarget {
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+  return mock as TTarget;
+}
+
+export { setupActivePinia, vuetify, toHTTPMethod, assertDefined, mockAs };

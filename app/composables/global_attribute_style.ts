@@ -1,5 +1,5 @@
 import type { JsonRpcSchema } from "@ogw_shared/utils/types";
-import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { getAttributeRange } from "@ogw_front/utils/attributes";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";

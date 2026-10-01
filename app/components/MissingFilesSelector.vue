@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 
 import FetchingData from "@ogw_front/components/FetchingData.vue";
 import FileUploader from "@ogw_front/components/FileUploader.vue";
