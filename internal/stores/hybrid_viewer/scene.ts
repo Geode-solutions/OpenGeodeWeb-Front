@@ -1,6 +1,7 @@
 import type { HybridDb, vtkActor as VtkActorInstance } from "./vtk_types";
 import { requireRenderWindow, useHybridViewerCore } from "./core";
 import { ACTOR_COLOR } from "./constants";
+import { base64ToArrayBuffer } from "./base64";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
@@ -25,8 +26,11 @@ const useHybridViewerScene = createSharedComposable(() => {
       return;
     }
     const value = await dataStore.item(id);
+    if (value.binary_light_viewable === undefined) {
+      return;
+    }
     const reader = vtkXMLPolyDataReader();
-    reader.parseAsArrayBuffer(new TextEncoder().encode(value.binary_light_viewable).buffer);
+    reader.parseAsArrayBuffer(base64ToArrayBuffer(value.binary_light_viewable));
     const actor = vtkActor();
     const mapper = vtkMapper();
     // oxlint-disable-next-line no-unsafe-type-assertion -- vtk.js's algorithm interface types getOutputData as `any`; this reader always produces polydata.
