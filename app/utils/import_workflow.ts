@@ -1,6 +1,7 @@
 // oxlint-disable promise/prefer-await-to-then
 // Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import { consola } from "consola";
 
 // Local imports
 import { type NewDataItem, useDataStore } from "@ogw_front/stores/data";
@@ -108,7 +109,7 @@ async function importWorkflow(files: readonly FileToImport[]): Promise<string[]>
 
 // NewDataItem has mutable array fields (mesh_components, collection_components), so a readonly array of it can't satisfy prefer-readonly-parameter-types deeply; left unfixed (same pattern as app/plugins/auto_store_register.ts).
 async function importWorkflowFromSnapshot(items: readonly NewDataItem[]): Promise<string[]> {
-  console.log("[importWorkflowFromSnapshot] start", { count: items?.length });
+  consola.debug("[importWorkflowFromSnapshot] start", { count: items?.length });
   const hybridViewerStore = useHybridViewerStore();
   const chunk_size = 5;
   const chunks: NewDataItem[][] = [];
@@ -132,7 +133,7 @@ async function importWorkflowFromSnapshot(items: readonly NewDataItem[]): Promis
   }
   await processChunk(0);
   await hybridViewerStore.remoteRender();
-  console.log("[importWorkflowFromSnapshot] done", {
+  consola.debug("[importWorkflowFromSnapshot] done", {
     ids,
   });
   return ids;

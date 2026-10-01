@@ -37,13 +37,11 @@ describe("model lines", () => {
   }, beforeAllTimeout);
 
   afterAll(async () => {
-    console.log("afterAll model lines kill", projectFolderPath);
     await cleanupBackend(projectFolderPath);
   });
 
   describe("lines visibility", () => {
     test("visibility false", async () => {
-      console.log("FROM TEST MODEL LINES");
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();

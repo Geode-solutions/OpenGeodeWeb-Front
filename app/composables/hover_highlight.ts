@@ -1,4 +1,5 @@
 import type { JsonRpcSchema } from "@ogw_shared/utils/types";
+import { consola } from "consola";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import vtk_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
@@ -60,7 +61,7 @@ export function useHoverhighlight(): {
       try {
         await viewerStore.request({ schema, params });
       } catch (error) {
-        console.error(`Highlight failed for ${type} ${id}:`, error);
+        consola.error(`Highlight failed for ${type} ${id}:`, error);
       }
     }
 
@@ -95,7 +96,7 @@ export function useHoverhighlight(): {
     try {
       await viewerStore.request(request);
     } catch (error) {
-      console.error(`Unhighlight failed for ${type} ${id}:`, error);
+      consola.error(`Unhighlight failed for ${type} ${id}:`, error);
     }
   }
 

@@ -4,6 +4,7 @@ import path from "node:path";
 
 // Third party imports
 import JSZip from "jszip";
+import { consola } from "consola";
 import { extract as extractTar } from "tar";
 
 const TAR_ARCHIVE_PATTERN = /\.(?<ext>tar\.gz|tgz|tar)$/u;
@@ -46,7 +47,7 @@ async function unzipFile(
   zipFilePath: string,
   outputDir: string = zipFilePath.replace(/\.[^/.]+$/u, ""),
 ): Promise<string> {
-  console.log("Unzipping file...", zipFilePath, outputDir);
+  consola.info("Unzipping file...", zipFilePath, outputDir);
   try {
     await fs.promises.mkdir(outputDir, { recursive: true });
 
@@ -56,10 +57,10 @@ async function unzipFile(
       await extractZipArchive(zipFilePath, outputDir);
     }
 
-    console.log("Extraction complete!");
+    consola.info("Extraction complete!");
     return outputDir;
   } catch (error) {
-    console.error("Error unzipping file:", error);
+    consola.error("Error unzipping file:", error);
     throw error;
   }
 }

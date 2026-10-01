@@ -1,6 +1,7 @@
 // Only ever fires now that tests are .ts; asks every bare `vi.fn()` mock to carry an explicit call-signature type parameter. Real value for a handful of mocks, but for the many plain mock objects across this test suite it would mean guessing a signature that's already implied by how the mock is used (risking a type that quietly doesn't match, which defeats the point) rather than deriving it from each real function - left off rather than doing that at scale.
 // oxlint-disable vitest/require-mock-type-parameters
 import { afterEach, beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest";
+import { consola } from "consola";
 
 import { useAppStore } from "@ogw_front/stores/app";
 
@@ -176,14 +177,14 @@ describe("app store", () => {
 
       test("warn when store not found in snapshot", async () => {
         const appStore = useAppStore();
-        const console_warn_spy = vi.spyOn(console, "warn").mockReturnValue(undefined);
+        const consola_warn_spy = vi.spyOn(consola, "warn").mockReturnValue(undefined);
         const mock_store = {
           $id: "testStore",
           importStores: vi.fn(),
         };
         appStore.registerStore(mock_store);
         await appStore.importStores({});
-        expect(console_warn_spy).toHaveBeenCalledWith(
+        expect(consola_warn_spy).toHaveBeenCalledWith(
           expect.stringContaining("Stores not found in snapshot: testStore"),
         );
       });

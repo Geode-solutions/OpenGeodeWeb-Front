@@ -1,3 +1,5 @@
+import { consola } from "consola";
+
 // Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
 // oxlint-disable eslint/sort-imports, eslint/max-lines
 import { defineStore } from "pinia";
@@ -108,8 +110,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
         rowHeights.value = config.rowHeights;
       }
     } catch (error) {
-      // oxlint-disable-next-line no-console -- surfaces persistence failures during local development.
-      console.error("Failed to load treeview config:", error);
+      consola.error("Failed to load treeview config:", error);
     }
   }
   // oxlint-disable-next-line typescript/no-floating-promises -- loadConfig catches its own errors internally.
