@@ -7,10 +7,10 @@ import * as components from "vuetify/components";
 import { describe, expect, test, vi } from "vitest";
 import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime";
 import { flushPromises } from "@vue/test-utils";
-import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 
 // Local imports
-import { setupActivePinia, toHTTPMethod, vuetify } from "@ogw_tests/utils";
+import { mockAs, setupActivePinia, toHTTPMethod, vuetify } from "@ogw_tests/utils";
 import FileUploader from "@ogw_front/components/FileUploader.vue";
 import MissingFilesSelector from "@ogw_front/components/MissingFilesSelector.vue";
 import { useBackStore } from "@ogw_front/stores/back";
@@ -27,20 +27,25 @@ describe("missing files selector", () => {
   (backStore as { base_url: string }).base_url = "/";
 
   test("select file", async () => {
-    backStore.request = vi.fn(
-      async (_request: unknown, callbacks: { response_function?: (response: unknown) => void }) => {
-        callbacks?.response_function?.({
-          has_missing_files: true,
-          mandatory_files: ["fake_file.txt"],
-          additional_files: ["fake_file_2.txt"],
-        });
-        await Promise.resolve();
-        return {
-          has_missing_files: true,
-          mandatory_files: ["fake_file.txt"],
-          additional_files: ["fake_file_2.txt"],
-        };
-      },
+    backStore.request = mockAs<typeof backStore.request>(
+      vi.fn(
+        async (
+          _request: unknown,
+          callbacks: { response_function?: (response: unknown) => void },
+        ) => {
+          callbacks?.response_function?.({
+            has_missing_files: true,
+            mandatory_files: ["fake_file.txt"],
+            additional_files: ["fake_file_2.txt"],
+          });
+          await Promise.resolve();
+          return {
+            has_missing_files: true,
+            mandatory_files: ["fake_file.txt"],
+            additional_files: ["fake_file_2.txt"],
+          };
+        },
+      ),
     );
 
     const wrapper = await mountSuspended(MissingFilesSelector, {

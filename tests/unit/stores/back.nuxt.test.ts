@@ -2,7 +2,7 @@
 // oxlint-disable vitest/require-mock-type-parameters
 // Third party imports
 import { beforeEach, describe, expect, expectTypeOf, test, vi } from "vitest";
-import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { registerEndpoint } from "@nuxt/test-utils/runtime";
 
 // Local imports

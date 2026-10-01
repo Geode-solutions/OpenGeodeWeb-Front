@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 
 import FetchingData from "@ogw_front/components/FetchingData.vue";
 import FileUploader from "@ogw_front/components/FileUploader.vue";
@@ -55,9 +55,7 @@ function files_uploaded_event(value: unknown[]): void {
 async function get_allowed_files(): Promise<void> {
   toggle_loading();
   const backStore = useBackStore();
-  const response = (await backStore.request({ schema })) as {
-    extensions: string[];
-  };
+  const response = await backStore.request({ schema });
   accept.value = response.extensions.map((extension) => `.${extension}`).join(",");
   toggle_loading();
 }

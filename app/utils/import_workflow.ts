@@ -1,6 +1,6 @@
 // oxlint-disable promise/prefer-await-to-then
 // Third party imports
-import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { consola } from "consola";
 
 // Local imports

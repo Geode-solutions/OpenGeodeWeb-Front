@@ -1,13 +1,18 @@
 import { getRestApiPort, getRestApiProtocol, isCloudMode } from "@ogw_front/utils/stores";
 import { Status } from "@ogw_front/utils/status";
 import { api_fetch } from "@ogw_internal/utils/api_fetch";
-import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { upload_file } from "@ogw_internal/utils/upload_file.js";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
-import type { JsonRpcSchema, RequestHandlers } from "@ogw_shared/utils/types.js";
+import type {
+  JsonRpcSchema,
+  ParamsOf,
+  RequestHandlers,
+  ResponseOf,
+} from "@ogw_shared/utils/types.js";
 
 import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json" with { type: "json" };
 
@@ -108,27 +113,35 @@ export const useBackStore = defineStore("back", {
       this.set_ping();
       await Promise.resolve();
     },
-    async request(
-      { schema, params = {} }: { schema: JsonRpcSchema; params?: Record<string, unknown> },
-      callbacks: RequestHandlers = {},
-    ) {
+    async request<Schema extends JsonRpcSchema>(
+      { schema, params }: { schema: Schema; params?: ParamsOf<Schema> },
+      callbacks: RequestHandlers<ResponseOf<Schema>> = {},
+    ): Promise<ResponseOf<Schema>> {
+      const rpc_schema: JsonRpcSchema = schema;
       const result = await api_fetch(
         this,
         // The back store is only ever used with HTTP ("front"/"back") schemas,
         // Which always carry `methods`; the wider JsonRpcSchema param above is
         // Kept as-is to match this action's public signature.
-        // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-        { schema: schema as JsonRpcSchema & { methods: string[] }, params, headers: {} },
+        {
+          // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+          schema: rpc_schema as JsonRpcSchema & { methods: string[] },
+          params: params ?? {},
+          headers: {},
+        },
         {
           ...callbacks,
           response_function: async (response: unknown) => {
             if (callbacks.response_function) {
-              await callbacks.response_function(response);
+              // The back validates its responses against the schema `response` it was generated from.
+              // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+              await callbacks.response_function(response as ResponseOf<Schema>);
             }
           },
         },
       );
-      return result;
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+      return result as ResponseOf<Schema>;
     },
     async upload(file: File, callbacks: RequestHandlers = {}) {
       const schema = back_schemas.opengeodeweb_back.upload_file;

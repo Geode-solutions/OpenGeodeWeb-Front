@@ -25,6 +25,8 @@
     "nuxt.config.ts",
     "opengeodeweb_front_schemas.json",
     "opengeodeweb_front_schemas.js",
+    "opengeodeweb_front_typed_schemas.js",
+    "opengeodeweb_front_typed_schemas.d.ts",
     "COPYLEFT",
     "LICENSE",
     "README.md"
