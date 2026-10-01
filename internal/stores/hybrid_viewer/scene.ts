@@ -1,12 +1,14 @@
 import type { HybridDb, vtkActor as VtkActorInstance } from "./vtk_types";
 import { requireRenderWindow, useHybridViewerCore } from "./core";
 import { ACTOR_COLOR } from "./constants";
+import { base64ToArrayBuffer } from "./base64";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
 import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper";
 import type vtkPolyData from "@kitware/vtk.js/Common/DataModel/PolyData";
+// oxlint-disable-next-line import/max-dependencies -- all imports above are required by this slice.
 import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLPolyDataReader";
 
 // Shared via createSharedComposable (rather than merged into the parent hybridViewer store) so sibling slices, e.g. camera.ts and ruler.ts, can read hybridDb/setZScaling directly without importing the parent store and creating a cycle. A Pinia store would work too but its $id/$patch/... properties would leak into the composed store's spread and collapse its inferred type.
@@ -25,8 +27,11 @@ const useHybridViewerScene = createSharedComposable(() => {
       return;
     }
     const value = await dataStore.item(id);
+    if (value.binary_light_viewable === undefined) {
+      return;
+    }
     const reader = vtkXMLPolyDataReader();
-    reader.parseAsArrayBuffer(new TextEncoder().encode(value.binary_light_viewable).buffer);
+    reader.parseAsArrayBuffer(base64ToArrayBuffer(value.binary_light_viewable));
     const actor = vtkActor();
     const mapper = vtkMapper();
     // oxlint-disable-next-line no-unsafe-type-assertion -- vtk.js's algorithm interface types getOutputData as `any`; this reader always produces polydata.
