@@ -2,73 +2,71 @@
 import type json from "./opengeodeweb_front_schemas.json";
 
 export interface RunParams {
-    projectFolderPath: string;
-    projectName:       string;
+  projectFolderPath: string;
+  projectName: string;
 }
 
 export interface RunViewerParams {
-    COMMAND_VIEWER: string;
-    NUXT_ROOT_PATH: string;
-    [property: string]: any;
+  COMMAND_VIEWER: string;
+  NUXT_ROOT_PATH: string;
+  [property: string]: any;
 }
 
 export interface RunBackParams {
-    COMMAND_BACK:   string;
-    NUXT_ROOT_PATH: string;
-    [property: string]: any;
+  COMMAND_BACK: string;
+  NUXT_ROOT_PATH: string;
+  [property: string]: any;
 }
 
 export interface ProjectFolderPathParams {
-    PROJECT: string;
-    [property: string]: any;
+  PROJECT: string;
+  [property: string]: any;
 }
 
-export interface KillParams {
-}
+export interface KillParams {}
 
 export interface UploadParams {
-    filename?: string;
+  filename?: string;
 }
 
 export interface RunParams1 {
-    projectFolderPath: string;
-    projectName:       string;
+  projectFolderPath: string;
+  projectName: string;
 }
 
 export interface KillParams1 {
-    extensionId:       string;
-    projectFolderPath: string;
-    projectName:       string;
+  extensionId: string;
+  projectFolderPath: string;
+  projectName: string;
 }
 
 export interface SetViewerBaseURLParams {
-    baseUrl: string;
+  baseUrl: string;
 }
 
 export interface SetIsAppReadyParams {
-    isReady: boolean;
+  isReady: boolean;
 }
 
 export interface SetBackBaseURLParams {
-    baseUrl: string;
+  baseUrl: string;
 }
 
 export interface SetAppBaseURLParams {
-    baseUrl: string;
+  baseUrl: string;
 }
 
-export interface GetIsAppReadyParams {
-}
+export interface GetIsAppReadyParams {}
 
 export interface DownloadParams {
-    extension: string;
-    platform:  string;
+  extension: string;
+  platform: string;
 }
 
 export interface ErrorResponse {
-    code:        number;
-    description: string;
-    name:        string;
+  code: number;
+  description: string;
+  name: string;
 }
 
 // `__params` and `__response` only exist at type level, to infer request/response types from a schema.
@@ -82,32 +80,46 @@ export interface Schemas {
   readonly api: {
     readonly cloud: {
       readonly extensions: {
-        readonly run: (typeof json)["api"]["cloud"]["extensions"]["run"] & TypedSchema<RunParams, unknown>;
+        readonly run: (typeof json)["api"]["cloud"]["extensions"]["run"] &
+          TypedSchema<RunParams, unknown>;
       };
     };
     readonly local: {
       readonly app: {
-        readonly run_viewer: (typeof json)["api"]["local"]["app"]["run_viewer"] & TypedSchema<RunViewerParams, unknown>;
-        readonly run_back: (typeof json)["api"]["local"]["app"]["run_back"] & TypedSchema<RunBackParams, unknown>;
-        readonly project_folder_path: (typeof json)["api"]["local"]["app"]["project_folder_path"] & TypedSchema<ProjectFolderPathParams, unknown>;
-        readonly kill: (typeof json)["api"]["local"]["app"]["kill"] & TypedSchema<KillParams, unknown>;
+        readonly run_viewer: (typeof json)["api"]["local"]["app"]["run_viewer"] &
+          TypedSchema<RunViewerParams, unknown>;
+        readonly run_back: (typeof json)["api"]["local"]["app"]["run_back"] &
+          TypedSchema<RunBackParams, unknown>;
+        readonly project_folder_path: (typeof json)["api"]["local"]["app"]["project_folder_path"] &
+          TypedSchema<ProjectFolderPathParams, unknown>;
+        readonly kill: (typeof json)["api"]["local"]["app"]["kill"] &
+          TypedSchema<KillParams, unknown>;
       };
       readonly extensions: {
-        readonly upload: (typeof json)["api"]["local"]["extensions"]["upload"] & TypedSchema<UploadParams, unknown>;
-        readonly run: (typeof json)["api"]["local"]["extensions"]["run"] & TypedSchema<RunParams, unknown>;
-        readonly kill: (typeof json)["api"]["local"]["extensions"]["kill"] & TypedSchema<KillParams, unknown>;
+        readonly upload: (typeof json)["api"]["local"]["extensions"]["upload"] &
+          TypedSchema<UploadParams, unknown>;
+        readonly run: (typeof json)["api"]["local"]["extensions"]["run"] &
+          TypedSchema<RunParams, unknown>;
+        readonly kill: (typeof json)["api"]["local"]["extensions"]["kill"] &
+          TypedSchema<KillParams, unknown>;
       };
     };
     readonly microservice: {
       readonly app: {
-        readonly set_viewer_base_url: (typeof json)["api"]["microservice"]["app"]["set_viewer_base_url"] & TypedSchema<SetViewerBaseURLParams, unknown>;
-        readonly set_is_app_ready: (typeof json)["api"]["microservice"]["app"]["set_is_app_ready"] & TypedSchema<SetIsAppReadyParams, unknown>;
-        readonly set_back_base_url: (typeof json)["api"]["microservice"]["app"]["set_back_base_url"] & TypedSchema<SetBackBaseURLParams, unknown>;
-        readonly set_app_base_url: (typeof json)["api"]["microservice"]["app"]["set_app_base_url"] & TypedSchema<SetAppBaseURLParams, unknown>;
-        readonly get_is_app_ready: (typeof json)["api"]["microservice"]["app"]["get_is_app_ready"] & TypedSchema<GetIsAppReadyParams, unknown>;
+        readonly set_viewer_base_url: (typeof json)["api"]["microservice"]["app"]["set_viewer_base_url"] &
+          TypedSchema<SetViewerBaseURLParams, unknown>;
+        readonly set_is_app_ready: (typeof json)["api"]["microservice"]["app"]["set_is_app_ready"] &
+          TypedSchema<SetIsAppReadyParams, unknown>;
+        readonly set_back_base_url: (typeof json)["api"]["microservice"]["app"]["set_back_base_url"] &
+          TypedSchema<SetBackBaseURLParams, unknown>;
+        readonly set_app_base_url: (typeof json)["api"]["microservice"]["app"]["set_app_base_url"] &
+          TypedSchema<SetAppBaseURLParams, unknown>;
+        readonly get_is_app_ready: (typeof json)["api"]["microservice"]["app"]["get_is_app_ready"] &
+          TypedSchema<GetIsAppReadyParams, unknown>;
       };
       readonly extensions: {
-        readonly download: (typeof json)["api"]["microservice"]["extensions"]["download"] & TypedSchema<DownloadParams, unknown>;
+        readonly download: (typeof json)["api"]["microservice"]["extensions"]["download"] &
+          TypedSchema<DownloadParams, unknown>;
       };
     };
   };
