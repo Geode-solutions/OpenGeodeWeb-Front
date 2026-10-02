@@ -1,21 +1,22 @@
 import { isModelSurfacesPolygonAttributeValid, useModelSurfacesPolygonAttribute } from "./polygon";
 import { isModelSurfacesVertexAttributeValid, useModelSurfacesVertexAttribute } from "./vertex";
+import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelSurfacesColor } from "./color";
 import { useModelSurfacesCommonStyle } from "./common";
 import { useModelSurfacesVisibility } from "./visibility";
 
 interface ColorGroup {
-  color: unknown;
+  color: RGBAColor | undefined;
   surfaces_ids: string[];
 }
 
 interface AttributeGroup {
-  name: string | undefined;
-  item: number | undefined;
-  minimum: number | undefined;
-  maximum: number | undefined;
-  colorMap: string | undefined;
+  name: string;
+  item: number;
+  minimum: number;
+  maximum: number;
+  colorMap: string;
   surfaces_ids: string[];
 }
 
@@ -127,14 +128,7 @@ export function useModelSurfacesStyle(): UseModelSurfacesStyleReturn {
             continue;
           }
           const key = `${name}_${item}_${colorMap}_${minimum}_${maximum}`;
-          vertexGroups[key] ??= {
-            name,
-            item,
-            minimum,
-            maximum,
-            colorMap,
-            surfaces_ids: [],
-          };
+          vertexGroups[key] ??= { ...attribute, surfaces_ids: [] };
           vertexGroups[key].surfaces_ids.push(surfaces_id);
         }
         coloringPromises.push(
@@ -177,14 +171,7 @@ export function useModelSurfacesStyle(): UseModelSurfacesStyleReturn {
             continue;
           }
           const key = `${name}_${item}_${colorMap}_${minimum}_${maximum}`;
-          polygonGroups[key] ??= {
-            name,
-            item,
-            minimum,
-            maximum,
-            colorMap,
-            surfaces_ids: [],
-          };
+          polygonGroups[key] ??= { ...attribute, surfaces_ids: [] };
           polygonGroups[key].surfaces_ids.push(surfaces_id);
         }
         coloringPromises.push(

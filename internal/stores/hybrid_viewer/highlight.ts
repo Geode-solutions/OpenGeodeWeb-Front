@@ -1,25 +1,19 @@
 import { HOVER_DEBOUNCE_MS, HOVER_TIMEOUT_MS } from "./constants";
 import type { HoverComponentInfo, HoverData } from "./vtk_types";
+import viewer_schemas, {
+  type PickedFieldType,
+  type ViewerHighlightResponse,
+} from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 import type { IndexableType } from "dexie";
 import { database } from "@ogw_internal/database/database.js";
 import { useHybridViewerCore } from "./core";
 import { useHybridViewerScene } from "./scene";
 import { useViewerStore } from "@ogw_front/stores/viewer";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
-
-// The dynamic/RPC-shaped payload of the viewer's "highlight" schema response.
-interface HighlightResponse {
-  id?: string;
-  picked_id?: number;
-  field_type?: string;
-  geode_id?: string | null;
-  attributes?: Record<string, unknown>;
-}
 
 // Shared via createSharedComposable (rather than merged into the parent hybridViewer store) so sibling slices, e.g. ruler.ts and viewport.ts, can read hover state/clearHoverHighlight/hoverHighlight directly without importing the parent store and creating a cycle. A Pinia store would work too but its $id/$patch/... properties would leak into the composed store's spread and collapse its inferred type.
 const useHybridViewerHighlight = createSharedComposable(() => {
   const is_hover_highlight = ref(false);
-  const hover_highlight_field_type = ref("CELL");
+  const hover_highlight_field_type = ref<PickedFieldType>("CELL");
   const hoverData = ref<HoverData | undefined>(undefined);
   const hoverPosition = ref({
     x: 0,
@@ -39,7 +33,7 @@ const useHybridViewerHighlight = createSharedComposable(() => {
 
   function requestHoverHighlight(
     event: MouseEvent,
-    onResponse: (response: unknown) => void | Promise<void>,
+    onResponse: (response: ViewerHighlightResponse) => void | Promise<void>,
   ): void {
     if (!is_hover_highlight.value) {
       return;
@@ -85,12 +79,9 @@ const useHybridViewerHighlight = createSharedComposable(() => {
           x: event.clientX,
           y: event.clientY,
         };
-    requestHoverHighlight(event, async (rawResponse: unknown) => {
-      // oxlint-disable-next-line no-unsafe-type-assertion -- trusted viewer RPC response boundary.
-      const response = rawResponse as HighlightResponse | undefined;
+    requestHoverHighlight(event, async (response) => {
       if (
         !is_hover_highlight.value ||
-        response === undefined ||
         response.id === undefined ||
         response.picked_id === undefined ||
         response.picked_id === -1
@@ -115,7 +106,7 @@ const useHybridViewerHighlight = createSharedComposable(() => {
         modelName = modelRecord.name;
       }
       const modelComponentsTable = database.model_components;
-      if (response.geode_id !== undefined && response.geode_id !== null && modelComponentsTable) {
+      if (response.geode_id !== undefined && modelComponentsTable) {
         const components = modelComponentsTable.where("[id+geode_id]");
         const query = components.equals([response.id, response.geode_id] as IndexableType);
         const component = (await query.first()) as
@@ -132,7 +123,7 @@ const useHybridViewerHighlight = createSharedComposable(() => {
       const newHoverData: HoverData = {
         modelId: response.id,
         modelName,
-        blockName: response.geode_id ?? undefined,
+        blockName: response.geode_id,
         pickedId: response.picked_id,
         fieldType: response.field_type,
         component: componentInfo,

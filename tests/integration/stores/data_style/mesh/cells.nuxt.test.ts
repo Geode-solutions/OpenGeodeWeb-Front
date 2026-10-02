@@ -1,7 +1,7 @@
 // oxlint-disable max-lines
 // Third party imports
 import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" };
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { beforeAllTimeout, setupIntegrationTests } from "@ogw_tests/integration/setup";
@@ -23,6 +23,13 @@ const ALTERNATE_RANGE_MAX = 100;
 const range: [number, number] = [MINIMUM_RANGE, MAXIMUM_RANGE];
 const default_vertex_attribute = { name: "points", item: 0, range };
 const default_cell_attribute = { name: "RGB_data", item: 0, range };
+
+function requireDefined<Value>(value: Value | undefined): Value {
+  if (value === undefined) {
+    throw new Error("Expected a defined stored config value");
+  }
+  return value;
+}
 
 let id = "";
 let projectFolderPath = "";
@@ -177,9 +184,9 @@ describe("mesh cells", () => {
       await dataStyleStore.setMeshCellsVertexAttribute(id, {
         name: "points",
         item: 0,
-        minimum: storedConfig0.minimum,
-        maximum: storedConfig0.maximum,
-        colorMap: storedConfig0.colorMap,
+        minimum: requireDefined(storedConfig0.minimum),
+        maximum: requireDefined(storedConfig0.maximum),
+        colorMap: requireDefined(storedConfig0.colorMap),
       });
       expect(dataStyleStore.meshCellsVertexAttributeItem(id)).toBe(0);
       expect(dataStyleStore.meshCellsVertexAttributeRange(id)).toStrictEqual([

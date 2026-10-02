@@ -3,22 +3,23 @@ import {
   useModelBlocksPolyhedronAttribute,
 } from "./polyhedron";
 import { isModelBlocksVertexAttributeValid, useModelBlocksVertexAttribute } from "./vertex";
+import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelBlocksColor } from "./color";
 import { useModelBlocksCommonStyle } from "./common";
 import { useModelBlocksVisibility } from "./visibility";
 
 interface ColorGroup {
-  color: unknown;
+  color: RGBAColor | undefined;
   blocks_ids: string[];
 }
 
 interface AttributeGroup {
-  name: string | undefined;
-  item: number | undefined;
-  minimum: number | undefined;
-  maximum: number | undefined;
-  colorMap: string | undefined;
+  name: string;
+  item: number;
+  minimum: number;
+  maximum: number;
+  colorMap: string;
   blocks_ids: string[];
 }
 
@@ -123,14 +124,7 @@ export function useModelBlocksStyle(): UseModelBlocksStyleReturn {
             continue;
           }
           const key = `${name}_${item}_${colorMap}_${minimum}_${maximum}`;
-          vertexGroups[key] ??= {
-            name,
-            item,
-            minimum,
-            maximum,
-            colorMap,
-            blocks_ids: [],
-          };
+          vertexGroups[key] ??= { ...attribute, blocks_ids: [] };
           vertexGroups[key].blocks_ids.push(block_id);
         }
         coloringPromises.push(
@@ -173,14 +167,7 @@ export function useModelBlocksStyle(): UseModelBlocksStyleReturn {
             continue;
           }
           const key = `${name}_${item}_${colorMap}_${minimum}_${maximum}`;
-          polyhedronGroups[key] ??= {
-            name,
-            item,
-            minimum,
-            maximum,
-            colorMap,
-            blocks_ids: [],
-          };
+          polyhedronGroups[key] ??= { ...attribute, blocks_ids: [] };
           polyhedronGroups[key].blocks_ids.push(block_id);
         }
         coloringPromises.push(

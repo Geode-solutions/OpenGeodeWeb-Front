@@ -1,7 +1,7 @@
 // oxlint-disable eslint/max-lines
-import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
+import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
@@ -16,7 +16,7 @@ interface AttributeStoredConfig {
   minimum: number | undefined;
   maximum: number | undefined;
   colorMap: string | undefined;
-  no_data_color: unknown;
+  no_data_color: RGBAColor;
 }
 
 interface AttributeState {
@@ -31,22 +31,25 @@ interface AttributeInput {
   minimum: number | undefined;
   maximum: number | undefined;
   colorMap: string | undefined;
-  no_data_color?: unknown;
+  no_data_color?: RGBAColor;
 }
 
-function isModelLinesVertexAttributeValid({
-  name,
-  item,
-  minimum,
-  maximum,
-  colorMap,
-}: AttributeInput): boolean {
+interface ValidAttributeInput {
+  name: string;
+  item: number;
+  minimum: number;
+  maximum: number;
+  colorMap: string;
+  no_data_color?: RGBAColor;
+}
+
+function isModelLinesVertexAttributeValid(input: AttributeInput): input is ValidAttributeInput {
   return (
-    name !== undefined &&
-    item !== undefined &&
-    minimum !== undefined &&
-    maximum !== undefined &&
-    colorMap !== undefined
+    input.name !== undefined &&
+    input.item !== undefined &&
+    input.minimum !== undefined &&
+    input.maximum !== undefined &&
+    input.colorMap !== undefined
   );
 }
 
@@ -67,7 +70,7 @@ interface UseModelLinesVertexAttributeReturn {
   setModelLinesVertexAttribute: (
     modelId: string,
     lineIds: string[],
-    input: AttributeInput,
+    input: ValidAttributeInput,
   ) => Promise<unknown>;
   setModelLinesVertexAttributeName: (
     modelId: string,
@@ -90,11 +93,11 @@ interface UseModelLinesVertexAttributeReturn {
     lineIds: string[],
     colorMap: string | undefined,
   ) => Promise<unknown>;
-  modelLinesVertexAttributeNoDataColor: (modelId: string, lineId?: string) => unknown;
+  modelLinesVertexAttributeNoDataColor: (modelId: string, lineId?: string) => RGBAColor;
   setModelLinesVertexAttributeNoDataColor: (
     modelId: string,
     lineIds: string[],
-    no_data_color: unknown,
+    no_data_color: RGBAColor,
   ) => Promise<unknown>;
 }
 
@@ -213,7 +216,7 @@ function useModelLinesVertexAttribute(): UseModelLinesVertexAttributeReturn {
       maximum,
       colorMap,
       no_data_color = DEFAULT_NO_DATA_COLOR,
-    }: AttributeInput,
+    }: ValidAttributeInput,
   ): Promise<unknown> {
     await mutateModelLinesVertexStyle(modelId, lineIds, {
       name,
@@ -225,7 +228,7 @@ function useModelLinesVertexAttribute(): UseModelLinesVertexAttributeReturn {
       colorMap,
       no_data_color,
     });
-    const points = getRGBPointsFromPreset(colorMap ?? "");
+    const points = [...getRGBPointsFromPreset(colorMap)];
     const line_viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, lineIds);
     const params = {
       id: modelId,
@@ -306,7 +309,7 @@ function useModelLinesVertexAttribute(): UseModelLinesVertexAttributeReturn {
     });
     return applyVertexAttribute(modelId, lineIds);
   }
-  function modelLinesVertexAttributeNoDataColor(modelId: string, lineId?: string): unknown {
+  function modelLinesVertexAttributeNoDataColor(modelId: string, lineId?: string): RGBAColor {
     const name = modelLinesVertexAttributeName(modelId, lineId);
     const item = modelLinesVertexAttributeItem(modelId, lineId);
     const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineId, name, item);
@@ -315,7 +318,7 @@ function useModelLinesVertexAttribute(): UseModelLinesVertexAttributeReturn {
   async function setModelLinesVertexAttributeNoDataColor(
     modelId: string,
     lineIds: string[],
-    no_data_color: unknown,
+    no_data_color: RGBAColor,
   ): Promise<unknown> {
     const name = modelLinesVertexAttributeName(modelId, lineIds[0]);
     const item = modelLinesVertexAttributeItem(modelId, lineIds[0]);

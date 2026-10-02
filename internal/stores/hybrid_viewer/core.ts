@@ -2,7 +2,7 @@ import { Status } from "@ogw_front/utils/status";
 import type { ViewStreamLike } from "./vtk_types";
 import type { vtkGenericRenderWindow as VtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 import { useViewerStore } from "@ogw_front/stores/viewer";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 interface GenericRenderWindowHolder {
   value?: VtkGenericRenderWindow;

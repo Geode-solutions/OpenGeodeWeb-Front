@@ -1,6 +1,6 @@
-import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
+import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
@@ -15,7 +15,7 @@ interface AttributeStoredConfig {
   minimum: number | undefined;
   maximum: number | undefined;
   colorMap: string | undefined;
-  no_data_color: unknown;
+  no_data_color: RGBAColor;
 }
 
 interface AttributeState {
@@ -30,22 +30,25 @@ interface AttributeInput {
   minimum: number | undefined;
   maximum: number | undefined;
   colorMap: string | undefined;
-  no_data_color?: unknown;
+  no_data_color?: RGBAColor;
 }
 
-function isMeshEdgesVertexAttributeValid({
-  name,
-  item,
-  minimum,
-  maximum,
-  colorMap,
-}: AttributeInput): boolean {
+interface ValidAttributeInput {
+  name: string;
+  item: number;
+  minimum: number;
+  maximum: number;
+  colorMap: string;
+  no_data_color?: RGBAColor;
+}
+
+function isMeshEdgesVertexAttributeValid(input: AttributeInput): input is ValidAttributeInput {
   return (
-    name !== undefined &&
-    item !== undefined &&
-    minimum !== undefined &&
-    maximum !== undefined &&
-    colorMap !== undefined
+    input.name !== undefined &&
+    input.item !== undefined &&
+    input.minimum !== undefined &&
+    input.maximum !== undefined &&
+    input.colorMap !== undefined
   );
 }
 
@@ -59,7 +62,7 @@ interface UseMeshEdgesVertexAttributeStyleReturn {
     name: string | undefined,
     item: number | undefined,
   ) => AttributeStoredConfig;
-  setMeshEdgesVertexAttribute: (id: string, input: AttributeInput) => Promise<unknown>;
+  setMeshEdgesVertexAttribute: (id: string, input: ValidAttributeInput) => Promise<unknown>;
   setMeshEdgesVertexAttributeName: (id: string, name: string) => Promise<unknown>;
   setMeshEdgesVertexAttributeItem: (id: string, item: number) => Promise<unknown>;
   setMeshEdgesVertexAttributeRange: (
@@ -71,8 +74,11 @@ interface UseMeshEdgesVertexAttributeStyleReturn {
     id: string,
     colorMap: string | undefined,
   ) => Promise<unknown>;
-  meshEdgesVertexAttributeNoDataColor: (id: string) => unknown;
-  setMeshEdgesVertexAttributeNoDataColor: (id: string, no_data_color: unknown) => Promise<unknown>;
+  meshEdgesVertexAttributeNoDataColor: (id: string) => RGBAColor;
+  setMeshEdgesVertexAttributeNoDataColor: (
+    id: string,
+    no_data_color: RGBAColor,
+  ) => Promise<unknown>;
 }
 
 // oxlint-disable-next-line max-lines-per-function
@@ -152,7 +158,7 @@ function useMeshEdgesVertexAttributeStyle(): UseMeshEdgesVertexAttributeStyleRet
       maximum,
       colorMap,
       no_data_color = DEFAULT_NO_DATA_COLOR,
-    }: AttributeInput,
+    }: ValidAttributeInput,
   ): Promise<unknown> {
     await mutateMeshEdgesVertexStyle(id, {
       name,
@@ -164,7 +170,7 @@ function useMeshEdgesVertexAttributeStyle(): UseMeshEdgesVertexAttributeStyleRet
       colorMap,
       no_data_color,
     });
-    const points = getRGBPointsFromPreset(colorMap ?? "");
+    const points = [...getRGBPointsFromPreset(colorMap)];
     const schema = meshEdgesVertexAttributeSchemas.attribute;
     const params = {
       id,
@@ -248,7 +254,7 @@ function useMeshEdgesVertexAttributeStyle(): UseMeshEdgesVertexAttributeStyleRet
     });
     return applyVertexAttribute(id);
   }
-  function meshEdgesVertexAttributeNoDataColor(id: string): unknown {
+  function meshEdgesVertexAttributeNoDataColor(id: string): RGBAColor {
     const name = meshEdgesVertexAttributeName(id);
     const item = meshEdgesVertexAttributeItem(id);
     const storedConfig = meshEdgesVertexAttributeStoredConfig(id, name, item);
@@ -256,7 +262,7 @@ function useMeshEdgesVertexAttributeStyle(): UseMeshEdgesVertexAttributeStyleRet
   }
   async function setMeshEdgesVertexAttributeNoDataColor(
     id: string,
-    no_data_color: unknown,
+    no_data_color: RGBAColor,
   ): Promise<unknown> {
     const name = meshEdgesVertexAttributeName(id);
     const item = meshEdgesVertexAttributeItem(id);

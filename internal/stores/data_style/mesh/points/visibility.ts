@@ -1,5 +1,5 @@
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { useMeshPointsCommonStyle } from "./common";
@@ -10,7 +10,7 @@ const schema = viewer_schemas.opengeodeweb_viewer.mesh.points.visibility;
 
 export function useMeshPointsVisibilityStyle(): {
   meshPointsVisibility: (id: string) => boolean | undefined;
-  setMeshPointsVisibility: (id: string, visibility: boolean | undefined) => Promise<unknown>;
+  setMeshPointsVisibility: (id: string, visibility: boolean) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const meshPointsCommonStyle = useMeshPointsCommonStyle();
@@ -19,10 +19,7 @@ export function useMeshPointsVisibilityStyle(): {
     // oxlint-disable-next-line no-unsafe-type-assertion -- visibility is defined as boolean in the data style schema.
     return meshPointsCommonStyle.meshPointsStyle(id).visibility as boolean | undefined;
   }
-  async function setMeshPointsVisibility(
-    id: string,
-    visibility: boolean | undefined,
-  ): Promise<unknown> {
+  async function setMeshPointsVisibility(id: string, visibility: boolean): Promise<unknown> {
     const params = { id, visibility };
     const result = await viewerStore.request(
       {
@@ -30,11 +27,8 @@ export function useMeshPointsVisibilityStyle(): {
         params,
       },
       {
-        response_function: async (response: unknown) => {
-          // oxlint-disable-next-line no-unsafe-type-assertion -- response shape is defined by the viewer schema.
-          const typedResponse = response as { id: string; visibility: boolean };
-          const mutateResult =
-            await meshPointsCommonStyle.mutateMeshPointsVisibility(typedResponse);
+        response_function: async (response) => {
+          const mutateResult = await meshPointsCommonStyle.mutateMeshPointsVisibility(response);
           return mutateResult;
         },
       },

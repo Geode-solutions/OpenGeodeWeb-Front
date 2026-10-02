@@ -4,18 +4,33 @@ import type {
   ModelComponentTypeStyle,
   StyleValues,
 } from "@ogw_internal/stores/data_style/types.js";
-import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
+import type { ParamsOf } from "@ogw_shared/utils/types.js";
+import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import { database } from "@ogw_internal/database/database";
 import merge from "lodash/merge";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useViewerStore } from "@ogw_front/stores/viewer";
+import type viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // The underlying dexie tables use compound array keys ([id_model, id_component] /
 // [id_model, type]) but the shared `database` proxy types every table as
 // Table<Record<string, unknown>, string>. Cast locally to the real key shape.
 type ComponentTable = Table<ModelComponentStyle, [string, string]>;
 type ComponentTypeTable = Table<ModelComponentTypeStyle, [string, string]>;
+
+type ModelComponentSchemas = (typeof viewer_schemas)["opengeodeweb_viewer"]["model"][
+  | "corners"
+  | "lines"
+  | "surfaces"
+  | "blocks"];
+type ModelColorSchema = ModelComponentSchemas["color"];
+type ModelVisibilitySchema = ModelComponentSchemas["visibility"];
+type ModelColorMode = ParamsOf<ModelColorSchema>["color_mode"];
+
+function isModelColorMode(value: string): value is ModelColorMode {
+  return value === "constant" || value === "random";
+}
 
 interface ComponentStyleUpdate {
   id_component: string;
@@ -45,16 +60,16 @@ interface UseModelCommonStyleReturn {
   setModelTypeColor: (
     id: string,
     component_ids: string[],
-    color: unknown,
-    schema: JsonRpcSchema,
+    color: RGBAColor | undefined,
+    schema: ModelColorSchema,
     activeColoring?: string,
     collectionId?: string,
   ) => Promise<unknown>;
   setModelTypeVisibility: (
     id: string,
     component_ids: string[],
-    visibility: boolean | undefined,
-    schema: JsonRpcSchema,
+    visibility: boolean,
+    schema: ModelVisibilitySchema,
   ) => Promise<unknown>;
 }
 
@@ -164,8 +179,8 @@ export function useModelCommonStyle(): UseModelCommonStyleReturn {
   async function setModelTypeColor(
     id: string,
     component_ids: string[],
-    color: unknown,
-    schema: JsonRpcSchema,
+    color: RGBAColor | undefined,
+    schema: ModelColorSchema,
     activeColoring = "constant",
     collectionId?: string,
   ): Promise<unknown> {
@@ -178,27 +193,28 @@ export function useModelCommonStyle(): UseModelCommonStyleReturn {
       return undefined;
     }
 
-    const params: Record<string, unknown> = {
-      id,
-      block_ids: viewer_ids,
-      color_mode: activeColoring,
-      collection_id: collectionId,
-    };
     if (activeColoring === "constant") {
       await mutateComponentStyles(id, component_ids, {
         coloring: {
           constant: color,
         },
       });
-      params.color = color;
     }
+    if (!isModelColorMode(activeColoring)) {
+      throw new Error(`Unknown model color mode: ${activeColoring}`);
+    }
+    const params = {
+      id,
+      block_ids: viewer_ids,
+      color_mode: activeColoring,
+      collection_id: collectionId,
+      ...(activeColoring === "constant" && { color }),
+    };
 
     return viewerStore.request(
       { schema, params },
       {
-        response_function: async (response: unknown) => {
-          // oxlint-disable-next-line no-unsafe-type-assertion -- response shape is defined by the color-set schema.
-          const colors = response as { geode_id: string; color: unknown }[] | undefined;
+        response_function: async ({ colors }) => {
           if (activeColoring === "constant") {
             await mutateComponentStyles(id, component_ids, {
               coloring: {
@@ -208,7 +224,7 @@ export function useModelCommonStyle(): UseModelCommonStyleReturn {
             return;
           }
 
-          if (colors === undefined || colors.length === 0) {
+          if (colors.length === 0) {
             return;
           }
 
@@ -231,8 +247,8 @@ export function useModelCommonStyle(): UseModelCommonStyleReturn {
   async function setModelTypeVisibility(
     id: string,
     component_ids: string[],
-    visibility: boolean | undefined,
-    schema: JsonRpcSchema,
+    visibility: boolean,
+    schema: ModelVisibilitySchema,
   ): Promise<unknown> {
     if (!component_ids?.length) {
       return undefined;
