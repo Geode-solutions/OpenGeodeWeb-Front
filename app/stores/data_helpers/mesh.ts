@@ -14,6 +14,7 @@ interface ModelComponentRecord {
 
 interface FormattedComponent {
   readonly id: string;
+  readonly geode_id: string;
   readonly title: string;
   readonly category: string;
   readonly viewer_id: number;
@@ -29,6 +30,7 @@ interface FormattedComponentGroup {
 function toFormattedComponent(meshComponent: ModelComponentRecord): FormattedComponent {
   return {
     id: meshComponent.geode_id,
+    geode_id: meshComponent.geode_id,
     title: meshComponent.name,
     category: meshComponent.type,
     viewer_id: Math.trunc(Number(meshComponent.viewer_id)),
