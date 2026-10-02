@@ -5,12 +5,29 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useDataStore } from "@ogw_front/stores/data";
 
+const DATA_ID_LENGTH = 32;
+
 describe("useDataStore - collections", () => {
   setupActivePinia();
 
   beforeEach(async () => {
     const dataStore = useDataStore();
     await dataStore.clear();
+  });
+
+  test("addItem stores geode_id", async () => {
+    const dataStore = useDataStore();
+    const dataId = "a".repeat(DATA_ID_LENGTH);
+    const geodeId = "01a08187-2c4c-7e64-85c5-52c3439f0626";
+    await dataStore.addItem({
+      id: dataId,
+      geode_id: geodeId,
+      name: "cube",
+      viewer_type: "model",
+      geode_object_type: "BRep",
+    });
+    const stored = await dataStore.item(dataId);
+    expect(stored.geode_id).toBe(geodeId);
   });
 
   test("correctly recognizes, formats, and pluralizes any collection component type not in MESH_COMPONENT_TYPES", async () => {
@@ -20,6 +37,7 @@ describe("useDataStore - collections", () => {
     // 1. Add model item
     await dataStore.addItem({
       id: modelId,
+      geode_id: "00000000-0000-0000-0000-000000000001",
       name: "Test Model",
       viewer_type: "model",
       geode_object_type: "BRep",
@@ -28,6 +46,7 @@ describe("useDataStore - collections", () => {
     // 2. Add mesh components and collection components (including a custom type like "MyCustomCollection")
     await dataStore.addComponents({
       id: modelId,
+      geode_id: "00000000-0000-0000-0000-000000000001",
       viewer_type: "model",
       geode_object_type: "BRep",
       mesh_components: [
@@ -63,6 +82,7 @@ describe("useDataStore - collections", () => {
     // Add component relations
     await dataStore.addComponentRelations({
       id: modelId,
+      geode_id: "00000000-0000-0000-0000-000000000001",
       viewer_type: "model",
       geode_object_type: "BRep",
       collection_components: [
@@ -94,12 +114,13 @@ describe("useDataStore - collections", () => {
     expect(allCollections).toStrictEqual([
       {
         id: "custom1",
+        geode_id: "custom1",
         title: "Custom 1",
         category: "MyCustomCollection",
         viewer_id: 4,
         is_active: true,
       },
-      { id: "fault1", title: "Fault 1", category: "Fault", viewer_id: 3, is_active: true },
+      { id: "fault1", geode_id: "fault1", title: "Fault 1", category: "Fault", viewer_id: 3, is_active: true },
     ]);
 
     // 5. Verify formatedCollectionComponents groups them and pluralizes the titles
@@ -111,6 +132,7 @@ describe("useDataStore - collections", () => {
         children: [
           {
             id: "custom1",
+            geode_id: "custom1",
             title: "Custom 1",
             category: "MyCustomCollection",
             viewer_id: 4,
@@ -125,6 +147,7 @@ describe("useDataStore - collections", () => {
         children: [
           {
             id: "fault1",
+            geode_id: "fault1",
             title: "Fault 1",
             category: "Fault",
             viewer_id: 3,
@@ -132,6 +155,7 @@ describe("useDataStore - collections", () => {
             children: [
               {
                 id: "mesh_surface",
+                geode_id: "mesh_surface",
                 title: "Surface 1",
                 category: "Surface",
                 viewer_id: 2,

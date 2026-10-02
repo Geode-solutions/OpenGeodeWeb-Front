@@ -38,7 +38,13 @@ async function importItem(item: NewDataItem): Promise<string> {
     item.viewer_type === "model" ? dataStore.addComponents(item) : Promise.resolve();
   const addDataRelationsTask =
     item.viewer_type === "model" ? dataStore.addComponentRelations(item) : Promise.resolve();
-  treeviewStore.addItem(item.geode_object_type, item.name ?? item.id, item.id, item.viewer_type);
+  treeviewStore.addItem(
+    item.geode_object_type,
+    item.name ?? item.id,
+    item.id,
+    item.geode_id,
+    item.viewer_type,
+  );
   const addDataStyleTask = dataStyleStore.addDataStyle(item.id, item.geode_object_type);
   const addViewerTask = addDataTask.then(async () => {
     if (!(await dataStore.isItemViewable(item))) {
