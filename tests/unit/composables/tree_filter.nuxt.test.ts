@@ -54,10 +54,10 @@ describe("useTreeFilter geode_id", () => {
     expect(firstGroupChildIds(processedItems.value)).toHaveLength(2);
   });
 
-  test("a group node without geode_id is found by its title", () => {
+  test("a group whose title matches but no child does is hidden", () => {
     const { search, processedItems } = useTreeFilter(buildItems());
     search.value = "BRep";
-    expect(processedItems.value).toHaveLength(1);
+    expect(processedItems.value).toHaveLength(0);
   });
 
   test("sort by id orders objects by geode_id", () => {

@@ -48,7 +48,7 @@ function customFilter(
     return false;
   }
   const query = searchQuery.toLowerCase();
-  const { title = "", id = value, geode_id: geodeId = "" } = item.raw;
+  const { title = "", id = value, geode_id: geodeId } = item.raw;
   return [title, id, geodeId].some((field) => String(field).toLowerCase().includes(query));
 }
 
@@ -138,7 +138,7 @@ function useTreeFilter(
       const children = (category.children ?? []).filter((child) =>
         customFilter(child.id, search.value, { raw: child }),
       );
-      if (children.length > 0 || customFilter(category.id, search.value, { raw: category })) {
+      if (children.length > 0) {
         result.push({ ...category, children });
       }
     }
