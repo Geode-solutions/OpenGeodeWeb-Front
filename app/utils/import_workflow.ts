@@ -86,6 +86,9 @@ async function importFile(filename: string, geode_object_type: string): Promise<
 }
 
 async function importWorkflow(files: readonly FileToImport[]): Promise<string[]> {
+  const hybridViewerStore = useHybridViewerStore();
+  // Files are imported concurrently and the viewer only frames the first actor to arrive, so the camera is reset once everything is loaded
+  const wasSceneEmpty = Object.keys(hybridViewerStore.hybridDb).length === 0;
   const chunk_size = 5;
   const chunks: FileToImport[][] = [];
   for (let i = 0; i < files.length; i += chunk_size) {
@@ -108,7 +111,10 @@ async function importWorkflow(files: readonly FileToImport[]): Promise<string[]>
     await processChunk(chunkIndex + 1);
   }
   await processChunk(0);
-  const hybridViewerStore = useHybridViewerStore();
+  const isSceneFilled = Object.keys(hybridViewerStore.hybridDb).length > 0;
+  if (wasSceneEmpty && isSceneFilled) {
+    hybridViewerStore.resetCamera();
+  }
   await hybridViewerStore.remoteRender();
   return results;
 }
