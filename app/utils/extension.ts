@@ -15,6 +15,7 @@ interface ExtensionDescriptor {
   version: string;
   frontendContent: string;
   port: number;
+  serverPort?: number;
 }
 
 interface DownloadExtensionParams {
@@ -87,12 +88,16 @@ async function registerRunningExtensions(): Promise<RegisteredExtension[]> {
   const { extensionsArray } = await runExtensions();
   return Promise.all(
     extensionsArray.map(async (extension: ExtensionDescriptor) => {
-      const { id, name, version, frontendContent, port } = extension;
+      const { id, name, version, frontendContent, port, serverPort } = extension;
       const blob = new Blob([frontendContent], {
         type: "application/javascript",
       });
       const blobUrl = URL.createObjectURL(blob);
-      const extensionModule = await appStore.loadExtension(blobUrl, String(port));
+      const extensionModule = await appStore.loadExtension(
+        blobUrl,
+        String(port),
+        serverPort === undefined ? undefined : String(serverPort),
+      );
       consola.info("[ExtensionManager] Extension loaded:", id);
       const storeFactory = extensionModule.metadata.store;
       const store = storeFactory();

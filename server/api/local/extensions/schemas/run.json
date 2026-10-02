@@ -37,6 +37,9 @@
             },
             "port": {
               "type": "integer"
+            },
+            "serverPort": {
+              "type": "integer"
             }
           },
           "required": ["id", "name", "version", "frontendContent", "port"],
