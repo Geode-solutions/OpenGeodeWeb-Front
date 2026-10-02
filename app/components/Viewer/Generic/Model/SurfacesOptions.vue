@@ -160,11 +160,9 @@ const surfacesVertexAttributeColorMap = computed<Map<string, RGBAColor> | undefi
   },
 });
 
-const surfacesVertexAttributeNoDataColor = computed<RGBAColor | undefined>({
+const surfacesVertexAttributeNoDataColor = computed<RGBAColor>({
   get: () =>
-    dataStyleStore.modelSurfacesVertexAttributeNoDataColor(modelId, referenceSurfaceId.value) as
-      | RGBAColor
-      | undefined,
+    dataStyleStore.modelSurfacesVertexAttributeNoDataColor(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesVertexAttributeNoDataColor(
       modelId,
@@ -224,11 +222,9 @@ const surfacesPolygonAttributeColorMap = computed<Map<string, RGBAColor> | undef
   },
 });
 
-const surfacesPolygonAttributeNoDataColor = computed<RGBAColor | undefined>({
+const surfacesPolygonAttributeNoDataColor = computed<RGBAColor>({
   get: () =>
-    dataStyleStore.modelSurfacesPolygonAttributeNoDataColor(modelId, referenceSurfaceId.value) as
-      | RGBAColor
-      | undefined,
+    dataStyleStore.modelSurfacesPolygonAttributeNoDataColor(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesPolygonAttributeNoDataColor(
       modelId,
@@ -290,11 +286,8 @@ const vertexAttributeColorMap = computed<Map<string, RGBAColor> | undefined>({
   },
 });
 
-const vertexAttributeNoDataColor = computed<RGBAColor | undefined>({
-  get: () =>
-    dataStyleStore.modelSurfacesVertexAttributeNoDataColor(modelId, surfaceId) as
-      | RGBAColor
-      | undefined,
+const vertexAttributeNoDataColor = computed<RGBAColor>({
+  get: () => dataStyleStore.modelSurfacesVertexAttributeNoDataColor(modelId, surfaceId),
   set: async (newValue) => {
     if (surfaceId === undefined) {
       return;
@@ -354,11 +347,8 @@ const polygonAttributeColorMap = computed<Map<string, RGBAColor> | undefined>({
   },
 });
 
-const polygonAttributeNoDataColor = computed<RGBAColor | undefined>({
-  get: () =>
-    dataStyleStore.modelSurfacesPolygonAttributeNoDataColor(modelId, surfaceId) as
-      | RGBAColor
-      | undefined,
+const polygonAttributeNoDataColor = computed<RGBAColor>({
+  get: () => dataStyleStore.modelSurfacesPolygonAttributeNoDataColor(modelId, surfaceId),
   set: async (newValue) => {
     if (surfaceId === undefined) {
       return;

@@ -1,5 +1,5 @@
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { useModelPointsCommonStyle } from "./common";
@@ -10,7 +10,7 @@ const schema = viewer_schemas.opengeodeweb_viewer.model.points.size;
 
 export function useModelPointsSizeStyle(): {
   modelPointsSize: (id: string) => number | undefined;
-  setModelPointsSize: (id: string, size: number | undefined) => Promise<unknown>;
+  setModelPointsSize: (id: string, size: number) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const modelPointsCommonStyle = useModelPointsCommonStyle();
@@ -20,7 +20,7 @@ export function useModelPointsSizeStyle(): {
     return modelPointsCommonStyle.modelPointsStyle(id).size as number | undefined;
   }
 
-  async function setModelPointsSize(id: string, size: number | undefined): Promise<unknown> {
+  async function setModelPointsSize(id: string, size: number): Promise<unknown> {
     const params = { id, size };
     const result = await viewerStore.request(
       {

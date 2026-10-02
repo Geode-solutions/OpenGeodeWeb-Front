@@ -23,6 +23,9 @@ const id = computed(() => (itemProps.meta_data.modelId as string | undefined) ||
 const visibility = computed({
   get: () => dataStyleStore.modelEdgesVisibility(id.value),
   set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setModelEdgesVisibility(targetId, newValue),
     );

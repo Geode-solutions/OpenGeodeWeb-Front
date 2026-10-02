@@ -1,5 +1,5 @@
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { useMeshCellsCommonStyle } from "./common";
@@ -10,7 +10,7 @@ const schema = viewer_schemas.opengeodeweb_viewer.mesh.cells.visibility;
 
 export function useMeshCellsVisibilityStyle(): {
   meshCellsVisibility: (id: string) => boolean | undefined;
-  setMeshCellsVisibility: (id: string, visibility: boolean | undefined) => Promise<unknown>;
+  setMeshCellsVisibility: (id: string, visibility: boolean) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const meshCellsCommonStyle = useMeshCellsCommonStyle();
@@ -19,10 +19,7 @@ export function useMeshCellsVisibilityStyle(): {
     // oxlint-disable-next-line no-unsafe-type-assertion -- visibility is defined as boolean in the data style schema.
     return meshCellsCommonStyle.meshCellsStyle(id).visibility as boolean | undefined;
   }
-  async function setMeshCellsVisibility(
-    id: string,
-    visibility: boolean | undefined,
-  ): Promise<unknown> {
+  async function setMeshCellsVisibility(id: string, visibility: boolean): Promise<unknown> {
     const params = { id, visibility };
     const result = await viewerStore.request(
       {

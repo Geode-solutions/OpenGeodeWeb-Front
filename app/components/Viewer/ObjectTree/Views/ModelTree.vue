@@ -212,10 +212,6 @@ function getLeafViewerIds(item: CollectionTreeItem): number[] {
   const actualItem = item.raw || item;
   return extractIds(actualItem);
 }
-
-function getLeafViewerIdsForFocus(item: CollectionTreeItem): string[] {
-  return getLeafViewerIds(item) as unknown as string[];
-}
 </script>
 
 <template>
@@ -272,7 +268,7 @@ function getLeafViewerIdsForFocus(item: CollectionTreeItem): string[] {
           @click.stop="
             hybridViewerStore.focusCameraOnObject(
               id,
-              getLeafViewerIdsForFocus(item as unknown as CollectionTreeItem),
+              getLeafViewerIds(item as unknown as CollectionTreeItem),
             )
           "
         />

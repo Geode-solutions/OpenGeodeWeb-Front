@@ -1,6 +1,6 @@
-import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
+import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
@@ -15,7 +15,7 @@ interface AttributeStoredConfig {
   minimum: number | undefined;
   maximum: number | undefined;
   colorMap: string | undefined;
-  no_data_color: unknown;
+  no_data_color: RGBAColor;
 }
 
 interface AttributeState {
@@ -30,22 +30,25 @@ interface AttributeInput {
   minimum: number | undefined;
   maximum: number | undefined;
   colorMap: string | undefined;
-  no_data_color?: unknown;
+  no_data_color?: RGBAColor;
 }
 
-function isMeshPolygonsVertexAttributeValid({
-  name,
-  item,
-  minimum,
-  maximum,
-  colorMap,
-}: AttributeInput): boolean {
+interface ValidAttributeInput {
+  name: string;
+  item: number;
+  minimum: number;
+  maximum: number;
+  colorMap: string;
+  no_data_color?: RGBAColor;
+}
+
+function isMeshPolygonsVertexAttributeValid(input: AttributeInput): input is ValidAttributeInput {
   return (
-    name !== undefined &&
-    item !== undefined &&
-    minimum !== undefined &&
-    maximum !== undefined &&
-    colorMap !== undefined
+    input.name !== undefined &&
+    input.item !== undefined &&
+    input.minimum !== undefined &&
+    input.maximum !== undefined &&
+    input.colorMap !== undefined
   );
 }
 
@@ -59,7 +62,7 @@ interface UseMeshPolygonsVertexAttributeStyleReturn {
     name: string | undefined,
     item: number | undefined,
   ) => AttributeStoredConfig;
-  setMeshPolygonsVertexAttribute: (id: string, input: AttributeInput) => Promise<unknown>;
+  setMeshPolygonsVertexAttribute: (id: string, input: ValidAttributeInput) => Promise<unknown>;
   setMeshPolygonsVertexAttributeName: (id: string, name: string) => Promise<unknown>;
   setMeshPolygonsVertexAttributeItem: (id: string, item: number) => Promise<unknown>;
   setMeshPolygonsVertexAttributeRange: (
@@ -71,10 +74,10 @@ interface UseMeshPolygonsVertexAttributeStyleReturn {
     id: string,
     colorMap: string | undefined,
   ) => Promise<unknown>;
-  meshPolygonsVertexAttributeNoDataColor: (id: string) => unknown;
+  meshPolygonsVertexAttributeNoDataColor: (id: string) => RGBAColor;
   setMeshPolygonsVertexAttributeNoDataColor: (
     id: string,
-    no_data_color: unknown,
+    no_data_color: RGBAColor,
   ) => Promise<unknown>;
 }
 
@@ -155,7 +158,7 @@ function useMeshPolygonsVertexAttributeStyle(): UseMeshPolygonsVertexAttributeSt
       maximum,
       colorMap,
       no_data_color = DEFAULT_NO_DATA_COLOR,
-    }: AttributeInput,
+    }: ValidAttributeInput,
   ): Promise<unknown> {
     await mutateMeshPolygonsVertexStyle(id, {
       name,
@@ -167,7 +170,7 @@ function useMeshPolygonsVertexAttributeStyle(): UseMeshPolygonsVertexAttributeSt
       colorMap,
       no_data_color,
     });
-    const points = getRGBPointsFromPreset(colorMap ?? "");
+    const points = [...getRGBPointsFromPreset(colorMap)];
     const schema = meshPolygonsVertexAttributeSchemas.attribute;
     const params = {
       id,
@@ -251,7 +254,7 @@ function useMeshPolygonsVertexAttributeStyle(): UseMeshPolygonsVertexAttributeSt
     });
     return applyVertexAttribute(id);
   }
-  function meshPolygonsVertexAttributeNoDataColor(id: string): unknown {
+  function meshPolygonsVertexAttributeNoDataColor(id: string): RGBAColor {
     const name = meshPolygonsVertexAttributeName(id);
     const item = meshPolygonsVertexAttributeItem(id);
     const storedConfig = meshPolygonsVertexAttributeStoredConfig(id, name, item);
@@ -259,7 +262,7 @@ function useMeshPolygonsVertexAttributeStyle(): UseMeshPolygonsVertexAttributeSt
   }
   async function setMeshPolygonsVertexAttributeNoDataColor(
     id: string,
-    no_data_color: unknown,
+    no_data_color: RGBAColor,
   ): Promise<unknown> {
     const name = meshPolygonsVertexAttributeName(id);
     const item = meshPolygonsVertexAttributeItem(id);
