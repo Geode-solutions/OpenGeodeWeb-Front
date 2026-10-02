@@ -33,7 +33,9 @@ function buildItems(): TestItem[] {
   ];
 }
 
-function firstGroupChildIds(groups: readonly { children?: readonly { id: unknown }[] }[]): string[] {
+function firstGroupChildIds(
+  groups: readonly { children?: readonly { id: unknown }[] }[],
+): string[] {
   return (groups[0]?.children ?? []).map((child) => String(child.id));
 }
 

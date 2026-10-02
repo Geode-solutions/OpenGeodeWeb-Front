@@ -120,7 +120,14 @@ describe("useDataStore - collections", () => {
         viewer_id: 4,
         is_active: true,
       },
-      { id: "fault1", geode_id: "fault1", title: "Fault 1", category: "Fault", viewer_id: 3, is_active: true },
+      {
+        id: "fault1",
+        geode_id: "fault1",
+        title: "Fault 1",
+        category: "Fault",
+        viewer_id: 3,
+        is_active: true,
+      },
     ]);
 
     // 5. Verify formatedCollectionComponents groups them and pluralizes the titles
