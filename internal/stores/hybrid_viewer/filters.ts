@@ -1,3 +1,4 @@
+import type { SliceAxis } from "@ogw_front/utils/slice";
 import { useHybridViewerCore } from "./core";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
@@ -30,6 +31,25 @@ async function setShrink(ids: string[], shrink_factor: number): Promise<void> {
   });
   await remoteRender();
 }
+async function setSlice(
+  ids: string[],
+  slices: { axis: SliceAxis; index: number }[],
+): Promise<[number, number, number]> {
+  const viewerStore = useViewerStore();
+  const { remoteRender } = useHybridViewerCore();
+  const schema = viewer_schemas.opengeodeweb_viewer.viewer.slice;
+  const params = {
+    ids,
+    slices,
+  };
+  const response = await viewerStore.request({
+    schema,
+    params,
+  });
+  await remoteRender();
+  // oxlint-disable-next-line no-unsafe-type-assertion -- response shape is defined by the slice schema.
+  return (response as { max_indices: [number, number, number] }).max_indices;
+}
 interface ThresholdAttribute {
   name: string;
   location: "point" | "cell";
@@ -54,11 +74,16 @@ async function setThreshold(ids: string[], attribute?: ThresholdAttribute): Prom
 function useHybridViewerFilters(): {
   setClippingPlanes: (ids: string[], planes: unknown) => Promise<void>;
   setShrink: (ids: string[], shrink_factor: number) => Promise<void>;
+  setSlice: (
+    ids: string[],
+    slices: { axis: SliceAxis; index: number }[],
+  ) => Promise<[number, number, number]>;
   setThreshold: (ids: string[], attribute?: ThresholdAttribute) => Promise<void>;
 } {
   return {
     setClippingPlanes,
     setShrink,
+    setSlice,
     setThreshold,
   };
 }
