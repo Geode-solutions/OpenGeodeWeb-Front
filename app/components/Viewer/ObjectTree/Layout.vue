@@ -283,9 +283,7 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
             >
               <ModelTree
                 data-testid="modelComponentsObjectTree"
-                :id="view.modelId || view.id"
-                :view-id="view.id"
-                :view-type="view.viewType"
+                :id="view.id"
                 @show-menu="emit('show-menu', $event)"
               />
             </ViewerObjectTreeBox>
