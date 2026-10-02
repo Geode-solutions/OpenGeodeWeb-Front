@@ -20,7 +20,7 @@ interface RunArgs {
 }
 
 const MILLISECONDS_PER_SECOND = 1000;
-const DEFAULT_TIMEOUT_SECONDS = 45;
+const DEFAULT_TIMEOUT_SECONDS = 120;
 const MAX_PORT_RETRIES = 1;
 const DEFAULT_RUN_ARGS: RunArgs = { projectFolderPath: "" };
 const LISTENING_LOG_PATTERN = /^Listening on https?:\/\/.+:\d+\/?\s*$/mu;
