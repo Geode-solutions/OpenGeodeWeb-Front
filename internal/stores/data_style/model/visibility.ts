@@ -5,7 +5,7 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 import { useModelSelection } from "./selection";
 import { useViewerStore } from "@ogw_front/stores/viewer";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // The four per-component-type style composables (Surface/Line/Block/Corner) each expose a different, large set of methods (color, visibility, per-attribute-kind getters/setters...). This module only cares about looking a handful of them up dynamically by name, so a precise structural type for componentStyleFunctions isn't worth modelling here; `any` keeps the dynamic dispatch table honest about that.
 // oxlint-disable-next-line no-explicit-any

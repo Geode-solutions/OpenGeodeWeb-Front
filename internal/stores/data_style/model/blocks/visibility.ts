@@ -1,6 +1,6 @@
 import { useModelBlocksCommonStyle } from "./common";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 const schema = viewer_schemas.opengeodeweb_viewer.model.blocks.visibility;
 
@@ -8,7 +8,7 @@ export function useModelBlocksVisibility(): {
   setModelBlocksVisibility: (
     modelId: string,
     blocks_ids: string[],
-    visibility: boolean | undefined,
+    visibility: boolean,
   ) => Promise<unknown>;
   modelBlockVisibility: (id: string, block_id?: string) => unknown;
 } {
@@ -22,7 +22,7 @@ export function useModelBlocksVisibility(): {
   async function setModelBlocksVisibility(
     modelId: string,
     blocks_ids: string[],
-    visibility: boolean | undefined,
+    visibility: boolean,
   ): Promise<unknown> {
     const result = await modelCommonStyle.setModelTypeVisibility(
       modelId,

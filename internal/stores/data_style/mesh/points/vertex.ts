@@ -1,6 +1,6 @@
-import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
+import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
@@ -15,7 +15,7 @@ interface AttributeStoredConfig {
   minimum: number | undefined;
   maximum: number | undefined;
   colorMap: string | undefined;
-  no_data_color: unknown;
+  no_data_color: RGBAColor;
 }
 
 interface AttributeState {
@@ -30,22 +30,25 @@ interface AttributeInput {
   minimum: number | undefined;
   maximum: number | undefined;
   colorMap: string | undefined;
-  no_data_color?: unknown;
+  no_data_color?: RGBAColor;
 }
 
-function isMeshPointsVertexAttributeValid({
-  name,
-  item,
-  minimum,
-  maximum,
-  colorMap,
-}: AttributeInput): boolean {
+interface ValidAttributeInput {
+  name: string;
+  item: number;
+  minimum: number;
+  maximum: number;
+  colorMap: string;
+  no_data_color?: RGBAColor;
+}
+
+function isMeshPointsVertexAttributeValid(input: AttributeInput): input is ValidAttributeInput {
   return (
-    name !== undefined &&
-    item !== undefined &&
-    minimum !== undefined &&
-    maximum !== undefined &&
-    colorMap !== undefined
+    input.name !== undefined &&
+    input.item !== undefined &&
+    input.minimum !== undefined &&
+    input.maximum !== undefined &&
+    input.colorMap !== undefined
   );
 }
 
@@ -59,7 +62,7 @@ interface UseMeshPointsVertexAttributeStyleReturn {
     name: string | undefined,
     item: number | undefined,
   ) => AttributeStoredConfig;
-  setMeshPointsVertexAttribute: (id: string, input: AttributeInput) => Promise<unknown>;
+  setMeshPointsVertexAttribute: (id: string, input: ValidAttributeInput) => Promise<unknown>;
   setMeshPointsVertexAttributeName: (id: string, name: string) => Promise<unknown>;
   setMeshPointsVertexAttributeItem: (id: string, item: number) => Promise<unknown>;
   setMeshPointsVertexAttributeRange: (
@@ -71,8 +74,11 @@ interface UseMeshPointsVertexAttributeStyleReturn {
     id: string,
     colorMap: string | undefined,
   ) => Promise<unknown>;
-  meshPointsVertexAttributeNoDataColor: (id: string) => unknown;
-  setMeshPointsVertexAttributeNoDataColor: (id: string, no_data_color: unknown) => Promise<unknown>;
+  meshPointsVertexAttributeNoDataColor: (id: string) => RGBAColor;
+  setMeshPointsVertexAttributeNoDataColor: (
+    id: string,
+    no_data_color: RGBAColor,
+  ) => Promise<unknown>;
 }
 
 // oxlint-disable-next-line max-lines-per-function
@@ -152,7 +158,7 @@ function useMeshPointsVertexAttributeStyle(): UseMeshPointsVertexAttributeStyleR
       maximum,
       colorMap,
       no_data_color = DEFAULT_NO_DATA_COLOR,
-    }: AttributeInput,
+    }: ValidAttributeInput,
   ): Promise<unknown> {
     await mutateMeshPointsVertexStyle(id, {
       name,
@@ -164,7 +170,7 @@ function useMeshPointsVertexAttributeStyle(): UseMeshPointsVertexAttributeStyleR
       colorMap,
       no_data_color,
     });
-    const points = getRGBPointsFromPreset(colorMap ?? "");
+    const points = [...getRGBPointsFromPreset(colorMap)];
     const schema = meshPointsVertexAttributeSchemas.attribute;
     const params = {
       id,
@@ -248,7 +254,7 @@ function useMeshPointsVertexAttributeStyle(): UseMeshPointsVertexAttributeStyleR
     });
     return applyVertexAttribute(id);
   }
-  function meshPointsVertexAttributeNoDataColor(id: string): unknown {
+  function meshPointsVertexAttributeNoDataColor(id: string): RGBAColor {
     const name = meshPointsVertexAttributeName(id);
     const item = meshPointsVertexAttributeItem(id);
     const storedConfig = meshPointsVertexAttributeStoredConfig(id, name, item);
@@ -256,7 +262,7 @@ function useMeshPointsVertexAttributeStyle(): UseMeshPointsVertexAttributeStyleR
   }
   async function setMeshPointsVertexAttributeNoDataColor(
     id: string,
-    no_data_color: unknown,
+    no_data_color: RGBAColor,
   ): Promise<unknown> {
     const name = meshPointsVertexAttributeName(id);
     const item = meshPointsVertexAttributeItem(id);

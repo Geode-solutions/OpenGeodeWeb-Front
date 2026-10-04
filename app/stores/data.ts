@@ -3,7 +3,7 @@
 import { type Table, liveQuery } from "dexie";
 import type { Observable } from "rxjs";
 import { useObservable } from "@vueuse/rxjs";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { type ModelComponentRecord, useDataMesh } from "./data_helpers/mesh.js";

@@ -21,6 +21,11 @@ type ParamsOf<Schema> = Schema extends { readonly __params?: infer Params }
   ? Params
   : Record<string, unknown>;
 
+// Any microservice's `microservice_version` schema, whatever the package that generated it.
+type MicroserviceVersionSchema = JsonRpcSchema & {
+  readonly __response?: { microservice_version: string };
+};
+
 interface RequestHandlers<Response = unknown> {
   readonly request_error_function?: (error: unknown) => void | Promise<void>;
   // Return value is intentionally untyped: callers commonly return the Promise of a downstream call (e.g. a Dexie `.put()`, which resolves to a primary key) that this code chains/awaits but never inspects the resolved value of.
@@ -34,6 +39,7 @@ interface RequestHandlersWithValidation extends RequestHandlers {
 
 export type {
   JsonRpcSchema,
+  MicroserviceVersionSchema,
   ParamsOf,
   RequestHandlers,
   RequestHandlersWithValidation,

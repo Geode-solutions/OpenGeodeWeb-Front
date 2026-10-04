@@ -1,6 +1,6 @@
-import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
+import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
@@ -15,7 +15,7 @@ interface AttributeStoredConfig {
   minimum: number | undefined;
   maximum: number | undefined;
   colorMap: string | undefined;
-  no_data_color: unknown;
+  no_data_color: RGBAColor;
 }
 
 interface AttributeState {
@@ -30,7 +30,16 @@ interface AttributeInput {
   minimum: number | undefined;
   maximum: number | undefined;
   colorMap: string | undefined;
-  no_data_color?: unknown;
+  no_data_color?: RGBAColor;
+}
+
+interface ValidAttributeInput {
+  name: string;
+  item: number;
+  minimum: number;
+  maximum: number;
+  colorMap: string;
+  no_data_color?: RGBAColor;
 }
 
 type IdsFn<Value> = (modelId: string, cornerIds: string[], value: Value) => Promise<void>;
@@ -52,7 +61,7 @@ interface ModelCornersVertexAttributeApi {
   setModelCornersVertexAttribute: (
     modelId: string,
     cornerIds: string[],
-    attribute: AttributeInput,
+    attribute: ValidAttributeInput,
   ) => Promise<unknown>;
   setModelCornersVertexAttributeName: IdsFn<string>;
   setModelCornersVertexAttributeItem: IdsFn<number>;
@@ -63,23 +72,17 @@ interface ModelCornersVertexAttributeApi {
     maximum: number,
   ) => Promise<void>;
   setModelCornersVertexAttributeColorMap: IdsFn<string | undefined>;
-  modelCornersVertexAttributeNoDataColor: (modelId: string, cornerId?: string) => unknown;
-  setModelCornersVertexAttributeNoDataColor: IdsFn<unknown>;
+  modelCornersVertexAttributeNoDataColor: (modelId: string, cornerId?: string) => RGBAColor;
+  setModelCornersVertexAttributeNoDataColor: IdsFn<RGBAColor>;
 }
 
-function isModelCornersVertexAttributeValid({
-  name,
-  item,
-  minimum,
-  maximum,
-  colorMap,
-}: AttributeInput): boolean {
+function isModelCornersVertexAttributeValid(input: AttributeInput): input is ValidAttributeInput {
   return (
-    name !== undefined &&
-    item !== undefined &&
-    minimum !== undefined &&
-    maximum !== undefined &&
-    colorMap !== undefined
+    input.name !== undefined &&
+    input.item !== undefined &&
+    input.minimum !== undefined &&
+    input.maximum !== undefined &&
+    input.colorMap !== undefined
   );
 }
 
@@ -197,7 +200,7 @@ function useModelCornersVertexAttribute(): ModelCornersVertexAttributeApi {
       maximum,
       colorMap,
       no_data_color = DEFAULT_NO_DATA_COLOR,
-    }: AttributeInput,
+    }: ValidAttributeInput,
   ): Promise<unknown> {
     await mutateModelCornersVertexStyle(modelId, cornerIds, { name, item });
     await setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, item, {
@@ -206,7 +209,7 @@ function useModelCornersVertexAttribute(): ModelCornersVertexAttributeApi {
       colorMap,
       no_data_color,
     });
-    const points = getRGBPointsFromPreset(colorMap ?? "");
+    const points = [...getRGBPointsFromPreset(colorMap)];
     const corner_viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, cornerIds);
     const params = {
       id: modelId,
@@ -278,7 +281,7 @@ function useModelCornersVertexAttribute(): ModelCornersVertexAttributeApi {
     await setModelCornersVertexAttributeStoredConfig(modelId, cornerIds, name, item, { colorMap });
     await applyVertexAttribute(modelId, cornerIds);
   }
-  function modelCornersVertexAttributeNoDataColor(modelId: string, cornerId?: string): unknown {
+  function modelCornersVertexAttributeNoDataColor(modelId: string, cornerId?: string): RGBAColor {
     const name = modelCornersVertexAttributeName(modelId, cornerId);
     const item = modelCornersVertexAttributeItem(modelId, cornerId);
     return modelCornersVertexAttributeStoredConfig(modelId, cornerId, name, item).no_data_color;
@@ -286,7 +289,7 @@ function useModelCornersVertexAttribute(): ModelCornersVertexAttributeApi {
   async function setModelCornersVertexAttributeNoDataColor(
     modelId: string,
     cornerIds: string[],
-    no_data_color: unknown,
+    no_data_color: RGBAColor,
   ): Promise<void> {
     const name = modelCornersVertexAttributeName(modelId, cornerIds[0]);
     const item = modelCornersVertexAttributeItem(modelId, cornerIds[0]);
