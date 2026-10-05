@@ -4,7 +4,7 @@ import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
-import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
@@ -44,7 +44,7 @@ const linesVisibility = computed<boolean>({
 const lineVisibility = computed<boolean | undefined>({
   get: () => dataStyleStore.modelLineVisibility(modelId, lineId) as boolean | undefined,
   set: async (newValue) => {
-    if (lineId === undefined) {
+    if (newValue === undefined || lineId === undefined) {
       return;
     }
     await dataStyleStore.setModelLinesVisibility(modelId, [lineId], newValue);
@@ -153,11 +153,8 @@ const linesVertexAttributeColorMap = computed<RGBAColorMap | undefined>({
   },
 });
 
-const linesVertexAttributeNoDataColor = computed<RGBAColor | undefined>({
-  get: () =>
-    dataStyleStore.modelLinesVertexAttributeNoDataColor(modelId, referenceLineId.value) as
-      | RGBAColor
-      | undefined,
+const linesVertexAttributeNoDataColor = computed<RGBAColor>({
+  get: () => dataStyleStore.modelLinesVertexAttributeNoDataColor(modelId, referenceLineId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesVertexAttributeNoDataColor(modelId, targetLineIds, newValue);
     hybridViewerStore.remoteRender();
@@ -203,11 +200,8 @@ const linesEdgeAttributeColorMap = computed<Map<string, RGBAColor> | undefined>(
   },
 });
 
-const linesEdgeAttributeNoDataColor = computed<RGBAColor | undefined>({
-  get: () =>
-    dataStyleStore.modelLinesEdgeAttributeNoDataColor(modelId, referenceLineId.value) as
-      | RGBAColor
-      | undefined,
+const linesEdgeAttributeNoDataColor = computed<RGBAColor>({
+  get: () => dataStyleStore.modelLinesEdgeAttributeNoDataColor(modelId, referenceLineId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesEdgeAttributeNoDataColor(modelId, targetLineIds, newValue);
     hybridViewerStore.remoteRender();
@@ -260,9 +254,8 @@ const vertexAttributeColorMap = computed<ColorMap | undefined>({
   },
 });
 
-const vertexAttributeNoDataColor = computed<RGBAColor | undefined>({
-  get: () =>
-    dataStyleStore.modelLinesVertexAttributeNoDataColor(modelId, lineId) as RGBAColor | undefined,
+const vertexAttributeNoDataColor = computed<RGBAColor>({
+  get: () => dataStyleStore.modelLinesVertexAttributeNoDataColor(modelId, lineId),
   set: async (newValue) => {
     if (lineId === undefined) {
       return;
@@ -317,9 +310,8 @@ const edgeAttributeColorMap = computed<Map<string, RGBAColor> | undefined>({
   },
 });
 
-const edgeAttributeNoDataColor = computed<RGBAColor | undefined>({
-  get: () =>
-    dataStyleStore.modelLinesEdgeAttributeNoDataColor(modelId, lineId) as RGBAColor | undefined,
+const edgeAttributeNoDataColor = computed<RGBAColor>({
+  get: () => dataStyleStore.modelLinesEdgeAttributeNoDataColor(modelId, lineId),
   set: async (newValue) => {
     if (lineId === undefined) {
       return;

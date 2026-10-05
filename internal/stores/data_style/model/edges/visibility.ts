@@ -1,15 +1,16 @@
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 import { useModelEdgesCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
+import { whenDefined } from "@ogw_internal/stores/data_style/when_defined";
 
 // Local constants
 const schema = viewer_schemas.opengeodeweb_viewer.model.edges.visibility;
 
 interface ModelEdgesVisibilityStyleApi {
   modelEdgesVisibility: (id: string) => boolean | undefined;
-  setModelEdgesVisibility: (id: string, visibility: boolean | undefined) => Promise<unknown>;
+  setModelEdgesVisibility: (id: string, visibility: boolean) => Promise<unknown>;
   applyModelEdgesStyle: (id: string) => Promise<unknown[]>;
 }
 
@@ -25,10 +26,7 @@ export function useModelEdgesVisibilityStyle(): ModelEdgesVisibilityStyleApi {
     return undefined;
   }
 
-  async function setModelEdgesVisibility(
-    id: string,
-    visibility: boolean | undefined,
-  ): Promise<unknown> {
+  async function setModelEdgesVisibility(id: string, visibility: boolean): Promise<unknown> {
     const params = { id, visibility };
     const result = await viewerStore.request(
       { schema, params },
@@ -42,8 +40,10 @@ export function useModelEdgesVisibilityStyle(): ModelEdgesVisibilityStyleApi {
   }
 
   async function applyModelEdgesStyle(id: string): Promise<unknown[]> {
-    const visibility = modelEdgesVisibility(id);
-    const result = await setModelEdgesVisibility(id, visibility);
+    const result = await whenDefined(modelEdgesVisibility(id), async (visibility) => {
+      const applied = await setModelEdgesVisibility(id, visibility);
+      return applied;
+    });
     return [result];
   }
 

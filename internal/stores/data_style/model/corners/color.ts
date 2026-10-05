@@ -1,9 +1,10 @@
 import { isModelCornersVertexAttributeValid, useModelCornersVertexAttribute } from "./vertex";
+import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 import { useModelCornersCommonStyle } from "./common";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 const schema = viewer_schemas.opengeodeweb_viewer.model.corners.color;
 
@@ -11,12 +12,12 @@ interface ModelCornersColorApi {
   setModelCornersColor: (
     modelId: string,
     corners_ids: string[],
-    color: unknown,
+    color: RGBAColor | undefined,
     activeColoring?: string,
     collectionId?: string,
   ) => Promise<unknown>;
   modelCornerColoring: (id: string, corner_id?: string) => StyleValues;
-  modelCornerColor: (id: string, corner_id?: string) => unknown;
+  modelCornerColor: (id: string, corner_id?: string) => RGBAColor | undefined;
   modelCornerActiveColoring: (id: string, corner_id?: string) => unknown;
   setModelCornersActiveColoring: (
     modelId: string,
@@ -37,14 +38,15 @@ export function useModelCornersColor(): ModelCornersColorApi {
     return modelCornersCommonStyle.modelCornerStyle(id, corner_id).coloring as StyleValues;
   }
 
-  function modelCornerColor(id: string, corner_id?: string): unknown {
-    return modelCornerColoring(id, corner_id).constant;
+  function modelCornerColor(id: string, corner_id?: string): RGBAColor | undefined {
+    // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.constant shape is defined by the data style schema.
+    return modelCornerColoring(id, corner_id).constant as RGBAColor | undefined;
   }
 
   async function setModelCornersColor(
     modelId: string,
     corners_ids: string[],
-    color: unknown,
+    color: RGBAColor | undefined,
     activeColoring = "constant",
     collectionId?: string,
   ): Promise<unknown> {

@@ -3,9 +3,51 @@
   "methods": ["POST"],
   "type": "object",
   "properties": {
-    "projectFolderPath": { "type": "string" },
-    "projectName": { "type": "string" }
+    "projectFolderPath": {
+      "type": "string"
+    },
+    "projectName": {
+      "type": "string"
+    }
   },
   "required": ["projectFolderPath", "projectName"],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "response": {
+    "type": "object",
+    "properties": {
+      "statusCode": {
+        "type": "integer"
+      },
+      "extensionsArray": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "frontendContent": {
+              "type": "string"
+            },
+            "port": {
+              "type": "integer"
+            },
+            "serverPort": {
+              "type": "integer"
+            }
+          },
+          "required": ["id", "name", "version", "frontendContent", "port"],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": ["statusCode", "extensionsArray"],
+    "additionalProperties": false
+  }
 }

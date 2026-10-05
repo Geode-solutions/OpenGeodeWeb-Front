@@ -2,7 +2,7 @@ import { clearCloudUrlParam, getCloudUrlParam } from "@ogw_front/utils/cloud";
 import type { RunCloudResponse } from "@geode/cloud-api/types";
 import { Status } from "@ogw_front/utils/status";
 import { api_fetch } from "@ogw_internal/utils/api_fetch";
-import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import cloud_api_schemas from "@geode/cloud-api/cloud_api_schemas.json";
 import { setAppBaseUrl } from "@ogw_shared/scripts";
 import { useAPIStore } from "@ogw_front/stores/api";

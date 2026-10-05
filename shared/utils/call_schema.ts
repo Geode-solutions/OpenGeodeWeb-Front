@@ -1,33 +1,34 @@
 // Third party imports
 
 // Local imports
-import type { JsonRpcSchema, RequestHandlersWithValidation } from "./types.js";
+import type { JsonRpcSchema, RequestHandlersWithValidation, ResponseOf } from "./types.js";
 import { type RpcClient, callRaw } from "./call_raw.js";
+import { consola } from "consola";
 import { validateSchema } from "./validate_schema.js";
 
 const ERROR_400 = 400;
 
-interface CallSchemaOptions {
-  schema: JsonRpcSchema;
-  params?: Record<string, unknown>;
+interface CallSchemaOptions<Schema extends JsonRpcSchema> {
+  schema: Schema;
+  params?: object;
   client: RpcClient;
   timeout?: number;
 }
 
-async function callSchema(
-  { schema, params = {}, client, timeout }: CallSchemaOptions,
+async function callSchema<Schema extends JsonRpcSchema>(
+  { schema, params = {}, client, timeout }: CallSchemaOptions<Schema>,
   {
     request_error_function,
     response_function,
     response_error_function,
     validation_error_function,
   }: RequestHandlersWithValidation = {},
-): Promise<unknown> {
+): Promise<ResponseOf<Schema>> {
   const { valid, error: schema_error } = validateSchema(schema, params);
 
   if (!valid) {
     if (process.env.NODE_ENV !== "production") {
-      console.log("Bad request", schema_error, schema, params);
+      consola.error("Bad request", schema_error, schema, params);
     }
     if (validation_error_function) {
       validation_error_function({ code: ERROR_400, name: "Bad request", error: schema_error });
@@ -48,7 +49,9 @@ async function callSchema(
       response_error_function,
     },
   );
-  return result;
+  // The microservice validates its responses against the schema `response` it was generated from.
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+  return result as ResponseOf<Schema>;
 }
 
 export { callSchema };

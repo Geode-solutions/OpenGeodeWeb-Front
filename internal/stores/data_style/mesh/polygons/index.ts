@@ -11,6 +11,7 @@ import { useMeshPolygonsColorStyle } from "./color";
 import { useMeshPolygonsCommonStyle } from "./common";
 import { useMeshPolygonsTexturesStyle } from "./textures";
 import { useMeshPolygonsVisibilityStyle } from "./visibility";
+import { whenDefined } from "@ogw_internal/stores/data_style/when_defined";
 
 // Local constants
 
@@ -61,17 +62,17 @@ async function setMeshPolygonsActiveColoring(
     coloring: { active: type },
   });
   if (type === "constant") {
-    const result = await deps.colorStyle.setMeshPolygonsColor(
-      id,
-      deps.colorStyle.meshPolygonsColor(id),
-    );
+    const result = await whenDefined(deps.colorStyle.meshPolygonsColor(id), async (value) => {
+      const applied = await deps.colorStyle.setMeshPolygonsColor(id, value);
+      return applied;
+    });
     return result;
   }
   if (type === "textures") {
-    const result = await deps.texturesStyle.setMeshPolygonsTextures(
-      id,
-      deps.texturesStyle.meshPolygonsTextures(id),
-    );
+    const result = await whenDefined(deps.texturesStyle.meshPolygonsTextures(id), async (value) => {
+      const applied = await deps.texturesStyle.setMeshPolygonsTextures(id, value);
+      return applied;
+    });
     return result;
   }
   if (type === "vertex") {
@@ -92,7 +93,10 @@ async function applyMeshPolygonsStyle(
   deps: MeshPolygonsActiveColoringDeps,
 ): Promise<unknown[]> {
   const result = await Promise.all([
-    visibilityStyle.setMeshPolygonsVisibility(id, visibilityStyle.meshPolygonsVisibility(id)),
+    whenDefined(visibilityStyle.meshPolygonsVisibility(id), async (value) => {
+      const applied = await visibilityStyle.setMeshPolygonsVisibility(id, value);
+      return applied;
+    }),
     setMeshPolygonsActiveColoring(id, activeColoringType, deps),
   ]);
   return result;

@@ -1,20 +1,21 @@
 import { isModelCornersVertexAttributeValid, useModelCornersVertexAttribute } from "./vertex";
+import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelCornersColor } from "./color";
 import { useModelCornersCommonStyle } from "./common";
 import { useModelCornersVisibility } from "./visibility";
 
 interface ColorGroup {
-  color: unknown;
+  color: RGBAColor | undefined;
   corners_ids: string[];
 }
 
 interface AttributeGroup {
-  name: string | undefined;
-  item: number | undefined;
-  minimum: number | undefined;
-  maximum: number | undefined;
-  colorMap: string | undefined;
+  name: string;
+  item: number;
+  minimum: number;
+  maximum: number;
+  colorMap: string;
   corners_ids: string[];
 }
 
@@ -122,14 +123,7 @@ export function useModelCornersStyle(): ModelCornersStyleApi {
             continue;
           }
           const key = `${name}_${item}_${colorMap}_${minimum}_${maximum}`;
-          vertexGroups[key] ??= {
-            name,
-            item,
-            minimum,
-            maximum,
-            colorMap,
-            corners_ids: [],
-          };
+          vertexGroups[key] ??= { ...attribute, corners_ids: [] };
           vertexGroups[key].corners_ids.push(corner_id);
         }
         coloringPromises.push(

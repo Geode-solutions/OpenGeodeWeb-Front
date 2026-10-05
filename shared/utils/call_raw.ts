@@ -6,19 +6,19 @@ import pTimeout from "p-timeout";
 import type { RequestHandlers } from "./types.js";
 
 interface RpcSession {
-  readonly call: (rpc: string, params: readonly [Record<string, unknown>]) => Promise<unknown>;
+  readonly call: (rpc: string, params: readonly [object]) => Promise<unknown>;
 }
 interface RpcConnection {
   readonly getSession: () => RpcSession;
 }
 interface RpcClient {
-  readonly call: (rpc: string, params: Record<string, unknown>) => Promise<unknown>;
+  readonly call: (rpc: string, params: object) => Promise<unknown>;
   readonly getConnection: () => RpcConnection;
 }
 
 interface CallClientOptions {
   rpc: string;
-  params?: Record<string, unknown>;
+  params?: object;
   client: RpcClient;
 }
 

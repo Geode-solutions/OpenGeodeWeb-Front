@@ -9,7 +9,7 @@ import { requireRenderWindow, useHybridViewerCore } from "./core";
 import { dot } from "@kitware/vtk.js/Common/Core/Math";
 import { useHybridViewerScene } from "./scene";
 import { useViewerStore } from "@ogw_front/stores/viewer";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 const BUMP_MULTIPLIER = 0.2;
 const ALIGNMENT_THRESHOLD = 0.9;
@@ -210,25 +210,24 @@ const useHybridViewerCamera = createSharedComposable(() => {
     syncRemoteCamera();
   }
 
-  async function performFocusCameraOnObject(id: string, block_ids: string[] = []): Promise<void> {
+  async function performFocusCameraOnObject(id: string, block_ids: number[] = []): Promise<void> {
     const { genericRenderWindow } = useHybridViewerCore();
     const { hybridDb } = useHybridViewerScene();
     if (!hybridDb[id]) {
       return;
     }
     const viewerStore = useViewerStore();
-    const bounds: [number, number, number, number, number, number] =
-      block_ids.length > 0
-        ? toBounds(
-            await viewerStore.request({
-              schema: viewer_schemas.opengeodeweb_viewer.model.get_blocks_bounds,
-              params: {
-                id,
-                block_ids,
-              },
-            }),
-          )
-        : hybridDb[id].actor.getBounds();
+    let bounds: [number, number, number, number, number, number] = hybridDb[id].actor.getBounds();
+    if (block_ids.length > 0) {
+      const response = await viewerStore.request({
+        schema: viewer_schemas.opengeodeweb_viewer.model.get_blocks_bounds,
+        params: {
+          id,
+          block_ids,
+        },
+      });
+      bounds = toBounds(response.bounds);
+    }
     const renderer = requireRenderWindow(genericRenderWindow).getRenderer();
     const camera = renderer.getActiveCamera();
     const startOptions = getCameraOptions(camera);
@@ -238,7 +237,7 @@ const useHybridViewerCamera = createSharedComposable(() => {
     performSetCamera(targetOptions);
   }
 
-  async function focusCameraOnObject(id: string, block_ids: string[] = []): Promise<void> {
+  async function focusCameraOnObject(id: string, block_ids: number[] = []): Promise<void> {
     await performFocusCameraOnObject(id, block_ids);
   }
 

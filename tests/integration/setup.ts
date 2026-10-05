@@ -6,6 +6,7 @@ import path from "node:path";
 
 // Third party imports
 import { afterAll, beforeAll, expect, vi } from "vitest";
+import { consola } from "consola";
 
 // Local imports
 import { addMicroserviceMetadatas, runBack, runViewer } from "@ogw_server/utils/microservices";
@@ -39,8 +40,8 @@ async function runMicroservices(): Promise<{ projectFolderPath: string }> {
     runViewer(COMMAND_VIEWER, NUXT_ROOT_PATH, { projectFolderPath }),
   ]);
 
-  console.log("back_port", back_port);
-  console.log("viewer_port", viewer_port);
+  consola.debug("back_port", back_port);
+  consola.debug("viewer_port", viewer_port);
 
   if (back_port === undefined || viewer_port === undefined) {
     throw new Error("Failed to start microservices: back_port or viewer_port is undefined");
@@ -75,7 +76,7 @@ async function setupIntegrationTests(
   await viewerStore.ws_connect();
   const id = await importFile(file_name, geode_object);
   expect(viewerStore.status).toBe(Status.CONNECTED);
-  console.log("end of setupIntegrationTests", { id, projectFolderPath });
+  consola.debug("end of setupIntegrationTests", { id, projectFolderPath });
   return { id, projectFolderPath };
 }
 

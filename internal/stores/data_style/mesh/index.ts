@@ -1,5 +1,6 @@
+import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -11,6 +12,7 @@ import { useMeshEdgesStyle } from "./edges";
 import { useMeshPointsStyle } from "./points";
 import { useMeshPolygonsStyle } from "./polygons";
 import { useMeshPolyhedraStyle } from "./polyhedra";
+import { whenDefined } from "@ogw_internal/stores/data_style/when_defined";
 
 // Local constants
 const meshSchemas = viewer_schemas.opengeodeweb_viewer.mesh;
@@ -18,9 +20,9 @@ const meshSchemas = viewer_schemas.opengeodeweb_viewer.mesh;
 // oxlint-disable-next-line max-lines-per-function
 export function useMeshStyle(): {
   meshVisibility: (id: string) => boolean | undefined;
-  setMeshVisibility: (id: string, visibility: boolean | undefined) => Promise<unknown>;
-  meshColor: (id: string) => unknown;
-  setMeshColor: (id: string, color: unknown) => Promise<unknown>;
+  setMeshVisibility: (id: string, visibility: boolean) => Promise<unknown>;
+  meshColor: (id: string) => RGBAColor | undefined;
+  setMeshColor: (id: string, color: RGBAColor) => Promise<unknown>;
   applyMeshStyle: (id: string) => Promise<unknown[]>;
 } & ReturnType<typeof useMeshPointsStyle> &
   ReturnType<typeof useMeshEdgesStyle> &
@@ -39,7 +41,7 @@ export function useMeshStyle(): {
   function meshVisibility(id: string): boolean | undefined {
     return dataStyleState.getStyle(id).visibility;
   }
-  async function setMeshVisibility(id: string, visibility: boolean | undefined): Promise<unknown> {
+  async function setMeshVisibility(id: string, visibility: boolean): Promise<unknown> {
     const schema = meshSchemas.visibility;
     const params = { id, visibility };
     const result = await viewerStore.request(
@@ -60,11 +62,12 @@ export function useMeshStyle(): {
     return result;
   }
 
-  function meshColor(id: string): unknown {
-    return dataStyleState.getStyle(id).color;
+  function meshColor(id: string): RGBAColor | undefined {
+    // oxlint-disable-next-line no-unsafe-type-assertion -- color shape is defined by the data style schema.
+    return dataStyleState.getStyle(id).color as RGBAColor | undefined;
   }
 
-  async function setMeshColor(id: string, color: unknown): Promise<unknown> {
+  async function setMeshColor(id: string, color: RGBAColor): Promise<unknown> {
     const schema = meshSchemas.color;
     const params = { id, color };
     const result = await viewerStore.request(
@@ -85,11 +88,21 @@ export function useMeshStyle(): {
   async function applyMeshStyle(id: string): Promise<unknown[]> {
     const style = dataStyleState.getStyle(id);
     const promise_array: unknown[] = [];
-    for (const [key, value] of Object.entries(style)) {
+    for (const key of Object.keys(style)) {
       if (key === "visibility") {
-        promise_array.push(setMeshVisibility(id, style.visibility));
+        promise_array.push(
+          whenDefined(style.visibility, async (visibility) => {
+            const applied = await setMeshVisibility(id, visibility);
+            return applied;
+          }),
+        );
       } else if (key === "color") {
-        promise_array.push(setMeshColor(id, value));
+        promise_array.push(
+          whenDefined(meshColor(id), async (color) => {
+            const applied = await setMeshColor(id, color);
+            return applied;
+          }),
+        );
       } else if (key === "points") {
         promise_array.push(meshPointsStyle.applyMeshPointsStyle(id));
       } else if (key === "edges") {

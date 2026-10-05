@@ -1,6 +1,6 @@
-import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import fileDownload from "js-file-download";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 import { type DataStyleSnapshot, useDataStyleStore } from "@ogw_front/stores/data_style";
 import { type NewDataItem, useDataStore } from "@ogw_front/stores/data";
@@ -46,7 +46,6 @@ function isFileDownloadData(
 }
 
 async function exportProject(): Promise<{ result: unknown }> {
-  console.log("[export triggered]");
   const appStore = useAppStore();
   const backStore = useBackStore();
   const feedbackStore = useFeedbackStore();

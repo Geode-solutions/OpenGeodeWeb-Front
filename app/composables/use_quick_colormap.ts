@@ -1,15 +1,6 @@
+import { consola } from "consola";
 import { useViewerStore } from "@ogw_front/stores/viewer";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
-
-// Runtime guard for the unknown response of viewerStore.request(), used instead of an
-// `as` cast so the shape is actually verified (data_id, when present, must be a string).
-function isPickColormapResult(value: unknown): value is { data_id?: string } {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    (!("data_id" in value) || typeof value.data_id === "string")
-  );
-}
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 export function useQuickColormap(): {
   pickColormap: typeof pickColormap;
@@ -37,16 +28,16 @@ export function useQuickColormap(): {
     try {
       const schema = viewer_schemas.opengeodeweb_viewer.viewer.pick_colormap;
       const params = { x: offsetX, y: offsetY };
-      const result = await viewerStore.request({ schema, params });
-      if (isPickColormapResult(result) && result.data_id !== undefined && result.data_id !== "") {
-        quickColormap.data_id = result.data_id;
+      const { data_id } = await viewerStore.request({ schema, params });
+      if (data_id !== undefined && data_id !== "") {
+        quickColormap.data_id = data_id;
         quickColormap.x = clientX;
         quickColormap.y = clientY;
         quickColormap.show = true;
         return true;
       }
     } catch (error) {
-      console.error("Error picking colormap:", error);
+      consola.error("Error picking colormap:", error);
     }
     return false;
   }

@@ -1,6 +1,6 @@
-import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
+import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
@@ -14,7 +14,7 @@ interface AttributeStoredConfig {
   minimum: number | undefined;
   maximum: number | undefined;
   colorMap: string | undefined;
-  no_data_color: unknown;
+  no_data_color: RGBAColor;
 }
 
 interface AttributeState {
@@ -29,22 +29,25 @@ interface AttributeInput {
   minimum: number | undefined;
   maximum: number | undefined;
   colorMap: string | undefined;
-  no_data_color?: unknown;
+  no_data_color?: RGBAColor;
 }
 
-function isMeshCellsCellAttributeValid({
-  name,
-  item,
-  minimum,
-  maximum,
-  colorMap,
-}: AttributeInput): boolean {
+interface ValidAttributeInput {
+  name: string;
+  item: number;
+  minimum: number;
+  maximum: number;
+  colorMap: string;
+  no_data_color?: RGBAColor;
+}
+
+function isMeshCellsCellAttributeValid(input: AttributeInput): input is ValidAttributeInput {
   return (
-    name !== undefined &&
-    item !== undefined &&
-    minimum !== undefined &&
-    maximum !== undefined &&
-    colorMap !== undefined
+    input.name !== undefined &&
+    input.item !== undefined &&
+    input.minimum !== undefined &&
+    input.maximum !== undefined &&
+    input.colorMap !== undefined
   );
 }
 
@@ -59,7 +62,7 @@ function useMeshCellsCellAttributeStyle(): {
     name: string | undefined,
     item: number | undefined,
   ) => AttributeStoredConfig;
-  setMeshCellsCellAttribute: (id: string, input: AttributeInput) => Promise<unknown>;
+  setMeshCellsCellAttribute: (id: string, input: ValidAttributeInput) => Promise<unknown>;
   setMeshCellsCellAttributeName: (id: string, name: string) => Promise<unknown>;
   setMeshCellsCellAttributeItem: (id: string, item: number) => Promise<unknown>;
   setMeshCellsCellAttributeRange: (
@@ -68,8 +71,8 @@ function useMeshCellsCellAttributeStyle(): {
     maximum: number,
   ) => Promise<unknown>;
   setMeshCellsCellAttributeColorMap: (id: string, colorMap: string | undefined) => Promise<unknown>;
-  meshCellsCellAttributeNoDataColor: (id: string) => unknown;
-  setMeshCellsCellAttributeNoDataColor: (id: string, no_data_color: unknown) => Promise<unknown>;
+  meshCellsCellAttributeNoDataColor: (id: string) => RGBAColor;
+  setMeshCellsCellAttributeNoDataColor: (id: string, no_data_color: RGBAColor) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const meshCellsCommonStyle = useMeshCellsCommonStyle();
@@ -146,7 +149,7 @@ function useMeshCellsCellAttributeStyle(): {
       maximum,
       colorMap,
       no_data_color = DEFAULT_NO_DATA_COLOR,
-    }: AttributeInput,
+    }: ValidAttributeInput,
   ): Promise<unknown> {
     await mutateMeshCellsCellStyle(id, {
       name,
@@ -158,7 +161,7 @@ function useMeshCellsCellAttributeStyle(): {
       colorMap,
       no_data_color,
     });
-    const points = getRGBPointsFromPreset(colorMap ?? "");
+    const points = [...getRGBPointsFromPreset(colorMap)];
     const schema = meshCellsCellAttributeSchemas.attribute;
     const params = {
       id,
@@ -242,7 +245,7 @@ function useMeshCellsCellAttributeStyle(): {
     });
     return applyCellAttribute(id);
   }
-  function meshCellsCellAttributeNoDataColor(id: string): unknown {
+  function meshCellsCellAttributeNoDataColor(id: string): RGBAColor {
     const name = meshCellsCellAttributeName(id);
     const item = meshCellsCellAttributeItem(id);
     const storedConfig = meshCellsCellAttributeStoredConfig(id, name, item);
@@ -250,7 +253,7 @@ function useMeshCellsCellAttributeStyle(): {
   }
   async function setMeshCellsCellAttributeNoDataColor(
     id: string,
-    no_data_color: unknown,
+    no_data_color: RGBAColor,
   ): Promise<unknown> {
     const name = meshCellsCellAttributeName(id);
     const item = meshCellsCellAttributeItem(id);

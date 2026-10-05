@@ -1,7 +1,6 @@
 // Node imports
 
 // Third party imports
-import { type H3Event, createError, defineEventHandler, readBody } from "h3";
 
 // Local imports
 import {
@@ -9,25 +8,11 @@ import {
   generateProjectFolderPath,
 } from "@geode/opengeodeweb-front/server/utils/path.ts";
 
-interface ProjectFolderPathBody {
-  PROJECT: string;
-}
+import { defineTypedEventHandler } from "@geode/opengeodeweb-front/server/utils/typed_handler.ts";
+import schemas from "@geode/opengeodeweb-front/opengeodeweb_front_typed_schemas.js";
 
-export default defineEventHandler(async (event: H3Event) => {
-  try {
-    const { PROJECT } = await readBody<ProjectFolderPathBody>(event);
-    const projectFolderPath = generateProjectFolderPath(PROJECT);
-    createPath(projectFolderPath);
-
-    return {
-      statusCode: 200,
-      projectFolderPath,
-    };
-  } catch (error) {
-    console.log(error);
-    throw createError({
-      statusCode: 500,
-      statusMessage: error instanceof Error ? error.message : String(error),
-    });
-  }
+export default defineTypedEventHandler(schemas.api.local.app.project_folder_path, ({ PROJECT }) => {
+  const projectFolderPath = generateProjectFolderPath(PROJECT);
+  createPath(projectFolderPath);
+  return { statusCode: 200, projectFolderPath };
 });

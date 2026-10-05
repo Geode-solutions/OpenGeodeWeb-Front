@@ -1,3 +1,4 @@
+import { consola } from "consola";
 import { killExtension } from "@ogw_front/utils/extension.js";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
@@ -58,6 +59,7 @@ export function useAppExtensions(): {
   async function loadExtension(
     path: string,
     extensionPort: string,
+    serverPort?: string,
     backendPath?: string,
   ): Promise<ExtensionModule> {
     try {
@@ -76,7 +78,10 @@ export function useAppExtensions(): {
       // oxlint-disable-next-line no-inline-comments, no-unsafe-assignment
       const extensionModule: ExtensionModule = await import(/* @vite-ignore */ finalURL);
       const store = extensionModule.metadata.store();
-      store.$patch?.({ default_local_port: extensionPort });
+      store.$patch?.({
+        default_local_port: extensionPort,
+        ...(serverPort === undefined ? {} : { nitro_port: serverPort }),
+      });
 
       if (finalURL !== path && finalURL.startsWith("blob:")) {
         URL.revokeObjectURL(finalURL);
@@ -89,7 +94,7 @@ export function useAppExtensions(): {
       const extensionId = extensionModule.metadata.id;
 
       if (loadedExtensions.value.has(extensionId)) {
-        console.warn(`[AppStore] Extension "${extensionId}" is already loaded`);
+        consola.warn(`[AppStore] Extension "${extensionId}" is already loaded`);
         throw new Error(`Extension "${extensionId}" is already loaded.`);
       }
 
@@ -114,10 +119,10 @@ export function useAppExtensions(): {
       };
       loadedExtensions.value.set(extensionId, extensionData);
 
-      console.log(`[AppStore] Extension loaded successfully: ${extensionId}`);
+      consola.info(`[AppStore] Extension loaded successfully: ${extensionId}`);
       return extensionModule;
     } catch (error) {
-      console.error(`[AppStore] Failed to load extension from ${path}:`, error);
+      consola.error(`[AppStore] Failed to load extension from ${path}:`, error);
       throw error;
     }
   }
@@ -127,13 +132,13 @@ export function useAppExtensions(): {
   }
 
   async function unloadExtension(extensionId: string): Promise<boolean> {
-    console.log(`[AppStore] Unloading extension: ${extensionId}`);
+    consola.info(`[AppStore] Unloading extension: ${extensionId}`);
     const infraStore = useInfraStore();
     infraStore.unregister_microservice(extensionId);
     await killExtension(extensionId);
 
     loadedExtensions.value.delete(extensionId);
-    console.log(`[AppStore] Extension unloaded: ${extensionId}`);
+    consola.info(`[AppStore] Extension unloaded: ${extensionId}`);
     return true;
   }
 
@@ -143,7 +148,7 @@ export function useAppExtensions(): {
       return false;
     }
     extensionData.enabled = !extensionData.enabled;
-    console.log(
+    consola.info(
       `[AppStore] Extension ${extensionData.enabled ? "enabled" : "disabled"}: ${extensionId}`,
     );
     return extensionData.enabled;
@@ -155,7 +160,7 @@ export function useAppExtensions(): {
       return false;
     }
     extensionData.enabled = enabled;
-    console.log(`[AppStore] Extension ${enabled ? "enabled" : "disabled"}: ${extensionId}`);
+    consola.info(`[AppStore] Extension ${enabled ? "enabled" : "disabled"}: ${extensionId}`);
     return true;
   }
 

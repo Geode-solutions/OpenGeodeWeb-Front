@@ -11,6 +11,7 @@ import type vtkAbstractWidgetFactory from "@kitware/vtk.js/Widgets/Core/Abstract
 import { newInstance as vtkImplicitPlaneWidget } from "@kitware/vtk.js/Widgets/Widgets3D/ImplicitPlaneWidget";
 
 interface ClippingPlane {
+  id: number;
   origin?: number[];
   normal: number[];
 }

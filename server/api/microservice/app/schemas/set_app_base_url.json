@@ -3,8 +3,23 @@
   "methods": ["POST"],
   "type": "object",
   "properties": {
-    "baseUrl": { "type": "string" }
+    "baseUrl": {
+      "type": "string"
+    }
   },
   "required": ["baseUrl"],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "response": {
+    "type": "object",
+    "properties": {
+      "statusCode": {
+        "type": "integer"
+      },
+      "baseUrl": {
+        "type": "string"
+      }
+    },
+    "required": ["statusCode", "baseUrl"],
+    "additionalProperties": false
+  }
 }

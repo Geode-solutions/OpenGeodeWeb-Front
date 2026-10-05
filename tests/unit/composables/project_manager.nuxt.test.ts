@@ -16,7 +16,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { exportProject, importProject } from "@ogw_front/composables/project_manager";
 import type { api_fetch as apiFetchType } from "@ogw_internal/utils/api_fetch";
 import { appMode } from "@ogw_shared/app_mode";
-import backSchemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import backSchemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { setupActivePinia } from "@ogw_tests/utils";
 
 vi.mock(import("ofetch"), () => ({
@@ -57,6 +57,7 @@ const snapshotMock = {
     items: [
       {
         id: "abc123",
+        geode_id: "11111111-1111-1111-1111-111111111111",
         viewer_type: "mesh",
         geode_object_type: "PointSet2D",
         native_file: "native.ext",
@@ -297,7 +298,13 @@ function verifyDataManagement(): void {
   expect(dataStyleStoreMock.applyAllStylesFromState).toHaveBeenCalledWith();
   expect(dataStoreMock.registerObject).toHaveBeenCalledWith("abc123", "My Data");
   expect(dataStoreMock.addItem).toHaveBeenCalledWith(snapshotMock.data.items[0]);
-  expect(treeviewStoreMock.addItem).toHaveBeenCalledWith("PointSet2D", "My Data", "abc123", "mesh");
+  expect(treeviewStoreMock.addItem).toHaveBeenCalledWith(
+    "PointSet2D",
+    "My Data",
+    "abc123",
+    "11111111-1111-1111-1111-111111111111",
+    "mesh",
+  );
 }
 
 function verifyRemaining(): void {

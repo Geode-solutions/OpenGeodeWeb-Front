@@ -1,6 +1,6 @@
 // Third party imports
 import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" };
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { beforeAllTimeout, setupIntegrationTests } from "@ogw_tests/integration/setup";
@@ -29,7 +29,6 @@ describe("mesh points", () => {
   }, beforeAllTimeout);
 
   afterAll(async () => {
-    console.log("afterAll mesh points kill", projectFolderPath);
     await cleanupBackend(projectFolderPath);
   });
 

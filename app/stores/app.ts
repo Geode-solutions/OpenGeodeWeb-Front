@@ -1,3 +1,5 @@
+import { consola } from "consola";
+
 // Local imports
 import { getRestApiPort, getRestApiProtocol, isCloudMode } from "@ogw_front/utils/stores.js";
 import { Status } from "@ogw_front/utils/status";
@@ -6,10 +8,15 @@ import { upload_file } from "@ogw_internal/utils/upload_file.js";
 import { useAppExtensions } from "./app_helpers/extension.js";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
-import type { JsonRpcSchema, RequestHandlers } from "@ogw_shared/utils/types.js";
+import type {
+  JsonRpcSchema,
+  ParamsOf,
+  RequestHandlers,
+  ResponseOf,
+} from "@ogw_shared/utils/types.js";
 import type { StateTree } from "pinia";
 
-import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_schemas.json" with { type: "json" };
+import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_typed_schemas.js";
 
 // The `share` defineStore option (used by every store in this codebase) is implemented by a runtime pinia plugin outside this package's type surface; this augmentation only teaches the type checker about the option shape already used at each defineStore call site.
 declare module "pinia" {
@@ -122,7 +129,7 @@ export const useAppStore = defineStore("app", () => {
     );
 
     if (missingStoreIds.length > 0) {
-      console.warn(`Stores not found in snapshot: ${missingStoreIds.join(", ")}`);
+      consola.warn(`Stores not found in snapshot: ${missingStoreIds.join(", ")}`);
     }
   }
 
@@ -168,29 +175,30 @@ export const useAppStore = defineStore("app", () => {
     return result;
   }
 
-  // `TResult` is asserted, not verified, at the single `return result as TResult` boundary below: the backend response is only checked against `schema` at runtime, so callers' `TResult` is a contract with the schema, not something this function can prove.
+  // The response type comes from the schema's generated `response` type, asserted at the single `as ResponseOf<Schema>` boundary below: the server checks its responses against that schema outside production.
   // oxlint-disable-next-line unicorn/consistent-function-scoping
-  // oxlint-disable-next-line unicorn/consistent-function-scoping
-  async function request<TResult = unknown>(
-    { schema, params }: { schema: JsonRpcSchema; params?: Record<string, unknown> },
-    callbacks: RequestHandlers = {},
-  ): Promise<TResult> {
+  async function request<Schema extends JsonRpcSchema>(
+    { schema, params }: { schema: Schema; params?: ParamsOf<Schema> },
+    callbacks: RequestHandlers<ResponseOf<Schema>> = {},
+  ): Promise<ResponseOf<Schema>> {
+    const rpc_schema: JsonRpcSchema = schema;
     const result = await api_fetch(
       { $id: "app", base_url: base_url.value, start_request, stop_request },
       // The app store is only ever used with HTTP ("front") schemas, which always carry `methods`; the wider JsonRpcSchema param above is kept as-is to match this action's public signature (e.g. relayed from get_version-style callers that only know about the shared, looser schema shape).
       // oxlint-disable-next-line no-unsafe-type-assertion -- narrowing optional `methods` to required is safe here; see comment above.
-      { schema: schema as JsonRpcSchema & { methods: string[] }, params },
+      { schema: rpc_schema as JsonRpcSchema & { methods: string[] }, params: params ?? {} },
       {
         ...callbacks,
         response_function: async (response: unknown) => {
           if (callbacks.response_function) {
-            await callbacks.response_function(response);
+            // oxlint-disable-next-line no-unsafe-type-assertion -- this is the trusted API boundary; see comment above.
+            await callbacks.response_function(response as ResponseOf<Schema>);
           }
         },
       },
     );
     // oxlint-disable-next-line no-unsafe-type-assertion -- this is the trusted API boundary; see comment above.
-    return result as TResult;
+    return result as ResponseOf<Schema>;
   }
 
   const projectFolderPath = ref("");
@@ -202,12 +210,8 @@ export const useAppStore = defineStore("app", () => {
     const result = await request(
       { schema, params },
       {
-        response_function: (response: unknown) => {
-          // oxlint-disable-next-line no-unsafe-type-assertion
-          const { projectFolderPath: newProjectFolderPath } = response as {
-            projectFolderPath: string;
-          };
-          projectFolderPath.value = newProjectFolderPath;
+        response_function: (response) => {
+          projectFolderPath.value = response.projectFolderPath;
         },
       },
     );

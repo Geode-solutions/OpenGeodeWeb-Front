@@ -5,6 +5,7 @@ import { unlink } from "node:fs/promises";
 // Third party imports
 import Conf from "conf";
 import StreamZip from "node-stream-zip";
+import { consola } from "consola";
 import sanitize from "sanitize-filename";
 
 // Local imports
@@ -17,7 +18,7 @@ function projectConf(projectName: string): Conf<ExtensionsConfigSchema> {
   const projectConfig = new Conf<ExtensionsConfigSchema>({
     projectName,
   });
-  console.log(projectConf.name, {
+  consola.debug(projectConf.name, {
     projectConfig,
   });
   return projectConfig;
@@ -57,9 +58,9 @@ async function removeExtensionFromConf(projectName: string, extensionId: string)
   const projectConfig = projectConf(projectName);
   const extensionArchivePath = extensionPathFromConf(projectName, extensionId);
   await unlink(extensionArchivePath);
-  console.log(`${extensionArchivePath} was deleted`);
+  consola.info(`${extensionArchivePath} was deleted`);
   projectConfig.delete(`extensions.${extensionId}`);
-  console.log(`${extensionId} was deleted from ${projectName} config`);
+  consola.info(`${extensionId} was deleted from ${projectName} config`);
 }
 
 interface ExtensionMetadata {

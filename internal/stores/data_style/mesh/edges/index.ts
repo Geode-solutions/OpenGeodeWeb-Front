@@ -8,6 +8,7 @@ import { useMeshEdgesColorStyle } from "./color";
 import { useMeshEdgesCommonStyle } from "./common";
 import { useMeshEdgesVisibilityStyle } from "./visibility";
 import { useMeshEdgesWidthStyle } from "./width";
+import { whenDefined } from "@ogw_internal/stores/data_style/when_defined";
 
 // Local constants
 
@@ -57,7 +58,10 @@ async function setMeshEdgesActiveColoring(
     coloring: { active: type },
   });
   if (type === "constant") {
-    const result = await deps.colorStyle.setMeshEdgesColor(id, deps.colorStyle.meshEdgesColor(id));
+    const result = await whenDefined(deps.colorStyle.meshEdgesColor(id), async (value) => {
+      const applied = await deps.colorStyle.setMeshEdgesColor(id, value);
+      return applied;
+    });
     return result;
   }
   if (type === "vertex") {
@@ -79,8 +83,14 @@ async function applyMeshEdgesStyle(
   deps: MeshEdgesActiveColoringDeps,
 ): Promise<unknown[]> {
   const result = await Promise.all([
-    visibilityStyle.setMeshEdgesVisibility(id, visibilityStyle.meshEdgesVisibility(id)),
-    widthStyle.setMeshEdgesWidth(id, widthStyle.meshEdgesWidth(id)),
+    whenDefined(visibilityStyle.meshEdgesVisibility(id), async (value) => {
+      const applied = await visibilityStyle.setMeshEdgesVisibility(id, value);
+      return applied;
+    }),
+    whenDefined(widthStyle.meshEdgesWidth(id), async (value) => {
+      const applied = await widthStyle.setMeshEdgesWidth(id, value);
+      return applied;
+    }),
     setMeshEdgesActiveColoring(id, activeColoringType, deps),
   ]);
   return result;

@@ -2,7 +2,7 @@
 import fs from "node:fs";
 
 // Third party imports
-import { type H3Event, createError, defineEventHandler, readBody } from "h3";
+import { consola } from "consola";
 
 // Local imports
 import {
@@ -20,15 +20,13 @@ import {
 import { extensionsConf } from "@geode/opengeodeweb-front/server/utils/app_config.ts";
 import { unzipFile } from "@geode/opengeodeweb-front/server/utils/server.ts";
 
-interface RunExtensionsBody {
-  projectFolderPath: string;
-  projectName: string;
-}
+import { defineTypedEventHandler } from "@geode/opengeodeweb-front/server/utils/typed_handler.ts";
+import schemas from "@geode/opengeodeweb-front/opengeodeweb_front_typed_schemas.js";
 
-export default defineEventHandler(async (event: H3Event) => {
-  try {
-    console.log("NITRO: runExtensions", event);
-    const { projectFolderPath, projectName } = await readBody<RunExtensionsBody>(event);
+export default defineTypedEventHandler(
+  schemas.api.cloud.extensions.run,
+  async ({ projectFolderPath, projectName }) => {
+    consola.debug("NITRO: runExtensions", { projectFolderPath, projectName });
     const extensionsConfig = extensionsConf(projectName);
     const extensionsArray = await Promise.all(
       Object.entries(extensionsConfig).map(async ([extensionId, { path: extensionPath }]) => {
@@ -62,15 +60,6 @@ export default defineEventHandler(async (event: H3Event) => {
       }),
     );
 
-    return {
-      statusCode: 200,
-      extensionsArray,
-    };
-  } catch (error) {
-    console.error("Error running extensions:", error);
-    throw createError({
-      statusCode: 500,
-      statusMessage: error instanceof Error ? error.message : String(error),
-    });
-  }
-});
+    return { statusCode: 200, extensionsArray };
+  },
+);

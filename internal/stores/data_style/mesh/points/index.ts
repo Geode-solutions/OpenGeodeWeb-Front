@@ -7,6 +7,7 @@ import { useMeshPointsColorStyle } from "./color";
 import { useMeshPointsCommonStyle } from "./common";
 import { useMeshPointsSizeStyle } from "./size";
 import { useMeshPointsVisibilityStyle } from "./visibility";
+import { whenDefined } from "@ogw_internal/stores/data_style/when_defined";
 
 // Local constants
 
@@ -40,10 +41,10 @@ async function setMeshPointsActiveColoring(
     coloring: { active: type },
   });
   if (type === "constant") {
-    const result = await deps.colorStyle.setMeshPointsColor(
-      id,
-      deps.colorStyle.meshPointsColor(id),
-    );
+    const result = await whenDefined(deps.colorStyle.meshPointsColor(id), async (value) => {
+      const applied = await deps.colorStyle.setMeshPointsColor(id, value);
+      return applied;
+    });
     return result;
   }
   if (type === "vertex") {
@@ -61,8 +62,14 @@ async function applyMeshPointsStyle(
   deps: MeshPointsActiveColoringDeps,
 ): Promise<unknown[]> {
   const result = await Promise.all([
-    visibilityStyle.setMeshPointsVisibility(id, visibilityStyle.meshPointsVisibility(id)),
-    sizeStyle.setMeshPointsSize(id, sizeStyle.meshPointsSize(id)),
+    whenDefined(visibilityStyle.meshPointsVisibility(id), async (value) => {
+      const applied = await visibilityStyle.setMeshPointsVisibility(id, value);
+      return applied;
+    }),
+    whenDefined(sizeStyle.meshPointsSize(id), async (value) => {
+      const applied = await sizeStyle.setMeshPointsSize(id, value);
+      return applied;
+    }),
     setMeshPointsActiveColoring(id, activeColoringType, deps),
   ]);
   return result;

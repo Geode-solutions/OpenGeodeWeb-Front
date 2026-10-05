@@ -1,11 +1,13 @@
-import type { JsonRpcSchema } from "@ogw_shared/utils/types";
+import type { ParamsOf } from "@ogw_shared/utils/types";
+import { consola } from "consola";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useViewerStore } from "@ogw_front/stores/viewer";
-import vtk_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import vtk_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 const HOVER_DELAY = 200;
 
 type HighlightType = "mesh" | "model";
+type HighlightSchema = (typeof vtk_schemas)["opengeodeweb_viewer"][HighlightType]["highlight"];
 type BlockIdsProvider = readonly number[] | (() => readonly number[] | Promise<readonly number[]>);
 
 export function useHoverhighlight(): {
@@ -60,7 +62,7 @@ export function useHoverhighlight(): {
       try {
         await viewerStore.request({ schema, params });
       } catch (error) {
-        console.error(`Highlight failed for ${type} ${id}:`, error);
+        consola.error(`Highlight failed for ${type} ${id}:`, error);
       }
     }
 
@@ -87,15 +89,15 @@ export function useHoverhighlight(): {
     type: HighlightType,
     id: string,
     request: {
-      schema: JsonRpcSchema;
-      params?: Record<string, unknown>;
+      schema: HighlightSchema;
+      params?: ParamsOf<HighlightSchema>;
       timeout?: number;
     },
   ): Promise<void> {
     try {
       await viewerStore.request(request);
     } catch (error) {
-      console.error(`Unhighlight failed for ${type} ${id}:`, error);
+      consola.error(`Unhighlight failed for ${type} ${id}:`, error);
     }
   }
 

@@ -53,6 +53,9 @@ const coloring_style_key = computed<string>({
 const color = computed<RGBAColor | undefined>({
   get: () => dataStyleStore.meshEdgesColor(id.value) as RGBAColor | undefined,
   set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshEdgesColor(targetId, newValue),
     );
@@ -102,8 +105,8 @@ const vertex_attribute_color_map = computed<Map<string, RGBAColor>>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_no_data_color = computed<RGBAColor | undefined>({
-  get: () => dataStyleStore.meshEdgesVertexAttributeNoDataColor(id.value) as RGBAColor | undefined,
+const vertex_attribute_no_data_color = computed<RGBAColor>({
+  get: () => dataStyleStore.meshEdgesVertexAttributeNoDataColor(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshEdgesVertexAttributeNoDataColor(targetId, newValue),
@@ -154,8 +157,8 @@ const edge_attribute_color_map = computed<Map<string, RGBAColor>>({
     hybridViewerStore.remoteRender();
   },
 });
-const edge_attribute_no_data_color = computed<RGBAColor | undefined>({
-  get: () => dataStyleStore.meshEdgesEdgeAttributeNoDataColor(id.value) as RGBAColor | undefined,
+const edge_attribute_no_data_color = computed<RGBAColor>({
+  get: () => dataStyleStore.meshEdgesEdgeAttributeNoDataColor(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshEdgesEdgeAttributeNoDataColor(targetId, newValue),

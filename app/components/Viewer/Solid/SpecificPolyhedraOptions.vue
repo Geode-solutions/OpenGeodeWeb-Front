@@ -44,6 +44,9 @@ const coloring_style_key = computed<string>({
 const color = computed<RGBAColor | undefined>({
   get: () => dataStyleStore.meshPolyhedraColor(id.value) as RGBAColor | undefined,
   set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPolyhedraColor(targetId, newValue),
     );
@@ -95,9 +98,8 @@ const vertex_attribute_color_map = computed<Map<string, RGBAColor> | undefined>(
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_no_data_color = computed<RGBAColor | undefined>({
-  get: () =>
-    dataStyleStore.meshPolyhedraVertexAttributeNoDataColor(id.value) as RGBAColor | undefined,
+const vertex_attribute_no_data_color = computed<RGBAColor>({
+  get: () => dataStyleStore.meshPolyhedraVertexAttributeNoDataColor(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPolyhedraVertexAttributeNoDataColor(targetId, newValue),
@@ -152,9 +154,8 @@ const polyhedron_attribute_color_map = computed<Map<string, RGBAColor> | undefin
     hybridViewerStore.remoteRender();
   },
 });
-const polyhedron_attribute_no_data_color = computed<RGBAColor | undefined>({
-  get: () =>
-    dataStyleStore.meshPolyhedraPolyhedronAttributeNoDataColor(id.value) as RGBAColor | undefined,
+const polyhedron_attribute_no_data_color = computed<RGBAColor>({
+  get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeNoDataColor(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPolyhedraPolyhedronAttributeNoDataColor(targetId, newValue),

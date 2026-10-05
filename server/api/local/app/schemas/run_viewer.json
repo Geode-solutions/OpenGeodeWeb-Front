@@ -3,9 +3,36 @@
   "methods": ["POST"],
   "type": "object",
   "properties": {
-    "COMMAND_VIEWER": { "type": "string" },
-    "NUXT_ROOT_PATH": { "type": "string" }
+    "COMMAND_VIEWER": {
+      "type": "string"
+    },
+    "NUXT_ROOT_PATH": {
+      "type": "string"
+    },
+    "args": {
+      "type": "object",
+      "properties": {
+        "projectFolderPath": {
+          "type": "string"
+        }
+      },
+      "required": ["projectFolderPath"],
+      "additionalProperties": true
+    }
   },
-  "required": ["COMMAND_VIEWER", "NUXT_ROOT_PATH"],
-  "additionalProperties": true
+  "required": ["COMMAND_VIEWER", "NUXT_ROOT_PATH", "args"],
+  "additionalProperties": true,
+  "response": {
+    "type": "object",
+    "properties": {
+      "statusCode": {
+        "type": "integer"
+      },
+      "port": {
+        "type": "integer"
+      }
+    },
+    "required": ["statusCode", "port"],
+    "additionalProperties": false
+  }
 }

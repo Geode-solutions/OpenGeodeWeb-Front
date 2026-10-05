@@ -13,6 +13,7 @@ import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { useMeshPolyhedraColorStyle } from "./color";
 import { useMeshPolyhedraCommonStyle } from "./common";
 import { useMeshPolyhedraVisibilityStyle } from "./visibility";
+import { whenDefined } from "@ogw_internal/stores/data_style/when_defined";
 
 // Local constants
 
@@ -62,10 +63,10 @@ async function setMeshPolyhedraActiveColoring(
     coloring: { active: type },
   });
   if (type === "constant") {
-    const result = await deps.colorStyle.setMeshPolyhedraColor(
-      id,
-      deps.colorStyle.meshPolyhedraColor(id),
-    );
+    const result = await whenDefined(deps.colorStyle.meshPolyhedraColor(id), async (value) => {
+      const applied = await deps.colorStyle.setMeshPolyhedraColor(id, value);
+      return applied;
+    });
     return result;
   }
   if (type === "vertex") {
@@ -86,7 +87,10 @@ async function applyMeshPolyhedraStyle(
   deps: MeshPolyhedraActiveColoringDeps,
 ): Promise<unknown[]> {
   const result = await Promise.all([
-    visibilityStyle.setMeshPolyhedraVisibility(id, visibilityStyle.meshPolyhedraVisibility(id)),
+    whenDefined(visibilityStyle.meshPolyhedraVisibility(id), async (value) => {
+      const applied = await visibilityStyle.setMeshPolyhedraVisibility(id, value);
+      return applied;
+    }),
     setMeshPolyhedraActiveColoring(id, activeColoringType, deps),
   ]);
   return result;

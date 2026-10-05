@@ -4,7 +4,7 @@ import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
-import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
@@ -44,7 +44,7 @@ const blocksVisibility = computed<boolean>({
 const blockVisibility = computed<boolean | undefined>({
   get: () => dataStyleStore.modelBlockVisibility(modelId, blockId) as boolean | undefined,
   set: async (newValue) => {
-    if (blockId === undefined) {
+    if (newValue === undefined || blockId === undefined) {
       return;
     }
     await dataStyleStore.setModelBlocksVisibility(modelId, [blockId], newValue);
@@ -154,11 +154,8 @@ const blocksVertexAttributeColorMap = computed<Map<string, RGBAColor> | undefine
   },
 });
 
-const blocksVertexAttributeNoDataColor = computed<RGBAColor | undefined>({
-  get: () =>
-    dataStyleStore.modelBlocksVertexAttributeNoDataColor(modelId, referenceBlockId.value) as
-      | RGBAColor
-      | undefined,
+const blocksVertexAttributeNoDataColor = computed<RGBAColor>({
+  get: () => dataStyleStore.modelBlocksVertexAttributeNoDataColor(modelId, referenceBlockId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksVertexAttributeNoDataColor(
       modelId,
@@ -217,11 +214,9 @@ const blocksPolyhedronAttributeColorMap = computed<Map<string, RGBAColor> | unde
   },
 });
 
-const blocksPolyhedronAttributeNoDataColor = computed<RGBAColor | undefined>({
+const blocksPolyhedronAttributeNoDataColor = computed<RGBAColor>({
   get: () =>
-    dataStyleStore.modelBlocksPolyhedronAttributeNoDataColor(modelId, referenceBlockId.value) as
-      | RGBAColor
-      | undefined,
+    dataStyleStore.modelBlocksPolyhedronAttributeNoDataColor(modelId, referenceBlockId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksPolyhedronAttributeNoDataColor(
       modelId,
@@ -278,9 +273,8 @@ const vertexAttributeColorMap = computed<Map<string, RGBAColor> | undefined>({
   },
 });
 
-const vertexAttributeNoDataColor = computed<RGBAColor | undefined>({
-  get: () =>
-    dataStyleStore.modelBlocksVertexAttributeNoDataColor(modelId, blockId) as RGBAColor | undefined,
+const vertexAttributeNoDataColor = computed<RGBAColor>({
+  get: () => dataStyleStore.modelBlocksVertexAttributeNoDataColor(modelId, blockId),
   set: async (newValue) => {
     if (blockId === undefined) {
       return;
@@ -340,11 +334,8 @@ const polyhedronAttributeColorMap = computed<Map<string, RGBAColor> | undefined>
   },
 });
 
-const polyhedronAttributeNoDataColor = computed<RGBAColor | undefined>({
-  get: () =>
-    dataStyleStore.modelBlocksPolyhedronAttributeNoDataColor(modelId, blockId) as
-      | RGBAColor
-      | undefined,
+const polyhedronAttributeNoDataColor = computed<RGBAColor>({
+  get: () => dataStyleStore.modelBlocksPolyhedronAttributeNoDataColor(modelId, blockId),
   set: async (newValue) => {
     if (blockId === undefined) {
       return;

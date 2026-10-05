@@ -1,7 +1,6 @@
 // Node imports
 
 // Third party imports
-import { type H3Event, createError, defineEventHandler, readBody } from "h3";
 
 // Local imports
 import {
@@ -9,31 +8,18 @@ import {
   runViewer,
 } from "@geode/opengeodeweb-front/server/utils/microservices.ts";
 
-interface RunViewerBody {
-  COMMAND_VIEWER: string;
-  NUXT_ROOT_PATH: string;
-  args: { projectFolderPath: string; [key: string]: unknown };
-}
+import { defineTypedEventHandler } from "@geode/opengeodeweb-front/server/utils/typed_handler.ts";
+import schemas from "@geode/opengeodeweb-front/opengeodeweb_front_typed_schemas.js";
 
-export default defineEventHandler(async (event: H3Event) => {
-  try {
-    const { COMMAND_VIEWER, NUXT_ROOT_PATH, args } = await readBody<RunViewerBody>(event);
+export default defineTypedEventHandler(
+  schemas.api.local.app.run_viewer,
+  async ({ COMMAND_VIEWER, NUXT_ROOT_PATH, args }) => {
     const port = await runViewer(COMMAND_VIEWER, NUXT_ROOT_PATH, args);
     addMicroserviceMetadatas(args.projectFolderPath, {
       type: "viewer",
       name: COMMAND_VIEWER,
       port,
     });
-
-    return {
-      statusCode: 200,
-      port,
-    };
-  } catch (error) {
-    console.log(error);
-    throw createError({
-      statusCode: 500,
-      statusMessage: error instanceof Error ? error.message : String(error),
-    });
-  }
-});
+    return { statusCode: 200, port };
+  },
+);

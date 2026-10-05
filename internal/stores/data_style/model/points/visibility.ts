@@ -1,5 +1,5 @@
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { useModelPointsCommonStyle } from "./common";
@@ -10,7 +10,7 @@ const schema = viewer_schemas.opengeodeweb_viewer.model.points.visibility;
 
 export function useModelPointsVisibilityStyle(): {
   modelPointsVisibility: (id: string) => boolean | undefined;
-  setModelPointsVisibility: (id: string, visibility: boolean | undefined) => Promise<unknown>;
+  setModelPointsVisibility: (id: string, visibility: boolean) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const modelPointsCommonStyle = useModelPointsCommonStyle();
@@ -20,10 +20,7 @@ export function useModelPointsVisibilityStyle(): {
     return modelPointsCommonStyle.modelPointsStyle(id).visibility as boolean | undefined;
   }
 
-  async function setModelPointsVisibility(
-    id: string,
-    visibility: boolean | undefined,
-  ): Promise<unknown> {
+  async function setModelPointsVisibility(id: string, visibility: boolean): Promise<unknown> {
     const params = { id, visibility };
     const result = await viewerStore.request(
       { schema, params },
