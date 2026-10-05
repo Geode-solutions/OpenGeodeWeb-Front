@@ -45,6 +45,7 @@ type MenuItems = Component[];
 interface MenuMetaData {
   viewer_type?: string;
   geode_object_type?: string;
+  targetIds?: string[];
   [key: string]: unknown;
 }
 
@@ -246,3 +247,5 @@ export const useMenuStore = defineStore("menu", () => {
     toggleItemOptions,
   };
 });
+
+export type { MenuMetaData };

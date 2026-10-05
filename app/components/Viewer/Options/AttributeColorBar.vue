@@ -8,6 +8,12 @@ interface Emits {
 
 const emit = defineEmits<Emits>();
 
+interface Props {
+  hideRange?: boolean;
+}
+
+const { hideRange = false } = defineProps<Props>();
+
 const minimum = defineModel<number>("minimum");
 const maximum = defineModel<number>("maximum");
 const colorMap = defineModel<string>("colorMap");
@@ -21,6 +27,7 @@ const colorMap = defineModel<string>("colorMap");
       :max="maximum ?? 0"
     />
     <AttributeRangeSelector
+      v-if="!hideRange"
       v-model:minimum="minimum"
       v-model:maximum="maximum"
       class="mt-2"
