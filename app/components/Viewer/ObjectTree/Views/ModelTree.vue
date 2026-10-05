@@ -3,24 +3,19 @@ import { sortAndFormatItems, useTreeFilter } from "@ogw_front/composables/tree_f
 import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
-import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import type { ModelComponentMenuPayload } from "@ogw_front/utils/treeview";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import { useModelCollections } from "@ogw_front/composables/model_collections";
-import { useModelComponents } from "@ogw_front/composables/model_components";
+import { useModelTree } from "@ogw_front/composables/model_tree";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 interface Props {
   id: string;
-  viewId?: string;
-  viewType?: string;
 }
 
-const { id, viewId = undefined, viewType = "model_components" } = defineProps<Props>();
-const actualViewId = viewId || id;
+const { id } = defineProps<Props>();
 
 interface CollectionTreeItem {
   raw?: CollectionTreeItem;
@@ -41,29 +36,20 @@ const emit = defineEmits<Emits>();
 
 const treeviewStore = useTreeviewStore();
 
-const isCollections = computed(() => viewType === "model_collections");
-
-const composable = isCollections.value ? useModelCollections(id) : useModelComponents(id);
 const {
-  items: rawItems,
+  isLoading,
   localCategories,
+  cache,
+  collectionTypes,
   selection: visibleComponents,
   updateVisibility,
-} = composable;
+} = useModelTree(id);
 
-const cache = computed(
-  () =>
-    ("componentsCache" in composable ? composable.componentsCache.value : undefined) ??
-    ("collectionsCache" in composable ? composable.collectionsCache.value : undefined),
-);
-
-const currentView = computed(() =>
-  treeviewStore.opened_views.find((view) => view.id === actualViewId),
-);
+const currentView = computed(() => treeviewStore.opened_views.find((view) => view.id === id));
 
 const opened = computed<string[]>({
   get: () => currentView.value?.opened || [],
-  set: (val) => treeviewStore.setOpened(actualViewId, val),
+  set: (val) => treeviewStore.setOpened(id, val),
 });
 
 const {
@@ -84,25 +70,37 @@ function onUpdateSelection(newSelection: string[]): void {
 
 const visibleSelection = computed<string[]>(() => applySearchFilter(visibleComponents.value, []));
 
-const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
-  if (search.value && cache.value) {
-    const query = search.value.toLowerCase();
-    const result: CollectionTreeItem[] = [];
-    for (const type of Object.keys(cache.value)) {
-      const matches = (cache.value[type] ?? []).filter(
-        (component: { title: string; id: string }) =>
-          component.title.toLowerCase().includes(query) ||
-          component.id.toLowerCase().includes(query),
-      );
-      if (matches.length > 0) {
-        result.push({
-          id: type,
-          title: `${type}s (${matches.length})`,
-          children: sortAndFormatItems(matches, sortType.value) as unknown as CollectionTreeItem[],
-        });
-      }
+function matchesSearch(item: CollectionTreeItem, query: string): boolean {
+  return (
+    (item.title ?? "").toLowerCase().includes(query) ||
+    item.id.toLowerCase().includes(query) ||
+    (item.children ?? []).some((child) => matchesSearch(child, query))
+  );
+}
+
+function searchGroups(query: string): CollectionTreeItem[] {
+  const groups = (cache.value ?? {}) as Record<string, CollectionTreeItem[]>;
+  const result: CollectionTreeItem[] = [];
+  for (const [type, components] of Object.entries(groups)) {
+    const matches = components.filter((component) => matchesSearch(component, query));
+    if (matches.length > 0) {
+      result.push({
+        id: type,
+        title: `${type}s (${matches.length})`,
+        children: sortAndFormatItems(matches, sortType.value) as unknown as CollectionTreeItem[],
+      });
     }
-    return result;
+  }
+  return result;
+}
+
+const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
+  if (search.value) {
+    const query = search.value.toLowerCase();
+    return sortAndFormatItems(
+      searchGroups(query),
+      sortType.value,
+    ) as unknown as CollectionTreeItem[];
   }
 
   const result: CollectionTreeItem[] = [];
@@ -127,9 +125,13 @@ function extractComponentIds(node: CollectionTreeItem): string[] {
   return [node.id];
 }
 
+function isCollectionNode(item: CollectionTreeItem): boolean {
+  return collectionTypes.value.has(item.category ?? item.id);
+}
+
 function showContextMenu(event: MouseEvent, item: CollectionTreeItem): void {
   const actualItem = item.raw || item;
-  if (isCollections.value && !MESH_COMPONENT_TYPES.includes(actualItem.category ?? "")) {
+  if (isCollectionNode(actualItem)) {
     emit("show-menu", {
       event,
       itemId: id,
@@ -217,9 +219,10 @@ function getLeafViewerIds(item: CollectionTreeItem): number[] {
       @expand-all="expandAll"
     />
 
-    <FetchingData v-if="rawItems === undefined" :size="48" :width="4" text="" />
+    <FetchingData v-if="isLoading" :size="48" :width="4" text="" />
 
     <CommonTreeView
+      v-else
       :selected="visibleSelection"
       v-model:opened="opened"
       v-model:active="treeviewStore.activeItems"
@@ -233,7 +236,7 @@ function getLeafViewerIds(item: CollectionTreeItem): number[] {
       class="transparent-treeview virtual-tree-height"
       @update:selected="(val) => onUpdateSelection(val as string[])"
       @click:item="onUpdateSelection([$event.id as string, ...visibleComponents])"
-      @update:scroll-top="treeviewStore.setScrollTop(actualViewId, $event)"
+      @update:scroll-top="treeviewStore.setScrollTop(id, $event)"
       @hover:enter="({ item }) => handleHoverEnter({ item: item as unknown as CollectionTreeItem })"
       @hover:leave="handleHoverLeave"
       @contextmenu="showContextMenu($event.event, $event.item as unknown as CollectionTreeItem)"

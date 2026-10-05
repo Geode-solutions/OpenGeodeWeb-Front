@@ -132,6 +132,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
       ...component_style_promises,
       ...model_component_type_style_promises,
     ]);
+    await dataStyleState.loadFromDatabase();
   }
 
   async function applyAllStylesFromState(): Promise<void> {

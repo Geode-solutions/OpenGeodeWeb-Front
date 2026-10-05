@@ -8,7 +8,6 @@ import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonT
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
-import { consola } from "consola";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
@@ -109,31 +108,6 @@ function isModel(item: TreeGroupItem): boolean {
     ["BRep", "Section"].includes(actualItem.geode_object_type ?? "")
   );
 }
-
-const hasCollectionsMap = reactive<Record<string, boolean>>({});
-
-watch(
-  () => treeviewStore.items,
-  async (newItems) => {
-    const models = newItems
-      .flatMap((group) => group.children || [])
-      .filter((item) => isModel(item));
-    const fetchPromises = models.map(async (model) => {
-      if (hasCollectionsMap[model.id] === undefined) {
-        hasCollectionsMap[model.id] = false;
-        try {
-          const hasCollections = await dataStore.hasCollectionComponents(model.id);
-          hasCollectionsMap[model.id] = hasCollections;
-        } catch (error) {
-          consola.error("Failed to check collections", error);
-        }
-      }
-    });
-
-    await Promise.all(fetchPromises);
-  },
-  { immediate: true, deep: true },
-);
 
 function handleHoverEnter({
   item,
@@ -245,29 +219,11 @@ function expandAll(): void {
                 item.id as string,
                 item.title as string | undefined,
                 item.geode_object_type as string,
-                'model_components',
               )
             "
           >
             <v-icon size="18">mdi-magnify-expand</v-icon>
           </v-btn>
-          <v-btn
-            v-if="isModel(item as unknown as TreeGroupItem) && hasCollectionsMap[item.id as string]"
-            data-testid="expandModelCollectionsButton"
-            icon="mdi-format-list-group"
-            size="medium"
-            class="ml-2"
-            variant="text"
-            v-tooltip="'Model\'s collections'"
-            @click.stop="
-              treeviewStore.displayAdditionalTree(
-                item.id as string,
-                item.title as string | undefined,
-                item.geode_object_type as string,
-                'model_collections',
-              )
-            "
-          />
         </template>
       </template>
     </CommonTreeView>
