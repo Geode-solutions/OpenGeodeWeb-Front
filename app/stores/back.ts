@@ -9,6 +9,7 @@ import { useInfraStore } from "@ogw_front/stores/infra";
 
 import type {
   JsonRpcSchema,
+  MicroserviceVersionSchema,
   ParamsOf,
   RequestHandlers,
   ResponseOf,
@@ -155,22 +156,15 @@ export const useBackStore = defineStore("back", {
       );
       return result;
     },
-    async get_version(schema: JsonRpcSchema | undefined) {
+    async get_version(schema: MicroserviceVersionSchema | undefined) {
       if (!schema) {
         return undefined;
       }
       const result = await this.request(
         { schema },
         {
-          response_function: (response: unknown) => {
-            if (
-              typeof response === "object" &&
-              response !== null &&
-              "microservice_version" in response &&
-              typeof response.microservice_version === "string"
-            ) {
-              this.version = response.microservice_version;
-            }
+          response_function: ({ microservice_version }) => {
+            this.version = microservice_version;
           },
         },
       );

@@ -1,11 +1,15 @@
 <script setup lang="ts">
+import {
+  type RangesPerData,
+  applyRangesPerData,
+  useBatchStyle,
+} from "@ogw_front/composables/batch_style";
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
-import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
@@ -44,6 +48,9 @@ const coloring_style_key = computed<string>({
 const color = computed<RGBAColor | undefined>({
   get: () => dataStyleStore.meshPolyhedraColor(id.value) as RGBAColor | undefined,
   set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPolyhedraColor(targetId, newValue),
     );
@@ -95,9 +102,8 @@ const vertex_attribute_color_map = computed<Map<string, RGBAColor>>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_no_data_color = computed<RGBAColor | undefined>({
-  get: () =>
-    dataStyleStore.meshPolyhedraVertexAttributeNoDataColor(id.value) as RGBAColor | undefined,
+const vertex_attribute_no_data_color = computed<RGBAColor>({
+  get: () => dataStyleStore.meshPolyhedraVertexAttributeNoDataColor(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPolyhedraVertexAttributeNoDataColor(targetId, newValue),
@@ -152,9 +158,8 @@ const polyhedron_attribute_color_map = computed<Map<string, RGBAColor>>({
     hybridViewerStore.remoteRender();
   },
 });
-const polyhedron_attribute_no_data_color = computed<RGBAColor | undefined>({
-  get: () =>
-    dataStyleStore.meshPolyhedraPolyhedronAttributeNoDataColor(id.value) as RGBAColor | undefined,
+const polyhedron_attribute_no_data_color = computed<RGBAColor>({
+  get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeNoDataColor(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPolyhedraPolyhedronAttributeNoDataColor(targetId, newValue),
@@ -162,6 +167,20 @@ const polyhedron_attribute_no_data_color = computed<RGBAColor | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
+
+async function setVertexAttributeRangesPerData(ranges: RangesPerData): Promise<void> {
+  await applyRangesPerData(ranges, (targetId, minimum, maximum) =>
+    dataStyleStore.setMeshPolyhedraVertexAttributeRange(targetId, minimum, maximum),
+  );
+  hybridViewerStore.remoteRender();
+}
+
+async function setPolyhedronAttributeRangesPerData(ranges: RangesPerData): Promise<void> {
+  await applyRangesPerData(ranges, (targetId, minimum, maximum) =>
+    dataStyleStore.setMeshPolyhedraPolyhedronAttributeRange(targetId, minimum, maximum),
+  );
+  hybridViewerStore.remoteRender();
+}
 </script>
 
 <template>
@@ -186,11 +205,13 @@ const polyhedron_attribute_no_data_color = computed<RGBAColor | undefined>({
           v-model:vertex_attribute_name="vertex_attribute_name"
           v-model:vertex_attribute_item="vertex_attribute_item"
           v-model:vertex_attribute_range="vertex_attribute_range"
+          @vertex_attribute_ranges_per_data="setVertexAttributeRangesPerData"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
           v-model:vertex_attribute_no_data_color="vertex_attribute_no_data_color"
           v-model:polyhedron_attribute_name="polyhedron_attribute_name"
           v-model:polyhedron_attribute_item="polyhedron_attribute_item"
           v-model:polyhedron_attribute_range="polyhedron_attribute_range"
+          @polyhedron_attribute_ranges_per_data="setPolyhedronAttributeRangesPerData"
           v-model:polyhedron_attribute_color_map="polyhedron_attribute_color_map"
           v-model:polyhedron_attribute_no_data_color="polyhedron_attribute_no_data_color"
           :capabilities="{

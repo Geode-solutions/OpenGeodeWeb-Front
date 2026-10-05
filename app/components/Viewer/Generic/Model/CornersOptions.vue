@@ -44,7 +44,7 @@ const cornersVisibility = computed<boolean>({
 const cornerVisibility = computed<boolean | undefined>({
   get: () => dataStyleStore.modelCornerVisibility(modelId, cornerId) as boolean | undefined,
   set: async (newValue) => {
-    if (cornerId === undefined) {
+    if (newValue === undefined || cornerId === undefined) {
       return;
     }
     await dataStyleStore.setModelCornersVisibility(modelId, [cornerId], newValue);
@@ -156,11 +156,9 @@ const cornersVertexAttributeColorMap = computed<ColorMap | undefined>({
   },
 });
 
-const cornersVertexAttributeNoDataColor = computed<RGBAColor | undefined>({
+const cornersVertexAttributeNoDataColor = computed<RGBAColor>({
   get: () =>
-    dataStyleStore.modelCornersVertexAttributeNoDataColor(modelId, referenceCornerId.value) as
-      | RGBAColor
-      | undefined,
+    dataStyleStore.modelCornersVertexAttributeNoDataColor(modelId, referenceCornerId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelCornersVertexAttributeNoDataColor(
       modelId,
@@ -217,11 +215,8 @@ const vertexAttributeColorMap = computed<ColorMap | undefined>({
   },
 });
 
-const vertexAttributeNoDataColor = computed<RGBAColor | undefined>({
-  get: () =>
-    dataStyleStore.modelCornersVertexAttributeNoDataColor(modelId, cornerId) as
-      | RGBAColor
-      | undefined,
+const vertexAttributeNoDataColor = computed<RGBAColor>({
+  get: () => dataStyleStore.modelCornersVertexAttributeNoDataColor(modelId, cornerId),
   set: async (newValue) => {
     if (cornerId === undefined) {
       return;

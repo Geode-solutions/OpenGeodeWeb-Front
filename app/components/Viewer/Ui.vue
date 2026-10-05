@@ -1,12 +1,16 @@
 <script setup lang="ts">
+import {
+  type ViewerIdResult,
+  useOverlappingPicker,
+} from "@ogw_front/composables/use_overlapping_picker";
 import OverlappingObjectsPicker from "@ogw_front/components/Viewer/OverlappingObjectsPicker.vue";
 import ToolActiveChip from "@ogw_front/components/Viewer/ToolActiveChip.vue";
+import type { TreeMenuPayload } from "@ogw_front/utils/treeview";
 import ViewerContextMenu from "@ogw_front/components/Viewer/ContextMenu/ContextMenu.vue";
 import ViewerObjectTreeLayout from "@ogw_front/components/Viewer/ObjectTree/Layout.vue";
 import { getCurrentInstance } from "vue";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useMenuStore } from "@ogw_front/stores/menu";
-import { useOverlappingPicker } from "@ogw_front/composables/use_overlapping_picker";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 interface Props {
@@ -18,7 +22,7 @@ interface Props {
 const { displayMenu, containerWidth, containerHeight } = defineProps<Props>();
 
 const emit = defineEmits<{
-  "show-menu": [args: unknown];
+  "show-menu": [payload: TreeMenuPayload];
 }>();
 const menuStore = useMenuStore();
 const viewerStore = useViewerStore();
@@ -66,7 +70,7 @@ const {
   get_viewer_id: trigger_picker,
 } = useOverlappingPicker();
 
-function get_viewer_id(x: number, y: number): string {
+function get_viewer_id(x: number, y: number): Promise<ViewerIdResult> {
   const instance = getCurrentInstance();
   const containerRect = instance?.proxy?.$el
     ?.closest?.('[data-testid="hybridViewer"]')

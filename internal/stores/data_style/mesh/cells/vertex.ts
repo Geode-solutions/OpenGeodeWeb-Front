@@ -1,6 +1,6 @@
-import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
+import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
@@ -15,7 +15,7 @@ interface AttributeStoredConfig {
   minimum: number | undefined;
   maximum: number | undefined;
   colorMap: string | undefined;
-  no_data_color: unknown;
+  no_data_color: RGBAColor;
 }
 
 interface AttributeState {
@@ -30,22 +30,25 @@ interface AttributeInput {
   minimum: number | undefined;
   maximum: number | undefined;
   colorMap: string | undefined;
-  no_data_color?: unknown;
+  no_data_color?: RGBAColor;
 }
 
-function isMeshCellsVertexAttributeValid({
-  name,
-  item,
-  minimum,
-  maximum,
-  colorMap,
-}: AttributeInput): boolean {
+interface ValidAttributeInput {
+  name: string;
+  item: number;
+  minimum: number;
+  maximum: number;
+  colorMap: string;
+  no_data_color?: RGBAColor;
+}
+
+function isMeshCellsVertexAttributeValid(input: AttributeInput): input is ValidAttributeInput {
   return (
-    name !== undefined &&
-    item !== undefined &&
-    minimum !== undefined &&
-    maximum !== undefined &&
-    colorMap !== undefined
+    input.name !== undefined &&
+    input.item !== undefined &&
+    input.minimum !== undefined &&
+    input.maximum !== undefined &&
+    input.colorMap !== undefined
   );
 }
 
@@ -59,7 +62,7 @@ interface UseMeshCellsVertexAttributeStyleReturn {
     name: string | undefined,
     item: number | undefined,
   ) => AttributeStoredConfig;
-  setMeshCellsVertexAttribute: (id: string, input: AttributeInput) => Promise<unknown>;
+  setMeshCellsVertexAttribute: (id: string, input: ValidAttributeInput) => Promise<unknown>;
   setMeshCellsVertexAttributeName: (id: string, name: string) => Promise<unknown>;
   setMeshCellsVertexAttributeItem: (id: string, item: number) => Promise<unknown>;
   setMeshCellsVertexAttributeRange: (
@@ -71,8 +74,11 @@ interface UseMeshCellsVertexAttributeStyleReturn {
     id: string,
     colorMap: string | undefined,
   ) => Promise<unknown>;
-  meshCellsVertexAttributeNoDataColor: (id: string) => unknown;
-  setMeshCellsVertexAttributeNoDataColor: (id: string, no_data_color: unknown) => Promise<unknown>;
+  meshCellsVertexAttributeNoDataColor: (id: string) => RGBAColor;
+  setMeshCellsVertexAttributeNoDataColor: (
+    id: string,
+    no_data_color: RGBAColor,
+  ) => Promise<unknown>;
 }
 
 // oxlint-disable-next-line max-lines-per-function
@@ -152,7 +158,7 @@ function useMeshCellsVertexAttributeStyle(): UseMeshCellsVertexAttributeStyleRet
       maximum,
       colorMap,
       no_data_color = DEFAULT_NO_DATA_COLOR,
-    }: AttributeInput,
+    }: ValidAttributeInput,
   ): Promise<unknown> {
     await mutateMeshCellsVertexStyle(id, {
       name,
@@ -164,7 +170,7 @@ function useMeshCellsVertexAttributeStyle(): UseMeshCellsVertexAttributeStyleRet
       colorMap,
       no_data_color,
     });
-    const points = getRGBPointsFromPreset(colorMap ?? "");
+    const points = [...getRGBPointsFromPreset(colorMap)];
     const schema = meshCellsVertexAttributeSchemas.attribute;
     const params = {
       id,
@@ -248,7 +254,7 @@ function useMeshCellsVertexAttributeStyle(): UseMeshCellsVertexAttributeStyleRet
     });
     return applyVertexAttribute(id);
   }
-  function meshCellsVertexAttributeNoDataColor(id: string): unknown {
+  function meshCellsVertexAttributeNoDataColor(id: string): RGBAColor {
     const name = meshCellsVertexAttributeName(id);
     const item = meshCellsVertexAttributeItem(id);
     const storedConfig = meshCellsVertexAttributeStoredConfig(id, name, item);
@@ -256,7 +262,7 @@ function useMeshCellsVertexAttributeStyle(): UseMeshCellsVertexAttributeStyleRet
   }
   async function setMeshCellsVertexAttributeNoDataColor(
     id: string,
-    no_data_color: unknown,
+    no_data_color: RGBAColor,
   ): Promise<unknown> {
     const name = meshCellsVertexAttributeName(id);
     const item = meshCellsVertexAttributeItem(id);

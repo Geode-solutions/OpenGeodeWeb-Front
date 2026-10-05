@@ -7,6 +7,8 @@ type ReadonlyMaybeRefOrGetter<Value> = Value | Ref<Value> | (() => Value);
 interface FilterableItem {
   readonly id: unknown;
   readonly title?: string;
+  // Present on geode objects (data and model components), absent on group nodes.
+  readonly geode_id?: string;
   readonly children?: readonly FilterableItem[];
 }
 
@@ -28,10 +30,10 @@ interface UseTreeFilterReturn {
   availableFilterOptions: ComputedRef<string[]>;
   toggleSort: () => void;
   customFilter: typeof customFilter;
-  applySearchFilter: (
-    newSelection: readonly unknown[],
-    previousSelection?: readonly unknown[],
-  ) => unknown[];
+  applySearchFilter: <TId>(
+    newSelection: readonly TId[],
+    previousSelection?: readonly TId[],
+  ) => TId[];
 }
 
 function customFilter(
@@ -46,15 +48,15 @@ function customFilter(
     return false;
   }
   const query = searchQuery.toLowerCase();
-  const { title = "", id = value } = item.raw;
-  return [title, id].some((field) => String(field).toLowerCase().includes(query));
+  const { title = "", id = value, geode_id: geodeId } = item.raw;
+  return [title, id, geodeId].some((field) => String(field).toLowerCase().includes(query));
 }
 
 // Extracted so we never call String() directly on a value typed as `unknown`/`any`.
 // The `id` field can be anything at runtime, so only stringify primitives that have a sane toString.
 // Anything else falls back to "" instead of risking "[object Object]".
 function toSortKey(item: FilterableItem, field: "title" | "id"): string {
-  const raw = item[field] ?? item.id ?? "";
+  const raw = (field === "id" ? item.geode_id : item.title) ?? item.id ?? "";
   if (typeof raw === "string" || typeof raw === "number" || typeof raw === "boolean") {
     return String(raw);
   }
@@ -136,7 +138,7 @@ function useTreeFilter(
       const children = (category.children ?? []).filter((child) =>
         customFilter(child.id, search.value, { raw: child }),
       );
-      if (children.length > 0 || customFilter(category.id, search.value, { raw: category })) {
+      if (children.length > 0) {
         result.push({ ...category, children });
       }
     }
@@ -161,10 +163,10 @@ function useTreeFilter(
     return map;
   });
 
-  function applySearchFilter(
-    newSelection: readonly unknown[],
-    previousSelection: readonly unknown[] = [],
-  ): unknown[] {
+  function applySearchFilter<TId>(
+    newSelection: readonly TId[],
+    previousSelection: readonly TId[] = [],
+  ): TId[] {
     if (!search.value) {
       return [...newSelection];
     }

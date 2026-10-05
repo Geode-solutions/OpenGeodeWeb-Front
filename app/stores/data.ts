@@ -3,7 +3,7 @@
 import { type Table, liveQuery } from "dexie";
 import type { Observable } from "rxjs";
 import { useObservable } from "@vueuse/rxjs";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { type ModelComponentRecord, useDataMesh } from "./data_helpers/mesh.js";
@@ -13,6 +13,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 interface DataItem {
   id: string;
+  geode_id: string;
   name: string;
   viewer_type: string;
   geode_object_type: string;
@@ -35,6 +36,7 @@ interface ModelComponentInput {
 
 interface NewDataItem {
   id: string;
+  geode_id: string;
   name?: string;
   viewer_type: string;
   geode_object_type: string;
@@ -199,6 +201,7 @@ export const useDataStore = defineStore("data", () => {
   async function addItem(new_item: NewDataItem): Promise<string> {
     const itemData: DataItem = {
       id: new_item.id,
+      geode_id: new_item.geode_id,
       name: new_item.name ?? new_item.id,
       viewer_type: new_item.viewer_type,
       geode_object_type: new_item.geode_object_type,

@@ -29,6 +29,7 @@ const { width: containerWidth } = useElementSize(labelContainer);
 // The item prop can be either a DisplayItem wrapper (with a `.raw` domain object) or the domain object itself when this component is used outside CommonTreeView's slot machinery; the domain object always carries an id/title at runtime.
 interface LabeledItem {
   id: string;
+  geode_id?: string;
   title?: string;
   is_active?: boolean;
   category?: string;
@@ -96,9 +97,9 @@ async function copyToClipboard(text: string, label: string): Promise<void> {
       </template>
 
       <div class="d-flex flex-column ga-1">
-        <span class="text-caption d-flex align-center">
+        <span v-if="actualItem.geode_id" class="text-caption d-flex align-center">
           <strong class="text-white mr-1">ID:</strong>
-          <span data-testid="tooltipIdValue">{{ actualItem.id }}</span>
+          <span data-testid="tooltipIdValue">{{ actualItem.geode_id }}</span>
           <v-btn
             data-testid="copyIdBtn"
             icon
@@ -106,7 +107,7 @@ async function copyToClipboard(text: string, label: string): Promise<void> {
             density="compact"
             class="ml-1 text-white"
             style="width: 18px; height: 18px; min-width: 18px; min-height: 18px"
-            @click.stop="copyToClipboard(actualItem.id, 'ID')"
+            @click.stop="copyToClipboard(actualItem.geode_id, 'ID')"
           >
             <v-icon size="12">mdi-content-copy</v-icon>
           </v-btn>

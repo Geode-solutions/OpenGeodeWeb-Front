@@ -90,6 +90,7 @@ export interface LocalExtensionsRunResponseExtensionsArray {
   id: string;
   name: string;
   port: number;
+  serverPort?: number;
   version: string;
 }
 

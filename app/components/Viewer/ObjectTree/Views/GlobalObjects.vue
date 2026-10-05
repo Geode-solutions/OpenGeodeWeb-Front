@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import {
+  type DataMenuPayload,
+  type GeodeObjectTypeMenuPayload,
+  compareSelections,
+} from "@ogw_front/utils/treeview";
 import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
-import { compareSelections } from "@ogw_front/utils/treeview";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
@@ -18,7 +22,7 @@ const hybridViewerStore = useHybridViewerStore();
 const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 
 interface Emits {
-  "show-menu": [payload: { event: MouseEvent; itemId: string }];
+  "show-menu": [payload: DataMenuPayload | GeodeObjectTypeMenuPayload];
 }
 
 const emit = defineEmits<Emits>();
@@ -50,7 +54,7 @@ const {
 } = useTreeFilter(() => treeviewStore.items, { recursiveSort: true });
 
 function onUpdateSelection(val: string[]): void {
-  treeviewStore.selection = applySearchFilter(val, treeviewStore.selection) as string[];
+  treeviewStore.selection = applySearchFilter(val, treeviewStore.selection);
 }
 
 const visibleSelection = computed<string[]>(() => applySearchFilter(treeviewStore.selection, []));
@@ -81,6 +85,21 @@ watch(
     hybridViewerStore.remoteRender();
   },
 );
+
+function showMenu(event: MouseEvent, item: TreeGroupItem): void {
+  const actualItem = item.raw || item;
+  if (!actualItem.children) {
+    emit("show-menu", { event, itemId: actualItem.id });
+    return;
+  }
+  const childIds = actualItem.children.map((child) => child.id);
+  emit("show-menu", {
+    event,
+    itemId: actualItem.id,
+    context_type: "geode_object_type",
+    targetIds: applySearchFilter(childIds),
+  });
+}
 
 function isModel(item: TreeGroupItem): boolean {
   const actualItem = item.raw || item;
@@ -165,18 +184,13 @@ function expandAll(): void {
       @update:scroll-top="treeviewStore.setScrollTop(mainView?.id ?? '', $event)"
       @hover:enter="({ item }) => handleHoverEnter({ item: item as unknown as TreeGroupItem })"
       @hover:leave="({ item }) => handleHoverLeave({ item: item as unknown as TreeGroupItem })"
-      @contextmenu="
-        emit('show-menu', {
-          event: $event.event,
-          itemId: $event.item.id as string,
-        })
-      "
+      @contextmenu="showMenu($event.event, $event.item as unknown as TreeGroupItem)"
     >
       <template #title="{ item, isLeaf }">
         <ObjectTreeItemLabel
           :item="item as unknown as DisplayItem"
           :is-leaf="isLeaf"
-          @contextmenu="emit('show-menu', { event: $event, itemId: item.id as string })"
+          @contextmenu="showMenu($event, item as unknown as TreeGroupItem)"
         />
       </template>
 

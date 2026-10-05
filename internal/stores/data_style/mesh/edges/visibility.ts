@@ -1,5 +1,5 @@
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 import { useMeshEdgesCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -9,7 +9,7 @@ const schema = viewer_schemas.opengeodeweb_viewer.mesh.edges.visibility;
 
 export function useMeshEdgesVisibilityStyle(): {
   meshEdgesVisibility: (id: string) => boolean | undefined;
-  setMeshEdgesVisibility: (id: string, visibility: boolean | undefined) => Promise<unknown>;
+  setMeshEdgesVisibility: (id: string, visibility: boolean) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const meshEdgesCommonStyle = useMeshEdgesCommonStyle();
@@ -18,10 +18,7 @@ export function useMeshEdgesVisibilityStyle(): {
     // oxlint-disable-next-line no-unsafe-type-assertion -- visibility is defined as boolean in the data style schema.
     return meshEdgesCommonStyle.meshEdgesStyle(id).visibility as boolean | undefined;
   }
-  async function setMeshEdgesVisibility(
-    id: string,
-    visibility: boolean | undefined,
-  ): Promise<unknown> {
+  async function setMeshEdgesVisibility(id: string, visibility: boolean): Promise<unknown> {
     const params = { id, visibility };
     const result = await viewerStore.request(
       {

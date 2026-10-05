@@ -1,6 +1,6 @@
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 import { useModelCornersCommonStyle } from "./common";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 const schema = viewer_schemas.opengeodeweb_viewer.model.corners.visibility;
 
@@ -8,7 +8,7 @@ interface ModelCornersVisibilityApi {
   setModelCornersVisibility: (
     modelId: string,
     corners_ids: string[],
-    visibility: boolean | undefined,
+    visibility: boolean,
   ) => Promise<unknown>;
   modelCornerVisibility: (id: string, corner_id?: string) => unknown;
 }
@@ -24,7 +24,7 @@ export function useModelCornersVisibility(): ModelCornersVisibilityApi {
   async function setModelCornersVisibility(
     modelId: string,
     corners_ids: string[],
-    visibility: boolean | undefined,
+    visibility: boolean,
   ): Promise<unknown> {
     const result = await modelCommonStyle.setModelTypeVisibility(
       modelId,

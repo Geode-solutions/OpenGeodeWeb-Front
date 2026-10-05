@@ -1,12 +1,14 @@
+import viewer_schemas, {
+  type PickedFieldType,
+} from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 import { useHybridViewerCore } from "./core";
 import { useHybridViewerHighlight } from "./highlight";
 import { useHybridViewerScene } from "./scene";
 import { useViewerStore } from "@ogw_front/stores/viewer";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 interface RulerHoverState {
   active: boolean;
-  fieldType: string;
+  fieldType: PickedFieldType;
 }
 
 function useHybridViewerRuler(): {
@@ -63,11 +65,8 @@ function useHybridViewerRuler(): {
     const { remoteRender } = useHybridViewerCore();
     const viewerStore = useViewerStore();
     const schema = viewer_schemas.opengeodeweb_viewer.viewer.ruler;
-    // oxlint-disable-next-line no-unsafe-type-assertion -- response shape is defined by the ruler schema.
-    const response = (await viewerStore.request({ schema, params: { points } })) as {
-      distance?: number;
-    };
-    ruler_distance.value = response.distance;
+    const { distance } = await viewerStore.request({ schema, params: { points } });
+    ruler_distance.value = distance;
     await remoteRender();
   }
 
@@ -80,14 +79,12 @@ function useHybridViewerRuler(): {
       const params = {
         x: Math.round(x),
         y: Math.round(y),
-        field_type: "POINT",
+        field_type: "POINT" as const,
         ids: Object.keys(hybridDb),
       };
-      // oxlint-disable-next-line no-unsafe-type-assertion -- response shape is defined by the highlight schema.
-      const response = (await viewerStore.request({ schema, params })) as {
-        attributes?: { coordinates?: number[] };
-      };
-      coords = response.attributes?.coordinates;
+      const { attributes } = await viewerStore.request({ schema, params });
+      const coordinates = attributes?.coordinates;
+      coords = Array.isArray(coordinates) ? coordinates : undefined;
     } else {
       coords = await viewerStore.pick_world_position(x, y);
     }

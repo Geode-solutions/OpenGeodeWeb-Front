@@ -1,3 +1,4 @@
+import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // oxlint-disable eslint/max-lines
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { dispatchToComponentTypes } from "./visibility";
@@ -47,14 +48,14 @@ function attributeFn<Signature>(method: unknown): Signature {
 
 // oxlint-disable-next-line max-lines-per-function
 function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
-  getModelColor: (modelId: string) => unknown;
+  getModelColor: (modelId: string) => RGBAColor | undefined;
   getModelActiveColoring: (modelId: string) => unknown;
   getModelComponentColor: (modelId: string, componentId: string) => unknown;
   getModelComponentEffectiveColor: (modelId: string, componentId: string, type: string) => unknown;
   getModelComponentActiveColoring: (modelId: string, componentId: string) => unknown;
   modelComponentTypeColor: (modelId: string, type: string) => unknown;
   getModelComponentTypeActiveColoring: (modelId: string, type: string) => unknown;
-  setModelComponentTypeColor: (modelId: string, type: string, color: unknown) => Promise<void>;
+  setModelComponentTypeColor: (modelId: string, type: string, color: RGBAColor) => Promise<void>;
   setModelComponentTypeActiveColoring: (
     modelId: string,
     type: string,
@@ -68,7 +69,7 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
   setModelComponentsColor: (
     modelId: string,
     componentIds: string[],
-    color: unknown,
+    color: RGBAColor | undefined,
     activeColoring?: string,
   ) => Promise<unknown[]>;
 } {
@@ -205,7 +206,7 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
   async function setModelComponentsColor(
     modelId: string,
     componentIds: string[],
-    color: unknown,
+    color: RGBAColor | undefined,
     activeColoring = "constant",
   ): Promise<unknown[]> {
     await modelCommonStyle.mutateComponentStyles(modelId, componentIds, {
@@ -228,7 +229,7 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
   async function setModelComponentTypeColor(
     modelId: string,
     type: string,
-    color: unknown,
+    color: RGBAColor,
   ): Promise<void> {
     await modelCommonStyle.mutateModelComponentTypeStyle(modelId, type, {
       coloring: {
@@ -323,9 +324,11 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
       }
     }
   }
-  function getModelColor(modelId: string): unknown {
+  function getModelColor(modelId: string): RGBAColor | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
-    return (dataStyleState.getStyle(modelId).coloring as StyleValues).constant;
+    return (dataStyleState.getStyle(modelId).coloring as StyleValues).constant as
+      | RGBAColor
+      | undefined;
   }
   function getModelActiveColoring(modelId: string): unknown {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.

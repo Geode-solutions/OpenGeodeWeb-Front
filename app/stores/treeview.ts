@@ -22,6 +22,7 @@ interface OpenedView {
 interface TreeviewChild {
   title: string;
   id: string;
+  geode_id: string;
   viewer_type: string;
   geode_object_type: string;
 }
@@ -155,10 +156,17 @@ export const useTreeviewStore = defineStore("treeview", () => {
     }
   }
 
-  function addItem(geodeObjectType: string, name: string, id: string, viewer_type: string): void {
+  function addItem(
+    geodeObjectType: string,
+    name: string,
+    id: string,
+    geode_id: string,
+    viewer_type: string,
+  ): void {
     const child: TreeviewChild = {
       title: name,
       id,
+      geode_id,
       viewer_type,
       geode_object_type: geodeObjectType,
     };

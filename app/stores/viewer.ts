@@ -5,7 +5,7 @@ import type { Vector3 } from "@kitware/vtk.js/types";
 import { connectImageStream } from "@kitware/vtk.js/Rendering/Misc/RemoteView";
 import { initWebSocketClient } from "@ogw_internal/utils/ws_client";
 import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_typed_schemas.js";
-import opengeodeweb_viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json" with { type: "json" };
+import opengeodeweb_viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import {
@@ -18,7 +18,13 @@ import { useAppStore } from "@ogw_front/stores/app";
 import { useInfraStore } from "@ogw_front/stores/infra";
 import { viewer_call } from "@ogw_internal/utils/viewer_call";
 
-import type { JsonRpcSchema, RequestHandlers } from "@ogw_shared/utils/types.js";
+import type {
+  JsonRpcSchema,
+  MicroserviceVersionSchema,
+  ParamsOf,
+  RequestHandlers,
+  ResponseOf,
+} from "@ogw_shared/utils/types.js";
 // oxlint-disable-next-line import/max-dependencies -- all imports above are required by this store.
 import type { RpcClient } from "@ogw_shared/utils/call_raw.js";
 
@@ -70,18 +76,18 @@ export const useViewerStore = defineStore(
       picking_mode.value = value;
     }
     // oxlint-disable-next-line unicorn/consistent-function-scoping
-    async function request(
+    async function request<Schema extends JsonRpcSchema>(
       {
         schema,
-        params = {},
+        params,
         timeout = request_timeout,
       }: {
-        schema: JsonRpcSchema;
-        params?: Record<string, unknown>;
+        schema: Schema;
+        params?: ParamsOf<Schema>;
         timeout?: number;
       },
-      callbacks: RequestHandlers = {},
-    ): Promise<unknown> {
+      callbacks: RequestHandlers<ResponseOf<Schema>> = {},
+    ): Promise<ResponseOf<Schema>> {
       const microservice = {
         $id: "viewer",
         client: client.value,
@@ -93,26 +99,34 @@ export const useViewerStore = defineStore(
         microservice,
         {
           schema,
-          params,
+          params: params ?? {},
           timeout,
         },
         {
           ...callbacks,
           response_function: async (response: unknown) => {
             if (callbacks.response_function) {
-              await callbacks.response_function(response);
+              // The viewer validates its responses against the schema `response` it was generated from.
+              // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+              await callbacks.response_function(response as ResponseOf<Schema>);
             }
           },
         },
       );
-      return result;
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+      return result as ResponseOf<Schema>;
     }
     async function pick_world_position(x: number, y: number): Promise<Vector3> {
       const schema = opengeodeweb_viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
-      const response = await request({ schema, params: { x: Math.round(x), y: Math.round(y) } });
-      // oxlint-disable-next-line no-unsafe-type-assertion -- response shape is defined by the get_point_position schema.
-      const position = response as { x: number; y: number; z: number };
-      return [position.x, position.y, position.z];
+      const {
+        x: world_x,
+        y: world_y,
+        z: world_z,
+      } = await request({
+        schema,
+        params: { x: Math.round(x), y: Math.round(y) },
+      });
+      return [world_x, world_y, world_z];
     }
     async function set_picked_point(x: number, y: number): Promise<void> {
       const [world_x, world_y, world_z] = await pick_world_position(x, y);
@@ -175,7 +189,9 @@ export const useViewerStore = defineStore(
     async function connect(): Promise<void> {
       await ws_connect();
     }
-    async function get_version(schema: JsonRpcSchema | undefined): Promise<unknown> {
+    async function get_version(
+      schema: MicroserviceVersionSchema | undefined,
+    ): Promise<{ microservice_version: string } | undefined> {
       if (!schema) {
         return undefined;
       }
@@ -184,9 +200,7 @@ export const useViewerStore = defineStore(
           schema,
         },
         {
-          response_function: (response: unknown) => {
-            // oxlint-disable-next-line no-unsafe-type-assertion -- response shape is defined by the version schema.
-            const { microservice_version } = response as { microservice_version: string };
+          response_function: ({ microservice_version }) => {
             version.value = microservice_version;
           },
         },

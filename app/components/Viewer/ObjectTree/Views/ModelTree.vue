@@ -3,6 +3,7 @@ import { sortAndFormatItems, useTreeFilter } from "@ogw_front/composables/tree_f
 import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
+import type { ModelComponentMenuPayload } from "@ogw_front/utils/treeview";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
@@ -28,16 +29,7 @@ interface CollectionTreeItem {
 const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 const hybridViewerStore = useHybridViewerStore();
 interface Emits {
-  "show-menu": [
-    payload: {
-      event: unknown;
-      itemId: string;
-      context_type: "model_component" | "model_component_type";
-      modelId: string;
-      modelComponentType?: string;
-      targetComponentIds?: string[];
-    },
-  ];
+  "show-menu": [payload: ModelComponentMenuPayload];
 }
 
 const emit = defineEmits<Emits>();
@@ -73,12 +65,10 @@ const {
 
 function onUpdateSelection(newSelection: string[]): void {
   const finalSelection = applySearchFilter(newSelection, visibleComponents.value);
-  updateVisibility(finalSelection as string[]);
+  updateVisibility(finalSelection);
 }
 
-const visibleSelection = computed<string[]>(
-  () => applySearchFilter(visibleComponents.value, []) as string[],
-);
+const visibleSelection = computed<string[]>(() => applySearchFilter(visibleComponents.value, []));
 
 function matchesSearch(item: CollectionTreeItem, query: string): boolean {
   return (
@@ -139,7 +129,7 @@ function isCollectionNode(item: CollectionTreeItem): boolean {
   return collectionTypes.value.has(item.category ?? item.id);
 }
 
-function showContextMenu(event: unknown, item: CollectionTreeItem): void {
+function showContextMenu(event: MouseEvent, item: CollectionTreeItem): void {
   const actualItem = item.raw || item;
   if (isCollectionNode(actualItem)) {
     emit("show-menu", {
@@ -214,10 +204,6 @@ function getLeafViewerIds(item: CollectionTreeItem): number[] {
   const actualItem = item.raw || item;
   return extractIds(actualItem);
 }
-
-function getLeafViewerIdsForFocus(item: CollectionTreeItem): string[] {
-  return getLeafViewerIds(item) as unknown as string[];
-}
 </script>
 
 <template>
@@ -275,7 +261,7 @@ function getLeafViewerIdsForFocus(item: CollectionTreeItem): string[] {
           @click.stop="
             hybridViewerStore.focusCameraOnObject(
               id,
-              getLeafViewerIdsForFocus(item as unknown as CollectionTreeItem),
+              getLeafViewerIds(item as unknown as CollectionTreeItem),
             )
           "
         />

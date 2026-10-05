@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import viewer_schemas, {
+  type ViewerTakeScreenshotParams,
+} from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import fileDownload from "js-file-download";
 import { useClipboardItems } from "@vueuse/core";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useViewerStore } from "@ogw_front/stores/viewer";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 
 const DEFAULT_PANEL_WIDTH = 260;
 
@@ -20,7 +22,7 @@ const { width = DEFAULT_PANEL_WIDTH, escapeFunction = undefined } = defineProps<
 const output_extensions =
   viewer_schemas.opengeodeweb_viewer.viewer.take_screenshot.properties.output_extension.enum;
 const filename = ref<string>("");
-const output_extension = ref<string>("png");
+const output_extension = ref<ViewerTakeScreenshotParams["output_extension"]>("png");
 const include_background = ref<boolean>(true);
 const screenshot_type = ref<string>("file");
 
@@ -42,8 +44,8 @@ async function takeScreenshot(): Promise<void> {
       params,
     },
     {
-      response_function: async (response: unknown) => {
-        const { blob } = response as { blob: BlobPart };
+      // `blob` is a wslink attachment: the viewer sends its key, the client receives the binary in its place
+      response_function: async ({ blob }) => {
         if (screenshot_type.value === "file") {
           fileDownload(blob, `${current_filename}.${output_extension.value}`);
           feedbackStore.add_success("Screenshot downloaded");

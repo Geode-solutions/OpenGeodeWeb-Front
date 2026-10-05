@@ -1,21 +1,22 @@
 import { isModelLinesEdgeAttributeValid, useModelLinesEdgeAttribute } from "./edge";
 import { isModelLinesVertexAttributeValid, useModelLinesVertexAttribute } from "./vertex";
+import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelLinesColor } from "./color";
 import { useModelLinesCommonStyle } from "./common";
 import { useModelLinesVisibility } from "./visibility";
 
 interface ColorGroup {
-  color: unknown;
+  color: RGBAColor | undefined;
   lines_ids: string[];
 }
 
 interface AttributeGroup {
-  name: string | undefined;
-  item: number | undefined;
-  minimum: number | undefined;
-  maximum: number | undefined;
-  colorMap: string | undefined;
+  name: string;
+  item: number;
+  minimum: number;
+  maximum: number;
+  colorMap: string;
   lines_ids: string[];
 }
 
@@ -117,14 +118,7 @@ export function useModelLinesStyle(): ReturnType<typeof useModelLinesCommonStyle
             continue;
           }
           const key = `${name}_${item}_${colorMap}_${minimum}_${maximum}`;
-          vertexGroups[key] ??= {
-            name,
-            item,
-            minimum,
-            maximum,
-            colorMap,
-            lines_ids: [],
-          };
+          vertexGroups[key] ??= { ...attribute, lines_ids: [] };
           vertexGroups[key].lines_ids.push(line_id);
         }
         coloringPromises.push(
@@ -163,14 +157,7 @@ export function useModelLinesStyle(): ReturnType<typeof useModelLinesCommonStyle
             continue;
           }
           const key = `${name}_${item}_${colorMap}_${minimum}_${maximum}`;
-          edgeGroups[key] ??= {
-            name,
-            item,
-            minimum,
-            maximum,
-            colorMap,
-            lines_ids: [],
-          };
+          edgeGroups[key] ??= { ...attribute, lines_ids: [] };
           edgeGroups[key].lines_ids.push(line_id);
         }
         coloringPromises.push(

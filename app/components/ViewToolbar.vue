@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import schemas, {
+  type PickedFieldType,
+} from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 import ActionButton from "@ogw_front/components/ActionButton.vue";
 import CameraBookmarkIcon from "@ogw_front/assets/viewer_svgs/camera-bookmark.svg";
 import CameraManager from "@ogw_front/components/CameraManager.vue";
@@ -10,7 +13,6 @@ import ShrinkFilter from "@ogw_front/components/ShrinkFilter.vue";
 import ThresholdFilter from "@ogw_front/components/ThresholdFilter.vue";
 import ZScaling from "@ogw_front/components/ZScaling.vue";
 import { onKeyStroke } from "@vueuse/core";
-import schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -96,7 +98,7 @@ function toggleTool(toolRef: Ref<boolean>): void {
   toolRef.value = !toolRef.value;
 }
 
-function toggleHoverHighlight(fieldType: string): void {
+function toggleHoverHighlight(fieldType: PickedFieldType): void {
   const activate =
     !hybridViewerStore.is_hover_highlight ||
     hybridViewerStore.hover_highlight_field_type !== fieldType;

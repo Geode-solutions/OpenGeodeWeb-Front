@@ -1,10 +1,11 @@
 import { isModelSurfacesPolygonAttributeValid, useModelSurfacesPolygonAttribute } from "./polygon";
 import { isModelSurfacesVertexAttributeValid, useModelSurfacesVertexAttribute } from "./vertex";
+import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 import { useModelSurfacesCommonStyle } from "./common";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 const schema = viewer_schemas.opengeodeweb_viewer.model.surfaces.color;
 
@@ -12,12 +13,12 @@ export function useModelSurfacesColor(): {
   setModelSurfacesColor: (
     modelId: string,
     surfaces_ids: string[],
-    color: unknown,
+    color: RGBAColor | undefined,
     activeColoring?: string,
     collectionId?: string,
   ) => Promise<unknown>;
   modelSurfaceColoring: (id: string, surface_id?: string) => StyleValues;
-  modelSurfaceColor: (id: string, surface_id?: string) => unknown;
+  modelSurfaceColor: (id: string, surface_id?: string) => RGBAColor | undefined;
   modelSurfaceActiveColoring: (id: string, surface_id?: string) => unknown;
   setModelSurfacesActiveColoring: (
     modelId: string,
@@ -37,14 +38,15 @@ export function useModelSurfacesColor(): {
     return modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id).coloring as StyleValues;
   }
 
-  function modelSurfaceColor(id: string, surface_id?: string): unknown {
-    return modelSurfaceColoring(id, surface_id).constant;
+  function modelSurfaceColor(id: string, surface_id?: string): RGBAColor | undefined {
+    // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.constant shape is defined by the data style schema.
+    return modelSurfaceColoring(id, surface_id).constant as RGBAColor | undefined;
   }
 
   async function setModelSurfacesColor(
     modelId: string,
     surfaces_ids: string[],
-    color: unknown,
+    color: RGBAColor | undefined,
     activeColoring = "constant",
     collectionId?: string,
   ): Promise<unknown> {

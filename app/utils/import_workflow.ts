@@ -38,7 +38,13 @@ async function importItem(item: NewDataItem): Promise<string> {
     item.viewer_type === "model" ? dataStore.addComponents(item) : Promise.resolve();
   const addDataRelationsTask =
     item.viewer_type === "model" ? dataStore.addComponentRelations(item) : Promise.resolve();
-  treeviewStore.addItem(item.geode_object_type, item.name ?? item.id, item.id, item.viewer_type);
+  treeviewStore.addItem(
+    item.geode_object_type,
+    item.name ?? item.id,
+    item.id,
+    item.geode_id,
+    item.viewer_type,
+  );
   const addDataStyleTask = dataStyleStore.addDataStyle(item.id, item.geode_object_type);
   const addViewerTask = addDataTask.then(async () => {
     if (!(await dataStore.isItemViewable(item))) {
@@ -80,6 +86,9 @@ async function importFile(filename: string, geode_object_type: string): Promise<
 }
 
 async function importWorkflow(files: readonly FileToImport[]): Promise<string[]> {
+  const hybridViewerStore = useHybridViewerStore();
+  // Files are imported concurrently and the viewer only frames the first actor to arrive, so the camera is reset once everything is loaded
+  const wasSceneEmpty = Object.keys(hybridViewerStore.hybridDb).length === 0;
   const chunk_size = 5;
   const chunks: FileToImport[][] = [];
   for (let i = 0; i < files.length; i += chunk_size) {
@@ -102,7 +111,10 @@ async function importWorkflow(files: readonly FileToImport[]): Promise<string[]>
     await processChunk(chunkIndex + 1);
   }
   await processChunk(0);
-  const hybridViewerStore = useHybridViewerStore();
+  const isSceneFilled = Object.keys(hybridViewerStore.hybridDb).length > 0;
+  if (wasSceneEmpty && isSceneFilled) {
+    hybridViewerStore.resetCamera();
+  }
   await hybridViewerStore.remoteRender();
   return results;
 }

@@ -59,6 +59,7 @@ export function useDataCollections(): {
       .filter((component: ModelComponentRecord) => !MESH_COMPONENT_TYPES.includes(component.type))
       .map((component: ModelComponentRecord) => ({
         id: component.geode_id,
+        geode_id: component.geode_id,
         title: component.name,
         category: component.type,
         viewer_id: Number(component.viewer_id),

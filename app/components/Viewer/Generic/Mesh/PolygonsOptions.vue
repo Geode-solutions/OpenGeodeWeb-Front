@@ -1,11 +1,15 @@
 <script setup lang="ts">
+import {
+  type RangesPerData,
+  applyRangesPerData,
+  useBatchStyle,
+} from "@ogw_front/composables/batch_style";
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
-import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
@@ -60,6 +64,9 @@ const coloring_style_key = computed<string>({
 const color = computed<RGBAColor | undefined>({
   get: () => dataStyleStore.meshPolygonsColor(id.value) as RGBAColor | undefined,
   set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPolygonsColor(targetId, newValue),
     );
@@ -69,6 +76,9 @@ const color = computed<RGBAColor | undefined>({
 const textures = computed<Texture[] | undefined>({
   get: () => dataStyleStore.meshPolygonsTextures(id.value) as Texture[] | undefined,
   set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPolygonsTextures(targetId, newValue),
     );
@@ -121,9 +131,8 @@ const vertex_attribute_color_map = computed<Map<string, RGBAColor>>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_no_data_color = computed<RGBAColor | undefined>({
-  get: () =>
-    dataStyleStore.meshPolygonsVertexAttributeNoDataColor(id.value) as RGBAColor | undefined,
+const vertex_attribute_no_data_color = computed<RGBAColor>({
+  get: () => dataStyleStore.meshPolygonsVertexAttributeNoDataColor(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPolygonsVertexAttributeNoDataColor(targetId, newValue),
@@ -176,9 +185,8 @@ const polygon_attribute_color_map = computed<Map<string, RGBAColor>>({
     hybridViewerStore.remoteRender();
   },
 });
-const polygon_attribute_no_data_color = computed<RGBAColor | undefined>({
-  get: () =>
-    dataStyleStore.meshPolygonsPolygonAttributeNoDataColor(id.value) as RGBAColor | undefined,
+const polygon_attribute_no_data_color = computed<RGBAColor>({
+  get: () => dataStyleStore.meshPolygonsPolygonAttributeNoDataColor(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPolygonsPolygonAttributeNoDataColor(targetId, newValue),
@@ -186,6 +194,20 @@ const polygon_attribute_no_data_color = computed<RGBAColor | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
+
+async function setVertexAttributeRangesPerData(ranges: RangesPerData): Promise<void> {
+  await applyRangesPerData(ranges, (targetId, minimum, maximum) =>
+    dataStyleStore.setMeshPolygonsVertexAttributeRange(targetId, minimum, maximum),
+  );
+  hybridViewerStore.remoteRender();
+}
+
+async function setPolygonAttributeRangesPerData(ranges: RangesPerData): Promise<void> {
+  await applyRangesPerData(ranges, (targetId, minimum, maximum) =>
+    dataStyleStore.setMeshPolygonsPolygonAttributeRange(targetId, minimum, maximum),
+  );
+  hybridViewerStore.remoteRender();
+}
 </script>
 
 <template>
@@ -211,11 +233,13 @@ const polygon_attribute_no_data_color = computed<RGBAColor | undefined>({
           v-model:vertex_attribute_name="vertex_attribute_name"
           v-model:vertex_attribute_item="vertex_attribute_item"
           v-model:vertex_attribute_range="vertex_attribute_range"
+          @vertex_attribute_ranges_per_data="setVertexAttributeRangesPerData"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
           v-model:vertex_attribute_no_data_color="vertex_attribute_no_data_color"
           v-model:polygon_attribute_name="polygon_attribute_name"
           v-model:polygon_attribute_item="polygon_attribute_item"
           v-model:polygon_attribute_range="polygon_attribute_range"
+          @polygon_attribute_ranges_per_data="setPolygonAttributeRangesPerData"
           v-model:polygon_attribute_color_map="polygon_attribute_color_map"
           v-model:polygon_attribute_no_data_color="polygon_attribute_no_data_color"
           :capabilities="capabilities"

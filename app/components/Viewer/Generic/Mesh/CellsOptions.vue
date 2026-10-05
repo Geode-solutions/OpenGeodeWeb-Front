@@ -1,11 +1,15 @@
 <script setup lang="ts">
+import {
+  type RangesPerData,
+  applyRangesPerData,
+  useBatchStyle,
+} from "@ogw_front/composables/batch_style";
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
-import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
@@ -49,6 +53,9 @@ const coloring_style_key = computed<string>({
 const color = computed<RGBAColor | undefined>({
   get: () => dataStyleStore.meshCellsColor(id.value) as RGBAColor | undefined,
   set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshCellsColor(targetId, newValue),
     );
@@ -58,6 +65,9 @@ const color = computed<RGBAColor | undefined>({
 const textures = computed<Texture[] | undefined>({
   get: () => dataStyleStore.meshCellsTextures(id.value) as Texture[] | undefined,
   set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshCellsTextures(targetId, newValue),
     );
@@ -108,8 +118,8 @@ const vertex_attribute_color_map = computed<Map<string, RGBAColor>>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_no_data_color = computed<RGBAColor | undefined>({
-  get: () => dataStyleStore.meshCellsVertexAttributeNoDataColor(id.value) as RGBAColor | undefined,
+const vertex_attribute_no_data_color = computed<RGBAColor>({
+  get: () => dataStyleStore.meshCellsVertexAttributeNoDataColor(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshCellsVertexAttributeNoDataColor(targetId, newValue),
@@ -160,8 +170,8 @@ const cell_attribute_color_map = computed<Map<string, RGBAColor>>({
     hybridViewerStore.remoteRender();
   },
 });
-const cell_attribute_no_data_color = computed<RGBAColor | undefined>({
-  get: () => dataStyleStore.meshCellsCellAttributeNoDataColor(id.value) as RGBAColor | undefined,
+const cell_attribute_no_data_color = computed<RGBAColor>({
+  get: () => dataStyleStore.meshCellsCellAttributeNoDataColor(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshCellsCellAttributeNoDataColor(targetId, newValue),
@@ -169,6 +179,20 @@ const cell_attribute_no_data_color = computed<RGBAColor | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
+
+async function setVertexAttributeRangesPerData(ranges: RangesPerData): Promise<void> {
+  await applyRangesPerData(ranges, (targetId, minimum, maximum) =>
+    dataStyleStore.setMeshCellsVertexAttributeRange(targetId, minimum, maximum),
+  );
+  hybridViewerStore.remoteRender();
+}
+
+async function setCellAttributeRangesPerData(ranges: RangesPerData): Promise<void> {
+  await applyRangesPerData(ranges, (targetId, minimum, maximum) =>
+    dataStyleStore.setMeshCellsCellAttributeRange(targetId, minimum, maximum),
+  );
+  hybridViewerStore.remoteRender();
+}
 </script>
 
 <template>
@@ -191,11 +215,13 @@ const cell_attribute_no_data_color = computed<RGBAColor | undefined>({
           v-model:vertex_attribute_name="vertex_attribute_name"
           v-model:vertex_attribute_item="vertex_attribute_item"
           v-model:vertex_attribute_range="vertex_attribute_range"
+          @vertex_attribute_ranges_per_data="setVertexAttributeRangesPerData"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
           v-model:vertex_attribute_no_data_color="vertex_attribute_no_data_color"
           v-model:cell_attribute_name="cell_attribute_name"
           v-model:cell_attribute_item="cell_attribute_item"
           v-model:cell_attribute_range="cell_attribute_range"
+          @cell_attribute_ranges_per_data="setCellAttributeRangesPerData"
           v-model:cell_attribute_color_map="cell_attribute_color_map"
           v-model:cell_attribute_no_data_color="cell_attribute_no_data_color"
         />
