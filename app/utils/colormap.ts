@@ -40,14 +40,19 @@ const THREE = 3;
 
 function buildColorTable(rgbPoints: readonly number[], width: number): Float32Array {
   const lut = vtkColorTransferFunction();
+  // oxlint-disable id-length
+  const nodes = [];
   for (let pointIdx = 0; pointIdx < rgbPoints.length; pointIdx += 4) {
-    lut.addRGBPoint(
-      rgbPoints[pointIdx] ?? 0,
-      rgbPoints[pointIdx + 1] ?? 0,
-      rgbPoints[pointIdx + 2] ?? 0,
-      rgbPoints[pointIdx + THREE] ?? 0,
-    );
+    nodes.push({
+      x: rgbPoints[pointIdx] ?? 0,
+      r: rgbPoints[pointIdx + 1] ?? 0,
+      g: rgbPoints[pointIdx + 2] ?? 0,
+      b: rgbPoints[pointIdx + THREE] ?? 0,
+      midpoint: 0.5,
+      sharpness: 0,
+    });
   }
+  lut.setNodes(nodes);
   return lut.getUint8Table(rgbPoints[0] ?? 0, rgbPoints.at(-LAST_POINT_OFFSET) ?? 0, width, true);
 }
 
