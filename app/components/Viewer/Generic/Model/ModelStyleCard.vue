@@ -9,23 +9,15 @@ import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import SurfacesOptions from "./SurfacesOptions.vue";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
+import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const dataStore = useDataStore();
-const treeviewStore = useTreeviewStore();
-
-function getBatchComponentIds(currentId: string): string[] {
-  const { activeItems } = treeviewStore;
-  if (activeItems.includes(currentId) && activeItems.length > 1) {
-    return activeItems;
-  }
-  return [currentId];
-}
+const { applyBatchStyle } = useBatchStyle();
 
 interface Props {
   itemProps: Record<string, unknown>;
@@ -35,9 +27,9 @@ const { itemProps } = defineProps<Props>();
 
 const modelId = computed<string>(() => itemProps.meta_data.modelId || itemProps.id);
 const componentId = computed<string | undefined>(() => itemProps.meta_data.pickedComponentId);
-const selection = computed<string[]>(
-  () => dataStyleStore.visibleMeshComponents(modelId.value).value || [],
-);
+function visibleComponents(targetId: string): string[] {
+  return dataStyleStore.visibleMeshComponents(targetId).value || [];
+}
 const componentType = ref<string | undefined>(undefined);
 const collections = ref<CollectionComponent[] | undefined>(undefined);
 
@@ -105,7 +97,9 @@ const modelVisibility = computed<boolean | undefined>({
     if (newValue === undefined) {
       return;
     }
-    await dataStyleStore.setModelVisibility(modelId.value, newValue);
+    await applyBatchStyle(modelId.value, (targetId: string) =>
+      dataStyleStore.setModelVisibility(targetId, newValue),
+    );
     hybridViewerStore.remoteRender();
   },
 });
@@ -113,16 +107,18 @@ const modelVisibility = computed<boolean | undefined>({
 const modelComponentsColor = computed<RGBAColor | undefined>({
   get: () => dataStyleStore.getModelColor(modelId.value) as RGBAColor | undefined,
   set: async (color) => {
-    await dataStyleStore.mutateStyle(modelId.value, {
-      coloring: { constant: color },
+    await applyBatchStyle(modelId.value, async (targetId: string) => {
+      await dataStyleStore.mutateStyle(targetId, {
+        coloring: { constant: color },
+      });
+      const activeColoring = dataStyleStore.getModelActiveColoring(targetId);
+      await dataStyleStore.setModelComponentsColor(
+        targetId,
+        visibleComponents(targetId),
+        color,
+        typeof activeColoring === "string" ? activeColoring : undefined,
+      );
     });
-    const activeColoring = dataStyleStore.getModelActiveColoring(modelId.value);
-    await dataStyleStore.setModelComponentsColor(
-      modelId.value,
-      selection.value,
-      color,
-      typeof activeColoring === "string" ? activeColoring : undefined,
-    );
     hybridViewerStore.remoteRender();
   },
 });
@@ -133,15 +129,17 @@ const modelComponentsActiveColoring = computed<string | undefined>({
     if (typeof coloringType !== "string") {
       return;
     }
-    await dataStyleStore.mutateStyle(modelId.value, {
-      coloring: { active: coloringType },
+    await applyBatchStyle(modelId.value, async (targetId: string) => {
+      await dataStyleStore.mutateStyle(targetId, {
+        coloring: { active: coloringType },
+      });
+      await dataStyleStore.setModelComponentsColor(
+        targetId,
+        visibleComponents(targetId),
+        dataStyleStore.getModelColor(targetId),
+        coloringType,
+      );
     });
-    await dataStyleStore.setModelComponentsColor(
-      modelId.value,
-      selection.value,
-      dataStyleStore.getModelColor(modelId.value),
-      coloringType,
-    );
     hybridViewerStore.remoteRender();
   },
 });

@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import {
+  type RangesPerData,
+  applyRangesPerData,
+  useBatchStyle,
+} from "@ogw_front/composables/batch_style";
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
@@ -6,7 +11,6 @@ import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import ViewerOptionsWidthSlider from "@ogw_front/components/Viewer/Options/Sliders/Width.vue";
-import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
@@ -167,6 +171,20 @@ const edge_attribute_no_data_color = computed<RGBAColor>({
     hybridViewerStore.remoteRender();
   },
 });
+
+async function setVertexAttributeRangesPerData(ranges: RangesPerData): Promise<void> {
+  await applyRangesPerData(ranges, (targetId, minimum, maximum) =>
+    dataStyleStore.setMeshEdgesVertexAttributeRange(targetId, minimum, maximum),
+  );
+  hybridViewerStore.remoteRender();
+}
+
+async function setEdgeAttributeRangesPerData(ranges: RangesPerData): Promise<void> {
+  await applyRangesPerData(ranges, (targetId, minimum, maximum) =>
+    dataStyleStore.setMeshEdgesEdgeAttributeRange(targetId, minimum, maximum),
+  );
+  hybridViewerStore.remoteRender();
+}
 </script>
 
 <template>
@@ -196,11 +214,13 @@ const edge_attribute_no_data_color = computed<RGBAColor>({
           v-model:vertex_attribute_name="vertex_attribute_name"
           v-model:vertex_attribute_item="vertex_attribute_item"
           v-model:vertex_attribute_range="vertex_attribute_range"
+          @vertex_attribute_ranges_per_data="setVertexAttributeRangesPerData"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
           v-model:vertex_attribute_no_data_color="vertex_attribute_no_data_color"
           v-model:edge_attribute_name="edge_attribute_name"
           v-model:edge_attribute_item="edge_attribute_item"
           v-model:edge_attribute_range="edge_attribute_range"
+          @edge_attribute_ranges_per_data="setEdgeAttributeRangesPerData"
           v-model:edge_attribute_color_map="edge_attribute_color_map"
           v-model:edge_attribute_no_data_color="edge_attribute_no_data_color"
         />

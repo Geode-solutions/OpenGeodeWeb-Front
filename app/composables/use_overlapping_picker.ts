@@ -192,3 +192,5 @@ export function useOverlappingPicker(): UseOverlappingPickerReturn {
     get_viewer_id,
   };
 }
+
+export type { ViewerIdResult };

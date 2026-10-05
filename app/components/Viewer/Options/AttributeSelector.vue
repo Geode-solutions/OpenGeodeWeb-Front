@@ -1,16 +1,24 @@
 <script setup lang="ts">
+import {
+  type AttributeRange,
+  type RangesPerData,
+  useBatchGroup,
+} from "@ogw_front/composables/batch_style";
+import { getAttributeRange, intersectAttributes } from "@ogw_front/utils/attributes";
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
 import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar.vue";
 import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
-import { getAttributeRange } from "@ogw_front/utils/attributes";
+import { requestForTargets } from "@ogw_front/utils/request_for_targets";
 import { useBackStore } from "@ogw_front/stores/back";
 
 const backStore = useBackStore();
 
 const attributeName = defineModel<string>("attributeName");
 const attributeItem = defineModel<number>("attributeItem");
-const attributeRange = defineModel<(number | undefined)[]>("attributeRange");
+const attributeRange = defineModel<(number | undefined)[]>("attributeRange", {
+  default: () => [],
+});
 const attributeColorMap = defineModel<string>("attributeColorMap");
 const attributeNoDataColor = defineModel<typeof DEFAULT_NO_DATA_COLOR>("attributeNoDataColor");
 
@@ -22,6 +30,13 @@ interface Props {
 
 const { id, componentIds = undefined, schema } = defineProps<Props>();
 
+interface Emits {
+  "update:attributeColorMap": [colorMap: string];
+  ranges_per_data: [ranges: RangesPerData];
+}
+
+const emit = defineEmits<Emits>();
+
 interface AttributeInfo {
   attribute_name: string;
   nb_items: number;
@@ -30,6 +45,9 @@ interface AttributeInfo {
 }
 
 const attributes = ref<AttributeInfo[]>([]);
+let attributesPerTarget = new Map<string, AttributeInfo[]>();
+
+const groupTargetIds = useBatchGroup(() => id);
 
 const currentAttribute = computed<AttributeInfo | undefined>(() =>
   attributes.value.find((attr) => attr.attribute_name === attributeName.value),
@@ -39,16 +57,12 @@ const cssNoDataColor = computed<string>(() => {
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 });
 const rangeMin = computed<number | undefined>({
-  get: () => {
-    const range = attributeRange.value as number[] | undefined;
-    return range ? range[0] : undefined;
-  },
+  get: () => attributeRange.value[0],
   set: (val: number | undefined) => {
     if (val === undefined) {
       return;
     }
-    const range = attributeRange.value as number[] | undefined;
-    const currentMax = range ? range[1] : undefined;
+    const [, currentMax] = attributeRange.value;
     let newMin = val;
     if (typeof currentMax === "number" && val > currentMax) {
       newMin = currentMax;
@@ -57,16 +71,12 @@ const rangeMin = computed<number | undefined>({
   },
 });
 const rangeMax = computed<number | undefined>({
-  get: () => {
-    const range = attributeRange.value as number[] | undefined;
-    return range ? range[1] : undefined;
-  },
+  get: () => attributeRange.value[1],
   set: (val: number | undefined) => {
     if (val === undefined) {
       return;
     }
-    const range = attributeRange.value as number[] | undefined;
-    const currentMin = range ? range[0] : undefined;
+    const [currentMin] = attributeRange.value;
     let newMax = val;
     if (typeof currentMin === "number" && val < currentMin) {
       newMax = currentMin;
@@ -103,7 +113,37 @@ function hasSelectedComponent(components: unknown): boolean {
   return Array.isArray(components) && components.length > 0;
 }
 
-function getAttributes(): void {
+async function getGroupAttributes(targetIds: string[]): Promise<void> {
+  const responses = await requestForTargets<{ attributes: AttributeInfo[] }>(schema, targetIds, {
+    attributes: [],
+  });
+  attributesPerTarget = new Map(
+    responses.map(([targetId, response]) => [targetId, response.attributes]),
+  );
+  attributes.value = intersectAttributes([...attributesPerTarget.values()]);
+}
+
+function initGroupAttribute(name: string, item: number): void {
+  const ranges = new Map<string, AttributeRange>();
+  for (const [targetId, targetAttributes] of attributesPerTarget) {
+    const attribute = targetAttributes.find((candidate) => candidate.attribute_name === name);
+    if (attribute) {
+      const { min, max } = getAttributeRange(
+        attribute as unknown as Parameters<typeof getAttributeRange>[0],
+        item,
+      );
+      ranges.set(targetId, [min, max]);
+    }
+  }
+  emit("update:attributeColorMap", attributeColorMap.value ?? "batlow");
+  emit("ranges_per_data", ranges);
+}
+
+async function getAttributes(): Promise<void> {
+  if (groupTargetIds.value) {
+    await getGroupAttributes(groupTargetIds.value);
+    return;
+  }
   const schemaProperties = schema.properties as Record<string, unknown> | undefined;
   const requiresComponent = schemaProperties?.component_ids !== undefined;
   if (requiresComponent && !hasSelectedComponent(componentIds)) {
@@ -115,7 +155,7 @@ function getAttributes(): void {
     params.component_ids = componentIds;
   }
 
-  backStore.request(
+  await backStore.request(
     { schema, params },
     {
       response_function: (response: unknown) => {
@@ -125,25 +165,34 @@ function getAttributes(): void {
   );
 }
 
-onMounted(() => {
-  getAttributes();
+onMounted(async () => {
+  await getAttributes();
 });
 
 watch(
   () => [id, componentIds, schema],
-  () => {
-    getAttributes();
+  async () => {
+    await getAttributes();
   },
 );
 
+watch([attributeName, attributeItem], ([name, item]) => {
+  if (groupTargetIds.value && name !== undefined) {
+    initGroupAttribute(name, item ?? 0);
+  }
+});
+
 watch([attributeName, attributeItem, currentAttribute], () => {
+  if (groupTargetIds.value) {
+    return;
+  }
   if (attributeColorMap.value === undefined) {
     attributeColorMap.value = "batlow";
   }
   if (attributeNoDataColor.value === undefined) {
     attributeNoDataColor.value = DEFAULT_NO_DATA_COLOR;
   }
-  if (!attributeRange.value || attributeRange.value[0] === undefined) {
+  if (attributeRange.value[0] === undefined) {
     resetRange();
   }
 });
@@ -200,6 +249,7 @@ watch([attributeName, attributeItem, currentAttribute], () => {
     v-model:minimum="rangeMin"
     v-model:maximum="rangeMax"
     v-model:colorMap="attributeColorMap"
+    :hide-range="groupTargetIds !== undefined"
     @reset="resetRange"
   />
 </template>
