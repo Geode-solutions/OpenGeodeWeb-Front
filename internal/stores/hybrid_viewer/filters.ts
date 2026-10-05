@@ -36,6 +36,20 @@ async function setShrink(ids: string[], shrink_factor: number): Promise<void> {
   });
   await remoteRender();
 }
+async function setExplode(ids: string[], explode_factor: number): Promise<void> {
+  const viewerStore = useViewerStore();
+  const { remoteRender } = useHybridViewerCore();
+  const schema = viewer_schemas.opengeodeweb_viewer.viewer.explode;
+  const params = {
+    ids,
+    explode_factor,
+  };
+  await viewerStore.request({
+    schema,
+    params,
+  });
+  await remoteRender();
+}
 async function setSlice(
   ids: string[],
   slices: { axis: SliceAxis; index: number }[],
@@ -80,6 +94,7 @@ async function setThreshold(ids: string[], attribute?: ThresholdAttribute): Prom
 function useHybridViewerFilters(): {
   setClippingPlanes: (ids: string[], planes: ViewerClippingPlanesParams["planes"]) => Promise<void>;
   setShrink: (ids: string[], shrink_factor: number) => Promise<void>;
+  setExplode: (ids: string[], explode_factor: number) => Promise<void>;
   setSlice: (
     ids: string[],
     slices: { axis: SliceAxis; index: number }[],
@@ -89,6 +104,7 @@ function useHybridViewerFilters(): {
   return {
     setClippingPlanes,
     setShrink,
+    setExplode,
     setSlice,
     setThreshold,
   };
