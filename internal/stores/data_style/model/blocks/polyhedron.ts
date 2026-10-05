@@ -1,7 +1,7 @@
 // oxlint-disable eslint/max-lines
-import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
+import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
@@ -17,7 +17,7 @@ interface AttributeStoredConfig {
   minimum: number | undefined;
   maximum: number | undefined;
   colorMap: string | undefined;
-  no_data_color: unknown;
+  no_data_color: RGBAColor;
 }
 
 interface AttributeState {
@@ -32,22 +32,27 @@ interface AttributeInput {
   minimum: number | undefined;
   maximum: number | undefined;
   colorMap: string | undefined;
-  no_data_color?: unknown;
+  no_data_color?: RGBAColor;
 }
 
-function isModelBlocksPolyhedronAttributeValid({
-  name,
-  item,
-  minimum,
-  maximum,
-  colorMap,
-}: AttributeInput): boolean {
+interface ValidAttributeInput {
+  name: string;
+  item: number;
+  minimum: number;
+  maximum: number;
+  colorMap: string;
+  no_data_color?: RGBAColor;
+}
+
+function isModelBlocksPolyhedronAttributeValid(
+  input: AttributeInput,
+): input is ValidAttributeInput {
   return (
-    name !== undefined &&
-    item !== undefined &&
-    minimum !== undefined &&
-    maximum !== undefined &&
-    colorMap !== undefined
+    input.name !== undefined &&
+    input.item !== undefined &&
+    input.minimum !== undefined &&
+    input.maximum !== undefined &&
+    input.colorMap !== undefined
   );
 }
 
@@ -68,7 +73,7 @@ interface UseModelBlocksPolyhedronAttributeReturn {
   setModelBlocksPolyhedronAttribute: (
     modelId: string,
     blockIds: string[],
-    input: AttributeInput,
+    input: ValidAttributeInput,
   ) => Promise<unknown>;
   setModelBlocksPolyhedronAttributeName: (
     modelId: string,
@@ -91,11 +96,11 @@ interface UseModelBlocksPolyhedronAttributeReturn {
     blockIds: string[],
     colorMap: string | undefined,
   ) => Promise<unknown>;
-  modelBlocksPolyhedronAttributeNoDataColor: (modelId: string, blockId?: string) => unknown;
+  modelBlocksPolyhedronAttributeNoDataColor: (modelId: string, blockId?: string) => RGBAColor;
   setModelBlocksPolyhedronAttributeNoDataColor: (
     modelId: string,
     blockIds: string[],
-    no_data_color: unknown,
+    no_data_color: RGBAColor,
   ) => Promise<unknown>;
 }
 
@@ -220,7 +225,7 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
       maximum,
       colorMap,
       no_data_color = DEFAULT_NO_DATA_COLOR,
-    }: AttributeInput,
+    }: ValidAttributeInput,
   ): Promise<unknown> {
     await mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
       name,
@@ -232,7 +237,7 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
       colorMap,
       no_data_color,
     });
-    const points = getRGBPointsFromPreset(colorMap ?? "");
+    const points = [...getRGBPointsFromPreset(colorMap)];
     const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, blockIds);
     const params = {
       id: modelId,
@@ -320,7 +325,7 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
     });
     return applyPolyhedronAttribute(modelId, blockIds);
   }
-  function modelBlocksPolyhedronAttributeNoDataColor(modelId: string, blockId?: string): unknown {
+  function modelBlocksPolyhedronAttributeNoDataColor(modelId: string, blockId?: string): RGBAColor {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockId);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockId);
     const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(modelId, blockId, name, item);
@@ -329,7 +334,7 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
   async function setModelBlocksPolyhedronAttributeNoDataColor(
     modelId: string,
     blockIds: string[],
-    no_data_color: unknown,
+    no_data_color: RGBAColor,
   ): Promise<unknown> {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockIds[0]);

@@ -1,5 +1,5 @@
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { useMeshPolygonsCommonStyle } from "./common";
@@ -10,7 +10,7 @@ const schema = viewer_schemas.opengeodeweb_viewer.mesh.polygons.visibility;
 
 export function useMeshPolygonsVisibilityStyle(): {
   meshPolygonsVisibility: (id: string) => boolean | undefined;
-  setMeshPolygonsVisibility: (id: string, visibility: boolean | undefined) => Promise<unknown>;
+  setMeshPolygonsVisibility: (id: string, visibility: boolean) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle();
@@ -19,10 +19,7 @@ export function useMeshPolygonsVisibilityStyle(): {
     // oxlint-disable-next-line no-unsafe-type-assertion -- visibility is defined as boolean in the data style schema.
     return meshPolygonsCommonStyle.meshPolygonsStyle(id).visibility as boolean | undefined;
   }
-  async function setMeshPolygonsVisibility(
-    id: string,
-    visibility: boolean | undefined,
-  ): Promise<unknown> {
+  async function setMeshPolygonsVisibility(id: string, visibility: boolean): Promise<unknown> {
     const params = { id, visibility };
     const result = await viewerStore.request(
       {

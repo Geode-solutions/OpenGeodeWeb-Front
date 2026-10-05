@@ -5,7 +5,7 @@ import type { RangesPerData } from "@ogw_front/composables/batch_style";
 import ViewerOptionsAttributeSelector from "@ogw_front/components/Viewer/Options/AttributeSelector.vue";
 import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
 import ViewerOptionsTexturesSelector from "@ogw_front/components/Viewer/Options/TexturesSelector.vue";
-import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 
 interface Texture {
   id: string;

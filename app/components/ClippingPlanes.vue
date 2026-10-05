@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import { DEBOUNCE_DELAY, DEFAULT_NORMALS } from "@ogw_front/utils/clipping_planes";
+import {
+  DEFAULT_SLICE_AXIS,
+  SLICE_AXES,
+  type SliceAxis,
+  areAllGrids,
+} from "@ogw_front/utils/slice";
+import type { ClippingPlane } from "@ogw_front/composables/clipping_planes_widget_entries";
 import ClippingPlaneCard from "@ogw_front/components/ClippingPlaneCard.vue";
+import SliceCard from "@ogw_front/components/SliceCard.vue";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import { useClippingPlanesWidget } from "@ogw_front/composables/clipping_planes_widget";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -18,10 +26,23 @@ const dataStore = useDataStore();
 const hybridViewerStore = useHybridViewerStore();
 const targetAllVisible = ref<boolean>(true);
 const selectedDatasetIds = ref<string[]>([]);
-const planes = ref<{ origin?: number[]; normal: number[] }[]>([
-  { origin: undefined, normal: [1, 0, 0] },
-]);
+let lastItemId = 0;
+function newItemId(): number {
+  lastItemId += 1;
+  return lastItemId;
+}
+const planes = ref<ClippingPlane[]>([{ id: newItemId(), origin: undefined, normal: [1, 0, 0] }]);
 const allItems = dataStore.refAllItems();
+const sliceEnabled = ref<boolean>(false);
+const slices = ref<{ id: number; axis: SliceAxis; index: number }[]>([
+  { id: newItemId(), axis: DEFAULT_SLICE_AXIS, index: 0 },
+]);
+const sliceMaxIndices = ref<[number, number, number]>([0, 0, 0]);
+const targetIds = computed<string[]>(() =>
+  targetAllVisible.value ? allItems.value.map((item) => item.id) : selectedDatasetIds.value,
+);
+const isAllGrid = computed<boolean>(() => areAllGrids(allItems.value, targetIds.value));
+const isSliceActive = computed<boolean>(() => isAllGrid.value && sliceEnabled.value);
 const availableDatasets = computed<{ title: string; value: string }[]>(() =>
   allItems.value.map((item) => ({
     title: item.name || item.id,
@@ -30,6 +51,8 @@ const availableDatasets = computed<{ title: string; value: string }[]>(() =>
 );
 const widgetContainer = useTemplateRef("widgetContainer");
 let debouncedApply: ((...args: unknown[]) => void) | undefined = undefined;
+let areSlicesApplied = false;
+let pendingSlices: Promise<void> = Promise.resolve();
 
 const {
   getSceneCenter,
@@ -49,39 +72,101 @@ const {
   debouncedApply: (...args: unknown[]) => debouncedApply?.(...args),
 });
 
+function getUntargetedIds(): string[] {
+  return allItems.value.map((item) => item.id).filter((id) => !targetIds.value.includes(id));
+}
+
 async function applyClippingPlanes(): Promise<void> {
-  const allIds = allItems.value.map((item) => item.id);
-  if (allIds.length === 0) {
+  if (allItems.value.length === 0) {
     return;
   }
   const center = getSceneCenter();
-  const targetIds = targetAllVisible.value ? allIds : selectedDatasetIds.value;
-  const untargetedIds = allIds.filter((id) => !targetIds.includes(id));
+  const untargetedIds = getUntargetedIds();
   const planesData = planes.value.map((plane) => ({
     origin: (plane.origin || center).map(Number),
     normal: plane.normal.map(Number),
   }));
-
-  if (targetIds.length > 0) {
-    await hybridViewerStore.setClippingPlanes(targetIds, planesData);
+  if (targetIds.value.length > 0) {
+    await hybridViewerStore.setClippingPlanes(
+      targetIds.value,
+      isSliceActive.value ? [] : planesData,
+    );
   }
   if (untargetedIds.length > 0) {
     await hybridViewerStore.setClippingPlanes(untargetedIds, []);
   }
 }
 
+async function sendSlices(): Promise<void> {
+  if (!isAllGrid.value && !areSlicesApplied) {
+    return;
+  }
+  const isActive = isSliceActive.value;
+  const untargetedIds = getUntargetedIds();
+  if (targetIds.value.length > 0) {
+    const maxIndices = await hybridViewerStore.setSlice(
+      targetIds.value,
+      isActive ? slices.value.map(({ axis, index }) => ({ axis, index })) : [],
+    );
+    if (isAllGrid.value) {
+      sliceMaxIndices.value = maxIndices;
+    }
+    if (isActive) {
+      for (const slice of slices.value) {
+        slice.index = Math.min(slice.index, maxIndices[slice.axis]);
+      }
+    }
+  }
+  if (areSlicesApplied && untargetedIds.length > 0) {
+    await hybridViewerStore.setSlice(untargetedIds, []);
+  }
+  areSlicesApplied = isActive;
+}
+
+function queueSliceTask(task: () => Promise<void>): Promise<void> {
+  const previous = pendingSlices;
+  pendingSlices = (async (): Promise<void> => {
+    await Promise.allSettled([previous]);
+    await task();
+  })();
+  return pendingSlices;
+}
+
+function applySlices(): Promise<void> {
+  return queueSliceTask(sendSlices);
+}
+
+async function applyAll(): Promise<void> {
+  await applyClippingPlanes();
+  await applySlices();
+}
+
 debouncedApply = useDebounceFn(() => applyClippingPlanes(), DEBOUNCE_DELAY);
+const debouncedApplySlices = useDebounceFn(() => applySlices(), DEBOUNCE_DELAY);
 
 function addPlane(): void {
   // Index is always in-bounds (modulo the fixed-size list); the fallbacks only
   // Satisfy noUncheckedIndexedAccess and are never hit at runtime.
   const normal = DEFAULT_NORMALS[planes.value.length % DEFAULT_NORMALS.length] ??
     DEFAULT_NORMALS[0] ?? [1, 0, 0];
-  planes.value.push({ origin: getSceneCenter(), normal });
+  planes.value.push({ id: newItemId(), origin: getSceneCenter(), normal });
 }
 
 function removePlane(index: number): void {
   planes.value.splice(index, 1);
+}
+
+function addSlice(): void {
+  const lastSlice = slices.value.at(-1);
+  slices.value.push({
+    id: newItemId(),
+    axis: lastSlice ? SLICE_AXES[lastSlice.axis].next : DEFAULT_SLICE_AXIS,
+    index: 0,
+  });
+}
+
+function removeSlice(index: number): void {
+  slices.value.splice(index, 1);
 }
 
 function flipNormal(plane: { normal: number[] }): void {
@@ -92,15 +177,23 @@ function flipNormal(plane: { normal: number[] }): void {
 
 async function resetClippingPlanes(): Promise<void> {
   setFromWidget(true);
-  planes.value = [{ origin: undefined, normal: [1, 0, 0] }];
+  planes.value = [{ id: newItemId(), origin: undefined, normal: [1, 0, 0] }];
+  sliceEnabled.value = false;
+  slices.value = [{ id: newItemId(), axis: DEFAULT_SLICE_AXIS, index: 0 }];
   updateWidgetPlacement({ isReset: true });
   setFromWidget(false);
-  await applyClippingPlanes();
+  await applyAll();
 }
 
 async function removeClippingPlanes(): Promise<void> {
   const allIds = allItems.value.map((item) => item.id);
   await hybridViewerStore.setClippingPlanes(allIds, []);
+  await queueSliceTask(async () => {
+    if (areSlicesApplied) {
+      await hybridViewerStore.setSlice(allIds, []);
+      areSlicesApplied = false;
+    }
+  });
 }
 
 watch(widgetContainer, (container) => {
@@ -124,7 +217,7 @@ watch(
 watch(show, (visible) => {
   if (visible) {
     updateWidgetPlacement({ isReset: true });
-    applyClippingPlanes();
+    applyAll();
   }
 });
 
@@ -133,7 +226,23 @@ watch(
   () => {
     if (show.value) {
       updateWidgetPlacement({ isReset: true });
-      applyClippingPlanes();
+      applyAll();
+    }
+  },
+  { deep: true },
+);
+
+watch(sliceEnabled, () => {
+  if (show.value) {
+    applyAll();
+  }
+});
+
+watch(
+  slices,
+  () => {
+    if (show.value) {
+      debouncedApplySlices();
     }
   },
   { deep: true },
@@ -142,7 +251,7 @@ watch(
 watch(allItems, () => {
   if (show.value) {
     updateWidgetPlacement({ isReset: true });
-    applyClippingPlanes();
+    applyAll();
   }
 });
 
@@ -151,7 +260,7 @@ watch(
   (actorCount) => {
     if (show.value && actorCount > 0) {
       updateWidgetPlacement({ isReset: true });
-      applyClippingPlanes();
+      applyAll();
     }
   },
 );
@@ -171,6 +280,7 @@ onBeforeUnmount(cleanupLocalWidget);
   >
     <v-card-text class="pa-3 max-panel-height overflow-y-auto">
       <v-sheet
+        v-show="!isSliceActive"
         ref="widgetContainer"
         height="180"
         color="transparent"
@@ -203,28 +313,66 @@ onBeforeUnmount(cleanupLocalWidget);
 
       <v-divider class="my-2" />
 
-      <v-row align="center" justify="space-between" no-gutters class="mb-2">
-        <v-col class="text-caption font-weight-bold">Planes ({{ planes.length }})</v-col>
-        <v-col cols="auto">
-          <v-btn
-            data-testid="addPlaneButton"
-            size="x-small"
-            variant="tonal"
-            color="primary"
-            icon="mdi-plus"
-            @click="addPlane"
+      <template v-if="isAllGrid">
+        <v-switch
+          v-model="sliceEnabled"
+          data-testid="sliceSwitch"
+          label="Slice"
+          color="primary"
+          density="compact"
+          hide-details
+          class="mb-2 text-caption"
+        />
+        <template v-if="sliceEnabled">
+          <v-row align="center" justify="space-between" no-gutters class="mb-2">
+            <v-col class="text-caption font-weight-bold">Slices ({{ slices.length }})</v-col>
+            <v-col cols="auto">
+              <v-btn
+                data-testid="addSliceButton"
+                size="x-small"
+                variant="tonal"
+                color="primary"
+                icon="mdi-plus"
+                @click="addSlice"
+              />
+            </v-col>
+          </v-row>
+          <SliceCard
+            v-for="(slice, idx) in slices"
+            :key="slice.id"
+            :slice="slice"
+            :index="idx"
+            :max-index="sliceMaxIndices[slice.axis]"
+            @remove="removeSlice(idx)"
           />
-        </v-col>
-      </v-row>
+        </template>
+        <v-divider class="my-2" />
+      </template>
 
-      <ClippingPlaneCard
-        v-for="(plane, idx) in planes"
-        :key="idx"
-        :plane="plane"
-        :index="idx"
-        @remove="removePlane(idx)"
-        @flip-normal="flipNormal(plane)"
-      />
+      <template v-if="!isSliceActive">
+        <v-row align="center" justify="space-between" no-gutters class="mb-2">
+          <v-col class="text-caption font-weight-bold">Planes ({{ planes.length }})</v-col>
+          <v-col cols="auto">
+            <v-btn
+              data-testid="addPlaneButton"
+              size="x-small"
+              variant="tonal"
+              color="primary"
+              icon="mdi-plus"
+              @click="addPlane"
+            />
+          </v-col>
+        </v-row>
+
+        <ClippingPlaneCard
+          v-for="(plane, idx) in planes"
+          :key="plane.id"
+          :plane="plane"
+          :index="idx"
+          @remove="removePlane(idx)"
+          @flip-normal="flipNormal(plane)"
+        />
+      </template>
     </v-card-text>
 
     <template #actions>

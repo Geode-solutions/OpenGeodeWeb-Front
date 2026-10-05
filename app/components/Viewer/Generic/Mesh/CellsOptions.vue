@@ -53,6 +53,9 @@ const coloring_style_key = computed<string>({
 const color = computed<RGBAColor | undefined>({
   get: () => dataStyleStore.meshCellsColor(id.value) as RGBAColor | undefined,
   set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshCellsColor(targetId, newValue),
     );
@@ -62,6 +65,9 @@ const color = computed<RGBAColor | undefined>({
 const textures = computed<Texture[] | undefined>({
   get: () => dataStyleStore.meshCellsTextures(id.value) as Texture[] | undefined,
   set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshCellsTextures(targetId, newValue),
     );
@@ -112,8 +118,8 @@ const vertex_attribute_color_map = computed<Map<string, RGBAColor>>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_no_data_color = computed<RGBAColor | undefined>({
-  get: () => dataStyleStore.meshCellsVertexAttributeNoDataColor(id.value) as RGBAColor | undefined,
+const vertex_attribute_no_data_color = computed<RGBAColor>({
+  get: () => dataStyleStore.meshCellsVertexAttributeNoDataColor(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshCellsVertexAttributeNoDataColor(targetId, newValue),
@@ -164,8 +170,8 @@ const cell_attribute_color_map = computed<Map<string, RGBAColor>>({
     hybridViewerStore.remoteRender();
   },
 });
-const cell_attribute_no_data_color = computed<RGBAColor | undefined>({
-  get: () => dataStyleStore.meshCellsCellAttributeNoDataColor(id.value) as RGBAColor | undefined,
+const cell_attribute_no_data_color = computed<RGBAColor>({
+  get: () => dataStyleStore.meshCellsCellAttributeNoDataColor(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshCellsCellAttributeNoDataColor(targetId, newValue),

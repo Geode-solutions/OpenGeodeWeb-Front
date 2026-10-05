@@ -3,21 +3,22 @@ import {
   useModelBlocksPolyhedronAttribute,
 } from "./polyhedron";
 import { isModelBlocksVertexAttributeValid, useModelBlocksVertexAttribute } from "./vertex";
+import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelBlocksCommonStyle } from "./common";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 const schema = viewer_schemas.opengeodeweb_viewer.model.blocks.color;
 
 export function useModelBlocksColor(): {
   modelBlockColoring: (id: string, block_id?: string) => StyleValues;
-  modelBlockColor: (id: string, block_id?: string) => unknown;
+  modelBlockColor: (id: string, block_id?: string) => RGBAColor | undefined;
   setModelBlocksColor: (
     modelId: string,
     blocks_ids: string[],
-    color: unknown,
+    color: RGBAColor | undefined,
     activeColoring?: string,
     collectionId?: string,
   ) => Promise<unknown>;
@@ -40,14 +41,15 @@ export function useModelBlocksColor(): {
     return modelBlocksCommonStyle.modelBlockStyle(id, block_id).coloring as StyleValues;
   }
 
-  function modelBlockColor(id: string, block_id?: string): unknown {
-    return modelBlockColoring(id, block_id).constant;
+  function modelBlockColor(id: string, block_id?: string): RGBAColor | undefined {
+    // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.constant shape is defined by the data style schema.
+    return modelBlockColoring(id, block_id).constant as RGBAColor | undefined;
   }
 
   async function setModelBlocksColor(
     modelId: string,
     blocks_ids: string[],
-    color: unknown,
+    color: RGBAColor | undefined,
     activeColoring = "constant",
     collectionId?: string,
   ): Promise<unknown> {

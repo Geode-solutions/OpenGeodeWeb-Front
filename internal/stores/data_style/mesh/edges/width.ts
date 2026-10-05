@@ -1,5 +1,5 @@
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 import { useMeshEdgesCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -9,7 +9,7 @@ const schema = viewer_schemas.opengeodeweb_viewer.mesh.edges.width;
 
 export function useMeshEdgesWidthStyle(): {
   meshEdgesWidth: (id: string) => number | undefined;
-  setMeshEdgesWidth: (id: string, width: number | undefined) => Promise<unknown>;
+  setMeshEdgesWidth: (id: string, width: number) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const meshEdgesCommonStyle = useMeshEdgesCommonStyle();
@@ -18,7 +18,7 @@ export function useMeshEdgesWidthStyle(): {
     // oxlint-disable-next-line no-unsafe-type-assertion -- width is defined as number in the data style schema.
     return meshEdgesCommonStyle.meshEdgesStyle(id).width as number | undefined;
   }
-  async function setMeshEdgesWidth(id: string, width: number | undefined): Promise<unknown> {
+  async function setMeshEdgesWidth(id: string, width: number): Promise<unknown> {
     const params = { id, width };
     const result = await viewerStore.request(
       {

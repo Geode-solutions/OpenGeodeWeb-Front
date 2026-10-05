@@ -30,6 +30,9 @@ const id = toRef(() => itemProps.id);
 const visibility = computed({
   get: () => dataStyleStore.meshPointsVisibility(id.value),
   set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPointsVisibility(targetId, newValue),
     );
@@ -39,6 +42,9 @@ const visibility = computed({
 const size = computed({
   get: () => dataStyleStore.meshPointsSize(id.value),
   set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPointsSize(targetId, newValue),
     );
@@ -57,6 +63,9 @@ const coloring_style_key = computed({
 const color = computed<RGBAColor | undefined>({
   get: () => dataStyleStore.meshPointsColor(id.value) as RGBAColor | undefined,
   set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPointsColor(targetId, newValue),
     );
@@ -106,8 +115,8 @@ const vertex_attribute_color_map = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_no_data_color = computed<RGBAColor | undefined>({
-  get: () => dataStyleStore.meshPointsVertexAttributeNoDataColor(id.value) as RGBAColor | undefined,
+const vertex_attribute_no_data_color = computed<RGBAColor>({
+  get: () => dataStyleStore.meshPointsVertexAttributeNoDataColor(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPointsVertexAttributeNoDataColor(targetId, newValue),

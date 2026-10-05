@@ -58,6 +58,9 @@ const coloring_style_key = computed<string>({
 const color = computed<RGBAColor | undefined>({
   get: () => dataStyleStore.meshPointsColor(id.value) as RGBAColor | undefined,
   set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPointsColor(targetId, newValue),
     );
@@ -107,8 +110,8 @@ const vertex_attribute_color_map = computed<Map<string, RGBAColor>>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_no_data_color = computed<RGBAColor | undefined>({
-  get: () => dataStyleStore.meshPointsVertexAttributeNoDataColor(id.value) as RGBAColor | undefined,
+const vertex_attribute_no_data_color = computed<RGBAColor>({
+  get: () => dataStyleStore.meshPointsVertexAttributeNoDataColor(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPointsVertexAttributeNoDataColor(targetId, newValue),

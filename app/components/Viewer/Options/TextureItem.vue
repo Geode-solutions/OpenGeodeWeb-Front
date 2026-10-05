@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import FileUploader from "@ogw_front/components/FileUploader.vue";
-import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { intersectBy } from "@ogw_front/utils/attributes";
 import { requestForTargets } from "@ogw_front/utils/request_for_targets";
 import { useBackStore } from "@ogw_front/stores/back";
@@ -71,8 +71,8 @@ async function files_uploaded_event(value: UploadFile[]): Promise<void> {
     await backStore.request(
       { schema, params },
       {
-        response_function: (response: unknown) => {
-          textureId.value = (response as { id: string }).id;
+        response_function: (response) => {
+          textureId.value = response.id;
         },
       },
     );

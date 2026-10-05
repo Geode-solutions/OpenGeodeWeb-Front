@@ -25,6 +25,8 @@
     "nuxt.config.ts",
     "opengeodeweb_front_schemas.json",
     "opengeodeweb_front_schemas.js",
+    "opengeodeweb_front_typed_schemas.js",
+    "opengeodeweb_front_typed_schemas.d.ts",
     "COPYLEFT",
     "LICENSE",
     "README.md"
@@ -49,11 +51,10 @@
   "scripts": {
     "lint": "oxlint --fix .",
     "prepare:types": "cross-env MODE=BROWSER nuxi prepare",
-    "typecheck": "nuxt typecheck && tsc -p tsconfig.tests.json --noEmit",
     "build:back": "npx opengeodeweb-microservice-pyinstaller ../OpenGeodeWeb-Back",
     "build:viewer": "npx opengeodeweb-microservice-pyinstaller ../OpenGeodeWeb-Viewer",
     "build:microservices": "concurrently \"npm run build:back\" \"npm run build:viewer\"",
-    "json": "npx opengeodeweb-microservice-generate --startDir server/api --key route --separator / --prefix api",
+    "json": "npx opengeodeweb-microservice-generate --startDir server/api --key route --separator / --prefix api --requireResponse",
     "test": "npm run test:unit",
     "tests": "npm run prepare:types && vitest --config ./tests/vitest.config.ts",
     "test:unit": "npm run tests -- --project unit",
@@ -112,20 +113,19 @@
     "cross-env": "10.0.0",
     "happy-dom": "20.0.11",
     "msw": "2.11.1",
-    "oxlint": "1.82.0",
+    "oxlint": "latest",
+    "oxlint-tsgolint": "latest",
     "playwright-core": "1.52.0",
     "prettier": "3.8.1",
     "resize-observer-polyfill": "1.5.1",
     "rolldown": "1.2.8",
     "tsx": "4.23.13",
-    "typescript": "5.9.3",
     "unplugin-auto-import": "20.0.0",
     "vite": "8.2.0",
     "vite-plugin-vuetify": "2.1.3",
     "vitest": "4.1.10",
     "vitest-environment-nuxt": "2.0.0",
-    "vitest-indexeddb": "0.0.1",
-    "vue-tsc": "3.3.11"
+    "vitest-indexeddb": "0.0.1"
   },
   "overrides": {
     "vue": "3.5.40"

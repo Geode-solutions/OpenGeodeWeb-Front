@@ -1,7 +1,6 @@
 // Node imports
 
 // Third party imports
-import { type H3Event, createError, defineEventHandler, readBody } from "h3";
 import { consola } from "consola";
 
 // Local imports
@@ -14,17 +13,12 @@ import {
 import { extensionFolderPath } from "@geode/opengeodeweb-front/server/utils/path.ts";
 import { removeExtensionFromConf } from "@geode/opengeodeweb-front/server/utils/app_config.ts";
 
-interface KillExtensionBody {
-  projectFolderPath: string;
-  projectName: string;
-  extensionId: string;
-}
+import { defineTypedEventHandler } from "@geode/opengeodeweb-front/server/utils/typed_handler.ts";
+import schemas from "@geode/opengeodeweb-front/opengeodeweb_front_typed_schemas.js";
 
-export default defineEventHandler(async (event: H3Event) => {
-  try {
-    const body = await readBody<KillExtensionBody>(event);
-    const { projectFolderPath, projectName, extensionId } = body;
-
+export default defineTypedEventHandler(
+  schemas.api.local.extensions.kill,
+  async ({ projectFolderPath, projectName, extensionId }) => {
     consola.debug({ projectFolderPath, projectName, extensionId });
 
     const microservices = projectMicroservices(projectFolderPath);
@@ -37,15 +31,6 @@ export default defineEventHandler(async (event: H3Event) => {
     await killMicroservice(microservice);
     await deleteFolderRecursive(extensionFolderPath(projectFolderPath, extensionId));
 
-    return {
-      statusCode: 200,
-    };
-  } catch (error) {
-    consola.error("Error killing extension:", error);
-    throw createError({
-      statusCode: 500,
-
-      statusMessage: error instanceof Error ? error.message : String(error),
-    });
-  }
-});
+    return { statusCode: 200 };
+  },
+);

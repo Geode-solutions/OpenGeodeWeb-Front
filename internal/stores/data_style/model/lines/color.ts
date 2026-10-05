@@ -1,10 +1,11 @@
 import { isModelLinesEdgeAttributeValid, useModelLinesEdgeAttribute } from "./edge";
 import { isModelLinesVertexAttributeValid, useModelLinesVertexAttribute } from "./vertex";
+import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 import { useModelLinesCommonStyle } from "./common";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 const schema = viewer_schemas.opengeodeweb_viewer.model.lines.color;
 
@@ -12,12 +13,12 @@ export function useModelLinesColor(): {
   setModelLinesColor: (
     modelId: string,
     lines_ids: string[],
-    color: unknown,
+    color: RGBAColor | undefined,
     activeColoring?: string,
     collectionId?: string,
   ) => Promise<unknown>;
   modelLineColoring: (id: string, line_id?: string) => StyleValues;
-  modelLineColor: (id: string, line_id?: string) => unknown;
+  modelLineColor: (id: string, line_id?: string) => RGBAColor | undefined;
   modelLineActiveColoring: (id: string, line_id?: string) => unknown;
   setModelLinesActiveColoring: (
     modelId: string,
@@ -37,14 +38,15 @@ export function useModelLinesColor(): {
     return modelLinesCommonStyle.modelLineStyle(id, line_id).coloring as StyleValues;
   }
 
-  function modelLineColor(id: string, line_id?: string): unknown {
-    return modelLineColoring(id, line_id).constant;
+  function modelLineColor(id: string, line_id?: string): RGBAColor | undefined {
+    // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.constant shape is defined by the data style schema.
+    return modelLineColoring(id, line_id).constant as RGBAColor | undefined;
   }
 
   async function setModelLinesColor(
     modelId: string,
     lines_ids: string[],
-    color: unknown,
+    color: RGBAColor | undefined,
     activeColoring = "constant",
     collectionId?: string,
   ): Promise<unknown> {

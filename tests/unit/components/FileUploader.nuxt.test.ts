@@ -5,7 +5,7 @@ import * as components from "vuetify/components";
 import { describe, expect, test } from "vitest";
 import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime";
 import { flushPromises } from "@vue/test-utils";
-import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 
 // Local imports
 import { setupActivePinia, toHTTPMethod, vuetify } from "@ogw_tests/utils";

@@ -8,6 +8,7 @@ import { useMeshCellsColorStyle } from "./color";
 import { useMeshCellsCommonStyle } from "./common";
 import { useMeshCellsTexturesStyle } from "./textures";
 import { useMeshCellsVisibilityStyle } from "./visibility";
+import { whenDefined } from "@ogw_internal/stores/data_style/when_defined";
 
 // Local constants
 
@@ -58,14 +59,17 @@ async function setMeshCellsActiveColoring(
     coloring: { active: type },
   });
   if (type === "constant") {
-    const result = await deps.colorStyle.setMeshCellsColor(id, deps.colorStyle.meshCellsColor(id));
+    const result = await whenDefined(deps.colorStyle.meshCellsColor(id), async (value) => {
+      const applied = await deps.colorStyle.setMeshCellsColor(id, value);
+      return applied;
+    });
     return result;
   }
   if (type === "textures") {
-    const result = await deps.texturesStyle.setMeshCellsTextures(
-      id,
-      deps.texturesStyle.meshCellsTextures(id),
-    );
+    const result = await whenDefined(deps.texturesStyle.meshCellsTextures(id), async (value) => {
+      const applied = await deps.texturesStyle.setMeshCellsTextures(id, value);
+      return applied;
+    });
     return result;
   }
   if (type === "vertex") {
@@ -86,7 +90,10 @@ async function applyMeshCellsStyle(
   deps: MeshCellsActiveColoringDeps,
 ): Promise<unknown[]> {
   const result = await Promise.all([
-    visibilityStyle.setMeshCellsVisibility(id, visibilityStyle.meshCellsVisibility(id)),
+    whenDefined(visibilityStyle.meshCellsVisibility(id), async (value) => {
+      const applied = await visibilityStyle.setMeshCellsVisibility(id, value);
+      return applied;
+    }),
     setMeshCellsActiveColoring(id, activeColoringType, deps),
   ]);
   return result;

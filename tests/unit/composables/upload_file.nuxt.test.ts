@@ -2,7 +2,7 @@
 import { type H3Event, getQuery } from "h3";
 import { beforeEach, describe, expect, test } from "vitest";
 import { registerEndpoint } from "@nuxt/test-utils/runtime";
-import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 
 // Local imports
 import { CHUNK_SIZE_BYTES } from "@ogw_shared/utils/file.js";

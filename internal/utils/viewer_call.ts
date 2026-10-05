@@ -11,7 +11,7 @@ interface ViewerMicroservice extends Microservice {
 
 interface ViewerCallParams {
   schema: JsonRpcSchema;
-  params?: Record<string, unknown>;
+  params?: object;
   timeout?: number;
 }
 

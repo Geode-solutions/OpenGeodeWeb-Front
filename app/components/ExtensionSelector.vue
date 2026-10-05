@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_schemas.json";
+import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 
 import FetchingData from "@ogw_front/components/FetchingData.vue";
 import { useBackStore } from "@ogw_front/stores/back";
@@ -28,15 +28,11 @@ async function get_output_file_extensions(): Promise<void> {
   toggle_loading();
   geode_objects_and_output_extensions.value = {};
   const backStore = useBackStore();
-  const values: Record<string, OutputExtensions>[] = await Promise.all(
-    filenames.map(async (filename): Promise<Record<string, OutputExtensions>> => {
+  const values: Record<string, Record<string, boolean>>[] = await Promise.all(
+    filenames.map(async (filename): Promise<Record<string, Record<string, boolean>>> => {
       const params = { geode_object_type: geodeObjectType, filename };
       const response = await backStore.request({ schema, params });
-      return (
-        response as {
-          geode_objects_and_output_extensions: Record<string, OutputExtensions>;
-        }
-      ).geode_objects_and_output_extensions;
+      return response.geode_objects_and_output_extensions;
     }),
   );
   const all_keys = [...new Set(values.flatMap((value) => Object.keys(value)))];
@@ -49,10 +45,8 @@ async function get_output_file_extensions(): Promise<void> {
       if (!extensions) {
         continue;
       }
-      for (const extension of Object.keys(extensions)) {
-        final_object[key][extension] = {
-          is_saveable: extensions[extension].is_saveable,
-        };
+      for (const [extension, is_saveable] of Object.entries(extensions)) {
+        final_object[key][extension] = { is_saveable };
       }
     }
   }

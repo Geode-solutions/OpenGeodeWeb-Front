@@ -1,6 +1,6 @@
-import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
+import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
@@ -14,7 +14,7 @@ interface AttributeStoredConfig {
   minimum: number | undefined;
   maximum: number | undefined;
   colorMap: string | undefined;
-  no_data_color: unknown;
+  no_data_color: RGBAColor;
 }
 
 interface AttributeState {
@@ -29,22 +29,25 @@ interface AttributeInput {
   minimum: number | undefined;
   maximum: number | undefined;
   colorMap: string | undefined;
-  no_data_color?: unknown;
+  no_data_color?: RGBAColor;
 }
 
-function isMeshEdgesEdgeAttributeValid({
-  name,
-  item,
-  minimum,
-  maximum,
-  colorMap,
-}: AttributeInput): boolean {
+interface ValidAttributeInput {
+  name: string;
+  item: number;
+  minimum: number;
+  maximum: number;
+  colorMap: string;
+  no_data_color?: RGBAColor;
+}
+
+function isMeshEdgesEdgeAttributeValid(input: AttributeInput): input is ValidAttributeInput {
   return (
-    name !== undefined &&
-    item !== undefined &&
-    minimum !== undefined &&
-    maximum !== undefined &&
-    colorMap !== undefined
+    input.name !== undefined &&
+    input.item !== undefined &&
+    input.minimum !== undefined &&
+    input.maximum !== undefined &&
+    input.colorMap !== undefined
   );
 }
 
@@ -59,7 +62,7 @@ function useMeshEdgesEdgeAttributeStyle(): {
     name: string | undefined,
     item: number | undefined,
   ) => AttributeStoredConfig;
-  setMeshEdgesEdgeAttribute: (id: string, input: AttributeInput) => Promise<unknown>;
+  setMeshEdgesEdgeAttribute: (id: string, input: ValidAttributeInput) => Promise<unknown>;
   setMeshEdgesEdgeAttributeName: (id: string, name: string) => Promise<unknown>;
   setMeshEdgesEdgeAttributeItem: (id: string, item: number) => Promise<unknown>;
   setMeshEdgesEdgeAttributeRange: (
@@ -68,8 +71,8 @@ function useMeshEdgesEdgeAttributeStyle(): {
     maximum: number,
   ) => Promise<unknown>;
   setMeshEdgesEdgeAttributeColorMap: (id: string, colorMap: string | undefined) => Promise<unknown>;
-  meshEdgesEdgeAttributeNoDataColor: (id: string) => unknown;
-  setMeshEdgesEdgeAttributeNoDataColor: (id: string, no_data_color: unknown) => Promise<unknown>;
+  meshEdgesEdgeAttributeNoDataColor: (id: string) => RGBAColor;
+  setMeshEdgesEdgeAttributeNoDataColor: (id: string, no_data_color: RGBAColor) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const meshEdgesCommonStyle = useMeshEdgesCommonStyle();
@@ -146,7 +149,7 @@ function useMeshEdgesEdgeAttributeStyle(): {
       maximum,
       colorMap,
       no_data_color = DEFAULT_NO_DATA_COLOR,
-    }: AttributeInput,
+    }: ValidAttributeInput,
   ): Promise<unknown> {
     await mutateMeshEdgesEdgeStyle(id, {
       name,
@@ -158,7 +161,7 @@ function useMeshEdgesEdgeAttributeStyle(): {
       colorMap,
       no_data_color,
     });
-    const points = getRGBPointsFromPreset(colorMap ?? "");
+    const points = [...getRGBPointsFromPreset(colorMap)];
     const schema = meshEdgesEdgeAttributeSchemas.attribute;
     const params = {
       id,
@@ -242,7 +245,7 @@ function useMeshEdgesEdgeAttributeStyle(): {
     });
     return applyEdgeAttribute(id);
   }
-  function meshEdgesEdgeAttributeNoDataColor(id: string): unknown {
+  function meshEdgesEdgeAttributeNoDataColor(id: string): RGBAColor {
     const name = meshEdgesEdgeAttributeName(id);
     const item = meshEdgesEdgeAttributeItem(id);
     const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name, item);
@@ -250,7 +253,7 @@ function useMeshEdgesEdgeAttributeStyle(): {
   }
   async function setMeshEdgesEdgeAttributeNoDataColor(
     id: string,
-    no_data_color: unknown,
+    no_data_color: RGBAColor,
   ): Promise<unknown> {
     const name = meshEdgesEdgeAttributeName(id);
     const item = meshEdgesEdgeAttributeItem(id);

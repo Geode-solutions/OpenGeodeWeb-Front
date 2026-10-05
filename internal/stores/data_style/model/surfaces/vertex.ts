@@ -1,7 +1,7 @@
 // oxlint-disable eslint/max-lines
-import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
+import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_schemas.json";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
@@ -17,7 +17,7 @@ interface AttributeStoredConfig {
   minimum: number | undefined;
   maximum: number | undefined;
   colorMap: string | undefined;
-  no_data_color: unknown;
+  no_data_color: RGBAColor;
 }
 
 interface AttributeState {
@@ -32,22 +32,25 @@ interface AttributeInput {
   minimum: number | undefined;
   maximum: number | undefined;
   colorMap: string | undefined;
-  no_data_color?: unknown;
+  no_data_color?: RGBAColor;
 }
 
-function isModelSurfacesVertexAttributeValid({
-  name,
-  item,
-  minimum,
-  maximum,
-  colorMap,
-}: AttributeInput): boolean {
+interface ValidAttributeInput {
+  name: string;
+  item: number;
+  minimum: number;
+  maximum: number;
+  colorMap: string;
+  no_data_color?: RGBAColor;
+}
+
+function isModelSurfacesVertexAttributeValid(input: AttributeInput): input is ValidAttributeInput {
   return (
-    name !== undefined &&
-    item !== undefined &&
-    minimum !== undefined &&
-    maximum !== undefined &&
-    colorMap !== undefined
+    input.name !== undefined &&
+    input.item !== undefined &&
+    input.minimum !== undefined &&
+    input.maximum !== undefined &&
+    input.colorMap !== undefined
   );
 }
 
@@ -68,7 +71,7 @@ interface UseModelSurfacesVertexAttributeReturn {
   setModelSurfacesVertexAttribute: (
     modelId: string,
     surfaceIds: string[],
-    input: AttributeInput,
+    input: ValidAttributeInput,
   ) => Promise<unknown>;
   setModelSurfacesVertexAttributeName: (
     modelId: string,
@@ -91,11 +94,11 @@ interface UseModelSurfacesVertexAttributeReturn {
     surfaceIds: string[],
     colorMap: string | undefined,
   ) => Promise<unknown>;
-  modelSurfacesVertexAttributeNoDataColor: (modelId: string, surfaceId?: string) => unknown;
+  modelSurfacesVertexAttributeNoDataColor: (modelId: string, surfaceId?: string) => RGBAColor;
   setModelSurfacesVertexAttributeNoDataColor: (
     modelId: string,
     surfaceIds: string[],
-    no_data_color: unknown,
+    no_data_color: RGBAColor,
   ) => Promise<unknown>;
 }
 
@@ -213,7 +216,7 @@ function useModelSurfacesVertexAttribute(): UseModelSurfacesVertexAttributeRetur
       maximum,
       colorMap,
       no_data_color = DEFAULT_NO_DATA_COLOR,
-    }: AttributeInput,
+    }: ValidAttributeInput,
   ): Promise<unknown> {
     await mutateModelSurfacesVertexStyle(modelId, surfaceIds, { name, item });
     await setModelSurfacesVertexAttributeStoredConfig(modelId, surfaceIds, name, item, {
@@ -222,7 +225,7 @@ function useModelSurfacesVertexAttribute(): UseModelSurfacesVertexAttributeRetur
       colorMap,
       no_data_color,
     });
-    const points = getRGBPointsFromPreset(colorMap ?? "");
+    const points = [...getRGBPointsFromPreset(colorMap)];
     const surface_viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, surfaceIds);
     const params = {
       id: modelId,
@@ -307,7 +310,7 @@ function useModelSurfacesVertexAttribute(): UseModelSurfacesVertexAttributeRetur
     const result = await applyVertexAttribute(modelId, surfaceIds);
     return result;
   }
-  function modelSurfacesVertexAttributeNoDataColor(modelId: string, surfaceId?: string): unknown {
+  function modelSurfacesVertexAttributeNoDataColor(modelId: string, surfaceId?: string): RGBAColor {
     const name = modelSurfacesVertexAttributeName(modelId, surfaceId);
     const item = modelSurfacesVertexAttributeItem(modelId, surfaceId);
     const storedConfig = modelSurfacesVertexAttributeStoredConfig(modelId, surfaceId, name, item);
@@ -316,7 +319,7 @@ function useModelSurfacesVertexAttribute(): UseModelSurfacesVertexAttributeRetur
   async function setModelSurfacesVertexAttributeNoDataColor(
     modelId: string,
     surfaceIds: string[],
-    no_data_color: unknown,
+    no_data_color: RGBAColor,
   ): Promise<unknown> {
     const name = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
     const item = modelSurfacesVertexAttributeItem(modelId, surfaceIds[0]);

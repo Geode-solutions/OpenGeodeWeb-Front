@@ -53,6 +53,9 @@ const coloring_style_key = computed<string>({
 const color = computed<RGBAColor | undefined>({
   get: () => dataStyleStore.meshPolygonsColor(id.value) as RGBAColor | undefined,
   set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPolygonsColor(targetId, newValue),
     );
@@ -62,6 +65,9 @@ const color = computed<RGBAColor | undefined>({
 const textures = computed<Texture[] | undefined>({
   get: () => dataStyleStore.meshPolygonsTextures(id.value) as Texture[] | undefined,
   set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPolygonsTextures(targetId, newValue),
     );
@@ -113,9 +119,8 @@ const vertex_attribute_color_map = computed<Map<string, RGBAColor> | undefined>(
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_no_data_color = computed<RGBAColor | undefined>({
-  get: () =>
-    dataStyleStore.meshPolygonsVertexAttributeNoDataColor(id.value) as RGBAColor | undefined,
+const vertex_attribute_no_data_color = computed<RGBAColor>({
+  get: () => dataStyleStore.meshPolygonsVertexAttributeNoDataColor(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPolygonsVertexAttributeNoDataColor(targetId, newValue),
@@ -168,9 +173,8 @@ const polygon_attribute_color_map = computed<Map<string, RGBAColor> | undefined>
     hybridViewerStore.remoteRender();
   },
 });
-const polygon_attribute_no_data_color = computed<RGBAColor | undefined>({
-  get: () =>
-    dataStyleStore.meshPolygonsPolygonAttributeNoDataColor(id.value) as RGBAColor | undefined,
+const polygon_attribute_no_data_color = computed<RGBAColor>({
+  get: () => dataStyleStore.meshPolygonsPolygonAttributeNoDataColor(id.value),
   set: async (newValue) => {
     await applyBatchStyle(id.value, (targetId: string) =>
       dataStyleStore.setMeshPolygonsPolygonAttributeNoDataColor(targetId, newValue),

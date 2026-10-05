@@ -8,5 +8,15 @@
       "minLength": 1
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "response": {
+    "type": "object",
+    "properties": {
+      "statusCode": {
+        "type": "integer"
+      }
+    },
+    "required": ["statusCode"],
+    "additionalProperties": false
+  }
 }
