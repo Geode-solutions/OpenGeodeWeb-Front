@@ -264,7 +264,7 @@ describe("infra store", () => {
         return data;
       });
 
-      await infraStore.create_backend("noreply@example.com");
+      await infraStore.create_backend("token");
       expect(infraStore.status).toBe(Status.CREATED);
       expect(infraStore.domain_name).toBe(url);
 
@@ -278,7 +278,7 @@ describe("infra store", () => {
       infraStore.app_mode = appMode.CLOUD;
       vi.mocked($fetch).mockRejectedValue(new Error("unreachable"));
 
-      await expect(infraStore.create_backend("noreply@example.com")).rejects.toThrow("unreachable");
+      await expect(infraStore.create_backend("token")).rejects.toThrow("unreachable");
       expect(infraStore.status).toBe(Status.NOT_CREATED);
     });
   });

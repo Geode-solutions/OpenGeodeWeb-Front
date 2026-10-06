@@ -28,7 +28,7 @@ const mockedFetch = vi.mocked($fetch);
 const PROJECT = "project";
 const BRANCH = "branch";
 const CLOUD_API_URL = "https://api.example.com";
-const EMAIL = "noreply@example.com";
+const TOKEN = "token";
 const RESPONSE_OK_STATUS = 200;
 const RESPONSE_ERROR_STATUS = 500;
 const CLOUD_RUN_HOST = "vease-abc123.europe-west1.run.app";
@@ -114,13 +114,14 @@ describe("cloud store", () => {
           return data;
         });
 
-        await cloudStore.launch(EMAIL);
+        await cloudStore.launch(TOKEN);
 
         expect(mockedFetch).toHaveBeenCalledWith(
           "cloud_api/cloud/run",
           expect.objectContaining({
             baseURL: CLOUD_API_URL,
-            body: { email: EMAIL, project: PROJECT, branch: BRANCH },
+            body: { project: PROJECT, branch: BRANCH },
+            headers: { Authorization: `Bearer ${TOKEN}` },
           }),
         );
         expect(cloudStore.status).toBe(Status.CONNECTED);
@@ -152,7 +153,7 @@ describe("cloud store", () => {
           throw error;
         });
 
-        await expect(cloudStore.launch(EMAIL)).rejects.toThrow("500 Internal Server Error");
+        await expect(cloudStore.launch(TOKEN)).rejects.toThrow("500 Internal Server Error");
 
         expect(cloudStore.status).toBe(Status.NOT_CONNECTED);
         expect(feedbackStore.server_error).toBe(true);
@@ -249,16 +250,24 @@ describe("cloud store", () => {
       test("without cloud_url launches a new service", async () => {
         setupConfig();
         setCloudUrlParam();
-        await useCloudStore().start(EMAIL);
+        await useCloudStore().start(TOKEN);
 
         expect(mockedFetch).toHaveBeenCalledWith("cloud_api/cloud/run", expect.anything());
         expect(useInfraStore().domain_name).toBe("test.com");
       });
 
+      test("without cloud_url nor auth token getter rejects", async () => {
+        setupConfig();
+        setCloudUrlParam();
+        await expect(useCloudStore().start()).rejects.toThrow("requires an authenticated user");
+
+        expect(mockedFetch).not.toHaveBeenCalledWith("cloud_api/cloud/run", expect.anything());
+      });
+
       test("with cloud_url connects to the existing service", async () => {
         setupConfig();
         setCloudUrlParam(CLOUD_RUN_HOST);
-        await useCloudStore().start(EMAIL);
+        await useCloudStore().start(TOKEN);
 
         expect(mockedFetch).not.toHaveBeenCalledWith("cloud_api/cloud/run", expect.anything());
         expect(mockedFetch).toHaveBeenCalledWith("opengeodeweb_back/ping", expect.anything());
@@ -272,11 +281,11 @@ describe("cloud store", () => {
         const cloudStore = useCloudStore();
         mockedFetch.mockRejectedValueOnce(new Error("unreachable"));
 
-        await expect(cloudStore.start(EMAIL)).rejects.toThrow("unreachable");
+        await expect(cloudStore.start(TOKEN)).rejects.toThrow("unreachable");
         expect(globalThis.location.search).toBe("");
 
         mockedFetch.mockClear();
-        await cloudStore.start(EMAIL);
+        await cloudStore.start(TOKEN);
         expect(mockedFetch).toHaveBeenCalledWith("cloud_api/cloud/run", expect.anything());
         expect(mockedFetch).not.toHaveBeenCalledWith("opengeodeweb_back/ping", expect.anything());
         expect(useInfraStore().domain_name).toBe("test.com");
