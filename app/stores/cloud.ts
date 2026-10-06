@@ -1,9 +1,8 @@
 import { clearCloudUrlParam, getCloudUrlParam } from "@ogw_front/utils/cloud";
-import type { RunCloudResponse } from "@geode/cloud-api/types";
 import { Status } from "@ogw_front/utils/status";
 import { api_fetch } from "@ogw_internal/utils/api_fetch";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
-import cloud_api_schemas from "@geode/cloud-api/cloud_api_schemas.json";
+import cloud_api_schemas from "@geode/cloud-api/cloud_api_typed_schemas.js";
 import { setAppBaseUrl } from "@ogw_shared/scripts";
 import { useAPIStore } from "@ogw_front/stores/api";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
@@ -17,10 +16,13 @@ export const useCloudStore = defineStore("cloud", {
   actions: {
     // Reuses the running service given by `?cloud_url=` when present, otherwise launches a new one.
     // The param is single use: it is cleared whatever the outcome, so a retry launches a new service.
-    async start(email: string) {
+    async start(authToken?: string) {
       const existing_host = getCloudUrlParam();
       if (existing_host === undefined) {
-        await this.launch(email);
+        if (authToken === undefined) {
+          throw new Error("Launching a cloud service requires an authenticated user");
+        }
+        await this.launch(authToken);
         return;
       }
       try {
@@ -29,29 +31,23 @@ export const useCloudStore = defineStore("cloud", {
         clearCloudUrlParam();
       }
     },
-    async launch(email: string) {
+    // `authToken` is the user's Firebase ID token, checked by the Cloud API
+    async launch(authToken: string) {
       this.status = Status.CONNECTING;
       const { PROJECT, BRANCH } = useRuntimeConfig().public;
-      const params = { email, project: PROJECT, branch: BRANCH };
+      const params = { project: PROJECT, branch: BRANCH };
+      const headers = { Authorization: `Bearer ${authToken}` };
       const feedbackStore = useFeedbackStore();
       const APIStore = useAPIStore();
-      const result = await APIStore.request<RunCloudResponse>(
-        { schema: run_cloud_schema, params },
+      const result = await APIStore.request(
+        { schema: run_cloud_schema, params, headers },
         {
           request_error_function: () => {
             feedbackStore.$patch({ server_error: true });
             this.status = Status.NOT_CONNECTED;
           },
-          response_function: async (response: unknown) => {
-            if (
-              typeof response !== "object" ||
-              response === null ||
-              !("url" in response) ||
-              typeof response.url !== "string"
-            ) {
-              return;
-            }
-            await this.on_connected(response.url);
+          response_function: async ({ url }) => {
+            await this.on_connected(url);
           },
           response_error_function: () => {
             feedbackStore.$patch({ server_error: true });

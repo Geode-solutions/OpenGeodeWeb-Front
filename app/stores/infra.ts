@@ -44,7 +44,7 @@ export const useInfraStore = defineStore("infra", {
         (microservice: Microservice) => microservice.$id !== microserviceId,
       );
     },
-    async create_backend(email?: string) {
+    async create_backend(authToken?: string) {
       if (this.status === Status.CREATED) {
         return undefined;
       }
@@ -56,7 +56,7 @@ export const useInfraStore = defineStore("infra", {
         if (this.app_mode === appMode.CLOUD) {
           const cloudStore = useCloudStore();
           try {
-            await cloudStore.start(email ?? "");
+            await cloudStore.start(authToken);
           } catch (error) {
             // Back to the "Load the app" button so the user is not stuck on the loading screen.
             this.status = Status.NOT_CREATED;

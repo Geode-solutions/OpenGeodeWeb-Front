@@ -1,4 +1,4 @@
-import type { RequestHandlers } from "@ogw_shared/utils/types";
+import type { ParamsOf, RequestHandlers, ResponseOf } from "@ogw_shared/utils/types";
 import { api_fetch } from "@ogw_internal/utils/api_fetch";
 import { consola } from "consola";
 
@@ -8,7 +8,7 @@ interface ApiSchema {
   [key: string]: unknown;
 }
 
-type ApiCallbacks = RequestHandlers & {
+type ApiCallbacks<Response = unknown> = RequestHandlers<Response> & {
   skip_feedback_error?: boolean;
 };
 
@@ -26,21 +26,21 @@ export const useAPIStore = defineStore("api", () => {
     request_counter.value -= 1;
   }
 
-  // `TResult` is asserted, not verified: the response is only checked against `schema` at runtime
-  async function request<TResult = unknown>(
+  // The response type comes from the schema's generated `response` type (see the Cloud API typed schemas), asserted at the API boundary below, not verified
+  async function request<Schema extends ApiSchema>(
     {
       schema,
-      params = {},
+      params,
       headers = {},
-    }: { schema: ApiSchema; params?: Record<string, unknown>; headers?: Record<string, string> },
-    callbacks: ApiCallbacks = {},
-  ): Promise<TResult> {
+    }: { schema: Schema; params?: ParamsOf<Schema>; headers?: Record<string, string> },
+    callbacks: ApiCallbacks<ResponseOf<Schema>> = {},
+  ): Promise<ResponseOf<Schema>> {
     consola.info("[API] Request:", schema.$id);
     const start = Date.now();
 
     const result = await api_fetch(
       { $id: schema.$id, base_url: base_url.value, start_request, stop_request },
-      { schema, params, headers },
+      { schema, params: params ?? {}, headers },
       {
         ...callbacks,
         response_function: async (response: unknown) => {
@@ -52,13 +52,14 @@ export const useAPIStore = defineStore("api", () => {
             "s",
           );
           if (callbacks.response_function) {
-            await callbacks.response_function(response);
+            // oxlint-disable-next-line no-unsafe-type-assertion -- trusted API boundary; see comment above.
+            await callbacks.response_function(response as ResponseOf<Schema>);
           }
         },
       },
     );
     // oxlint-disable-next-line no-unsafe-type-assertion -- trusted API boundary; see comment above.
-    return result as TResult;
+    return result as ResponseOf<Schema>;
   }
   return {
     base_url,
