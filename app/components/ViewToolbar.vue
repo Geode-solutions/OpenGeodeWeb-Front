@@ -7,6 +7,7 @@ import CameraBookmarkIcon from "@ogw_front/assets/viewer_svgs/camera-bookmark.sv
 import CameraManager from "@ogw_front/components/CameraManager.vue";
 import CameraOrientation from "@ogw_front/components/CameraOrientation.vue";
 import ClippingPlanes from "@ogw_front/components/ClippingPlanes.vue";
+import ExplodeFilter from "@ogw_front/components/ExplodeFilter.vue";
 import Ruler from "@ogw_front/components/Ruler.vue";
 import Screenshot from "@ogw_front/components/Screenshot.vue";
 import ShrinkFilter from "@ogw_front/components/ShrinkFilter.vue";
@@ -26,6 +27,7 @@ const showCameraOrientation = ref<boolean>(false);
 const showZScaling = ref<boolean>(false);
 const showClippingPlanes = ref<boolean>(false);
 const showShrinkFilter = ref<boolean>(false);
+const showExplodeFilter = ref<boolean>(false);
 const showThresholdFilter = ref<boolean>(false);
 const showRuler = ref<boolean>(false);
 const gridScale = ref<boolean>(false);
@@ -77,6 +79,7 @@ function closeAllToolsExcept(toolRef: Ref<boolean>): void {
     showZScaling,
     showClippingPlanes,
     showShrinkFilter,
+    showExplodeFilter,
     showThresholdFilter,
     showRuler,
     is_picking,
@@ -237,6 +240,15 @@ const camera_options = computed<CameraOptionAction[]>(() => [
     },
   },
   {
+    testId: "explodeFilterButton",
+    tooltip: "Exploded View",
+    icon: "mdi-arrow-expand-all",
+    color: showExplodeFilter.value ? "primary" : undefined,
+    action: (): void => {
+      toggleTool(showExplodeFilter);
+    },
+  },
+  {
     testId: "thresholdFilterButton",
     tooltip: "Threshold Filter",
     icon: "mdi-filter-variant",
@@ -333,6 +345,10 @@ const camera_options = computed<CameraOptionAction[]>(() => [
   <ShrinkFilter
     v-model:show="showShrinkFilter"
     :escapeFunction="() => (showShrinkFilter = false)"
+  />
+  <ExplodeFilter
+    v-model:show="showExplodeFilter"
+    :escapeFunction="() => (showExplodeFilter = false)"
   />
   <ThresholdFilter
     v-model:show="showThresholdFilter"

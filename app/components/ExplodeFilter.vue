@@ -2,10 +2,9 @@
 import FactorFilterPanel from "@ogw_front/components/FactorFilterPanel.vue";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
-const DEFAULT_SHRINK_VALUE = 0.8;
-const MIN_SHRINK_VALUE = 0;
-const MAX_SHRINK_VALUE = 1;
-const PERCENT = 100;
+const DEFAULT_EXPLODE_VALUE = 0.2;
+const MIN_EXPLODE_VALUE = 0;
+const MAX_EXPLODE_VALUE = 1;
 
 interface Props {
   escapeFunction?: () => void;
@@ -15,26 +14,21 @@ const { escapeFunction = undefined } = defineProps<Props>();
 
 const show = defineModel<boolean>("show", { default: false });
 const hybridViewerStore = useHybridViewerStore();
-
-function formatShrinkFactor(value: number): string {
-  return `${(value * PERCENT).toFixed(0)}% (${value.toFixed(2)})`;
-}
 </script>
 
 <template>
   <FactorFilterPanel
     v-model:show="show"
-    title="Shrink Filter"
-    label="Shrink Factor"
-    test-id-prefix="shrink"
-    :set-factor="hybridViewerStore.setShrink"
+    title="Exploded View"
+    label="Explode Factor"
+    test-id-prefix="explode"
+    :set-factor="hybridViewerStore.setExplode"
     :factor-range="{
-      min: MIN_SHRINK_VALUE,
-      max: MAX_SHRINK_VALUE,
-      defaultValue: DEFAULT_SHRINK_VALUE,
-      neutralValue: MAX_SHRINK_VALUE,
+      min: MIN_EXPLODE_VALUE,
+      max: MAX_EXPLODE_VALUE,
+      defaultValue: DEFAULT_EXPLODE_VALUE,
+      neutralValue: MIN_EXPLODE_VALUE,
     }"
-    :format-value="formatShrinkFactor"
     :escapeFunction="escapeFunction"
   />
 </template>
