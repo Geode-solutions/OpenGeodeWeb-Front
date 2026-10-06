@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import Loading from "@ogw_front/components/Loading.vue";
-import Recaptcha from "@ogw_front/components/Recaptcha.vue";
 import { Status } from "@ogw_front/utils/status";
 import { appMode } from "@ogw_shared/app_mode";
 import { getCloudUrlParam } from "@ogw_front/utils/cloud";
@@ -8,22 +7,28 @@ import { useInfraStore } from "@ogw_front/stores/infra";
 
 interface Props {
   appName: string;
-  email?: string;
+  // Firebase ID token for the cloud launch; required in cloud mode.
+  authToken?: string;
   isUserAuthenticated?: boolean;
   logo?: string;
 }
 
-const { appName, email = undefined, isUserAuthenticated = false, logo = "" } = defineProps<Props>();
+const {
+  appName,
+  authToken = undefined,
+  isUserAuthenticated = false,
+  logo = "",
+} = defineProps<Props>();
 
 const infraStore = useInfraStore();
 // In cloud mode, wait for the user to authenticate and load the app, unless a `?cloud_url=` link
 // Points at an already running service: that one is connected straight away, without authentication.
 if (infraStore.app_mode !== appMode.CLOUD || getCloudUrlParam() !== undefined) {
-  infraStore.create_backend(email);
+  infraStore.create_backend(authToken);
 }
 
 function cloudCreateBackend(): Promise<void> {
-  return infraStore.create_backend(email);
+  return infraStore.create_backend(authToken);
 }
 </script>
 
