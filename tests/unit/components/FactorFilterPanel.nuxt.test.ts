@@ -59,32 +59,44 @@ async function settle(): Promise<void> {
 }
 
 describe("factor filter panel", () => {
-  test("applies the default factor once when opened", async () => {
-    const setFactor = mockSetFactor();
-    await mountOpenedPanel(setFactor);
-    await settle();
-    expect(setFactor.mock.calls).toStrictEqual([[[DATA_ID], DEFAULT_VALUE]]);
-  }, TIMEOUT);
+  test(
+    "applies the default factor once when opened",
+    async () => {
+      const setFactor = mockSetFactor();
+      await mountOpenedPanel(setFactor);
+      await settle();
+      expect(setFactor.mock.calls).toStrictEqual([[[DATA_ID], DEFAULT_VALUE]]);
+    },
+    TIMEOUT,
+  );
 
-  test("remove sends a single request with the neutral factor", async () => {
-    const setFactor = mockSetFactor();
-    const wrapper = await mountOpenedPanel(setFactor);
-    await settle();
-    setFactor.mockClear();
-    await wrapper.find('[data-testid="removeExplodeButton"]').trigger("click");
-    await settle();
-    expect(setFactor.mock.calls).toStrictEqual([[[DATA_ID], NEUTRAL_VALUE]]);
-  }, TIMEOUT);
+  test(
+    "remove sends a single request with the neutral factor",
+    async () => {
+      const setFactor = mockSetFactor();
+      const wrapper = await mountOpenedPanel(setFactor);
+      await settle();
+      setFactor.mockClear();
+      await wrapper.find('[data-testid="removeExplodeButton"]').trigger("click");
+      await settle();
+      expect(setFactor.mock.calls).toStrictEqual([[[DATA_ID], NEUTRAL_VALUE]]);
+    },
+    TIMEOUT,
+  );
 
-  test("reset sends a single request with the default factor", async () => {
-    const setFactor = mockSetFactor();
-    const wrapper = await mountOpenedPanel(setFactor);
-    await settle();
-    await wrapper.find('[data-testid="removeExplodeButton"]').trigger("click");
-    await settle();
-    setFactor.mockClear();
-    await wrapper.find('[data-testid="resetExplodeButton"]').trigger("click");
-    await settle();
-    expect(setFactor.mock.calls).toStrictEqual([[[DATA_ID], DEFAULT_VALUE]]);
-  }, TIMEOUT);
+  test(
+    "reset sends a single request with the default factor",
+    async () => {
+      const setFactor = mockSetFactor();
+      const wrapper = await mountOpenedPanel(setFactor);
+      await settle();
+      await wrapper.find('[data-testid="removeExplodeButton"]').trigger("click");
+      await settle();
+      setFactor.mockClear();
+      await wrapper.find('[data-testid="resetExplodeButton"]').trigger("click");
+      await settle();
+      expect(setFactor.mock.calls).toStrictEqual([[[DATA_ID], DEFAULT_VALUE]]);
+    },
+    TIMEOUT,
+  );
 });
