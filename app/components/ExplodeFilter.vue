@@ -2,9 +2,9 @@
 import FactorFilterPanel from "@ogw_front/components/FactorFilterPanel.vue";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
-const DEFAULT_EXPLODE_VALUE = 0.5;
+const DEFAULT_EXPLODE_VALUE = 0.2;
 const MIN_EXPLODE_VALUE = 0;
-const MAX_EXPLODE_VALUE = 2;
+const MAX_EXPLODE_VALUE = 1;
 
 interface Props {
   escapeFunction?: () => void;
