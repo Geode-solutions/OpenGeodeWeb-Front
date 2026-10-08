@@ -45,6 +45,11 @@ function formatTime(index: number): string {
     @end="commitTimeStep"
     @keyup="commitTimeStep(sliderTimeStep)"
   >
+    <template #prepend>
+      <span data-testid="timeStepValue" class="time-step-value">
+        {{ formatTime(sliderTimeStep) }}
+      </span>
+    </template>
     <template #thumb-label="{ modelValue }">{{
       formatTime(modelValue)
     }}</template>
@@ -52,6 +57,16 @@ function formatTime(index: number): string {
 </template>
 
 <style scoped>
+.time-step-value {
+  min-width: 32px;
+  white-space: nowrap;
+  font-size: 0.8125rem;
+}
+
+.time-step-slider.v-slider.v-input--horizontal :deep(.v-input__prepend) {
+  margin-inline-end: 4px;
+}
+
 .time-step-slider :deep(.v-slider-thumb__label) {
   width: auto;
   white-space: nowrap;
