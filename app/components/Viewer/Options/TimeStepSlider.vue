@@ -51,6 +51,14 @@ function formatTime(index: number): string {
       </span>
     </template>
     <template #thumb-label="{ modelValue }">{{ formatTime(modelValue) }}</template>
+    <template #tick-label="{ index }">
+      <span class="time-step-tick">
+        <span class="v-slider-thumb__label time-step-tick-label">
+          <span class="v-slider-thumb__label-wedge" />
+          {{ formatTime(index) }}
+        </span>
+      </span>
+    </template>
   </v-slider>
 </template>
 
@@ -69,6 +77,31 @@ function formatTime(index: number): string {
   width: auto;
   white-space: nowrap;
   padding: 0 6px;
+}
+
+/* Since v-tooltip is a bit different from the slider tick label */
+.time-step-slider :deep(.v-slider-track__tick-label) {
+  inset: 0;
+  transform: none !important;
+  margin: 0 !important;
+}
+
+.time-step-tick {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.time-step-slider .time-step-tick-label {
+  display: none;
+  bottom: calc(100% + 8px) !important;
+  left: 50%;
+  pointer-events: none;
+}
+
+.time-step-tick:hover .time-step-tick-label {
+  display: flex;
 }
 
 .time-step-slider :deep(.v-slider-track__tick) {
