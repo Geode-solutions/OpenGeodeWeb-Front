@@ -46,6 +46,7 @@ vi.mock(import("@ogw_front/stores/hybrid_viewer") as Promise<unknown>, () => ({
 }));
 
 async function settle(): Promise<void> {
+  // oxlint-disable-next-line promise/avoid-new
   await new Promise((resolve) => {
     setTimeout(resolve, DEBOUNCE_WAIT);
   });
