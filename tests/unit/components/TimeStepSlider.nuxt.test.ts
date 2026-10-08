@@ -33,8 +33,6 @@ describe("timeStepSlider", () => {
     wrapper.findComponent(VSlider).vm.$emit("end", LAST_STEP);
     await flushPromises();
 
-    expect(wrapper.emitted("update:modelValue")?.at(-1)).toStrictEqual([
-      LAST_STEP,
-    ]);
+    expect(wrapper.emitted("update:modelValue")?.at(-1)).toStrictEqual([LAST_STEP]);
   });
 });

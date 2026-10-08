@@ -45,9 +45,7 @@ function formatTime(index: number): string {
     @end="commitTimeStep"
     @keyup="commitTimeStep(sliderTimeStep)"
   >
-    <template #thumb-label="{ modelValue }">{{
-      formatTime(modelValue)
-    }}</template>
+    <template #thumb-label="{ modelValue }">{{ formatTime(modelValue) }}</template>
   </v-slider>
 </template>
 
@@ -64,13 +62,11 @@ function formatTime(index: number): string {
 }
 
 /* Vuetify insets the first and last ticks, which only suits tiny ticks */
-.time-step-slider.v-slider.v-input--horizontal
-  :deep(.v-slider-track__tick--first) {
+.time-step-slider.v-slider.v-input--horizontal :deep(.v-slider-track__tick--first) {
   margin-inline-start: 0;
 }
 
-.time-step-slider.v-slider.v-input--horizontal
-  :deep(.v-slider-track__tick--last) {
+.time-step-slider.v-slider.v-input--horizontal :deep(.v-slider-track__tick--last) {
   margin-inline-start: 100%;
 }
 </style>
