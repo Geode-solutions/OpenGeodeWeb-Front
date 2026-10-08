@@ -1,13 +1,16 @@
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
+import { useAttributeTimeStepStyle } from "@ogw_internal/stores/data_style/time_step";
 import { useMeshPolyhedraCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
+const attributeNamesSchema = back_schemas.opengeodeweb_back.vertex_attribute_names;
 const meshPolyhedraVertexAttributeSchemas =
   viewer_schemas.opengeodeweb_viewer.mesh.polyhedra.attribute.vertex;
 
@@ -56,6 +59,8 @@ interface UseMeshPolyhedraVertexAttributeStyleReturn {
   meshPolyhedraVertexAttributeName: (id: string) => string | undefined;
   meshPolyhedraVertexAttributeItem: (id: string) => number;
   meshPolyhedraVertexAttributeRange: (id: string) => [number | undefined, number | undefined];
+  meshPolyhedraVertexAttributeTimeStep: (id: string) => number | undefined;
+  setMeshPolyhedraVertexAttributeTimeStep: (id: string, timeStep: number) => Promise<unknown>;
   meshPolyhedraVertexAttributeColorMap: (id: string) => string | undefined;
   meshPolyhedraVertexAttributeStoredConfig: (
     id: string,
@@ -83,6 +88,7 @@ interface UseMeshPolyhedraVertexAttributeStyleReturn {
 
 // oxlint-disable-next-line max-lines-per-function
 function useMeshPolyhedraVertexAttributeStyle(): UseMeshPolyhedraVertexAttributeStyleReturn {
+  const { attributeTimeStep, setAttributeTimeStep, seriesArrayName } = useAttributeTimeStepStyle();
   const viewerStore = useViewerStore();
   const meshPolyhedraCommonStyle = useMeshPolyhedraCommonStyle();
   function meshPolyhedraVertexAttribute(id: string): AttributeState {
@@ -149,6 +155,9 @@ function useMeshPolyhedraVertexAttributeStyle(): UseMeshPolyhedraVertexAttribute
     const { item, name } = meshPolyhedraVertexAttribute(id);
     return item ?? meshPolyhedraVertexAttributeLastItem(id, name);
   }
+  function meshPolyhedraVertexAttributeTimeStep(id: string): number | undefined {
+    return attributeTimeStep(id, attributeNamesSchema.$id, meshPolyhedraVertexAttribute(id).name);
+  }
   async function setMeshPolyhedraVertexAttribute(
     id: string,
     {
@@ -174,7 +183,7 @@ function useMeshPolyhedraVertexAttributeStyle(): UseMeshPolyhedraVertexAttribute
     const schema = meshPolyhedraVertexAttributeSchemas.attribute;
     const params = {
       id,
-      name,
+      name: seriesArrayName(id, attributeNamesSchema.$id, name),
       item,
       points,
       minimum,
@@ -223,6 +232,17 @@ function useMeshPolyhedraVertexAttributeStyle(): UseMeshPolyhedraVertexAttribute
     const item = meshPolyhedraVertexAttributeItem(id);
     const storedConfig = meshPolyhedraVertexAttributeStoredConfig(id, name, item);
     return [storedConfig.minimum, storedConfig.maximum];
+  }
+  async function setMeshPolyhedraVertexAttributeTimeStep(
+    id: string,
+    timeStep: number,
+  ): Promise<unknown> {
+    const name = meshPolyhedraVertexAttributeName(id);
+    if (name === undefined) {
+      return undefined;
+    }
+    await setAttributeTimeStep(id, attributeNamesSchema.$id, name, timeStep);
+    return applyVertexAttribute(id);
   }
   async function setMeshPolyhedraVertexAttributeRange(
     id: string,
@@ -275,6 +295,8 @@ function useMeshPolyhedraVertexAttributeStyle(): UseMeshPolyhedraVertexAttribute
   }
   return {
     meshPolyhedraVertexAttributeName,
+    meshPolyhedraVertexAttributeTimeStep,
+    setMeshPolyhedraVertexAttributeTimeStep,
     meshPolyhedraVertexAttributeItem,
     meshPolyhedraVertexAttributeRange,
     meshPolyhedraVertexAttributeColorMap,

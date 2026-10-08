@@ -31,7 +31,8 @@ function handleMeshPolygonsVertexColoring(
   const item = vertexAttributeStyle.meshPolygonsVertexAttributeItem(id);
   const [minimum, maximum] = vertexAttributeStyle.meshPolygonsVertexAttributeRange(id);
   const colorMap = vertexAttributeStyle.meshPolygonsVertexAttributeColorMap(id);
-  const vertex_attribute = { name, item, minimum, maximum, colorMap };
+  const no_data_color = vertexAttributeStyle.meshPolygonsVertexAttributeNoDataColor(id);
+  const vertex_attribute = { name, item, minimum, maximum, colorMap, no_data_color };
   if (!isMeshPolygonsVertexAttributeValid(vertex_attribute)) {
     return undefined;
   }
@@ -46,7 +47,15 @@ function handleMeshPolygonsPolygonColoring(
   const item = polygonAttributeStyle.meshPolygonsPolygonAttributeItem(id);
   const [minimum, maximum] = polygonAttributeStyle.meshPolygonsPolygonAttributeRange(id);
   const colorMap = polygonAttributeStyle.meshPolygonsPolygonAttributeColorMap(id);
-  const polygon_attribute = { name, item, minimum, maximum, colorMap };
+  const no_data_color = polygonAttributeStyle.meshPolygonsPolygonAttributeNoDataColor(id);
+  const polygon_attribute = {
+    name,
+    item,
+    minimum,
+    maximum,
+    colorMap,
+    no_data_color,
+  };
   if (!isMeshPolygonsPolygonAttributeValid(polygon_attribute)) {
     return undefined;
   }

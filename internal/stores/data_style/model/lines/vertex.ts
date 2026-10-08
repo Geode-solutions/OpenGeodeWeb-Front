@@ -4,6 +4,10 @@ import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
+import {
+  reapplySameSeries,
+  useAttributeTimeStepStyle,
+} from "@ogw_internal/stores/data_style/time_step";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelLinesCommonStyle } from "./common";
@@ -60,6 +64,12 @@ interface UseModelLinesVertexAttributeReturn {
     modelId: string,
     lineId?: string,
   ) => [number | undefined, number | undefined];
+  modelLinesVertexAttributeTimeStep: (modelId: string, lineId?: string) => number | undefined;
+  setModelLinesVertexAttributeTimeStep: (
+    modelId: string,
+    lineIds: string[],
+    timeStep: number,
+  ) => Promise<void>;
   modelLinesVertexAttributeColorMap: (modelId: string, lineId?: string) => string | undefined;
   modelLinesVertexAttributeStoredConfig: (
     modelId: string,
@@ -103,6 +113,7 @@ interface UseModelLinesVertexAttributeReturn {
 
 // oxlint-disable-next-line max-lines-per-function
 function useModelLinesVertexAttribute(): UseModelLinesVertexAttributeReturn {
+  const { attributeTimeStep, setAttributeTimeStep, seriesArrayName } = useAttributeTimeStepStyle();
   const dataStore = useDataStore();
   const modelLinesCommonStyle = useModelLinesCommonStyle();
   const viewerStore = useViewerStore();
@@ -206,6 +217,19 @@ function useModelLinesVertexAttribute(): UseModelLinesVertexAttributeReturn {
     const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineId, name, item);
     return storedConfig.colorMap;
   }
+  function modelLinesVertexAttributeNoDataColor(modelId: string, lineId?: string): RGBAColor {
+    const name = modelLinesVertexAttributeName(modelId, lineId);
+    const item = modelLinesVertexAttributeItem(modelId, lineId);
+    const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineId, name, item);
+    return storedConfig.no_data_color;
+  }
+  function modelLinesVertexAttributeTimeStep(modelId: string, lineId?: string): number | undefined {
+    return attributeTimeStep(
+      modelId,
+      attributeSchema.$id,
+      modelLinesVertexAttribute(modelId, lineId).name,
+    );
+  }
   async function setModelLinesVertexAttribute(
     modelId: string,
     lineIds: string[],
@@ -233,7 +257,7 @@ function useModelLinesVertexAttribute(): UseModelLinesVertexAttributeReturn {
     const params = {
       id: modelId,
       block_ids: line_viewer_ids,
-      name,
+      name: seriesArrayName(modelId, attributeSchema.$id, name),
       item,
       points,
       minimum,
@@ -283,6 +307,37 @@ function useModelLinesVertexAttribute(): UseModelLinesVertexAttributeReturn {
     });
     return applyVertexAttribute(modelId, lineIds);
   }
+  async function setModelLinesVertexAttributeTimeStep(
+    modelId: string,
+    lineIds: string[],
+    timeStep: number,
+  ): Promise<void> {
+    const name = modelLinesVertexAttributeName(modelId, lineIds[0]);
+    if (name === undefined) {
+      return;
+    }
+    await setAttributeTimeStep(modelId, attributeSchema.$id, name, timeStep);
+    await Promise.all([
+      applyVertexAttribute(modelId, lineIds),
+      reapplySameSeries(
+        await dataStore.getLinesGeodeIds(modelId),
+        lineIds,
+        (id) =>
+          modelLinesCommonStyle.modelLineColoring(modelId, id).active === "vertex" &&
+          modelLinesVertexAttributeName(modelId, id) === name
+            ? [
+                modelLinesVertexAttributeItem(modelId, id),
+                modelLinesVertexAttributeRange(modelId, id),
+                modelLinesVertexAttributeColorMap(modelId, id),
+                JSON.stringify(modelLinesVertexAttributeNoDataColor(modelId, id)),
+              ].join("|")
+            : undefined,
+        async (ids) => {
+          await applyVertexAttribute(modelId, ids);
+        },
+      ),
+    ]);
+  }
   async function setModelLinesVertexAttributeRange(
     modelId: string,
     lineIds: string[],
@@ -309,12 +364,6 @@ function useModelLinesVertexAttribute(): UseModelLinesVertexAttributeReturn {
     });
     return applyVertexAttribute(modelId, lineIds);
   }
-  function modelLinesVertexAttributeNoDataColor(modelId: string, lineId?: string): RGBAColor {
-    const name = modelLinesVertexAttributeName(modelId, lineId);
-    const item = modelLinesVertexAttributeItem(modelId, lineId);
-    const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineId, name, item);
-    return storedConfig.no_data_color;
-  }
   async function setModelLinesVertexAttributeNoDataColor(
     modelId: string,
     lineIds: string[],
@@ -331,6 +380,8 @@ function useModelLinesVertexAttribute(): UseModelLinesVertexAttributeReturn {
   }
   return {
     modelLinesVertexAttributeName,
+    modelLinesVertexAttributeTimeStep,
+    setModelLinesVertexAttributeTimeStep,
     modelLinesVertexAttributeItem,
     modelLinesVertexAttributeRange,
     modelLinesVertexAttributeColorMap,

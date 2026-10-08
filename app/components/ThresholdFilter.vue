@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import {
   MESH_ELEMENT_KINDS,
+  MODEL_COMPONENT_ATTRIBUTE_SCHEMAS,
   MODEL_COMPONENT_KINDS,
+  attributeArrayName,
   getAttributeRange,
 } from "@ogw_front/utils/attributes";
 import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
@@ -10,6 +12,7 @@ import ViewerOptionsAttributeRangeSelector from "@ogw_front/components/Viewer/Op
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStore } from "@ogw_front/stores/data";
+import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useDebounceFn } from "@vueuse/core";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
@@ -24,6 +27,7 @@ const { escapeFunction = undefined } = defineProps<Props>();
 interface AttributeSource {
   title: string;
   schema: JsonRpcSchema;
+  timeStepKey: string;
   params: Record<string, unknown>;
   location: "point" | "cell";
 }
@@ -31,12 +35,14 @@ interface AttributeSource {
 interface AttributeInfo {
   attribute_name: string;
   nb_items: number;
+  time_steps?: number[];
   [key: string]: unknown;
 }
 
 const show = defineModel<boolean>("show", { default: false });
 const backStore = useBackStore();
 const dataStore = useDataStore();
+const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const selectedDatasetId = ref<string>();
 const sources = ref<AttributeSource[]>([]);
@@ -60,6 +66,19 @@ const availableSources = computed<{ title: string; value: number }[]>(() =>
 const currentAttribute = computed<AttributeInfo | undefined>(() =>
   attributes.value.find((attribute) => attribute.attribute_name === attributeName.value),
 );
+const currentTimeStep = computed<number | undefined>(() => {
+  const source = sources.value[selectedSourceIndex.value ?? -1];
+  if (!selectedDatasetId.value || !source || !currentAttribute.value?.time_steps?.length) {
+    return undefined;
+  }
+  const step =
+    dataStyleStore.attributeTimeStep(
+      selectedDatasetId.value,
+      source.timeStepKey,
+      attributeName.value,
+    ) ?? 0;
+  return Math.min(step, currentAttribute.value.time_steps.length - 1);
+});
 const itemOptions = computed<{ title: string; value: number }[]>(() =>
   Array.from({ length: currentAttribute.value?.nb_items ?? 0 }, (_, index) => ({
     title: `Item ${index + 1}`,
@@ -78,11 +97,16 @@ function attributeSource(
   kind: string,
   title: string,
   params: Record<string, unknown>,
-  isModel: boolean,
+  modelType?: string,
 ): AttributeSource {
+  const schema = attributeSchema(kind, modelType !== undefined);
   return {
     title: `${title}${kind} attribute`,
-    schema: attributeSchema(kind, isModel),
+    schema,
+    timeStepKey:
+      modelType === undefined
+        ? schema.$id
+        : (MODEL_COMPONENT_ATTRIBUTE_SCHEMAS[modelType]?.[kind]?.$id ?? schema.$id),
     params,
     location: kind === "vertex" ? "point" : "cell",
   };
@@ -93,7 +117,7 @@ async function fetchSources(id: string): Promise<AttributeSource[]> {
   if (item.viewer_type !== "model") {
     return ["vertex", MESH_ELEMENT_KINDS[item.geode_object_type]]
       .filter((kind): kind is string => kind !== undefined)
-      .map((kind) => attributeSource(kind, "", { id }, false));
+      .map((kind) => attributeSource(kind, "", { id }));
   }
   const modelSources = await Promise.all(
     Object.entries(MODEL_COMPONENT_KINDS).map(async ([type, kinds]) => {
@@ -101,7 +125,7 @@ async function fetchSources(id: string): Promise<AttributeSource[]> {
       if (component_ids.length === 0) {
         return [];
       }
-      return kinds.map((kind) => attributeSource(kind, `${type} `, { id, component_ids }, true));
+      return kinds.map((kind) => attributeSource(kind, `${type} `, { id, component_ids }, type));
     }),
   );
   return modelSources.flat();
@@ -120,7 +144,7 @@ async function applyThreshold(): Promise<void> {
     return;
   }
   await hybridViewerStore.setThreshold([selectedDatasetId.value], {
-    name: attributeName.value,
+    name: attributeArrayName(attributeName.value, currentTimeStep.value),
     location: source.location,
     item: attributeItem.value,
     minimum: minimum.value,
@@ -175,6 +199,10 @@ watch(attributeName, () => {
 
 watch(attributeItem, () => {
   resetRange();
+});
+
+watch(currentTimeStep, () => {
+  debouncedApply();
 });
 
 watch([minimum, maximum], () => {

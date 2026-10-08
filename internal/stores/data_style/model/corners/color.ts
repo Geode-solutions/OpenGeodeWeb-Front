@@ -102,7 +102,11 @@ export function useModelCornersColor(): ModelCornersColorApi {
         modelId,
         corners_ids[0],
       );
-      const attribute = { name, item, minimum, maximum, colorMap };
+      const no_data_color = modelCornersVertexAttribute.modelCornersVertexAttributeNoDataColor(
+        modelId,
+        corners_ids[0],
+      );
+      const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
       if (isModelCornersVertexAttributeValid(attribute)) {
         return modelCornersVertexAttribute.setModelCornersVertexAttribute(
           modelId,

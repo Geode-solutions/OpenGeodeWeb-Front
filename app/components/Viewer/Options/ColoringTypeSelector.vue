@@ -45,24 +45,28 @@ const vertex_attribute_item = defineModel<number>("vertex_attribute_item");
 const vertex_attribute_range = defineModel<(number | undefined)[]>("vertex_attribute_range");
 const vertex_attribute_color_map = defineModel<string>("vertex_attribute_color_map");
 const vertex_attribute_no_data_color = defineModel<RGBAColor>("vertex_attribute_no_data_color");
+const vertex_attribute_time_step = defineModel<number>("vertex_attribute_time_step");
 
 const edge_attribute_name = defineModel<string>("edge_attribute_name");
 const edge_attribute_item = defineModel<number>("edge_attribute_item");
 const edge_attribute_range = defineModel<(number | undefined)[]>("edge_attribute_range");
 const edge_attribute_color_map = defineModel<string>("edge_attribute_color_map");
 const edge_attribute_no_data_color = defineModel<RGBAColor>("edge_attribute_no_data_color");
+const edge_attribute_time_step = defineModel<number>("edge_attribute_time_step");
 
 const cell_attribute_name = defineModel<string>("cell_attribute_name");
 const cell_attribute_item = defineModel<number>("cell_attribute_item");
 const cell_attribute_range = defineModel<(number | undefined)[]>("cell_attribute_range");
 const cell_attribute_color_map = defineModel<string>("cell_attribute_color_map");
 const cell_attribute_no_data_color = defineModel<RGBAColor>("cell_attribute_no_data_color");
+const cell_attribute_time_step = defineModel<number>("cell_attribute_time_step");
 
 const polygon_attribute_name = defineModel<string>("polygon_attribute_name");
 const polygon_attribute_item = defineModel<number>("polygon_attribute_item");
 const polygon_attribute_range = defineModel<(number | undefined)[]>("polygon_attribute_range");
 const polygon_attribute_color_map = defineModel<string>("polygon_attribute_color_map");
 const polygon_attribute_no_data_color = defineModel<RGBAColor>("polygon_attribute_no_data_color");
+const polygon_attribute_time_step = defineModel<number>("polygon_attribute_time_step");
 
 const polyhedron_attribute_name = defineModel<string>("polyhedron_attribute_name");
 const polyhedron_attribute_item = defineModel<number>("polyhedron_attribute_item");
@@ -73,6 +77,7 @@ const polyhedron_attribute_color_map = defineModel<string>("polyhedron_attribute
 const polyhedron_attribute_no_data_color = defineModel<RGBAColor>(
   "polyhedron_attribute_no_data_color",
 );
+const polyhedron_attribute_time_step = defineModel<number>("polyhedron_attribute_time_step");
 
 interface Props {
   id: string;
@@ -257,6 +262,7 @@ watch(
           v-model:attributeRange="vertex_attribute_range"
           v-model:attributeColorMap="vertex_attribute_color_map"
           v-model:attributeNoDataColor="vertex_attribute_no_data_color"
+          v-model:attributeTimeStep="vertex_attribute_time_step"
           @ranges_per_data="emit('vertex_attribute_ranges_per_data', $event)"
           :id="id"
           :componentIds="componentIds"
@@ -270,6 +276,7 @@ watch(
           v-model:attributeRange="edge_attribute_range"
           v-model:attributeColorMap="edge_attribute_color_map"
           v-model:attributeNoDataColor="edge_attribute_no_data_color"
+          v-model:attributeTimeStep="edge_attribute_time_step"
           @ranges_per_data="emit('edge_attribute_ranges_per_data', $event)"
           :id="id"
           :componentIds="componentIds"
@@ -283,6 +290,7 @@ watch(
           v-model:attributeRange="cell_attribute_range"
           v-model:attributeColorMap="cell_attribute_color_map"
           v-model:attributeNoDataColor="cell_attribute_no_data_color"
+          v-model:attributeTimeStep="cell_attribute_time_step"
           @ranges_per_data="emit('cell_attribute_ranges_per_data', $event)"
           :id="id"
           :componentIds="componentIds"
@@ -296,6 +304,7 @@ watch(
           v-model:attributeRange="polygon_attribute_range"
           v-model:attributeColorMap="polygon_attribute_color_map"
           v-model:attributeNoDataColor="polygon_attribute_no_data_color"
+          v-model:attributeTimeStep="polygon_attribute_time_step"
           @ranges_per_data="emit('polygon_attribute_ranges_per_data', $event)"
           :id="id"
           :componentIds="componentIds"
@@ -309,6 +318,7 @@ watch(
           v-model:attributeRange="polyhedron_attribute_range"
           v-model:attributeColorMap="polyhedron_attribute_color_map"
           v-model:attributeNoDataColor="polyhedron_attribute_no_data_color"
+          v-model:attributeTimeStep="polyhedron_attribute_time_step"
           @ranges_per_data="emit('polyhedron_attribute_ranges_per_data', $event)"
           :id="id"
           :componentIds="componentIds"

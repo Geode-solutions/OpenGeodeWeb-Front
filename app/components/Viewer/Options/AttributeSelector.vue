@@ -9,6 +9,7 @@ import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants
 import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
 import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar.vue";
 import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
+import ViewerOptionsTimeStepSlider from "@ogw_front/components/Viewer/Options/TimeStepSlider.vue";
 import { requestForTargets } from "@ogw_front/utils/request_for_targets";
 import { useBackStore } from "@ogw_front/stores/back";
 
@@ -21,6 +22,7 @@ const attributeRange = defineModel<(number | undefined)[]>("attributeRange", {
 });
 const attributeColorMap = defineModel<string>("attributeColorMap");
 const attributeNoDataColor = defineModel<typeof DEFAULT_NO_DATA_COLOR>("attributeNoDataColor");
+const attributeTimeStep = defineModel<number>("attributeTimeStep");
 
 interface Props {
   id: string;
@@ -32,6 +34,7 @@ const { id, componentIds = undefined, schema } = defineProps<Props>();
 
 interface Emits {
   "update:attributeColorMap": [colorMap: string];
+  "update:attributeTimeStep": [timeStep: number];
   ranges_per_data: [ranges: RangesPerData];
 }
 
@@ -41,6 +44,7 @@ interface AttributeInfo {
   attribute_name: string;
   nb_items: number;
   no_data?: boolean;
+  time_steps?: number[];
   [key: string]: unknown;
 }
 
@@ -52,6 +56,25 @@ const groupTargetIds = useBatchGroup(() => id);
 const currentAttribute = computed<AttributeInfo | undefined>(() =>
   attributes.value.find((attr) => attr.attribute_name === attributeName.value),
 );
+const timeSteps = computed<number[]>(() => currentAttribute.value?.time_steps ?? []);
+
+let committedSeries: string | undefined = undefined;
+
+function commitSeriesTimeStep(): void {
+  if (timeSteps.value.length === 0) {
+    committedSeries = undefined;
+    return;
+  }
+  const name = currentAttribute.value?.attribute_name;
+  if (name === committedSeries) {
+    return;
+  }
+  committedSeries = name;
+  const current = attributeTimeStep.value;
+  const valid = current !== undefined && current >= 0 && current < timeSteps.value.length;
+  emit("update:attributeTimeStep", valid ? current : 0);
+}
+
 const cssNoDataColor = computed<string>(() => {
   const { red, green, blue, alpha } = attributeNoDataColor.value ?? DEFAULT_NO_DATA_COLOR;
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
@@ -183,6 +206,7 @@ watch([attributeName, attributeItem], ([name, item]) => {
 });
 
 watch([attributeName, attributeItem, currentAttribute], () => {
+  commitSeriesTimeStep();
   if (groupTargetIds.value) {
     return;
   }
@@ -221,6 +245,7 @@ watch([attributeName, attributeItem, currentAttribute], () => {
     class="mt-3"
     hide-details
   />
+  <ViewerOptionsTimeStepSlider v-model="attributeTimeStep" :time-steps="timeSteps" />
   <div
     v-if="currentAttribute && currentAttribute.no_data"
     class="text-caption text-high-emphasis mt-1 d-flex align-center ga-1"

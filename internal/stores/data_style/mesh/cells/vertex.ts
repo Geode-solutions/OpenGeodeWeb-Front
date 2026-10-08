@@ -1,13 +1,16 @@
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
+import { useAttributeTimeStepStyle } from "@ogw_internal/stores/data_style/time_step";
 import { useMeshCellsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
+const attributeNamesSchema = back_schemas.opengeodeweb_back.vertex_attribute_names;
 const meshCellsVertexAttributeSchemas =
   viewer_schemas.opengeodeweb_viewer.mesh.cells.attribute.vertex;
 
@@ -56,6 +59,8 @@ interface UseMeshCellsVertexAttributeStyleReturn {
   meshCellsVertexAttributeName: (id: string) => string | undefined;
   meshCellsVertexAttributeItem: (id: string) => number;
   meshCellsVertexAttributeRange: (id: string) => [number | undefined, number | undefined];
+  meshCellsVertexAttributeTimeStep: (id: string) => number | undefined;
+  setMeshCellsVertexAttributeTimeStep: (id: string, timeStep: number) => Promise<unknown>;
   meshCellsVertexAttributeColorMap: (id: string) => string | undefined;
   meshCellsVertexAttributeStoredConfig: (
     id: string,
@@ -83,6 +88,7 @@ interface UseMeshCellsVertexAttributeStyleReturn {
 
 // oxlint-disable-next-line max-lines-per-function
 function useMeshCellsVertexAttributeStyle(): UseMeshCellsVertexAttributeStyleReturn {
+  const { attributeTimeStep, setAttributeTimeStep, seriesArrayName } = useAttributeTimeStepStyle();
   const viewerStore = useViewerStore();
   const meshCellsCommonStyle = useMeshCellsCommonStyle();
   function meshCellsVertexAttribute(id: string): AttributeState {
@@ -149,6 +155,9 @@ function useMeshCellsVertexAttributeStyle(): UseMeshCellsVertexAttributeStyleRet
     const { item, name } = meshCellsVertexAttribute(id);
     return item ?? meshCellsVertexAttributeLastItem(id, name);
   }
+  function meshCellsVertexAttributeTimeStep(id: string): number | undefined {
+    return attributeTimeStep(id, attributeNamesSchema.$id, meshCellsVertexAttribute(id).name);
+  }
   async function setMeshCellsVertexAttribute(
     id: string,
     {
@@ -174,7 +183,7 @@ function useMeshCellsVertexAttributeStyle(): UseMeshCellsVertexAttributeStyleRet
     const schema = meshCellsVertexAttributeSchemas.attribute;
     const params = {
       id,
-      name,
+      name: seriesArrayName(id, attributeNamesSchema.$id, name),
       item,
       points,
       minimum,
@@ -223,6 +232,17 @@ function useMeshCellsVertexAttributeStyle(): UseMeshCellsVertexAttributeStyleRet
     const item = meshCellsVertexAttributeItem(id);
     const storedConfig = meshCellsVertexAttributeStoredConfig(id, name, item);
     return [storedConfig.minimum, storedConfig.maximum];
+  }
+  async function setMeshCellsVertexAttributeTimeStep(
+    id: string,
+    timeStep: number,
+  ): Promise<unknown> {
+    const name = meshCellsVertexAttributeName(id);
+    if (name === undefined) {
+      return undefined;
+    }
+    await setAttributeTimeStep(id, attributeNamesSchema.$id, name, timeStep);
+    return applyVertexAttribute(id);
   }
   async function setMeshCellsVertexAttributeRange(
     id: string,
@@ -275,6 +295,8 @@ function useMeshCellsVertexAttributeStyle(): UseMeshCellsVertexAttributeStyleRet
   }
   return {
     meshCellsVertexAttributeName,
+    meshCellsVertexAttributeTimeStep,
+    setMeshCellsVertexAttributeTimeStep,
     meshCellsVertexAttributeItem,
     meshCellsVertexAttributeRange,
     meshCellsVertexAttributeColorMap,

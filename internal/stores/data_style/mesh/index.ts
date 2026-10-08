@@ -85,6 +85,69 @@ export function useMeshStyle(): {
     return result;
   }
 
+  const pointsCard = {
+    key: "points",
+    name: meshPointsStyle.meshPointsVertexAttributeName,
+    active: meshPointsStyle.meshPointsActiveColoring,
+    setActive: meshPointsStyle.setMeshPointsActiveColoring,
+    setTimeStep: meshPointsStyle.setMeshPointsVertexAttributeTimeStep,
+  };
+  const edgesCard = {
+    key: "edges",
+    name: meshEdgesStyle.meshEdgesVertexAttributeName,
+    active: meshEdgesStyle.meshEdgesActiveColoring,
+    setActive: meshEdgesStyle.setMeshEdgesActiveColoring,
+    setTimeStep: meshEdgesStyle.setMeshEdgesVertexAttributeTimeStep,
+  };
+  const cellsCard = {
+    key: "cells",
+    name: meshCellsStyle.meshCellsVertexAttributeName,
+    active: meshCellsStyle.meshCellsActiveColoring,
+    setActive: meshCellsStyle.setMeshCellsActiveColoring,
+    setTimeStep: meshCellsStyle.setMeshCellsVertexAttributeTimeStep,
+  };
+  const polygonsCard = {
+    key: "polygons",
+    name: meshPolygonsStyle.meshPolygonsVertexAttributeName,
+    active: meshPolygonsStyle.meshPolygonsActiveColoring,
+    setActive: meshPolygonsStyle.setMeshPolygonsActiveColoring,
+    setTimeStep: meshPolygonsStyle.setMeshPolygonsVertexAttributeTimeStep,
+  };
+  const polyhedraCard = {
+    key: "polyhedra",
+    name: meshPolyhedraStyle.meshPolyhedraVertexAttributeName,
+    active: meshPolyhedraStyle.meshPolyhedraActiveColoring,
+    setActive: meshPolyhedraStyle.setMeshPolyhedraActiveColoring,
+    setTimeStep: meshPolyhedraStyle.setMeshPolyhedraVertexAttributeTimeStep,
+  };
+  const vertexCards = [pointsCard, edgesCard, cellsCard, polygonsCard, polyhedraCard];
+
+  // The vertex series is shared by all the cards: re-render the other cards showing it
+  function sharedVertexTimeStep(
+    card: (typeof vertexCards)[number],
+  ): (id: string, timeStep: number) => Promise<unknown> {
+    return async (id, timeStep) => {
+      const result = await card.setTimeStep(id, timeStep);
+      const name = card.name(id);
+      const style = dataStyleState.getStyle(id);
+      const others = vertexCards.filter(
+        (other) =>
+          other !== card &&
+          style[other.key] !== undefined &&
+          other.active(id) === "vertex" &&
+          other.name(id) === name,
+      );
+      if (name !== undefined) {
+        await Promise.all(
+          others.map(async (other) => {
+            await other.setActive(id, "vertex");
+          }),
+        );
+      }
+      return result;
+    };
+  }
+
   async function applyMeshStyle(id: string): Promise<unknown[]> {
     const style = dataStyleState.getStyle(id);
     const promise_array: unknown[] = [];
@@ -142,5 +205,10 @@ export function useMeshStyle(): {
     ...meshCellsStyle,
     ...meshPolygonsStyle,
     ...meshPolyhedraStyle,
+    setMeshPointsVertexAttributeTimeStep: sharedVertexTimeStep(pointsCard),
+    setMeshEdgesVertexAttributeTimeStep: sharedVertexTimeStep(edgesCard),
+    setMeshCellsVertexAttributeTimeStep: sharedVertexTimeStep(cellsCard),
+    setMeshPolygonsVertexAttributeTimeStep: sharedVertexTimeStep(polygonsCard),
+    setMeshPolyhedraVertexAttributeTimeStep: sharedVertexTimeStep(polyhedraCard),
   };
 }

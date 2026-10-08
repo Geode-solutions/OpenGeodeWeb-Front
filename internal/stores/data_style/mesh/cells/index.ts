@@ -28,7 +28,8 @@ function handleMeshCellsVertexColoring(
   const item = vertexAttributeStyle.meshCellsVertexAttributeItem(id);
   const [minimum, maximum] = vertexAttributeStyle.meshCellsVertexAttributeRange(id);
   const colorMap = vertexAttributeStyle.meshCellsVertexAttributeColorMap(id);
-  const vertex_attribute = { name, item, minimum, maximum, colorMap };
+  const no_data_color = vertexAttributeStyle.meshCellsVertexAttributeNoDataColor(id);
+  const vertex_attribute = { name, item, minimum, maximum, colorMap, no_data_color };
   if (!isMeshCellsVertexAttributeValid(vertex_attribute)) {
     return undefined;
   }
@@ -43,7 +44,8 @@ function handleMeshCellsCellColoring(
   const item = cellAttributeStyle.meshCellsCellAttributeItem(id);
   const [minimum, maximum] = cellAttributeStyle.meshCellsCellAttributeRange(id);
   const colorMap = cellAttributeStyle.meshCellsCellAttributeColorMap(id);
-  const cell_attribute = { name, item, minimum, maximum, colorMap };
+  const no_data_color = cellAttributeStyle.meshCellsCellAttributeNoDataColor(id);
+  const cell_attribute = { name, item, minimum, maximum, colorMap, no_data_color };
   if (!isMeshCellsCellAttributeValid(cell_attribute)) {
     return undefined;
   }

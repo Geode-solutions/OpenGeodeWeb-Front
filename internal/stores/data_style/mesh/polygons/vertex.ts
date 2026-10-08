@@ -1,13 +1,16 @@
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
+import { useAttributeTimeStepStyle } from "@ogw_internal/stores/data_style/time_step";
 import { useMeshPolygonsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
+const attributeNamesSchema = back_schemas.opengeodeweb_back.vertex_attribute_names;
 const meshPolygonsVertexAttributeSchemas =
   viewer_schemas.opengeodeweb_viewer.mesh.polygons.attribute.vertex;
 
@@ -56,6 +59,8 @@ interface UseMeshPolygonsVertexAttributeStyleReturn {
   meshPolygonsVertexAttributeName: (id: string) => string | undefined;
   meshPolygonsVertexAttributeItem: (id: string) => number;
   meshPolygonsVertexAttributeRange: (id: string) => [number | undefined, number | undefined];
+  meshPolygonsVertexAttributeTimeStep: (id: string) => number | undefined;
+  setMeshPolygonsVertexAttributeTimeStep: (id: string, timeStep: number) => Promise<unknown>;
   meshPolygonsVertexAttributeColorMap: (id: string) => string | undefined;
   meshPolygonsVertexAttributeStoredConfig: (
     id: string,
@@ -83,6 +88,7 @@ interface UseMeshPolygonsVertexAttributeStyleReturn {
 
 // oxlint-disable-next-line max-lines-per-function
 function useMeshPolygonsVertexAttributeStyle(): UseMeshPolygonsVertexAttributeStyleReturn {
+  const { attributeTimeStep, setAttributeTimeStep, seriesArrayName } = useAttributeTimeStepStyle();
   const viewerStore = useViewerStore();
   const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle();
   function meshPolygonsVertexAttribute(id: string): AttributeState {
@@ -149,6 +155,9 @@ function useMeshPolygonsVertexAttributeStyle(): UseMeshPolygonsVertexAttributeSt
     const { item, name } = meshPolygonsVertexAttribute(id);
     return item ?? meshPolygonsVertexAttributeLastItem(id, name);
   }
+  function meshPolygonsVertexAttributeTimeStep(id: string): number | undefined {
+    return attributeTimeStep(id, attributeNamesSchema.$id, meshPolygonsVertexAttribute(id).name);
+  }
   async function setMeshPolygonsVertexAttribute(
     id: string,
     {
@@ -174,7 +183,7 @@ function useMeshPolygonsVertexAttributeStyle(): UseMeshPolygonsVertexAttributeSt
     const schema = meshPolygonsVertexAttributeSchemas.attribute;
     const params = {
       id,
-      name,
+      name: seriesArrayName(id, attributeNamesSchema.$id, name),
       item,
       points,
       minimum,
@@ -223,6 +232,17 @@ function useMeshPolygonsVertexAttributeStyle(): UseMeshPolygonsVertexAttributeSt
     const item = meshPolygonsVertexAttributeItem(id);
     const storedConfig = meshPolygonsVertexAttributeStoredConfig(id, name, item);
     return [storedConfig.minimum, storedConfig.maximum];
+  }
+  async function setMeshPolygonsVertexAttributeTimeStep(
+    id: string,
+    timeStep: number,
+  ): Promise<unknown> {
+    const name = meshPolygonsVertexAttributeName(id);
+    if (name === undefined) {
+      return undefined;
+    }
+    await setAttributeTimeStep(id, attributeNamesSchema.$id, name, timeStep);
+    return applyVertexAttribute(id);
   }
   async function setMeshPolygonsVertexAttributeRange(
     id: string,
@@ -275,6 +295,8 @@ function useMeshPolygonsVertexAttributeStyle(): UseMeshPolygonsVertexAttributeSt
   }
   return {
     meshPolygonsVertexAttributeName,
+    meshPolygonsVertexAttributeTimeStep,
+    setMeshPolygonsVertexAttributeTimeStep,
     meshPolygonsVertexAttributeItem,
     meshPolygonsVertexAttributeRange,
     meshPolygonsVertexAttributeColorMap,

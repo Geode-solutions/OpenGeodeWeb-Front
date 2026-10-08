@@ -1,13 +1,16 @@
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
+import { useAttributeTimeStepStyle } from "@ogw_internal/stores/data_style/time_step";
 import { useMeshEdgesCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
+const attributeNamesSchema = back_schemas.opengeodeweb_back.edge_attribute_names;
 const meshEdgesEdgeAttributeSchemas = viewer_schemas.opengeodeweb_viewer.mesh.edges.attribute.edge;
 
 interface AttributeStoredConfig {
@@ -56,6 +59,8 @@ function useMeshEdgesEdgeAttributeStyle(): {
   meshEdgesEdgeAttributeName: (id: string) => string | undefined;
   meshEdgesEdgeAttributeItem: (id: string) => number;
   meshEdgesEdgeAttributeRange: (id: string) => [number | undefined, number | undefined];
+  meshEdgesEdgeAttributeTimeStep: (id: string) => number | undefined;
+  setMeshEdgesEdgeAttributeTimeStep: (id: string, timeStep: number) => Promise<unknown>;
   meshEdgesEdgeAttributeColorMap: (id: string) => string | undefined;
   meshEdgesEdgeAttributeStoredConfig: (
     id: string,
@@ -74,6 +79,7 @@ function useMeshEdgesEdgeAttributeStyle(): {
   meshEdgesEdgeAttributeNoDataColor: (id: string) => RGBAColor;
   setMeshEdgesEdgeAttributeNoDataColor: (id: string, no_data_color: RGBAColor) => Promise<unknown>;
 } {
+  const { attributeTimeStep, setAttributeTimeStep, seriesArrayName } = useAttributeTimeStepStyle();
   const viewerStore = useViewerStore();
   const meshEdgesCommonStyle = useMeshEdgesCommonStyle();
   function meshEdgesEdgeAttribute(id: string): AttributeState {
@@ -140,6 +146,9 @@ function useMeshEdgesEdgeAttributeStyle(): {
     const { item, name } = meshEdgesEdgeAttribute(id);
     return item ?? meshEdgesEdgeAttributeLastItem(id, name);
   }
+  function meshEdgesEdgeAttributeTimeStep(id: string): number | undefined {
+    return attributeTimeStep(id, attributeNamesSchema.$id, meshEdgesEdgeAttribute(id).name);
+  }
   async function setMeshEdgesEdgeAttribute(
     id: string,
     {
@@ -165,7 +174,7 @@ function useMeshEdgesEdgeAttributeStyle(): {
     const schema = meshEdgesEdgeAttributeSchemas.attribute;
     const params = {
       id,
-      name,
+      name: seriesArrayName(id, attributeNamesSchema.$id, name),
       item,
       points,
       minimum,
@@ -214,6 +223,14 @@ function useMeshEdgesEdgeAttributeStyle(): {
     const item = meshEdgesEdgeAttributeItem(id);
     const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name, item);
     return [storedConfig.minimum, storedConfig.maximum];
+  }
+  async function setMeshEdgesEdgeAttributeTimeStep(id: string, timeStep: number): Promise<unknown> {
+    const name = meshEdgesEdgeAttributeName(id);
+    if (name === undefined) {
+      return undefined;
+    }
+    await setAttributeTimeStep(id, attributeNamesSchema.$id, name, timeStep);
+    return applyEdgeAttribute(id);
   }
   async function setMeshEdgesEdgeAttributeRange(
     id: string,
@@ -266,6 +283,8 @@ function useMeshEdgesEdgeAttributeStyle(): {
   }
   return {
     meshEdgesEdgeAttributeName,
+    meshEdgesEdgeAttributeTimeStep,
+    setMeshEdgesEdgeAttributeTimeStep,
     meshEdgesEdgeAttributeItem,
     meshEdgesEdgeAttributeRange,
     meshEdgesEdgeAttributeColorMap,

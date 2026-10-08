@@ -69,6 +69,19 @@ const vertex_attribute_name = computed<string | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
+
+const vertex_attribute_time_step = computed<number | undefined>({
+  get: () => dataStyleStore.meshPolyhedraVertexAttributeTimeStep(id.value),
+  set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
+    await applyBatchStyle(id.value, (targetId: string) =>
+      Promise.resolve(dataStyleStore.setMeshPolyhedraVertexAttributeTimeStep(targetId, newValue)),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
 const vertex_attribute_item = computed<string | undefined>({
   get: () => dataStyleStore.meshPolyhedraVertexAttributeItem(id.value),
   set: async (newValue) => {
@@ -119,6 +132,21 @@ const polyhedron_attribute_name = computed<string | undefined>({
     }
     await applyBatchStyle(id.value, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(targetId, newValue)),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const polyhedron_attribute_time_step = computed<number | undefined>({
+  get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeTimeStep(id.value),
+  set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
+    await applyBatchStyle(id.value, (targetId: string) =>
+      Promise.resolve(
+        dataStyleStore.setMeshPolyhedraPolyhedronAttributeTimeStep(targetId, newValue),
+      ),
     );
     hybridViewerStore.remoteRender();
   },
@@ -208,12 +236,14 @@ async function setPolyhedronAttributeRangesPerData(ranges: RangesPerData): Promi
           @vertex_attribute_ranges_per_data="setVertexAttributeRangesPerData"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
           v-model:vertex_attribute_no_data_color="vertex_attribute_no_data_color"
+          v-model:vertex_attribute_time_step="vertex_attribute_time_step"
           v-model:polyhedron_attribute_name="polyhedron_attribute_name"
           v-model:polyhedron_attribute_item="polyhedron_attribute_item"
           v-model:polyhedron_attribute_range="polyhedron_attribute_range"
           @polyhedron_attribute_ranges_per_data="setPolyhedronAttributeRangesPerData"
           v-model:polyhedron_attribute_color_map="polyhedron_attribute_color_map"
           v-model:polyhedron_attribute_no_data_color="polyhedron_attribute_no_data_color"
+          v-model:polyhedron_attribute_time_step="polyhedron_attribute_time_step"
           :capabilities="{
             vertex: { available: true, hasColorMap: true },
             polyhedron: { available: true, hasColorMap: true },

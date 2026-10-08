@@ -17,6 +17,7 @@ interface AttributeGroup {
   minimum: number;
   maximum: number;
   colorMap: string;
+  no_data_color?: RGBAColor;
   surfaces_ids: string[];
 }
 
@@ -123,17 +124,39 @@ export function useModelSurfacesStyle(): UseModelSurfacesStyleReturn {
             modelId,
             surfaces_id,
           );
-          const attribute = { name, item, minimum, maximum, colorMap };
+          const no_data_color =
+            modelSurfacesVertexAttribute.modelSurfacesVertexAttributeNoDataColor(
+              modelId,
+              surfaces_id,
+            );
+          const attribute = {
+            name,
+            item,
+            minimum,
+            maximum,
+            colorMap,
+            no_data_color,
+          };
           if (!isModelSurfacesVertexAttributeValid(attribute)) {
             continue;
           }
-          const key = `${name}_${item}_${colorMap}_${minimum}_${maximum}`;
+          const key = [name, item, colorMap, minimum, maximum, JSON.stringify(no_data_color)].join(
+            "_",
+          );
           vertexGroups[key] ??= { ...attribute, surfaces_ids: [] };
           vertexGroups[key].surfaces_ids.push(surfaces_id);
         }
         coloringPromises.push(
           ...Object.values(vertexGroups).map(
-            async ({ name, item, minimum, maximum, colorMap, surfaces_ids: ids }) => {
+            async ({
+              name,
+              item,
+              minimum,
+              maximum,
+              colorMap,
+              no_data_color,
+              surfaces_ids: ids,
+            }) => {
               const result = await modelSurfacesVertexAttribute.setModelSurfacesVertexAttribute(
                 modelId,
                 ids,
@@ -143,6 +166,7 @@ export function useModelSurfacesStyle(): UseModelSurfacesStyleReturn {
                   minimum,
                   maximum,
                   colorMap,
+                  no_data_color,
                 },
               );
               return result;
@@ -166,17 +190,39 @@ export function useModelSurfacesStyle(): UseModelSurfacesStyleReturn {
             modelId,
             surfaces_id,
           );
-          const attribute = { name, item, minimum, maximum, colorMap };
+          const no_data_color =
+            modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeNoDataColor(
+              modelId,
+              surfaces_id,
+            );
+          const attribute = {
+            name,
+            item,
+            minimum,
+            maximum,
+            colorMap,
+            no_data_color,
+          };
           if (!isModelSurfacesPolygonAttributeValid(attribute)) {
             continue;
           }
-          const key = `${name}_${item}_${colorMap}_${minimum}_${maximum}`;
+          const key = [name, item, colorMap, minimum, maximum, JSON.stringify(no_data_color)].join(
+            "_",
+          );
           polygonGroups[key] ??= { ...attribute, surfaces_ids: [] };
           polygonGroups[key].surfaces_ids.push(surfaces_id);
         }
         coloringPromises.push(
           ...Object.values(polygonGroups).map(
-            async ({ name, item, minimum, maximum, colorMap, surfaces_ids: ids }) => {
+            async ({
+              name,
+              item,
+              minimum,
+              maximum,
+              colorMap,
+              no_data_color,
+              surfaces_ids: ids,
+            }) => {
               const result = await modelSurfacesPolygonAttribute.setModelSurfacesPolygonAttribute(
                 modelId,
                 ids,
@@ -186,6 +232,7 @@ export function useModelSurfacesStyle(): UseModelSurfacesStyleReturn {
                   minimum,
                   maximum,
                   colorMap,
+                  no_data_color,
                 },
               );
               return result;

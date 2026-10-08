@@ -4,6 +4,10 @@ import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
+import {
+  reapplySameSeries,
+  useAttributeTimeStepStyle,
+} from "@ogw_internal/stores/data_style/time_step";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelSurfacesCommonStyle } from "./common";
@@ -61,6 +65,12 @@ interface UseModelSurfacesVertexAttributeReturn {
     modelId: string,
     surfaceId?: string,
   ) => [number | undefined, number | undefined];
+  modelSurfacesVertexAttributeTimeStep: (modelId: string, surfaceId?: string) => number | undefined;
+  setModelSurfacesVertexAttributeTimeStep: (
+    modelId: string,
+    surfaceIds: string[],
+    timeStep: number,
+  ) => Promise<void>;
   modelSurfacesVertexAttributeColorMap: (modelId: string, surfaceId?: string) => string | undefined;
   modelSurfacesVertexAttributeStoredConfig: (
     modelId: string,
@@ -104,14 +114,14 @@ interface UseModelSurfacesVertexAttributeReturn {
 
 // oxlint-disable-next-line max-lines-per-function
 function useModelSurfacesVertexAttribute(): UseModelSurfacesVertexAttributeReturn {
+  const { attributeTimeStep, setAttributeTimeStep, seriesArrayName } = useAttributeTimeStepStyle();
   const dataStore = useDataStore();
   const modelSurfacesCommonStyle = useModelSurfacesCommonStyle();
   const viewerStore = useViewerStore();
   function modelSurfacesVertexAttribute(modelId: string, surfaceId?: string): AttributeState {
     return (
-      modelSurfacesCommonStyle.modelSurfaceColoring(modelId, surfaceId)
-        // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.vertex shape is defined by the data style schema.
-        .vertex as AttributeState
+      // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.vertex shape is defined by the data style schema.
+      modelSurfacesCommonStyle.modelSurfaceColoring(modelId, surfaceId).vertex as AttributeState
     );
   }
   function modelSurfacesVertexAttributeStoredConfig(
@@ -146,7 +156,9 @@ function useModelSurfacesVertexAttribute(): UseModelSurfacesVertexAttributeRetur
     const totalSurfaceIds = await dataStore.getSurfacesGeodeIds(modelId);
     if (surfaceIds.length === totalSurfaceIds.length) {
       tasks.push(
-        modelSurfacesCommonStyle.mutateModelSurfacesTypeColoring(modelId, { vertex: values }),
+        modelSurfacesCommonStyle.mutateModelSurfacesTypeColoring(modelId, {
+          vertex: values,
+        }),
       );
     }
     await Promise.all(tasks);
@@ -206,6 +218,22 @@ function useModelSurfacesVertexAttribute(): UseModelSurfacesVertexAttributeRetur
     const storedConfig = modelSurfacesVertexAttributeStoredConfig(modelId, surfaceId, name, item);
     return storedConfig.colorMap;
   }
+  function modelSurfacesVertexAttributeNoDataColor(modelId: string, surfaceId?: string): RGBAColor {
+    const name = modelSurfacesVertexAttributeName(modelId, surfaceId);
+    const item = modelSurfacesVertexAttributeItem(modelId, surfaceId);
+    const storedConfig = modelSurfacesVertexAttributeStoredConfig(modelId, surfaceId, name, item);
+    return storedConfig.no_data_color;
+  }
+  function modelSurfacesVertexAttributeTimeStep(
+    modelId: string,
+    surfaceId?: string,
+  ): number | undefined {
+    return attributeTimeStep(
+      modelId,
+      attributeSchema.$id,
+      modelSurfacesVertexAttribute(modelId, surfaceId).name,
+    );
+  }
   async function setModelSurfacesVertexAttribute(
     modelId: string,
     surfaceIds: string[],
@@ -230,14 +258,17 @@ function useModelSurfacesVertexAttribute(): UseModelSurfacesVertexAttributeRetur
     const params = {
       id: modelId,
       block_ids: surface_viewer_ids,
-      name,
+      name: seriesArrayName(modelId, attributeSchema.$id, name),
       item,
       points,
       minimum,
       maximum,
       no_data_color,
     };
-    const result = await viewerStore.request({ schema: attributeSchema, params });
+    const result = await viewerStore.request({
+      schema: attributeSchema,
+      params,
+    });
     return result;
   }
   async function applyVertexAttribute(modelId: string, surfaceIds: string[]): Promise<unknown> {
@@ -282,6 +313,37 @@ function useModelSurfacesVertexAttribute(): UseModelSurfacesVertexAttributeRetur
     const result = await applyVertexAttribute(modelId, surfaceIds);
     return result;
   }
+  async function setModelSurfacesVertexAttributeTimeStep(
+    modelId: string,
+    surfaceIds: string[],
+    timeStep: number,
+  ): Promise<void> {
+    const name = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
+    if (name === undefined) {
+      return;
+    }
+    await setAttributeTimeStep(modelId, attributeSchema.$id, name, timeStep);
+    await Promise.all([
+      applyVertexAttribute(modelId, surfaceIds),
+      reapplySameSeries(
+        await dataStore.getSurfacesGeodeIds(modelId),
+        surfaceIds,
+        (id) =>
+          modelSurfacesCommonStyle.modelSurfaceColoring(modelId, id).active === "vertex" &&
+          modelSurfacesVertexAttributeName(modelId, id) === name
+            ? [
+                modelSurfacesVertexAttributeItem(modelId, id),
+                modelSurfacesVertexAttributeRange(modelId, id),
+                modelSurfacesVertexAttributeColorMap(modelId, id),
+                JSON.stringify(modelSurfacesVertexAttributeNoDataColor(modelId, id)),
+              ].join("|")
+            : undefined,
+        async (ids) => {
+          await applyVertexAttribute(modelId, ids);
+        },
+      ),
+    ]);
+  }
   async function setModelSurfacesVertexAttributeRange(
     modelId: string,
     surfaceIds: string[],
@@ -310,12 +372,6 @@ function useModelSurfacesVertexAttribute(): UseModelSurfacesVertexAttributeRetur
     const result = await applyVertexAttribute(modelId, surfaceIds);
     return result;
   }
-  function modelSurfacesVertexAttributeNoDataColor(modelId: string, surfaceId?: string): RGBAColor {
-    const name = modelSurfacesVertexAttributeName(modelId, surfaceId);
-    const item = modelSurfacesVertexAttributeItem(modelId, surfaceId);
-    const storedConfig = modelSurfacesVertexAttributeStoredConfig(modelId, surfaceId, name, item);
-    return storedConfig.no_data_color;
-  }
   async function setModelSurfacesVertexAttributeNoDataColor(
     modelId: string,
     surfaceIds: string[],
@@ -338,6 +394,8 @@ function useModelSurfacesVertexAttribute(): UseModelSurfacesVertexAttributeRetur
   }
   return {
     modelSurfacesVertexAttributeName,
+    modelSurfacesVertexAttributeTimeStep,
+    setModelSurfacesVertexAttributeTimeStep,
     modelSurfacesVertexAttributeItem,
     modelSurfacesVertexAttributeRange,
     modelSurfacesVertexAttributeColorMap,

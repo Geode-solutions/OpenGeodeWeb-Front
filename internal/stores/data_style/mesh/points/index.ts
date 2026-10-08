@@ -25,7 +25,8 @@ function handleMeshPointsVertexColoring(
   const item = vertexAttributeStyle.meshPointsVertexAttributeItem(id);
   const [minimum, maximum] = vertexAttributeStyle.meshPointsVertexAttributeRange(id);
   const colorMap = vertexAttributeStyle.meshPointsVertexAttributeColorMap(id);
-  const vertex_attribute = { name, item, minimum, maximum, colorMap };
+  const no_data_color = vertexAttributeStyle.meshPointsVertexAttributeNoDataColor(id);
+  const vertex_attribute = { name, item, minimum, maximum, colorMap, no_data_color };
   if (!isMeshPointsVertexAttributeValid(vertex_attribute)) {
     return undefined;
   }

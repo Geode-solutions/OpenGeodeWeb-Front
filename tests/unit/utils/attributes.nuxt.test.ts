@@ -2,7 +2,7 @@
 import { describe, expect, test } from "vitest";
 
 // Local imports
-import { intersectAttributes } from "@ogw_front/utils/attributes";
+import { attributeArrayName, intersectAttributes } from "@ogw_front/utils/attributes";
 
 describe("attributes intersection", () => {
   test("keeps only the attributes shared by every data", () => {
@@ -34,5 +34,42 @@ describe("attributes intersection", () => {
 
   test("returns no attribute when there is no data", () => {
     expect(intersectAttributes([])).toStrictEqual([]);
+  });
+
+  test("keeps a time series with the same time steps everywhere", () => {
+    const common = intersectAttributes([
+      [{ attribute_name: "pressure", nb_items: 1, time_steps: [0, 1] }],
+      [{ attribute_name: "pressure", nb_items: 1, time_steps: [0, 1] }],
+    ]);
+
+    expect(common).toStrictEqual([{ attribute_name: "pressure", nb_items: 1, time_steps: [0, 1] }]);
+  });
+
+  test("drops a time series whose time steps differ", () => {
+    const common = intersectAttributes([
+      [{ attribute_name: "pressure", nb_items: 1, time_steps: [0, 1] }],
+      [{ attribute_name: "pressure", nb_items: 1, time_steps: [0, 2] }],
+    ]);
+
+    expect(common).toStrictEqual([]);
+  });
+
+  test("drops an attribute temporal on one data only", () => {
+    const common = intersectAttributes([
+      [{ attribute_name: "pressure", nb_items: 1, time_steps: [0, 1] }],
+      [{ attribute_name: "pressure", nb_items: 1, time_steps: [] }],
+    ]);
+
+    expect(common).toStrictEqual([]);
+  });
+});
+
+describe("attribute array name", () => {
+  test("keeps the name of a non temporal attribute", () => {
+    expect(attributeArrayName("pressure", undefined)).toBe("pressure");
+  });
+
+  test("adds the time step to the name of a time series", () => {
+    expect(attributeArrayName("pressure", 2)).toBe("pressure@2");
   });
 });

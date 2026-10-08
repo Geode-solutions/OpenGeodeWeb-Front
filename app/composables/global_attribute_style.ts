@@ -39,6 +39,7 @@ interface AttributeResponse {
     readonly max_values?: readonly number[];
     readonly min_value?: number;
     readonly max_value?: number;
+    readonly time_steps?: readonly number[];
   }[];
 }
 
@@ -75,6 +76,9 @@ export function useGlobalAttributeStyle(dataIdRef: Ref<string | undefined>): {
   currentRange: typeof currentRange;
   applyGlobalColormap: typeof applyGlobalColormap;
   resetGlobalRange: typeof resetGlobalRange;
+  currentTimeSteps: typeof currentTimeSteps;
+  currentTimeStep: typeof currentTimeStep;
+  loadTimeSteps: typeof loadTimeSteps;
 } {
   const dataStyleStore = useDataStyleStore();
   const hybridViewerStore = useHybridViewerStore();
@@ -294,10 +298,100 @@ export function useGlobalAttributeStyle(dataIdRef: Ref<string | undefined>): {
     await Promise.all(requestPromises);
   }
 
+  const currentTimeSteps = ref<number[]>([]);
+  const temporalComponent = shallowRef<ActiveComponent | undefined>(undefined);
+
+  async function requestTimeSteps(targetId: string, comp: ActiveComponent): Promise<number[]> {
+    const { activeColoring, attributeType, getterKey } = comp;
+    const nameGetter = getDynamicStoreMethod(dataStyleStore, `${getterKey}${attributeType}Name`);
+    const rawAttrName = nameGetter?.(targetId);
+    const schema = (back_schemas.opengeodeweb_back as Record<string, unknown>)[
+      `${activeColoring}_attribute_names`
+    ];
+    if (
+      !isStringOrUndefined(rawAttrName) ||
+      rawAttrName === undefined ||
+      rawAttrName === "" ||
+      !isJsonRpcSchema(schema)
+    ) {
+      return [];
+    }
+    let timeSteps: number[] = [];
+    await backStore.request(
+      { schema, params: { id: targetId } },
+      {
+        response_function: (response: unknown): void => {
+          if (!isAttributeResponse(response)) {
+            return;
+          }
+          const found = response.attributes?.find((attr) => attr.attribute_name === rawAttrName);
+          timeSteps = [...(found?.time_steps ?? [])];
+        },
+      },
+    );
+    return timeSteps;
+  }
+
+  async function loadTimeSteps(): Promise<void> {
+    const targetId = dataIdRef.value;
+    temporalComponent.value = undefined;
+    currentTimeSteps.value = [];
+    if (targetId === undefined || targetId === "") {
+      return;
+    }
+    for (const comp of getActiveComponents(targetId)) {
+      // oxlint-disable-next-line no-await-in-loop -- first temporal component wins, in order.
+      const timeSteps = await requestTimeSteps(targetId, comp);
+      if (timeSteps.length > 0) {
+        temporalComponent.value = comp;
+        currentTimeSteps.value = timeSteps;
+        return;
+      }
+    }
+  }
+
+  watch(dataIdRef, loadTimeSteps, { immediate: true });
+
+  async function applyCurrentTimeStep(step: number): Promise<void> {
+    const targetId = dataIdRef.value;
+    const comp = temporalComponent.value;
+    if (targetId === undefined || targetId === "" || !comp) {
+      return;
+    }
+    const { attributeType, setterKey } = comp;
+    const setter = getDynamicStoreMethod(dataStyleStore, `set${setterKey}${attributeType}TimeStep`);
+    if (setter) {
+      await setter(targetId, step);
+      await hybridViewerStore.remoteRender();
+    }
+  }
+
+  const currentTimeStep = computed<number>({
+    get(): number {
+      const targetId = dataIdRef.value;
+      const comp = temporalComponent.value;
+      if (targetId === undefined || targetId === "" || !comp) {
+        return 0;
+      }
+      const { attributeType, getterKey } = comp;
+      const getter = getDynamicStoreMethod(dataStyleStore, `${getterKey}${attributeType}TimeStep`);
+      const rawStep = getter?.(targetId);
+      return typeof rawStep === "number" ? rawStep : 0;
+    },
+    // Setter cannot be async (see `currentRange`), so the work is delegated to a helper.
+    set: (step: number): void => {
+      /* oxlint-disable-next-line promise/prefer-await-to-then -- setter cannot be async; see comment above. */
+      applyCurrentTimeStep(step).catch(() => undefined);
+    },
+  });
+
   return {
     currentColormap,
     currentRange,
     applyGlobalColormap,
     resetGlobalRange,
+    currentTimeSteps,
+    currentTimeStep,
+    loadTimeSteps,
   };
 }
