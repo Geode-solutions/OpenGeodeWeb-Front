@@ -32,7 +32,8 @@ function handleMeshPolyhedraVertexColoring(
   const item = vertexAttributeStyle.meshPolyhedraVertexAttributeItem(id);
   const [minimum, maximum] = vertexAttributeStyle.meshPolyhedraVertexAttributeRange(id);
   const colorMap = vertexAttributeStyle.meshPolyhedraVertexAttributeColorMap(id);
-  const vertex_attribute = { name, item, minimum, maximum, colorMap };
+  const no_data_color = vertexAttributeStyle.meshPolyhedraVertexAttributeNoDataColor(id);
+  const vertex_attribute = { name, item, minimum, maximum, colorMap, no_data_color };
   if (!isMeshPolyhedraVertexAttributeValid(vertex_attribute)) {
     return undefined;
   }
@@ -47,7 +48,15 @@ function handleMeshPolyhedraPolyhedronColoring(
   const item = polyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeItem(id);
   const [minimum, maximum] = polyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeRange(id);
   const colorMap = polyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeColorMap(id);
-  const polyhedron_attribute = { name, item, minimum, maximum, colorMap };
+  const no_data_color = polyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeNoDataColor(id);
+  const polyhedron_attribute = {
+    name,
+    item,
+    minimum,
+    maximum,
+    colorMap,
+    no_data_color,
+  };
   if (!isMeshPolyhedraPolyhedronAttributeValid(polyhedron_attribute)) {
     return undefined;
   }

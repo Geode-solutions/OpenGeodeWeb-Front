@@ -27,7 +27,8 @@ function handleMeshEdgesVertexColoring(
   const item = vertexAttributeStyle.meshEdgesVertexAttributeItem(id);
   const [minimum, maximum] = vertexAttributeStyle.meshEdgesVertexAttributeRange(id);
   const colorMap = vertexAttributeStyle.meshEdgesVertexAttributeColorMap(id);
-  const vertex_attribute = { name, item, minimum, maximum, colorMap };
+  const no_data_color = vertexAttributeStyle.meshEdgesVertexAttributeNoDataColor(id);
+  const vertex_attribute = { name, item, minimum, maximum, colorMap, no_data_color };
   if (!isMeshEdgesVertexAttributeValid(vertex_attribute)) {
     return undefined;
   }
@@ -42,7 +43,8 @@ function handleMeshEdgesEdgeColoring(
   const item = edgeAttributeStyle.meshEdgesEdgeAttributeItem(id);
   const [minimum, maximum] = edgeAttributeStyle.meshEdgesEdgeAttributeRange(id);
   const colorMap = edgeAttributeStyle.meshEdgesEdgeAttributeColorMap(id);
-  const edge_attribute = { name, item, minimum, maximum, colorMap };
+  const no_data_color = edgeAttributeStyle.meshEdgesEdgeAttributeNoDataColor(id);
+  const edge_attribute = { name, item, minimum, maximum, colorMap, no_data_color };
   if (!isMeshEdgesEdgeAttributeValid(edge_attribute)) {
     return undefined;
   }

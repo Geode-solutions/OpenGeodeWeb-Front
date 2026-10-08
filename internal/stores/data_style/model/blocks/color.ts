@@ -106,7 +106,11 @@ export function useModelBlocksColor(): {
         modelId,
         blocks_ids[0],
       );
-      const attribute = { name, item, minimum, maximum, colorMap };
+      const no_data_color = modelBlocksVertexAttribute.modelBlocksVertexAttributeNoDataColor(
+        modelId,
+        blocks_ids[0],
+      );
+      const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
       if (isModelBlocksVertexAttributeValid(attribute)) {
         await modelBlocksVertexAttribute.setModelBlocksVertexAttribute(
           modelId,
@@ -131,7 +135,12 @@ export function useModelBlocksColor(): {
         modelId,
         blocks_ids[0],
       );
-      const attribute = { name, item, minimum, maximum, colorMap };
+      const no_data_color =
+        modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeNoDataColor(
+          modelId,
+          blocks_ids[0],
+        );
+      const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
       if (isModelBlocksPolyhedronAttributeValid(attribute)) {
         await modelBlocksPolyhedronAttribute.setModelBlocksPolyhedronAttribute(
           modelId,

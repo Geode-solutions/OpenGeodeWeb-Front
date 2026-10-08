@@ -87,6 +87,19 @@ const vertex_attribute_name = computed<string | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
+
+const vertex_attribute_time_step = computed<number | undefined>({
+  get: () => dataStyleStore.meshCellsVertexAttributeTimeStep(id.value),
+  set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
+    await applyBatchStyle(id.value, (targetId: string) =>
+      Promise.resolve(dataStyleStore.setMeshCellsVertexAttributeTimeStep(targetId, newValue)),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
 const vertex_attribute_item = computed<string | undefined>({
   get: () => dataStyleStore.meshCellsVertexAttributeItem(id.value),
   set: async (newValue) => {
@@ -135,6 +148,19 @@ const cell_attribute_name = computed<string | undefined>({
     }
     await applyBatchStyle(id.value, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshCellsCellAttributeName(targetId, newValue)),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const cell_attribute_time_step = computed<number | undefined>({
+  get: () => dataStyleStore.meshCellsCellAttributeTimeStep(id.value),
+  set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
+    await applyBatchStyle(id.value, (targetId: string) =>
+      Promise.resolve(dataStyleStore.setMeshCellsCellAttributeTimeStep(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -218,12 +244,14 @@ async function setCellAttributeRangesPerData(ranges: RangesPerData): Promise<voi
           @vertex_attribute_ranges_per_data="setVertexAttributeRangesPerData"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
           v-model:vertex_attribute_no_data_color="vertex_attribute_no_data_color"
+          v-model:vertex_attribute_time_step="vertex_attribute_time_step"
           v-model:cell_attribute_name="cell_attribute_name"
           v-model:cell_attribute_item="cell_attribute_item"
           v-model:cell_attribute_range="cell_attribute_range"
           @cell_attribute_ranges_per_data="setCellAttributeRangesPerData"
           v-model:cell_attribute_color_map="cell_attribute_color_map"
           v-model:cell_attribute_no_data_color="cell_attribute_no_data_color"
+          v-model:cell_attribute_time_step="cell_attribute_time_step"
         />
       </template>
     </template>

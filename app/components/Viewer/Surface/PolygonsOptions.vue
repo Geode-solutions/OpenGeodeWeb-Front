@@ -86,6 +86,19 @@ const vertex_attribute_name = computed<string | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
+
+const vertex_attribute_time_step = computed<number | undefined>({
+  get: () => dataStyleStore.meshPolygonsVertexAttributeTimeStep(id.value),
+  set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
+    await applyBatchStyle(id.value, (targetId: string) =>
+      Promise.resolve(dataStyleStore.setMeshPolygonsVertexAttributeTimeStep(targetId, newValue)),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
 const vertex_attribute_item = computed<string | undefined>({
   get: () => dataStyleStore.meshPolygonsVertexAttributeItem(id.value),
   set: async (newValue) => {
@@ -136,6 +149,19 @@ const polygon_attribute_name = computed<string | undefined>({
     }
     await applyBatchStyle(id.value, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshPolygonsPolygonAttributeName(targetId, newValue)),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const polygon_attribute_time_step = computed<number | undefined>({
+  get: () => dataStyleStore.meshPolygonsPolygonAttributeTimeStep(id.value),
+  set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
+    await applyBatchStyle(id.value, (targetId: string) =>
+      Promise.resolve(dataStyleStore.setMeshPolygonsPolygonAttributeTimeStep(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -223,12 +249,14 @@ async function setPolygonAttributeRangesPerData(ranges: RangesPerData): Promise<
           @vertex_attribute_ranges_per_data="setVertexAttributeRangesPerData"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
           v-model:vertex_attribute_no_data_color="vertex_attribute_no_data_color"
+          v-model:vertex_attribute_time_step="vertex_attribute_time_step"
           v-model:polygon_attribute_name="polygon_attribute_name"
           v-model:polygon_attribute_item="polygon_attribute_item"
           v-model:polygon_attribute_range="polygon_attribute_range"
           @polygon_attribute_ranges_per_data="setPolygonAttributeRangesPerData"
           v-model:polygon_attribute_color_map="polygon_attribute_color_map"
           v-model:polygon_attribute_no_data_color="polygon_attribute_no_data_color"
+          v-model:polygon_attribute_time_step="polygon_attribute_time_step"
         />
       </template>
     </template>

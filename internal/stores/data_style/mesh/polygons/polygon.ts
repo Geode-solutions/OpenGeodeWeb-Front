@@ -1,13 +1,16 @@
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
+import { useAttributeTimeStepStyle } from "@ogw_internal/stores/data_style/time_step";
 import { useMeshPolygonsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
+const attributeNamesSchema = back_schemas.opengeodeweb_back.polygon_attribute_names;
 const meshPolygonsPolygonAttributeSchemas =
   viewer_schemas.opengeodeweb_viewer.mesh.polygons.attribute.polygon;
 
@@ -57,6 +60,8 @@ function useMeshPolygonsPolygonAttributeStyle(): {
   meshPolygonsPolygonAttributeName: (id: string) => string | undefined;
   meshPolygonsPolygonAttributeItem: (id: string) => number;
   meshPolygonsPolygonAttributeRange: (id: string) => [number | undefined, number | undefined];
+  meshPolygonsPolygonAttributeTimeStep: (id: string) => number | undefined;
+  setMeshPolygonsPolygonAttributeTimeStep: (id: string, timeStep: number) => Promise<unknown>;
   meshPolygonsPolygonAttributeColorMap: (id: string) => string | undefined;
   meshPolygonsPolygonAttributeStoredConfig: (
     id: string,
@@ -81,6 +86,7 @@ function useMeshPolygonsPolygonAttributeStyle(): {
     no_data_color: RGBAColor,
   ) => Promise<unknown>;
 } {
+  const { attributeTimeStep, setAttributeTimeStep, seriesArrayName } = useAttributeTimeStepStyle();
   const viewerStore = useViewerStore();
   const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle();
   function meshPolygonsPolygonAttribute(id: string): AttributeState {
@@ -143,6 +149,9 @@ function useMeshPolygonsPolygonAttributeStyle(): {
     const { item, name } = meshPolygonsPolygonAttribute(id);
     return item ?? meshPolygonsPolygonAttributeLastItem(id, name);
   }
+  function meshPolygonsPolygonAttributeTimeStep(id: string): number | undefined {
+    return attributeTimeStep(id, attributeNamesSchema.$id, meshPolygonsPolygonAttribute(id).name);
+  }
   async function setMeshPolygonsPolygonAttribute(
     id: string,
     {
@@ -168,7 +177,7 @@ function useMeshPolygonsPolygonAttributeStyle(): {
     const schema = meshPolygonsPolygonAttributeSchemas.attribute;
     const params = {
       id,
-      name,
+      name: seriesArrayName(id, attributeNamesSchema.$id, name),
       item,
       points,
       minimum,
@@ -217,6 +226,17 @@ function useMeshPolygonsPolygonAttributeStyle(): {
     const item = meshPolygonsPolygonAttributeItem(id);
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(id, name, item);
     return [storedConfig.minimum, storedConfig.maximum];
+  }
+  async function setMeshPolygonsPolygonAttributeTimeStep(
+    id: string,
+    timeStep: number,
+  ): Promise<unknown> {
+    const name = meshPolygonsPolygonAttributeName(id);
+    if (name === undefined) {
+      return undefined;
+    }
+    await setAttributeTimeStep(id, attributeNamesSchema.$id, name, timeStep);
+    return applyPolygonAttribute(id);
   }
   async function setMeshPolygonsPolygonAttributeRange(
     id: string,
@@ -269,6 +289,8 @@ function useMeshPolygonsPolygonAttributeStyle(): {
   }
   return {
     meshPolygonsPolygonAttributeName,
+    meshPolygonsPolygonAttributeTimeStep,
+    setMeshPolygonsPolygonAttributeTimeStep,
     meshPolygonsPolygonAttributeItem,
     meshPolygonsPolygonAttributeRange,
     meshPolygonsPolygonAttributeColorMap,

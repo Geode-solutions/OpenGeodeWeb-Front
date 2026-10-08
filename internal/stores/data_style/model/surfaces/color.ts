@@ -102,7 +102,11 @@ export function useModelSurfacesColor(): {
         modelId,
         surfaces_ids[0],
       );
-      const attribute = { name, item, minimum, maximum, colorMap };
+      const no_data_color = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeNoDataColor(
+        modelId,
+        surfaces_ids[0],
+      );
+      const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
       if (isModelSurfacesVertexAttributeValid(attribute)) {
         return modelSurfacesVertexAttribute.setModelSurfacesVertexAttribute(
           modelId,
@@ -127,7 +131,11 @@ export function useModelSurfacesColor(): {
         modelId,
         surfaces_ids[0],
       );
-      const attribute = { name, item, minimum, maximum, colorMap };
+      const no_data_color = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeNoDataColor(
+        modelId,
+        surfaces_ids[0],
+      );
+      const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
       if (isModelSurfacesPolygonAttributeValid(attribute)) {
         return modelSurfacesPolygonAttribute.setModelSurfacesPolygonAttribute(
           modelId,

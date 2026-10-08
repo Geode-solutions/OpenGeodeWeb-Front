@@ -4,6 +4,10 @@ import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
+import {
+  reapplySameSeries,
+  useAttributeTimeStepStyle,
+} from "@ogw_internal/stores/data_style/time_step";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelBlocksCommonStyle } from "./common";
@@ -63,6 +67,12 @@ interface UseModelBlocksPolyhedronAttributeReturn {
     modelId: string,
     blockId?: string,
   ) => [number | undefined, number | undefined];
+  modelBlocksPolyhedronAttributeTimeStep: (modelId: string, blockId?: string) => number | undefined;
+  setModelBlocksPolyhedronAttributeTimeStep: (
+    modelId: string,
+    blockIds: string[],
+    timeStep: number,
+  ) => Promise<void>;
   modelBlocksPolyhedronAttributeColorMap: (modelId: string, blockId?: string) => string | undefined;
   modelBlocksPolyhedronAttributeStoredConfig: (
     modelId: string,
@@ -106,6 +116,7 @@ interface UseModelBlocksPolyhedronAttributeReturn {
 
 // oxlint-disable-next-line max-lines-per-function
 function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeReturn {
+  const { attributeTimeStep, setAttributeTimeStep, seriesArrayName } = useAttributeTimeStepStyle();
   const dataStore = useDataStore();
   const modelBlocksCommonStyle = useModelBlocksCommonStyle();
   const viewerStore = useViewerStore();
@@ -215,6 +226,22 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
     const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(modelId, blockId, name, item);
     return storedConfig.colorMap;
   }
+  function modelBlocksPolyhedronAttributeNoDataColor(modelId: string, blockId?: string): RGBAColor {
+    const name = modelBlocksPolyhedronAttributeName(modelId, blockId);
+    const item = modelBlocksPolyhedronAttributeItem(modelId, blockId);
+    const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(modelId, blockId, name, item);
+    return storedConfig.no_data_color;
+  }
+  function modelBlocksPolyhedronAttributeTimeStep(
+    modelId: string,
+    blockId?: string,
+  ): number | undefined {
+    return attributeTimeStep(
+      modelId,
+      modelBlockPolyhedronAttributeSchema.$id,
+      modelBlocksPolyhedronAttribute(modelId, blockId).name,
+    );
+  }
   async function setModelBlocksPolyhedronAttribute(
     modelId: string,
     blockIds: string[],
@@ -242,7 +269,7 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
     const params = {
       id: modelId,
       block_ids: viewer_ids,
-      name,
+      name: seriesArrayName(modelId, modelBlockPolyhedronAttributeSchema.$id, name),
       item,
       points,
       minimum,
@@ -299,6 +326,37 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
     });
     return applyPolyhedronAttribute(modelId, blockIds);
   }
+  async function setModelBlocksPolyhedronAttributeTimeStep(
+    modelId: string,
+    blockIds: string[],
+    timeStep: number,
+  ): Promise<void> {
+    const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
+    if (name === undefined) {
+      return;
+    }
+    await setAttributeTimeStep(modelId, modelBlockPolyhedronAttributeSchema.$id, name, timeStep);
+    await Promise.all([
+      applyPolyhedronAttribute(modelId, blockIds),
+      reapplySameSeries(
+        await dataStore.getBlocksGeodeIds(modelId),
+        blockIds,
+        (id) =>
+          modelBlocksCommonStyle.modelBlockColoring(modelId, id).active === "polyhedron" &&
+          modelBlocksPolyhedronAttributeName(modelId, id) === name
+            ? [
+                modelBlocksPolyhedronAttributeItem(modelId, id),
+                modelBlocksPolyhedronAttributeRange(modelId, id),
+                modelBlocksPolyhedronAttributeColorMap(modelId, id),
+                JSON.stringify(modelBlocksPolyhedronAttributeNoDataColor(modelId, id)),
+              ].join("|")
+            : undefined,
+        async (ids) => {
+          await applyPolyhedronAttribute(modelId, ids);
+        },
+      ),
+    ]);
+  }
   async function setModelBlocksPolyhedronAttributeRange(
     modelId: string,
     blockIds: string[],
@@ -325,12 +383,6 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
     });
     return applyPolyhedronAttribute(modelId, blockIds);
   }
-  function modelBlocksPolyhedronAttributeNoDataColor(modelId: string, blockId?: string): RGBAColor {
-    const name = modelBlocksPolyhedronAttributeName(modelId, blockId);
-    const item = modelBlocksPolyhedronAttributeItem(modelId, blockId);
-    const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(modelId, blockId, name, item);
-    return storedConfig.no_data_color;
-  }
   async function setModelBlocksPolyhedronAttributeNoDataColor(
     modelId: string,
     blockIds: string[],
@@ -352,6 +404,8 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
   }
   return {
     modelBlocksPolyhedronAttributeName,
+    modelBlocksPolyhedronAttributeTimeStep,
+    setModelBlocksPolyhedronAttributeTimeStep,
     modelBlocksPolyhedronAttributeItem,
     modelBlocksPolyhedronAttributeRange,
     modelBlocksPolyhedronAttributeColorMap,

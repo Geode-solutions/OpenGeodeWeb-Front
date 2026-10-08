@@ -4,6 +4,10 @@ import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
+import {
+  reapplySameSeries,
+  useAttributeTimeStepStyle,
+} from "@ogw_internal/stores/data_style/time_step";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelBlocksCommonStyle } from "./common";
@@ -60,6 +64,12 @@ interface UseModelBlocksVertexAttributeReturn {
     modelId: string,
     blockId?: string,
   ) => [number | undefined, number | undefined];
+  modelBlocksVertexAttributeTimeStep: (modelId: string, blockId?: string) => number | undefined;
+  setModelBlocksVertexAttributeTimeStep: (
+    modelId: string,
+    blockIds: string[],
+    timeStep: number,
+  ) => Promise<void>;
   modelBlocksVertexAttributeColorMap: (modelId: string, blockId?: string) => string | undefined;
   modelBlocksVertexAttributeStoredConfig: (
     modelId: string,
@@ -103,6 +113,7 @@ interface UseModelBlocksVertexAttributeReturn {
 
 // oxlint-disable-next-line max-lines-per-function
 function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
+  const { attributeTimeStep, setAttributeTimeStep, seriesArrayName } = useAttributeTimeStepStyle();
   const dataStore = useDataStore();
   const modelBlocksCommonStyle = useModelBlocksCommonStyle();
   const viewerStore = useViewerStore();
@@ -209,6 +220,22 @@ function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
     const storedConfig = modelBlocksVertexAttributeStoredConfig(modelId, blockId, name, item);
     return storedConfig.colorMap;
   }
+  function modelBlocksVertexAttributeNoDataColor(modelId: string, blockId?: string): RGBAColor {
+    const name = modelBlocksVertexAttributeName(modelId, blockId);
+    const item = modelBlocksVertexAttributeItem(modelId, blockId);
+    const storedConfig = modelBlocksVertexAttributeStoredConfig(modelId, blockId, name, item);
+    return storedConfig.no_data_color;
+  }
+  function modelBlocksVertexAttributeTimeStep(
+    modelId: string,
+    blockId?: string,
+  ): number | undefined {
+    return attributeTimeStep(
+      modelId,
+      attributeSchema.$id,
+      modelBlocksVertexAttribute(modelId, blockId).name,
+    );
+  }
   async function setModelBlocksVertexAttribute(
     modelId: string,
     blockIds: string[],
@@ -236,7 +263,7 @@ function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
     const params = {
       id: modelId,
       block_ids: block_viewer_ids,
-      name,
+      name: seriesArrayName(modelId, attributeSchema.$id, name),
       item,
       points,
       minimum,
@@ -288,6 +315,37 @@ function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
     });
     return applyVertexAttribute(modelId, blockIds);
   }
+  async function setModelBlocksVertexAttributeTimeStep(
+    modelId: string,
+    blockIds: string[],
+    timeStep: number,
+  ): Promise<void> {
+    const name = modelBlocksVertexAttributeName(modelId, blockIds[0]);
+    if (name === undefined) {
+      return;
+    }
+    await setAttributeTimeStep(modelId, attributeSchema.$id, name, timeStep);
+    await Promise.all([
+      applyVertexAttribute(modelId, blockIds),
+      reapplySameSeries(
+        await dataStore.getBlocksGeodeIds(modelId),
+        blockIds,
+        (id) =>
+          modelBlocksCommonStyle.modelBlockColoring(modelId, id).active === "vertex" &&
+          modelBlocksVertexAttributeName(modelId, id) === name
+            ? [
+                modelBlocksVertexAttributeItem(modelId, id),
+                modelBlocksVertexAttributeRange(modelId, id),
+                modelBlocksVertexAttributeColorMap(modelId, id),
+                JSON.stringify(modelBlocksVertexAttributeNoDataColor(modelId, id)),
+              ].join("|")
+            : undefined,
+        async (ids) => {
+          await applyVertexAttribute(modelId, ids);
+        },
+      ),
+    ]);
+  }
   async function setModelBlocksVertexAttributeRange(
     modelId: string,
     blockIds: string[],
@@ -314,12 +372,6 @@ function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
     });
     return applyVertexAttribute(modelId, blockIds);
   }
-  function modelBlocksVertexAttributeNoDataColor(modelId: string, blockId?: string): RGBAColor {
-    const name = modelBlocksVertexAttributeName(modelId, blockId);
-    const item = modelBlocksVertexAttributeItem(modelId, blockId);
-    const storedConfig = modelBlocksVertexAttributeStoredConfig(modelId, blockId, name, item);
-    return storedConfig.no_data_color;
-  }
   async function setModelBlocksVertexAttributeNoDataColor(
     modelId: string,
     blockIds: string[],
@@ -336,6 +388,8 @@ function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
   }
   return {
     modelBlocksVertexAttributeName,
+    modelBlocksVertexAttributeTimeStep,
+    setModelBlocksVertexAttributeTimeStep,
     modelBlocksVertexAttributeItem,
     modelBlocksVertexAttributeRange,
     modelBlocksVertexAttributeColorMap,

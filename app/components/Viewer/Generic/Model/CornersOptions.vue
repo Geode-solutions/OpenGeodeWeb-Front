@@ -123,6 +123,17 @@ const cornersVertexAttributeName = computed<string | undefined>({
   },
 });
 
+const cornersVertexAttributeTimeStep = computed<number | undefined>({
+  get: () => dataStyleStore.modelCornersVertexAttributeTimeStep(modelId, referenceCornerId.value),
+  set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
+    await dataStyleStore.setModelCornersVertexAttributeTimeStep(modelId, targetCornerIds, newValue);
+    hybridViewerStore.remoteRender();
+  },
+});
+
 const cornersVertexAttributeItem = computed<string | undefined>({
   get: () => dataStyleStore.modelCornersVertexAttributeItem(modelId, referenceCornerId.value),
   set: async (newValue) => {
@@ -177,6 +188,17 @@ const vertexAttributeName = computed<string | undefined>({
       return;
     }
     await dataStyleStore.setModelCornersVertexAttributeName(modelId, [cornerId], newValue);
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const vertexAttributeTimeStep = computed<number | undefined>({
+  get: () => dataStyleStore.modelCornersVertexAttributeTimeStep(modelId, cornerId),
+  set: async (newValue) => {
+    if (cornerId === undefined || newValue === undefined) {
+      return;
+    }
+    await dataStyleStore.setModelCornersVertexAttributeTimeStep(modelId, [cornerId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -252,6 +274,7 @@ const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attri
       v-model:vertex_attribute_range="cornersVertexAttributeRange"
       v-model:vertex_attribute_color_map="cornersVertexAttributeColorMap"
       v-model:vertex_attribute_no_data_color="cornersVertexAttributeNoDataColor"
+      v-model:vertex_attribute_time_step="cornersVertexAttributeTimeStep"
       :capabilities="capabilities"
       :schemas="{ vertex: vertexSchema }"
       :allowRandom="true"
@@ -275,6 +298,7 @@ const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attri
       v-model:vertex_attribute_range="vertexAttributeRange"
       v-model:vertex_attribute_color_map="vertexAttributeColorMap"
       v-model:vertex_attribute_no_data_color="vertexAttributeNoDataColor"
+      v-model:vertex_attribute_time_step="vertexAttributeTimeStep"
       :capabilities="capabilities"
       :schemas="{ vertex: vertexSchema }"
       :allowRandom="true"

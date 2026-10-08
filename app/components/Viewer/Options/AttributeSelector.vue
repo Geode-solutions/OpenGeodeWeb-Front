@@ -21,6 +21,7 @@ const attributeRange = defineModel<(number | undefined)[]>("attributeRange", {
 });
 const attributeColorMap = defineModel<string>("attributeColorMap");
 const attributeNoDataColor = defineModel<typeof DEFAULT_NO_DATA_COLOR>("attributeNoDataColor");
+const attributeTimeStep = defineModel<number>("attributeTimeStep");
 
 interface Props {
   id: string;
@@ -32,6 +33,7 @@ const { id, componentIds = undefined, schema } = defineProps<Props>();
 
 interface Emits {
   "update:attributeColorMap": [colorMap: string];
+  "update:attributeTimeStep": [timeStep: number];
   ranges_per_data: [ranges: RangesPerData];
 }
 
@@ -41,6 +43,7 @@ interface AttributeInfo {
   attribute_name: string;
   nb_items: number;
   no_data?: boolean;
+  time_steps?: number[];
   [key: string]: unknown;
 }
 
@@ -52,6 +55,43 @@ const groupTargetIds = useBatchGroup(() => id);
 const currentAttribute = computed<AttributeInfo | undefined>(() =>
   attributes.value.find((attr) => attr.attribute_name === attributeName.value),
 );
+const timeSteps = computed<number[]>(() => currentAttribute.value?.time_steps ?? []);
+const sliderTimeStep = ref<number>(0);
+
+watch(
+  attributeTimeStep,
+  (value) => {
+    sliderTimeStep.value = value ?? 0;
+  },
+  { immediate: true },
+);
+
+function commitTimeStep(value: number): void {
+  attributeTimeStep.value = value;
+}
+
+function formatTime(index: number): string {
+  const time = timeSteps.value[index];
+  return time === undefined ? "" : `t = ${time}`;
+}
+
+let committedSeries: string | undefined = undefined;
+
+function commitSeriesTimeStep(): void {
+  if (timeSteps.value.length === 0) {
+    committedSeries = undefined;
+    return;
+  }
+  const name = currentAttribute.value?.attribute_name;
+  if (name === committedSeries) {
+    return;
+  }
+  committedSeries = name;
+  const current = attributeTimeStep.value;
+  const valid = current !== undefined && current >= 0 && current < timeSteps.value.length;
+  emit("update:attributeTimeStep", valid ? current : 0);
+}
+
 const cssNoDataColor = computed<string>(() => {
   const { red, green, blue, alpha } = attributeNoDataColor.value ?? DEFAULT_NO_DATA_COLOR;
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
@@ -183,6 +223,7 @@ watch([attributeName, attributeItem], ([name, item]) => {
 });
 
 watch([attributeName, attributeItem, currentAttribute], () => {
+  commitSeriesTimeStep();
   if (groupTargetIds.value) {
     return;
   }
@@ -221,6 +262,25 @@ watch([attributeName, attributeItem, currentAttribute], () => {
     class="mt-3"
     hide-details
   />
+  <v-slider
+    v-if="timeSteps.length > 1"
+    data-testid="timeStepSlider"
+    v-model="sliderTimeStep"
+    :min="0"
+    :max="timeSteps.length - 1"
+    :step="1"
+    color="primary"
+    density="compact"
+    class="time-step-slider mt-3"
+    hide-details
+    show-ticks="always"
+    :tick-size="10"
+    thumb-label="hover"
+    @end="commitTimeStep"
+    @keyup="commitTimeStep(sliderTimeStep)"
+  >
+    <template #thumb-label="{ modelValue }">{{ formatTime(modelValue) }}</template>
+  </v-slider>
   <div
     v-if="currentAttribute && currentAttribute.no_data"
     class="text-caption text-high-emphasis mt-1 d-flex align-center ga-1"
@@ -271,5 +331,25 @@ watch([attributeName, attributeItem, currentAttribute], () => {
 .color-picker-rect-btn:hover {
   border-color: rgba(255, 255, 255, 0.9);
   transform: scale(1.1);
+}
+
+.time-step-slider :deep(.v-slider-thumb__label) {
+  width: auto;
+  white-space: nowrap;
+  padding: 0 6px;
+}
+
+.time-step-slider :deep(.v-slider-track__tick) {
+  border-radius: 50%;
+  background-color: rgb(var(--v-theme-primary));
+}
+
+/* Vuetify insets the first and last ticks, which only suits tiny ticks */
+.time-step-slider.v-slider.v-input--horizontal :deep(.v-slider-track__tick--first) {
+  margin-inline-start: 0;
+}
+
+.time-step-slider.v-slider.v-input--horizontal :deep(.v-slider-track__tick--last) {
+  margin-inline-start: 100%;
 }
 </style>

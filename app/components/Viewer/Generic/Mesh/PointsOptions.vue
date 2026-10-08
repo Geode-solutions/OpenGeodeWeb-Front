@@ -79,6 +79,19 @@ const vertex_attribute_name = computed<string | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
+
+const vertex_attribute_time_step = computed<number | undefined>({
+  get: () => dataStyleStore.meshPointsVertexAttributeTimeStep(id.value),
+  set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
+    await applyBatchStyle(id.value, (targetId: string) =>
+      Promise.resolve(dataStyleStore.setMeshPointsVertexAttributeTimeStep(targetId, newValue)),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
 const vertex_attribute_item = computed<string | undefined>({
   get: () => dataStyleStore.meshPointsVertexAttributeItem(id.value),
   set: async (newValue) => {
@@ -158,6 +171,7 @@ async function setVertexAttributeRangesPerData(ranges: RangesPerData): Promise<v
           @vertex_attribute_ranges_per_data="setVertexAttributeRangesPerData"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
           v-model:vertex_attribute_no_data_color="vertex_attribute_no_data_color"
+          v-model:vertex_attribute_time_step="vertex_attribute_time_step"
           :capabilities="{ vertex: { available: false } }"
         />
       </template>

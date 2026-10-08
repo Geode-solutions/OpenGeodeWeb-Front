@@ -17,6 +17,7 @@ interface AttributeGroup {
   minimum: number;
   maximum: number;
   colorMap: string;
+  no_data_color?: RGBAColor;
   lines_ids: string[];
 }
 
@@ -113,17 +114,30 @@ export function useModelLinesStyle(): ReturnType<typeof useModelLinesCommonStyle
             modelId,
             line_id,
           );
-          const attribute = { name, item, minimum, maximum, colorMap };
+          const no_data_color = modelLinesVertexAttribute.modelLinesVertexAttributeNoDataColor(
+            modelId,
+            line_id,
+          );
+          const attribute = {
+            name,
+            item,
+            minimum,
+            maximum,
+            colorMap,
+            no_data_color,
+          };
           if (!isModelLinesVertexAttributeValid(attribute)) {
             continue;
           }
-          const key = `${name}_${item}_${colorMap}_${minimum}_${maximum}`;
+          const key = [name, item, colorMap, minimum, maximum, JSON.stringify(no_data_color)].join(
+            "_",
+          );
           vertexGroups[key] ??= { ...attribute, lines_ids: [] };
           vertexGroups[key].lines_ids.push(line_id);
         }
         coloringPromises.push(
           ...Object.values(vertexGroups).map(
-            async ({ name, item, minimum, maximum, colorMap, lines_ids: ids }) => {
+            async ({ name, item, minimum, maximum, colorMap, no_data_color, lines_ids: ids }) => {
               const result = await modelLinesVertexAttribute.setModelLinesVertexAttribute(
                 modelId,
                 ids,
@@ -133,6 +147,7 @@ export function useModelLinesStyle(): ReturnType<typeof useModelLinesCommonStyle
                   minimum,
                   maximum,
                   colorMap,
+                  no_data_color,
                 },
               );
               return result;
@@ -152,17 +167,30 @@ export function useModelLinesStyle(): ReturnType<typeof useModelLinesCommonStyle
             modelId,
             line_id,
           );
-          const attribute = { name, item, minimum, maximum, colorMap };
+          const no_data_color = modelLinesEdgeAttribute.modelLinesEdgeAttributeNoDataColor(
+            modelId,
+            line_id,
+          );
+          const attribute = {
+            name,
+            item,
+            minimum,
+            maximum,
+            colorMap,
+            no_data_color,
+          };
           if (!isModelLinesEdgeAttributeValid(attribute)) {
             continue;
           }
-          const key = `${name}_${item}_${colorMap}_${minimum}_${maximum}`;
+          const key = [name, item, colorMap, minimum, maximum, JSON.stringify(no_data_color)].join(
+            "_",
+          );
           edgeGroups[key] ??= { ...attribute, lines_ids: [] };
           edgeGroups[key].lines_ids.push(line_id);
         }
         coloringPromises.push(
           ...Object.values(edgeGroups).map(
-            async ({ name, item, minimum, maximum, colorMap, lines_ids: ids }) => {
+            async ({ name, item, minimum, maximum, colorMap, no_data_color, lines_ids: ids }) => {
               const result = await modelLinesEdgeAttribute.setModelLinesEdgeAttribute(
                 modelId,
                 ids,
@@ -172,6 +200,7 @@ export function useModelLinesStyle(): ReturnType<typeof useModelLinesCommonStyle
                   minimum,
                   maximum,
                   colorMap,
+                  no_data_color,
                 },
               );
               return result;

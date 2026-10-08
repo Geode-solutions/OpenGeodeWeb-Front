@@ -6,6 +6,7 @@ import type {
 import type { Table } from "dexie";
 import { database } from "@ogw_internal/database/database.js";
 import { getDefaultStyle } from "@ogw_front/utils/default_styles";
+import { useAttributeTimeStepStyle } from "@ogw_internal/stores/data_style/time_step";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useMeshStyle } from "@ogw_internal/stores/data_style/mesh/index";
@@ -37,6 +38,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   const dataStyleState = useDataStyleState();
   const meshStyleStore = useMeshStyle();
   const modelStyleStore = useModelStyle();
+  const attributeTimeStepStyle = useAttributeTimeStepStyle();
   const dataStore = useDataStore();
   // oxlint-disable-next-line no-unsafe-type-assertion -- the database Proxy is typed as `{}` at its export site; this cast documents its real runtime shape.
   const typedDatabase = database as unknown as DatabaseTables;
@@ -160,6 +162,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     importStores,
     applyAllStylesFromState,
     ...dataStyleState,
+    ...attributeTimeStepStyle,
     ...meshStyleStore,
     ...modelStyleStore,
   };

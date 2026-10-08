@@ -96,7 +96,11 @@ export function useModelLinesColor(): {
         modelId,
         lines_ids[0],
       );
-      const attribute = { name, item, minimum, maximum, colorMap };
+      const no_data_color = modelLinesVertexAttribute.modelLinesVertexAttributeNoDataColor(
+        modelId,
+        lines_ids[0],
+      );
+      const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
       if (isModelLinesVertexAttributeValid(attribute)) {
         return modelLinesVertexAttribute.setModelLinesVertexAttribute(
           modelId,
@@ -115,7 +119,11 @@ export function useModelLinesColor(): {
         modelId,
         lines_ids[0],
       );
-      const attribute = { name, item, minimum, maximum, colorMap };
+      const no_data_color = modelLinesEdgeAttribute.modelLinesEdgeAttributeNoDataColor(
+        modelId,
+        lines_ids[0],
+      );
+      const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
       if (isModelLinesEdgeAttributeValid(attribute)) {
         return modelLinesEdgeAttribute.setModelLinesEdgeAttribute(modelId, lines_ids, attribute);
       }

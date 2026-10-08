@@ -14,6 +14,7 @@ interface ObjectStyle {
   surfaces?: StyleValues;
   blocks?: StyleValues;
   attributes?: StyleValues;
+  timeSteps?: Record<string, Record<string, number>>;
   [key: string]: unknown;
 }
 

@@ -79,6 +79,19 @@ const vertex_attribute_name = computed<string | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
+
+const vertex_attribute_time_step = computed<number | undefined>({
+  get: () => dataStyleStore.meshEdgesVertexAttributeTimeStep(id.value),
+  set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
+    await applyBatchStyle(id.value, (targetId: string) =>
+      Promise.resolve(dataStyleStore.setMeshEdgesVertexAttributeTimeStep(targetId, newValue)),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
 const vertex_attribute_item = computed<string | undefined>({
   get: () => dataStyleStore.meshEdgesVertexAttributeItem(id.value),
   set: async (newValue) => {
@@ -127,6 +140,19 @@ const edge_attribute_name = computed<string | undefined>({
     }
     await applyBatchStyle(id.value, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshEdgesEdgeAttributeName(targetId, newValue)),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const edge_attribute_time_step = computed<number | undefined>({
+  get: () => dataStyleStore.meshEdgesEdgeAttributeTimeStep(id.value),
+  set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
+    await applyBatchStyle(id.value, (targetId: string) =>
+      Promise.resolve(dataStyleStore.setMeshEdgesEdgeAttributeTimeStep(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -217,12 +243,14 @@ async function setEdgeAttributeRangesPerData(ranges: RangesPerData): Promise<voi
           @vertex_attribute_ranges_per_data="setVertexAttributeRangesPerData"
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
           v-model:vertex_attribute_no_data_color="vertex_attribute_no_data_color"
+          v-model:vertex_attribute_time_step="vertex_attribute_time_step"
           v-model:edge_attribute_name="edge_attribute_name"
           v-model:edge_attribute_item="edge_attribute_item"
           v-model:edge_attribute_range="edge_attribute_range"
           @edge_attribute_ranges_per_data="setEdgeAttributeRangesPerData"
           v-model:edge_attribute_color_map="edge_attribute_color_map"
           v-model:edge_attribute_no_data_color="edge_attribute_no_data_color"
+          v-model:edge_attribute_time_step="edge_attribute_time_step"
         />
       </template>
     </template>

@@ -1,13 +1,16 @@
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
+import { useAttributeTimeStepStyle } from "@ogw_internal/stores/data_style/time_step";
 import { useMeshCellsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
+const attributeNamesSchema = back_schemas.opengeodeweb_back.cell_attribute_names;
 const meshCellsCellAttributeSchemas = viewer_schemas.opengeodeweb_viewer.mesh.cells.attribute.cell;
 
 interface AttributeStoredConfig {
@@ -56,6 +59,8 @@ function useMeshCellsCellAttributeStyle(): {
   meshCellsCellAttributeName: (id: string) => string | undefined;
   meshCellsCellAttributeItem: (id: string) => number;
   meshCellsCellAttributeRange: (id: string) => [number | undefined, number | undefined];
+  meshCellsCellAttributeTimeStep: (id: string) => number | undefined;
+  setMeshCellsCellAttributeTimeStep: (id: string, timeStep: number) => Promise<unknown>;
   meshCellsCellAttributeColorMap: (id: string) => string | undefined;
   meshCellsCellAttributeStoredConfig: (
     id: string,
@@ -74,6 +79,7 @@ function useMeshCellsCellAttributeStyle(): {
   meshCellsCellAttributeNoDataColor: (id: string) => RGBAColor;
   setMeshCellsCellAttributeNoDataColor: (id: string, no_data_color: RGBAColor) => Promise<unknown>;
 } {
+  const { attributeTimeStep, setAttributeTimeStep, seriesArrayName } = useAttributeTimeStepStyle();
   const viewerStore = useViewerStore();
   const meshCellsCommonStyle = useMeshCellsCommonStyle();
   function meshCellsCellAttribute(id: string): AttributeState {
@@ -140,6 +146,9 @@ function useMeshCellsCellAttributeStyle(): {
     const { item, name } = meshCellsCellAttribute(id);
     return item ?? meshCellsCellAttributeLastItem(id, name);
   }
+  function meshCellsCellAttributeTimeStep(id: string): number | undefined {
+    return attributeTimeStep(id, attributeNamesSchema.$id, meshCellsCellAttribute(id).name);
+  }
   async function setMeshCellsCellAttribute(
     id: string,
     {
@@ -165,7 +174,7 @@ function useMeshCellsCellAttributeStyle(): {
     const schema = meshCellsCellAttributeSchemas.attribute;
     const params = {
       id,
-      name,
+      name: seriesArrayName(id, attributeNamesSchema.$id, name),
       item,
       points,
       minimum,
@@ -214,6 +223,14 @@ function useMeshCellsCellAttributeStyle(): {
     const item = meshCellsCellAttributeItem(id);
     const storedConfig = meshCellsCellAttributeStoredConfig(id, name, item);
     return [storedConfig.minimum, storedConfig.maximum];
+  }
+  async function setMeshCellsCellAttributeTimeStep(id: string, timeStep: number): Promise<unknown> {
+    const name = meshCellsCellAttributeName(id);
+    if (name === undefined) {
+      return undefined;
+    }
+    await setAttributeTimeStep(id, attributeNamesSchema.$id, name, timeStep);
+    return applyCellAttribute(id);
   }
   async function setMeshCellsCellAttributeRange(
     id: string,
@@ -266,6 +283,8 @@ function useMeshCellsCellAttributeStyle(): {
   }
   return {
     meshCellsCellAttributeName,
+    meshCellsCellAttributeTimeStep,
+    setMeshCellsCellAttributeTimeStep,
     meshCellsCellAttributeItem,
     meshCellsCellAttributeRange,
     meshCellsCellAttributeColorMap,

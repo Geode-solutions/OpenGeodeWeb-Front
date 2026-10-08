@@ -20,6 +20,7 @@ interface AttributeGroup {
   minimum: number;
   maximum: number;
   colorMap: string;
+  no_data_color?: RGBAColor;
   blocks_ids: string[];
 }
 
@@ -119,17 +120,30 @@ export function useModelBlocksStyle(): UseModelBlocksStyleReturn {
             modelId,
             block_id,
           );
-          const attribute = { name, item, minimum, maximum, colorMap };
+          const no_data_color = modelBlocksVertexAttribute.modelBlocksVertexAttributeNoDataColor(
+            modelId,
+            block_id,
+          );
+          const attribute = {
+            name,
+            item,
+            minimum,
+            maximum,
+            colorMap,
+            no_data_color,
+          };
           if (!isModelBlocksVertexAttributeValid(attribute)) {
             continue;
           }
-          const key = `${name}_${item}_${colorMap}_${minimum}_${maximum}`;
+          const key = [name, item, colorMap, minimum, maximum, JSON.stringify(no_data_color)].join(
+            "_",
+          );
           vertexGroups[key] ??= { ...attribute, blocks_ids: [] };
           vertexGroups[key].blocks_ids.push(block_id);
         }
         coloringPromises.push(
           ...Object.values(vertexGroups).map(
-            async ({ name, item, minimum, maximum, colorMap, blocks_ids: ids }) => {
+            async ({ name, item, minimum, maximum, colorMap, no_data_color, blocks_ids: ids }) => {
               const result = await modelBlocksVertexAttribute.setModelBlocksVertexAttribute(
                 modelId,
                 ids,
@@ -139,6 +153,7 @@ export function useModelBlocksStyle(): UseModelBlocksStyleReturn {
                   minimum,
                   maximum,
                   colorMap,
+                  no_data_color,
                 },
               );
               return result;
@@ -162,17 +177,31 @@ export function useModelBlocksStyle(): UseModelBlocksStyleReturn {
             modelId,
             block_id,
           );
-          const attribute = { name, item, minimum, maximum, colorMap };
+          const no_data_color =
+            modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeNoDataColor(
+              modelId,
+              block_id,
+            );
+          const attribute = {
+            name,
+            item,
+            minimum,
+            maximum,
+            colorMap,
+            no_data_color,
+          };
           if (!isModelBlocksPolyhedronAttributeValid(attribute)) {
             continue;
           }
-          const key = `${name}_${item}_${colorMap}_${minimum}_${maximum}`;
+          const key = [name, item, colorMap, minimum, maximum, JSON.stringify(no_data_color)].join(
+            "_",
+          );
           polyhedronGroups[key] ??= { ...attribute, blocks_ids: [] };
           polyhedronGroups[key].blocks_ids.push(block_id);
         }
         coloringPromises.push(
           ...Object.values(polyhedronGroups).map(
-            async ({ name, item, minimum, maximum, colorMap, blocks_ids: ids }) => {
+            async ({ name, item, minimum, maximum, colorMap, no_data_color, blocks_ids: ids }) => {
               const result = await modelBlocksPolyhedronAttribute.setModelBlocksPolyhedronAttribute(
                 modelId,
                 ids,
@@ -182,6 +211,7 @@ export function useModelBlocksStyle(): UseModelBlocksStyleReturn {
                   minimum,
                   maximum,
                   colorMap,
+                  no_data_color,
                 },
               );
               return result;

@@ -1,3 +1,5 @@
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
+
 interface AttributeRangeSource {
   min_values?: readonly number[];
   max_values?: readonly number[];
@@ -55,12 +57,28 @@ const MESH_ELEMENT_KINDS: Record<string, string> = {
   TetrahedralSolid3D: "polyhedron",
 };
 
-const MODEL_COMPONENT_KINDS: Record<string, string[]> = {
-  Corner: ["vertex"],
-  Line: ["vertex", "edge"],
-  Surface: ["vertex", "polygon"],
-  Block: ["vertex", "polyhedron"],
+const MODEL_COMPONENT_ATTRIBUTE_SCHEMAS: Record<string, Record<string, { $id: string }>> = {
+  Corner: { vertex: viewer_schemas.opengeodeweb_viewer.model.corners.attribute.vertex.attribute },
+  Line: {
+    vertex: viewer_schemas.opengeodeweb_viewer.model.lines.attribute.vertex.attribute,
+    edge: viewer_schemas.opengeodeweb_viewer.model.lines.attribute.edge.attribute,
+  },
+  Surface: {
+    vertex: viewer_schemas.opengeodeweb_viewer.model.surfaces.attribute.vertex.attribute,
+    polygon: viewer_schemas.opengeodeweb_viewer.model.surfaces.attribute.polygon.attribute,
+  },
+  Block: {
+    vertex: viewer_schemas.opengeodeweb_viewer.model.blocks.attribute.vertex.attribute,
+    polyhedron: viewer_schemas.opengeodeweb_viewer.model.blocks.attribute.polyhedron.attribute,
+  },
 };
+
+const MODEL_COMPONENT_KINDS: Record<string, string[]> = Object.fromEntries(
+  Object.entries(MODEL_COMPONENT_ATTRIBUTE_SCHEMAS).map(([type, schemas]) => [
+    type,
+    Object.keys(schemas),
+  ]),
+);
 
 function intersectBy<TItem>(
   lists: readonly (readonly TItem[])[],
@@ -75,6 +93,16 @@ function intersectBy<TItem>(
 interface NamedAttribute {
   attribute_name: string;
   nb_items: number;
+  time_steps?: readonly number[];
+}
+
+function sameTimeSteps(left: NamedAttribute, right: NamedAttribute): boolean {
+  const leftSteps = left.time_steps ?? [];
+  const rightSteps = right.time_steps ?? [];
+  return (
+    leftSteps.length === rightSteps.length &&
+    leftSteps.every((time, index) => time === rightSteps[index])
+  );
 }
 
 function intersectAttributes<TAttribute extends NamedAttribute>(
@@ -83,19 +111,28 @@ function intersectAttributes<TAttribute extends NamedAttribute>(
   const allAttributes = attributesPerData.flat();
   const common: TAttribute[] = [];
   for (const attribute of intersectBy(attributesPerData, (item) => item.attribute_name)) {
-    const nb_items = Math.min(
-      ...allAttributes
-        .filter((other) => other.attribute_name === attribute.attribute_name)
-        .map((other) => other.nb_items),
+    const sameName = allAttributes.filter(
+      (other) => other.attribute_name === attribute.attribute_name,
     );
+    if (!sameName.every((other) => sameTimeSteps(other, attribute))) {
+      continue;
+    }
+    const nb_items = Math.min(...sameName.map((other) => other.nb_items));
     common.push({ ...attribute, nb_items });
   }
   return common;
 }
 
+// OpenGeode-IO writes each step of a time series as the "<name>@<step>" VTK array
+function attributeArrayName(name: string, timeStep: number | undefined): string {
+  return timeStep === undefined ? name : `${name}@${timeStep}`;
+}
+
 export {
   MESH_ELEMENT_KINDS,
+  MODEL_COMPONENT_ATTRIBUTE_SCHEMAS,
   MODEL_COMPONENT_KINDS,
+  attributeArrayName,
   getAttributeRange,
   intersectAttributes,
   intersectBy,

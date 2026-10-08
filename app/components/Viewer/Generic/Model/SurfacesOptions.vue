@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// oxlint-disable eslint/max-lines
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
@@ -123,6 +124,21 @@ const surfacesVertexAttributeName = computed<string | undefined>({
   },
 });
 
+const surfacesVertexAttributeTimeStep = computed<number | undefined>({
+  get: () => dataStyleStore.modelSurfacesVertexAttributeTimeStep(modelId, referenceSurfaceId.value),
+  set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
+    await dataStyleStore.setModelSurfacesVertexAttributeTimeStep(
+      modelId,
+      targetSurfaceIds,
+      newValue,
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
+
 const surfacesVertexAttributeItem = computed<string | undefined>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeItem(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
@@ -180,6 +196,22 @@ const surfacesPolygonAttributeName = computed<string | undefined>({
       return;
     }
     await dataStyleStore.setModelSurfacesPolygonAttributeName(modelId, targetSurfaceIds, newValue);
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const surfacesPolygonAttributeTimeStep = computed<number | undefined>({
+  get: () =>
+    dataStyleStore.modelSurfacesPolygonAttributeTimeStep(modelId, referenceSurfaceId.value),
+  set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
+    await dataStyleStore.setModelSurfacesPolygonAttributeTimeStep(
+      modelId,
+      targetSurfaceIds,
+      newValue,
+    );
     hybridViewerStore.remoteRender();
   },
 });
@@ -247,6 +279,17 @@ const vertexAttributeName = computed<string | undefined>({
   },
 });
 
+const vertexAttributeTimeStep = computed<number | undefined>({
+  get: () => dataStyleStore.modelSurfacesVertexAttributeTimeStep(modelId, surfaceId),
+  set: async (newValue) => {
+    if (surfaceId === undefined || newValue === undefined) {
+      return;
+    }
+    await dataStyleStore.setModelSurfacesVertexAttributeTimeStep(modelId, [surfaceId], newValue);
+    hybridViewerStore.remoteRender();
+  },
+});
+
 const vertexAttributeItem = computed<string | undefined>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeItem(modelId, surfaceId),
   set: async (newValue) => {
@@ -304,6 +347,17 @@ const polygonAttributeName = computed<string | undefined>({
       return;
     }
     await dataStyleStore.setModelSurfacesPolygonAttributeName(modelId, [surfaceId], newValue);
+    hybridViewerStore.remoteRender();
+  },
+});
+
+const polygonAttributeTimeStep = computed<number | undefined>({
+  get: () => dataStyleStore.modelSurfacesPolygonAttributeTimeStep(modelId, surfaceId),
+  set: async (newValue) => {
+    if (surfaceId === undefined || newValue === undefined) {
+      return;
+    }
+    await dataStyleStore.setModelSurfacesPolygonAttributeTimeStep(modelId, [surfaceId], newValue);
     hybridViewerStore.remoteRender();
   },
 });
@@ -389,11 +443,13 @@ const polygonSchema = back_schemas.opengeodeweb_back.model_component_polygon_att
       v-model:vertex_attribute_range="surfacesVertexAttributeRange"
       v-model:vertex_attribute_color_map="surfacesVertexAttributeColorMap"
       v-model:vertex_attribute_no_data_color="surfacesVertexAttributeNoDataColor"
+      v-model:vertex_attribute_time_step="surfacesVertexAttributeTimeStep"
       v-model:polygon_attribute_name="surfacesPolygonAttributeName"
       v-model:polygon_attribute_item="surfacesPolygonAttributeItem"
       v-model:polygon_attribute_range="surfacesPolygonAttributeRange"
       v-model:polygon_attribute_color_map="surfacesPolygonAttributeColorMap"
       v-model:polygon_attribute_no_data_color="surfacesPolygonAttributeNoDataColor"
+      v-model:polygon_attribute_time_step="surfacesPolygonAttributeTimeStep"
       :capabilities="capabilities"
       :schemas="{ vertex: vertexSchema, polygon: polygonSchema }"
       :allowRandom="true"
@@ -417,11 +473,13 @@ const polygonSchema = back_schemas.opengeodeweb_back.model_component_polygon_att
       v-model:vertex_attribute_range="vertexAttributeRange"
       v-model:vertex_attribute_color_map="vertexAttributeColorMap"
       v-model:vertex_attribute_no_data_color="vertexAttributeNoDataColor"
+      v-model:vertex_attribute_time_step="vertexAttributeTimeStep"
       v-model:polygon_attribute_name="polygonAttributeName"
       v-model:polygon_attribute_item="polygonAttributeItem"
       v-model:polygon_attribute_range="polygonAttributeRange"
       v-model:polygon_attribute_color_map="polygonAttributeColorMap"
       v-model:polygon_attribute_no_data_color="polygonAttributeNoDataColor"
+      v-model:polygon_attribute_time_step="polygonAttributeTimeStep"
       :capabilities="capabilities"
       :schemas="{ vertex: vertexSchema, polygon: polygonSchema }"
       :allowRandom="true"

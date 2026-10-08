@@ -1,13 +1,16 @@
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
+import { useAttributeTimeStepStyle } from "@ogw_internal/stores/data_style/time_step";
 import { useMeshPointsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
+const attributeNamesSchema = back_schemas.opengeodeweb_back.vertex_attribute_names;
 const meshPointsVertexAttributeSchemas =
   viewer_schemas.opengeodeweb_viewer.mesh.points.attribute.vertex;
 
@@ -56,6 +59,8 @@ interface UseMeshPointsVertexAttributeStyleReturn {
   meshPointsVertexAttributeName: (id: string) => string | undefined;
   meshPointsVertexAttributeItem: (id: string) => number;
   meshPointsVertexAttributeRange: (id: string) => [number | undefined, number | undefined];
+  meshPointsVertexAttributeTimeStep: (id: string) => number | undefined;
+  setMeshPointsVertexAttributeTimeStep: (id: string, timeStep: number) => Promise<unknown>;
   meshPointsVertexAttributeColorMap: (id: string) => string | undefined;
   meshPointsVertexAttributeStoredConfig: (
     id: string,
@@ -83,6 +88,7 @@ interface UseMeshPointsVertexAttributeStyleReturn {
 
 // oxlint-disable-next-line max-lines-per-function
 function useMeshPointsVertexAttributeStyle(): UseMeshPointsVertexAttributeStyleReturn {
+  const { attributeTimeStep, setAttributeTimeStep, seriesArrayName } = useAttributeTimeStepStyle();
   const viewerStore = useViewerStore();
   const meshPointsCommonStyle = useMeshPointsCommonStyle();
   function meshPointsVertexAttribute(id: string): AttributeState {
@@ -149,6 +155,9 @@ function useMeshPointsVertexAttributeStyle(): UseMeshPointsVertexAttributeStyleR
     const { item, name } = meshPointsVertexAttribute(id);
     return item ?? meshPointsVertexAttributeLastItem(id, name);
   }
+  function meshPointsVertexAttributeTimeStep(id: string): number | undefined {
+    return attributeTimeStep(id, attributeNamesSchema.$id, meshPointsVertexAttribute(id).name);
+  }
   async function setMeshPointsVertexAttribute(
     id: string,
     {
@@ -174,7 +183,7 @@ function useMeshPointsVertexAttributeStyle(): UseMeshPointsVertexAttributeStyleR
     const schema = meshPointsVertexAttributeSchemas.attribute;
     const params = {
       id,
-      name,
+      name: seriesArrayName(id, attributeNamesSchema.$id, name),
       item,
       points,
       minimum,
@@ -223,6 +232,17 @@ function useMeshPointsVertexAttributeStyle(): UseMeshPointsVertexAttributeStyleR
     const item = meshPointsVertexAttributeItem(id);
     const storedConfig = meshPointsVertexAttributeStoredConfig(id, name, item);
     return [storedConfig.minimum, storedConfig.maximum];
+  }
+  async function setMeshPointsVertexAttributeTimeStep(
+    id: string,
+    timeStep: number,
+  ): Promise<unknown> {
+    const name = meshPointsVertexAttributeName(id);
+    if (name === undefined) {
+      return undefined;
+    }
+    await setAttributeTimeStep(id, attributeNamesSchema.$id, name, timeStep);
+    return applyVertexAttribute(id);
   }
   async function setMeshPointsVertexAttributeRange(
     id: string,
@@ -275,6 +295,8 @@ function useMeshPointsVertexAttributeStyle(): UseMeshPointsVertexAttributeStyleR
   }
   return {
     meshPointsVertexAttributeName,
+    meshPointsVertexAttributeTimeStep,
+    setMeshPointsVertexAttributeTimeStep,
     meshPointsVertexAttributeItem,
     meshPointsVertexAttributeRange,
     meshPointsVertexAttributeColorMap,

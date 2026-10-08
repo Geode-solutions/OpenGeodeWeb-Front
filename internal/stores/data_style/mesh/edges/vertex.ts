@@ -1,13 +1,16 @@
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
+import { useAttributeTimeStepStyle } from "@ogw_internal/stores/data_style/time_step";
 import { useMeshEdgesCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
+const attributeNamesSchema = back_schemas.opengeodeweb_back.vertex_attribute_names;
 const meshEdgesVertexAttributeSchemas =
   viewer_schemas.opengeodeweb_viewer.mesh.edges.attribute.vertex;
 
@@ -56,6 +59,8 @@ interface UseMeshEdgesVertexAttributeStyleReturn {
   meshEdgesVertexAttributeName: (id: string) => string | undefined;
   meshEdgesVertexAttributeItem: (id: string) => number;
   meshEdgesVertexAttributeRange: (id: string) => [number | undefined, number | undefined];
+  meshEdgesVertexAttributeTimeStep: (id: string) => number | undefined;
+  setMeshEdgesVertexAttributeTimeStep: (id: string, timeStep: number) => Promise<unknown>;
   meshEdgesVertexAttributeColorMap: (id: string) => string | undefined;
   meshEdgesVertexAttributeStoredConfig: (
     id: string,
@@ -83,6 +88,7 @@ interface UseMeshEdgesVertexAttributeStyleReturn {
 
 // oxlint-disable-next-line max-lines-per-function
 function useMeshEdgesVertexAttributeStyle(): UseMeshEdgesVertexAttributeStyleReturn {
+  const { attributeTimeStep, setAttributeTimeStep, seriesArrayName } = useAttributeTimeStepStyle();
   const viewerStore = useViewerStore();
   const meshEdgesCommonStyle = useMeshEdgesCommonStyle();
   function meshEdgesVertexAttribute(id: string): AttributeState {
@@ -149,6 +155,9 @@ function useMeshEdgesVertexAttributeStyle(): UseMeshEdgesVertexAttributeStyleRet
     const { item, name } = meshEdgesVertexAttribute(id);
     return item ?? meshEdgesVertexAttributeLastItem(id, name);
   }
+  function meshEdgesVertexAttributeTimeStep(id: string): number | undefined {
+    return attributeTimeStep(id, attributeNamesSchema.$id, meshEdgesVertexAttribute(id).name);
+  }
   async function setMeshEdgesVertexAttribute(
     id: string,
     {
@@ -174,7 +183,7 @@ function useMeshEdgesVertexAttributeStyle(): UseMeshEdgesVertexAttributeStyleRet
     const schema = meshEdgesVertexAttributeSchemas.attribute;
     const params = {
       id,
-      name,
+      name: seriesArrayName(id, attributeNamesSchema.$id, name),
       item,
       points,
       minimum,
@@ -223,6 +232,17 @@ function useMeshEdgesVertexAttributeStyle(): UseMeshEdgesVertexAttributeStyleRet
     const item = meshEdgesVertexAttributeItem(id);
     const storedConfig = meshEdgesVertexAttributeStoredConfig(id, name, item);
     return [storedConfig.minimum, storedConfig.maximum];
+  }
+  async function setMeshEdgesVertexAttributeTimeStep(
+    id: string,
+    timeStep: number,
+  ): Promise<unknown> {
+    const name = meshEdgesVertexAttributeName(id);
+    if (name === undefined) {
+      return undefined;
+    }
+    await setAttributeTimeStep(id, attributeNamesSchema.$id, name, timeStep);
+    return applyVertexAttribute(id);
   }
   async function setMeshEdgesVertexAttributeRange(
     id: string,
@@ -275,6 +295,8 @@ function useMeshEdgesVertexAttributeStyle(): UseMeshEdgesVertexAttributeStyleRet
   }
   return {
     meshEdgesVertexAttributeName,
+    meshEdgesVertexAttributeTimeStep,
+    setMeshEdgesVertexAttributeTimeStep,
     meshEdgesVertexAttributeItem,
     meshEdgesVertexAttributeRange,
     meshEdgesVertexAttributeColorMap,

@@ -16,6 +16,7 @@ interface AttributeGroup {
   minimum: number;
   maximum: number;
   colorMap: string;
+  no_data_color?: RGBAColor;
   corners_ids: string[];
 }
 
@@ -118,17 +119,30 @@ export function useModelCornersStyle(): ModelCornersStyleApi {
             modelId,
             corner_id,
           );
-          const attribute = { name, item, minimum, maximum, colorMap };
+          const no_data_color = modelCornersVertexAttribute.modelCornersVertexAttributeNoDataColor(
+            modelId,
+            corner_id,
+          );
+          const attribute = {
+            name,
+            item,
+            minimum,
+            maximum,
+            colorMap,
+            no_data_color,
+          };
           if (!isModelCornersVertexAttributeValid(attribute)) {
             continue;
           }
-          const key = `${name}_${item}_${colorMap}_${minimum}_${maximum}`;
+          const key = [name, item, colorMap, minimum, maximum, JSON.stringify(no_data_color)].join(
+            "_",
+          );
           vertexGroups[key] ??= { ...attribute, corners_ids: [] };
           vertexGroups[key].corners_ids.push(corner_id);
         }
         coloringPromises.push(
           ...Object.values(vertexGroups).map(
-            async ({ name, item, minimum, maximum, colorMap, corners_ids: ids }) => {
+            async ({ name, item, minimum, maximum, colorMap, no_data_color, corners_ids: ids }) => {
               const result = await modelCornersVertexAttribute.setModelCornersVertexAttribute(
                 modelId,
                 ids,
@@ -138,6 +152,7 @@ export function useModelCornersStyle(): ModelCornersStyleApi {
                   minimum,
                   maximum,
                   colorMap,
+                  no_data_color,
                 },
               );
               return result;
