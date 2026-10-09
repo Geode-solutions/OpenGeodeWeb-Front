@@ -86,4 +86,50 @@ describe("missing files selector", () => {
     });
     expect(wrapper.emitted().increment_step).toHaveLength(EXPECTED_LENGTH);
   });
+
+  test("time series re-requests missing files after upload", async () => {
+    const request_mock = vi.fn();
+    request_mock.mockResolvedValueOnce({
+      has_missing_files: true,
+      mandatory_files: ["a.vtm"],
+      additional_files: [],
+    });
+    request_mock.mockResolvedValue({
+      has_missing_files: false,
+      mandatory_files: [],
+      additional_files: [],
+    });
+    backStore.request = mockAs<typeof backStore.request>(request_mock);
+
+    const wrapper = await mountSuspended(MissingFilesSelector, {
+      global: {
+        plugins: [vuetify, pinia],
+      },
+      props: {
+        multiple: false,
+        geode_object_type: "BRep",
+        filenames: ["a.pvd"],
+        timeSeries: true,
+      },
+    });
+    expect(request_mock).toHaveBeenCalledTimes(EXPECTED_LENGTH);
+
+    const file_uploader = wrapper.findComponent(FileUploader);
+    const v_file_input = file_uploader.find('input[type="file"]');
+    Object.defineProperty(v_file_input.element, "files", {
+      value: [new File(["a"], "a.vtm")],
+      writable: true,
+    });
+    await v_file_input.trigger("change");
+    await flushPromises();
+    registerEndpoint(upload_file_schema.$id, {
+      method: toHTTPMethod(upload_file_schema.methods[SECOND_INDEX]),
+      handler: () => ({}),
+    });
+    await file_uploader.findComponent(components.VBtn).trigger("click");
+    await flushPromises();
+    await flushPromises();
+    expect(request_mock).toHaveBeenCalledTimes(SECOND_INDEX + EXPECTED_LENGTH);
+    expect(wrapper.emitted().increment_step).toHaveLength(EXPECTED_LENGTH);
+  });
 });

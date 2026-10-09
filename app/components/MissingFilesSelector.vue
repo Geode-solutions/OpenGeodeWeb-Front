@@ -1,12 +1,18 @@
 <script setup lang="ts">
+import {
+  type UploadFile,
+  alignOnExpectedFiles,
+  joinUploadPath,
+  uploadDirectory,
+  uploadPath,
+} from "@ogw_front/utils/upload_path";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 
 import FetchingData from "@ogw_front/components/FetchingData.vue";
 import FileUploader from "@ogw_front/components/FileUploader.vue";
 import { useBackStore } from "@ogw_front/stores/back";
+import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
-// Files carry extra app-specific bookkeeping fields once picked up here.
-type UploadFile = File & { isConfigured?: boolean };
 interface FilePlan {
   has_missing_files: boolean;
   mandatory_files: string[];
@@ -28,9 +34,10 @@ interface Props {
   geodeObjectType: string;
   filenames: string[];
   files?: UploadFile[];
+  timeSeries?: boolean;
 }
 
-const { multiple, geodeObjectType, filenames, files = [] } = defineProps<Props>();
+const { multiple, geodeObjectType, filenames, files = [], timeSeries = false } = defineProps<Props>();
 
 const accept = ref<string>("");
 const loading = ref<boolean>(false);
@@ -39,9 +46,36 @@ const mandatory_files = ref<string[]>([]);
 const additional_files = ref<string[]>([]);
 const toggle_loading = useToggle(loading);
 
-function files_uploaded_event(value: UploadFile[]): void {
-  emit("update_values", { additional_files: value });
-  emit("increment_step");
+// Missing files are listed relative to the main file: upload them next to it.
+const upload_directory = computed(() =>
+  filenames.length === 1 ? uploadDirectory(filenames[0] ?? "") : "",
+);
+
+function withUploadPath(file: UploadFile, path: string): UploadFile {
+  return Object.assign(file, { relativePath: joinUploadPath(upload_directory.value, path) });
+}
+
+// Time series: the user may select any folder above the referenced files, whatever the export tree.
+function prepare_files(selected_files: UploadFile[]): UploadFile[] {
+  if (!timeSeries) {
+    return selected_files.map((file) => withUploadPath(file, uploadPath(file)));
+  }
+  const alignment = alignOnExpectedFiles(
+    selected_files.map((file) => uploadPath(file)),
+    [...mandatory_files.value, ...additional_files.value],
+  );
+  if (alignment.status === "not_found") {
+    useFeedbackStore().add_warning("None of the expected files were found in this folder");
+    return [];
+  }
+  if (alignment.status === "ambiguous") {
+    useFeedbackStore().add_warning("Several matching exports in this folder, select a more specific one");
+    return [];
+  }
+  return selected_files.flatMap((file, index) => {
+    const aligned = alignment.paths[index];
+    return aligned === undefined ? [] : [withUploadPath(file, aligned)];
+  });
 }
 
 function isCsvFile(filename: string): boolean {
@@ -63,7 +97,9 @@ async function missing_files(): Promise<void> {
         additional_files: [],
       });
     }
-    const params = { geode_object_type: geodeObjectType, filename };
+    const params = timeSeries
+      ? { geode_object_type: geodeObjectType, filename, time_series: true }
+      : { geode_object_type: geodeObjectType, filename };
     return backStore.request({ schema, params });
   });
   const values = await Promise.all(promise_array);
@@ -86,6 +122,16 @@ async function missing_files(): Promise<void> {
     emit("increment_step");
   }
   toggle_loading();
+}
+
+function files_uploaded_event(value: UploadFile[]): void {
+  emit("update_values", { additional_files: value });
+  if (timeSeries) {
+    // Re-list what is still missing: the next tree level only becomes known once this one is uploaded.
+    void missing_files();
+    return;
+  }
+  emit("increment_step");
 }
 
 // oxlint-disable-next-line no-top-level-await
@@ -116,7 +162,14 @@ await missing_files();
     <v-row>
       <v-col cols="12">
         <FileUploader
-          v-bind="{ multiple, accept, files, autoUpload: false }"
+          v-bind="{
+            multiple,
+            accept,
+            files,
+            autoUpload: false,
+            prepareFiles: prepare_files,
+            directory: timeSeries,
+          }"
           @files_uploaded="files_uploaded_event"
         />
       </v-col>

@@ -6,6 +6,34 @@ import { mountSuspended } from "@nuxt/test-utils/runtime";
 // Local imports
 import { setupActivePinia, vuetify } from "@ogw_tests/utils";
 import DragAndDrop from "@ogw_front/components/DragAndDrop.vue";
+import { useFeedbackStore } from "@ogw_front/stores/feedback";
+
+function fileEntry(file: File): object {
+  return {
+    isFile: true,
+    isDirectory: false,
+    name: file.name,
+    file: (resolve: (value: File) => void): void => {
+      resolve(file);
+    },
+  };
+}
+
+function directoryEntry(name: string, children: unknown[]): object {
+  return {
+    isFile: false,
+    isDirectory: true,
+    name,
+    createReader: (): object => {
+      const batches = [children, []];
+      return {
+        readEntries: (resolve: (entries: unknown[]) => void): void => {
+          resolve(batches.shift() ?? []);
+        },
+      };
+    },
+  };
+}
 
 describe("drag and drop", () => {
   const pinia = setupActivePinia();
@@ -85,5 +113,94 @@ describe("drag and drop", () => {
 
     expect(wrapper.emitted("files-selected")).toBeDefined();
     expect(wrapper.emitted("files-selected")?.[0]?.[0]).toStrictEqual([dataFile]);
+  });
+
+  test("keeps the folder tree of a dropped directory", async () => {
+    const wrapper = await mountSuspended(DragAndDrop, {
+      global: { plugins: [vuetify, pinia] },
+      props: { accept: ".pvd", directory: true },
+    });
+    const nested = directoryEntry("vtkOutput", [fileEntry(new File(["vtu"], "rank_0.vtu"))]);
+    const folder = directoryEntry("spe10", [fileEntry(new File(["pvd"], "vtkOutput.pvd")), nested]);
+    const dropEvent = new Event("drop", { bubbles: true, cancelable: true });
+    Object.defineProperty(dropEvent, "dataTransfer", {
+      value: {
+        files: [],
+        types: ["Files"],
+        items: [{ webkitGetAsEntry: (): object => folder }],
+      },
+    });
+
+    globalThis.dispatchEvent(dropEvent);
+    await flushPromises();
+
+    expect(wrapper.emitted("files-selected")?.[0]?.[0]).toMatchObject([
+      { relativePath: "spe10/vtkOutput.pvd" },
+      { relativePath: "spe10/vtkOutput/rank_0.vtu" },
+    ]);
+  });
+
+  test("ignores dropped folders outside folder mode", async () => {
+    const wrapper = await mountSuspended(DragAndDrop, {
+      global: { plugins: [vuetify, pinia] },
+      props: { accept: "" },
+    });
+    const pvdFile = new File(["pvd"], "vtkOutput.pvd");
+    const folder = directoryEntry("vtkOutput", [fileEntry(new File(["vtu"], "rank_0.vtu"))]);
+    const dropEvent = new Event("drop", { bubbles: true, cancelable: true });
+    Object.defineProperty(dropEvent, "dataTransfer", {
+      value: {
+        files: [],
+        types: ["Files"],
+        items: [
+          { webkitGetAsEntry: (): object => folder },
+          { webkitGetAsEntry: (): object => fileEntry(pvdFile) },
+        ],
+      },
+    });
+
+    globalThis.dispatchEvent(dropEvent);
+    await flushPromises();
+
+    expect(wrapper.emitted("files-selected")?.[0]?.[0]).toStrictEqual([pvdFile]);
+    expect(wrapper.emitted("folders-ignored")).toHaveLength(1);
+  });
+
+  test("warns when a dropped directory cannot be read", async () => {
+    const wrapper = await mountSuspended(DragAndDrop, {
+      global: { plugins: [vuetify, pinia] },
+      props: { directory: true },
+    });
+    const feedbackStore = useFeedbackStore();
+    const folder = {
+      isFile: false,
+      isDirectory: true,
+      name: "broken",
+      createReader: (): object => ({
+        readEntries: (_resolve: unknown, reject: (error: Error) => void): void => {
+          reject(new Error("read failed"));
+        },
+      }),
+    };
+    const dropEvent = new Event("drop", { bubbles: true, cancelable: true });
+    Object.defineProperty(dropEvent, "dataTransfer", {
+      value: {
+        files: [],
+        types: ["Files"],
+        items: [{ webkitGetAsEntry: (): object => folder }],
+      },
+    });
+
+    globalThis.dispatchEvent(dropEvent);
+    await flushPromises();
+
+    expect(wrapper.emitted("files-selected")).toBeUndefined();
+    // Wrappers mounted by earlier tests also listen to the window, so several warnings can exist.
+    expect(feedbackStore.feedbacks).toContainEqual(
+      expect.objectContaining({
+        type: "warning",
+        description: "Could not read the dropped folder: read failed",
+      }),
+    );
   });
 });

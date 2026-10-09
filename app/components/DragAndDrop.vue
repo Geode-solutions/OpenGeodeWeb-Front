@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import DragAndDropInline from "./DragAndDropInternal/DragAndDropInline.vue";
 import DragAndDropOverlay from "./DragAndDropInternal/DragAndDropOverlay.vue";
+import type { UploadFile } from "@ogw_front/utils/upload_path";
+import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 interface DragAndDropTexts {
   idle: string;
@@ -18,6 +20,7 @@ interface Props {
   inline?: boolean;
   showOverlay?: boolean;
   texts?: DragAndDropTexts;
+  directory?: boolean;
 }
 
 const {
@@ -33,10 +36,22 @@ const {
     drop: "Drop files here",
     loading: "Loading...",
   },
+  directory = false,
+  // oxlint-disable-next-line vue/max-props
 } = defineProps<Props>();
 
+const displayed_texts = computed<DragAndDropTexts>(() =>
+  directory
+    ? { ...texts, idle: "Click or drag and drop a folder", drop: "Drop the folder here" }
+    : texts,
+);
+
+const feedbackStore = useFeedbackStore();
+
 const emit = defineEmits<{
-  "files-selected": [files: File[]];
+  "files-selected": [files: UploadFile[]];
+  // A folder was dropped outside folder mode: the parent decides whether to warn.
+  "folders-ignored": [];
 }>();
 
 const isDragging = ref(false);
@@ -115,10 +130,70 @@ function onDragOver(event: DragEvent): void {
   }
 }
 
+async function readAllEntries(reader: FileSystemDirectoryReader): Promise<FileSystemEntry[]> {
+  // oxlint-disable-next-line promise/avoid-new
+  const batch = await new Promise<FileSystemEntry[]>((resolve, reject) => {
+    reader.readEntries(resolve, reject);
+  });
+  if (batch.length === 0) {
+    return [];
+  }
+  return [...batch, ...(await readAllEntries(reader))];
+}
+
+async function filesFromEntry(entry: FileSystemEntry, path: string): Promise<UploadFile[]> {
+  if (entry.isFile) {
+    // oxlint-disable-next-line promise/avoid-new
+    const file = await new Promise<File>((resolve, reject) => {
+      // oxlint-disable-next-line no-unsafe-type-assertion -- isFile guarantees a FileSystemFileEntry
+      (entry as FileSystemFileEntry).file(resolve, reject);
+    });
+    return [Object.assign(file, { relativePath: path })];
+  }
+  // oxlint-disable-next-line no-unsafe-type-assertion -- not a file, so a FileSystemDirectoryEntry
+  const children = await readAllEntries((entry as FileSystemDirectoryEntry).createReader());
+  const nested = await Promise.all(
+    children.map((child) => filesFromEntry(child, `${path}/${child.name}`)),
+  );
+  return nested.flat();
+}
+
+async function emitDroppedEntries(entries: FileSystemEntry[]): Promise<void> {
+  try {
+    const groups = await Promise.all(
+      entries.map(async (entry) => {
+        const files = await filesFromEntry(entry, entry.name);
+        // Files inside a dropped folder are all needed: never filtered out.
+        return entry.isDirectory ? files : files.filter((file) => isFileAccepted(file, accept));
+      }),
+    );
+    const files = groups.flat();
+    if (files.length > 0) {
+      emit("files-selected", files);
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    feedbackStore.add_warning(`Could not read the dropped folder: ${message}`);
+  }
+}
+
 function onDrop(event: DragEvent): void {
   event.preventDefault();
   dragCounter.value = 0;
   isDragging.value = false;
+  // Entries must be read synchronously: the DataTransfer is emptied once the event returns.
+  const entries = [...(event.dataTransfer?.items ?? [])]
+    .map((item) => item.webkitGetAsEntry?.())
+    .filter((entry): entry is FileSystemEntry => entry !== null && entry !== undefined);
+  if (entries.some((entry) => entry.isDirectory)) {
+    if (directory) {
+      void emitDroppedEntries(entries);
+      return;
+    }
+    emit("folders-ignored");
+    void emitDroppedEntries(entries.filter((entry) => entry.isFile));
+    return;
+  }
   const files = [...(event.dataTransfer?.files ?? [])].filter((file) =>
     isFileAccepted(file, accept),
   );
@@ -181,7 +256,7 @@ defineExpose({ triggerFileDialog });
     v-if="inline"
     :is-dragging
     :loading
-    :texts
+    :texts="displayed_texts"
     :accept
     :show-extensions
     @click="triggerFileDialog"
@@ -193,13 +268,21 @@ defineExpose({ triggerFileDialog });
     :show-overlay
     :fullscreen
     :loading
-    :texts
+    :texts="displayed_texts"
     :multiple
     :accept
     :show-extensions
   />
 
-  <input ref="fileInput" type="file" class="d-none" :multiple :accept @change="handleFileSelect" />
+  <input
+    ref="fileInput"
+    type="file"
+    class="d-none"
+    :multiple
+    :accept
+    :webkitdirectory="directory"
+    @change="handleFileSelect"
+  />
 </template>
 
 <style>
