@@ -1,18 +1,15 @@
 <script setup lang="ts">
-import {
-  type UploadFile,
-  alignOnExpectedFiles,
-  joinUploadPath,
-  uploadDirectory,
-  uploadPath,
-} from "@ogw_front/utils/upload_path";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 
+import { matchExpectedFiles, uploadPath } from "@ogw_front/utils/upload_path";
+import DragAndDrop from "@ogw_front/components/DragAndDrop.vue";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
 import FileUploader from "@ogw_front/components/FileUploader.vue";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
+// Files carry extra app-specific bookkeeping fields once picked up here.
+type UploadFile = File & { isConfigured?: boolean; relativePath?: string };
 interface FilePlan {
   has_missing_files: boolean;
   mandatory_files: string[];
@@ -50,41 +47,12 @@ const loading = ref<boolean>(false);
 const has_missing_files = ref<boolean>(false);
 const mandatory_files = ref<string[]>([]);
 const additional_files = ref<string[]>([]);
-const uploaded_files = ref<UploadFile[]>([]);
 const toggle_loading = useToggle(loading);
+const uploading = ref<boolean>(false);
 
-// Missing files are listed relative to the main file: upload them next to it.
-const upload_directory = computed(() =>
-  filenames.length === 1 ? uploadDirectory(filenames[0] ?? "") : "",
-);
-
-function withUploadPath(file: UploadFile, path: string): UploadFile {
-  return Object.assign(file, { relativePath: joinUploadPath(upload_directory.value, path) });
-}
-
-// Time series: the user may select any folder above the referenced files, whatever the export tree.
-function prepare_files(selected_files: UploadFile[]): UploadFile[] {
-  if (!timeSeries) {
-    return selected_files.map((file) => withUploadPath(file, uploadPath(file)));
-  }
-  const alignment = alignOnExpectedFiles(
-    selected_files.map((file) => uploadPath(file)),
-    [...mandatory_files.value, ...additional_files.value],
-  );
-  if (alignment.status === "not_found") {
-    useFeedbackStore().add_warning("None of the expected files were found in this folder");
-    return [];
-  }
-  if (alignment.status === "ambiguous") {
-    useFeedbackStore().add_warning(
-      "Several matching exports in this folder, select a more specific one",
-    );
-    return [];
-  }
-  return selected_files.flatMap((file, index) => {
-    const aligned = alignment.paths[index];
-    return aligned === undefined ? [] : [withUploadPath(file, aligned)];
-  });
+function files_uploaded_event(value: UploadFile[]): void {
+  emit("update_values", { additional_files: value });
+  emit("increment_step");
 }
 
 function isCsvFile(filename: string): boolean {
@@ -133,26 +101,53 @@ async function missing_files(): Promise<void> {
   toggle_loading();
 }
 
-async function recheck_missing_files(): Promise<void> {
-  const previously_missing = [...mandatory_files.value, ...additional_files.value];
+// Time series: uploads the missing files found in the selected folder, then the files they
+// Reference in turn, until nothing is missing. The folder layout does not matter.
+async function upload_missing_from(
+  folder_files: UploadFile[],
+  uploaded: UploadFile[],
+): Promise<void> {
+  const expected = [...mandatory_files.value, ...additional_files.value];
+  const match = matchExpectedFiles(
+    folder_files.map((file) => uploadPath(file)),
+    expected,
+  );
+  if (match.status === "ambiguous") {
+    useFeedbackStore().add_warning(
+      `Several matching files for ${match.path}, select a more specific folder`,
+    );
+    return;
+  }
+  const found = expected.flatMap((expected_path, index) => {
+    const file = folder_files[match.indices[index] ?? -1];
+    return file && !uploaded.includes(file)
+      ? [Object.assign(file, { relativePath: expected_path })]
+      : [];
+  });
+  if (found.length === 0) {
+    useFeedbackStore().add_warning(`The selected folder does not contain: ${expected.join(", ")}`);
+    return;
+  }
+  const backStore = useBackStore();
+  await Promise.all(found.map((file) => backStore.upload(file)));
+  emit("update_values", { additional_files: [...uploaded, ...found] });
   await missing_files();
-  const still_missing = [...mandatory_files.value, ...additional_files.value];
-  const unchanged =
-    still_missing.length === previously_missing.length &&
-    still_missing.every((file) => previously_missing.includes(file));
-  if (has_missing_files.value && unchanged) {
-    useFeedbackStore().add_warning("The selected folder does not contain the missing files");
+  if (has_missing_files.value) {
+    await upload_missing_from(folder_files, [...uploaded, ...found]);
   }
 }
 
-function files_uploaded_event(value: UploadFile[]): void {
-  uploaded_files.value = [...uploaded_files.value, ...value];
-  emit("update_values", { additional_files: uploaded_files.value });
-  if (timeSeries) {
-    void recheck_missing_files();
-    return;
+async function upload_folder(folder_files: UploadFile[]): Promise<void> {
+  uploading.value = true;
+  try {
+    await upload_missing_from(folder_files, []);
+  } finally {
+    uploading.value = false;
   }
-  emit("increment_step");
+}
+
+function warn_folder_read_error(message: string): void {
+  useFeedbackStore().add_warning(`Could not read the dropped folder: ${message}`);
 }
 
 // oxlint-disable-next-line no-top-level-await
@@ -160,7 +155,7 @@ await missing_files();
 </script>
 
 <template>
-  <FetchingData v-if="loading" />
+  <FetchingData v-if="loading || uploading" />
   <v-container v-else-if="has_missing_files">
     <v-row v-if="mandatory_files.length" align="center">
       <v-col cols="auto" class="pa-0">
@@ -182,15 +177,16 @@ await missing_files();
     </v-row>
     <v-row>
       <v-col cols="12">
+        <DragAndDrop
+          v-if="timeSeries"
+          directory
+          :show-extensions="false"
+          @files-selected="upload_folder"
+          @folder-read-error="warn_folder_read_error"
+        />
         <FileUploader
-          v-bind="{
-            multiple,
-            accept,
-            files,
-            autoUpload: false,
-            prepareFiles: prepare_files,
-            directory: timeSeries,
-          }"
+          v-else
+          v-bind="{ multiple, accept, files, autoUpload: false }"
           @files_uploaded="files_uploaded_event"
         />
       </v-col>

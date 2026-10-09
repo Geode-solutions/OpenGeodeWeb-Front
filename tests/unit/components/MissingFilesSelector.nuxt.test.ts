@@ -11,16 +11,22 @@ import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js
 
 // Local imports
 import { mockAs, setupActivePinia, toHTTPMethod, vuetify } from "@ogw_tests/utils";
+import DragAndDrop from "@ogw_front/components/DragAndDrop.vue";
 import FileUploader from "@ogw_front/components/FileUploader.vue";
 import MissingFilesSelector from "@ogw_front/components/MissingFilesSelector.vue";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
+import { uploadPath } from "@ogw_front/utils/upload_path";
 
 const EXPECTED_LENGTH = 1;
 const FIRST_INDEX = 0;
 const SECOND_INDEX = 1;
 
 const upload_file_schema = schemas.opengeodeweb_back.upload_file;
+
+function missing(files: string[]): object {
+  return { has_missing_files: files.length > 0, mandatory_files: files, additional_files: [] };
+}
 
 describe("missing files selector", () => {
   const pinia = setupActivePinia();
@@ -88,91 +94,53 @@ describe("missing files selector", () => {
     expect(wrapper.emitted().increment_step).toHaveLength(EXPECTED_LENGTH);
   });
 
-  test("time series re-requests missing files after upload", async () => {
+  test("time series uploads the referenced files found in a folder, level by level", async () => {
     const request_mock = vi.fn();
-    request_mock.mockResolvedValueOnce({
-      has_missing_files: true,
-      mandatory_files: ["a.vtm"],
-      additional_files: [],
-    });
-    request_mock.mockResolvedValue({
-      has_missing_files: false,
-      mandatory_files: [],
-      additional_files: [],
-    });
+    request_mock
+      .mockResolvedValueOnce(missing(["outputs/a.vtm"]))
+      .mockResolvedValueOnce(missing(["outputs/a/b.vtu"]))
+      .mockResolvedValue(missing([]));
     backStore.request = mockAs<typeof backStore.request>(request_mock);
+    const upload_mock = vi.fn<typeof backStore.upload>().mockResolvedValue({});
+    backStore.upload = mockAs<typeof backStore.upload>(upload_mock);
 
     const wrapper = await mountSuspended(MissingFilesSelector, {
-      global: {
-        plugins: [vuetify, pinia],
-      },
-      props: {
-        multiple: false,
-        geode_object_type: "BRep",
-        filenames: ["a.pvd"],
-        timeSeries: true,
-      },
+      global: { plugins: [vuetify, pinia] },
+      props: { multiple: false, geodeObjectType: "BRep", filenames: ["a.pvd"], timeSeries: true },
     });
-    expect(request_mock).toHaveBeenCalledTimes(EXPECTED_LENGTH);
+    const folder = [
+      Object.assign(new File(["b"], "b.vtu"), { relativePath: "run/outputs/a/b.vtu" }),
+      Object.assign(new File(["a"], "a.vtm"), { relativePath: "run/outputs/a.vtm" }),
+      Object.assign(new File(["m"], "model.og_brep"), { relativePath: "run/model.og_brep" }),
+    ];
+    wrapper.findComponent(DragAndDrop).vm.$emit("files-selected", folder);
+    await flushPromises();
 
-    const file_uploader = wrapper.findComponent(FileUploader);
-    const v_file_input = file_uploader.find('input[type="file"]');
-    Object.defineProperty(v_file_input.element, "files", {
-      value: [new File(["a"], "a.vtm")],
-      writable: true,
-    });
-    await v_file_input.trigger("change");
-    await flushPromises();
-    registerEndpoint(upload_file_schema.$id, {
-      method: toHTTPMethod(upload_file_schema.methods[SECOND_INDEX]),
-      handler: () => ({}),
-    });
-    await file_uploader.findComponent(components.VBtn).trigger("click");
-    await flushPromises();
-    await flushPromises();
-    expect(request_mock).toHaveBeenCalledTimes(SECOND_INDEX + EXPECTED_LENGTH);
+    expect(upload_mock.mock.calls.map(([file]) => uploadPath(file))).toStrictEqual([
+      "outputs/a.vtm",
+      "outputs/a/b.vtu",
+    ]);
     expect(wrapper.emitted().increment_step).toHaveLength(EXPECTED_LENGTH);
   });
 
-  test("time series warns when the upload did not provide the missing files", async () => {
-    const request_mock = vi.fn().mockResolvedValue({
-      has_missing_files: true,
-      mandatory_files: ["a.vtm"],
-      additional_files: [],
-    });
-    backStore.request = mockAs<typeof backStore.request>(request_mock);
+  test("time series warns when the folder lacks the missing files", async () => {
+    backStore.request = mockAs<typeof backStore.request>(
+      vi.fn().mockResolvedValue({
+        has_missing_files: true,
+        mandatory_files: ["a.vtm"],
+        additional_files: [],
+      }),
+    );
     const warning_spy = vi.spyOn(useFeedbackStore(), "add_warning");
 
     const wrapper = await mountSuspended(MissingFilesSelector, {
-      global: {
-        plugins: [vuetify, pinia],
-      },
-      props: {
-        multiple: false,
-        geode_object_type: "BRep",
-        filenames: ["a.pvd"],
-        timeSeries: true,
-      },
+      global: { plugins: [vuetify, pinia] },
+      props: { multiple: false, geodeObjectType: "BRep", filenames: ["a.pvd"], timeSeries: true },
     });
+    wrapper.findComponent(DragAndDrop).vm.$emit("files-selected", [new File(["x"], "other.txt")]);
+    await flushPromises();
 
-    const file_uploader = wrapper.findComponent(FileUploader);
-    const v_file_input = file_uploader.find('input[type="file"]');
-    Object.defineProperty(v_file_input.element, "files", {
-      value: [new File(["a"], "a.vtm")],
-      writable: true,
-    });
-    await v_file_input.trigger("change");
-    await flushPromises();
-    registerEndpoint(upload_file_schema.$id, {
-      method: toHTTPMethod(upload_file_schema.methods[SECOND_INDEX]),
-      handler: () => ({}),
-    });
-    await file_uploader.findComponent(components.VBtn).trigger("click");
-    await flushPromises();
-    await flushPromises();
-    expect(warning_spy).toHaveBeenCalledWith(
-      "The selected folder does not contain the missing files",
-    );
+    expect(warning_spy).toHaveBeenCalledWith("The selected folder does not contain: a.vtm");
     expect(wrapper.emitted().increment_step).toBeUndefined();
   });
 });

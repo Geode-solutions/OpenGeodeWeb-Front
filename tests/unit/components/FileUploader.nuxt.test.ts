@@ -9,7 +9,6 @@ import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js
 
 // Local imports
 import { setupActivePinia, toHTTPMethod, vuetify } from "@ogw_tests/utils";
-import { type UploadFile, uploadPath } from "@ogw_front/utils/upload_path";
 import FileUploader from "@ogw_front/components/FileUploader.vue";
 import { useBackStore } from "@ogw_front/stores/back";
 
@@ -71,36 +70,6 @@ describe("file uploader", () => {
       expect(
         wrapper.emitted<unknown[]>().files_uploaded?.[FIRST_INDEX]?.[FIRST_INDEX],
       ).toStrictEqual(files);
-    });
-
-    test("prop prepareFiles sets the upload path", async () => {
-      const nested_file: UploadFile = new File(["fake_file"], "000000.vtm");
-      nested_file.relativePath = "vtkOutput/000000.vtm";
-      const wrapper = await mountSuspended(FileUploader, {
-        global: {
-          plugins: [vuetify, pinia],
-        },
-        props: {
-          multiple: true,
-          autoUpload: false,
-          prepareFiles: (selected: UploadFile[]): UploadFile[] =>
-            selected.map((file) =>
-              Object.assign(file, { relativePath: `spe10/${uploadPath(file)}` }),
-            ),
-        },
-      });
-
-      const v_file_input = wrapper.find('input[type="file"]');
-      Object.defineProperty(v_file_input.element, "files", {
-        value: [nested_file],
-        writable: true,
-      });
-      await v_file_input.trigger("change");
-      await flushPromises();
-      await wrapper.findComponent(components.VBtn).trigger("click");
-      await flushPromises();
-      await flushPromises();
-      expect(nested_file.relativePath).toBe("spe10/vtkOutput/000000.vtm");
     });
   });
 });

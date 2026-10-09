@@ -2,13 +2,7 @@
 import { describe, expect, test } from "vitest";
 
 // Local imports
-import {
-  alignOnExpectedFiles,
-  fileExtension,
-  joinUploadPath,
-  uploadDirectory,
-  uploadPath,
-} from "@ogw_front/utils/upload_path";
+import { fileExtension, matchExpectedFiles, uploadPath } from "@ogw_front/utils/upload_path";
 
 describe("upload path", () => {
   test("uses the relative path of a file dropped from a folder", () => {
@@ -22,59 +16,52 @@ describe("upload path", () => {
     expect(uploadPath(new File(["pvd"], "time_series.pvd"))).toBe("time_series.pvd");
   });
 
-  test("splits and joins directories", () => {
-    expect(uploadDirectory("spe10/vtkOutput.pvd")).toBe("spe10");
-    expect(uploadDirectory("vtkOutput.pvd")).toBe("");
-    expect(joinUploadPath("spe10", "vtkOutput/000000.vtm")).toBe("spe10/vtkOutput/000000.vtm");
-    expect(joinUploadPath("", "vtkOutput/000000.vtm")).toBe("vtkOutput/000000.vtm");
+  test("gets the lower case extension", () => {
     expect(fileExtension("spe10/vtkOutput.PVD")).toBe("pvd");
   });
 
-  describe("align on expected files", () => {
-    const expected = ["vtkOutput/000000.vtm", "vtkOutput/000060.vtm"];
-    const tree = [
-      "vtkOutput/000000.vtm",
-      "vtkOutput/000060.vtm",
-      "vtkOutput/000000/reservoir/rank_0.vtu",
+  describe("match expected files", () => {
+    const expected = [
+      "outputs/vtkOutput/000000.vtm",
+      "outputs/vtkOutput/000000/block/rank_0.vtu",
+      "outputs/vtkOutput/000001/block/rank_0.vtu",
     ];
 
-    test("keeps the paths of the exact folder", () => {
-      expect(alignOnExpectedFiles(tree, expected)).toStrictEqual({
-        status: "aligned",
-        paths: tree,
-      });
-    });
-
-    test("finds the expected files in a folder several levels above", () => {
+    test("finds the files in a folder above them", () => {
       const selected = [
-        "exports/spe10/model.og_brep",
-        ...tree.map((path) => `exports/spe10/${path}`),
+        "exports/model.og_brep",
+        "exports/outputs/vtkOutput/000001/block/rank_0.vtu",
+        "exports/outputs/vtkOutput/000000/block/rank_0.vtu",
+        "exports/outputs/vtkOutput/000000.vtm",
       ];
-      expect(alignOnExpectedFiles(selected, expected)).toStrictEqual({
-        status: "aligned",
-        paths: [undefined, ...tree],
+      expect(matchExpectedFiles(selected, expected)).toStrictEqual({
+        status: "matched",
+        indices: [3, 2, 1],
       });
     });
 
-    test("keeps flat expected files", () => {
-      expect(alignOnExpectedFiles(["run/a.vtu", "run/b.txt"], ["a.vtu"])).toStrictEqual({
-        status: "aligned",
-        paths: ["a.vtu", undefined],
+    test("finds the files in a folder inside the referenced tree", () => {
+      const selected = ["vtkOutput/000000.vtm", "vtkOutput/000000/block/rank_0.vtu"];
+      expect(matchExpectedFiles(selected, expected)).toStrictEqual({
+        status: "matched",
+        indices: [0, 1, undefined],
       });
     });
 
-    test("reports a folder without the expected files", () => {
-      expect(alignOnExpectedFiles(["other/x.vtu"], expected)).toStrictEqual({
-        status: "not_found",
+    test("finds the files in a different layout", () => {
+      const selected = ["run/000001/rank_0.vtu", "run/steps/000000.vtm", "run/000000/rank_0.vtu"];
+      expect(matchExpectedFiles(selected, expected)).toStrictEqual({
+        status: "matched",
+        indices: [1, 2, 0],
       });
     });
 
-    test("reports several matching exports", () => {
-      const selected = [
-        ...tree.map((path) => `run1/${path}`),
-        ...tree.map((path) => `run2/${path}`),
-      ];
-      expect(alignOnExpectedFiles(selected, expected)).toStrictEqual({ status: "ambiguous" });
+    test("reports several equally matching files", () => {
+      const selected = ["run1/vtkOutput/000000.vtm", "run2/vtkOutput/000000.vtm"];
+      expect(matchExpectedFiles(selected, expected)).toStrictEqual({
+        status: "ambiguous",
+        path: "outputs/vtkOutput/000000.vtm",
+      });
     });
   });
 });

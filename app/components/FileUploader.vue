@@ -1,11 +1,13 @@
 <script setup lang="ts">
+import { foldersIgnoredWarning } from "@ogw_front/utils/upload_path";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 import CsvPreviewer from "@ogw_front/components/csv-preview/CsvPreviewer.vue";
 import DragAndDrop from "@ogw_front/components/DragAndDrop.vue";
 
-import { type UploadFile, foldersIgnoredWarning, uploadPath } from "@ogw_front/utils/upload_path";
+// Files carry extra app-specific bookkeeping fields once picked up here.
+type UploadFile = File & { isConfigured?: boolean; displayName?: string };
 
 const emit = defineEmits<{
   files_uploaded: [files: UploadFile[]];
@@ -20,9 +22,6 @@ interface Props {
   autoUpload?: boolean;
   showOverlay?: boolean;
   mini?: boolean;
-  // Turns the selected files into the files to upload (filter, set their upload path).
-  prepareFiles?: (selected_files: UploadFile[]) => UploadFile[];
-  directory?: boolean;
 }
 
 const {
@@ -32,8 +31,6 @@ const {
   autoUpload = true,
   showOverlay = false,
   mini = false,
-  prepareFiles = (selected_files: UploadFile[]): UploadFile[] => selected_files,
-  directory = false,
 } = defineProps<Props>();
 
 const backStore = useBackStore();
@@ -81,12 +78,7 @@ function warnFoldersIgnored(): void {
   useFeedbackStore().add_warning(foldersIgnoredWarning);
 }
 
-function warnFolderReadError(message: string): void {
-  useFeedbackStore().add_warning(`Could not read the dropped folder: ${message}`);
-}
-
-function processSelectedFiles(dropped_files: UploadFile[]): void {
-  const selected_files = prepareFiles(dropped_files);
+function processSelectedFiles(selected_files: UploadFile[]): void {
   if (multiple) {
     internal_files.value = [...internal_files.value, ...selected_files];
   } else {
@@ -166,11 +158,9 @@ watch(
       ref="dragAndDropRef"
       :multiple
       :accept
-      :directory
       :inline="false"
       @files-selected="processSelectedFiles"
       @folders-ignored="warnFoldersIgnored"
-      @folder-read-error="warnFolderReadError"
     />
   </template>
   <DragAndDrop
@@ -178,14 +168,12 @@ watch(
     ref="dragAndDropRef"
     :multiple
     :accept
-    :directory
     :loading
     :show-extensions="false"
     :inline="!internal_files.length"
     :show-overlay="showOverlay"
     @files-selected="processSelectedFiles"
     @folders-ignored="warnFoldersIgnored"
-    @folder-read-error="warnFolderReadError"
   />
 
   <v-card-text v-if="internal_files.length" class="mt-6 pa-0">
@@ -229,7 +217,7 @@ watch(
                 : "mdi-file-outline"
             }}
           </v-icon>
-          <span class="text-white">{{ file.displayName || uploadPath(file) }}</span>
+          <span class="text-white">{{ file.displayName || file.name }}</span>
 
           <v-tooltip v-if="isCsv(file)" text="Configure CSV" location="bottom">
             <template #activator="{ props: tooltipProps }">
