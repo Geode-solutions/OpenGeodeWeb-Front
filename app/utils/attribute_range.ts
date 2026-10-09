@@ -30,6 +30,22 @@ const ATTRIBUTE_RANGE_ELEMENTS: Record<string, AttributeElement> = {
   [backSchemas.model_component_polyhedron_attribute_names.$id]: "polyhedron",
 };
 
+// A data never changes once imported: selectors showing the same attribute share one request
+const rangeRequests = new Map<string, Promise<AttributeRangeInfo | undefined>>();
+
+async function requestAttributeRange(
+  params: AttributeRangeParams & { element: AttributeElement; attribute_name: string },
+  key: string,
+): Promise<AttributeRangeInfo | undefined> {
+  const backStore = useBackStore();
+  try {
+    return await backStore.request({ schema: backSchemas.attribute_range, params });
+  } catch {
+    rangeRequests.delete(key);
+    return undefined;
+  }
+}
+
 async function fetchAttributeRange(
   namesSchema: JsonRpcSchema,
   params: AttributeRangeParams,
@@ -39,15 +55,15 @@ async function fetchAttributeRange(
   if (element === undefined) {
     return undefined;
   }
-  const backStore = useBackStore();
-  try {
-    return await backStore.request({
-      schema: backSchemas.attribute_range,
-      params: { ...params, element, attribute_name: attributeName },
-    });
-  } catch {
-    return undefined;
+  const rangeParams = { ...params, element, attribute_name: attributeName };
+  const key = JSON.stringify(rangeParams);
+  let request = rangeRequests.get(key);
+  if (request === undefined) {
+    request = requestAttributeRange(rangeParams, key);
+    rangeRequests.set(key, request);
   }
+  const range = await request;
+  return range;
 }
 
 export { type AttributeRangeInfo, fetchAttributeRange };
