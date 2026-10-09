@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { foldersIgnoredWarning } from "@ogw_front/utils/upload_path";
 import { useBackStore } from "@ogw_front/stores/back";
+import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 import CsvPreviewer from "@ogw_front/components/csv-preview/CsvPreviewer.vue";
 import DragAndDrop from "@ogw_front/components/DragAndDrop.vue";
@@ -70,6 +72,10 @@ async function onCsvConfirm(result: unknown): Promise<void> {
   await backStore.upload(json_file);
   internal_files.value = [...internal_files.value];
   csv_dialog.value = false;
+}
+
+function warnFoldersIgnored(): void {
+  useFeedbackStore().add_warning(foldersIgnoredWarning);
 }
 
 function processSelectedFiles(selected_files: UploadFile[]): void {
@@ -154,6 +160,7 @@ watch(
       :accept
       :inline="false"
       @files-selected="processSelectedFiles"
+      @folders-ignored="warnFoldersIgnored"
     />
   </template>
   <DragAndDrop
@@ -166,6 +173,7 @@ watch(
     :inline="!internal_files.length"
     :show-overlay="showOverlay"
     @files-selected="processSelectedFiles"
+    @folders-ignored="warnFoldersIgnored"
   />
 
   <v-card-text v-if="internal_files.length" class="mt-6 pa-0">
