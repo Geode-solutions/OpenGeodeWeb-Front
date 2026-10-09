@@ -73,5 +73,15 @@ function alignOnExpectedFiles(paths: readonly string[], expected: readonly strin
   return { status: "aligned", paths: aligned_paths };
 }
 
-export { alignOnExpectedFiles, fileExtension, joinUploadPath, uploadDirectory, uploadPath };
+// Shared by every drop zone that refuses folders.
+const foldersIgnoredWarning = "Folders can't be dropped here";
+
+export {
+  alignOnExpectedFiles,
+  fileExtension,
+  foldersIgnoredWarning,
+  joinUploadPath,
+  uploadDirectory,
+  uploadPath,
+};
 export type { UploadFile };

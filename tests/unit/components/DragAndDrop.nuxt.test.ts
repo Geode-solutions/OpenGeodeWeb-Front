@@ -6,7 +6,6 @@ import { mountSuspended } from "@nuxt/test-utils/runtime";
 // Local imports
 import { setupActivePinia, vuetify } from "@ogw_tests/utils";
 import DragAndDrop from "@ogw_front/components/DragAndDrop.vue";
-import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 function fileEntry(file: File): object {
   return {
@@ -166,12 +165,11 @@ describe("drag and drop", () => {
     expect(wrapper.emitted("folders-ignored")).toHaveLength(1);
   });
 
-  test("warns when a dropped directory cannot be read", async () => {
+  test("reports a dropped directory that cannot be read", async () => {
     const wrapper = await mountSuspended(DragAndDrop, {
       global: { plugins: [vuetify, pinia] },
       props: { directory: true },
     });
-    const feedbackStore = useFeedbackStore();
     const folder = {
       isFile: false,
       isDirectory: true,
@@ -195,12 +193,6 @@ describe("drag and drop", () => {
     await flushPromises();
 
     expect(wrapper.emitted("files-selected")).toBeUndefined();
-    // Wrappers mounted by earlier tests also listen to the window, so several warnings can exist.
-    expect(feedbackStore.feedbacks).toContainEqual(
-      expect.objectContaining({
-        type: "warning",
-        description: "Could not read the dropped folder: read failed",
-      }),
-    );
+    expect(wrapper.emitted("folder-read-error")).toStrictEqual([["read failed"]]);
   });
 });

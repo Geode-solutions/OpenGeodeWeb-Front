@@ -50,6 +50,7 @@ const loading = ref<boolean>(false);
 const has_missing_files = ref<boolean>(false);
 const mandatory_files = ref<string[]>([]);
 const additional_files = ref<string[]>([]);
+const uploaded_files = ref<UploadFile[]>([]);
 const toggle_loading = useToggle(loading);
 
 // Missing files are listed relative to the main file: upload them next to it.
@@ -132,11 +133,23 @@ async function missing_files(): Promise<void> {
   toggle_loading();
 }
 
+async function recheck_missing_files(): Promise<void> {
+  const previously_missing = [...mandatory_files.value, ...additional_files.value];
+  await missing_files();
+  const still_missing = [...mandatory_files.value, ...additional_files.value];
+  const unchanged =
+    still_missing.length === previously_missing.length &&
+    still_missing.every((file) => previously_missing.includes(file));
+  if (has_missing_files.value && unchanged) {
+    useFeedbackStore().add_warning("The selected folder does not contain the missing files");
+  }
+}
+
 function files_uploaded_event(value: UploadFile[]): void {
-  emit("update_values", { additional_files: value });
+  uploaded_files.value = [...uploaded_files.value, ...value];
+  emit("update_values", { additional_files: uploaded_files.value });
   if (timeSeries) {
-    // Re-list what is still missing: the next tree level only becomes known once this one is uploaded.
-    void missing_files();
+    void recheck_missing_files();
     return;
   }
   emit("increment_step");

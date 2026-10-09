@@ -5,7 +5,7 @@ import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import CsvPreviewer from "@ogw_front/components/csv-preview/CsvPreviewer.vue";
 import DragAndDrop from "@ogw_front/components/DragAndDrop.vue";
 
-import { type UploadFile, uploadPath } from "@ogw_front/utils/upload_path";
+import { type UploadFile, foldersIgnoredWarning, uploadPath } from "@ogw_front/utils/upload_path";
 
 const emit = defineEmits<{
   files_uploaded: [files: UploadFile[]];
@@ -78,7 +78,11 @@ async function onCsvConfirm(result: unknown): Promise<void> {
 }
 
 function warnFoldersIgnored(): void {
-  useFeedbackStore().add_warning("Folders can't be dropped here");
+  useFeedbackStore().add_warning(foldersIgnoredWarning);
+}
+
+function warnFolderReadError(message: string): void {
+  useFeedbackStore().add_warning(`Could not read the dropped folder: ${message}`);
 }
 
 function processSelectedFiles(dropped_files: UploadFile[]): void {
@@ -166,6 +170,7 @@ watch(
       :inline="false"
       @files-selected="processSelectedFiles"
       @folders-ignored="warnFoldersIgnored"
+      @folder-read-error="warnFolderReadError"
     />
   </template>
   <DragAndDrop
@@ -180,6 +185,7 @@ watch(
     :show-overlay="showOverlay"
     @files-selected="processSelectedFiles"
     @folders-ignored="warnFoldersIgnored"
+    @folder-read-error="warnFolderReadError"
   />
 
   <v-card-text v-if="internal_files.length" class="mt-6 pa-0">

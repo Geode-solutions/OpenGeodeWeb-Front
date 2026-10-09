@@ -8,7 +8,7 @@ import { useBackStore } from "@ogw_front/stores/back";
 const schema = schemas.opengeodeweb_back.allowed_files;
 
 interface Emits {
-  update_values: [values: { files: unknown[]; autoUpload: boolean }];
+  update_values: [values: { files: unknown[]; autoUpload: boolean; time_series?: string[] }];
   increment_step: [];
   decrement_step: [];
 }
@@ -20,13 +20,21 @@ interface Props {
   files?: File[];
   autoUpload?: boolean;
   showOverlay?: boolean;
+  timeSeries?: boolean;
 }
 
-const { multiple, files = [], autoUpload = true, showOverlay = true } = defineProps<Props>();
+const {
+  multiple,
+  files = [],
+  autoUpload = true,
+  showOverlay = true,
+  timeSeries = false,
+} = defineProps<Props>();
 
 const internal_files = ref<File[]>(files);
 const internal_auto_upload = ref<boolean>(autoUpload);
 const accept = ref<string>("");
+const time_series = ref<string[]>([]);
 const loading = ref<boolean>(false);
 
 watch(
@@ -47,7 +55,12 @@ const toggle_loading = useToggle(loading);
 
 function files_uploaded_event(value: unknown[]): void {
   if (value.length > 0) {
-    emit("update_values", { files: value, autoUpload: false });
+    emit(
+      "update_values",
+      timeSeries
+        ? { files: value, autoUpload: false, time_series: time_series.value }
+        : { files: value, autoUpload: false },
+    );
     emit("increment_step");
   }
 }
@@ -56,7 +69,10 @@ async function get_allowed_files(): Promise<void> {
   toggle_loading();
   const backStore = useBackStore();
   const response = await backStore.request({ schema });
-  accept.value = response.extensions.map((extension) => `.${extension}`).join(",");
+  time_series.value = timeSeries ? response.time_series : [];
+  accept.value = [...response.extensions, ...time_series.value]
+    .map((extension) => `.${extension}`)
+    .join(",");
   toggle_loading();
 }
 

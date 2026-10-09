@@ -3,7 +3,6 @@ import { computed, onMounted, onUnmounted, ref } from "vue";
 import DragAndDropInline from "./DragAndDropInternal/DragAndDropInline.vue";
 import DragAndDropOverlay from "./DragAndDropInternal/DragAndDropOverlay.vue";
 import type { UploadFile } from "@ogw_front/utils/upload_path";
-import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 interface DragAndDropTexts {
   idle: string;
@@ -46,12 +45,10 @@ const displayed_texts = computed<DragAndDropTexts>(() =>
     : texts,
 );
 
-const feedbackStore = useFeedbackStore();
-
 const emit = defineEmits<{
   "files-selected": [files: UploadFile[]];
-  // A folder was dropped outside folder mode: the parent decides whether to warn.
   "folders-ignored": [];
+  "folder-read-error": [message: string];
 }>();
 
 const isDragging = ref(false);
@@ -173,7 +170,7 @@ async function emitDroppedEntries(entries: FileSystemEntry[]): Promise<void> {
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    feedbackStore.add_warning(`Could not read the dropped folder: ${message}`);
+    emit("folder-read-error", message);
   }
 }
 

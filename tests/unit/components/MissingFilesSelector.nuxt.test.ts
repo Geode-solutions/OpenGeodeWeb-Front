@@ -14,6 +14,7 @@ import { mockAs, setupActivePinia, toHTTPMethod, vuetify } from "@ogw_tests/util
 import FileUploader from "@ogw_front/components/FileUploader.vue";
 import MissingFilesSelector from "@ogw_front/components/MissingFilesSelector.vue";
 import { useBackStore } from "@ogw_front/stores/back";
+import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 const EXPECTED_LENGTH = 1;
 const FIRST_INDEX = 0;
@@ -131,5 +132,47 @@ describe("missing files selector", () => {
     await flushPromises();
     expect(request_mock).toHaveBeenCalledTimes(SECOND_INDEX + EXPECTED_LENGTH);
     expect(wrapper.emitted().increment_step).toHaveLength(EXPECTED_LENGTH);
+  });
+
+  test("time series warns when the upload did not provide the missing files", async () => {
+    const request_mock = vi.fn().mockResolvedValue({
+      has_missing_files: true,
+      mandatory_files: ["a.vtm"],
+      additional_files: [],
+    });
+    backStore.request = mockAs<typeof backStore.request>(request_mock);
+    const warning_spy = vi.spyOn(useFeedbackStore(), "add_warning");
+
+    const wrapper = await mountSuspended(MissingFilesSelector, {
+      global: {
+        plugins: [vuetify, pinia],
+      },
+      props: {
+        multiple: false,
+        geode_object_type: "BRep",
+        filenames: ["a.pvd"],
+        timeSeries: true,
+      },
+    });
+
+    const file_uploader = wrapper.findComponent(FileUploader);
+    const v_file_input = file_uploader.find('input[type="file"]');
+    Object.defineProperty(v_file_input.element, "files", {
+      value: [new File(["a"], "a.vtm")],
+      writable: true,
+    });
+    await v_file_input.trigger("change");
+    await flushPromises();
+    registerEndpoint(upload_file_schema.$id, {
+      method: toHTTPMethod(upload_file_schema.methods[SECOND_INDEX]),
+      handler: () => ({}),
+    });
+    await file_uploader.findComponent(components.VBtn).trigger("click");
+    await flushPromises();
+    await flushPromises();
+    expect(warning_spy).toHaveBeenCalledWith(
+      "The selected folder does not contain the missing files",
+    );
+    expect(wrapper.emitted().increment_step).toBeUndefined();
   });
 });
