@@ -66,7 +66,8 @@ function alignOnExpectedFiles(paths: readonly string[], expected: readonly strin
     }
     const aligned = path.slice(prefix.length);
     const is_referenced =
-      expected.includes(aligned) || top_directories.some((directory) => aligned.startsWith(directory));
+      expected.includes(aligned) ||
+      top_directories.some((directory) => aligned.startsWith(directory));
     return is_referenced ? aligned : undefined;
   });
   return { status: "aligned", paths: aligned_paths };

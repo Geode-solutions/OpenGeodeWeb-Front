@@ -39,7 +39,10 @@ describe("upload path", () => {
     ];
 
     test("keeps the paths of the exact folder", () => {
-      expect(alignOnExpectedFiles(tree, expected)).toStrictEqual({ status: "aligned", paths: tree });
+      expect(alignOnExpectedFiles(tree, expected)).toStrictEqual({
+        status: "aligned",
+        paths: tree,
+      });
     });
 
     test("finds the expected files in a folder several levels above", () => {
@@ -67,7 +70,10 @@ describe("upload path", () => {
     });
 
     test("reports several matching exports", () => {
-      const selected = [...tree.map((path) => `run1/${path}`), ...tree.map((path) => `run2/${path}`)];
+      const selected = [
+        ...tree.map((path) => `run1/${path}`),
+        ...tree.map((path) => `run2/${path}`),
+      ];
       expect(alignOnExpectedFiles(selected, expected)).toStrictEqual({ status: "ambiguous" });
     });
   });

@@ -37,7 +37,13 @@ interface Props {
   timeSeries?: boolean;
 }
 
-const { multiple, geodeObjectType, filenames, files = [], timeSeries = false } = defineProps<Props>();
+const {
+  multiple,
+  geodeObjectType,
+  filenames,
+  files = [],
+  timeSeries = false,
+} = defineProps<Props>();
 
 const accept = ref<string>("");
 const loading = ref<boolean>(false);
@@ -69,7 +75,9 @@ function prepare_files(selected_files: UploadFile[]): UploadFile[] {
     return [];
   }
   if (alignment.status === "ambiguous") {
-    useFeedbackStore().add_warning("Several matching exports in this folder, select a more specific one");
+    useFeedbackStore().add_warning(
+      "Several matching exports in this folder, select a more specific one",
+    );
     return [];
   }
   return selected_files.flatMap((file, index) => {
