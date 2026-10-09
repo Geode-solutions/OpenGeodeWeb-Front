@@ -29,7 +29,8 @@ describe("file selector", () => {
     registerEndpoint(allowed_files_schema.$id, {
       method: toHTTPMethod(allowed_files_schema.methods[FIRST_INDEX]),
       handler: () => ({
-        extensions: ["1", "2", "3"],
+        data_extensions: ["1", "2", "3"],
+        time_series_extensions: [],
       }),
     });
     const wrapper = await mountSuspended(FileSelector, {
@@ -71,7 +72,8 @@ describe("file selector", () => {
     registerEndpoint(allowed_files_schema.$id, {
       method: toHTTPMethod(allowed_files_schema.methods[FIRST_INDEX]),
       handler: () => ({
-        extensions: ["1", "2", "3"],
+        data_extensions: ["1", "2", "3"],
+        time_series_extensions: [],
       }),
     });
 

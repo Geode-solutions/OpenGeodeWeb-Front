@@ -16,7 +16,8 @@ interface FilePlan {
   additional_files: string[];
 }
 
-const schema = schemas.opengeodeweb_back.missing_files;
+const schema = schemas.opengeodeweb_back.data_missing_files;
+const time_series_schema = schemas.opengeodeweb_back.time_series_missing_files;
 
 interface Emits {
   update_values: [value: { additional_files: UploadFile[] }];
@@ -74,9 +75,10 @@ async function missing_files(): Promise<void> {
         additional_files: [],
       });
     }
-    const params = timeSeries
-      ? { geode_object_type: geodeObjectType, filename, time_series: true }
-      : { geode_object_type: geodeObjectType, filename };
+    if (timeSeries) {
+      return backStore.request({ schema: time_series_schema, params: { filename } });
+    }
+    const params = { geode_object_type: geodeObjectType, filename };
     return backStore.request({ schema, params });
   });
   const values = await Promise.all(promise_array);

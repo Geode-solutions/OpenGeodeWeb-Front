@@ -69,8 +69,8 @@ async function get_allowed_files(): Promise<void> {
   toggle_loading();
   const backStore = useBackStore();
   const response = await backStore.request({ schema });
-  time_series.value = timeSeries ? response.time_series : [];
-  accept.value = [...response.extensions, ...time_series.value]
+  time_series.value = timeSeries ? response.time_series_extensions : [];
+  accept.value = [...response.data_extensions, ...time_series.value]
     .map((extension) => `.${extension}`)
     .join(",");
   toggle_loading();
