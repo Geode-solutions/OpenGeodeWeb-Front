@@ -4,6 +4,7 @@ import {
   type RangesPerData,
   useBatchGroup,
 } from "@ogw_front/composables/batch_style";
+import { type AttributeRangeInfo, fetchAttributeRange } from "@ogw_front/utils/attribute_range";
 import { getAttributeRange, intersectAttributes } from "@ogw_front/utils/attributes";
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
@@ -43,13 +44,15 @@ const emit = defineEmits<Emits>();
 interface AttributeInfo {
   attribute_name: string;
   nb_items: number;
-  no_data?: boolean;
   time_steps?: number[];
   [key: string]: unknown;
 }
 
 const attributes = ref<AttributeInfo[]>([]);
 let attributesPerTarget = new Map<string, AttributeInfo[]>();
+const rangesPerTarget = ref(new Map<string, AttributeRangeInfo>());
+let rangesName: string | undefined = undefined;
+let rangesLoading: Promise<void> = Promise.resolve();
 
 const groupTargetIds = useBatchGroup(() => id);
 
@@ -57,6 +60,9 @@ const currentAttribute = computed<AttributeInfo | undefined>(() =>
   attributes.value.find((attr) => attr.attribute_name === attributeName.value),
 );
 const timeSteps = computed<number[]>(() => currentAttribute.value?.time_steps ?? []);
+const noData = computed<boolean>(() =>
+  [...rangesPerTarget.value.values()].some((range) => range.no_data),
+);
 
 let committedSeries: string | undefined = undefined;
 
@@ -118,22 +124,61 @@ const componentItems = computed<{ title: string; value: number }[]>(() => {
   }));
 });
 
-function resetRange(): void {
-  if (currentAttribute.value) {
-    const comp = attributeItem.value ?? 0;
-    // GetAttributeRange's parameter type (AttributeRangeSource) isn't exported;
-    // AttributeInfo's index signature covers its optional min/max fields at
-    // Runtime (they come from the same backend attribute response shape).
-    const { min, max } = getAttributeRange(
-      currentAttribute.value as unknown as Parameters<typeof getAttributeRange>[0],
-      comp,
-    );
-    attributeRange.value = [min, max];
-  }
-}
-
 function hasSelectedComponent(components: unknown): boolean {
   return Array.isArray(components) && components.length > 0;
+}
+
+function requestParams(): { id: string; component_ids?: string[] } | undefined {
+  const schemaProperties = schema.properties as Record<string, unknown> | undefined;
+  if (schemaProperties?.component_ids === undefined) {
+    return { id };
+  }
+  return hasSelectedComponent(componentIds) ? { id, component_ids: componentIds } : undefined;
+}
+
+// Ranges are computed by the back for the selected attribute only, as scanning every step of every series is slow
+async function requestRanges(name: string): Promise<void> {
+  const targets: [string, { id: string; component_ids?: string[] } | undefined][] =
+    groupTargetIds.value
+      ? [...attributesPerTarget]
+          .filter(([, targetAttributes]) =>
+            targetAttributes.some((attribute) => attribute.attribute_name === name),
+          )
+          .map(([targetId]) => [targetId, { id: targetId }])
+      : [[id, requestParams()]];
+  const entries = await Promise.all(
+    targets.map(async ([targetId, params]): Promise<[string, AttributeRangeInfo | undefined]> => [
+      targetId,
+      params ? await fetchAttributeRange(schema, params, name) : undefined,
+    ]),
+  );
+  if (rangesName !== name) {
+    return;
+  }
+  rangesPerTarget.value = new Map(
+    entries.filter((entry): entry is [string, AttributeRangeInfo] => entry[1] !== undefined),
+  );
+}
+
+async function loadRanges(name: string): Promise<void> {
+  if (name !== rangesName) {
+    rangesName = name;
+    rangesPerTarget.value = new Map();
+    rangesLoading = requestRanges(name);
+  }
+  await rangesLoading;
+}
+
+function applyRange(): void {
+  const { min, max } = getAttributeRange(rangesPerTarget.value.get(id), attributeItem.value ?? 0);
+  attributeRange.value = [min, max];
+}
+
+async function resetRange(): Promise<void> {
+  if (currentAttribute.value) {
+    await loadRanges(currentAttribute.value.attribute_name);
+    applyRange();
+  }
 }
 
 async function getGroupAttributes(targetIds: string[]): Promise<void> {
@@ -146,36 +191,30 @@ async function getGroupAttributes(targetIds: string[]): Promise<void> {
   attributes.value = intersectAttributes([...attributesPerTarget.values()]);
 }
 
-function initGroupAttribute(name: string, item: number): void {
+async function initGroupAttribute(name: string, item: number): Promise<void> {
+  await loadRanges(name);
+  if (attributeName.value !== name) {
+    return;
+  }
   const ranges = new Map<string, AttributeRange>();
-  for (const [targetId, targetAttributes] of attributesPerTarget) {
-    const attribute = targetAttributes.find((candidate) => candidate.attribute_name === name);
-    if (attribute) {
-      const { min, max } = getAttributeRange(
-        attribute as unknown as Parameters<typeof getAttributeRange>[0],
-        item,
-      );
-      ranges.set(targetId, [min, max]);
-    }
+  for (const [targetId, range] of rangesPerTarget.value) {
+    const { min, max } = getAttributeRange(range, item);
+    ranges.set(targetId, [min, max]);
   }
   emit("update:attributeColorMap", attributeColorMap.value ?? "batlow");
   emit("ranges_per_data", ranges);
 }
 
 async function getAttributes(): Promise<void> {
+  rangesName = undefined;
+  rangesPerTarget.value = new Map();
   if (groupTargetIds.value) {
     await getGroupAttributes(groupTargetIds.value);
     return;
   }
-  const schemaProperties = schema.properties as Record<string, unknown> | undefined;
-  const requiresComponent = schemaProperties?.component_ids !== undefined;
-  if (requiresComponent && !hasSelectedComponent(componentIds)) {
+  const params = requestParams();
+  if (!params) {
     return;
-  }
-
-  const params: { id: string; component_ids?: unknown } = { id };
-  if (requiresComponent) {
-    params.component_ids = componentIds;
   }
 
   await backStore.request(
@@ -199,13 +238,13 @@ watch(
   },
 );
 
-watch([attributeName, attributeItem], ([name, item]) => {
+watch([attributeName, attributeItem], async ([name, item]) => {
   if (groupTargetIds.value && name !== undefined) {
-    initGroupAttribute(name, item ?? 0);
+    await initGroupAttribute(name, item ?? 0);
   }
 });
 
-watch([attributeName, attributeItem, currentAttribute], () => {
+watch([attributeName, attributeItem, currentAttribute], async () => {
   commitSeriesTimeStep();
   if (groupTargetIds.value) {
     return;
@@ -216,8 +255,13 @@ watch([attributeName, attributeItem, currentAttribute], () => {
   if (attributeNoDataColor.value === undefined) {
     attributeNoDataColor.value = DEFAULT_NO_DATA_COLOR;
   }
-  if (attributeRange.value[0] === undefined) {
-    resetRange();
+  const name = currentAttribute.value?.attribute_name;
+  if (name === undefined) {
+    return;
+  }
+  await loadRanges(name);
+  if (name === currentAttribute.value?.attribute_name && attributeRange.value[0] === undefined) {
+    applyRange();
   }
 });
 </script>
@@ -247,7 +291,7 @@ watch([attributeName, attributeItem, currentAttribute], () => {
   />
   <ViewerOptionsTimeStepSlider v-model="attributeTimeStep" :time-steps="timeSteps" />
   <div
-    v-if="currentAttribute && currentAttribute.no_data"
+    v-if="currentAttribute && noData"
     class="text-caption text-high-emphasis mt-1 d-flex align-center ga-1"
     data-testid="noDataInfo"
   >

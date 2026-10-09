@@ -5,31 +5,29 @@ import { mountSuspended } from "@nuxt/test-utils/runtime";
 
 // Local imports
 import AttributeSelector from "@ogw_front/components/Viewer/Options/AttributeSelector.vue";
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { vuetify } from "@ogw_tests/utils";
 
 const ATTRIBUTE_RANGE = [0, 1];
 const OUT_OF_RANGE_STEP = 5;
 const LAST_STEP = 2;
 const HALF = 0.5;
+const RANGE_MIN = 2;
+const RANGE_MAX = 3;
 
 function makeAttribute(attribute_name: string, time_steps: number[]): Record<string, unknown> {
   return {
     attribute_name,
     attribute_id: attribute_name,
     nb_items: 1,
-    min_value: 0,
-    max_value: 1,
-    min_values: [0],
-    max_values: [1],
-    no_data: false,
     time_steps,
   };
 }
 
 type BackRequest = (
-  request: unknown,
-  options: { response_function: (response: unknown) => void },
-) => void;
+  request: { schema: { $id: string } },
+  options?: { response_function: (response: unknown) => void },
+) => unknown;
 
 const ATTRIBUTES = [
   makeAttribute("temperature", [HALF, 1, 2]),
@@ -39,8 +37,12 @@ const ATTRIBUTES = [
 
 vi.mock(import("@ogw_front/stores/back") as Promise<unknown>, () => ({
   useBackStore: (): { request: unknown } => ({
-    request: vi.fn<BackRequest>().mockImplementation((_request, { response_function }) => {
-      response_function({ attributes: ATTRIBUTES });
+    request: vi.fn<BackRequest>().mockImplementation(({ schema }, options) => {
+      if (schema.$id.endsWith("attribute_range")) {
+        return { min_values: [RANGE_MIN], max_values: [RANGE_MAX], no_data: true };
+      }
+      options?.response_function({ attributes: ATTRIBUTES });
+      return undefined;
     }),
   }),
 }));
@@ -51,15 +53,16 @@ vi.mock(import("@ogw_front/composables/batch_style") as Promise<unknown>, () => 
 async function mountSelector(
   attributeName: string,
   attributeTimeStep?: number,
+  attributeRange: (number | undefined)[] = ATTRIBUTE_RANGE,
 ): Promise<VueWrapper> {
   const wrapper = await mountSuspended(AttributeSelector, {
     global: { plugins: [vuetify] },
     props: {
       id: "id",
-      schema: { $id: "vertex_attribute_names", properties: { id: {} } },
+      schema: back_schemas.opengeodeweb_back.vertex_attribute_names,
       attributeName,
       attributeItem: 0,
-      attributeRange: ATTRIBUTE_RANGE,
+      attributeRange,
       attributeColorMap: "batlow",
       attributeTimeStep,
     },
@@ -114,5 +117,14 @@ describe("attributeSelector time steps", () => {
     await flushPromises();
 
     expect(wrapper.emitted("update:attributeRange")).toBeUndefined();
+  });
+
+  test("requests the range of the selected attribute when it is unset", async () => {
+    const wrapper = await mountSelector("plain", undefined, []);
+
+    expect(wrapper.emitted("update:attributeRange")?.at(-1)).toStrictEqual([
+      [RANGE_MIN, RANGE_MAX],
+    ]);
+    expect(wrapper.find('[data-testid="noDataInfo"]').exists()).toBe(true);
   });
 });

@@ -10,6 +10,7 @@ import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import ViewerOptionsAttributeRangeSelector from "@ogw_front/components/Viewer/Options/AttributeRangeSelector.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
+import { fetchAttributeRange } from "@ogw_front/utils/attribute_range";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -28,7 +29,7 @@ interface AttributeSource {
   title: string;
   schema: JsonRpcSchema;
   timeStepKey: string;
-  params: Record<string, unknown>;
+  params: { id: string; component_ids?: string[] };
   location: "point" | "cell";
 }
 
@@ -96,7 +97,7 @@ function attributeSchema(kind: string, isModel: boolean): JsonRpcSchema {
 function attributeSource(
   kind: string,
   title: string,
-  params: Record<string, unknown>,
+  params: { id: string; component_ids?: string[] },
   modelType?: string,
 ): AttributeSource {
   const schema = attributeSchema(kind, modelType !== undefined);
@@ -154,11 +155,17 @@ async function applyThreshold(): Promise<void> {
 
 const debouncedApply = useDebounceFn(() => applyThreshold(), DEBOUNCE_DELAY);
 
-function resetRange(): void {
-  const { min, max } = getAttributeRange(
-    currentAttribute.value as Parameters<typeof getAttributeRange>[0],
-    attributeItem.value,
-  );
+async function resetRange(): Promise<void> {
+  const source = sources.value[selectedSourceIndex.value ?? -1];
+  const name = attributeName.value;
+  if (!source || name === undefined) {
+    return;
+  }
+  const range = await fetchAttributeRange(source.schema, source.params, name);
+  if (name !== attributeName.value) {
+    return;
+  }
+  const { min, max } = getAttributeRange(range, attributeItem.value);
   minimum.value = min;
   maximum.value = max;
 }
@@ -192,13 +199,13 @@ watch(selectedSourceIndex, async (index) => {
   attributes.value = response.attributes;
 });
 
-watch(attributeName, () => {
+watch(attributeName, async () => {
   attributeItem.value = 0;
-  resetRange();
+  await resetRange();
 });
 
-watch(attributeItem, () => {
-  resetRange();
+watch(attributeItem, async () => {
+  await resetRange();
 });
 
 watch(currentTimeStep, () => {
