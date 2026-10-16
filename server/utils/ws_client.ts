@@ -1,4 +1,6 @@
 // Third party imports
+import { Decoder, encode } from "@msgpack/msgpack";
+import { UnChunker, generateChunks } from "wslink/src/WebsocketConnection/chunking";
 import { WebSocket } from "ws";
 import { v4 as uuidv4 } from "uuid";
 
@@ -6,6 +8,8 @@ import { v4 as uuidv4 } from "uuid";
 
 const HELLO_ID = "system:hello";
 const HELLO_SECRET = "wslink-secret";
+// Wslink default (512 KiB), until the hello response gives the server's limit
+const DEFAULT_MAX_MSG_SIZE = 524_288;
 
 interface PendingCall {
   resolve: (value: unknown) => void;
@@ -15,7 +19,7 @@ interface PendingCall {
 interface WsRpcMessage {
   id?: string;
   error?: { message?: string };
-  result?: unknown;
+  result?: { maxMsgSize?: number } & Record<string, unknown>;
 }
 
 function isWsRpcMessage(value: unknown): value is WsRpcMessage {
@@ -23,14 +27,11 @@ function isWsRpcMessage(value: unknown): value is WsRpcMessage {
 }
 
 // oxlint-disable-next-line prefer-readonly-parameter-types
-function rawDataToString(raw: WebSocket.RawData): string {
-  if (Buffer.isBuffer(raw)) {
-    return raw.toString();
+function rawDataToBlob(raw: WebSocket.RawData): Blob {
+  if (raw instanceof ArrayBuffer) {
+    return new Blob([raw]);
   }
-  if (Array.isArray(raw)) {
-    return Buffer.concat(raw).toString();
-  }
-  return Buffer.from(raw).toString();
+  return new Blob([Uint8Array.from(Array.isArray(raw) ? Buffer.concat(raw) : raw)]);
 }
 
 interface ServerWsRpcClient {
@@ -42,6 +43,7 @@ interface ServerWsRpcClient {
     };
   };
   isOpen: () => boolean;
+  notify: (method: string) => Promise<void>;
   onConnectionClose: (callback: () => void) => void;
   onConnectionError: (callback: (error: unknown) => void) => void;
   ready: Promise<void>;
@@ -51,35 +53,44 @@ interface ServerWsRpcClient {
 function createServerWsRpcClient(baseUrl: string): ServerWsRpcClient {
   const socket = new WebSocket(baseUrl);
   const pending = new Map<string, PendingCall>();
+  // Wslink 2 messages are msgpack-encoded and split into chunks
+  const unChunker = new UnChunker();
+  let maxMsgSize = DEFAULT_MAX_MSG_SIZE;
   let onCloseCallback: (() => void) | undefined = undefined;
   let onErrorCallback: ((error: unknown) => void) | undefined = undefined;
+
+  function send(message: object): void {
+    for (const chunk of generateChunks(encode(message), maxMsgSize)) {
+      socket.send(chunk);
+    }
+  }
 
   //oxlint-disable-next-line promise/avoid-new max-lines-per-function
   const ready = new Promise<void>((resolve, reject) => {
     socket.on("open", () => {
-      socket.send(
-        JSON.stringify({
-          id: HELLO_ID,
-          method: "wslink.hello",
-          args: [{ secret: HELLO_SECRET }],
-        }),
-      );
+      send({
+        wslink: "1.0",
+        id: HELLO_ID,
+        method: "wslink.hello",
+        args: [{ secret: HELLO_SECRET }],
+      });
     });
 
     // oxlint-disable-next-line prefer-readonly-parameter-types
-    socket.on("message", (raw: WebSocket.RawData) => {
+    async function handleMessage(raw: WebSocket.RawData): Promise<void> {
       let message: WsRpcMessage | undefined = undefined;
       try {
-        const parsed: unknown = JSON.parse(rawDataToString(raw));
-        if (!isWsRpcMessage(parsed)) {
+        const decoded = await unChunker.processChunk(rawDataToBlob(raw), () => new Decoder());
+        if (!isWsRpcMessage(decoded)) {
           return;
         }
-        message = parsed;
+        message = decoded;
       } catch {
         return;
       }
 
       if (message.id === HELLO_ID) {
+        maxMsgSize = message.result?.maxMsgSize ?? maxMsgSize;
         resolve();
         return;
       }
@@ -98,6 +109,11 @@ function createServerWsRpcClient(baseUrl: string): ServerWsRpcClient {
       } else {
         entry.resolve(message.result);
       }
+    }
+
+    // oxlint-disable-next-line prefer-readonly-parameter-types
+    socket.on("message", (raw: WebSocket.RawData) => {
+      void handleMessage(raw);
     });
 
     socket.on("error", (error: Error) => {
@@ -106,6 +122,7 @@ function createServerWsRpcClient(baseUrl: string): ServerWsRpcClient {
     });
 
     socket.on("close", () => {
+      reject(new Error("WebSocket closed"));
       onCloseCallback?.();
       for (const { reject: rejectPending } of pending.values()) {
         rejectPending(new Error("WebSocket closed"));
@@ -120,16 +137,20 @@ function createServerWsRpcClient(baseUrl: string): ServerWsRpcClient {
     //oxlint-disable-next-line promise/avoid-new
     return new Promise((resolve, reject) => {
       pending.set(id, { resolve, reject });
-      socket.send(
-        JSON.stringify({
-          wslink: "1.0",
-          id,
-          method: rpc,
-          args: [params],
-          kwargs: { stream: true },
-        }),
-      );
+      send({
+        wslink: "1.0",
+        id,
+        method: rpc,
+        args: [params],
+        kwargs: { stream: true },
+      });
     });
+  }
+
+  // Call an RPC without arguments nor waiting for its response (e.g. "application.exit")
+  async function notify(method: string): Promise<void> {
+    await ready;
+    send({ wslink: "1.0", id: method, method });
   }
 
   function close(): void {
@@ -161,7 +182,16 @@ function createServerWsRpcClient(baseUrl: string): ServerWsRpcClient {
     onErrorCallback = callback;
   }
 
-  return { call, close, getConnection, isOpen, onConnectionClose, onConnectionError, ready };
+  return {
+    call,
+    close,
+    getConnection,
+    isOpen,
+    notify,
+    onConnectionClose,
+    onConnectionError,
+    ready,
+  };
 }
 
 export { createServerWsRpcClient };
