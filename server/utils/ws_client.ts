@@ -1,6 +1,6 @@
 // Third party imports
 import { Decoder, encode } from "@msgpack/msgpack";
-import { UnChunker, generateChunks } from "wslink/src/WebsocketConnection/chunking";
+import { UnChunker, generateChunks } from "wslink/src/WebsocketConnection/chunking.js";
 import { WebSocket } from "ws";
 import { v4 as uuidv4 } from "uuid";
 

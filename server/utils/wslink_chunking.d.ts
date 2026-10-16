@@ -1,5 +1,5 @@
 // Wslink ships no types for its chunking module; this describes what ws_client.ts uses.
-declare module "wslink/src/WebsocketConnection/chunking" {
+declare module "wslink/src/WebsocketConnection/chunking.js" {
   interface Decoder {
     decode: (buffer: Uint8Array) => unknown;
   }
