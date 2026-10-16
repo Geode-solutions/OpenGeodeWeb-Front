@@ -69,7 +69,6 @@ function createServerWsRpcClient(baseUrl: string): ServerWsRpcClient {
   const ready = new Promise<void>((resolve, reject) => {
     socket.on("open", () => {
       send({
-        wslink: "1.0",
         id: HELLO_ID,
         method: "wslink.hello",
         args: [{ secret: HELLO_SECRET }],
@@ -138,7 +137,6 @@ function createServerWsRpcClient(baseUrl: string): ServerWsRpcClient {
     return new Promise((resolve, reject) => {
       pending.set(id, { resolve, reject });
       send({
-        wslink: "1.0",
         id,
         method: rpc,
         args: [params],
@@ -150,7 +148,7 @@ function createServerWsRpcClient(baseUrl: string): ServerWsRpcClient {
   // Call an RPC without arguments nor waiting for its response (e.g. "application.exit")
   async function notify(method: string): Promise<void> {
     await ready;
-    send({ wslink: "1.0", id: method, method });
+    send({ id: method, method });
   }
 
   function close(): void {
