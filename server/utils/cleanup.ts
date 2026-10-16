@@ -4,10 +4,12 @@ import path from "node:path";
 import { setTimeout } from "node:timers/promises";
 
 // Third party imports
-import { WebSocket } from "ws";
 import { consola } from "consola";
 import pTimeout from "p-timeout";
 import { rimraf } from "rimraf";
+
+// Local imports
+import { createServerWsRpcClient } from "./ws_client.js";
 
 interface Microservice {
   type: "back" | "viewer";
@@ -88,49 +90,21 @@ async function killWebsocketMicroservice(microservice: Microservice): Promise<vo
     if (microservice.url === undefined) {
       return;
     }
-    const socketUrl = microservice.url;
+    const client = createServerWsRpcClient(microservice.url);
     // oxlint-disable-next-line promise/avoid-new
-    await new Promise<void>((resolve) => {
-      const socket = new WebSocket(socketUrl);
-      socket.on("open", () => {
-        consola.info("Connected to WebSocket server");
-        socket.send(
-          JSON.stringify({
-            id: "system:hello",
-            method: "wslink.hello",
-            args: [
-              {
-                secret: "wslink-secret",
-              },
-            ],
-          }),
-        );
-      });
-      socket.on("message", (data: Buffer | string) => {
-        const message = data.toString();
-        consola.debug("Received from server:", message);
-        if (message.includes("hello")) {
-          socket.send(
-            JSON.stringify({
-              id: "application.exit",
-              method: "application.exit",
-            }),
-          );
-          consola.info(successMessage);
-          socket.close();
-          resolve();
-        }
-      });
-      socket.on("close", () => {
-        consola.info(successMessage);
-        resolve();
-      });
-      socket.on("error", (error: Error) => {
-        consola.error("WebSocket error:", error);
-        socket.close();
-        resolve();
-      });
+    const closed = new Promise<void>((resolve) => {
+      client.onConnectionClose(resolve);
     });
+    try {
+      await client.notify("application.exit");
+      // Wslink handles messages asynchronously: closing right away would drop the exit request
+      await closed;
+      consola.info(successMessage);
+    } catch (error) {
+      consola.error("WebSocket error:", error);
+    } finally {
+      client.close();
+    }
   }
   await pTimeout(do_kill(), {
     milliseconds: 5000,
