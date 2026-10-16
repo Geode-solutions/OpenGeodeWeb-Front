@@ -1,6 +1,6 @@
-import { type Table, liveQuery } from "dexie";
-import type { Observable } from "rxjs";
+import type { Table } from "dexie";
 import { database } from "@ogw_internal/database/database.js";
+import { liveObservable } from "@ogw_front/utils/live_observable";
 import { useObservable } from "@vueuse/rxjs";
 
 interface ModelComponentRecord {
@@ -87,11 +87,10 @@ export function useDataMesh(): {
 
   function refFormatedMeshComponents(modelId: string): Ref<FormattedComponentGroup[] | undefined> {
     return useObservable(
-      liveQuery(async () => {
+      liveObservable(async () => {
         const components = await formatedMeshComponents(modelId);
         return components;
-        // oxlint-disable-next-line no-unsafe-type-assertion
-      }) as unknown as Observable<FormattedComponentGroup[]>,
+      }),
       {
         initialValue: undefined,
       },

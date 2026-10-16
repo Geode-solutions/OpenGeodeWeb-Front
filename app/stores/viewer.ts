@@ -142,12 +142,13 @@ export const useViewerStore = defineStore(
         }
         try {
           status.value = Status.CONNECTING;
-          client.value = (await initWebSocketClient(base_url.value, client.value, {
+          const wsClient = await initWebSocketClient(base_url.value, client.value, {
             onConnectionClose: () => {
               status.value = Status.NOT_CONNECTED;
             },
-            // oxlint-disable-next-line no-unsafe-type-assertion -- initWebSocketClient's return is not typed as RpcClient.
-          })) as unknown as RpcClient;
+          });
+          // oxlint-disable-next-line no-unsafe-type-assertion -- initWebSocketClient's return is not typed as RpcClient.
+          client.value = wsClient as unknown as RpcClient;
           connectImageStream(client.value.getConnection().getSession());
           // oxlint-disable-next-line no-unsafe-type-assertion -- endBusy is not part of the RpcClient type.
           (client.value as unknown as { endBusy: () => void }).endBusy();
