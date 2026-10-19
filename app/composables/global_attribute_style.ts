@@ -1,6 +1,6 @@
+import { fetchAttributeRange, isAttributeElement } from "@ogw_front/utils/attribute_range";
 import type { JsonRpcSchema } from "@ogw_shared/utils/types";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
-import { fetchAttributeRange } from "@ogw_front/utils/attribute_range";
 import { getAttributeRange } from "@ogw_front/utils/attributes";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -256,16 +256,13 @@ export function useGlobalAttributeStyle(dataIdRef: Ref<string | undefined>): {
         continue;
       }
 
-      const schemaName = `${activeColoring}_attribute_names`;
-      const backSchemas = back_schemas.opengeodeweb_back as Record<string, unknown>;
-      const schema = backSchemas[schemaName];
-      if (schema === undefined || !isJsonRpcSchema(schema)) {
+      if (!isAttributeElement(activeColoring)) {
         continue;
       }
 
       requestPromises.push(
         (async (): Promise<void> => {
-          const range = await fetchAttributeRange(schema, { id: targetId }, attrName);
+          const range = await fetchAttributeRange(activeColoring, { id: targetId }, attrName);
           if (!range) {
             return;
           }

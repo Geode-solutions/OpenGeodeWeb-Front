@@ -60,6 +60,7 @@ async function mountSelector(
     props: {
       id: "id",
       schema: back_schemas.opengeodeweb_back.vertex_attribute_names,
+      element: "vertex",
       attributeName,
       attributeItem: 0,
       attributeRange,

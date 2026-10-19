@@ -267,6 +267,7 @@ watch(
           :id="id"
           :componentIds="componentIds"
           :schema="vertexSchema"
+          element="vertex"
         />
       </template>
       <template v-if="active_key === edge_dict['value'] && hasColorMap('edge')">
@@ -281,6 +282,7 @@ watch(
           :id="id"
           :componentIds="componentIds"
           :schema="edgeSchema"
+          element="edge"
         />
       </template>
       <template v-if="active_key === cell_dict['value'] && hasColorMap('cell')">
@@ -295,6 +297,7 @@ watch(
           :id="id"
           :componentIds="componentIds"
           :schema="cellSchema"
+          element="cell"
         />
       </template>
       <template v-if="active_key === polygon_dict['value'] && hasColorMap('polygon')">
@@ -309,6 +312,7 @@ watch(
           :id="id"
           :componentIds="componentIds"
           :schema="polygonSchema"
+          element="polygon"
         />
       </template>
       <template v-if="active_key === polyhedron_dict['value'] && hasColorMap('polyhedron')">
@@ -323,6 +327,7 @@ watch(
           :id="id"
           :componentIds="componentIds"
           :schema="polyhedronSchema"
+          element="polyhedron"
         />
       </template>
     </v-col>

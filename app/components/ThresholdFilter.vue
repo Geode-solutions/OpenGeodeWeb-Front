@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { type AttributeElement, fetchAttributeRange } from "@ogw_front/utils/attribute_range";
 import {
   MESH_ELEMENT_KINDS,
   MODEL_COMPONENT_ATTRIBUTE_SCHEMAS,
@@ -10,7 +11,6 @@ import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import ViewerOptionsAttributeRangeSelector from "@ogw_front/components/Viewer/Options/AttributeRangeSelector.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
-import { fetchAttributeRange } from "@ogw_front/utils/attribute_range";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -28,6 +28,7 @@ const { escapeFunction = undefined } = defineProps<Props>();
 interface AttributeSource {
   title: string;
   schema: JsonRpcSchema;
+  element: AttributeElement;
   timeStepKey: string;
   params: { id: string; component_ids?: string[] };
   location: "point" | "cell";
@@ -95,7 +96,7 @@ function attributeSchema(kind: string, isModel: boolean): JsonRpcSchema {
 }
 
 function attributeSource(
-  kind: string,
+  kind: AttributeElement,
   title: string,
   params: { id: string; component_ids?: string[] },
   modelType?: string,
@@ -104,6 +105,7 @@ function attributeSource(
   return {
     title: `${title}${kind} attribute`,
     schema,
+    element: kind,
     timeStepKey:
       modelType === undefined
         ? schema.$id
@@ -116,8 +118,12 @@ function attributeSource(
 async function fetchSources(id: string): Promise<AttributeSource[]> {
   const item = await dataStore.item(id);
   if (item.viewer_type !== "model") {
-    return ["vertex", MESH_ELEMENT_KINDS[item.geode_object_type]]
-      .filter((kind): kind is string => kind !== undefined)
+    const kinds: (AttributeElement | undefined)[] = [
+      "vertex",
+      MESH_ELEMENT_KINDS[item.geode_object_type],
+    ];
+    return kinds
+      .filter((kind): kind is AttributeElement => kind !== undefined)
       .map((kind) => attributeSource(kind, "", { id }));
   }
   const modelSources = await Promise.all(
@@ -161,7 +167,7 @@ async function resetRange(): Promise<void> {
   if (!source || name === undefined) {
     return;
   }
-  const range = await fetchAttributeRange(source.schema, source.params, name);
+  const range = await fetchAttributeRange(source.element, source.params, name);
   if (name !== attributeName.value) {
     return;
   }

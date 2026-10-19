@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import {
+  type AttributeElement,
+  type AttributeRangeInfo,
+  fetchAttributeRange,
+} from "@ogw_front/utils/attribute_range";
+import {
   type AttributeRange,
   type RangesPerData,
   useBatchGroup,
 } from "@ogw_front/composables/batch_style";
-import { type AttributeRangeInfo, fetchAttributeRange } from "@ogw_front/utils/attribute_range";
 import { getAttributeRange, intersectAttributes } from "@ogw_front/utils/attributes";
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
@@ -29,9 +33,10 @@ interface Props {
   id: string;
   componentIds?: string[];
   schema: JsonRpcSchema;
+  element: AttributeElement;
 }
 
-const { id, componentIds = undefined, schema } = defineProps<Props>();
+const { id, componentIds = undefined, schema, element } = defineProps<Props>();
 
 interface Emits {
   "update:attributeColorMap": [colorMap: string];
@@ -149,7 +154,7 @@ async function requestRanges(name: string): Promise<void> {
   const entries = await Promise.all(
     targets.map(async ([targetId, params]): Promise<[string, AttributeRangeInfo | undefined]> => [
       targetId,
-      params ? await fetchAttributeRange(schema, params, name) : undefined,
+      params ? await fetchAttributeRange(element, params, name) : undefined,
     ]),
   );
   if (rangesName !== name) {
