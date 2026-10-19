@@ -1,19 +1,23 @@
 <script setup lang="ts">
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 
+import { matchExpectedFiles, uploadPath } from "@ogw_front/utils/upload_path";
+import DragAndDrop from "@ogw_front/components/DragAndDrop.vue";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
 import FileUploader from "@ogw_front/components/FileUploader.vue";
 import { useBackStore } from "@ogw_front/stores/back";
+import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 // Files carry extra app-specific bookkeeping fields once picked up here.
-type UploadFile = File & { isConfigured?: boolean };
+type UploadFile = File & { isConfigured?: boolean; relativePath?: string };
 interface FilePlan {
   has_missing_files: boolean;
   mandatory_files: string[];
   additional_files: string[];
 }
 
-const schema = schemas.opengeodeweb_back.missing_files;
+const schema = schemas.opengeodeweb_back.data_missing_files;
+const time_series_schema = schemas.opengeodeweb_back.time_series_missing_files;
 
 interface Emits {
   update_values: [value: { additional_files: UploadFile[] }];
@@ -28,9 +32,16 @@ interface Props {
   geodeObjectType: string;
   filenames: string[];
   files?: UploadFile[];
+  timeSeries?: boolean;
 }
 
-const { multiple, geodeObjectType, filenames, files = [] } = defineProps<Props>();
+const {
+  multiple,
+  geodeObjectType,
+  filenames,
+  files = [],
+  timeSeries = false,
+} = defineProps<Props>();
 
 const accept = ref<string>("");
 const loading = ref<boolean>(false);
@@ -38,6 +49,7 @@ const has_missing_files = ref<boolean>(false);
 const mandatory_files = ref<string[]>([]);
 const additional_files = ref<string[]>([]);
 const toggle_loading = useToggle(loading);
+const uploading = ref<boolean>(false);
 
 function files_uploaded_event(value: UploadFile[]): void {
   emit("update_values", { additional_files: value });
@@ -62,6 +74,9 @@ async function missing_files(): Promise<void> {
         mandatory_files: [],
         additional_files: [],
       });
+    }
+    if (timeSeries) {
+      return backStore.request({ schema: time_series_schema, params: { filename } });
     }
     const params = { geode_object_type: geodeObjectType, filename };
     return backStore.request({ schema, params });
@@ -88,12 +103,61 @@ async function missing_files(): Promise<void> {
   toggle_loading();
 }
 
+// Time series: uploads the missing files found in the selected folder, then the files they
+// Reference in turn, until nothing is missing. The folder layout does not matter.
+async function upload_missing_from(
+  folder_files: UploadFile[],
+  uploaded: UploadFile[],
+): Promise<void> {
+  const expected = [...mandatory_files.value, ...additional_files.value];
+  const match = matchExpectedFiles(
+    folder_files.map((file) => uploadPath(file)),
+    expected,
+  );
+  if (match.status === "ambiguous") {
+    useFeedbackStore().add_warning(
+      `Several matching files for ${match.path}, select a more specific folder`,
+    );
+    return;
+  }
+  const found = expected.flatMap((expected_path, index) => {
+    const file = folder_files[match.indices[index] ?? -1];
+    return file && !uploaded.includes(file)
+      ? [Object.assign(file, { relativePath: expected_path })]
+      : [];
+  });
+  if (found.length === 0) {
+    useFeedbackStore().add_warning(`The selected folder does not contain: ${expected.join(", ")}`);
+    return;
+  }
+  const backStore = useBackStore();
+  await Promise.all(found.map((file) => backStore.upload(file)));
+  emit("update_values", { additional_files: [...uploaded, ...found] });
+  await missing_files();
+  if (has_missing_files.value) {
+    await upload_missing_from(folder_files, [...uploaded, ...found]);
+  }
+}
+
+async function upload_folder(folder_files: UploadFile[]): Promise<void> {
+  uploading.value = true;
+  try {
+    await upload_missing_from(folder_files, []);
+  } finally {
+    uploading.value = false;
+  }
+}
+
+function warn_folder_read_error(message: string): void {
+  useFeedbackStore().add_warning(`Could not read the dropped folder: ${message}`);
+}
+
 // oxlint-disable-next-line no-top-level-await
 await missing_files();
 </script>
 
 <template>
-  <FetchingData v-if="loading" />
+  <FetchingData v-if="loading || uploading" />
   <v-container v-else-if="has_missing_files">
     <v-row v-if="mandatory_files.length" align="center">
       <v-col cols="auto" class="pa-0">
@@ -115,7 +179,15 @@ await missing_files();
     </v-row>
     <v-row>
       <v-col cols="12">
+        <DragAndDrop
+          v-if="timeSeries"
+          directory
+          :show-extensions="false"
+          @files-selected="upload_folder"
+          @folder-read-error="warn_folder_read_error"
+        />
         <FileUploader
+          v-else
           v-bind="{ multiple, accept, files, autoUpload: false }"
           @files_uploaded="files_uploaded_event"
         />
