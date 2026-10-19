@@ -83,7 +83,10 @@ function commitSeriesTimeStep(): void {
   committedSeries = name;
   const current = attributeTimeStep.value;
   const valid = current !== undefined && current >= 0 && current < timeSteps.value.length;
-  emit("update:attributeTimeStep", valid ? current : 0);
+  // A valid step is already stored and applied with the series: emitting it again re-applies the attribute
+  if (!valid) {
+    emit("update:attributeTimeStep", 0);
+  }
 }
 
 const cssNoDataColor = computed<string>(() => {

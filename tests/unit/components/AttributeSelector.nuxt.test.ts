@@ -110,10 +110,10 @@ describe("attributeSelector time steps", () => {
     expect(wrapper.emitted("update:attributeTimeStep")?.at(-1)).toStrictEqual([0]);
   });
 
-  test("commits a valid stored step when the series is selected", async () => {
+  test("keeps a valid stored step when the series is selected", async () => {
     const wrapper = await mountSelector("temperature", LAST_STEP);
 
-    expect(wrapper.emitted("update:attributeTimeStep")?.at(-1)).toStrictEqual([LAST_STEP]);
+    expect(wrapper.emitted("update:attributeTimeStep")).toBeUndefined();
   });
 
   test("does not reset the range when the step changes", async () => {

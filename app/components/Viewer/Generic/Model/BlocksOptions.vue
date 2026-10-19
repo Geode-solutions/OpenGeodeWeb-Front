@@ -186,8 +186,14 @@ const blocksPolyhedronAttributeName = computed<string | undefined>({
     if (newValue === undefined) {
       return;
     }
-    await dataStyleStore.setModelBlocksPolyhedronAttributeName(modelId, targetBlockIds, newValue);
-    hybridViewerStore.remoteRender();
+    const applied = await dataStyleStore.setModelBlocksPolyhedronAttributeName(
+      modelId,
+      targetBlockIds,
+      newValue,
+    );
+    if (applied) {
+      hybridViewerStore.remoteRender();
+    }
   },
 });
 
@@ -197,20 +203,28 @@ const blocksPolyhedronAttributeTimeStep = computed<number | undefined>({
     if (newValue === undefined) {
       return;
     }
-    await dataStyleStore.setModelBlocksPolyhedronAttributeTimeStep(
+    const applied = await dataStyleStore.setModelBlocksPolyhedronAttributeTimeStep(
       modelId,
       targetBlockIds,
       newValue,
     );
-    hybridViewerStore.remoteRender();
+    if (applied) {
+      hybridViewerStore.remoteRender();
+    }
   },
 });
 
 const blocksPolyhedronAttributeItem = computed<string | undefined>({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeItem(modelId, referenceBlockId.value),
   set: async (newValue) => {
-    await dataStyleStore.setModelBlocksPolyhedronAttributeItem(modelId, targetBlockIds, newValue);
-    hybridViewerStore.remoteRender();
+    const applied = await dataStyleStore.setModelBlocksPolyhedronAttributeItem(
+      modelId,
+      targetBlockIds,
+      newValue,
+    );
+    if (applied) {
+      hybridViewerStore.remoteRender();
+    }
   },
 });
 
@@ -221,25 +235,29 @@ const blocksPolyhedronAttributeRange = computed<[number, number] | undefined>({
     if (minimum === undefined || maximum === undefined) {
       return;
     }
-    await dataStyleStore.setModelBlocksPolyhedronAttributeRange(
+    const applied = await dataStyleStore.setModelBlocksPolyhedronAttributeRange(
       modelId,
       targetBlockIds,
       minimum,
       maximum,
     );
-    hybridViewerStore.remoteRender();
+    if (applied) {
+      hybridViewerStore.remoteRender();
+    }
   },
 });
 
 const blocksPolyhedronAttributeColorMap = computed<Map<string, RGBAColor> | undefined>({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeColorMap(modelId, referenceBlockId.value),
   set: async (newValue) => {
-    await dataStyleStore.setModelBlocksPolyhedronAttributeColorMap(
+    const applied = await dataStyleStore.setModelBlocksPolyhedronAttributeColorMap(
       modelId,
       targetBlockIds,
       newValue,
     );
-    hybridViewerStore.remoteRender();
+    if (applied) {
+      hybridViewerStore.remoteRender();
+    }
   },
 });
 
@@ -247,12 +265,14 @@ const blocksPolyhedronAttributeNoDataColor = computed<RGBAColor>({
   get: () =>
     dataStyleStore.modelBlocksPolyhedronAttributeNoDataColor(modelId, referenceBlockId.value),
   set: async (newValue) => {
-    await dataStyleStore.setModelBlocksPolyhedronAttributeNoDataColor(
+    const applied = await dataStyleStore.setModelBlocksPolyhedronAttributeNoDataColor(
       modelId,
       targetBlockIds,
       newValue,
     );
-    hybridViewerStore.remoteRender();
+    if (applied) {
+      hybridViewerStore.remoteRender();
+    }
   },
 });
 
@@ -330,8 +350,14 @@ const polyhedronAttributeName = computed<string | undefined>({
     if (blockId === undefined || newValue === undefined) {
       return;
     }
-    await dataStyleStore.setModelBlocksPolyhedronAttributeName(modelId, [blockId], newValue);
-    hybridViewerStore.remoteRender();
+    const applied = await dataStyleStore.setModelBlocksPolyhedronAttributeName(
+      modelId,
+      [blockId],
+      newValue,
+    );
+    if (applied) {
+      hybridViewerStore.remoteRender();
+    }
   },
 });
 
@@ -341,8 +367,14 @@ const polyhedronAttributeTimeStep = computed<number | undefined>({
     if (blockId === undefined || newValue === undefined) {
       return;
     }
-    await dataStyleStore.setModelBlocksPolyhedronAttributeTimeStep(modelId, [blockId], newValue);
-    hybridViewerStore.remoteRender();
+    const applied = await dataStyleStore.setModelBlocksPolyhedronAttributeTimeStep(
+      modelId,
+      [blockId],
+      newValue,
+    );
+    if (applied) {
+      hybridViewerStore.remoteRender();
+    }
   },
 });
 
@@ -352,8 +384,14 @@ const polyhedronAttributeItem = computed<string | undefined>({
     if (blockId === undefined) {
       return;
     }
-    await dataStyleStore.setModelBlocksPolyhedronAttributeItem(modelId, [blockId], newValue);
-    hybridViewerStore.remoteRender();
+    const applied = await dataStyleStore.setModelBlocksPolyhedronAttributeItem(
+      modelId,
+      [blockId],
+      newValue,
+    );
+    if (applied) {
+      hybridViewerStore.remoteRender();
+    }
   },
 });
 
@@ -364,13 +402,15 @@ const polyhedronAttributeRange = computed<[number, number] | undefined>({
     if (blockId === undefined || minimum === undefined || maximum === undefined) {
       return;
     }
-    await dataStyleStore.setModelBlocksPolyhedronAttributeRange(
+    const applied = await dataStyleStore.setModelBlocksPolyhedronAttributeRange(
       modelId,
       [blockId],
       minimum,
       maximum,
     );
-    hybridViewerStore.remoteRender();
+    if (applied) {
+      hybridViewerStore.remoteRender();
+    }
   },
 });
 
@@ -380,8 +420,14 @@ const polyhedronAttributeColorMap = computed<Map<string, RGBAColor> | undefined>
     if (blockId === undefined) {
       return;
     }
-    await dataStyleStore.setModelBlocksPolyhedronAttributeColorMap(modelId, [blockId], newValue);
-    hybridViewerStore.remoteRender();
+    const applied = await dataStyleStore.setModelBlocksPolyhedronAttributeColorMap(
+      modelId,
+      [blockId],
+      newValue,
+    );
+    if (applied) {
+      hybridViewerStore.remoteRender();
+    }
   },
 });
 
@@ -391,8 +437,14 @@ const polyhedronAttributeNoDataColor = computed<RGBAColor>({
     if (blockId === undefined) {
       return;
     }
-    await dataStyleStore.setModelBlocksPolyhedronAttributeNoDataColor(modelId, [blockId], newValue);
-    hybridViewerStore.remoteRender();
+    const applied = await dataStyleStore.setModelBlocksPolyhedronAttributeNoDataColor(
+      modelId,
+      [blockId],
+      newValue,
+    );
+    if (applied) {
+      hybridViewerStore.remoteRender();
+    }
   },
 });
 
