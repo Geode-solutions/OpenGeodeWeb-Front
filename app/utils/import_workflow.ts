@@ -150,4 +150,29 @@ async function importWorkflowFromSnapshot(items: readonly NewDataItem[]): Promis
   });
   return ids;
 }
-export { importFile, importWorkflow, importWorkflowFromSnapshot, importItem };
+
+// The time series only adds attributes to the model, so the viewer object is reloaded under the same id with its stored style.
+async function applyTimeSeriesWorkflow(filename: string, id: string): Promise<string> {
+  const backStore = useBackStore();
+  const dataStore = useDataStore();
+  const dataStyleStore = useDataStyleStore();
+  const hybridViewerStore = useHybridViewerStore();
+  await backStore.request({
+    schema: back_schemas.opengeodeweb_back.apply_time_series,
+    params: { id, filename },
+  });
+  const item = await dataStore.item(id);
+  await dataStore.deregisterObject(id);
+  await dataStore.registerObject(id, item.name ?? id);
+  await dataStyleStore.applyDefaultStyle(id);
+  await hybridViewerStore.remoteRender();
+  return id;
+}
+
+export {
+  importFile,
+  importWorkflow,
+  importWorkflowFromSnapshot,
+  importItem,
+  applyTimeSeriesWorkflow,
+};

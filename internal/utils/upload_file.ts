@@ -3,6 +3,7 @@ import { CHUNK_SIZE_BYTES } from "@ogw_shared/utils/file.js";
 import type { Microservice } from "./api_fetch.js";
 import { consola } from "consola";
 import { fetchRaw } from "@ogw_shared/utils/fetch_raw.js";
+import { uploadPath } from "@ogw_front/utils/upload_path";
 import { useFeedbackStore } from "@ogw_front/stores/feedback.js";
 
 interface UploadFileParams {
@@ -86,7 +87,7 @@ async function upload_file(
     const chunk = file.slice(start, start + CHUNK_SIZE_BYTES);
     const query = new URLSearchParams({
       ...params,
-      filename: file.name,
+      filename: uploadPath(file),
       chunk_index: String(chunkIndex),
       total_chunks: String(totalChunks),
     });
