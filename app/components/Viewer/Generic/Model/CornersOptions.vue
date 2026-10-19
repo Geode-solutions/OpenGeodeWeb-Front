@@ -29,6 +29,8 @@ const referenceCornerId = computed<string | undefined>(() =>
   collections ? targetCornerIds[0] : undefined,
 );
 
+const cornerComponentIds = computed<string[]>(() => (cornerId === undefined ? [] : [cornerId]));
+
 // Visibility
 const cornersVisibility = computed<boolean>({
   get: () =>
@@ -290,7 +292,7 @@ const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attri
     <VisibilitySwitch v-model="cornerVisibility" />
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
-      :componentIds="[cornerId]"
+      :componentIds="cornerComponentIds"
       v-model:coloring_style_key="cornerActiveColoring"
       v-model:color="cornerColor"
       v-model:vertex_attribute_name="vertexAttributeName"

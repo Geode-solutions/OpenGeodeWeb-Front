@@ -30,6 +30,8 @@ const referenceSurfaceId = computed<string | undefined>(() =>
   collections ? targetSurfaceIds[0] : undefined,
 );
 
+const surfaceComponentIds = computed<string[]>(() => (surfaceId === undefined ? [] : [surfaceId]));
+
 // Visibility
 const surfacesVisibility = computed<boolean>({
   get: () =>
@@ -465,7 +467,7 @@ const polygonSchema = back_schemas.opengeodeweb_back.model_component_polygon_att
     <VisibilitySwitch v-model="surfaceVisibility" />
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
-      :componentIds="[surfaceId]"
+      :componentIds="surfaceComponentIds"
       v-model:coloring_style_key="surfaceActiveColoring"
       v-model:color="surfaceColor"
       v-model:vertex_attribute_name="vertexAttributeName"

@@ -237,7 +237,7 @@ onMounted(async () => {
 });
 
 watch(
-  () => [id, componentIds, schema],
+  [(): string => id, (): string[] | undefined => componentIds, (): JsonRpcSchema => schema],
   async () => {
     await getAttributes();
   },

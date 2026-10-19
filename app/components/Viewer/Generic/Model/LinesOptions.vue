@@ -29,6 +29,8 @@ const referenceLineId = computed<string | undefined>(() =>
   collections ? targetLineIds[0] : undefined,
 );
 
+const lineComponentIds = computed<string[]>(() => (lineId === undefined ? [] : [lineId]));
+
 // Visibility
 const linesVisibility = computed<boolean>({
   get: () =>
@@ -414,7 +416,7 @@ const edgeSchema = back_schemas.opengeodeweb_back.model_component_edge_attribute
     <VisibilitySwitch v-model="lineVisibility" />
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
-      :componentIds="[lineId]"
+      :componentIds="lineComponentIds"
       v-model:coloring_style_key="lineActiveColoring"
       v-model:color="lineColor"
       v-model:vertex_attribute_name="vertexAttributeName"

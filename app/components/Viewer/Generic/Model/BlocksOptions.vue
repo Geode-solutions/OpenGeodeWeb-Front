@@ -30,6 +30,8 @@ const referenceBlockId = computed<string | undefined>(() =>
   collections ? targetBlockIds[0] : undefined,
 );
 
+const blockComponentIds = computed<string[]>(() => (blockId === undefined ? [] : [blockId]));
+
 // Visibility
 const blocksVisibility = computed<boolean>({
   get: () =>
@@ -443,7 +445,7 @@ const polyhedronSchema = back_schemas.opengeodeweb_back.model_component_polyhedr
     <VisibilitySwitch v-model="blockVisibility" />
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
-      :componentIds="[blockId]"
+      :componentIds="blockComponentIds"
       v-model:coloring_style_key="blockActiveColoring"
       v-model:color="blockColor"
       v-model:vertex_attribute_name="vertexAttributeName"

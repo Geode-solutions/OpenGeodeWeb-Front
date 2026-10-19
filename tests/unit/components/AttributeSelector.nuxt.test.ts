@@ -1,6 +1,7 @@
 // Third party imports
 import { type VueWrapper, flushPromises } from "@vue/test-utils";
 import { describe, expect, test, vi } from "vitest";
+import type { VNode } from "vue";
 import { mountSuspended } from "@nuxt/test-utils/runtime";
 
 // Local imports
@@ -29,6 +30,8 @@ type BackRequest = (
   options?: { response_function: (response: unknown) => void },
 ) => unknown;
 
+let nbNamesRequests = 0;
+
 const ATTRIBUTES = [
   makeAttribute("temperature", [HALF, 1, 2]),
   makeAttribute("single_step", [3]),
@@ -41,6 +44,7 @@ vi.mock(import("@ogw_front/stores/back") as Promise<unknown>, () => ({
       if (schema.$id.endsWith("attribute_range")) {
         return { min_values: [RANGE_MIN], max_values: [RANGE_MAX], no_data: true };
       }
+      nbNamesRequests += 1;
       options?.response_function({ attributes: ATTRIBUTES });
       return undefined;
     }),
@@ -127,5 +131,34 @@ describe("attributeSelector time steps", () => {
       [RANGE_MIN, RANGE_MAX],
     ]);
     expect(wrapper.find('[data-testid="noDataInfo"]').exists()).toBe(true);
+  });
+});
+
+describe("attributeSelector attribute names", () => {
+  test("requests the names again only when the components change", async () => {
+    const componentIds = ref(["component"]);
+    const rerenders = ref(0);
+    const Parent = defineComponent({
+      setup: () => (): VNode =>
+        h("div", { "data-rerenders": rerenders.value }, [
+          h(AttributeSelector, {
+            id: "id",
+            componentIds: componentIds.value,
+            schema: back_schemas.opengeodeweb_back.vertex_attribute_names,
+            element: "vertex",
+          }),
+        ]),
+    });
+    await mountSuspended(Parent, { global: { plugins: [vuetify] } });
+    await flushPromises();
+    const nbRequestsAfterMount = nbNamesRequests;
+
+    rerenders.value += 1;
+    await flushPromises();
+    expect(nbNamesRequests).toBe(nbRequestsAfterMount);
+
+    componentIds.value = ["other_component"];
+    await flushPromises();
+    expect(nbNamesRequests).toBe(nbRequestsAfterMount + 1);
   });
 });
