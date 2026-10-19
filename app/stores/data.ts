@@ -1,13 +1,13 @@
 // oxlint-disable eslint/max-lines
 // Third party imports
-import { type Table, liveQuery } from "dexie";
-import type { Observable } from "rxjs";
+import type { Table } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { type ModelComponentRecord, useDataMesh } from "./data_helpers/mesh.js";
 import { database } from "@ogw_internal/database/database.js";
+import { liveObservable } from "@ogw_front/utils/live_observable";
 import { useDataCollections } from "./data_helpers/collections.js";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -137,16 +137,11 @@ export const useDataStore = defineStore("data", () => {
     return items;
   }
   function refItem(id: string): Ref<DataItem | undefined> {
-    // Dexie's liveQuery() returns Dexie's own minimal Observable shape, not an
-    // Actual rxjs Observable instance (useObservable's declared parameter type);
-    // The two are structurally close enough at runtime (vueuse only calls
-    // `.subscribe`) but not identical, hence the cast.
     return useObservable(
-      liveQuery(async () => {
+      liveObservable(async () => {
         const data_item = await data_db.get(id);
         return data_item;
-        // oxlint-disable-next-line no-unsafe-type-assertion -- trusted vueuse/Dexie Observable boundary; see comment above.
-      }) as unknown as Observable<DataItem | undefined>,
+      }),
       {
         // oxlint-disable-next-line no-unsafe-type-assertion -- placeholder until the live query resolves; consumers must treat this as possibly incomplete.
         initialValue: {} as DataItem,
@@ -155,11 +150,10 @@ export const useDataStore = defineStore("data", () => {
   }
   function refAllItems(): Ref<DataItem[]> {
     return useObservable(
-      liveQuery(async () => {
+      liveObservable(async () => {
         const items = await data_db.toArray();
         return items;
-        // oxlint-disable-next-line no-unsafe-type-assertion -- trusted vueuse/Dexie Observable boundary; see comment above.
-      }) as unknown as Observable<DataItem[]>,
+      }),
       {
         initialValue: [] as DataItem[],
       },

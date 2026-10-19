@@ -47,6 +47,11 @@ function asWidgetFactory(widget: PlaneWidget): vtkAbstractWidgetFactory<vtkAbstr
   return widget as unknown as vtkAbstractWidgetFactory<vtkAbstractWidget>;
 }
 
+function asWidgetHandle(widget: unknown): WidgetHandle {
+  // oxlint-disable-next-line no-unsafe-type-assertion -- vtk.js WidgetManager.addWidget is untyped for our custom WidgetHandle shape; narrowed here.
+  return widget as WidgetHandle;
+}
+
 interface WidgetEntryManagerParams {
   planes: Ref<ClippingPlane[]>;
   debouncedApply: (...args: readonly unknown[]) => void;
@@ -136,10 +141,7 @@ function useWidgetEntryManager({ planes, debouncedApply }: WidgetEntryManagerPar
     if (!widgetEntries[idx]) {
       // oxlint-disable-next-line no-unsafe-call no-unsafe-type-assertion -- vtk.js has no types for ImplicitPlaneWidget's factory; narrowed here.
       const planeWidget = vtkImplicitPlaneWidget() as PlaneWidget;
-      const widgetHandle = widgetManager.addWidget(
-        asWidgetFactory(planeWidget),
-        // oxlint-disable-next-line no-unsafe-type-assertion -- vtk.js WidgetManager.addWidget is untyped for our custom WidgetHandle shape; narrowed here.
-      ) as unknown as WidgetHandle;
+      const widgetHandle = asWidgetHandle(widgetManager.addWidget(asWidgetFactory(planeWidget)));
       widgetEntries.push(createWidgetEntry(planeWidget, widgetHandle, idx));
     }
     const entry = widgetEntries[idx];

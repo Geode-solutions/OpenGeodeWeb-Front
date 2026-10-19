@@ -26,12 +26,35 @@ interface CallRawOptions extends CallClientOptions {
   timeout?: number;
 }
 
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+  return _.isPlainObject(value);
+}
+
+// Wslink encodes messages with msgpack, which sends undefined values as null where JSON omitted them
+function omitUndefinedFields(record: object): Record<string, unknown> {
+  function omitUndefined(value: unknown): unknown {
+    if (Array.isArray(value)) {
+      return value.map((item: unknown) => omitUndefined(item));
+    }
+    if (isPlainRecord(value)) {
+      return omitUndefinedFields(value);
+    }
+    return value;
+  }
+  return Object.fromEntries(
+    Object.entries(record)
+      .filter(([, value]) => value !== undefined)
+      .map(([key, value]) => [key, omitUndefined(value)]),
+  );
+}
+
 async function callClient({ rpc, params = {}, client }: CallClientOptions): Promise<unknown> {
+  const definedParams = omitUndefinedFields(params);
   if (globalThis.window !== undefined) {
-    const response = await client.getConnection().getSession().call(rpc, [params]);
+    const response = await client.getConnection().getSession().call(rpc, [definedParams]);
     return response;
   }
-  const response = await client.call(rpc, params);
+  const response = await client.call(rpc, definedParams);
   return response;
 }
 
