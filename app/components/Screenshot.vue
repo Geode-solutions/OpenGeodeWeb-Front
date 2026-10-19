@@ -44,7 +44,7 @@ async function takeScreenshot(): Promise<void> {
       params,
     },
     {
-      // `blob` is a wslink attachment: the viewer sends its key, the client receives the binary in its place
+      // `blob` is the image file content, received as binary (Uint8Array) through wslink
       response_function: async ({ blob }) => {
         if (screenshot_type.value === "file") {
           fileDownload(blob, `${current_filename}.${output_extension.value}`);

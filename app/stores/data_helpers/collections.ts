@@ -1,9 +1,8 @@
 import { type FormattedComponent, type ModelComponentRecord, useDataMesh } from "./mesh.js";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
-import type { Observable } from "rxjs";
 import type { Ref } from "vue";
 import { getTable } from "@ogw_internal/database/database.js";
-import { liveQuery } from "dexie";
+import { liveObservable } from "@ogw_front/utils/live_observable";
 import { useObservable } from "@vueuse/rxjs";
 
 interface ModelComponentRelationRecord {
@@ -115,12 +114,10 @@ export function useDataCollections(): {
     modelId: string,
   ): Ref<CollectionComponentGroup[] | undefined> {
     return useObservable(
-      // Dexie's liveQuery returns its own Observable-like type, not rxjs's Observable, so bridging needs a cast.
-      liveQuery(async () => {
+      liveObservable(async () => {
         const groups = await formatedCollectionComponents(modelId);
         return groups;
-        // oxlint-disable-next-line no-unsafe-type-assertion
-      }) as unknown as Observable<CollectionComponentGroup[]>,
+      }),
       {
         initialValue: undefined,
       },

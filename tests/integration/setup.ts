@@ -13,6 +13,7 @@ import { addMicroserviceMetadatas, runBack, runViewer } from "@ogw_server/utils/
 import { createPath, generateProjectFolderPath } from "@ogw_server/utils/path";
 import { Status } from "@ogw_front/utils/status";
 import { appMode } from "@ogw_shared/app_mode";
+import { cleanupBackend } from "@ogw_server/utils/cleanup";
 import { importFile } from "@ogw_front/utils/import_workflow";
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useBackStore } from "@ogw_front/stores/back";
@@ -22,6 +23,8 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 // Local constants
 const beforeAllTimeout = 40_000;
 const data_folder = path.join("tests", "integration", "data", "uploads");
+// Cleaned up after each test file, even when its setup failed before returning the folder
+const startedProjectFolderPaths: string[] = [];
 
 async function runMicroservices(): Promise<{ projectFolderPath: string }> {
   const backStore = useBackStore();
@@ -31,32 +34,26 @@ async function runMicroservices(): Promise<{ projectFolderPath: string }> {
   const { COMMAND_BACK, PROJECT, COMMAND_VIEWER, NUXT_ROOT_PATH } = useRuntimeConfig().public;
   const projectFolderPath = generateProjectFolderPath(PROJECT);
   createPath(projectFolderPath);
+  startedProjectFolderPaths.push(projectFolderPath);
 
-  const [back_port, viewer_port] = await Promise.all([
-    runBack(COMMAND_BACK, NUXT_ROOT_PATH, {
+  // Each microservice is registered as soon as it runs, so it is killed even if the other fails
+  async function startBack(): Promise<number> {
+    const port = await runBack(COMMAND_BACK, NUXT_ROOT_PATH, {
       projectFolderPath,
       uploadFolderPath: data_folder,
-    }),
-    runViewer(COMMAND_VIEWER, NUXT_ROOT_PATH, { projectFolderPath }),
-  ]);
+    });
+    addMicroserviceMetadatas(projectFolderPath, { type: "back", name: COMMAND_BACK, port });
+    return port;
+  }
+  async function startViewer(): Promise<number> {
+    const port = await runViewer(COMMAND_VIEWER, NUXT_ROOT_PATH, { projectFolderPath });
+    addMicroserviceMetadatas(projectFolderPath, { type: "viewer", name: COMMAND_VIEWER, port });
+    return port;
+  }
+  const [back_port, viewer_port] = await Promise.all([startBack(), startViewer()]);
 
   consola.debug("back_port", back_port);
   consola.debug("viewer_port", viewer_port);
-
-  if (back_port === undefined || viewer_port === undefined) {
-    throw new Error("Failed to start microservices: back_port or viewer_port is undefined");
-  }
-
-  addMicroserviceMetadatas(projectFolderPath, {
-    type: "back",
-    name: COMMAND_BACK,
-    port: back_port,
-  });
-  addMicroserviceMetadatas(projectFolderPath, {
-    type: "viewer",
-    name: COMMAND_VIEWER,
-    port: viewer_port,
-  });
 
   backStore.default_local_port = String(back_port);
   viewerStore.default_local_port = String(viewer_port);
@@ -98,8 +95,13 @@ beforeAll(() => {
   globalThis.WebSocket = WebSocket as unknown as typeof globalThis.WebSocket;
 });
 
-afterAll(() => {
+afterAll(async () => {
   Reflect.deleteProperty(globalThis, "WebSocket");
+  await Promise.all(
+    startedProjectFolderPaths.splice(0).map(async (folderPath) => {
+      await cleanupBackend(folderPath);
+    }),
+  );
 });
 
 export { beforeAllTimeout, runMicroservices, setupIntegrationTests };
