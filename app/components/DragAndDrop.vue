@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from "vue";
 import DragAndDropInline from "./DragAndDropInternal/DragAndDropInline.vue";
 import DragAndDropOverlay from "./DragAndDropInternal/DragAndDropOverlay.vue";
 import type { UploadFile } from "@ogw_front/utils/upload_path";
