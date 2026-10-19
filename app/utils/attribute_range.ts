@@ -1,33 +1,36 @@
-import back_schemas, {
-  type AttributeRangeParams,
-  type AttributeRangeResponse,
-} from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
+import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
 import { useBackStore } from "@ogw_front/stores/back";
 
-type AttributeRangeInfo = AttributeRangeResponse;
-type AttributeElement = AttributeRangeParams["element"];
-type AttributeRangeTarget = Pick<AttributeRangeParams, "id" | "component_ids">;
+interface AttributeRangeInfo {
+  min_values: number[];
+  max_values: number[];
+  no_data: boolean;
+}
 
-const ATTRIBUTE_ELEMENTS: readonly string[] =
-  back_schemas.opengeodeweb_back.attribute_range.properties.element.enum;
+// The *_attribute_names route listing the attributes, and its *_attribute_range route
+interface AttributeSchemas {
+  names: JsonRpcSchema;
+  range: JsonRpcSchema;
+}
 
-function isAttributeElement(value: unknown): value is AttributeElement {
-  return typeof value === "string" && ATTRIBUTE_ELEMENTS.includes(value);
+interface AttributeRangeTarget {
+  id: string;
+  component_ids?: string[];
 }
 
 // A data never changes once imported: selectors showing the same attribute share one request
 const rangeRequests = new Map<string, Promise<AttributeRangeInfo | undefined>>();
 
 async function requestAttributeRange(
-  params: AttributeRangeParams,
+  rangeSchema: JsonRpcSchema,
+  params: Record<string, unknown>,
   key: string,
 ): Promise<AttributeRangeInfo | undefined> {
   const backStore = useBackStore();
   try {
-    return await backStore.request({
-      schema: back_schemas.opengeodeweb_back.attribute_range,
-      params,
-    });
+    const range = await backStore.request({ schema: rangeSchema, params });
+    // oxlint-disable-next-line no-unsafe-type-assertion -- every *_attribute_range schema shares this response.
+    return range as AttributeRangeInfo;
   } catch {
     rangeRequests.delete(key);
     return undefined;
@@ -35,19 +38,19 @@ async function requestAttributeRange(
 }
 
 async function fetchAttributeRange(
-  element: AttributeElement,
+  rangeSchema: JsonRpcSchema,
   target: AttributeRangeTarget,
   attributeName: string,
 ): Promise<AttributeRangeInfo | undefined> {
-  const params = { ...target, element, attribute_name: attributeName };
-  const key = JSON.stringify(params);
+  const params = { ...target, attribute_name: attributeName };
+  const key = JSON.stringify([rangeSchema.$id, params]);
   let request = rangeRequests.get(key);
   if (request === undefined) {
-    request = requestAttributeRange(params, key);
+    request = requestAttributeRange(rangeSchema, params, key);
     rangeRequests.set(key, request);
   }
   const range = await request;
   return range;
 }
 
-export { type AttributeElement, type AttributeRangeInfo, fetchAttributeRange, isAttributeElement };
+export { type AttributeRangeInfo, type AttributeSchemas, fetchAttributeRange };

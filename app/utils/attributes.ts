@@ -1,4 +1,3 @@
-import { type AttributeElement, isAttributeElement } from "@ogw_front/utils/attribute_range";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 interface AttributeRangeSource {
@@ -42,7 +41,7 @@ function getAttributeRange(
   return { min, max };
 }
 
-const MESH_ELEMENT_KINDS: Record<string, AttributeElement> = {
+const MESH_ELEMENT_KINDS: Record<string, string> = {
   EdgedCurve2D: "edge",
   EdgedCurve3D: "edge",
   LightRegularGrid2D: "cell",
@@ -58,10 +57,7 @@ const MESH_ELEMENT_KINDS: Record<string, AttributeElement> = {
   TetrahedralSolid3D: "polyhedron",
 };
 
-const MODEL_COMPONENT_ATTRIBUTE_SCHEMAS: Record<
-  string,
-  Partial<Record<AttributeElement, { $id: string }>>
-> = {
+const MODEL_COMPONENT_ATTRIBUTE_SCHEMAS: Record<string, Record<string, { $id: string }>> = {
   Corner: { vertex: viewer_schemas.opengeodeweb_viewer.model.corners.attribute.vertex.attribute },
   Line: {
     vertex: viewer_schemas.opengeodeweb_viewer.model.lines.attribute.vertex.attribute,
@@ -77,10 +73,10 @@ const MODEL_COMPONENT_ATTRIBUTE_SCHEMAS: Record<
   },
 };
 
-const MODEL_COMPONENT_KINDS: Record<string, AttributeElement[]> = Object.fromEntries(
+const MODEL_COMPONENT_KINDS: Record<string, string[]> = Object.fromEntries(
   Object.entries(MODEL_COMPONENT_ATTRIBUTE_SCHEMAS).map(([type, schemas]) => [
     type,
-    Object.keys(schemas).filter((kind) => isAttributeElement(kind)),
+    Object.keys(schemas),
   ]),
 );
 

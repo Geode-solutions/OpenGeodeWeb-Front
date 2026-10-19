@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type AttributeElement, fetchAttributeRange } from "@ogw_front/utils/attribute_range";
+import { type AttributeSchemas, fetchAttributeRange } from "@ogw_front/utils/attribute_range";
 import {
   MESH_ELEMENT_KINDS,
   MODEL_COMPONENT_ATTRIBUTE_SCHEMAS,
@@ -27,8 +27,7 @@ const { escapeFunction = undefined } = defineProps<Props>();
 
 interface AttributeSource {
   title: string;
-  schema: JsonRpcSchema;
-  element: AttributeElement;
+  schemas: AttributeSchemas;
   timeStepKey: string;
   params: { id: string; component_ids?: string[] };
   location: "point" | "cell";
@@ -88,24 +87,24 @@ const itemOptions = computed<{ title: string; value: number }[]>(() =>
   })),
 );
 
-function attributeSchema(kind: string, isModel: boolean): JsonRpcSchema {
+function attributeSchema(kind: string, isModel: boolean, route: "names" | "range"): JsonRpcSchema {
   const prefix = isModel ? "model_component_" : "";
   return back_schemas.opengeodeweb_back[
-    `${prefix}${kind}_attribute_names` as keyof typeof back_schemas.opengeodeweb_back
+    `${prefix}${kind}_attribute_${route}` as keyof typeof back_schemas.opengeodeweb_back
   ] as JsonRpcSchema;
 }
 
 function attributeSource(
-  kind: AttributeElement,
+  kind: string,
   title: string,
   params: { id: string; component_ids?: string[] },
   modelType?: string,
 ): AttributeSource {
-  const schema = attributeSchema(kind, modelType !== undefined);
+  const isModel = modelType !== undefined;
+  const schema = attributeSchema(kind, isModel, "names");
   return {
     title: `${title}${kind} attribute`,
-    schema,
-    element: kind,
+    schemas: { names: schema, range: attributeSchema(kind, isModel, "range") },
     timeStepKey:
       modelType === undefined
         ? schema.$id
@@ -118,12 +117,8 @@ function attributeSource(
 async function fetchSources(id: string): Promise<AttributeSource[]> {
   const item = await dataStore.item(id);
   if (item.viewer_type !== "model") {
-    const kinds: (AttributeElement | undefined)[] = [
-      "vertex",
-      MESH_ELEMENT_KINDS[item.geode_object_type],
-    ];
-    return kinds
-      .filter((kind): kind is AttributeElement => kind !== undefined)
+    return ["vertex", MESH_ELEMENT_KINDS[item.geode_object_type]]
+      .filter((kind): kind is string => kind !== undefined)
       .map((kind) => attributeSource(kind, "", { id }));
   }
   const modelSources = await Promise.all(
@@ -167,7 +162,7 @@ async function resetRange(): Promise<void> {
   if (!source || name === undefined) {
     return;
   }
-  const range = await fetchAttributeRange(source.element, source.params, name);
+  const range = await fetchAttributeRange(source.schemas.range, source.params, name);
   if (name !== attributeName.value) {
     return;
   }
@@ -199,7 +194,7 @@ watch(selectedSourceIndex, async (index) => {
     return;
   }
   const response = (await backStore.request({
-    schema: source.schema,
+    schema: source.schemas.names,
     params: source.params,
   })) as { attributes: AttributeInfo[] };
   attributes.value = response.attributes;

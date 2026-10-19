@@ -260,7 +260,13 @@ const capabilities = {
   polyhedron: { available: false },
 };
 
-const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attribute_names;
+const backSchemas = back_schemas.opengeodeweb_back;
+const attributeSchemas = {
+  vertex: {
+    names: backSchemas.model_component_vertex_attribute_names,
+    range: backSchemas.model_component_vertex_attribute_range,
+  },
+};
 </script>
 
 <template>
@@ -278,7 +284,7 @@ const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attri
       v-model:vertex_attribute_no_data_color="cornersVertexAttributeNoDataColor"
       v-model:vertex_attribute_time_step="cornersVertexAttributeTimeStep"
       :capabilities="capabilities"
-      :schemas="{ vertex: vertexSchema }"
+      :schemas="attributeSchemas"
       :allowRandom="true"
     />
   </OptionsSection>
@@ -302,7 +308,7 @@ const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attri
       v-model:vertex_attribute_no_data_color="vertexAttributeNoDataColor"
       v-model:vertex_attribute_time_step="vertexAttributeTimeStep"
       :capabilities="capabilities"
-      :schemas="{ vertex: vertexSchema }"
+      :schemas="attributeSchemas"
       :allowRandom="true"
     />
   </OptionsSection>

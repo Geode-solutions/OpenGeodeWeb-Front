@@ -1,17 +1,16 @@
 <script setup lang="ts">
 import {
-  type AttributeElement,
-  type AttributeRangeInfo,
-  fetchAttributeRange,
-} from "@ogw_front/utils/attribute_range";
-import {
   type AttributeRange,
   type RangesPerData,
   useBatchGroup,
 } from "@ogw_front/composables/batch_style";
+import {
+  type AttributeRangeInfo,
+  type AttributeSchemas,
+  fetchAttributeRange,
+} from "@ogw_front/utils/attribute_range";
 import { getAttributeRange, intersectAttributes } from "@ogw_front/utils/attributes";
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
-import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
 import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar.vue";
 import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
 import ViewerOptionsTimeStepSlider from "@ogw_front/components/Viewer/Options/TimeStepSlider.vue";
@@ -32,11 +31,10 @@ const attributeTimeStep = defineModel<number>("attributeTimeStep");
 interface Props {
   id: string;
   componentIds?: string[];
-  schema: JsonRpcSchema;
-  element: AttributeElement;
+  schemas: AttributeSchemas;
 }
 
-const { id, componentIds = undefined, schema, element } = defineProps<Props>();
+const { id, componentIds = undefined, schemas } = defineProps<Props>();
 
 interface Emits {
   "update:attributeColorMap": [colorMap: string];
@@ -137,7 +135,7 @@ function hasSelectedComponent(components: unknown): boolean {
 }
 
 function requestParams(): { id: string; component_ids?: string[] } | undefined {
-  const schemaProperties = schema.properties as Record<string, unknown> | undefined;
+  const schemaProperties = schemas.names.properties as Record<string, unknown> | undefined;
   if (schemaProperties?.component_ids === undefined) {
     return { id };
   }
@@ -157,7 +155,7 @@ async function requestRanges(name: string): Promise<void> {
   const entries = await Promise.all(
     targets.map(async ([targetId, params]): Promise<[string, AttributeRangeInfo | undefined]> => [
       targetId,
-      params ? await fetchAttributeRange(element, params, name) : undefined,
+      params ? await fetchAttributeRange(schemas.range, params, name) : undefined,
     ]),
   );
   if (rangesName !== name) {
@@ -190,9 +188,13 @@ async function resetRange(): Promise<void> {
 }
 
 async function getGroupAttributes(targetIds: string[]): Promise<void> {
-  const responses = await requestForTargets<{ attributes: AttributeInfo[] }>(schema, targetIds, {
-    attributes: [],
-  });
+  const responses = await requestForTargets<{ attributes: AttributeInfo[] }>(
+    schemas.names,
+    targetIds,
+    {
+      attributes: [],
+    },
+  );
   attributesPerTarget = new Map(
     responses.map(([targetId, response]) => [targetId, response.attributes]),
   );
@@ -226,7 +228,7 @@ async function getAttributes(): Promise<void> {
   }
 
   await backStore.request(
-    { schema, params },
+    { schema: schemas.names, params },
     {
       response_function: (response: unknown) => {
         attributes.value = (response as { attributes: AttributeInfo[] }).attributes;
@@ -240,7 +242,7 @@ onMounted(async () => {
 });
 
 watch(
-  [(): string => id, (): string[] | undefined => componentIds, (): JsonRpcSchema => schema],
+  [(): string => id, (): string[] | undefined => componentIds, (): AttributeSchemas => schemas],
   async () => {
     await getAttributes();
   },

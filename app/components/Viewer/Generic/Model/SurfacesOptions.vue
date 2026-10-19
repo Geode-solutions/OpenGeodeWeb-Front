@@ -428,8 +428,17 @@ const capabilities = {
   polyhedron: { available: false },
 };
 
-const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attribute_names;
-const polygonSchema = back_schemas.opengeodeweb_back.model_component_polygon_attribute_names;
+const backSchemas = back_schemas.opengeodeweb_back;
+const attributeSchemas = {
+  vertex: {
+    names: backSchemas.model_component_vertex_attribute_names,
+    range: backSchemas.model_component_vertex_attribute_range,
+  },
+  polygon: {
+    names: backSchemas.model_component_polygon_attribute_names,
+    range: backSchemas.model_component_polygon_attribute_range,
+  },
+};
 </script>
 
 <template>
@@ -453,7 +462,7 @@ const polygonSchema = back_schemas.opengeodeweb_back.model_component_polygon_att
       v-model:polygon_attribute_no_data_color="surfacesPolygonAttributeNoDataColor"
       v-model:polygon_attribute_time_step="surfacesPolygonAttributeTimeStep"
       :capabilities="capabilities"
-      :schemas="{ vertex: vertexSchema, polygon: polygonSchema }"
+      :schemas="attributeSchemas"
       :allowRandom="true"
     />
   </OptionsSection>
@@ -483,7 +492,7 @@ const polygonSchema = back_schemas.opengeodeweb_back.model_component_polygon_att
       v-model:polygon_attribute_no_data_color="polygonAttributeNoDataColor"
       v-model:polygon_attribute_time_step="polygonAttributeTimeStep"
       :capabilities="capabilities"
-      :schemas="{ vertex: vertexSchema, polygon: polygonSchema }"
+      :schemas="attributeSchemas"
       :allowRandom="true"
     />
   </OptionsSection>

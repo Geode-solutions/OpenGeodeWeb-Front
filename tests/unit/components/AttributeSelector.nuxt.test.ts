@@ -10,6 +10,10 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schem
 import { vuetify } from "@ogw_tests/utils";
 
 const ATTRIBUTE_RANGE = [0, 1];
+const VERTEX_SCHEMAS = {
+  names: back_schemas.opengeodeweb_back.vertex_attribute_names,
+  range: back_schemas.opengeodeweb_back.vertex_attribute_range,
+};
 const OUT_OF_RANGE_STEP = 5;
 const LAST_STEP = 2;
 const HALF = 0.5;
@@ -63,8 +67,7 @@ async function mountSelector(
     global: { plugins: [vuetify] },
     props: {
       id: "id",
-      schema: back_schemas.opengeodeweb_back.vertex_attribute_names,
-      element: "vertex",
+      schemas: VERTEX_SCHEMAS,
       attributeName,
       attributeItem: 0,
       attributeRange,
@@ -144,8 +147,7 @@ describe("attributeSelector attribute names", () => {
           h(AttributeSelector, {
             id: "id",
             componentIds: componentIds.value,
-            schema: back_schemas.opengeodeweb_back.vertex_attribute_names,
-            element: "vertex",
+            schemas: VERTEX_SCHEMAS,
           }),
         ]),
     });
