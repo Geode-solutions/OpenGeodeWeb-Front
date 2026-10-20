@@ -266,9 +266,6 @@ export function useGlobalAttributeStyle(dataIdRef: Ref<string | undefined>): {
       requestPromises.push(
         (async (): Promise<void> => {
           const range = await fetchAttributeRange(rangeSchema, { id: targetId }, attrName);
-          if (!range) {
-            return;
-          }
           const { min, max } = getAttributeRange(range, attrItem);
           const setter = getDynamicStoreMethod(
             dataStyleStore,

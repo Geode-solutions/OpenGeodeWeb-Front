@@ -19,38 +19,38 @@ interface AttributeRangeTarget {
 }
 
 // A data never changes once imported: selectors showing the same attribute share one request
-const rangeRequests = new Map<string, Promise<AttributeRangeInfo | undefined>>();
+const rangeRequests = new Map<string, Promise<AttributeRangeInfo>>();
 
 async function requestAttributeRange(
   rangeSchema: JsonRpcSchema,
   params: Record<string, unknown>,
-  key: string,
-): Promise<AttributeRangeInfo | undefined> {
+): Promise<AttributeRangeInfo> {
   const backStore = useBackStore();
-  try {
-    const range = await backStore.request({ schema: rangeSchema, params });
-    // oxlint-disable-next-line no-unsafe-type-assertion -- every *_attribute_range schema shares this response.
-    return range as AttributeRangeInfo;
-  } catch {
-    rangeRequests.delete(key);
-    return undefined;
-  }
+  const range = await backStore.request({ schema: rangeSchema, params });
+  // oxlint-disable-next-line no-unsafe-type-assertion -- every *_attribute_range schema shares this response.
+  return range as AttributeRangeInfo;
 }
 
 async function fetchAttributeRange(
   rangeSchema: JsonRpcSchema,
   target: AttributeRangeTarget,
   attributeName: string,
-): Promise<AttributeRangeInfo | undefined> {
+): Promise<AttributeRangeInfo> {
   const params = { ...target, attribute_name: attributeName };
   const key = JSON.stringify([rangeSchema.$id, params]);
   let request = rangeRequests.get(key);
   if (request === undefined) {
-    request = requestAttributeRange(rangeSchema, params, key);
+    request = requestAttributeRange(rangeSchema, params);
     rangeRequests.set(key, request);
   }
-  const range = await request;
-  return range;
+  try {
+    const range = await request;
+    return range;
+  } catch (error) {
+    // A failed request is not kept: the next call retries it
+    rangeRequests.delete(key);
+    throw error;
+  }
 }
 
 export { type AttributeRangeInfo, type AttributeSchemas, fetchAttributeRange };
