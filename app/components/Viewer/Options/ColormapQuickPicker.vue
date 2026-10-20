@@ -5,6 +5,7 @@ import TimeStepSlider from "@ogw_front/components/Viewer/Options/TimeStepSlider.
 
 import { getPresetsWithCurrentAtTop } from "@ogw_front/utils/colormap";
 import { useGlobalAttributeStyle } from "@ogw_front/composables/global_attribute_style";
+import { useModelAttributeStyle } from "@ogw_front/composables/model_attribute_style";
 
 interface Props {
   dataId?: string;
@@ -18,7 +19,7 @@ const { dataId = undefined, blockIds = undefined, x, y } = defineProps<Props>();
 const show = defineModel<boolean>("show", { default: false });
 
 const dataIdRef = computed<string>(() => dataId);
-const blockIdsRef = computed<number[] | undefined>(() => blockIds);
+// The parent keys this picker on the picked data: a mesh or a model, so the style is chosen once here
 const {
   currentColormap,
   currentRange,
@@ -27,7 +28,13 @@ const {
   currentTimeSteps,
   currentTimeStep,
   loadTimeSteps,
-} = useGlobalAttributeStyle(dataIdRef, blockIdsRef);
+} =
+  blockIds === undefined
+    ? useGlobalAttributeStyle(dataIdRef)
+    : useModelAttributeStyle(
+        dataIdRef,
+        computed<number[]>(() => blockIds),
+      );
 
 watch(show, async (isShown) => {
   if (isShown) {

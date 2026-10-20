@@ -98,6 +98,7 @@ async function handleClick(event: PointerEvent): Promise<void> {
   <ClientOnly>
     <div data-testid="hybridViewer" class="fill-height" style="position: relative; height: 100%">
       <ColormapQuickPicker
+        :key="quickColormap.data_id"
         v-model:show="quickColormap.show"
         :x="quickColormap.x"
         :y="quickColormap.y"
