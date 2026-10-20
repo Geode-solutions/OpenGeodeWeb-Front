@@ -44,7 +44,7 @@ async function upload_file(
   const feedbackStore = useFeedbackStore();
 
   if (!(file instanceof File)) {
-    throw new Error("file must be an instance of File");
+    throw new TypeError("file must be an instance of File");
   }
 
   const route = schema.$id;
