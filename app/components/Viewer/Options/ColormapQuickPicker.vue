@@ -8,15 +8,17 @@ import { useGlobalAttributeStyle } from "@ogw_front/composables/global_attribute
 
 interface Props {
   dataId?: string;
+  blockIds?: number[];
   x: number;
   y: number;
 }
 
-const { dataId = undefined, x, y } = defineProps<Props>();
+const { dataId = undefined, blockIds = undefined, x, y } = defineProps<Props>();
 
 const show = defineModel<boolean>("show", { default: false });
 
 const dataIdRef = computed<string>(() => dataId);
+const blockIdsRef = computed<number[] | undefined>(() => blockIds);
 const {
   currentColormap,
   currentRange,
@@ -25,7 +27,7 @@ const {
   currentTimeSteps,
   currentTimeStep,
   loadTimeSteps,
-} = useGlobalAttributeStyle(dataIdRef);
+} = useGlobalAttributeStyle(dataIdRef, blockIdsRef);
 
 watch(show, async (isShown) => {
   if (isShown) {

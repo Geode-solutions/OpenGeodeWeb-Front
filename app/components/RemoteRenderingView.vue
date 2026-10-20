@@ -120,6 +120,7 @@ onMounted(async () => {
         :x="quickColormap.x"
         :y="quickColormap.y"
         :data-id="quickColormap.data_id"
+        :block-ids="quickColormap.block_ids"
       />
       <ViewToolbar />
       <slot name="ui"></slot>
