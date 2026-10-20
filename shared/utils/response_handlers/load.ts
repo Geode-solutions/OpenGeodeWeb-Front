@@ -106,4 +106,40 @@ function resolveAllowedObjects(
   };
 }
 
-export { resolveAllowedObjects, getFileExtension };
+interface FileAllowedObjects {
+  readonly filename: string;
+  // Loadable types only, sorted by best is_loadable then best object_priority
+  readonly candidates: string[];
+  readonly selectedGeodeObject: string | undefined;
+}
+
+function sortCandidates(objectMap: AllowedObjectMap): string[] {
+  return Object.keys(objectMap)
+    .filter((key) => getObject(objectMap, key).is_loadable > 0)
+    .toSorted((keyA, keyB) => {
+      const objectA = getObject(objectMap, keyA);
+      const objectB = getObject(objectMap, keyB);
+      if (objectA.is_loadable !== objectB.is_loadable) {
+        return objectB.is_loadable - objectA.is_loadable;
+      }
+      return (objectB.object_priority ?? -Infinity) - (objectA.object_priority ?? -Infinity);
+    });
+}
+
+// Each file gets its own geode object type; files are no longer required to share one
+function resolveAllowedObjectsPerFile(
+  filenames: readonly string[],
+  allowedObjectsList: readonly AllowedObjectMap[],
+): FileAllowedObjects[] {
+  return filenames.map((filename, index) => {
+    const objectMap = allowedObjectsList[index] ?? {};
+    return {
+      filename,
+      candidates: sortCandidates(objectMap),
+      selectedGeodeObject: selectGeodeObject(objectMap),
+    };
+  });
+}
+
+export { resolveAllowedObjects, resolveAllowedObjectsPerFile, getFileExtension };
+export type { FileAllowedObjects };
