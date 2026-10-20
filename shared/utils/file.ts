@@ -10,7 +10,7 @@ const CHUNK_SIZE_BYTES = CHUNK_SIZE_MEBIBYTES * KIBIBYTES_PER_MEBIBYTE * BYTES_P
 function assertFile(file: unknown): asserts file is File {
   consola.debug("[ASSERT_FILE] Asserting file", { file });
   if (!(file instanceof File)) {
-    throw new Error("file must be an instance of File");
+    throw new TypeError("file must be an instance of File");
   }
 }
 
