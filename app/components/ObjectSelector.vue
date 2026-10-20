@@ -25,19 +25,16 @@ interface PendingGroup {
 }
 
 const emit = defineEmits<{
-  update_values: [
-    value: { geode_object_type: string } | { geode_object_types: Record<string, string> },
-  ];
+  // Filename -> geode object type, files that cannot be loaded are left out
+  update_values: [value: { geode_object_types: Record<string, string> }];
   increment_step: [];
 }>();
 
 interface Props {
   filenames: string[];
-  // Each file gets its own geode object type, emitted as geode_object_types (filename -> type)
-  perFile?: boolean;
 }
 
-const { filenames, perFile = false } = defineProps<Props>();
+const { filenames } = defineProps<Props>();
 
 const backStore = useBackStore();
 
@@ -45,7 +42,7 @@ const loading = ref<boolean>(false);
 const allowedGeodeObjects = ref<AllowedObjectMap>({});
 const toggleLoading = useToggle(loading);
 const multipleFilesNoCommon = ref<boolean>(false);
-// Per file mode: types already known, files left to choose for, and files that cannot be loaded
+// Types already known, files left to choose for, and files that cannot be loaded
 const resolvedTypes = ref<Record<string, string>>({});
 const pendingFilenames = ref<string[]>([]);
 const pendingGroups = ref<PendingGroup[]>([]);
@@ -72,13 +69,8 @@ function setGeodeObject(geode_object_type: string | undefined): void {
   if (!geode_object_type) {
     return;
   }
-  if (perFile) {
-    const chosen = pendingFilenames.value.map((filename) => [filename, geode_object_type]);
-    emitGeodeObjectTypes({ ...resolvedTypes.value, ...Object.fromEntries(chosen) });
-    return;
-  }
-  emit("update_values", { geode_object_type });
-  emit("increment_step");
+  const chosen = pendingFilenames.value.map((filename) => [filename, geode_object_type]);
+  emitGeodeObjectTypes({ ...resolvedTypes.value, ...Object.fromEntries(chosen) });
 }
 
 function confirmPerFile(): void {
@@ -128,12 +120,12 @@ function showCommonGeodeObjects(
   return resolved.selectedGeodeObject;
 }
 
-// Returns true when the per file panel is needed, i.e. the files cannot be handled by a single choice
+// Each file gets its own type. Returns true when the per file panel is needed, i.e. the files cannot be handled by a single choice
 function resolvePerFile(allowedObjectsList: readonly AllowedObjectMap[]): boolean {
   const files = resolveAllowedObjectsPerFile(filenames, allowedObjectsList);
   const loadable = files.filter((file) => file.candidates.length > 0);
   if (loadable.length === 0) {
-    // Nothing can be loaded: same display as a single choice
+    // Nothing can be loaded: show why with the common types
     showCommonGeodeObjects(filenames, allowedObjectsList);
     return false;
   }
@@ -156,7 +148,7 @@ function resolvePerFile(allowedObjectsList: readonly AllowedObjectMap[]): boolea
     const pendingAllowedObjects = pending.map(
       (file) => allowedObjectsList[filenames.indexOf(file.filename)] ?? {},
     );
-    // Pending files sharing a loadable type: same single choice display as before
+    // Pending files sharing a loadable type: one choice for all of them
     const selected = showCommonGeodeObjects(pendingFilenames.value, pendingAllowedObjects);
     if (Object.values(allowedGeodeObjects.value).some((object) => object.is_loadable > 0)) {
       setGeodeObject(selected);
@@ -174,11 +166,7 @@ async function getAllowedGeodeObjects(): Promise<void> {
   showPerFile.value = false;
 
   const allowedGeodeObjectsList = await fetchAllowedObjectsList();
-  if (perFile) {
-    showPerFile.value = resolvePerFile(allowedGeodeObjectsList);
-  } else {
-    setGeodeObject(showCommonGeodeObjects(filenames, allowedGeodeObjectsList));
-  }
+  showPerFile.value = resolvePerFile(allowedGeodeObjectsList);
   toggleLoading();
 }
 // oxlint-disable-next-line no-top-level-await

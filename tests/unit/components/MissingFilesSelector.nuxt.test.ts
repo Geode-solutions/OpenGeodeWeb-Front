@@ -61,7 +61,7 @@ describe("missing files selector", () => {
       },
       props: {
         multiple: false,
-        geode_object_type: "BRep",
+        geodeObjectTypes: { "fake_file.txt": "BRep" },
         filenames: ["fake_file.txt"],
       },
     });
@@ -90,6 +90,7 @@ describe("missing files selector", () => {
     expect(wrapper.emitted<unknown[]>().update_values).toHaveLength(EXPECTED_LENGTH);
     expect(wrapper.emitted<unknown[]>().update_values?.[FIRST_INDEX]?.[FIRST_INDEX]).toStrictEqual({
       additional_files: files,
+      skipped_files: [],
     });
     expect(wrapper.emitted().increment_step).toHaveLength(EXPECTED_LENGTH);
   });
@@ -106,7 +107,7 @@ describe("missing files selector", () => {
 
     const wrapper = await mountSuspended(MissingFilesSelector, {
       global: { plugins: [vuetify, pinia] },
-      props: { multiple: false, geodeObjectType: "BRep", filenames: ["a.pvd"], timeSeries: true },
+      props: { multiple: false, filenames: ["a.pvd"], timeSeries: true },
     });
     const folder = [
       Object.assign(new File(["b"], "b.vtu"), { relativePath: "run/outputs/a/b.vtu" }),
@@ -135,7 +136,7 @@ describe("missing files selector", () => {
 
     const wrapper = await mountSuspended(MissingFilesSelector, {
       global: { plugins: [vuetify, pinia] },
-      props: { multiple: false, geodeObjectType: "BRep", filenames: ["a.pvd"], timeSeries: true },
+      props: { multiple: false, filenames: ["a.pvd"], timeSeries: true },
     });
     wrapper.findComponent(DragAndDrop).vm.$emit("files-selected", [new File(["x"], "other.txt")]);
     await flushPromises();

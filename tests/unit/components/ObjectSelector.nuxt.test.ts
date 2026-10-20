@@ -42,7 +42,7 @@ describe("object selector", () => {
     );
   }
 
-  test("loadable with one class", async () => {
+  test("loadable with one class is selected automatically", async () => {
     const response: AllowedObjectsResponse = {
       allowed_objects: {},
     };
@@ -58,15 +58,13 @@ describe("object selector", () => {
       },
       props: { filenames: ["test.toto"] },
     });
-    const v_card = wrapper.findComponent(components.VCard);
-    const v_img = v_card.findComponent(components.VImg);
     const emitted = wrapper.emitted<unknown[]>();
     wrapper.unmount();
-    expect(v_img.vm.src).toContain(`${geode_object_1}.svg`);
+    // Resolved without the user: no card to choose from
     expect(emitted).toHaveProperty("update_values");
     expect(emitted.update_values).toHaveLength(EXPECTED_LENGTH);
     expect(emitted.update_values?.[FIRST_INDEX]?.[FIRST_INDEX]).toStrictEqual({
-      geode_object_type: geode_object_1,
+      geode_object_types: { "test.toto": geode_object_1 },
     });
   });
 
@@ -100,7 +98,7 @@ describe("object selector", () => {
     expect(emitted).toHaveProperty("update_values");
     expect(emitted.update_values).toHaveLength(EXPECTED_LENGTH);
     expect(emitted.update_values?.[FIRST_INDEX]?.[FIRST_INDEX]).toStrictEqual({
-      geode_object_type: geode_object_1,
+      geode_object_types: { "test.toto": geode_object_1 },
     });
   });
 
@@ -133,11 +131,11 @@ describe("object selector", () => {
     expect(emitted).toHaveProperty("update_values");
     expect(emitted.update_values).toHaveLength(EXPECTED_LENGTH);
     expect(emitted.update_values?.[FIRST_INDEX]?.[FIRST_INDEX]).toStrictEqual({
-      geode_object_type: geode_object_1,
+      geode_object_types: { "test.toto": geode_object_1 },
     });
   });
 
-  describe("per file", () => {
+  describe("several files", () => {
     test("files with different types are resolved without user input", async () => {
       mockAllowedObjects({
         "mesh.vtu": { SolidMesh3D: { is_loadable: LOADABLE_SCORE } },
@@ -145,7 +143,7 @@ describe("object selector", () => {
       });
       const wrapper = await mountSuspended(ObjectSelector, {
         global: { plugins: [vuetify, pinia] },
-        props: { filenames: ["mesh.vtu", "model.og_brep"], perFile: true },
+        props: { filenames: ["mesh.vtu", "model.og_brep"] },
       });
       await flushPromises();
       const emitted = wrapper.emitted<unknown[]>();
@@ -168,7 +166,7 @@ describe("object selector", () => {
       });
       const wrapper = await mountSuspended(ObjectSelector, {
         global: { plugins: [vuetify, pinia] },
-        props: { filenames: ["a.og_brep", "b.og_brep", "mesh.vtu"], perFile: true },
+        props: { filenames: ["a.og_brep", "b.og_brep", "mesh.vtu"] },
       });
       await flushPromises();
       expect(wrapper.find('[data-testid="perFileObjectSelector"]').exists()).toBe(false);
@@ -185,7 +183,7 @@ describe("object selector", () => {
       mockAllowedObjects({ "mesh.vtu": { SolidMesh3D: { is_loadable: LOADABLE_SCORE } } });
       const wrapper = await mountSuspended(ObjectSelector, {
         global: { plugins: [vuetify, pinia] },
-        props: { filenames: ["mesh.vtu", "file.toto"], perFile: true },
+        props: { filenames: ["mesh.vtu", "file.toto"] },
       });
       await flushPromises();
       expect(wrapper.text()).toContain("Not supported, will be skipped:");
@@ -211,7 +209,7 @@ describe("object selector", () => {
       });
       const wrapper = await mountSuspended(ObjectSelector, {
         global: { plugins: [vuetify, pinia] },
-        props: { filenames: ["a.vtp", "b.vtu"], perFile: true },
+        props: { filenames: ["a.vtp", "b.vtu"] },
       });
       await flushPromises();
       expect(wrapper.findAllComponents(components.VSelect)).toHaveLength(2);
