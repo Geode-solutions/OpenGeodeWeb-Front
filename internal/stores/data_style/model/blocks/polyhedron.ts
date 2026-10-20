@@ -72,7 +72,7 @@ interface UseModelBlocksPolyhedronAttributeReturn {
     modelId: string,
     blockIds: string[],
     timeStep: number,
-  ) => Promise<void>;
+  ) => Promise<boolean>;
   modelBlocksPolyhedronAttributeColorMap: (modelId: string, blockId?: string) => string | undefined;
   modelBlocksPolyhedronAttributeStoredConfig: (
     modelId: string,
@@ -89,29 +89,29 @@ interface UseModelBlocksPolyhedronAttributeReturn {
     modelId: string,
     blockIds: string[],
     name: string,
-  ) => Promise<unknown>;
+  ) => Promise<boolean>;
   setModelBlocksPolyhedronAttributeItem: (
     modelId: string,
     blockIds: string[],
     item: number,
-  ) => Promise<unknown>;
+  ) => Promise<boolean>;
   setModelBlocksPolyhedronAttributeRange: (
     modelId: string,
     blockIds: string[],
     minimum: number,
     maximum: number,
-  ) => Promise<unknown>;
+  ) => Promise<boolean>;
   setModelBlocksPolyhedronAttributeColorMap: (
     modelId: string,
     blockIds: string[],
     colorMap: string | undefined,
-  ) => Promise<unknown>;
+  ) => Promise<boolean>;
   modelBlocksPolyhedronAttributeNoDataColor: (modelId: string, blockId?: string) => RGBAColor;
   setModelBlocksPolyhedronAttributeNoDataColor: (
     modelId: string,
     blockIds: string[],
     no_data_color: RGBAColor,
-  ) => Promise<unknown>;
+  ) => Promise<boolean>;
 }
 
 // oxlint-disable-next-line max-lines-per-function
@@ -281,7 +281,8 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
       params,
     });
   }
-  async function applyPolyhedronAttribute(modelId: string, blockIds: string[]): Promise<unknown> {
+  // True when the attribute was sent to the viewer, so the caller knows a render is needed
+  async function applyPolyhedronAttribute(modelId: string, blockIds: string[]): Promise<boolean> {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockIds[0]);
     const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(
@@ -298,17 +299,17 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
       colorMap: storedConfig.colorMap,
       no_data_color: storedConfig.no_data_color,
     };
-    if (isModelBlocksPolyhedronAttributeValid(attribute)) {
-      const result = await setModelBlocksPolyhedronAttribute(modelId, blockIds, attribute);
-      return result;
+    if (!isModelBlocksPolyhedronAttributeValid(attribute)) {
+      return false;
     }
-    return undefined;
+    await setModelBlocksPolyhedronAttribute(modelId, blockIds, attribute);
+    return true;
   }
   async function setModelBlocksPolyhedronAttributeName(
     modelId: string,
     blockIds: string[],
     name: string,
-  ): Promise<unknown> {
+  ): Promise<boolean> {
     const item = modelBlocksPolyhedronAttributeLastItem(modelId, blockIds[0], name);
     await mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
       name,
@@ -320,7 +321,7 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
     modelId: string,
     blockIds: string[],
     item: number,
-  ): Promise<unknown> {
+  ): Promise<boolean> {
     await mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
       item,
     });
@@ -330,13 +331,14 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
     modelId: string,
     blockIds: string[],
     timeStep: number,
-  ): Promise<void> {
+  ): Promise<boolean> {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
     if (name === undefined) {
-      return;
+      return false;
     }
     await setAttributeTimeStep(modelId, modelBlockPolyhedronAttributeSchema.$id, name, timeStep);
-    await Promise.all([
+    let reapplied = false;
+    const [applied] = await Promise.all([
       applyPolyhedronAttribute(modelId, blockIds),
       reapplySameSeries(
         await dataStore.getBlocksGeodeIds(modelId),
@@ -352,17 +354,18 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
               ].join("|")
             : undefined,
         async (ids) => {
-          await applyPolyhedronAttribute(modelId, ids);
+          reapplied = (await applyPolyhedronAttribute(modelId, ids)) || reapplied;
         },
       ),
     ]);
+    return applied || reapplied;
   }
   async function setModelBlocksPolyhedronAttributeRange(
     modelId: string,
     blockIds: string[],
     minimum: number,
     maximum: number,
-  ): Promise<unknown> {
+  ): Promise<boolean> {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockIds[0]);
     await setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, {
@@ -375,7 +378,7 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
     modelId: string,
     blockIds: string[],
     colorMap: string | undefined,
-  ): Promise<unknown> {
+  ): Promise<boolean> {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockIds[0]);
     await setModelBlocksPolyhedronAttributeStoredConfig(modelId, blockIds, name, item, {
@@ -387,7 +390,7 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
     modelId: string,
     blockIds: string[],
     no_data_color: RGBAColor,
-  ): Promise<unknown> {
+  ): Promise<boolean> {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockIds[0]);
     const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(

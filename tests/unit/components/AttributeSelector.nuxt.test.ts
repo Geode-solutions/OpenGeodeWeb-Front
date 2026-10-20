@@ -1,35 +1,40 @@
 // Third party imports
 import { type VueWrapper, flushPromises } from "@vue/test-utils";
 import { describe, expect, test, vi } from "vitest";
+import type { VNode } from "vue";
 import { mountSuspended } from "@nuxt/test-utils/runtime";
 
 // Local imports
 import AttributeSelector from "@ogw_front/components/Viewer/Options/AttributeSelector.vue";
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { vuetify } from "@ogw_tests/utils";
 
 const ATTRIBUTE_RANGE = [0, 1];
+const VERTEX_SCHEMAS = {
+  names: back_schemas.opengeodeweb_back.vertex_attribute_names,
+  range: back_schemas.opengeodeweb_back.vertex_attribute_range,
+};
 const OUT_OF_RANGE_STEP = 5;
 const LAST_STEP = 2;
 const HALF = 0.5;
+const RANGE_MIN = 2;
+const RANGE_MAX = 3;
 
 function makeAttribute(attribute_name: string, time_steps: number[]): Record<string, unknown> {
   return {
     attribute_name,
     attribute_id: attribute_name,
     nb_items: 1,
-    min_value: 0,
-    max_value: 1,
-    min_values: [0],
-    max_values: [1],
-    no_data: false,
     time_steps,
   };
 }
 
 type BackRequest = (
-  request: unknown,
-  options: { response_function: (response: unknown) => void },
-) => void;
+  request: { schema: { $id: string } },
+  options?: { response_function: (response: unknown) => void },
+) => unknown;
+
+let nbNamesRequests = 0;
 
 const ATTRIBUTES = [
   makeAttribute("temperature", [HALF, 1, 2]),
@@ -39,8 +44,13 @@ const ATTRIBUTES = [
 
 vi.mock(import("@ogw_front/stores/back") as Promise<unknown>, () => ({
   useBackStore: (): { request: unknown } => ({
-    request: vi.fn<BackRequest>().mockImplementation((_request, { response_function }) => {
-      response_function({ attributes: ATTRIBUTES });
+    request: vi.fn<BackRequest>().mockImplementation(({ schema }, options) => {
+      if (schema.$id.endsWith("attribute_range")) {
+        return { min_values: [RANGE_MIN], max_values: [RANGE_MAX], no_data: true };
+      }
+      nbNamesRequests += 1;
+      options?.response_function({ attributes: ATTRIBUTES });
+      return undefined;
     }),
   }),
 }));
@@ -51,15 +61,16 @@ vi.mock(import("@ogw_front/composables/batch_style") as Promise<unknown>, () => 
 async function mountSelector(
   attributeName: string,
   attributeTimeStep?: number,
+  attributeRange: (number | undefined)[] = ATTRIBUTE_RANGE,
 ): Promise<VueWrapper> {
   const wrapper = await mountSuspended(AttributeSelector, {
     global: { plugins: [vuetify] },
     props: {
       id: "id",
-      schema: { $id: "vertex_attribute_names", properties: { id: {} } },
+      schemas: VERTEX_SCHEMAS,
       attributeName,
       attributeItem: 0,
-      attributeRange: ATTRIBUTE_RANGE,
+      attributeRange,
       attributeColorMap: "batlow",
       attributeTimeStep,
     },
@@ -102,10 +113,10 @@ describe("attributeSelector time steps", () => {
     expect(wrapper.emitted("update:attributeTimeStep")?.at(-1)).toStrictEqual([0]);
   });
 
-  test("commits a valid stored step when the series is selected", async () => {
+  test("keeps a valid stored step when the series is selected", async () => {
     const wrapper = await mountSelector("temperature", LAST_STEP);
 
-    expect(wrapper.emitted("update:attributeTimeStep")?.at(-1)).toStrictEqual([LAST_STEP]);
+    expect(wrapper.emitted("update:attributeTimeStep")).toBeUndefined();
   });
 
   test("does not reset the range when the step changes", async () => {
@@ -114,5 +125,42 @@ describe("attributeSelector time steps", () => {
     await flushPromises();
 
     expect(wrapper.emitted("update:attributeRange")).toBeUndefined();
+  });
+
+  test("requests the range of the selected attribute when it is unset", async () => {
+    const wrapper = await mountSelector("plain", undefined, []);
+
+    expect(wrapper.emitted("update:attributeRange")?.at(-1)).toStrictEqual([
+      [RANGE_MIN, RANGE_MAX],
+    ]);
+    expect(wrapper.find('[data-testid="noDataInfo"]').exists()).toBe(true);
+  });
+});
+
+describe("attributeSelector attribute names", () => {
+  test("requests the names again only when the components change", async () => {
+    const componentIds = ref(["component"]);
+    const rerenders = ref(0);
+    const Parent = defineComponent({
+      setup: () => (): VNode =>
+        h("div", { "data-rerenders": rerenders.value }, [
+          h(AttributeSelector, {
+            id: "id",
+            componentIds: componentIds.value,
+            schemas: VERTEX_SCHEMAS,
+          }),
+        ]),
+    });
+    await mountSuspended(Parent, { global: { plugins: [vuetify] } });
+    await flushPromises();
+    const nbRequestsAfterMount = nbNamesRequests;
+
+    rerenders.value += 1;
+    await flushPromises();
+    expect(nbNamesRequests).toBe(nbRequestsAfterMount);
+
+    componentIds.value = ["other_component"];
+    await flushPromises();
+    expect(nbNamesRequests).toBe(nbRequestsAfterMount + 1);
   });
 });

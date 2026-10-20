@@ -29,6 +29,8 @@ const referenceLineId = computed<string | undefined>(() =>
   collections ? targetLineIds[0] : undefined,
 );
 
+const lineComponentIds = computed<string[]>(() => (lineId === undefined ? [] : [lineId]));
+
 // Visibility
 const linesVisibility = computed<boolean>({
   get: () =>
@@ -375,8 +377,17 @@ const capabilities = {
   polyhedron: { available: false },
 };
 
-const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attribute_names;
-const edgeSchema = back_schemas.opengeodeweb_back.model_component_edge_attribute_names;
+const backSchemas = back_schemas.opengeodeweb_back;
+const attributeSchemas = {
+  vertex: {
+    names: backSchemas.model_component_vertex_attribute_names,
+    range: backSchemas.model_component_vertex_attribute_range,
+  },
+  edge: {
+    names: backSchemas.model_component_edge_attribute_names,
+    range: backSchemas.model_component_edge_attribute_range,
+  },
+};
 </script>
 
 <template>
@@ -400,7 +411,7 @@ const edgeSchema = back_schemas.opengeodeweb_back.model_component_edge_attribute
       v-model:edge_attribute_no_data_color="linesEdgeAttributeNoDataColor"
       v-model:edge_attribute_time_step="linesEdgeAttributeTimeStep"
       :capabilities="capabilities"
-      :schemas="{ vertex: vertexSchema, edge: edgeSchema }"
+      :schemas="attributeSchemas"
       :allowRandom="true"
     />
   </OptionsSection>
@@ -414,7 +425,7 @@ const edgeSchema = back_schemas.opengeodeweb_back.model_component_edge_attribute
     <VisibilitySwitch v-model="lineVisibility" />
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
-      :componentIds="[lineId]"
+      :componentIds="lineComponentIds"
       v-model:coloring_style_key="lineActiveColoring"
       v-model:color="lineColor"
       v-model:vertex_attribute_name="vertexAttributeName"
@@ -430,7 +441,7 @@ const edgeSchema = back_schemas.opengeodeweb_back.model_component_edge_attribute
       v-model:edge_attribute_no_data_color="edgeAttributeNoDataColor"
       v-model:edge_attribute_time_step="edgeAttributeTimeStep"
       :capabilities="capabilities"
-      :schemas="{ vertex: vertexSchema, edge: edgeSchema }"
+      :schemas="attributeSchemas"
       :allowRandom="true"
     />
   </OptionsSection>

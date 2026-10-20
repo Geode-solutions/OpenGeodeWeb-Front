@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { type AttributeSchemas, fetchAttributeRange } from "@ogw_front/utils/attribute_range";
 import {
   MESH_ELEMENT_KINDS,
   MODEL_COMPONENT_ATTRIBUTE_SCHEMAS,
@@ -26,9 +27,9 @@ const { escapeFunction = undefined } = defineProps<Props>();
 
 interface AttributeSource {
   title: string;
-  schema: JsonRpcSchema;
+  schemas: AttributeSchemas;
   timeStepKey: string;
-  params: Record<string, unknown>;
+  params: { id: string; component_ids?: string[] };
   location: "point" | "cell";
 }
 
@@ -86,23 +87,24 @@ const itemOptions = computed<{ title: string; value: number }[]>(() =>
   })),
 );
 
-function attributeSchema(kind: string, isModel: boolean): JsonRpcSchema {
+function attributeSchema(kind: string, isModel: boolean, route: "names" | "range"): JsonRpcSchema {
   const prefix = isModel ? "model_component_" : "";
   return back_schemas.opengeodeweb_back[
-    `${prefix}${kind}_attribute_names` as keyof typeof back_schemas.opengeodeweb_back
+    `${prefix}${kind}_attribute_${route}` as keyof typeof back_schemas.opengeodeweb_back
   ] as JsonRpcSchema;
 }
 
 function attributeSource(
   kind: string,
   title: string,
-  params: Record<string, unknown>,
+  params: { id: string; component_ids?: string[] },
   modelType?: string,
 ): AttributeSource {
-  const schema = attributeSchema(kind, modelType !== undefined);
+  const isModel = modelType !== undefined;
+  const schema = attributeSchema(kind, isModel, "names");
   return {
     title: `${title}${kind} attribute`,
-    schema,
+    schemas: { names: schema, range: attributeSchema(kind, isModel, "range") },
     timeStepKey:
       modelType === undefined
         ? schema.$id
@@ -154,11 +156,17 @@ async function applyThreshold(): Promise<void> {
 
 const debouncedApply = useDebounceFn(() => applyThreshold(), DEBOUNCE_DELAY);
 
-function resetRange(): void {
-  const { min, max } = getAttributeRange(
-    currentAttribute.value as Parameters<typeof getAttributeRange>[0],
-    attributeItem.value,
-  );
+async function resetRange(): Promise<void> {
+  const source = sources.value[selectedSourceIndex.value ?? -1];
+  const name = attributeName.value;
+  if (!source || name === undefined) {
+    return;
+  }
+  const range = await fetchAttributeRange(source.schemas.range, source.params, name);
+  if (name !== attributeName.value) {
+    return;
+  }
+  const { min, max } = getAttributeRange(range, attributeItem.value);
   minimum.value = min;
   maximum.value = max;
 }
@@ -186,19 +194,19 @@ watch(selectedSourceIndex, async (index) => {
     return;
   }
   const response = (await backStore.request({
-    schema: source.schema,
+    schema: source.schemas.names,
     params: source.params,
   })) as { attributes: AttributeInfo[] };
   attributes.value = response.attributes;
 });
 
-watch(attributeName, () => {
+watch(attributeName, async () => {
   attributeItem.value = 0;
-  resetRange();
+  await resetRange();
 });
 
-watch(attributeItem, () => {
-  resetRange();
+watch(attributeItem, async () => {
+  await resetRange();
 });
 
 watch(currentTimeStep, () => {

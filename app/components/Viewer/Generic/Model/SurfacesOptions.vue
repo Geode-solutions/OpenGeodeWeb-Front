@@ -30,6 +30,8 @@ const referenceSurfaceId = computed<string | undefined>(() =>
   collections ? targetSurfaceIds[0] : undefined,
 );
 
+const surfaceComponentIds = computed<string[]>(() => (surfaceId === undefined ? [] : [surfaceId]));
+
 // Visibility
 const surfacesVisibility = computed<boolean>({
   get: () =>
@@ -426,8 +428,17 @@ const capabilities = {
   polyhedron: { available: false },
 };
 
-const vertexSchema = back_schemas.opengeodeweb_back.model_component_vertex_attribute_names;
-const polygonSchema = back_schemas.opengeodeweb_back.model_component_polygon_attribute_names;
+const backSchemas = back_schemas.opengeodeweb_back;
+const attributeSchemas = {
+  vertex: {
+    names: backSchemas.model_component_vertex_attribute_names,
+    range: backSchemas.model_component_vertex_attribute_range,
+  },
+  polygon: {
+    names: backSchemas.model_component_polygon_attribute_names,
+    range: backSchemas.model_component_polygon_attribute_range,
+  },
+};
 </script>
 
 <template>
@@ -451,7 +462,7 @@ const polygonSchema = back_schemas.opengeodeweb_back.model_component_polygon_att
       v-model:polygon_attribute_no_data_color="surfacesPolygonAttributeNoDataColor"
       v-model:polygon_attribute_time_step="surfacesPolygonAttributeTimeStep"
       :capabilities="capabilities"
-      :schemas="{ vertex: vertexSchema, polygon: polygonSchema }"
+      :schemas="attributeSchemas"
       :allowRandom="true"
     />
   </OptionsSection>
@@ -465,7 +476,7 @@ const polygonSchema = back_schemas.opengeodeweb_back.model_component_polygon_att
     <VisibilitySwitch v-model="surfaceVisibility" />
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
-      :componentIds="[surfaceId]"
+      :componentIds="surfaceComponentIds"
       v-model:coloring_style_key="surfaceActiveColoring"
       v-model:color="surfaceColor"
       v-model:vertex_attribute_name="vertexAttributeName"
@@ -481,7 +492,7 @@ const polygonSchema = back_schemas.opengeodeweb_back.model_component_polygon_att
       v-model:polygon_attribute_no_data_color="polygonAttributeNoDataColor"
       v-model:polygon_attribute_time_step="polygonAttributeTimeStep"
       :capabilities="capabilities"
-      :schemas="{ vertex: vertexSchema, polygon: polygonSchema }"
+      :schemas="attributeSchemas"
       :allowRandom="true"
     />
   </OptionsSection>

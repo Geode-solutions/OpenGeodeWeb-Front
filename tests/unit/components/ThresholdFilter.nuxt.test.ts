@@ -19,8 +19,6 @@ vi.mock(import("@ogw_front/stores/back") as Promise<unknown>, () => ({
         {
           attribute_name: "temp",
           nb_items: 1,
-          min_value: 0,
-          max_value: 1,
           time_steps: [0, 1, 2],
         },
       ],

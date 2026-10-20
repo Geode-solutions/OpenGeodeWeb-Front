@@ -1,5 +1,6 @@
 import type { JsonRpcSchema } from "@ogw_shared/utils/types";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
+import { fetchAttributeRange } from "@ogw_front/utils/attribute_range";
 import { getAttributeRange } from "@ogw_front/utils/attributes";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -35,10 +36,6 @@ interface AttributeStyleComponent {
 interface AttributeResponse {
   readonly attributes?: readonly {
     readonly attribute_name?: string;
-    readonly min_values?: readonly number[];
-    readonly max_values?: readonly number[];
-    readonly min_value?: number;
-    readonly max_value?: number;
     readonly time_steps?: readonly number[];
   }[];
 }
@@ -259,39 +256,29 @@ export function useGlobalAttributeStyle(dataIdRef: Ref<string | undefined>): {
         continue;
       }
 
-      const schemaName = `${activeColoring}_attribute_names`;
-      const backSchemas = back_schemas.opengeodeweb_back as Record<string, unknown>;
-      const schema = backSchemas[schemaName];
-      if (schema === undefined || !isJsonRpcSchema(schema)) {
+      const rangeSchema = (back_schemas.opengeodeweb_back as Record<string, unknown>)[
+        `${activeColoring}_attribute_range`
+      ];
+      if (!isJsonRpcSchema(rangeSchema)) {
         continue;
       }
 
       requestPromises.push(
-        backStore.request(
-          {
-            schema,
-            params: { id: targetId },
-          },
-          {
-            response_function: async (response: unknown): Promise<void> => {
-              if (!isAttributeResponse(response)) {
-                return;
-              }
-              const attributes = response.attributes ?? [];
-              const currentAttribute = attributes.find((attr) => attr.attribute_name === attrName);
-              if (currentAttribute) {
-                const { min, max } = getAttributeRange(currentAttribute, attrItem);
-
-                const setterName = `set${setterKey}${attributeType}Range`;
-                const setter = getDynamicStoreMethod(dataStyleStore, setterName);
-                if (setter) {
-                  setter(targetId, min, max);
-                  await hybridViewerStore.remoteRender();
-                }
-              }
-            },
-          },
-        ),
+        (async (): Promise<void> => {
+          const range = await fetchAttributeRange(rangeSchema, { id: targetId }, attrName);
+          if (!range) {
+            return;
+          }
+          const { min, max } = getAttributeRange(range, attrItem);
+          const setter = getDynamicStoreMethod(
+            dataStyleStore,
+            `set${setterKey}${attributeType}Range`,
+          );
+          if (setter) {
+            setter(targetId, min, max);
+            await hybridViewerStore.remoteRender();
+          }
+        })(),
       );
     }
 

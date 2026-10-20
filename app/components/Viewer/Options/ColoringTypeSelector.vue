@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
+import type { AttributeSchemas } from "@ogw_front/utils/attribute_range";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { RangesPerData } from "@ogw_front/composables/batch_style";
 import ViewerOptionsAttributeSelector from "@ogw_front/components/Viewer/Options/AttributeSelector.vue";
@@ -18,11 +18,11 @@ interface CapabilityConfig {
 }
 
 interface Schemas {
-  vertex?: JsonRpcSchema;
-  edge?: JsonRpcSchema;
-  cell?: JsonRpcSchema;
-  polygon?: JsonRpcSchema;
-  polyhedron?: JsonRpcSchema;
+  vertex?: AttributeSchemas;
+  edge?: AttributeSchemas;
+  cell?: AttributeSchemas;
+  polygon?: AttributeSchemas;
+  polyhedron?: AttributeSchemas;
 }
 
 const coloring_style_key = defineModel<string>("coloring_style_key");
@@ -95,12 +95,27 @@ const {
   allowRandom = false,
 } = defineProps<Props>();
 
-const vertexSchema = schemas.vertex || back_schemas.opengeodeweb_back.vertex_attribute_names;
-const edgeSchema = schemas.edge || back_schemas.opengeodeweb_back.edge_attribute_names;
-const cellSchema = schemas.cell || back_schemas.opengeodeweb_back.cell_attribute_names;
-const polygonSchema = schemas.polygon || back_schemas.opengeodeweb_back.polygon_attribute_names;
-const polyhedronSchema =
-  schemas.polyhedron || back_schemas.opengeodeweb_back.polyhedron_attribute_names;
+const backSchemas = back_schemas.opengeodeweb_back;
+const vertexSchemas = schemas.vertex ?? {
+  names: backSchemas.vertex_attribute_names,
+  range: backSchemas.vertex_attribute_range,
+};
+const edgeSchemas = schemas.edge ?? {
+  names: backSchemas.edge_attribute_names,
+  range: backSchemas.edge_attribute_range,
+};
+const cellSchemas = schemas.cell ?? {
+  names: backSchemas.cell_attribute_names,
+  range: backSchemas.cell_attribute_range,
+};
+const polygonSchemas = schemas.polygon ?? {
+  names: backSchemas.polygon_attribute_names,
+  range: backSchemas.polygon_attribute_range,
+};
+const polyhedronSchemas = schemas.polyhedron ?? {
+  names: backSchemas.polyhedron_attribute_names,
+  range: backSchemas.polyhedron_attribute_range,
+};
 
 function isAvailable(key: string): boolean {
   if (capabilities[key] && capabilities[key].available === false) {
@@ -266,7 +281,7 @@ watch(
           @ranges_per_data="emit('vertex_attribute_ranges_per_data', $event)"
           :id="id"
           :componentIds="componentIds"
-          :schema="vertexSchema"
+          :schemas="vertexSchemas"
         />
       </template>
       <template v-if="active_key === edge_dict['value'] && hasColorMap('edge')">
@@ -280,7 +295,7 @@ watch(
           @ranges_per_data="emit('edge_attribute_ranges_per_data', $event)"
           :id="id"
           :componentIds="componentIds"
-          :schema="edgeSchema"
+          :schemas="edgeSchemas"
         />
       </template>
       <template v-if="active_key === cell_dict['value'] && hasColorMap('cell')">
@@ -294,7 +309,7 @@ watch(
           @ranges_per_data="emit('cell_attribute_ranges_per_data', $event)"
           :id="id"
           :componentIds="componentIds"
-          :schema="cellSchema"
+          :schemas="cellSchemas"
         />
       </template>
       <template v-if="active_key === polygon_dict['value'] && hasColorMap('polygon')">
@@ -308,7 +323,7 @@ watch(
           @ranges_per_data="emit('polygon_attribute_ranges_per_data', $event)"
           :id="id"
           :componentIds="componentIds"
-          :schema="polygonSchema"
+          :schemas="polygonSchemas"
         />
       </template>
       <template v-if="active_key === polyhedron_dict['value'] && hasColorMap('polyhedron')">
@@ -322,7 +337,7 @@ watch(
           @ranges_per_data="emit('polyhedron_attribute_ranges_per_data', $event)"
           :id="id"
           :componentIds="componentIds"
-          :schema="polyhedronSchema"
+          :schemas="polyhedronSchemas"
         />
       </template>
     </v-col>
