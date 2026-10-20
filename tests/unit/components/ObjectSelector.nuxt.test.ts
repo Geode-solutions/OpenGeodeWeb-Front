@@ -31,6 +31,17 @@ describe("object selector", () => {
   const backStore = useBackStore();
   (backStore as { base_url: string }).base_url = "/";
 
+  function mockAllowedObjects(
+    byFile: Record<string, AllowedObjectsResponse["allowed_objects"]>,
+  ): void {
+    backStore.request = mockAs<typeof backStore.request>(
+      vi.fn(async ({ params }: { params: { filename: string } }) => {
+        await Promise.resolve();
+        return { allowed_objects: byFile[params.filename] ?? {} };
+      }),
+    );
+  }
+
   test("loadable with one class", async () => {
     const response: AllowedObjectsResponse = {
       allowed_objects: {},
@@ -127,17 +138,6 @@ describe("object selector", () => {
   });
 
   describe("per file", () => {
-    function mockAllowedObjects(
-      byFile: Record<string, AllowedObjectsResponse["allowed_objects"]>,
-    ): void {
-      backStore.request = mockAs<typeof backStore.request>(
-        vi.fn(async ({ params }: { params: { filename: string } }) => {
-          await Promise.resolve();
-          return { allowed_objects: byFile[params.filename] ?? {} };
-        }),
-      );
-    }
-
     test("files with different types are resolved without user input", async () => {
       mockAllowedObjects({
         "mesh.vtu": { SolidMesh3D: { is_loadable: LOADABLE_SCORE } },
