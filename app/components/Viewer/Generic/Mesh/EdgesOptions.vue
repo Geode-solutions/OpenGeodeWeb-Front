@@ -18,13 +18,24 @@ const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const { applyBatchStyle } = useBatchStyle();
 
+interface CapabilityConfig {
+  available?: boolean;
+  hasColorMap?: boolean;
+}
+
 interface Props {
   itemProps: ItemProps & { index?: number };
   btnImage: string;
   tooltip?: string;
+  capabilities?: Record<string, CapabilityConfig>;
 }
 
-const { itemProps, btnImage, tooltip = "Edges options" } = defineProps<Props>();
+const {
+  itemProps,
+  btnImage,
+  tooltip = "Edges options",
+  capabilities = {},
+} = defineProps<Props>();
 
 const id = toRef(() => itemProps.id);
 
@@ -251,6 +262,7 @@ async function setEdgeAttributeRangesPerData(ranges: RangesPerData): Promise<voi
           v-model:edge_attribute_color_map="edge_attribute_color_map"
           v-model:edge_attribute_no_data_color="edge_attribute_no_data_color"
           v-model:edge_attribute_time_step="edge_attribute_time_step"
+          :capabilities="capabilities"
         />
       </template>
     </template>
