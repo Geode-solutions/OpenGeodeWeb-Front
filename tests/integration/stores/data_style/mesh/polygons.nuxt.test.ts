@@ -13,6 +13,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
 const mesh_polygons_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polygons;
+const mesh_points_schemas = viewer_schemas.opengeodeweb_viewer.mesh.points;
 const file_name = "test.og_psf3d";
 const geode_object = "PolygonalSurface3D";
 const MINIMUM_RANGE = 10;
@@ -257,5 +258,36 @@ describe("mesh polygons", () => {
     expect(result).toBeInstanceOf(Promise);
     await result;
     expect(viewerStore.status).toBe(Status.CONNECTED);
+  });
+
+  describe("points vertex attribute", () => {
+    test("points vertex attribute", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const spy = vi.spyOn(viewerStore, "request");
+      const vertex_attribute = {
+        name: default_vertex_attribute.name,
+        item: default_vertex_attribute.item,
+        minimum: range[0],
+        maximum: range[1],
+        colorMap: "batlow",
+      };
+      await dataStyleStore.setMeshPointsVertexAttribute(id, vertex_attribute);
+      const params = {
+        id,
+        name: vertex_attribute.name,
+        item: vertex_attribute.item,
+        points: getRGBPointsFromPreset(vertex_attribute.colorMap),
+        minimum: vertex_attribute.minimum,
+        maximum: vertex_attribute.maximum,
+        no_data_color: DEFAULT_NO_DATA_COLOR,
+      };
+      expect(spy).toHaveBeenCalledWith({
+        schema: mesh_points_schemas.attribute.vertex.attribute,
+        params,
+      });
+      expect(dataStyleStore.meshPointsVertexAttributeName(id)).toBe(vertex_attribute.name);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
   });
 });
