@@ -30,12 +30,7 @@ interface Props {
   capabilities?: Record<string, CapabilityConfig>;
 }
 
-const {
-  itemProps,
-  btnImage,
-  tooltip = "Edges options",
-  capabilities = {},
-} = defineProps<Props>();
+const { itemProps, btnImage, tooltip = "Edges options", capabilities = {} } = defineProps<Props>();
 
 const id = toRef(() => itemProps.id);
 
