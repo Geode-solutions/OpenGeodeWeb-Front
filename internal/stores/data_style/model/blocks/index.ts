@@ -7,6 +7,7 @@ import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelBlocksColor } from "./color";
 import { useModelBlocksCommonStyle } from "./common";
+import { useModelBlocksPointsStyle } from "./points";
 import { useModelBlocksVisibility } from "./visibility";
 
 interface ColorGroup {
@@ -34,6 +35,7 @@ type UseModelBlocksStyleReturn = {
 } & ReturnType<typeof useModelBlocksCommonStyle> &
   ReturnType<typeof useModelBlocksVisibility> &
   ReturnType<typeof useModelBlocksColor> &
+  ReturnType<typeof useModelBlocksPointsStyle> &
   ReturnType<typeof useModelBlocksVertexAttribute> &
   ReturnType<typeof useModelBlocksPolyhedronAttribute>;
 
@@ -45,6 +47,7 @@ export function useModelBlocksStyle(): UseModelBlocksStyleReturn {
   const modelColorStyle = useModelBlocksColor();
   const modelBlocksVertexAttribute = useModelBlocksVertexAttribute();
   const modelBlocksPolyhedronAttribute = useModelBlocksPolyhedronAttribute();
+  const modelBlocksPointsStyle = useModelBlocksPointsStyle();
 
   async function applyModelBlocksVisibilityStyle(
     modelId: string,
@@ -245,5 +248,6 @@ export function useModelBlocksStyle(): UseModelBlocksStyleReturn {
     ...modelColorStyle,
     ...modelBlocksVertexAttribute,
     ...modelBlocksPolyhedronAttribute,
+    ...modelBlocksPointsStyle,
   };
 }
