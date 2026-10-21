@@ -96,6 +96,7 @@ const componentTargets = computed(() =>
     <OptionsSection
       v-if="!componentType && !componentId && allComponentsTargets.length > 0"
       title="Components Points Options"
+      data-testid="modelPointsComponentsOptions"
       class="mt-4"
     >
       <ViewerGenericModelComponentPointsOptions
@@ -107,6 +108,7 @@ const componentTargets = computed(() =>
     <OptionsSection
       v-if="pointsComponentType"
       :title="POINTS_TYPE_TITLES[pointsComponentType]"
+      data-testid="modelPointsComponentTypeOptions"
       class="mt-4"
     >
       <ViewerGenericModelComponentPointsOptions
@@ -119,6 +121,7 @@ const componentTargets = computed(() =>
     <OptionsSection
       v-if="pointsComponentType && componentId"
       title="Component Points Options"
+      data-testid="modelPointsComponentOptions"
       class="mt-4"
     >
       <ViewerGenericModelComponentPointsOptions
