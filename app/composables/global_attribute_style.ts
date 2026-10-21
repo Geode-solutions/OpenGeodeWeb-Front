@@ -1,384 +1,73 @@
-import type { JsonRpcSchema } from "@ogw_shared/utils/types";
-import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
-import { fetchAttributeRange } from "@ogw_front/utils/attribute_range";
-import { getAttributeRange } from "@ogw_front/utils/attributes";
-import { useBackStore } from "@ogw_front/stores/back";
+import {
+  type AttributeColoring,
+  type AttributeColoringStyle,
+  attributeSchemas,
+  attributeType,
+  storeMethod,
+  useAttributeColoringStyle,
+} from "@ogw_front/composables/attribute_coloring_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
-import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
-interface ComponentNameEntry {
-  getterKey: string;
-  setterKey: string;
-  key: string;
+interface MeshElement {
+  // Element type of the store methods, e.g. "MeshPoints" for "setMeshPointsVertexAttributeRange"
+  storeName: string;
+  styleKey: "points" | "edges" | "polygons" | "cells" | "polyhedra";
 }
 
-interface ActiveComponent extends ComponentNameEntry {
-  activeColoring: string;
-  attributeType: string;
-}
+const MESH_ELEMENTS: MeshElement[] = [
+  { storeName: "MeshPoints", styleKey: "points" },
+  { storeName: "MeshEdges", styleKey: "edges" },
+  { storeName: "MeshPolygons", styleKey: "polygons" },
+  { storeName: "MeshCells", styleKey: "cells" },
+  { storeName: "MeshPolyhedra", styleKey: "polyhedra" },
+];
 
-// This composable resolves a batch of dynamically-named getter/setter methods on the data style store (e.g. "meshPointsVertexAttributeRange", "setMeshPointsVertexAttributeRange", ...) - the store's real, fully-typed surface has no index signature for this, so dynamic lookups go through this type guard instead of an unsafe cast of the whole store (which mixes these methods with state refs and other members), matching how these methods are actually shaped (getters take an id and return a value, setters take an id plus arbitrary arguments).
-type DynamicStoreMethod = (...args: readonly unknown[]) => unknown;
+const ATTRIBUTE_COLORINGS = new Set(["vertex", "edge", "polygon", "cell", "polyhedron"]);
 
-function isDynamicStoreMethod(value: unknown): value is DynamicStoreMethod {
-  return typeof value === "function";
-}
-
-function getDynamicStoreMethod(store: object, key: string): DynamicStoreMethod | undefined {
-  const value: unknown = Reflect.get(store, key);
-  return isDynamicStoreMethod(value) ? value : undefined;
-}
-
-interface AttributeStyleComponent {
-  coloring?: { active?: string };
-}
-
-interface AttributeResponse {
-  readonly attributes?: readonly {
-    readonly attribute_name?: string;
-    readonly time_steps?: readonly number[];
-  }[];
-}
-
-function isColoringValue(
-  value: unknown,
-): value is NonNullable<AttributeStyleComponent["coloring"]> {
+function isColoring(value: unknown): value is { active?: string } {
   return typeof value === "object" && value !== null;
 }
 
-function isJsonRpcSchema(value: unknown): value is JsonRpcSchema {
-  return (
-    typeof value === "object" && value !== null && "$id" in value && typeof value.$id === "string"
-  );
-}
-
-function isAttributeResponse(value: unknown): value is AttributeResponse {
-  return typeof value === "object" && value !== null;
-}
-
-function isNumberArray(value: unknown): value is number[] {
-  return Array.isArray(value) && value.every((item) => typeof item === "number");
-}
-
-function isStringOrUndefined(value: unknown): value is string | undefined {
-  return value === undefined || typeof value === "string";
-}
-
-function isNumberOrUndefined(value: unknown): value is number | undefined {
-  return value === undefined || typeof value === "number";
-}
-
-export function useGlobalAttributeStyle(dataIdRef: Ref<string | undefined>): {
-  currentColormap: typeof currentColormap;
-  currentRange: typeof currentRange;
-  applyGlobalColormap: typeof applyGlobalColormap;
-  resetGlobalRange: typeof resetGlobalRange;
-  currentTimeSteps: typeof currentTimeSteps;
-  currentTimeStep: typeof currentTimeStep;
-  loadTimeSteps: typeof loadTimeSteps;
-} {
+// Styles the mesh elements colored by an attribute
+export function useGlobalAttributeStyle(
+  dataIdRef: Ref<string | undefined>,
+): AttributeColoringStyle {
   const dataStyleStore = useDataStyleStore();
-  const hybridViewerStore = useHybridViewerStore();
-  const backStore = useBackStore();
 
-  const componentNames: ComponentNameEntry[] = [
-    { getterKey: "meshPoints", setterKey: "MeshPoints", key: "points" },
-    { getterKey: "meshEdges", setterKey: "MeshEdges", key: "edges" },
-    { getterKey: "meshPolygons", setterKey: "MeshPolygons", key: "polygons" },
-    { getterKey: "meshCells", setterKey: "MeshCells", key: "cells" },
-    { getterKey: "meshPolyhedra", setterKey: "MeshPolyhedra", key: "polyhedra" },
-  ];
-
-  function getActiveComponents(targetId: string): ActiveComponent[] {
-    const style = dataStyleStore.getStyle(targetId);
-    const activeComponents: ActiveComponent[] = [];
-    for (const { key, getterKey, setterKey } of componentNames) {
-      let componentStyle: Record<string, unknown> | undefined = undefined;
-      switch (key) {
-        case "points": {
-          componentStyle = style.points;
-          break;
-        }
-        case "edges": {
-          componentStyle = style.edges;
-          break;
-        }
-        case "polygons": {
-          componentStyle = style.polygons;
-          break;
-        }
-        case "cells": {
-          componentStyle = style.cells;
-          break;
-        }
-        case "polyhedra": {
-          componentStyle = style.polyhedra;
-          break;
-        }
-        default: {
-          componentStyle = undefined;
-        }
-      }
-      if (componentStyle === undefined) {
-        continue;
-      }
-
-      const { coloring } = componentStyle;
-      if (!isColoringValue(coloring)) {
-        continue;
-      }
-
-      const { active: activeColoring } = coloring;
-      if (
-        activeColoring === undefined ||
-        !["vertex", "edge", "polygon", "cell", "polyhedron"].includes(activeColoring)
-      ) {
-        continue;
-      }
-
-      const attributeType = `${activeColoring.charAt(0).toUpperCase()}${activeColoring.slice(1)}Attribute`;
-      activeComponents.push({ activeColoring, attributeType, getterKey, setterKey, key });
-    }
-    return activeComponents;
+  function meshColoring(
+    dataId: string,
+    { storeName }: MeshElement,
+    activeColoring: string,
+  ): AttributeColoring {
+    const methodName = `${storeName}${attributeType(activeColoring)}`;
+    const getterName = `${methodName.charAt(0).toLowerCase()}${methodName.slice(1)}`;
+    return {
+      read: (property): unknown => storeMethod(dataStyleStore, `${getterName}${property}`)(dataId),
+      write: async (property, ...values): Promise<void> => {
+        await storeMethod(dataStyleStore, `set${methodName}${property}`)(dataId, ...values);
+      },
+      schemas: attributeSchemas("", activeColoring),
+      params: { id: dataId },
+    };
   }
 
-  const currentColormap = computed((): string => {
-    const targetId = dataIdRef.value;
-    if (targetId === undefined || targetId === "") {
-      return "batlow";
-    }
-
-    for (const comp of getActiveComponents(targetId)) {
-      const getterName = `${comp.getterKey}${comp.attributeType}ColorMap`;
-      const getter = getDynamicStoreMethod(dataStyleStore, getterName);
-      if (getter) {
-        const colorMap = getter(targetId);
-        if (typeof colorMap === "string" && colorMap.length > 0) {
-          return colorMap;
-        }
-      }
-    }
-
-    return "batlow";
-  });
-
-  async function applyCurrentRange(newValue: readonly [number, number]): Promise<void> {
-    const targetId = dataIdRef.value;
-    if (targetId === undefined || targetId === "") {
-      return;
-    }
-
-    let updated = false;
-    for (const comp of getActiveComponents(targetId)) {
-      const setterName = `set${comp.setterKey}${comp.attributeType}Range`;
-      const setter = getDynamicStoreMethod(dataStyleStore, setterName);
-      if (setter) {
-        setter(targetId, newValue[0], newValue[1]);
-        updated = true;
-      }
-    }
-    if (updated) {
-      await hybridViewerStore.remoteRender();
-    }
-  }
-
-  const currentRange = computed<readonly [number, number]>({
-    get(): readonly [number, number] {
-      const targetId = dataIdRef.value;
-      if (targetId === undefined || targetId === "") {
-        return [0, 1];
-      }
-
-      for (const comp of getActiveComponents(targetId)) {
-        const getterName = `${comp.getterKey}${comp.attributeType}Range`;
-        const getter = getDynamicStoreMethod(dataStyleStore, getterName);
-        if (getter) {
-          const rawRange = getter(targetId);
-          const range = isNumberArray(rawRange) ? rawRange : undefined;
-          if (range && range.length === 2) {
-            return [range[0] ?? 0, range[1] ?? 1];
-          }
-        }
-      }
-      return [0, 1];
-    },
-    // Vue's WritableComputedOptions setter is strictly `(v: T) => void`, so the async render call is delegated to a helper (see the same trade-off in `app/composables/hover_highlight.ts`'s `onHoverEnter`).
-    set: (newValue: readonly [number, number]): void => {
-      /* oxlint-disable-next-line promise/prefer-await-to-then -- setter cannot be async; see comment above. */
-      applyCurrentRange(newValue).catch(() => undefined);
-    },
-  });
-
-  async function applyGlobalColormap(newMap: string): Promise<void> {
-    const targetId = dataIdRef.value;
-    if (targetId === undefined || targetId === "") {
-      return;
-    }
-
-    const promises: Promise<unknown>[] = [];
-
-    for (const comp of getActiveComponents(targetId)) {
-      const setterName = `set${comp.setterKey}${comp.attributeType}ColorMap`;
-      const setter = getDynamicStoreMethod(dataStyleStore, setterName);
-
-      if (setter) {
-        promises.push(Promise.resolve(setter(targetId, newMap)));
-      }
-    }
-
-    await Promise.all(promises);
-    await hybridViewerStore.remoteRender();
-  }
-
-  async function resetGlobalRange(): Promise<void> {
-    const targetId = dataIdRef.value;
-    if (targetId === undefined || targetId === "") {
-      return;
-    }
-
-    const requestPromises: Promise<unknown>[] = [];
-
-    for (const comp of getActiveComponents(targetId)) {
-      const { activeColoring, attributeType, getterKey, setterKey } = comp;
-
-      const nameGetter = getDynamicStoreMethod(dataStyleStore, `${getterKey}${attributeType}Name`);
-      const itemGetter = getDynamicStoreMethod(dataStyleStore, `${getterKey}${attributeType}Item`);
-      if (!nameGetter || !itemGetter) {
-        continue;
-      }
-
-      const rawAttrName = nameGetter(targetId);
-      const attrName = isStringOrUndefined(rawAttrName) ? rawAttrName : undefined;
-      const rawAttrItem = itemGetter(targetId);
-      const attrItem = (isNumberOrUndefined(rawAttrItem) ? rawAttrItem : undefined) ?? 0;
-
-      if (attrName === undefined || attrName === "") {
-        continue;
-      }
-
-      const rangeSchema = (back_schemas.opengeodeweb_back as Record<string, unknown>)[
-        `${activeColoring}_attribute_range`
-      ];
-      if (!isJsonRpcSchema(rangeSchema)) {
-        continue;
-      }
-
-      requestPromises.push(
-        (async (): Promise<void> => {
-          const range = await fetchAttributeRange(rangeSchema, { id: targetId }, attrName);
-          if (!range) {
-            return;
-          }
-          const { min, max } = getAttributeRange(range, attrItem);
-          const setter = getDynamicStoreMethod(
-            dataStyleStore,
-            `set${setterKey}${attributeType}Range`,
-          );
-          if (setter) {
-            setter(targetId, min, max);
-            await hybridViewerStore.remoteRender();
-          }
-        })(),
-      );
-    }
-
-    await Promise.all(requestPromises);
-  }
-
-  const currentTimeSteps = ref<number[]>([]);
-  const temporalComponent = shallowRef<ActiveComponent | undefined>(undefined);
-
-  async function requestTimeSteps(targetId: string, comp: ActiveComponent): Promise<number[]> {
-    const { activeColoring, attributeType, getterKey } = comp;
-    const nameGetter = getDynamicStoreMethod(dataStyleStore, `${getterKey}${attributeType}Name`);
-    const rawAttrName = nameGetter?.(targetId);
-    const schema = (back_schemas.opengeodeweb_back as Record<string, unknown>)[
-      `${activeColoring}_attribute_names`
-    ];
-    if (
-      !isStringOrUndefined(rawAttrName) ||
-      rawAttrName === undefined ||
-      rawAttrName === "" ||
-      !isJsonRpcSchema(schema)
-    ) {
+  const colorings = computed<AttributeColoring[]>(() => {
+    const dataId = dataIdRef.value;
+    // The picker exists before any scalar bar is picked
+    if (dataId === undefined) {
       return [];
     }
-    let timeSteps: number[] = [];
-    await backStore.request(
-      { schema, params: { id: targetId } },
-      {
-        response_function: (response: unknown): void => {
-          if (!isAttributeResponse(response)) {
-            return;
-          }
-          const found = response.attributes?.find((attr) => attr.attribute_name === rawAttrName);
-          timeSteps = [...(found?.time_steps ?? [])];
-        },
-      },
-    );
-    return timeSteps;
-  }
-
-  async function loadTimeSteps(): Promise<void> {
-    const targetId = dataIdRef.value;
-    temporalComponent.value = undefined;
-    currentTimeSteps.value = [];
-    if (targetId === undefined || targetId === "") {
-      return;
-    }
-    for (const comp of getActiveComponents(targetId)) {
-      // oxlint-disable-next-line no-await-in-loop -- first temporal component wins, in order.
-      const timeSteps = await requestTimeSteps(targetId, comp);
-      if (timeSteps.length > 0) {
-        temporalComponent.value = comp;
-        currentTimeSteps.value = timeSteps;
-        return;
-      }
-    }
-  }
-
-  watch(dataIdRef, loadTimeSteps, { immediate: true });
-
-  async function applyCurrentTimeStep(step: number): Promise<void> {
-    const targetId = dataIdRef.value;
-    const comp = temporalComponent.value;
-    if (targetId === undefined || targetId === "" || !comp) {
-      return;
-    }
-    const { attributeType, setterKey } = comp;
-    const setter = getDynamicStoreMethod(dataStyleStore, `set${setterKey}${attributeType}TimeStep`);
-    if (setter) {
-      await setter(targetId, step);
-      await hybridViewerStore.remoteRender();
-    }
-  }
-
-  const currentTimeStep = computed<number>({
-    get(): number {
-      const targetId = dataIdRef.value;
-      const comp = temporalComponent.value;
-      if (targetId === undefined || targetId === "" || !comp) {
-        return 0;
-      }
-      const { attributeType, getterKey } = comp;
-      const getter = getDynamicStoreMethod(dataStyleStore, `${getterKey}${attributeType}TimeStep`);
-      const rawStep = getter?.(targetId);
-      return typeof rawStep === "number" ? rawStep : 0;
-    },
-    // Setter cannot be async (see `currentRange`), so the work is delegated to a helper.
-    set: (step: number): void => {
-      /* oxlint-disable-next-line promise/prefer-await-to-then -- setter cannot be async; see comment above. */
-      applyCurrentTimeStep(step).catch(() => undefined);
-    },
+    const style = dataStyleStore.getStyle(dataId);
+    return MESH_ELEMENTS.flatMap((element) => {
+      const coloring: unknown = style[element.styleKey]?.coloring;
+      const activeColoring = isColoring(coloring) ? coloring.active : undefined;
+      return activeColoring !== undefined && ATTRIBUTE_COLORINGS.has(activeColoring)
+        ? [meshColoring(dataId, element, activeColoring)]
+        : [];
+    });
   });
 
-  return {
-    currentColormap,
-    currentRange,
-    applyGlobalColormap,
-    resetGlobalRange,
-    currentTimeSteps,
-    currentTimeStep,
-    loadTimeSteps,
-  };
+  const style = useAttributeColoringStyle(colorings);
+  watch(dataIdRef, style.loadTimeSteps, { immediate: true });
+  return style;
 }
