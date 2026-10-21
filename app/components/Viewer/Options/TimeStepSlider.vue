@@ -23,54 +23,48 @@ function commitTimeStep(value: number): void {
 
 function formatTime(index: number): string {
   const time = timeSteps[index];
-  return time === undefined ? "" : `t = ${time}`;
+  return time === undefined ? "" : `timestep = ${time}`;
 }
 </script>
 
 <template>
-  <v-slider
-    v-if="timeSteps.length > 1"
-    data-testid="timeStepSlider"
-    v-model="sliderTimeStep"
-    :min="0"
-    :max="timeSteps.length - 1"
-    :step="1"
-    color="primary"
-    density="compact"
-    class="time-step-slider mt-3"
-    hide-details
-    show-ticks="always"
-    :tick-size="10"
-    thumb-label="hover"
-    @end="commitTimeStep"
-    @keyup="commitTimeStep(sliderTimeStep)"
-  >
-    <template #prepend>
-      <span data-testid="timeStepValue" class="time-step-value">
-        {{ formatTime(sliderTimeStep) }}
-      </span>
-    </template>
-    <template #thumb-label="{ modelValue }">{{ formatTime(modelValue) }}</template>
-    <template #tick-label="{ index }">
-      <span class="time-step-tick">
-        <span class="v-slider-thumb__label time-step-tick-label">
-          <span class="v-slider-thumb__label-wedge" />
-          {{ formatTime(index) }}
+  <div v-if="timeSteps.length > 1" class="mt-3">
+    <div data-testid="timeStepValue" class="time-step-value">
+      {{ formatTime(sliderTimeStep) }}
+    </div>
+    <v-slider
+      data-testid="timeStepSlider"
+      v-model="sliderTimeStep"
+      :min="0"
+      :max="timeSteps.length - 1"
+      :step="1"
+      color="primary"
+      density="compact"
+      class="time-step-slider"
+      hide-details
+      show-ticks="always"
+      :tick-size="10"
+      thumb-label="hover"
+      @end="commitTimeStep"
+      @keyup="commitTimeStep(sliderTimeStep)"
+    >
+      <template #thumb-label="{ modelValue }">{{ formatTime(modelValue) }}</template>
+      <template #tick-label="{ index }">
+        <span class="time-step-tick">
+          <span class="v-slider-thumb__label time-step-tick-label">
+            <span class="v-slider-thumb__label-wedge" />
+            {{ formatTime(index) }}
+          </span>
         </span>
-      </span>
-    </template>
-  </v-slider>
+      </template>
+    </v-slider>
+  </div>
 </template>
 
 <style scoped>
 .time-step-value {
-  min-width: 32px;
   white-space: nowrap;
   font-size: 0.8125rem;
-}
-
-.time-step-slider.v-slider.v-input--horizontal :deep(.v-input__prepend) {
-  margin-inline-end: 4px;
 }
 
 .time-step-slider :deep(.v-slider-thumb__label) {
