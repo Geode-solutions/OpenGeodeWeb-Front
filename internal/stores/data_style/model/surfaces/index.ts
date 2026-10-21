@@ -4,6 +4,7 @@ import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelSurfacesColor } from "./color";
 import { useModelSurfacesCommonStyle } from "./common";
+import { useModelSurfacesEdgesStyle } from "./edges";
 import { useModelSurfacesPointsStyle } from "./points";
 import { useModelSurfacesVisibility } from "./visibility";
 
@@ -30,6 +31,7 @@ type UseModelSurfacesStyleReturn = ReturnType<typeof useModelSurfacesCommonStyle
   ReturnType<typeof useModelSurfacesVisibility> &
   ReturnType<typeof useModelSurfacesColor> &
   ReturnType<typeof useModelSurfacesPointsStyle> &
+  ReturnType<typeof useModelSurfacesEdgesStyle> &
   ReturnType<typeof useModelSurfacesVertexAttribute> &
   ReturnType<typeof useModelSurfacesPolygonAttribute> & {
     applyModelSurfacesStyle: (modelId: string) => Promise<void>;
@@ -45,6 +47,7 @@ export function useModelSurfacesStyle(): UseModelSurfacesStyleReturn {
   const modelSurfacesVertexAttribute = useModelSurfacesVertexAttribute();
   const modelSurfacesPolygonAttribute = useModelSurfacesPolygonAttribute();
   const modelSurfacesPointsStyle = useModelSurfacesPointsStyle();
+  const modelSurfacesEdgesStyle = useModelSurfacesEdgesStyle();
 
   async function applyModelSurfacesVisibilityStyle(
     modelId: string,
@@ -268,5 +271,6 @@ export function useModelSurfacesStyle(): UseModelSurfacesStyleReturn {
     ...modelSurfacesVertexAttribute,
     ...modelSurfacesPolygonAttribute,
     ...modelSurfacesPointsStyle,
+    ...modelSurfacesEdgesStyle,
   };
 }

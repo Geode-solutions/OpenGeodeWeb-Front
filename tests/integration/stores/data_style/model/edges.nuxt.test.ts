@@ -6,6 +6,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed
 import { beforeAllTimeout, setupIntegrationTests } from "@ogw_tests/integration/setup";
 import { Status } from "@ogw_front/utils/status";
 import { cleanupBackend } from "@ogw_server/utils/cleanup";
+import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -14,6 +15,8 @@ const model_edges_schemas = viewer_schemas.opengeodeweb_viewer.model.edges;
 const file_name = "test.og_brep";
 const geode_object = "BRep";
 const SLEEP_MS = 200;
+const COMPONENT_EDGES_WIDTH = 8;
+const MODEL_EDGES_WIDTH = 1;
 
 async function sleep(milliseconds: number): Promise<void> {
   // oxlint-disable-next-line promise/avoid-new
@@ -56,6 +59,31 @@ describe("model edges", () => {
       );
       expect(dataStyleStore.modelEdgesVisibility(id)).toBe(visibility);
       expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
+  describe("edges width", () => {
+    test("model edges width overrides components", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const [surface_id] = await dataStore.getSurfacesGeodeIds(id);
+      if (surface_id === undefined) {
+        throw new Error("Expected the model to contain a surface");
+      }
+      await dataStyleStore.setModelSurfacesEdgesWidth(id, [surface_id], COMPONENT_EDGES_WIDTH);
+      const spy = vi.spyOn(viewerStore, "request");
+      spy.mockClear();
+      await dataStyleStore.setModelEdgesWidth(id, MODEL_EDGES_WIDTH);
+      await sleep(SLEEP_MS);
+      expect(spy).toHaveBeenCalledWith(
+        { schema: model_edges_schemas.width, params: { id, width: MODEL_EDGES_WIDTH } },
+        {
+          // oxlint-disable-next-line no-unsafe-assignment -- expect.any(Function) is untyped by design, this is a vitest matcher not a real callback.
+          response_function: expect.any(Function),
+        },
+      );
+      expect(dataStyleStore.modelEdgesWidth(id)).toBe(MODEL_EDGES_WIDTH);
+      expect(dataStyleStore.modelSurfaceEdgesWidth(id, surface_id)).toBe(MODEL_EDGES_WIDTH);
     });
   });
   describe("edges style", () => {
