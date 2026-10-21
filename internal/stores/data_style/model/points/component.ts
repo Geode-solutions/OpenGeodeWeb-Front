@@ -67,61 +67,9 @@ interface PointsStyle {
   };
 }
 
-interface UseModelComponentPointsStyleReturn {
-  visibility: (modelId: string, componentId?: string) => boolean;
-  size: (modelId: string, componentId?: string) => number;
-  color: (modelId: string, componentId?: string) => RGBAColor;
-  activeColoring: (modelId: string, componentId?: string) => string;
-  vertexAttributeName: (modelId: string, componentId?: string) => string | undefined;
-  vertexAttributeItem: (modelId: string, componentId?: string) => number;
-  vertexAttributeRange: (
-    modelId: string,
-    componentId?: string,
-  ) => [number | undefined, number | undefined];
-  vertexAttributeColorMap: (modelId: string, componentId?: string) => string | undefined;
-  vertexAttributeNoDataColor: (modelId: string, componentId?: string) => RGBAColor;
-  setVisibility: (modelId: string, componentIds: string[], visibility: boolean) => Promise<unknown>;
-  setSize: (modelId: string, componentIds: string[], size: number) => Promise<unknown>;
-  setColor: (modelId: string, componentIds: string[], color: RGBAColor) => Promise<unknown>;
-  setActiveColoring: (
-    modelId: string,
-    componentIds: string[],
-    activeColoring: string,
-  ) => Promise<unknown>;
-  setVertexAttributeName: (
-    modelId: string,
-    componentIds: string[],
-    name: string,
-  ) => Promise<unknown>;
-  setVertexAttributeItem: (
-    modelId: string,
-    componentIds: string[],
-    item: number,
-  ) => Promise<unknown>;
-  setVertexAttributeRange: (
-    modelId: string,
-    componentIds: string[],
-    minimum: number,
-    maximum: number,
-  ) => Promise<unknown>;
-  setVertexAttributeColorMap: (
-    modelId: string,
-    componentIds: string[],
-    colorMap: string | undefined,
-  ) => Promise<unknown>;
-  setVertexAttributeNoDataColor: (
-    modelId: string,
-    componentIds: string[],
-    no_data_color: RGBAColor,
-  ) => Promise<unknown>;
-  mutateStyledPoints: (modelId: string, values: PointsStyle) => Promise<void>;
-  applyPointsStyle: (modelId: string) => Promise<void>;
-}
-
-// oxlint-disable-next-line max-lines-per-function, max-statements
-function useModelComponentPointsStyle(
-  type: PointsComponentType,
-): UseModelComponentPointsStyleReturn {
+// Return type is inferred, see ModelComponentPointsStyle: signatures live on the functions only
+// oxlint-disable-next-line max-lines-per-function, max-statements, typescript/explicit-function-return-type, typescript/explicit-module-boundary-types
+function useModelComponentPointsStyle(type: PointsComponentType) {
   const dataStore = useDataStore();
   const dataStyleState = useDataStyleState();
   const modelCommonStyle = useModelCommonStyle();
@@ -469,7 +417,7 @@ function useModelComponentPointsStyle(
   };
 }
 
-type ModelComponentPointsStyle = UseModelComponentPointsStyleReturn;
+type ModelComponentPointsStyle = ReturnType<typeof useModelComponentPointsStyle>;
 
 export { POINTS_COMPONENT_TYPES, useModelComponentPointsStyle };
 export type { ModelComponentPointsStyle };
