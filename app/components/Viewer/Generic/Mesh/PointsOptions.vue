@@ -172,7 +172,6 @@ async function setVertexAttributeRangesPerData(ranges: RangesPerData): Promise<v
           v-model:vertex_attribute_color_map="vertex_attribute_color_map"
           v-model:vertex_attribute_no_data_color="vertex_attribute_no_data_color"
           v-model:vertex_attribute_time_step="vertex_attribute_time_step"
-          :capabilities="{ vertex: { available: false } }"
         />
       </template>
     </template>

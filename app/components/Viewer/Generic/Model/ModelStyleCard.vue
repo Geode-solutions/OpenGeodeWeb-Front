@@ -1,95 +1,35 @@
 <script setup lang="ts">
+import {
+  type ModelMenuItemProps,
+  useModelMenuContext,
+} from "@ogw_front/composables/model_menu_context";
 import BlocksOptions from "./BlocksOptions.vue";
-import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import CornersOptions from "./CornersOptions.vue";
 import LinesOptions from "./LinesOptions.vue";
-import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import SurfacesOptions from "./SurfacesOptions.vue";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
-import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
-const dataStore = useDataStore();
 const { applyBatchStyle } = useBatchStyle();
 
 interface Props {
-  itemProps: Record<string, unknown>;
+  itemProps: ModelMenuItemProps;
 }
 
 const { itemProps } = defineProps<Props>();
 
-const modelId = computed<string>(() => itemProps.meta_data.modelId || itemProps.id);
-const componentId = computed<string | undefined>(() => itemProps.meta_data.pickedComponentId);
+const { modelId, componentId, componentType, collections, targetComponentIds } =
+  useModelMenuContext(() => itemProps);
 function visibleComponents(targetId: string): string[] {
   return dataStyleStore.visibleMeshComponents(targetId).value || [];
 }
-const componentType = ref<string | undefined>(undefined);
-const collections = ref<CollectionComponent[] | undefined>(undefined);
-
-watch(
-  () => [
-    modelId.value,
-    componentId.value,
-    itemProps.meta_data.viewer_type,
-    itemProps.meta_data.modelComponentType,
-  ],
-  async () => {
-    componentType.value = undefined;
-    collections.value = undefined;
-    if (itemProps.meta_data.viewer_type === "model_component_type") {
-      const { modelComponentType, targetComponentIds: ids } = itemProps.meta_data;
-      if (MESH_COMPONENT_TYPES.includes(modelComponentType)) {
-        componentType.value = modelComponentType;
-      } else {
-        const collectionsByType = await dataStore.fetchAllCollectionComponents(modelId.value);
-        collections.value = collectionsByType[modelComponentType].filter((collection) =>
-          collection.children.every((child) => ids.includes(child.id)),
-        );
-        componentType.value = collections.value[0].children[0].category;
-      }
-    } else if (componentId.value && modelId.value) {
-      const currentModelId = modelId.value;
-      const currentCompId = componentId.value;
-      const type = await dataStore.meshComponentType(currentModelId, currentCompId);
-      if (
-        modelId.value === currentModelId &&
-        componentId.value === currentCompId &&
-        itemProps.meta_data.viewer_type !== "model_component_type"
-      ) {
-        componentType.value = type;
-      }
-    }
-  },
-  { immediate: true },
-);
-
-const targetComponentIds = ref<string[]>([]);
-watch(
-  () => [modelId.value, componentType.value, itemProps.meta_data.targetComponentIds],
-  async () => {
-    targetComponentIds.value = [];
-    if (itemProps.meta_data.targetComponentIds) {
-      targetComponentIds.value = itemProps.meta_data.targetComponentIds;
-      return;
-    }
-    if (componentType.value && modelId.value) {
-      const currentModelId = modelId.value;
-      const currentType = componentType.value;
-      const ids = await dataStore.getMeshComponentGeodeIds(currentModelId, currentType);
-      if (modelId.value === currentModelId && componentType.value === currentType) {
-        targetComponentIds.value = ids;
-      }
-    }
-  },
-  { immediate: true },
-);
 
 const modelVisibility = computed<boolean | undefined>({
   get: () => dataStyleStore.modelVisibility(modelId.value),

@@ -4,6 +4,7 @@ import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelLinesColor } from "./color";
 import { useModelLinesCommonStyle } from "./common";
+import { useModelLinesPointsStyle } from "./points";
 import { useModelLinesVisibility } from "./visibility";
 
 interface ColorGroup {
@@ -29,6 +30,7 @@ async function setModelLinesDefaultStyle(_id: string): Promise<void> {
 export function useModelLinesStyle(): ReturnType<typeof useModelLinesCommonStyle> &
   ReturnType<typeof useModelLinesVisibility> &
   ReturnType<typeof useModelLinesColor> &
+  ReturnType<typeof useModelLinesPointsStyle> &
   ReturnType<typeof useModelLinesVertexAttribute> &
   ReturnType<typeof useModelLinesEdgeAttribute> & {
     applyModelLinesStyle: (modelId: string) => Promise<void>;
@@ -40,6 +42,7 @@ export function useModelLinesStyle(): ReturnType<typeof useModelLinesCommonStyle
   const modelColorStyle = useModelLinesColor();
   const modelLinesVertexAttribute = useModelLinesVertexAttribute();
   const modelLinesEdgeAttribute = useModelLinesEdgeAttribute();
+  const modelLinesPointsStyle = useModelLinesPointsStyle();
 
   async function applyModelLinesVisibilityStyle(
     modelId: string,
@@ -232,5 +235,6 @@ export function useModelLinesStyle(): ReturnType<typeof useModelLinesCommonStyle
     ...modelColorStyle,
     ...modelLinesVertexAttribute,
     ...modelLinesEdgeAttribute,
+    ...modelLinesPointsStyle,
   };
 }
