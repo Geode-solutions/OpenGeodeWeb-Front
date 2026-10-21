@@ -96,18 +96,26 @@ async function importWorkflow(files: readonly FileToImport[]): Promise<string[]>
   }
 
   const results: string[] = [];
+  const errors: unknown[] = [];
   async function processChunk(chunkIndex: number): Promise<void> {
     if (chunkIndex >= chunks.length) {
       return;
     }
     const chunk = chunks[chunkIndex] ?? [];
-    const chunk_results = await Promise.all(
+    // A failing file does not prevent the other files from being imported
+    const chunk_results = await Promise.allSettled(
       chunk.map(async ({ filename, geode_object_type }) => {
         const id = await importFile(filename, geode_object_type);
         return id;
       }),
     );
-    results.push(...chunk_results);
+    for (const result of chunk_results) {
+      if (result.status === "fulfilled") {
+        results.push(result.value);
+      } else {
+        errors.push(result.reason);
+      }
+    }
     await processChunk(chunkIndex + 1);
   }
   await processChunk(0);
@@ -116,6 +124,9 @@ async function importWorkflow(files: readonly FileToImport[]): Promise<string[]>
     hybridViewerStore.resetCamera();
   }
   await hybridViewerStore.remoteRender();
+  if (errors.length > 0) {
+    throw new AggregateError(errors, `${errors.length} file(s) could not be imported`);
+  }
   return results;
 }
 

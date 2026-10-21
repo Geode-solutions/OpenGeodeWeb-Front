@@ -15,12 +15,17 @@ interface FilePlan {
   mandatory_files: string[];
   additional_files: string[];
 }
+interface FileMissingFiles {
+  filename: string;
+  mandatory_files: string[];
+  additional_files: string[];
+}
 
 const schema = schemas.opengeodeweb_back.data_missing_files;
 const time_series_schema = schemas.opengeodeweb_back.time_series_missing_files;
 
 interface Emits {
-  update_values: [value: { additional_files: UploadFile[] }];
+  update_values: [value: { additional_files?: UploadFile[]; skipped_files?: string[] }];
   increment_step: [];
   decrement_step: [];
 }
@@ -29,7 +34,8 @@ const emit = defineEmits<Emits>();
 
 interface Props {
   multiple: boolean;
-  geodeObjectType: string;
+  // Filename -> geode object type, each file is checked with its own type (unused for time series)
+  geodeObjectTypes?: Record<string, string>;
   filenames: string[];
   files?: UploadFile[];
   timeSeries?: boolean;
@@ -37,7 +43,7 @@ interface Props {
 
 const {
   multiple,
-  geodeObjectType,
+  geodeObjectTypes = {},
   filenames,
   files = [],
   timeSeries = false,
@@ -48,11 +54,36 @@ const loading = ref<boolean>(false);
 const has_missing_files = ref<boolean>(false);
 const mandatory_files = ref<string[]>([]);
 const additional_files = ref<string[]>([]);
+const missing_by_file = ref<FileMissingFiles[]>([]);
+// Files left out at the data type step are not checked
+const checked_filenames = computed(() =>
+  timeSeries ? filenames : filenames.filter((filename) => filename in geodeObjectTypes),
+);
+// Files whose mandatory files are missing are skipped when the step is skipped
+const files_without_mandatory = computed(() =>
+  checked_filenames.value.filter(
+    (filename) =>
+      !missing_by_file.value.some(
+        (missing) => missing.filename === filename && missing.mandatory_files.length > 0,
+      ),
+  ),
+);
+const can_skip = computed(
+  () => missing_by_file.value.length > 0 && files_without_mandatory.value.length > 0,
+);
 const toggle_loading = useToggle(loading);
 const uploading = ref<boolean>(false);
 
 function files_uploaded_event(value: UploadFile[]): void {
-  emit("update_values", { additional_files: value });
+  emit("update_values", { additional_files: value, skipped_files: [] });
+  emit("increment_step");
+}
+
+function skip_step(): void {
+  const skipped_files = checked_filenames.value.filter(
+    (filename) => !files_without_mandatory.value.includes(filename),
+  );
+  emit("update_values", { skipped_files });
   emit("increment_step");
 }
 
@@ -65,9 +96,10 @@ async function missing_files(): Promise<void> {
   has_missing_files.value = false;
   mandatory_files.value = [];
   additional_files.value = [];
+  missing_by_file.value = [];
   const backStore = useBackStore();
 
-  const promise_array: Promise<FilePlan>[] = filenames.map((filename): Promise<FilePlan> => {
+  const promise_array = checked_filenames.value.map((filename): Promise<FilePlan> => {
     if (isCsvFile(filename)) {
       return Promise.resolve({
         has_missing_files: false,
@@ -78,13 +110,18 @@ async function missing_files(): Promise<void> {
     if (timeSeries) {
       return backStore.request({ schema: time_series_schema, params: { filename } });
     }
-    const params = { geode_object_type: geodeObjectType, filename };
+    const params = { geode_object_type: geodeObjectTypes[filename] ?? "", filename };
     return backStore.request({ schema, params });
   });
   const values = await Promise.all(promise_array);
-  for (const value of values) {
+  for (const [index, value] of values.entries()) {
     if (value.has_missing_files) {
       has_missing_files.value = true;
+      missing_by_file.value.push({
+        filename: checked_filenames.value[index] ?? "",
+        mandatory_files: value.mandatory_files,
+        additional_files: value.additional_files,
+      });
     }
     mandatory_files.value = [...mandatory_files.value, ...value.mandatory_files];
     additional_files.value = [...additional_files.value, ...value.additional_files];
@@ -98,6 +135,7 @@ async function missing_files(): Promise<void> {
   }
 
   if (!has_missing_files.value) {
+    emit("update_values", { skipped_files: [] });
     emit("increment_step");
   }
   toggle_loading();
@@ -159,7 +197,40 @@ await missing_files();
 <template>
   <FetchingData v-if="loading || uploading" />
   <v-container v-else-if="has_missing_files">
-    <v-row v-if="mandatory_files.length" align="center">
+    <template v-if="checked_filenames.length > 1">
+      <div v-for="missing in missing_by_file" :key="missing.filename" class="mb-2">
+        <v-row align="center">
+          <p class="pa-1 font-weight-bold">{{ missing.filename }}</p>
+          <v-chip
+            v-if="missing.mandatory_files.length && files_without_mandatory.length"
+            class="ma-1"
+            color="warning"
+            size="small"
+          >
+            Skipped if mandatory files are not added
+          </v-chip>
+        </v-row>
+        <v-row v-if="missing.mandatory_files.length" align="center">
+          <v-col cols="auto" class="pa-0">
+            <v-icon color="warning" icon="mdi-file-document-alert-outline" />
+          </v-col>
+          <p class="pa-1">Mandatory files:</p>
+          <v-col v-for="mandatory_file in missing.mandatory_files" cols="auto" class="pa-0">
+            <v-chip>{{ mandatory_file }}</v-chip>
+          </v-col>
+        </v-row>
+        <v-row v-if="missing.additional_files.length" align="center">
+          <v-col cols="auto" class="pa-0">
+            <v-icon color="accent" icon="mdi-file-document-plus-outline" />
+          </v-col>
+          <p class="pa-1">Additional files:</p>
+          <v-col v-for="additional_file in missing.additional_files" cols="auto" class="pa-0">
+            <v-chip>{{ additional_file }}</v-chip>
+          </v-col>
+        </v-row>
+      </div>
+    </template>
+    <v-row v-else-if="mandatory_files.length" align="center">
       <v-col cols="auto" class="pa-0">
         <v-icon color="warning" icon="mdi-file-document-alert-outline" />
       </v-col>
@@ -168,7 +239,7 @@ await missing_files();
         <v-chip>{{ mandatory_file }}</v-chip>
       </v-col>
     </v-row>
-    <v-row v-if="additional_files.length" align="center">
+    <v-row v-if="!(checked_filenames.length > 1) && additional_files.length" align="center">
       <v-col cols="auto" class="pa-0">
         <v-icon color="accent" icon="mdi-file-document-plus-outline" />
       </v-col>
@@ -194,8 +265,10 @@ await missing_files();
       </v-col>
     </v-row>
     <v-row>
-      <v-col v-if="mandatory_files.length === 0 && additional_files.length > 0" cols="auto">
-        <v-btn @click="emit('increment_step')" color="warning">Skip step</v-btn>
+      <v-col v-if="can_skip" cols="auto">
+        <v-btn @click="skip_step" color="warning" data-testid="skipMissingFilesButton">
+          Skip step
+        </v-btn>
       </v-col>
     </v-row>
   </v-container>

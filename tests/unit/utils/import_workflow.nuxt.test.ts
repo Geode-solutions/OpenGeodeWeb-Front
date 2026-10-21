@@ -3,8 +3,8 @@
 import { type Mock, describe, expect, test, vi } from "vitest";
 
 // Local imports
+import { applyTimeSeriesWorkflow, importWorkflow } from "@ogw_front/utils/import_workflow";
 import { mockAs, setupActivePinia } from "@ogw_tests/utils";
-import { applyTimeSeriesWorkflow } from "@ogw_front/utils/import_workflow";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -73,5 +73,32 @@ describe("apply time series workflow", () => {
     await applyTimeSeriesWorkflow("time_series.pvd", "brep_id");
 
     expect(addDataStyle).not.toHaveBeenCalled();
+  });
+});
+
+describe("import workflow", () => {
+  setupActivePinia();
+
+  test("a failing file does not prevent the others from being imported", async () => {
+    const { request, remoteRender } = setup();
+    request
+      .mockRejectedValueOnce(new Error("cannot load"))
+      .mockResolvedValueOnce({ id: "model.og_brep", name: "model", viewer_type: "mesh" });
+    const dataStore = useDataStore();
+    dataStore.addItem = mockAs<typeof dataStore.addItem>(vi.fn().mockResolvedValue(undefined));
+    dataStore.isItemViewable = mockAs<typeof dataStore.isItemViewable>(
+      vi.fn().mockResolvedValue(false),
+    );
+
+    await expect(
+      importWorkflow([
+        { filename: "broken.vtu", geode_object_type: "SolidMesh3D" },
+        { filename: "model.og_brep", geode_object_type: "BRep" },
+      ]),
+    ).rejects.toThrow("1 file(s) could not be imported");
+    expect(dataStore.addItem).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "model.og_brep" }),
+    );
+    expect(remoteRender).toHaveBeenCalledWith();
   });
 });

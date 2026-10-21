@@ -61,7 +61,7 @@ describe("missing files selector", () => {
       },
       props: {
         multiple: false,
-        geode_object_type: "BRep",
+        geodeObjectTypes: { "fake_file.txt": "BRep" },
         filenames: ["fake_file.txt"],
       },
     });
@@ -90,6 +90,7 @@ describe("missing files selector", () => {
     expect(wrapper.emitted<unknown[]>().update_values).toHaveLength(EXPECTED_LENGTH);
     expect(wrapper.emitted<unknown[]>().update_values?.[FIRST_INDEX]?.[FIRST_INDEX]).toStrictEqual({
       additional_files: files,
+      skipped_files: [],
     });
     expect(wrapper.emitted().increment_step).toHaveLength(EXPECTED_LENGTH);
   });
@@ -106,7 +107,7 @@ describe("missing files selector", () => {
 
     const wrapper = await mountSuspended(MissingFilesSelector, {
       global: { plugins: [vuetify, pinia] },
-      props: { multiple: false, geodeObjectType: "BRep", filenames: ["a.pvd"], timeSeries: true },
+      props: { multiple: false, filenames: ["a.pvd"], timeSeries: true },
     });
     const folder = [
       Object.assign(new File(["b"], "b.vtu"), { relativePath: "run/outputs/a/b.vtu" }),
@@ -135,12 +136,49 @@ describe("missing files selector", () => {
 
     const wrapper = await mountSuspended(MissingFilesSelector, {
       global: { plugins: [vuetify, pinia] },
-      props: { multiple: false, geodeObjectType: "BRep", filenames: ["a.pvd"], timeSeries: true },
+      props: { multiple: false, filenames: ["a.pvd"], timeSeries: true },
     });
     wrapper.findComponent(DragAndDrop).vm.$emit("files-selected", [new File(["x"], "other.txt")]);
     await flushPromises();
 
     expect(warning_spy).toHaveBeenCalledWith("The selected folder does not contain: a.vtm");
     expect(wrapper.emitted().increment_step).toBeUndefined();
+  });
+
+  test("per file: checks each file with its own type and skips files missing mandatory files", async () => {
+    const missing_by_file: Record<string, object> = {
+      "a.vtu": missing(["a.vtp"]),
+      "b.og_brep": missing([]),
+    };
+    const request_mock = vi.fn(
+      async ({ params }: { params: { filename: string; geode_object_type: string } }) => {
+        await Promise.resolve();
+        return missing_by_file[params.filename];
+      },
+    );
+    backStore.request = mockAs<typeof backStore.request>(request_mock);
+
+    const wrapper = await mountSuspended(MissingFilesSelector, {
+      global: { plugins: [vuetify, pinia] },
+      props: {
+        multiple: true,
+        geodeObjectTypes: { "a.vtu": "SolidMesh3D", "b.og_brep": "BRep" },
+        filenames: ["a.vtu", "b.og_brep", "file.toto"],
+      },
+    });
+    await flushPromises();
+
+    expect(request_mock.mock.calls.map(([request]) => request.params)).toStrictEqual([
+      { geode_object_type: "SolidMesh3D", filename: "a.vtu" },
+      { geode_object_type: "BRep", filename: "b.og_brep" },
+    ]);
+    expect(wrapper.text()).toContain("a.vtu");
+    expect(wrapper.text()).toContain("Skipped if mandatory files are not added");
+
+    await wrapper.find('[data-testid="skipMissingFilesButton"]').trigger("click");
+    expect(wrapper.emitted<unknown[]>().update_values?.[FIRST_INDEX]?.[FIRST_INDEX]).toStrictEqual({
+      skipped_files: ["a.vtu"],
+    });
+    expect(wrapper.emitted().increment_step).toHaveLength(EXPECTED_LENGTH);
   });
 });

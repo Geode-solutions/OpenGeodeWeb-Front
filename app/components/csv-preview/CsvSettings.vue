@@ -26,7 +26,7 @@ const emit = defineEmits<Emits>();
 const separators = [
   { title: "Comma (,)", value: "," },
   { title: "Semicolon (;)", value: ";" },
-  { title: "Tab (\\t)", value: "\t" },
+  { title: String.raw`Tab (\t)`, value: "\t" },
   { title: "Space ( )", value: " " },
   { title: "Pipe (|)", value: "|" },
   { title: "Custom", value: "custom" },
