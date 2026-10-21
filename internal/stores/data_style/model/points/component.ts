@@ -1,5 +1,10 @@
 // oxlint-disable eslint/max-lines
 import {
+  type AttributeState,
+  type AttributeStoredConfig,
+  groupBy,
+} from "@ogw_internal/stores/data_style/model/component_style";
+import {
   DEFAULT_NO_DATA_COLOR,
   POINTS_DEFAULT_COLOR,
   POINTS_DEFAULT_SIZE,
@@ -33,29 +38,6 @@ type PointsRequestSchema =
   | PointsSchemas["size"]
   | PointsSchemas["color"]
   | PointsSchemas["attribute"]["vertex"]["attribute"];
-
-function groupBy(componentIds: string[], key: (componentId: string) => string): string[][] {
-  const groups: Record<string, string[]> = {};
-  for (const componentId of componentIds) {
-    const groupKey = key(componentId);
-    groups[groupKey] ??= [];
-    groups[groupKey].push(componentId);
-  }
-  return Object.values(groups);
-}
-
-interface AttributeStoredConfig {
-  minimum: number | undefined;
-  maximum: number | undefined;
-  colorMap: string | undefined;
-  no_data_color: RGBAColor;
-}
-
-interface AttributeState {
-  name?: string;
-  item?: number;
-  storedConfigs?: Record<string, { lastItem: number } & Record<string, AttributeStoredConfig>>;
-}
 
 interface PointsStyle {
   visibility?: boolean;
