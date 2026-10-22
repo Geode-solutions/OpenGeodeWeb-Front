@@ -1,14 +1,34 @@
+import { ACTOR_COLOR, RGB_MAX } from "./constants";
 import type { HybridDb, vtkActor as VtkActorInstance } from "./vtk_types";
 import { requireRenderWindow, useHybridViewerCore } from "./core";
-import { ACTOR_COLOR } from "./constants";
+import viewer_schemas, {
+  type ViewerSetBackgroundColorParams,
+} from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 import { base64ToArrayBuffer } from "./base64";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useViewerStore } from "@ogw_front/stores/viewer";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
 import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper";
 import type vtkPolyData from "@kitware/vtk.js/Common/DataModel/PolyData";
 import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLPolyDataReader";
+
+async function setBackgroundColor(color: ViewerSetBackgroundColorParams["color"]): Promise<void> {
+  const { genericRenderWindow, remoteRender } = useHybridViewerCore();
+  const renderer = requireRenderWindow(genericRenderWindow).getRenderer();
+  renderer.setBackground([color.r / RGB_MAX, color.g / RGB_MAX, color.b / RGB_MAX]);
+  const renderWindow = requireRenderWindow(genericRenderWindow).getRenderWindow();
+  renderWindow.render();
+  const viewerStore = useViewerStore();
+  const schema = viewer_schemas.opengeodeweb_viewer.viewer.set_background_color;
+  const params = {
+    color,
+  };
+  await viewerStore.request({
+    schema,
+    params,
+  });
+  await remoteRender();
+}
 
 // Shared via createSharedComposable (rather than merged into the parent hybridViewer store) so sibling slices, e.g. camera.ts and ruler.ts, can read hybridDb/setZScaling directly without importing the parent store and creating a cycle. A Pinia store would work too but its $id/$patch/... properties would leak into the composed store's spread and collapse its inferred type.
 const useHybridViewerScene = createSharedComposable(() => {
@@ -122,6 +142,7 @@ const useHybridViewerScene = createSharedComposable(() => {
     removeItem,
     setVisibility,
     setZScaling,
+    setBackgroundColor,
     clear,
   };
 });
