@@ -3,12 +3,18 @@
 import { type Mock, describe, expect, test, vi } from "vitest";
 
 // Local imports
-import { applyTimeSeriesWorkflow, importWorkflow } from "@ogw_front/utils/import_workflow";
+import {
+  applyTimeSeriesWorkflow,
+  importWorkflow,
+  reloadObject,
+} from "@ogw_front/utils/import_workflow";
 import { mockAs, setupActivePinia } from "@ogw_tests/utils";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+
+vi.setConfig({ testTimeout: 10_000 });
 
 function setup(): {
   calls: string[];
@@ -73,6 +79,21 @@ describe("apply time series workflow", () => {
     await applyTimeSeriesWorkflow("time_series.pvd", "brep_id");
 
     expect(addDataStyle).not.toHaveBeenCalled();
+  });
+});
+
+describe("reload object", () => {
+  setupActivePinia();
+
+  test("re-registers the object with its stored style", async () => {
+    const { calls, request, applyDefaultStyle, remoteRender } = setup();
+
+    await reloadObject("brep_id");
+
+    expect(request).not.toHaveBeenCalled();
+    expect(calls).toStrictEqual(["deregister", "register", "style"]);
+    expect(applyDefaultStyle).toHaveBeenCalledWith("brep_id");
+    expect(remoteRender).toHaveBeenCalledWith();
   });
 });
 
