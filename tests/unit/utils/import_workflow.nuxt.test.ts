@@ -22,6 +22,7 @@ function setup(): {
   applyDefaultStyle: Mock;
   addDataStyle: Mock;
   remoteRender: Mock;
+  addHybridItem: Mock;
 } {
   const calls: string[] = [];
   const backStore = useBackStore();
@@ -35,6 +36,9 @@ function setup(): {
   });
   const addDataStyle = vi.fn();
   const remoteRender = vi.fn();
+  const addHybridItem = vi.fn().mockImplementation(() => {
+    calls.push("hybrid");
+  });
   backStore.request = mockAs<typeof backStore.request>(request);
   dataStore.item = mockAs<typeof dataStore.item>(
     vi.fn().mockResolvedValue({ id: "brep_id", name: "cube" }),
@@ -53,7 +57,8 @@ function setup(): {
     mockAs<typeof dataStyleStore.applyDefaultStyle>(applyDefaultStyle);
   dataStyleStore.addDataStyle = mockAs<typeof dataStyleStore.addDataStyle>(addDataStyle);
   hybridViewerStore.remoteRender = mockAs<typeof hybridViewerStore.remoteRender>(remoteRender);
-  return { calls, request, applyDefaultStyle, addDataStyle, remoteRender };
+  hybridViewerStore.addItem = mockAs<typeof hybridViewerStore.addItem>(addHybridItem);
+  return { calls, request, applyDefaultStyle, addDataStyle, remoteRender, addHybridItem };
 }
 
 describe("apply time series workflow", () => {
@@ -68,7 +73,7 @@ describe("apply time series workflow", () => {
     expect(request).toHaveBeenCalledWith(
       expect.objectContaining({ params: { id: "brep_id", filename: "time_series.pvd" } }),
     );
-    expect(calls).toStrictEqual(["deregister", "register", "style"]);
+    expect(calls).toStrictEqual(["deregister", "register", "hybrid", "style"]);
     expect(applyDefaultStyle).toHaveBeenCalledWith("brep_id");
     expect(remoteRender).toHaveBeenCalledWith();
   });
@@ -91,7 +96,8 @@ describe("reload object", () => {
     await reloadObject("brep_id");
 
     expect(request).not.toHaveBeenCalled();
-    expect(calls).toStrictEqual(["deregister", "register", "style"]);
+    // The local actor is rebuilt too: the light viewable may have moved
+    expect(calls).toStrictEqual(["deregister", "register", "hybrid", "style"]);
     expect(applyDefaultStyle).toHaveBeenCalledWith("brep_id");
     expect(remoteRender).toHaveBeenCalledWith();
   });

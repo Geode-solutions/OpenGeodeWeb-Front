@@ -170,6 +170,8 @@ async function reloadObject(id: string): Promise<void> {
   const item = await dataStore.item(id);
   await dataStore.deregisterObject(id);
   await dataStore.registerObject(id, item.name ?? id);
+  // The local actor is rebuilt from the stored light viewable, which may have moved
+  await hybridViewerStore.addItem(id);
   await dataStyleStore.applyDefaultStyle(id);
   await hybridViewerStore.remoteRender();
 }
