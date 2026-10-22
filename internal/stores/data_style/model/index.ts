@@ -61,11 +61,13 @@ function useModelStyle(): UseModelStyleReturn {
       modelPointsStyle.applyModelPointsStyle(modelId),
       modelEdgesStyle.applyModelEdgesStyle(modelId),
     ]);
-    // Components points come after the model points, which override every component
+    // Components points and edges come after the model ones, which override every component
     await Promise.all([
       modelSurfacesStyle.applyModelSurfacesPointsStyle(modelId),
       modelLinesStyle.applyModelLinesPointsStyle(modelId),
       modelBlocksStyle.applyModelBlocksPointsStyle(modelId),
+      modelSurfacesStyle.applyModelSurfacesEdgesStyle(modelId),
+      modelBlocksStyle.applyModelBlocksEdgesStyle(modelId),
     ]);
     return results;
   }

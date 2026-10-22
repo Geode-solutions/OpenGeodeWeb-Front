@@ -2,36 +2,14 @@
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import ModelEdgesCard from "./ModelEdgesCard.vue";
 import SurfaceEdges from "@ogw_front/assets/viewer_svgs/surface_edges.svg";
-import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
-import { useBatchStyle } from "@ogw_front/composables/batch_style";
-import { useDataStyleStore } from "@ogw_front/stores/data_style";
-import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-
-const dataStyleStore = useDataStyleStore();
-const hybridViewerStore = useHybridViewerStore();
-const { applyBatchStyle } = useBatchStyle();
 
 interface Props {
   itemProps: ItemProps & { index: number };
 }
 
 const { itemProps } = defineProps<Props>();
-
-const id = computed(() => (itemProps.meta_data.modelId as string | undefined) || itemProps.id);
-
-const visibility = computed({
-  get: () => dataStyleStore.modelEdgesVisibility(id.value),
-  set: async (newValue) => {
-    if (newValue === undefined) {
-      return;
-    }
-    await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setModelEdgesVisibility(targetId, newValue),
-    );
-    hybridViewerStore.remoteRender();
-  },
-});
 </script>
 
 <template>
@@ -43,10 +21,7 @@ const visibility = computed({
     :btnImage="SurfaceEdges"
   >
     <template #options>
-      <ViewerOptionsVisibilitySwitch
-        data-testid="modelEdgesVisibilitySwitch"
-        v-model="visibility"
-      />
+      <ModelEdgesCard :itemProps="itemProps" />
     </template>
   </ViewerContextMenuItem>
 </template>

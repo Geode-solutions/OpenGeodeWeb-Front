@@ -11,5 +11,9 @@ const { itemProps } = defineProps<Props>();
 </script>
 
 <template>
-  <ViewerGenericMeshEdgesOptions :itemProps="itemProps" :btnImage="Grid3D_Edges" />
+  <ViewerGenericMeshEdgesOptions
+    :itemProps="itemProps"
+    :btnImage="Grid3D_Edges"
+    :capabilities="{ edge: { available: false } }"
+  />
 </template>
