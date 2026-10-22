@@ -116,10 +116,12 @@ onMounted(async () => {
   <ClientOnly>
     <div style="position: relative; width: 100%; height: 100%">
       <ColormapQuickPicker
+        :key="quickColormap.data_id"
         v-model:show="quickColormap.show"
         :x="quickColormap.x"
         :y="quickColormap.y"
         :data-id="quickColormap.data_id"
+        :block-ids="quickColormap.block_ids"
       />
       <ViewToolbar />
       <slot name="ui"></slot>

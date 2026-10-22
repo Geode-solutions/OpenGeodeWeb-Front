@@ -9,11 +9,13 @@ export function useQuickColormap(): {
   const viewerStore = useViewerStore();
   const quickColormap = reactive<{
     data_id: string | undefined;
+    block_ids: number[] | undefined;
     show: boolean;
     x: number;
     y: number;
   }>({
     data_id: undefined,
+    block_ids: undefined,
     show: false,
     x: 0,
     y: 0,
@@ -28,9 +30,10 @@ export function useQuickColormap(): {
     try {
       const schema = viewer_schemas.opengeodeweb_viewer.viewer.pick_colormap;
       const params = { x: offsetX, y: offsetY };
-      const { data_id } = await viewerStore.request({ schema, params });
+      const { data_id, block_ids } = await viewerStore.request({ schema, params });
       if (data_id !== undefined && data_id !== "") {
         quickColormap.data_id = data_id;
+        quickColormap.block_ids = block_ids;
         quickColormap.x = clientX;
         quickColormap.y = clientY;
         quickColormap.show = true;

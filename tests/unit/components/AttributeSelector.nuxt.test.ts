@@ -84,7 +84,7 @@ describe("attributeSelector time steps", () => {
     const wrapper = await mountSelector("temperature", 1);
 
     expect(wrapper.find('[data-testid="timeStepSlider"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="timeStepValue"]').text()).toBe("t = 1");
+    expect(wrapper.find('[data-testid="timeStepValue"]').text()).toBe("timestep = 1");
   });
 
   test("hides the slider for a non temporal attribute", async () => {

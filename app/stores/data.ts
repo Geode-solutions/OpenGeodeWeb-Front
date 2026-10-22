@@ -285,6 +285,17 @@ export const useDataStore = defineStore("data", () => {
       .first();
     return component;
   }
+  async function getComponentsByViewerIds(
+    modelId: string,
+    viewer_ids: number[],
+  ): Promise<ModelComponentRecord[]> {
+    const components = await model_components_db
+      .where("viewer_id")
+      .anyOf(viewer_ids)
+      .and((model_component: ModelComponentRecord) => model_component.id === modelId)
+      .toArray();
+    return components;
+  }
   async function deleteModelComponents(modelId: string): Promise<void> {
     await model_components_db.where("id").equals(modelId).delete();
     await model_components_relation_db.where("id").equals(modelId).delete();
@@ -365,6 +376,7 @@ export const useDataStore = defineStore("data", () => {
     getAllModelComponentsViewerIds,
     getMeshComponentsViewerIds,
     getComponentByViewerId,
+    getComponentsByViewerIds,
     exportStores,
     importStores,
     clear,
