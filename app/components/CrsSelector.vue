@@ -2,22 +2,14 @@
 import schemas, { type CRSList } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { useBackStore } from "@ogw_front/stores/back";
 
-const schema = schemas.opengeodeweb_back.geographic_coordinate_systems;
-
-interface Emits {
-  update_values: [values: Record<string, unknown>];
-  increment_step: [];
-  decrement_step: [];
-}
-
-const emit = defineEmits<Emits>();
+const schema = schemas.opengeodeweb_back.crs.geographic_list;
 
 interface Props {
   geodeObjectType: string;
-  keyToUpdate: string;
 }
 
-const { geodeObjectType, keyToUpdate } = defineProps<Props>();
+const { geodeObjectType } = defineProps<Props>();
+const selectedCrs = defineModel<CRSList | undefined>();
 
 const search = ref<string>("");
 const data_table_loading = ref<boolean>(false);
@@ -26,24 +18,20 @@ const selected_crs = ref<unknown[]>([]);
 const toggle_loading = useToggle(data_table_loading);
 const backStore = useBackStore();
 
-function get_selected_crs(crs_code: unknown): unknown {
-  for (const crs of crs_list.value) {
-    if (crs.code === crs_code) {
-      return crs;
-    }
-  }
+// Codes are only unique within an authority (e.g. EPSG:4812 and ESRI:4812)
+function crs_key(crs: CRSList): string {
+  return `${crs.authority}:${crs.code}`;
+}
+
+function get_selected_crs(key: unknown): CRSList | undefined {
+  return crs_list.value.find((crs) => crs_key(crs) === key);
 }
 
 watch(selected_crs, (new_value) => {
-  const crs = get_selected_crs(new_value[0]);
-  const keys_values_object = {
-    [keyToUpdate]: crs,
-  };
-  emit("update_values", keys_values_object);
-  emit("increment_step");
+  selectedCrs.value = get_selected_crs(new_value[0]);
 });
 
-async function get_crs_table(): void {
+async function get_crs_table(): Promise<void> {
   const params = { geode_object_type: geodeObjectType };
   toggle_loading();
   await backStore.request(
@@ -68,13 +56,16 @@ const headers = [
   { title: "Name", align: "end", key: "name" },
 ] as const;
 
-// oxlint-disable-next-line no-top-level-await
-await get_crs_table();
+// Not awaited in setup: the table renders right away with its loader
+onMounted(async () => {
+  await get_crs_table();
+});
 </script>
 
 <template>
   <v-text-field
     v-model="search"
+    data-testid="crsSearchInput"
     append-icon="mdi-magnify"
     label="Search"
     single-line
@@ -85,7 +76,7 @@ await get_crs_table();
     :v-model:items-per-page="10"
     :headers="headers"
     :items="crs_list"
-    item-value="code"
+    :item-value="crs_key"
     class="elevation-1"
     density="compact"
     fixed-header
