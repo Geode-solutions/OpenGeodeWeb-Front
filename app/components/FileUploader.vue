@@ -176,7 +176,7 @@ watch(
     @folders-ignored="warnFoldersIgnored"
   />
 
-  <v-card-text v-if="internal_files.length" class="mt-6 pa-0">
+  <v-card-text v-if="!mini && internal_files.length" class="mt-6 pa-0">
     <v-sheet class="d-flex align-center mb-4" color="transparent">
       <v-icon icon="mdi-file-check" class="mr-3" color="primary" size="24" />
       <span class="text-subtitle-1 font-weight-bold text-white"> Selected files </span>
