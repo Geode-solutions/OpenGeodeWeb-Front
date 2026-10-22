@@ -25,6 +25,14 @@ async function sleep(milliseconds: number): Promise<void> {
   });
 }
 
+function firstElement<Item>(array: readonly Item[]): Item {
+  const [element] = array;
+  if (element === undefined) {
+    throw new Error("Expected array to contain at least one element");
+  }
+  return element;
+}
+
 let id = "";
 let projectFolderPath = "";
 
@@ -66,10 +74,7 @@ describe("model edges", () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();
-      const [surface_id] = await dataStore.getSurfacesGeodeIds(id);
-      if (surface_id === undefined) {
-        throw new Error("Expected the model to contain a surface");
-      }
+      const surface_id = firstElement(await dataStore.getSurfacesGeodeIds(id));
       await dataStyleStore.setModelSurfacesEdgesWidth(id, [surface_id], COMPONENT_EDGES_WIDTH);
       const spy = vi.spyOn(viewerStore, "request");
       spy.mockClear();
