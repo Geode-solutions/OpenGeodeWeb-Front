@@ -101,6 +101,15 @@ function toggleTool(toolRef: Ref<boolean>): void {
   toolRef.value = !toolRef.value;
 }
 
+// Best effort: the operating system may intercept PrintScreen before the browser, and only fires keyup when it does not
+onKeyStroke(
+  "PrintScreen",
+  () => {
+    toggleTool(showScreenshot);
+  },
+  { eventName: "keyup" },
+);
+
 function toggleHoverHighlight(fieldType: PickedFieldType): void {
   const activate =
     !hybridViewerStore.is_hover_highlight ||
