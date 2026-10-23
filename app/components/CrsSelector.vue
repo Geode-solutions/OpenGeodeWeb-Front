@@ -4,9 +4,11 @@ import { useCrsStore } from "@ogw_front/stores/crs";
 
 interface Props {
   geodeObjectType: string;
+  // Narrow containers: one "AUTHORITY:CODE" column and a truncated name
+  compact?: boolean;
 }
 
-const { geodeObjectType } = defineProps<Props>();
+const { geodeObjectType, compact = false } = defineProps<Props>();
 const selectedCrs = defineModel<CRSList | undefined>();
 
 const search = ref<string>("");
@@ -35,7 +37,7 @@ async function get_crs_table(): Promise<void> {
   toggle_loading();
 }
 
-const headers = [
+const full_headers = [
   {
     title: "Authority",
     align: "start",
@@ -45,6 +47,14 @@ const headers = [
   { title: "Code", align: "end", key: "code" },
   { title: "Name", align: "end", key: "name" },
 ] as const;
+
+// A max width of 0 lets the name take the remaining space and truncate instead of wrapping
+const compact_headers = [
+  { title: "Code", align: "start", key: "code", value: crs_key, width: 110, nowrap: true },
+  { title: "Name", align: "start", key: "name", maxWidth: 0, nowrap: true },
+] as const;
+
+const headers = computed(() => (compact ? compact_headers : full_headers));
 
 // Not awaited in setup: the table renders right away with its loader
 onMounted(async () => {
@@ -56,7 +66,8 @@ onMounted(async () => {
   <v-text-field
     v-model="search"
     data-testid="crsSearchInput"
-    append-icon="mdi-magnify"
+    :append-icon="compact ? undefined : 'mdi-magnify'"
+    :prepend-inner-icon="compact ? 'mdi-magnify' : undefined"
     label="Search"
     single-line
     hide-details
@@ -75,5 +86,14 @@ onMounted(async () => {
     :search="search"
     :loading="data_table_loading"
     loading-text="Loading... Please wait"
-  ></v-data-table>
+  >
+    <template v-if="compact" #[`item.name`]="{ value }">
+      <v-tooltip :text="value" location="top">
+        <template #activator="{ props: tooltipProps }">
+          <span v-bind="tooltipProps">{{ value }}</span>
+        </template>
+      </v-tooltip>
+    </template>
+  </v-data-table>
 </template>
+

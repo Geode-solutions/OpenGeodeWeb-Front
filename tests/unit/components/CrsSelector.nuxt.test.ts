@@ -84,6 +84,26 @@ describe("crs selector", () => {
     ).toStrictEqual(crs_list[ESRI_INDEX]);
   });
 
+  test("compact mode shows the authority code and the name only", async () => {
+    const crs_list = [{ authority: "EPSG", code: "2154", name: "RGF93 v1 / Lambert-93" }];
+    const crsStore = useCrsStore();
+    crsStore.geographicList = mockAs<typeof crsStore.geographicList>(
+      vi.fn().mockResolvedValue(crs_list),
+    );
+
+    const wrapper = await mountSuspended(CrsSelector, {
+      global: {
+        plugins: [vuetify, pinia],
+      },
+      props: { geodeObjectType: "BRep", compact: true },
+    });
+    await wrapper.vm.$nextTick();
+    const headers = wrapper.findAll("th").map((header) => header.text());
+    expect(headers).toStrictEqual(["", "Code", "Name"]);
+    const cells = wrapper.findAll("tbody td").map((cell) => cell.text());
+    expect(cells).toStrictEqual(["", "EPSG:2154", "RGF93 v1 / Lambert-93"]);
+  });
+
   test("shows the table loader while the crs list loads", async () => {
     const crsStore = useCrsStore();
     crsStore.geographicList = mockAs<typeof crsStore.geographicList>(
