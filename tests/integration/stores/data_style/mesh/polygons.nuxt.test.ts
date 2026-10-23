@@ -249,6 +249,24 @@ describe("mesh polygons", () => {
       expect(dataStyleStore.meshPolygonsActiveColoring(id)).toBe(coloringName);
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
+
+    test("coloring textures without textures", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const spy = vi.spyOn(viewerStore, "request");
+      const coloringName = "textures";
+      const result = dataStyleStore.setMeshPolygonsActiveColoring(id, coloringName);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      expect(spy).not.toHaveBeenCalledWith(
+        // oxlint-disable-next-line no-unsafe-assignment -- expect.objectContaining is untyped by design, this is a vitest matcher.
+        expect.objectContaining({ schema: viewer_schemas.opengeodeweb_viewer.mesh.apply_textures }),
+        // oxlint-disable-next-line no-unsafe-assignment -- expect.anything is untyped by design, this is a vitest matcher.
+        expect.anything(),
+      );
+      expect(dataStyleStore.meshPolygonsActiveColoring(id)).toBe(coloringName);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
   });
 
   test("polygons apply default style", async () => {
