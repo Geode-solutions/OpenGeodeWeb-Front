@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import { formatCrs, formatCrsCode } from "@ogw_front/utils/crs";
 import GlassCard from "@ogw_front/components/GlassCard.vue";
 import { consola } from "consola";
 import { middleTruncate } from "@ogw_front/utils/string";
 import { useCopyToClipboard } from "@ogw_front/composables/copy_to_clipboard";
+import { useCrsStore } from "@ogw_front/stores/crs";
 import { useDataStore } from "@ogw_front/stores/data";
+import { useLiveDataItem } from "@ogw_front/composables/live_data_item";
 import { useMenuStore } from "@ogw_front/stores/menu";
 
 interface Props {
@@ -126,6 +129,13 @@ function formatId(id: string | undefined): string {
 }
 
 const formattedId = computed<string>(() => formatId(metaData.id));
+
+const crsStore = useCrsStore();
+// A model component shares the model CRS: the CRS row is only shown for a data
+const isData = computed<boolean>(() => metaData.id !== undefined && metaData.modelId === undefined);
+// The menu metadata is a snapshot taken when it opened: read the item live so a CRS edit shows at once
+const liveItem = useLiveDataItem(() => (isData.value ? metaData.id : undefined));
+const liveCrs = computed(() => liveItem.value?.crs ?? metaData.crs);
 </script>
 
 <template>
@@ -166,6 +176,23 @@ const formattedId = computed<string>(() => formatId(metaData.id));
               size="10"
               :color="isCopied(metaData.id) ? 'success' : 'white'"
               class="ml-1"
+            />
+          </v-col>
+          <v-col
+            v-if="isData"
+            class="id-badge-container crs-badge mt-1 d-inline-flex align-center px-2 py-0.5"
+          >
+            <span class="crs-label mr-1">CRS</span>
+            <span class="id-text" data-testid="infoCrsValue">{{ formatCrsCode(liveCrs) }}</span>
+            <v-tooltip activator="parent" location="top">{{ formatCrs(liveCrs) }}</v-tooltip>
+            <v-icon
+              v-if="crsStore.crsEditEnabled"
+              data-testid="infoEditCrsBtn"
+              icon="mdi-pencil"
+              size="10"
+              color="white"
+              class="ml-1"
+              @click.stop="crsStore.requestCrsEdit(metaData.id)"
             />
           </v-col>
 
@@ -227,6 +254,12 @@ const formattedId = computed<string>(() => formatId(metaData.id));
 
 .id-badge-container:active {
   transform: scale(0.97);
+}
+
+.crs-label {
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  color: rgb(var(--v-theme-secondary));
 }
 
 .id-text {

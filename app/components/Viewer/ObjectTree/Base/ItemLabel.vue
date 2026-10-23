@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
+import { formatCrs } from "@ogw_front/utils/crs";
 import { middleTruncate } from "@ogw_front/utils/string";
 import { useClipboard } from "@vueuse/core";
+import { useCrsStore } from "@ogw_front/stores/crs";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
+import { useLiveDataItem } from "@ogw_front/composables/live_data_item";
 import { useResponsiveMiddleTruncate } from "@ogw_front/composables/responsive_middle_truncate";
 
 const feedbackStore = useFeedbackStore();
@@ -11,9 +14,10 @@ const { copy } = useClipboard();
 interface Props {
   item: DisplayItem;
   isLeaf?: boolean;
+  showCrs?: boolean;
 }
 
-const { item, isLeaf } = defineProps<Props>();
+const { item, isLeaf, showCrs = false } = defineProps<Props>();
 
 interface Emits {
   contextmenu: [event: MouseEvent];
@@ -51,6 +55,19 @@ const tooltipTitle = computed<string>(() =>
     TOOLTIP_NAME_START_CHARS,
     TOOLTIP_NAME_END_CHARS,
   ),
+);
+
+const crsStore = useCrsStore();
+// Only top-level data carry a CRS: their stored item is read live so edits show at once
+const dataItem = useLiveDataItem(() => (showCrs ? actualItem.value.id : undefined));
+const crsLabel = computed<string>(
+  () =>
+    middleTruncate(
+      formatCrs(dataItem.value?.crs),
+      TOOLTIP_NAME_MAX_LENGTH,
+      TOOLTIP_NAME_START_CHARS,
+      TOOLTIP_NAME_END_CHARS,
+    ) ?? "",
 );
 
 const tooltipDisabled = computed<boolean>(() => {
@@ -125,6 +142,22 @@ async function copyToClipboard(text: string, label: string): Promise<void> {
             @click.stop="copyToClipboard(actualItem.title, 'Name')"
           >
             <v-icon size="12">mdi-content-copy</v-icon>
+          </v-btn>
+        </span>
+        <span v-if="showCrs" class="text-caption d-flex align-center">
+          <strong class="text-white mr-1">CRS:</strong>
+          <span data-testid="tooltipCrsValue">{{ crsLabel }}</span>
+          <v-btn
+            v-if="crsStore.crsEditEnabled"
+            data-testid="editCrsBtn"
+            icon
+            variant="text"
+            density="compact"
+            class="ml-1 text-white"
+            style="width: 18px; height: 18px; min-width: 18px; min-height: 18px"
+            @click.stop="crsStore.requestCrsEdit(actualItem.id)"
+          >
+            <v-icon size="12">mdi-pencil</v-icon>
           </v-btn>
         </span>
         <span v-if="actualItem.is_active !== undefined" class="text-caption d-flex align-center">
