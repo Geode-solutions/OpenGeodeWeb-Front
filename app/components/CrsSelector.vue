@@ -13,7 +13,8 @@ const selectedCrs = defineModel<CRSList | undefined>();
 
 const search = ref<string>("");
 const data_table_loading = ref<boolean>(false);
-const crs_list = ref<CRSList[]>([]);
+// Thousands of rows that are never mutated: no deep reactivity
+const crs_list = shallowRef<CRSList[]>([]);
 const selected_crs = ref<unknown[]>([]);
 const toggle_loading = useToggle(data_table_loading);
 const crsStore = useCrsStore();
@@ -54,6 +55,10 @@ const compact_headers = [
   { title: "Name", align: "start", key: "name", maxWidth: 0, nowrap: true },
 ] as const;
 
+// "All" would render the whole list (thousands of rows) at once
+// oxlint-disable-next-line no-magic-numbers -- the page sizes Vuetify offers by default, "All" aside
+const items_per_page_options = [10, 25, 50, 100];
+
 const headers = computed(() => (compact ? compact_headers : full_headers));
 
 // Not awaited in setup: the table renders right away with its loader
@@ -74,7 +79,8 @@ onMounted(async () => {
   ></v-text-field>
   <v-data-table
     v-model="selected_crs"
-    :v-model:items-per-page="10"
+    :items-per-page="10"
+    :items-per-page-options="items_per_page_options"
     :headers="headers"
     :items="crs_list"
     :item-value="crs_key"

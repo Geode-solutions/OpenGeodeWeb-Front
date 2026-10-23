@@ -104,6 +104,23 @@ describe("crs selector", () => {
     expect(cells).toStrictEqual(["", "EPSG:2154", "RGF93 v1 / Lambert-93"]);
   });
 
+  test("does not offer to show all the crs at once", async () => {
+    const crsStore = useCrsStore();
+    crsStore.geographicList = mockAs<typeof crsStore.geographicList>(
+      vi.fn().mockResolvedValue([]),
+    );
+
+    const wrapper = await mountSuspended(CrsSelector, {
+      global: {
+        plugins: [vuetify, pinia],
+      },
+      props: { geodeObjectType: "BRep" },
+    });
+    const options = wrapper.findComponent({ name: "VDataTable" }).props("itemsPerPageOptions");
+    expect(options).not.toContainEqual(expect.objectContaining({ value: -1 }));
+    expect(options).not.toContain(-1);
+  });
+
   test("shows the table loader while the crs list loads", async () => {
     const crsStore = useCrsStore();
     crsStore.geographicList = mockAs<typeof crsStore.geographicList>(
