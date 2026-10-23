@@ -12,8 +12,12 @@ function calc_margin(index: number): string {
 }
 
 function runAction(feedback: (typeof feedbackStore.feedbacks)[number]): void {
-  feedback.action?.onClick();
-  feedbackStore.delete_feedback(feedback.id);
+  try {
+    feedback.action?.onClick();
+  } finally {
+    // The snackbar closes even when the action fails
+    feedbackStore.delete_feedback(feedback.id);
+  }
 }
 </script>
 

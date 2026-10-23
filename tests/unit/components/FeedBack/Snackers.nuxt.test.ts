@@ -94,4 +94,42 @@ describe("feedback snackers", () => {
     expect(onClick).toHaveBeenCalledExactlyOnceWith();
     expect(feedbackStore.feedbacks).toHaveLength(0);
   });
+
+  test("a failing action still removes the feedback", async () => {
+    const pinia = setupActivePinia();
+    const feedbackStore = useFeedbackStore();
+    const onClick = vi.fn<() => void>().mockImplementation(() => {
+      throw new Error("action failed");
+    });
+    feedbackStore.$patch({
+      feedbacks: [
+        {
+          id: "1",
+          type: "warning",
+          description: "test description",
+          action: { label: "Edit CRS", onClick },
+        },
+      ],
+    });
+    const errorHandler = vi.fn<() => void>();
+
+    const wrapper = mount(
+      { template: "<v-layout><FeedBackSnackers/></v-layout>" },
+      {
+        global: {
+          components: { FeedBackSnackers },
+          plugins: [vuetify, pinia],
+          config: { errorHandler },
+        },
+      },
+    );
+    await findButton(wrapper, "feedbackActionBtn")?.trigger("click");
+
+    expect(errorHandler).toHaveBeenCalledExactlyOnceWith(
+      expect.any(Error),
+      expect.anything(),
+      expect.any(String),
+    );
+    expect(feedbackStore.feedbacks).toHaveLength(0);
+  });
 });
