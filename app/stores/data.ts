@@ -1,5 +1,6 @@
 // oxlint-disable eslint/max-lines
 // Third party imports
+import type { CRSList } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import type { Table } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
@@ -21,6 +22,7 @@ interface DataItem {
   created_at: string;
   is_viewable?: boolean;
   binary_light_viewable?: string;
+  crs?: CRSList;
 }
 
 interface ModelComponentInput {
@@ -42,6 +44,7 @@ interface NewDataItem {
   geode_object_type: string;
   is_viewable?: boolean;
   binary_light_viewable?: string;
+  crs?: CRSList;
   mesh_components?: ModelComponentInput[];
   collection_components?: ModelComponentInput[];
   nb_vertices?: number;
@@ -205,6 +208,9 @@ export const useDataStore = defineStore("data", () => {
     };
     if (new_item.binary_light_viewable !== undefined && new_item.binary_light_viewable !== null) {
       itemData.binary_light_viewable = new_item.binary_light_viewable;
+    }
+    if (new_item.crs !== undefined) {
+      itemData.crs = new_item.crs;
     }
     const id = await data_db.put(itemData);
     return id;

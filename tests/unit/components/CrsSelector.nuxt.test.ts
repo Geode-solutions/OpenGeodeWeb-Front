@@ -8,6 +8,7 @@ import { mountSuspended } from "@nuxt/test-utils/runtime";
 import { mockAs, setupActivePinia, vuetify } from "@ogw_tests/utils";
 import CrsSelector from "@ogw_front/components/CrsSelector.vue";
 import { useBackStore } from "@ogw_front/stores/back";
+import { useCrsStore } from "@ogw_front/stores/crs";
 
 vi.setConfig({ testTimeout: 10_000 });
 
@@ -37,18 +38,9 @@ describe("crs selector", () => {
       },
     ];
 
-    // Mock backStore.request instead of registerEndpoint
-    backStore.request = mockAs<typeof backStore.request>(
-      vi.fn(
-        async (
-          _request: unknown,
-          callbacks: { response_function?: (response: unknown) => void },
-        ) => {
-          callbacks.response_function?.({ crs_list });
-          await Promise.resolve();
-          return { crs_list };
-        },
-      ),
+    const crsStore = useCrsStore();
+    crsStore.geographicList = mockAs<typeof crsStore.geographicList>(
+      vi.fn().mockResolvedValue(crs_list),
     );
 
     const wrapper = await mountSuspended(CrsSelector, {
@@ -73,17 +65,9 @@ describe("crs selector", () => {
       { authority: "EPSG", code: "4812", name: "New Beijing / 3-degree Gauss-Kruger CM 132E" },
       { authority: "ESRI", code: "4812", name: "GCS_Voirol_Unifie_1960_Paris" },
     ];
-    backStore.request = mockAs<typeof backStore.request>(
-      vi.fn(
-        async (
-          _request: unknown,
-          callbacks: { response_function?: (response: unknown) => void },
-        ) => {
-          callbacks.response_function?.({ crs_list });
-          await Promise.resolve();
-          return { crs_list };
-        },
-      ),
+    const crsStore = useCrsStore();
+    crsStore.geographicList = mockAs<typeof crsStore.geographicList>(
+      vi.fn().mockResolvedValue(crs_list),
     );
 
     const wrapper = await mountSuspended(CrsSelector, {
@@ -101,7 +85,8 @@ describe("crs selector", () => {
   });
 
   test("shows the table loader while the crs list loads", async () => {
-    backStore.request = mockAs<typeof backStore.request>(
+    const crsStore = useCrsStore();
+    crsStore.geographicList = mockAs<typeof crsStore.geographicList>(
       vi.fn().mockReturnValue(Promise.withResolvers<never>().promise),
     );
 

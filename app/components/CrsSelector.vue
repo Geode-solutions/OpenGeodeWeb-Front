@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import schemas, { type CRSList } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
-import { useBackStore } from "@ogw_front/stores/back";
-
-const schema = schemas.opengeodeweb_back.crs.geographic_list;
+import type { CRSList } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
+import { useCrsStore } from "@ogw_front/stores/crs";
 
 interface Props {
   geodeObjectType: string;
@@ -16,7 +14,7 @@ const data_table_loading = ref<boolean>(false);
 const crs_list = ref<CRSList[]>([]);
 const selected_crs = ref<unknown[]>([]);
 const toggle_loading = useToggle(data_table_loading);
-const backStore = useBackStore();
+const crsStore = useCrsStore();
 
 // Codes are only unique within an authority (e.g. EPSG:4812 and ESRI:4812)
 function crs_key(crs: CRSList): string {
@@ -32,16 +30,8 @@ watch(selected_crs, (new_value) => {
 });
 
 async function get_crs_table(): Promise<void> {
-  const params = { geode_object_type: geodeObjectType };
   toggle_loading();
-  await backStore.request(
-    { schema, params },
-    {
-      response_function: (response) => {
-        crs_list.value = response.crs_list;
-      },
-    },
-  );
+  crs_list.value = await crsStore.geographicList(geodeObjectType);
   toggle_loading();
 }
 
