@@ -58,8 +58,12 @@ const tooltipTitle = computed<string>(() =>
 );
 
 const crsStore = useCrsStore();
-// Only top-level data carry a CRS: their stored item is read live so edits show at once
-const dataItem = useLiveDataItem(() => (showCrs ? actualItem.value.id : undefined));
+const tooltipOpen = ref(false);
+// Only top-level data carry a CRS: their stored item is read live, and only while the
+// Tooltip is open, so the rows of a long tree do not each keep a database query
+const dataItem = useLiveDataItem(() =>
+  showCrs && tooltipOpen.value ? actualItem.value.id : undefined,
+);
 const crsLabel = computed<string>(
   () =>
     middleTruncate(
@@ -93,6 +97,7 @@ async function copyToClipboard(text: string, label: string): Promise<void> {
     class="tree-item-label-container w-100"
   >
     <v-tooltip
+      v-model="tooltipOpen"
       :disabled="tooltipDisabled"
       location="right"
       open-delay="400"

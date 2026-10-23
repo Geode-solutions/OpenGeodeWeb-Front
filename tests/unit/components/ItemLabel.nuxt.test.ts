@@ -24,6 +24,15 @@ const VTooltipStub = {
   template: '<div><slot name="activator" :props="{}" /><slot /></div>',
 };
 
+// The stored item is only read once the tooltip opens
+const OpenTooltipStub = {
+  emits: ["update:modelValue"],
+  mounted(this: { $emit: (event: "update:modelValue", value: boolean) => void }): void {
+    this.$emit("update:modelValue", true);
+  },
+  template: VTooltipStub.template,
+};
+
 describe("item label tooltip", () => {
   const pinia = setupActivePinia();
 
@@ -56,7 +65,7 @@ describe("item label tooltip", () => {
     const crsStore = useCrsStore();
     crsStore.enableCrsEdit();
     const wrapper = await mountSuspended(ItemLabel, {
-      global: { plugins: [vuetify, pinia], stubs: { VTooltip: VTooltipStub } },
+      global: { plugins: [vuetify, pinia], stubs: { VTooltip: OpenTooltipStub } },
       props: {
         item: leaf({ id: DATA_ID, geode_id: GEODE_ID, title: "cube" }),
         isLeaf: true,
@@ -66,6 +75,21 @@ describe("item label tooltip", () => {
     expect(wrapper.get('[data-testid="tooltipCrsValue"]').text()).toContain("EPSG:2154");
     await wrapper.get('[data-testid="editCrsBtn"]').trigger("click");
     expect(crsStore.crsEditRequest).toBe(DATA_ID);
+  });
+
+  test("does not read the stored item while the tooltip is closed", async () => {
+    const dataStore = useDataStore();
+    const refItem = vi.fn<() => unknown>().mockReturnValue(ref({ id: DATA_ID }));
+    dataStore.refItem = mockAs<typeof dataStore.refItem>(refItem);
+    await mountSuspended(ItemLabel, {
+      global: { plugins: [vuetify, pinia], stubs: { VTooltip: VTooltipStub } },
+      props: {
+        item: leaf({ id: DATA_ID, geode_id: GEODE_ID, title: "cube" }),
+        isLeaf: true,
+        showCrs: true,
+      },
+    });
+    expect(refItem).not.toHaveBeenCalled();
   });
 
   test("has no crs row without showCrs", async () => {
@@ -88,7 +112,7 @@ describe("item label tooltip", () => {
       vi.fn<(id: string) => unknown>().mockImplementation((id) => ref(items[id])),
     );
     const wrapper = await mountSuspended(ItemLabel, {
-      global: { plugins: [vuetify, pinia], stubs: { VTooltip: VTooltipStub } },
+      global: { plugins: [vuetify, pinia], stubs: { VTooltip: OpenTooltipStub } },
       props: { item: leaf({ id: DATA_ID, title: "group" }), isLeaf: false, showCrs: false },
     });
     // The virtual tree reuses this label for another row
