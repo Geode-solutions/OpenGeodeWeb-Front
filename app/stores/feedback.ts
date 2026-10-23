@@ -5,6 +5,11 @@ const DEFAULT_FEEDBACKS_TIMEOUT_SECONDS = 10;
 
 type FeedbackType = "error" | "success" | "warning";
 
+interface FeedbackAction {
+  label: string;
+  onClick: () => void;
+}
+
 interface Feedback {
   id: string;
   type: FeedbackType;
@@ -12,6 +17,7 @@ interface Feedback {
   route?: string;
   name?: string;
   description?: string;
+  action?: FeedbackAction;
 }
 
 export const useFeedbackStore = defineStore("feedback", {
@@ -35,23 +41,25 @@ export const useFeedbackStore = defineStore("feedback", {
         this.delete_feedback(feedbackId);
       }, this.feedbacks_timeout_miliseconds);
     },
-    add_success(description: string) {
+    add_success(description: string, action?: FeedbackAction) {
       const feedbackId = uuidv4();
       this.feedbacks.push({
         id: feedbackId,
         type: "success",
         description,
+        ...(action === undefined ? {} : { action }),
       });
       setTimeout(() => {
         this.delete_feedback(feedbackId);
       }, this.feedbacks_timeout_miliseconds);
     },
-    add_warning(description: string) {
+    add_warning(description: string, action?: FeedbackAction) {
       const feedbackId = uuidv4();
       this.feedbacks.push({
         id: feedbackId,
         type: "warning",
         description,
+        ...(action === undefined ? {} : { action }),
       });
       setTimeout(() => {
         this.delete_feedback(feedbackId);
@@ -65,3 +73,5 @@ export const useFeedbackStore = defineStore("feedback", {
     },
   },
 });
+
+export type { FeedbackAction };
