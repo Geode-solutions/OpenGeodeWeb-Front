@@ -28,7 +28,10 @@ describe("info card crs", () => {
     });
     // The card is narrow: the code alone, the full name is in the tooltip
     expect(wrapper.get('[data-testid="infoCrsValue"]').text()).toBe("EPSG:2154");
-    await wrapper.get('[data-testid="infoEditCrsBtn"]').trigger("click");
+    const editButton = wrapper.get('[data-testid="infoEditCrsBtn"]');
+    // A real button: reachable with the keyboard
+    expect(editButton.element.tagName).toBe("BUTTON");
+    await editButton.trigger("click");
     expect(crsStore.crsEditRequest).toBe("data-1");
   });
 

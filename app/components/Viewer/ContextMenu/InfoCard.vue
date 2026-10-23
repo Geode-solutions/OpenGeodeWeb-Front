@@ -180,16 +180,19 @@ const liveCrs = computed(() => liveItem.value?.crs ?? metaData.crs);
           </v-col>
           <v-col
             v-if="isData"
-            class="id-badge-container crs-badge mt-1 d-inline-flex align-center px-2 py-0.5"
+            class="mt-1 d-inline-flex align-center px-2 py-0.5 text-caption"
+            style="font-size: 0.6rem"
           >
-            <span class="crs-label mr-1">CRS</span>
+            <span class="font-weight-black text-secondary mr-1">CRS</span>
             <span class="id-text" data-testid="infoCrsValue">{{ formatCrsCode(liveCrs) }}</span>
             <v-tooltip activator="parent" location="top">{{ formatCrs(liveCrs) }}</v-tooltip>
-            <v-icon
+            <v-btn
               v-if="crsStore.crsEditEnabled"
               data-testid="infoEditCrsBtn"
               icon="mdi-pencil"
-              size="10"
+              variant="text"
+              density="compact"
+              size="x-small"
               color="white"
               class="ml-1"
               @click.stop="crsStore.requestCrsEdit(metaData.id)"
@@ -254,12 +257,6 @@ const liveCrs = computed(() => liveItem.value?.crs ?? metaData.crs);
 
 .id-badge-container:active {
   transform: scale(0.97);
-}
-
-.crs-label {
-  font-weight: 900;
-  letter-spacing: 0.5px;
-  color: rgb(var(--v-theme-secondary));
 }
 
 .id-text {
