@@ -163,15 +163,20 @@ async function importWorkflowFromSnapshot(items: readonly NewDataItem[]): Promis
 }
 
 // Reloads the viewer object under the same id with its stored style, after the back rewrote its files.
-async function reloadObject(id: string): Promise<void> {
+async function reloadObject(
+  id: string,
+  { rebuildActor = false }: { rebuildActor?: boolean } = {},
+): Promise<void> {
   const dataStore = useDataStore();
   const dataStyleStore = useDataStyleStore();
   const hybridViewerStore = useHybridViewerStore();
   const item = await dataStore.item(id);
   await dataStore.deregisterObject(id);
   await dataStore.registerObject(id, item.name ?? id);
-  // The local actor is rebuilt from the stored light viewable, which may have moved
-  await hybridViewerStore.addItem(id);
+  // Only when the geometry moved: the local actor is rebuilt from the stored light viewable
+  if (rebuildActor) {
+    await hybridViewerStore.addItem(id);
+  }
   await dataStyleStore.applyDefaultStyle(id);
   await hybridViewerStore.remoteRender();
 }

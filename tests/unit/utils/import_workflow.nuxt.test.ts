@@ -73,7 +73,8 @@ describe("apply time series workflow", () => {
     expect(request).toHaveBeenCalledWith(
       expect.objectContaining({ params: { id: "brep_id", filename: "time_series.pvd" } }),
     );
-    expect(calls).toStrictEqual(["deregister", "register", "hybrid", "style"]);
+    // The geometry is unchanged: the local actor (and the camera) are kept
+    expect(calls).toStrictEqual(["deregister", "register", "style"]);
     expect(applyDefaultStyle).toHaveBeenCalledWith("brep_id");
     expect(remoteRender).toHaveBeenCalledWith();
   });
@@ -96,10 +97,17 @@ describe("reload object", () => {
     await reloadObject("brep_id");
 
     expect(request).not.toHaveBeenCalled();
-    // The local actor is rebuilt too: the light viewable may have moved
-    expect(calls).toStrictEqual(["deregister", "register", "hybrid", "style"]);
+    expect(calls).toStrictEqual(["deregister", "register", "style"]);
     expect(applyDefaultStyle).toHaveBeenCalledWith("brep_id");
     expect(remoteRender).toHaveBeenCalledWith();
+  });
+
+  test("rebuilds the local actor when the geometry moved", async () => {
+    const { calls } = setup();
+
+    await reloadObject("brep_id", { rebuildActor: true });
+
+    expect(calls).toStrictEqual(["deregister", "register", "hybrid", "style"]);
   });
 });
 
