@@ -2,6 +2,7 @@
 // oxlint-disable vitest/require-mock-type-parameters
 // Third party imports
 import { beforeEach, describe, expect, test, vi } from "vitest";
+import { VDataTable } from "vuetify/components";
 import { mountSuspended } from "@nuxt/test-utils/runtime";
 
 // Local imports
@@ -114,7 +115,7 @@ describe("crs selector", () => {
       },
       props: { geodeObjectType: "BRep" },
     });
-    const options = wrapper.findComponent({ name: "VDataTable" }).props("itemsPerPageOptions");
+    const options = wrapper.findComponent(VDataTable).props("itemsPerPageOptions");
     expect(options).not.toContainEqual(expect.objectContaining({ value: -1 }));
     expect(options).not.toContain(-1);
   });
