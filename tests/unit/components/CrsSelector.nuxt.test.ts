@@ -106,9 +106,7 @@ describe("crs selector", () => {
 
   test("does not offer to show all the crs at once", async () => {
     const crsStore = useCrsStore();
-    crsStore.geographicList = mockAs<typeof crsStore.geographicList>(
-      vi.fn().mockResolvedValue([]),
-    );
+    crsStore.geographicList = mockAs<typeof crsStore.geographicList>(vi.fn().mockResolvedValue([]));
 
     const wrapper = await mountSuspended(CrsSelector, {
       global: {
