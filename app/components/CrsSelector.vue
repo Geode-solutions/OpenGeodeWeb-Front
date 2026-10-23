@@ -96,4 +96,3 @@ onMounted(async () => {
     </template>
   </v-data-table>
 </template>
-
