@@ -1,9 +1,16 @@
-import { type ComputedRef, type Ref, computed, ref, watch } from "vue";
+import { type Ref, computed, ref, watch } from "vue";
 
-export interface ModelTabItem {
+interface ModelTabItem {
   label: string;
   value: string;
-  testId?: string;
+  testId: string;
+}
+
+interface ModelTabsOptions {
+  componentType: Ref<string | undefined>;
+  componentId: Ref<string | undefined>;
+  isTypeSupported?: (type: string) => boolean;
+  hasComponentsOptions?: Ref<boolean>;
 }
 
 const COMPONENT_TYPE_PLURALS: Record<string, string> = {
@@ -13,72 +20,56 @@ const COMPONENT_TYPE_PLURALS: Record<string, string> = {
   Block: "Blocks",
 };
 
-export function getComponentTypePlural(type: string): string {
+function getComponentTypePlural(type: string): string {
   return COMPONENT_TYPE_PLURALS[type] ?? `${type}s`;
 }
 
-interface UseModelTabsOptions {
-  componentType: Ref<string | undefined> | ComputedRef<string | undefined>;
-  componentId: Ref<string | undefined> | ComputedRef<string | undefined>;
-  isTypeSupported?: (type: string | undefined) => boolean;
-  hasComponentsOptions?: Ref<boolean> | ComputedRef<boolean>;
+function isFilled(value: string | undefined): value is string {
+  return value !== undefined && value !== "";
 }
 
-export function useModelTabs(options: UseModelTabsOptions): {
-  tabs: ComputedRef<ModelTabItem[]>;
-  activeTab: Ref<string>;
-} {
-  const isSupported = (type: string | undefined) =>
-    options.isTypeSupported ? options.isTypeSupported(type) : type !== undefined;
+// Tabs depend on where the menu was opened: data, a component type or one component.
+// Example: a picked surface gives Model | Surfaces | Surface, with Surface active.
+// oxlint-disable-next-line typescript/explicit-function-return-type, typescript/explicit-module-boundary-types
+function useModelTabs(options: ModelTabsOptions) {
+  const { componentType, componentId, isTypeSupported, hasComponentsOptions } = options;
+
+  const supportedType = computed<string | undefined>(() => {
+    const type = componentType.value;
+    if (!isFilled(type)) {
+      return undefined;
+    }
+    if (isTypeSupported && !isTypeSupported(type)) {
+      return undefined;
+    }
+    return type;
+  });
+  const isModelContext = computed<boolean>(
+    () => !isFilled(componentType.value) && !isFilled(componentId.value),
+  );
 
   const tabs = computed<ModelTabItem[]>(() => {
-    const type = options.componentType.value;
-    const id = options.componentId.value;
-
     const items: ModelTabItem[] = [{ label: "Model", value: "model", testId: "modelTab_model" }];
-
-    if (!type && !id) {
-      const showComponents =
-        options.hasComponentsOptions !== undefined ? options.hasComponentsOptions.value : true;
-      if (showComponents) {
-        items.push({
-          label: "Components Options",
-          value: "components",
-          testId: "modelTab_components",
-        });
-      }
-      return items;
-    }
-
-    if (type && isSupported(type)) {
-      items.push({
-        label: getComponentTypePlural(type),
-        value: "type",
-        testId: "modelTab_type",
-      });
-      if (id) {
-        items.push({
-          label: type,
-          value: "component",
-          testId: "modelTab_component",
-        });
+    const type = supportedType.value;
+    if (isModelContext.value && (hasComponentsOptions?.value ?? true)) {
+      items.push({ label: "Components Options", value: "components", testId: "modelTab_components" });
+    } else if (type !== undefined) {
+      items.push({ label: getComponentTypePlural(type), value: "type", testId: "modelTab_type" });
+      if (isFilled(componentId.value)) {
+        items.push({ label: type, value: "component", testId: "modelTab_component" });
       }
     }
-
     return items;
   });
 
   const activeTab = ref<string>("model");
-
   watch(
-    [() => options.componentType.value, () => options.componentId.value],
+    [supportedType, componentId],
     ([type, id]) => {
-      if (!type && !id) {
+      if (type === undefined) {
         activeTab.value = "model";
-      } else if (type && isSupported(type)) {
-        activeTab.value = id ? "component" : "type";
       } else {
-        activeTab.value = "model";
+        activeTab.value = isFilled(id) ? "component" : "type";
       }
     },
     { immediate: true },
@@ -86,3 +77,6 @@ export function useModelTabs(options: UseModelTabsOptions): {
 
   return { tabs, activeTab };
 }
+
+export { getComponentTypePlural, useModelTabs };
+export type { ModelTabItem };

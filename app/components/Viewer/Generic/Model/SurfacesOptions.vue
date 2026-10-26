@@ -444,7 +444,6 @@ const attributeSchemas = {
 
 <template>
   <div v-show="!activeTab || activeTab === 'type'" data-testid="modelComponentTypeOptions">
-    <span class="d-none">Surfaces Options</span>
     <VisibilitySwitch data-testid="modelSurfacesVisibilitySwitch" v-model="surfacesVisibility" />
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
