@@ -90,6 +90,7 @@ const snapshotMock = {
       },
     },
   },
+  basemap: { style: "satellite" },
   hybridViewer: {
     zScale: Z_SCALE,
     camera_options: {
@@ -134,6 +135,10 @@ const dataStyleStoreMock = {
   applyAllStylesFromState: vi.fn().mockResolvedValue(undefined),
   addDataStyle: vi.fn().mockResolvedValue(undefined),
   applyDefaultStyle: vi.fn().mockResolvedValue(undefined),
+};
+const basemapStoreMock = {
+  reset: vi.fn(),
+  importStores: vi.fn().mockResolvedValue(undefined),
 };
 const feedbackStoreMock = {
   add_success: vi.fn(),
@@ -243,6 +248,9 @@ vi.mock(import("@ogw_front/stores/data_style") as Promise<unknown>, () => ({
 vi.mock(import("@ogw_front/stores/hybrid_viewer") as Promise<unknown>, () => ({
   useHybridViewerStore: (): typeof hybridViewerStoreMock => hybridViewerStoreMock,
 }));
+vi.mock(import("@ogw_front/stores/basemap") as Promise<unknown>, () => ({
+  useBasemapStore: (): typeof basemapStoreMock => basemapStoreMock,
+}));
 vi.mock(import("@ogw_front/stores/back") as Promise<unknown>, () => ({
   useBackStore: (): typeof backStoreMock => backStoreMock,
 }));
@@ -293,6 +301,13 @@ function verifyStoreImports(): void {
   expect(hybridViewerStoreMock.setZScaling).toHaveBeenCalledWith(Z_SCALE);
 }
 
+function verifyBasemap(): void {
+  // The previous project's basemap is forgotten with the viewer, then the style is restored
+  expect(basemapStoreMock.reset).toHaveBeenCalledWith();
+  expect(basemapStoreMock.reset).toHaveBeenCalledBefore(basemapStoreMock.importStores);
+  expect(basemapStoreMock.importStores).toHaveBeenCalledWith(snapshotMock.basemap);
+}
+
 function verifyDataManagement(): void {
   expect(dataStyleStoreMock.importStores).toHaveBeenCalledWith(snapshotMock.dataStyle);
   expect(dataStyleStoreMock.applyAllStylesFromState).toHaveBeenCalledWith();
@@ -325,6 +340,7 @@ describe("projectManager composable (compact)", () => {
       dataStoreMock,
       dataStyleStoreMock,
       hybridViewerStoreMock,
+      basemapStoreMock,
       feedbackStoreMock,
     ];
     for (const store of storesList) {
@@ -356,6 +372,7 @@ describe("projectManager composable (compact)", () => {
 
     verifyViewerCalls();
     verifyStoreImports();
+    verifyBasemap();
   });
 
   test("importProjectFile with snapshot - Data and Rendering", async () => {
