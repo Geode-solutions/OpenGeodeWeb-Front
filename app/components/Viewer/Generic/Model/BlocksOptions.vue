@@ -1,7 +1,6 @@
 <script setup lang="ts">
 // oxlint-disable eslint/max-lines
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
-import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
@@ -14,6 +13,7 @@ interface Props {
   blockId?: string;
   targetBlockIds: string[];
   collections?: CollectionComponent[];
+  activeTab?: string;
 }
 
 const {
@@ -21,6 +21,7 @@ const {
   blockId = undefined,
   targetBlockIds,
   collections = undefined,
+  activeTab = undefined,
 } = defineProps<Props>();
 
 const dataStyleStore = useDataStyleStore();
@@ -472,7 +473,8 @@ const attributeSchemas = {
 </script>
 
 <template>
-  <OptionsSection title="Blocks Options" class="mt-4" data-testid="modelComponentTypeOptions">
+  <div v-show="!activeTab || activeTab === 'type'" data-testid="modelComponentTypeOptions">
+    <span class="d-none">Blocks Options</span>
     <VisibilitySwitch data-testid="modelBlocksVisibilitySwitch" v-model="blocksVisibility" />
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
@@ -495,12 +497,11 @@ const attributeSchemas = {
       :schemas="attributeSchemas"
       :allowRandom="true"
     />
-  </OptionsSection>
+  </div>
 
-  <OptionsSection
+  <div
     v-if="blockId"
-    title="Component Options"
-    class="mt-4"
+    v-show="!activeTab || activeTab === 'component'"
     data-testid="modelComponentOptions"
   >
     <VisibilitySwitch v-model="blockVisibility" />
@@ -525,5 +526,5 @@ const attributeSchemas = {
       :schemas="attributeSchemas"
       :allowRandom="true"
     />
-  </OptionsSection>
+  </div>
 </template>
