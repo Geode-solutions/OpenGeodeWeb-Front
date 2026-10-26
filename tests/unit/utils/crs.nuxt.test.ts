@@ -1,7 +1,11 @@
 import { describe, expect, test, vi } from "vitest";
-import { formatCrs, formatCrsCode } from "@ogw_front/utils/crs";
+import { formatCrs, formatCrsCode, projectCrs } from "@ogw_front/utils/crs";
+import type { DataItem } from "@ogw_front/stores/data";
 
 vi.setConfig({ testTimeout: 10_000 });
+
+const LAMBERT = { authority: "EPSG", code: "2154", name: "RGF93 v1 / Lambert-93" };
+const UTM = { authority: "EPSG", code: "32631", name: "WGS 84 / UTM zone 31N" };
 
 describe("format crs", () => {
   test("formats authority, code and name", () => {
@@ -19,5 +23,20 @@ describe("format crs", () => {
       "EPSG:2154",
     );
     expect(formatCrsCode(undefined)).toBe("None");
+  });
+});
+
+describe("project crs", () => {
+  test("is the crs of the oldest georeferenced data", () => {
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+    const items = [
+      { id: "b", created_at: "2", crs: UTM },
+      { id: "a", created_at: "1" },
+      { id: "c", created_at: "0", crs: LAMBERT },
+    ] as unknown as DataItem[];
+    expect(projectCrs(items)).toStrictEqual(LAMBERT);
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+    const noCrs = [{ id: "a", created_at: "1" }] as unknown as DataItem[];
+    expect(projectCrs(noCrs)).toBeUndefined();
   });
 });

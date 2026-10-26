@@ -2,6 +2,7 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schem
 import fileDownload from "js-file-download";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
+import { type BasemapStyle, useBasemapStore } from "@ogw_front/stores/basemap";
 import { type DataStyleSnapshot, useDataStyleStore } from "@ogw_front/stores/data_style";
 import { type NewDataItem, useDataStore } from "@ogw_front/stores/data";
 import { type TreeviewSnapshot, useTreeviewStore } from "@ogw_front/stores/treeview";
@@ -27,6 +28,7 @@ interface ProjectSnapshot {
   data?: ProjectDataSnapshot;
   hybridViewer?: CameraSnapshot;
   dataStyle?: DataStyleSnapshot;
+  basemap?: { style?: BasemapStyle };
 }
 
 // The backend response is an untyped network payload; this is the one place its shape is asserted.
@@ -99,6 +101,7 @@ async function importProject(file: File): Promise<void> {
   const dataStore = useDataStore();
   const treeviewStore = useTreeviewStore();
   const hybridViewerStore = useHybridViewerStore();
+  const basemapStore = useBasemapStore();
 
   await viewerStore.ws_connect();
 
@@ -110,6 +113,7 @@ async function importProject(file: File): Promise<void> {
   treeviewStore.clear();
   await dataStore.clear();
   hybridViewerStore.clear();
+  basemapStore.reset();
 
   const importProjectSchema = back_schemas.opengeodeweb_back.import_project;
   const form = new FormData();
@@ -139,6 +143,7 @@ async function importProject(file: File): Promise<void> {
 
   const items = snapshot.data?.items ?? [];
   await importWorkflowFromSnapshot(items);
+  await basemapStore.importStores(snapshot.basemap);
   await hybridViewerStore.importStores(snapshot.hybridViewer);
   if (snapshot.dataStyle !== undefined) {
     await dataStyleStore.importStores(snapshot.dataStyle);
