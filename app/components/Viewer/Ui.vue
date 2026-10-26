@@ -4,6 +4,7 @@ import {
   type ViewerIdResult,
   useOverlappingPicker,
 } from "@ogw_front/composables/use_overlapping_picker";
+import BasemapAttribution from "@ogw_front/components/BasemapAttribution.vue";
 import OverlappingObjectsPicker from "@ogw_front/components/Viewer/OverlappingObjectsPicker.vue";
 import ProjectCrs from "@ogw_front/components/ProjectCrs.vue";
 import ToolActiveChip from "@ogw_front/components/Viewer/ToolActiveChip.vue";
@@ -109,6 +110,8 @@ defineExpose({ get_viewer_id });
   />
 
   <ProjectCrs />
+
+  <BasemapAttribution />
 
   <OverlappingObjectsPicker
     :display-intermediate="displayIntermediate"
