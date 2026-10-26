@@ -4,6 +4,7 @@ import back_schemas, {
 import fileDownload from "js-file-download";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
+import { type BasemapStyle, useBasemapStore } from "@ogw_front/stores/basemap";
 import { type DataStyleSnapshot, useDataStyleStore } from "@ogw_front/stores/data_style";
 import { type NewDataItem, useDataStore } from "@ogw_front/stores/data";
 import { type TreeviewSnapshot, useTreeviewStore } from "@ogw_front/stores/treeview";
@@ -31,6 +32,7 @@ interface ProjectSnapshot {
   hybridViewer?: CameraSnapshot;
   dataStyle?: DataStyleSnapshot;
   crs?: { projectCrs?: CRSList };
+  basemap?: { style?: BasemapStyle };
 }
 
 async function exportProject(): Promise<{ result: Blob }> {
@@ -79,6 +81,7 @@ async function importProject(file: File): Promise<void> {
   const treeviewStore = useTreeviewStore();
   const hybridViewerStore = useHybridViewerStore();
   const crsStore = useCrsStore();
+  const basemapStore = useBasemapStore();
 
   await viewerStore.ws_connect();
 
@@ -91,6 +94,7 @@ async function importProject(file: File): Promise<void> {
   await dataStore.clear();
   hybridViewerStore.clear();
   crsStore.reset();
+  basemapStore.reset();
 
   const importProjectSchema = back_schemas.opengeodeweb_back.import_project;
   const form = new FormData();
@@ -123,6 +127,7 @@ async function importProject(file: File): Promise<void> {
       ? { projectCrs: oldestCrs(snapshot.data?.items ?? []) }
       : snapshot.crs,
   );
+  await basemapStore.importStores(snapshot.basemap);
   await hybridViewerStore.importStores(snapshot.hybridViewer);
   if (snapshot.dataStyle !== undefined) {
     await dataStyleStore.importStores(snapshot.dataStyle);
