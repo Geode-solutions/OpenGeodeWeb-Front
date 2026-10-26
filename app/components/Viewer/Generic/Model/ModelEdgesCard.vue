@@ -3,7 +3,7 @@ import {
   type ModelMenuItemProps,
   useModelMenuContext,
 } from "@ogw_front/composables/model_menu_context";
-import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
+import ModelCardTabs from "./ModelCardTabs.vue";
 import ViewerGenericModelComponentEdgesOptions from "@ogw_front/components/Viewer/Generic/Model/ComponentEdgesOptions.vue";
 import ViewerOptionsWidthSlider from "@ogw_front/components/Viewer/Options/Sliders/Width.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
@@ -11,6 +11,7 @@ import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import { useModelTabs } from "@ogw_front/composables/model_tabs";
 
 // Lines are edges themselves and corners have none: no edges options for them
 const EDGES_TYPE_TITLES = {
@@ -101,53 +102,59 @@ const componentTargets = computed(() =>
     ? []
     : [{ componentType: edgesComponentType.value, componentIds: [componentId.value] }],
 );
+
+const { tabs, activeTab } = useModelTabs({
+  componentType,
+  componentId,
+  isTypeSupported: (type) => isEdgesComponentType(type),
+  hasComponentsOptions: computed(() => allComponentsTargets.value.length > 0),
+});
 </script>
 
 <template>
   <v-sheet class="model-edges-card" color="transparent">
-    <OptionsSection title="Model Edges Options">
+    <ModelCardTabs v-model="activeTab" :tabs="tabs" />
+
+    <div v-show="activeTab === 'model'">
       <VisibilitySwitch data-testid="modelEdgesVisibilitySwitch" v-model="modelEdgesVisibility" />
       <ViewerOptionsWidthSlider
         v-if="modelEdgesVisibility"
         data-testid="modelEdgesWidthSlider"
         v-model="modelEdgesWidth"
       />
-    </OptionsSection>
+    </div>
 
-    <OptionsSection
+    <div
       v-if="!componentType && !componentId && allComponentsTargets.length > 0"
-      title="Components Edges Options"
+      v-show="activeTab === 'components'"
       data-testid="modelEdgesComponentsOptions"
-      class="mt-4"
     >
       <ViewerGenericModelComponentEdgesOptions :modelId="modelId" :targets="allComponentsTargets" />
-    </OptionsSection>
+    </div>
 
-    <OptionsSection
+    <div
       v-if="edgesComponentType"
-      :title="EDGES_TYPE_TITLES[edgesComponentType]"
+      v-show="activeTab === 'type'"
       data-testid="modelEdgesComponentTypeOptions"
-      class="mt-4"
     >
       <ViewerGenericModelComponentEdgesOptions
         :modelId="modelId"
         :targets="typeTargets"
         :referenceComponentId="typeReferenceId"
       />
-    </OptionsSection>
+    </div>
 
-    <OptionsSection
+    <div
       v-if="edgesComponentType && componentId"
-      title="Component Edges Options"
+      v-show="activeTab === 'component'"
       data-testid="modelEdgesComponentOptions"
-      class="mt-4"
     >
       <ViewerGenericModelComponentEdgesOptions
         :modelId="modelId"
         :targets="componentTargets"
         :referenceComponentId="componentId"
       />
-    </OptionsSection>
+    </div>
   </v-sheet>
 </template>
 
