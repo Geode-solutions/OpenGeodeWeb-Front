@@ -33,4 +33,3 @@ const activeTab = defineModel<string>({ required: true });
     </v-col>
   </v-row>
 </template>
-

@@ -52,7 +52,11 @@ function useModelTabs(options: ModelTabsOptions) {
     const items: ModelTabItem[] = [{ label: "Model", value: "model", testId: "modelTab_model" }];
     const type = supportedType.value;
     if (isModelContext.value && (hasComponentsOptions?.value ?? true)) {
-      items.push({ label: "Components Options", value: "components", testId: "modelTab_components" });
+      items.push({
+        label: "Components Options",
+        value: "components",
+        testId: "modelTab_components",
+      });
     } else if (type !== undefined) {
       items.push({ label: getComponentTypePlural(type), value: "type", testId: "modelTab_type" });
       if (isFilled(componentId.value)) {
