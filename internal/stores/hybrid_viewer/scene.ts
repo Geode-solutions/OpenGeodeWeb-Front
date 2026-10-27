@@ -59,12 +59,14 @@ const useHybridViewerScene = createSharedComposable(() => {
     const property = actor.getProperty();
     property.setColor(ACTOR_COLOR);
     actor.setMapper(mapper);
+    // The scene z-scaling also applies to actors added after it was set
+    actor.setScale(1, 1, zScale.value);
     const renderer = genericRenderWindow.value.getRenderer();
+    // Replacing an actor keeps the camera where the user left it
+    const isFirst = !hybridDb[id] && renderer.getActors().length === 0;
     if (hybridDb[id]) {
       renderer.removeActor(hybridDb[id].actor);
     }
-    const actors = renderer.getActors();
-    const isFirst = actors.length === 0;
     renderer.addActor(actor);
     if (isFirst) {
       renderer.resetCamera();

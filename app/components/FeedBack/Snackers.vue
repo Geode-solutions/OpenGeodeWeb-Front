@@ -10,6 +10,15 @@ const show = ref<boolean>(true);
 function calc_margin(index: number): string {
   return `${index * MARGIN_BETWEEN_SNACKERS + FIRST_SNACKER_MARGIN}px`;
 }
+
+function runAction(feedback: (typeof feedbackStore.feedbacks)[number]): void {
+  try {
+    feedback.action?.onClick();
+  } finally {
+    // The snackbar closes even when the action fails
+    feedbackStore.delete_feedback(feedback.id);
+  }
+}
 </script>
 
 <template>
@@ -62,9 +71,27 @@ function calc_margin(index: number): string {
         </v-tooltip>
       </v-col>
       <v-spacer />
+      <v-col v-if="feedback.action" cols="auto">
+        <v-tooltip location="top" :text="feedback.action.label">
+          <template #activator="{ props }">
+            <v-btn
+              v-bind="props"
+              icon
+              variant="flat"
+              size="20"
+              :color="feedback.type"
+              data-testid="feedbackActionBtn"
+              @click.stop="runAction(feedback)"
+            >
+              <v-icon icon="mdi-pencil" size="20" color="white" />
+            </v-btn>
+          </template>
+        </v-tooltip>
+      </v-col>
       <v-col cols="auto">
         <v-btn
           icon
+          data-testid="feedbackCloseBtn"
           variant="flat"
           size="20"
           :color="feedback.type"
