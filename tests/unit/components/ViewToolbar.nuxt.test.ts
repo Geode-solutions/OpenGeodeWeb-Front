@@ -17,6 +17,8 @@ interface FakeBasemap {
   loading: boolean;
   setStyle: Mock<(styleName: string) => void>;
   setOpacity: Mock<(value: number) => void>;
+  around: boolean;
+  setAround: Mock<(value: boolean) => void>;
 }
 
 const basemapState = vi.hoisted(() => ({ value: undefined as unknown }));
@@ -27,6 +29,7 @@ vi.mock(import("@ogw_front/stores/basemap") as Promise<unknown>, () => ({
 
 const SATELLITE = '[data-testid="basemapStyle-satellite"]';
 const OPACITY = '[data-testid="basemapOpacity"]';
+const AROUND = '[data-testid="basemapAround"]';
 const TIMEOUT = 5000;
 const PERCENT = 50;
 const FULL = 100;
@@ -38,6 +41,8 @@ let basemap: FakeBasemap = reactive({
   loading: false,
   setStyle: vi.fn<(styleName: string) => void>(),
   setOpacity: vi.fn<(value: number) => void>(),
+  around: true,
+  setAround: vi.fn<(value: boolean) => void>(),
 });
 
 // An open menu has its content in an active overlay
@@ -64,6 +69,8 @@ describe("view toolbar basemap", () => {
       loading: false,
       setStyle: vi.fn<(styleName: string) => void>(),
       setOpacity: vi.fn<(value: number) => void>(),
+      around: true,
+      setAround: vi.fn<(value: boolean) => void>(),
     });
     basemapState.value = basemap;
     document.body.innerHTML = "";
@@ -144,6 +151,20 @@ describe("view toolbar basemap", () => {
       expect(basemap.setOpacity).toHaveBeenCalledWith(PERCENT / FULL);
       // Moving the slider keeps the menu open
       expect(isShown(OPACITY)).toBe(true);
+    },
+    TIMEOUT,
+  );
+
+  test(
+    "the map around switch is disabled without basemap and asks the store",
+    async () => {
+      const wrapper = await mountToolbar();
+      await wrapper.find('[data-testid="basemapButton"]').trigger("click");
+      expect(document.querySelector(AROUND)?.classList).toContain("v-input--disabled");
+      basemap.style = "satellite";
+      await wrapper.vm.$nextTick();
+      document.querySelector<HTMLInputElement>(`${AROUND} input`)?.click();
+      expect(basemap.setAround).toHaveBeenCalledWith(false);
     },
     TIMEOUT,
   );
