@@ -338,7 +338,45 @@ const camera_options = computed<CameraOptionAction[]>(() => [
               tooltip-location="left"
             />
           </template>
-          <v-card class="pa-1 mr-2" elevation="4" rounded="pill">
+          <!-- Buttons and opacity: a pill would clip them, and a grid would overflow -->
+          <v-card
+            v-if="camera_option.testId === 'basemapButton'"
+            class="pa-2 mr-2"
+            elevation="4"
+            rounded="xl"
+            data-testid="basemapMenu"
+          >
+            <div class="d-flex ga-1">
+              <ActionButton
+                v-for="item in camera_option.menu"
+                :key="item.title"
+                :data-testid="item.testId"
+                :icon="item.icon"
+                :tooltip="item.title ?? ''"
+                :color="item.color"
+                tooltip-location="top"
+                @click="selectMenuItem(camera_option, item)"
+              />
+            </div>
+            <div class="d-flex align-center ga-2 mt-2 px-1">
+              <v-icon size="small" icon="mdi-circle-opacity" />
+              <v-slider
+                v-model="opacityPercent"
+                data-testid="basemapOpacity"
+                :min="10"
+                :max="100"
+                :step="5"
+                :disabled="basemapStore.style === 'none'"
+                density="compact"
+                color="primary"
+                hide-details
+              />
+              <span class="text-caption text-right" style="min-width: 4ch">
+                {{ opacityPercent }}%
+              </span>
+            </div>
+          </v-card>
+          <v-card v-else class="pa-1 mr-2" elevation="4" rounded="pill">
             <v-row dense>
               <v-col v-for="item in camera_option.menu" :key="item.title">
                 <ActionButton
@@ -358,19 +396,6 @@ const camera_options = computed<CameraOptionAction[]>(() => [
                 />
               </v-col>
             </v-row>
-            <v-slider
-              v-if="camera_option.testId === 'basemapButton'"
-              v-model="opacityPercent"
-              data-testid="basemapOpacity"
-              :min="10"
-              :max="100"
-              :step="5"
-              :disabled="basemapStore.style === 'none'"
-              density="compact"
-              color="primary"
-              hide-details
-              class="px-3"
-            />
           </v-card>
         </v-menu>
         <ActionButton
