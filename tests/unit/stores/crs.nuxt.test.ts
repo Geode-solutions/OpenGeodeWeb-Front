@@ -14,7 +14,7 @@ describe("crs store", () => {
     setupActivePinia();
   });
 
-  test("loads the geographic list once per object type", async () => {
+  test("loads the geographic list once, whatever the object type", async () => {
     const request = vi.fn().mockResolvedValue({ crs_list: CRS_LIST });
     const backStore = useBackStore();
     backStore.request = mockAs<typeof backStore.request>(request);
@@ -24,7 +24,9 @@ describe("crs store", () => {
       crsStore.geographicList("PointSet3D"),
       crsStore.geographicList("PointSet3D"),
     ]);
-    await crsStore.geographicList("PointSet3D");
+    // The same list for 2D and 3D data: another type does not request it again
+    await crsStore.geographicList("BRep");
+    await crsStore.geographicList("PointSet2D");
 
     expect(first).toStrictEqual(CRS_LIST);
     expect(second).toStrictEqual(CRS_LIST);

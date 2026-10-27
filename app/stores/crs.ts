@@ -6,7 +6,8 @@ import { useBackStore } from "@ogw_front/stores/back";
 // Session cache of the available CRS, and the channel the shared components use to ask the host app for a CRS edit
 export const useCrsStore = defineStore("crs", () => {
   const backStore = useBackStore();
-  const geographicLists = new Map<string, Promise<CRSList[]>>();
+  // OpenGeode geosciences lists the same geographic CRS for 2D and 3D data: one list for all types
+  let geographicListPromise: Promise<CRSList[]> | undefined = undefined;
   const crsEditEnabled = ref(false);
   const crsEditRequest = ref<string | undefined>(undefined);
 
@@ -23,17 +24,16 @@ export const useCrsStore = defineStore("crs", () => {
       // The back store already reports the error to the user
     }
     // A failed request is not cached: the next call retries
-    geographicLists.delete(geodeObjectType);
+    geographicListPromise = undefined;
     return [];
   }
 
   async function geographicList(geodeObjectType: string): Promise<CRSList[]> {
-    // The promise is cached, so dialogs opened together share a single request
-    if (!geographicLists.has(geodeObjectType)) {
-      geographicLists.set(geodeObjectType, fetchGeographicList(geodeObjectType));
-    }
-    const list = await geographicLists.get(geodeObjectType);
-    return list ?? [];
+    // The promise is cached, so dialogs opened together share a single request.
+    // The back still checks each CRS against the list of the data dimension
+    geographicListPromise ??= fetchGeographicList(geodeObjectType);
+    const list = await geographicListPromise;
+    return list;
   }
 
   function enableCrsEdit(): void {
