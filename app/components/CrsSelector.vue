@@ -1,63 +1,44 @@
 <script setup lang="ts">
-import schemas, { type CRSList } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
-import { useBackStore } from "@ogw_front/stores/back";
-
-const schema = schemas.opengeodeweb_back.geographic_coordinate_systems;
-
-interface Emits {
-  update_values: [values: Record<string, unknown>];
-  increment_step: [];
-  decrement_step: [];
-}
-
-const emit = defineEmits<Emits>();
+import type { CRSList } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
+import { useCrsStore } from "@ogw_front/stores/crs";
 
 interface Props {
   geodeObjectType: string;
-  keyToUpdate: string;
+  // Narrow containers: one "AUTHORITY:CODE" column and a truncated name
+  compact?: boolean;
 }
 
-const { geodeObjectType, keyToUpdate } = defineProps<Props>();
+const { geodeObjectType, compact = false } = defineProps<Props>();
+const selectedCrs = defineModel<CRSList | undefined>();
 
 const search = ref<string>("");
 const data_table_loading = ref<boolean>(false);
-const crs_list = ref<CRSList[]>([]);
+// Thousands of rows that are never mutated: no deep reactivity
+const crs_list = shallowRef<CRSList[]>([]);
 const selected_crs = ref<unknown[]>([]);
 const toggle_loading = useToggle(data_table_loading);
-const backStore = useBackStore();
+const crsStore = useCrsStore();
 
-function get_selected_crs(crs_code: unknown): unknown {
-  for (const crs of crs_list.value) {
-    if (crs.code === crs_code) {
-      return crs;
-    }
-  }
+// Codes are only unique within an authority (e.g. EPSG:4812 and ESRI:4812)
+function crs_key(crs: CRSList): string {
+  return `${crs.authority}:${crs.code}`;
+}
+
+function get_selected_crs(key: unknown): CRSList | undefined {
+  return crs_list.value.find((crs) => crs_key(crs) === key);
 }
 
 watch(selected_crs, (new_value) => {
-  const crs = get_selected_crs(new_value[0]);
-  const keys_values_object = {
-    [keyToUpdate]: crs,
-  };
-  emit("update_values", keys_values_object);
-  emit("increment_step");
+  selectedCrs.value = get_selected_crs(new_value[0]);
 });
 
-async function get_crs_table(): void {
-  const params = { geode_object_type: geodeObjectType };
+async function get_crs_table(): Promise<void> {
   toggle_loading();
-  await backStore.request(
-    { schema, params },
-    {
-      response_function: (response) => {
-        crs_list.value = response.crs_list;
-      },
-    },
-  );
+  crs_list.value = await crsStore.geographicList(geodeObjectType);
   toggle_loading();
 }
 
-const headers = [
+const full_headers = [
   {
     title: "Authority",
     align: "start",
@@ -68,24 +49,41 @@ const headers = [
   { title: "Name", align: "end", key: "name" },
 ] as const;
 
-// oxlint-disable-next-line no-top-level-await
-await get_crs_table();
+// A max width of 0 lets the name take the remaining space and truncate instead of wrapping
+const compact_headers = [
+  { title: "Code", align: "start", key: "code", value: crs_key, width: 110, nowrap: true },
+  { title: "Name", align: "start", key: "name", maxWidth: 0, nowrap: true },
+] as const;
+
+// "All" would render the whole list (thousands of rows) at once
+// oxlint-disable-next-line no-magic-numbers -- the page sizes Vuetify offers by default, "All" aside
+const items_per_page_options = [10, 25, 50, 100];
+
+const headers = computed(() => (compact ? compact_headers : full_headers));
+
+// Not awaited in setup: the table renders right away with its loader
+onMounted(async () => {
+  await get_crs_table();
+});
 </script>
 
 <template>
   <v-text-field
     v-model="search"
-    append-icon="mdi-magnify"
+    data-testid="crsSearchInput"
+    :append-icon="compact ? undefined : 'mdi-magnify'"
+    :prepend-inner-icon="compact ? 'mdi-magnify' : undefined"
     label="Search"
     single-line
     hide-details
   ></v-text-field>
   <v-data-table
     v-model="selected_crs"
-    :v-model:items-per-page="10"
+    :items-per-page="10"
+    :items-per-page-options="items_per_page_options"
     :headers="headers"
     :items="crs_list"
-    item-value="code"
+    :item-value="crs_key"
     class="elevation-1"
     density="compact"
     fixed-header
@@ -94,5 +92,13 @@ await get_crs_table();
     :search="search"
     :loading="data_table_loading"
     loading-text="Loading... Please wait"
-  ></v-data-table>
+  >
+    <template v-if="compact" #[`item.name`]="{ value }">
+      <v-tooltip :text="value" location="top">
+        <template #activator="{ props: tooltipProps }">
+          <span v-bind="tooltipProps">{{ value }}</span>
+        </template>
+      </v-tooltip>
+    </template>
+  </v-data-table>
 </template>
