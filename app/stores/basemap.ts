@@ -33,6 +33,8 @@ export const useBasemapStore = defineStore("basemap", () => {
 
   const style = ref<BasemapStyle>("none");
   const opacity = ref(1);
+  // The flat map around the draped top surfaces
+  const around = ref(true);
   const basemapId = ref<string | undefined>(undefined);
   const attribution = ref<string | undefined>(undefined);
   const loading = ref(false);
@@ -43,13 +45,16 @@ export const useBasemapStore = defineStore("basemap", () => {
   // Builds up to this number belong to a project the viewer and the back already cleared
   let lastBuildOfPreviousProject = 0;
 
+  // Data without a CRS is still in local coordinates: never under the basemap
+  function georeferencedIds(): string[] {
+    return (items.value ?? []).filter((item) => item.crs !== undefined).map((item) => item.id);
+  }
+
   // Unscaled polydata bounds: the actor bounds would include the z scale
   function dataBounds(): { bounds: Bounds; z: number } | undefined {
     // The basemap is never in hybridDb: every entry is project data. Data without a CRS is
     // Still in local coordinates and would move the basemap away from the georeferenced data
-    const georeferenced = new Set(
-      (items.value ?? []).filter((item) => item.crs !== undefined).map((item) => item.id),
-    );
+    const georeferenced = new Set(georeferencedIds());
     const boxes = Object.entries(hybridViewerStore.hybridDb)
       .filter(([id, entry]) => entry !== undefined && georeferenced.has(id))
       .map(([, entry]) => entry?.polydata.getBounds() ?? []);
@@ -109,6 +114,24 @@ export const useBasemapStore = defineStore("basemap", () => {
     });
   }
 
+  // The viewer drapes the top surfaces of these data and hides the flat map on request
+  async function applyDrape(id: string): Promise<void> {
+    await viewerStore.request({
+      schema: viewer_schemas.opengeodeweb_viewer.mesh.basemap_drape,
+      params: { id, around: around.value, data_ids: georeferencedIds() },
+    });
+  }
+
+  // No rebuild: only the flat map around the drape is shown or hidden
+  async function setAround(value: boolean): Promise<void> {
+    around.value = value;
+    if (basemapId.value === undefined) {
+      return;
+    }
+    await applyDrape(basemapId.value);
+    await hybridViewerStore.remoteRender();
+  }
+
   // No rebuild: only the opacity of the displayed basemap changes
   async function setOpacity(value: number): Promise<void> {
     opacity.value = value;
@@ -143,6 +166,7 @@ export const useBasemapStore = defineStore("basemap", () => {
           rows: response.rows,
         },
       });
+      await applyDrape(response.id);
       if (opacity.value < 1) {
         await applyOpacity(response.id);
       }
@@ -228,28 +252,31 @@ export const useBasemapStore = defineStore("basemap", () => {
     },
   );
 
-  function exportStores(): { style: BasemapStyle; opacity: number } {
-    return { style: style.value, opacity: opacity.value };
+  function exportStores(): { style: BasemapStyle; opacity: number; around: boolean } {
+    return { style: style.value, opacity: opacity.value, around: around.value };
   }
 
   // Called once the project data is imported. When the data is not displayed yet,
   // The rebuild finds no bounds and the watch above rebuilds once it is displayed.
   async function importStores(
-    snapshot: { style?: BasemapStyle; opacity?: number } | undefined,
+    snapshot: { style?: BasemapStyle; opacity?: number; around?: boolean } | undefined,
   ): Promise<void> {
     opacity.value = snapshot?.opacity ?? 1;
+    around.value = snapshot?.around ?? true;
     await setStyle(snapshot?.style ?? "none");
   }
 
   return {
     style,
     opacity,
+    around,
     basemapId,
     attribution,
     loading,
     available,
     setStyle,
     setOpacity,
+    setAround,
     rebuild,
     reset,
     exportStores,

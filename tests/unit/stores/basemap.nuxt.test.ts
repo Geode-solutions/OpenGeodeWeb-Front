@@ -1,4 +1,4 @@
-// oxlint-disable vitest/require-mock-type-parameters, no-magic-numbers
+// oxlint-disable vitest/require-mock-type-parameters, no-magic-numbers, max-lines
 import { type DataItem, useDataStore } from "@ogw_front/stores/data";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { mockAs, setupActivePinia } from "@ogw_tests/utils";
@@ -15,6 +15,7 @@ const REBUILD_DELAY = 500;
 const HALF_DELAY = 100;
 const ONCE = 1;
 const TWICE = 2;
+const THRICE = 3;
 const BOX_A = [0, 10, 0, 20, -5, 5];
 const BOX_B = [5, 30, -10, 10, 0, 1];
 // Data ids in hybridDb: a and c are georeferenced, b is still in local coordinates
@@ -222,7 +223,7 @@ describe("basemap store", () => {
   test("exports the style and opacity, rebuilds on import", async () => {
     const store = setup();
     await store.setStyle("satellite");
-    expect(store.exportStores()).toStrictEqual({ style: "satellite", opacity: 1 });
+    expect(store.exportStores()).toStrictEqual({ style: "satellite", opacity: 1, around: true });
     await store.importStores({ style: "topo" });
     const topoParams: unknown = expect.objectContaining({ style: "topo" });
     expect(backRequest).toHaveBeenLastCalledWith(expect.objectContaining({ params: topoParams }));
@@ -337,7 +338,8 @@ describe("basemap store", () => {
     const store = setup();
     await store.setOpacity(0.5);
     await store.setStyle("satellite");
-    expect(viewerRequest).toHaveBeenCalledTimes(TWICE);
+    // Apply, drape, then opacity
+    expect(viewerRequest).toHaveBeenCalledTimes(THRICE);
     expect(viewerRequest).toHaveBeenLastCalledWith(
       expect.objectContaining({ params: { id: "basemap-1", opacity: 0.5 } }),
     );
@@ -346,16 +348,60 @@ describe("basemap store", () => {
   test("a full opacity is not applied after a build", async () => {
     const store = setup();
     await store.setStyle("satellite");
-    expect(viewerRequest).toHaveBeenCalledTimes(ONCE);
+    // Apply and drape only
+    expect(viewerRequest).toHaveBeenCalledTimes(TWICE);
   });
 
   test("exports and imports the opacity", async () => {
     const store = setup();
     await store.setOpacity(0.7);
-    expect(store.exportStores()).toStrictEqual({ style: "none", opacity: 0.7 });
+    expect(store.exportStores()).toStrictEqual({ style: "none", opacity: 0.7, around: true });
     await store.importStores({ style: "none" });
     expect(store.opacity).toBe(1);
     await store.importStores({ style: "none", opacity: 0.3 });
     expect(store.opacity).toBe(0.3);
+  });
+
+  test("drapes on the georeferenced data after each build", async () => {
+    const store = setup();
+    await store.setStyle("satellite");
+    expect(viewerRequest).toHaveBeenCalledWith(
+      expect.objectContaining({
+        params: { id: "basemap-1", around: true, data_ids: ["a", "c"] },
+      }),
+    );
+  });
+
+  test("setAround asks the viewer without building again", async () => {
+    const store = setup();
+    await store.setStyle("satellite");
+    viewerRequest.mockClear();
+    remoteRender.mockClear();
+    await store.setAround(false);
+    expect(store.around).toBe(false);
+    expect(viewerRequest).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({
+        params: { id: "basemap-1", around: false, data_ids: ["a", "c"] },
+      }),
+    );
+    expect(remoteRender).toHaveBeenCalledTimes(ONCE);
+    expect(backRequest).toHaveBeenCalledTimes(ONCE);
+  });
+
+  test("setAround without basemap only stores the value", async () => {
+    const store = setup();
+    await store.setAround(false);
+    expect(store.around).toBe(false);
+    expect(viewerRequest).not.toHaveBeenCalled();
+  });
+
+  test("exports and imports map around", async () => {
+    const store = setup();
+    await store.setAround(false);
+    expect(store.exportStores()).toStrictEqual({ style: "none", opacity: 1, around: false });
+    await store.importStores({ style: "none" });
+    expect(store.around).toBe(true);
+    await store.importStores({ style: "none", around: false });
+    expect(store.around).toBe(false);
   });
 });

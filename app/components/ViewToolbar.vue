@@ -375,6 +375,17 @@ const camera_options = computed<CameraOptionAction[]>(() => [
                 {{ opacityPercent }}%
               </span>
             </div>
+            <v-switch
+              :model-value="basemapStore.around"
+              :disabled="basemapStore.style === 'none'"
+              label="Map around"
+              data-testid="basemapAround"
+              density="compact"
+              color="primary"
+              hide-details
+              class="px-1"
+              @update:model-value="(value) => basemapStore.setAround(Boolean(value))"
+            />
           </v-card>
           <v-card v-else class="pa-1 mr-2" elevation="4" rounded="pill">
             <v-row dense>
