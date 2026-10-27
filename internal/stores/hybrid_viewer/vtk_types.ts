@@ -1,5 +1,6 @@
 import type { Vector3 } from "@kitware/vtk.js/types";
 import type vtkActor from "@kitware/vtk.js/Rendering/Core/Actor";
+import type vtkPolyData from "@kitware/vtk.js/Common/DataModel/PolyData";
 
 // The camera state as exchanged with the viewer microservice (snake_case field names, plain arrays) - distinct from vtk.js's own vtkCamera object.
 interface CameraOptions {
@@ -13,7 +14,7 @@ interface CameraOptions {
 
 interface HybridDbEntry {
   actor: vtkActor;
-  polydata: unknown;
+  polydata: vtkPolyData;
   mapper: unknown;
 }
 

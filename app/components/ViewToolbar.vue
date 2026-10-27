@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { type BasemapStyle, useBasemapStore } from "@ogw_front/stores/basemap";
 import schemas, {
   type PickedFieldType,
 } from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
@@ -18,6 +19,7 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 const hybridViewerStore = useHybridViewerStore();
+const basemapStore = useBasemapStore();
 const viewerStore = useViewerStore();
 const { is_picking, is_zoom_box_active } = storeToRefs(hybridViewerStore);
 const { picking_mode } = storeToRefs(viewerStore);
@@ -32,7 +34,21 @@ const showThresholdFilter = ref<boolean>(false);
 const showRuler = ref<boolean>(false);
 const gridScale = ref<boolean>(false);
 const zScale = ref<number>(hybridViewerStore.zScale);
+const BASEMAP_STYLES: { style: BasemapStyle; title: string; icon: string }[] = [
+  { style: "none", title: "No basemap", icon: "mdi-map-marker-off-outline" },
+  { style: "satellite", title: "Satellite", icon: "mdi-satellite-variant" },
+  { style: "streets", title: "Streets", icon: "mdi-road-variant" },
+  { style: "topo", title: "Topo", icon: "mdi-terrain" },
+];
 const openSubMenus = ref<Record<string, boolean>>({});
+const PERCENT = 100;
+// The slider works in percent, the store in 0..1
+const opacityPercent = computed({
+  get: () => Math.round(basemapStore.opacity * PERCENT),
+  set: (value: number) => {
+    void basemapStore.setOpacity(value / PERCENT);
+  },
+});
 
 interface CameraOptionAction {
   title?: string;
@@ -41,6 +57,10 @@ interface CameraOptionAction {
   icon: string;
   iconSize?: number;
   color?: string;
+  disabled?: boolean;
+  loading?: boolean;
+  // Closes the sub-menu once one of its items is chosen
+  closeOnSelect?: boolean;
   action?: () => void;
   menu?: CameraOptionAction[];
 }
@@ -65,6 +85,13 @@ onKeyStroke("Escape", () => {
     }
   }
 });
+
+function selectMenuItem(option: CameraOptionAction, item: CameraOptionAction): void {
+  item.action?.();
+  if (option.closeOnSelect === true) {
+    openSubMenus.value[option.testId] = false;
+  }
+}
 
 function stopHoverHighlight(): void {
   hybridViewerStore.is_hover_highlight = false;
@@ -184,6 +211,24 @@ const camera_options = computed<CameraOptionAction[]>(() => [
     },
   },
   {
+    testId: "basemapButton",
+    tooltip: basemapStore.available ? "Basemap" : "Assign a CRS to display a basemap",
+    icon: "mdi-map",
+    color: basemapStore.style === "none" ? undefined : "primary",
+    disabled: !basemapStore.available,
+    loading: basemapStore.loading,
+    closeOnSelect: true,
+    menu: BASEMAP_STYLES.map(({ style, title, icon }) => ({
+      testId: `basemapStyle-${style}`,
+      title,
+      icon,
+      color: basemapStore.style === style ? "primary" : undefined,
+      action: (): void => {
+        void basemapStore.setStyle(style);
+      },
+    })),
+  },
+  {
     testId: "screenshotButton",
     tooltip: "Take a screenshot",
     icon: "mdi-camera",
@@ -278,6 +323,7 @@ const camera_options = computed<CameraOptionAction[]>(() => [
           v-model="openSubMenus[camera_option.testId]"
           location="start"
           :close-on-content-click="false"
+          :disabled="camera_option.disabled"
         >
           <template #activator="{ props }">
             <ActionButton
@@ -286,11 +332,62 @@ const camera_options = computed<CameraOptionAction[]>(() => [
               :icon="camera_option.icon"
               :tooltip="camera_option.tooltip ?? ''"
               :color="camera_option.color"
+              :disabled="camera_option.disabled"
+              :loading="camera_option.loading"
               :icon-size="camera_option.iconSize"
               tooltip-location="left"
             />
           </template>
-          <v-card class="pa-1 mr-2" elevation="4" rounded="pill">
+          <!-- Buttons and opacity: a pill would clip them, and a grid would overflow -->
+          <v-card
+            v-if="camera_option.testId === 'basemapButton'"
+            class="pa-2 mr-2"
+            elevation="4"
+            rounded="xl"
+            data-testid="basemapMenu"
+          >
+            <div class="d-flex ga-1">
+              <ActionButton
+                v-for="item in camera_option.menu"
+                :key="item.title"
+                :data-testid="item.testId"
+                :icon="item.icon"
+                :tooltip="item.title ?? ''"
+                :color="item.color"
+                tooltip-location="top"
+                @click="selectMenuItem(camera_option, item)"
+              />
+            </div>
+            <div class="d-flex align-center ga-2 mt-2 px-1">
+              <v-icon size="small" icon="mdi-circle-opacity" />
+              <v-slider
+                v-model="opacityPercent"
+                data-testid="basemapOpacity"
+                :min="10"
+                :max="100"
+                :step="5"
+                :disabled="basemapStore.style === 'none'"
+                density="compact"
+                color="primary"
+                hide-details
+              />
+              <span class="text-caption text-right" style="min-width: 4ch">
+                {{ opacityPercent }}%
+              </span>
+            </div>
+            <v-switch
+              :model-value="basemapStore.around"
+              :disabled="basemapStore.style === 'none'"
+              label="Map around"
+              data-testid="basemapAround"
+              density="compact"
+              color="primary"
+              hide-details
+              class="px-1"
+              @update:model-value="(value) => basemapStore.setAround(Boolean(value))"
+            />
+          </v-card>
+          <v-card v-else class="pa-1 mr-2" elevation="4" rounded="pill">
             <v-row dense>
               <v-col v-for="item in camera_option.menu" :key="item.title">
                 <ActionButton
@@ -298,14 +395,15 @@ const camera_options = computed<CameraOptionAction[]>(() => [
                   :icon="item.icon"
                   :tooltip="item.title ?? ''"
                   :color="
-                    hybridViewerStore.is_hover_highlight &&
+                    item.color ??
+                    (hybridViewerStore.is_hover_highlight &&
                     hybridViewerStore.hover_highlight_field_type ===
                       item.title?.toUpperCase().slice(0, -1)
                       ? 'primary'
-                      : undefined
+                      : undefined)
                   "
                   tooltip-location="top"
-                  @click="item.action?.()"
+                  @click="selectMenuItem(camera_option, item)"
                 />
               </v-col>
             </v-row>
