@@ -4,13 +4,14 @@ import { flushPromises } from "@vue/test-utils";
 import { mountSuspended } from "@nuxt/test-utils/runtime";
 
 // Local imports
+import ThresholdCard from "@ogw_front/components/ThresholdCard.vue";
 import ThresholdFilter from "@ogw_front/components/ThresholdFilter.vue";
 import { vuetify } from "@ogw_tests/utils";
 
 const DEBOUNCE_WAIT = 200;
 const LAST_STEP = 2;
 const timeStep = ref<number | undefined>(0);
-const setThreshold = vi.fn<(ids: string[], threshold?: { name: string }) => void>();
+const setThreshold = vi.fn<(ids: string[], thresholds: { name: string }[]) => void>();
 
 vi.mock(import("@ogw_front/stores/back") as Promise<unknown>, () => ({
   useBackStore: (): { request: () => Promise<unknown> } => ({
@@ -40,7 +41,9 @@ vi.mock(import("@ogw_front/stores/data_style") as Promise<unknown>, () => ({
   }),
 }));
 vi.mock(import("@ogw_front/stores/hybrid_viewer") as Promise<unknown>, () => ({
-  useHybridViewerStore: (): { setThreshold: typeof setThreshold } => ({ setThreshold }),
+  useHybridViewerStore: (): { setThreshold: typeof setThreshold } => ({
+    setThreshold,
+  }),
 }));
 
 async function settle(): Promise<void> {
@@ -61,13 +64,15 @@ describe("thresholdFilter time steps", () => {
     const state = wrapper.vm as unknown as Record<string, unknown>;
     state.selectedDatasetId = "id";
     await flushPromises();
-    state.selectedSourceIndex = 0;
+    // oxlint-disable-next-line no-unsafe-type-assertion -- script setup refs are not typed on vm
+    const cardState = wrapper.findComponent(ThresholdCard).vm as unknown as Record<string, unknown>;
+    cardState.selectedSourceIndex = 0;
     await flushPromises();
-    state.attributeName = "temp";
+    cardState.attributeName = "temp";
     await settle();
     expect(setThreshold).toHaveBeenLastCalledWith(
       ["id"],
-      expect.objectContaining({ name: "temp@0" }),
+      [expect.objectContaining({ name: "temp@0" })],
     );
 
     timeStep.value = LAST_STEP;
@@ -75,7 +80,7 @@ describe("thresholdFilter time steps", () => {
 
     expect(setThreshold).toHaveBeenLastCalledWith(
       ["id"],
-      expect.objectContaining({ name: "temp@2" }),
+      [expect.objectContaining({ name: "temp@2" })],
     );
   });
 });

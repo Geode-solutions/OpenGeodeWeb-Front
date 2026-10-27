@@ -60,10 +60,10 @@ interface ThresholdAttribute {
   minimum: number;
   maximum: number;
 }
-async function setThreshold(ids: string[], attribute?: ThresholdAttribute): Promise<void> {
+async function setThreshold(ids: string[], attributes: ThresholdAttribute[]): Promise<void> {
   await requestAndRender(viewer_schemas.opengeodeweb_viewer.viewer.threshold, {
     ids,
-    attribute,
+    attributes,
   });
 }
 function useHybridViewerFilters(): {
@@ -74,7 +74,7 @@ function useHybridViewerFilters(): {
     ids: string[],
     slices: { axis: SliceAxis; index: number }[],
   ) => Promise<[number, number, number]>;
-  setThreshold: (ids: string[], attribute?: ThresholdAttribute) => Promise<void>;
+  setThreshold: (ids: string[], attributes: ThresholdAttribute[]) => Promise<void>;
 } {
   return {
     setClippingPlanes,
