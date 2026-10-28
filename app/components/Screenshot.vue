@@ -2,14 +2,10 @@
 import viewer_schemas, {
   type ViewerTakeScreenshotParams,
 } from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
-import { BACKGROUND_GREY_VALUE } from "@ogw_internal/stores/hybrid_viewer/constants";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
-import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
 import fileDownload from "js-file-download";
 import { useClipboardItems } from "@vueuse/core";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
-import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 const DEFAULT_PANEL_WIDTH = 260;
@@ -30,27 +26,8 @@ const output_extension = ref<ViewerTakeScreenshotParams["output_extension"]>("pn
 const include_background = ref<boolean>(true);
 const include_ui = ref<boolean>(false);
 const screenshot_type = ref<string>("file");
-const DEFAULT_BACKGROUND_COLOR: RGBAColor = {
-  red: BACKGROUND_GREY_VALUE,
-  green: BACKGROUND_GREY_VALUE,
-  blue: BACKGROUND_GREY_VALUE,
-  alpha: 1,
-};
-const background_color = ref<RGBAColor>({ ...DEFAULT_BACKGROUND_COLOR });
-let is_capturing = false;
 
 const { copy } = useClipboardItems();
-
-function applyBackgroundColor(color: RGBAColor): Promise<void> {
-  const hybridViewerStore = useHybridViewerStore();
-  // oxlint-disable-next-line id-length -- the viewer schema requires { r, g, b }
-  return hybridViewerStore.setBackgroundColor({ r: color.red, g: color.green, b: color.blue });
-}
-
-async function restoreBackgroundColor(): Promise<void> {
-  background_color.value = { ...DEFAULT_BACKGROUND_COLOR };
-  await applyBackgroundColor(DEFAULT_BACKGROUND_COLOR);
-}
 
 async function deliverScreenshot(blob: Blob | Uint8Array, current_filename: string): Promise<void> {
   const feedbackStore = useFeedbackStore();
@@ -145,34 +122,16 @@ async function takeUiScreenshot(current_filename: string): Promise<void> {
 
 async function takeScreenshot(): Promise<void> {
   const current_filename = screenshot_type.value === "file" ? filename.value : "screenshot";
-  is_capturing = true;
-  try {
-    if (include_ui.value) {
-      // Close the panel first so it does not appear on the captured page
-      show.value = false;
-      await nextTick();
-      await takeUiScreenshot(current_filename);
-    } else {
-      await takeSceneScreenshot(current_filename);
-      show.value = false;
-    }
-  } finally {
-    await restoreBackgroundColor();
-    is_capturing = false;
+  if (include_ui.value) {
+    // Close the panel first so it does not appear on the captured page
+    show.value = false;
+    await nextTick();
+    await takeUiScreenshot(current_filename);
+  } else {
+    await takeSceneScreenshot(current_filename);
+    show.value = false;
   }
 }
-
-watch(background_color, async (color) => {
-  if (show.value) {
-    await applyBackgroundColor(color);
-  }
-});
-
-watch(show, async (value) => {
-  if (!value && !is_capturing) {
-    await restoreBackgroundColor();
-  }
-});
 
 watch([output_extension, include_ui], ([extension, with_ui]) => {
   if (extension !== "png" || with_ui) {
@@ -287,14 +246,6 @@ function handleClose(): void {
             inset
             class="text-caption"
           ></v-switch>
-        </v-col>
-        <v-col v-if="include_background" cols="12" class="py-1">
-          <span class="text-caption">Background color</span>
-          <ViewerOptionsColorPicker
-            data-testid="screenshotBackgroundColorPicker"
-            v-model="background_color"
-            disabled-alpha
-          />
         </v-col>
       </v-row>
     </v-container>

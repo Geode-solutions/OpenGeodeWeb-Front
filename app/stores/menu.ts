@@ -38,6 +38,11 @@ import ModelEdgesOptions from "@ogw_front/components/Viewer/Generic/Model/EdgesO
 import ModelPointsOptions from "@ogw_front/components/Viewer/Generic/Model/PointsOptions.vue";
 import ModelStyleOptions from "@ogw_front/components/Viewer/Generic/Model/ModelStyleOptions.vue";
 
+// Scene components
+import SceneBackgroundOptions from "@ogw_front/components/Viewer/Scene/BackgroundOptions.vue";
+import SceneOrientationWidgetOptions from "@ogw_front/components/Viewer/Scene/OrientationWidgetOptions.vue";
+import SceneTextOptions from "@ogw_front/components/Viewer/Scene/TextOptions.vue";
+
 import type { Component } from "vue";
 
 type MenuItems = Component[];
@@ -107,6 +112,12 @@ const StructuralModel_menu = [ModelEdgesOptions, ModelPointsOptions, ModelStyleO
 
 const ModelComponent_menu = [ModelEdgesOptions, ModelPointsOptions, ModelStyleOptions];
 
+const MENU_RADIUS = 80;
+// Same gap between neighbour items as a 4-item object menu (3 items, no center button)
+const SCENE_MENU_RADIUS = 65;
+
+const Scene_menu = [SceneBackgroundOptions, SceneTextOptions, SceneOrientationWidgetOptions];
+
 const menusData: Record<string, Record<string, MenuItems>> = {
   mesh: {
     EdgedCurve2D: EdgedCurve_menu,
@@ -139,6 +150,9 @@ const menusData: Record<string, Record<string, MenuItems>> = {
   model_component: {
     component: ModelComponent_menu,
   },
+  scene: {
+    scene: Scene_menu,
+  },
 };
 
 export const useMenuStore = defineStore("menu", () => {
@@ -153,6 +167,9 @@ export const useMenuStore = defineStore("menu", () => {
   const containerLeft = ref(0);
   const active_item_index = ref<number | undefined>(undefined);
   const current_meta_data = ref<MenuMetaData>({});
+  const menuRadius = computed(() =>
+    current_meta_data.value.viewer_type === "scene" ? SCENE_MENU_RADIUS : MENU_RADIUS,
+  );
 
   function getMenuItems(
     objectType: string | undefined,
@@ -240,6 +257,7 @@ export const useMenuStore = defineStore("menu", () => {
     containerTop,
     containerLeft,
     active_item_index,
+    menuRadius,
     getMenuItems,
     closeMenu,
     openMenu,
