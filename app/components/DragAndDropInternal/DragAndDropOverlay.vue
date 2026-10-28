@@ -43,7 +43,7 @@ const {
         content-class="w-100 h-100"
         persistent
       >
-        <v-container class="fill-height" :fluid="fullscreen">
+        <v-container class="fill-height d-flex align-center justify-center" :fluid="fullscreen">
           <v-row align="center" justify="center">
             <v-col
               cols="12"
@@ -63,7 +63,7 @@ const {
 
               <v-sheet
                 class="font-weight-black mb-6 text-white text-glow d-block bg-transparent"
-                :class="fullscreen ? 'text-h2' : 'text-h3'"
+                :class="fullscreen ? 'text-display-medium' : 'text-display-small'"
               >
                 {{
                   loading ? texts.loading : fullscreen ? "Drop your files here" : "Drop your files"
@@ -72,7 +72,7 @@ const {
 
               <v-sheet
                 class="text-white opacity-70 d-block mb-8 mx-auto bg-transparent"
-                :class="fullscreen ? 'text-h5' : 'text-h6'"
+                :class="fullscreen ? 'text-headline-medium' : 'text-headline-small'"
                 :style="fullscreen ? 'max-width:700px' : 'max-width:500px'"
               >
                 {{
@@ -94,7 +94,7 @@ const {
 
               <v-sheet
                 class="text-white opacity-40 d-block mt-12 bg-transparent"
-                :class="fullscreen ? 'text-h6' : 'text-body-2'"
+                :class="fullscreen ? 'text-headline-small' : 'text-body-medium'"
               >
                 Press
                 <v-kbd class="escape-kbd mx-1">Esc</v-kbd>
