@@ -1,4 +1,10 @@
 import {
+  SCENE_DEFAULT_BACKGROUND_COLOR,
+  SCENE_DEFAULT_FONT_FAMILY,
+  SCENE_DEFAULT_ORIENTATION_WIDGET,
+  SCENE_DEFAULT_TEXT_COLOR,
+} from "./constants";
+import {
   brepDefaultStyle,
   crossSectionDefaultStyle,
   implicitCrossSectionDefaultStyle,
@@ -14,6 +20,7 @@ import {
   solidDefaultStyle,
   surfaceDefaultStyle,
 } from "./meshes";
+import type { SceneStyle } from "@ogw_internal/stores/data_style/types";
 
 function default_styles(): Record<string, unknown> {
   return {
@@ -50,6 +57,15 @@ function getDefaultStyle(type: string): unknown {
   return styles[type];
 }
 
+function getDefaultSceneStyle(): SceneStyle {
+  return {
+    id: "scene",
+    background_color: { ...SCENE_DEFAULT_BACKGROUND_COLOR },
+    text: { color: { ...SCENE_DEFAULT_TEXT_COLOR }, font_family: SCENE_DEFAULT_FONT_FAMILY },
+    orientation_widget: SCENE_DEFAULT_ORIENTATION_WIDGET,
+  };
+}
+
 export { DEFAULT_MODEL_COMPONENT_TYPE_STYLES } from "./models";
 export {
   MESH_COMPONENT_TYPES,
@@ -58,4 +74,4 @@ export {
   MODEL_DEFAULT_ACTIVE_COLORING,
   DEFAULT_NO_DATA_COLOR,
 } from "./constants";
-export { getDefaultStyle };
+export { getDefaultSceneStyle, getDefaultStyle };
