@@ -39,7 +39,7 @@ interface Emits {
   "update:active": [value: unknown[]];
   "click:item": [item: DisplayItem["raw"]];
   "update:scrollTop": [value: number];
-  "hover:enter": [payload: { item: DisplayItem }];
+  "hover:enter": [payload: { item: DisplayItem; immediate?: boolean }];
   "hover:leave": [payload: { item: DisplayItem }];
   contextmenu: [payload: { event: MouseEvent; item: DisplayItem["raw"] }];
 }
