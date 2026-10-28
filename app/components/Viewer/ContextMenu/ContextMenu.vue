@@ -18,7 +18,6 @@ interface Props {
 
 const { id, x, y, containerWidth, containerHeight } = defineProps<Props>();
 
-const RADIUS = 80;
 const MARGIN_OFFSET = 40;
 const CLOSE_DELAY = 100;
 const TREEVIEW_MARGIN_LEFT = 10;
@@ -31,6 +30,7 @@ const menuStore = useMenuStore();
 const treeviewStore = useTreeviewStore();
 
 const meta_data = computed(() => menuStore.current_meta_data || {});
+const isSceneMenu = computed(() => meta_data.value.viewer_type === "scene");
 provideBatchGroup(() => meta_data.value.targetIds ?? []);
 
 const show_menu = ref<boolean>(true);
@@ -47,7 +47,7 @@ interface Position {
 }
 
 function clampPosition(posX: number, posY: number): Position {
-  const margin = RADIUS + MARGIN_OFFSET;
+  const margin = menuStore.menuRadius + MARGIN_OFFSET;
   return {
     x: Math.min(Math.max(posX, margin), containerWidth - margin),
     y: Math.min(Math.max(posY, margin), containerHeight - margin),
@@ -158,8 +158,8 @@ const isOverToolbar = computed<boolean>(() => {
 function getMenuStyle(): Record<string, string> {
   return {
     position: "fixed" as const,
-    left: `${menuStore.containerLeft + menuX.value - RADIUS}px`,
-    top: `${menuStore.containerTop + menuY.value - RADIUS}px`,
+    left: `${menuStore.containerLeft + menuX.value - menuStore.menuRadius}px`,
+    top: `${menuStore.containerTop + menuY.value - menuStore.menuRadius}px`,
   };
 }
 
@@ -180,7 +180,7 @@ function toggleShowName(): void {
     <div class="circular-menu-drag-handle" @mousedown.stop="startDrag">
       <div
         class="circular-menu-items"
-        :style="{ width: `${RADIUS * 2}px`, height: `${RADIUS * 2}px` }"
+        :style="{ width: `${menuStore.menuRadius * 2}px`, height: `${menuStore.menuRadius * 2}px` }"
       >
         <CircularItems
           :menu-items="menu_items"
@@ -190,13 +190,14 @@ function toggleShowName(): void {
         />
 
         <CenterButton
+          v-if="!isSceneMenu"
           :is-over-treeview="isOverTreeview"
           :is-over-toolbar="isOverToolbar"
           @drag="startDrag"
           @click="toggleShowName"
         />
 
-        <InfoCard v-model:show="showName" :meta-data="meta_data" />
+        <InfoCard v-if="!isSceneMenu" v-model:show="showName" :meta-data="meta_data" />
       </div>
     </div>
   </v-menu>

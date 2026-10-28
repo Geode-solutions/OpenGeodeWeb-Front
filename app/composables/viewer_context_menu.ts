@@ -14,6 +14,11 @@ interface MenuTarget {
   meta_data: MenuMetaData;
 }
 
+const SCENE_MENU_TARGET: MenuTarget = {
+  id: "scene",
+  meta_data: { viewer_type: "scene", geode_object_type: "scene" },
+};
+
 async function treeMenuTarget(
   dataStore: ReturnType<typeof useDataStore>,
   payload: TreeMenuPayload,
@@ -112,8 +117,11 @@ export function useViewerContextMenu(
     const rect = element.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const yPicking = containerHeight.value - (event.clientY - rect.top);
-    const { id: pickedId, viewer_id } = await viewerComponent.get_viewer_id(x, yPicking);
+    const { id: pickedId, viewer_id, dismissed } = await viewerComponent.get_viewer_id(x, yPicking);
     if (pickedId === undefined) {
+      if (dismissed !== true) {
+        openMenuAt(event, element, SCENE_MENU_TARGET);
+      }
       return;
     }
     openMenuAt(event, element, await viewerMenuTarget(dataStore, pickedId, viewer_id));

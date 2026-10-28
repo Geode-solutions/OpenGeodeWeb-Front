@@ -2,9 +2,11 @@ import type {
   ModelComponentStyle,
   ModelComponentTypeStyle,
   ObjectStyle,
+  SceneStyle,
   StyleValues,
 } from "./types";
 import type { Observable as RxObservable } from "rxjs";
+import { getDefaultSceneStyle } from "@ogw_front/utils/default_styles";
 import { getTable } from "@ogw_internal/database/database";
 import { liveQuery } from "dexie";
 import merge from "lodash/merge";
@@ -14,6 +16,7 @@ interface SharedState {
   styles: Ref<Record<string, ObjectStyle>>;
   modelComponentTypeStyles: Ref<Record<string, ModelComponentTypeStyle>>;
   componentStyles: Ref<Record<string, ModelComponentStyle>>;
+  sceneStyle: Ref<SceneStyle>;
   loadFromDatabase: () => Promise<void>;
   updateComponentStyleCache: (
     modelId: string,
@@ -74,12 +77,16 @@ function getSharedState(): SharedState {
 
   const modelComponentTypeStyles = ref<Record<string, ModelComponentTypeStyle>>({});
   const componentStyles = ref<Record<string, ModelComponentStyle>>({});
+  const sceneStyleTable = getTable<SceneStyle>("scene_style");
+  const sceneStyle = ref<SceneStyle>(getDefaultSceneStyle());
 
   async function loadFromDatabase(): Promise<void> {
-    const [fetchedTypeStyles, fetchedComponentStyles] = await Promise.all([
+    const [fetchedTypeStyles, fetchedComponentStyles, fetchedSceneStyle] = await Promise.all([
       modelComponentTypeDataStyleTable.toArray(),
       modelComponentDataStyleTable.toArray(),
+      sceneStyleTable.get("scene"),
     ]);
+    sceneStyle.value = fetchedSceneStyle ?? getDefaultSceneStyle();
     const typeStylesMap: Record<string, ModelComponentTypeStyle> = {};
     for (const typeStyle of fetchedTypeStyles) {
       const cacheKey = `${typeStyle.id_model}_${typeStyle.type}`;
@@ -177,6 +184,7 @@ function getSharedState(): SharedState {
     styles,
     modelComponentTypeStyles,
     componentStyles,
+    sceneStyle,
     loadFromDatabase,
     updateComponentStyleCache,
     bulkUpdateComponentStyleCache,
@@ -263,9 +271,11 @@ export function useDataStyleState(): DataStyleStateApi {
       dataStyleTable.clear(),
       modelComponentDataStyleTable.clear(),
       modelComponentTypeDataStyleTable.clear(),
+      getTable<SceneStyle>("scene_style").clear(),
     ]);
     modelComponentTypeStyles.value = {};
     componentStyles.value = {};
+    state.sceneStyle.value = getDefaultSceneStyle();
   }
 
   return {
