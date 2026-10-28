@@ -14,6 +14,7 @@ interface ClippingPlane {
   id: number;
   origin?: number[];
   normal: number[];
+  opacity: number;
 }
 
 interface ClippingWidgetState {

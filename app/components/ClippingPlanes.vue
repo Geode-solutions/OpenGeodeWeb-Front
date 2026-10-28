@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { DEBOUNCE_DELAY, DEFAULT_NORMALS } from "@ogw_front/utils/clipping_planes";
+import {
+  DEBOUNCE_DELAY,
+  DEFAULT_NORMALS,
+  DEFAULT_PLANE_OPACITY,
+  getPlaneColor,
+} from "@ogw_front/utils/clipping_planes";
 import {
   DEFAULT_SLICE_AXIS,
   SLICE_AXES,
@@ -31,7 +36,9 @@ function newItemId(): number {
   lastItemId += 1;
   return lastItemId;
 }
-const planes = ref<ClippingPlane[]>([{ id: newItemId(), origin: undefined, normal: [1, 0, 0] }]);
+const planes = ref<ClippingPlane[]>([
+  { id: newItemId(), origin: undefined, normal: [1, 0, 0], opacity: DEFAULT_PLANE_OPACITY },
+]);
 const allItems = dataStore.refAllItems();
 const sliceEnabled = ref<boolean>(false);
 const slices = ref<{ id: number; axis: SliceAxis; index: number }[]>([
@@ -82,9 +89,11 @@ async function applyClippingPlanes(): Promise<void> {
   }
   const center = getSceneCenter();
   const untargetedIds = getUntargetedIds();
-  const planesData = planes.value.map((plane) => ({
+  const planesData = planes.value.map((plane, index) => ({
     origin: (plane.origin || center).map(Number),
     normal: plane.normal.map(Number),
+    color: [...getPlaneColor(index)],
+    opacity: plane.opacity,
   }));
   if (targetIds.value.length > 0) {
     await hybridViewerStore.setClippingPlanes(
@@ -149,7 +158,12 @@ function addPlane(): void {
   // Satisfy noUncheckedIndexedAccess and are never hit at runtime.
   const normal = DEFAULT_NORMALS[planes.value.length % DEFAULT_NORMALS.length] ??
     DEFAULT_NORMALS[0] ?? [1, 0, 0];
-  planes.value.push({ id: newItemId(), origin: getSceneCenter(), normal });
+  planes.value.push({
+    id: newItemId(),
+    origin: getSceneCenter(),
+    normal,
+    opacity: DEFAULT_PLANE_OPACITY,
+  });
 }
 
 function removePlane(index: number): void {
@@ -177,7 +191,9 @@ function flipNormal(plane: { normal: number[] }): void {
 
 async function resetClippingPlanes(): Promise<void> {
   setFromWidget(true);
-  planes.value = [{ id: newItemId(), origin: undefined, normal: [1, 0, 0] }];
+  planes.value = [
+    { id: newItemId(), origin: undefined, normal: [1, 0, 0], opacity: DEFAULT_PLANE_OPACITY },
+  ];
   sliceEnabled.value = false;
   slices.value = [{ id: newItemId(), axis: DEFAULT_SLICE_AXIS, index: 0 }];
   updateWidgetPlacement({ isReset: true });
