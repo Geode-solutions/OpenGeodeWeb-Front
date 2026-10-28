@@ -6,6 +6,7 @@ const AXIS_SCALE = 0.45;
 const SIZE_RATIO = 0.1;
 const DEBOUNCE_DELAY = 200;
 const CHANGE_THRESHOLD = 1e-4;
+const DEFAULT_PLANE_OPACITY = 0.1;
 // oxlint-disable no-magic-numbers
 const COLOR_BLUE = [0.12, 0.53, 0.9];
 const COLOR_GREEN = [0.26, 0.63, 0.28];
@@ -20,8 +21,12 @@ const NORMAL_Z = [0, 0, 1];
 const DEFAULT_NORMALS = [NORMAL_X, NORMAL_Y, NORMAL_Z];
 const RGB_MAX_VALUE = 255;
 
+function getPlaneColor(index: number): readonly number[] {
+  return PLANE_COLORS[index % PLANE_COLORS.length] ?? COLOR_BLUE;
+}
+
 function getPlaneCssColor(index: number): string {
-  const rgb = PLANE_COLORS[index % PLANE_COLORS.length] ?? COLOR_BLUE;
+  const rgb = getPlaneColor(index);
   return `rgb(${rgb.map((channel) => Math.round(channel * RGB_MAX_VALUE)).join(",")})`;
 }
 
@@ -208,8 +213,10 @@ export {
   SIZE_RATIO,
   DEBOUNCE_DELAY,
   CHANGE_THRESHOLD,
+  DEFAULT_PLANE_OPACITY,
   PLANE_COLORS,
   DEFAULT_NORMALS,
+  getPlaneColor,
   getPlaneCssColor,
   hasPlaneChanged,
   getPlaneStyle,
