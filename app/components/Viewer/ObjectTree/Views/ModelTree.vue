@@ -248,6 +248,7 @@ function getLeafViewerIds(item: CollectionTreeItem): number[] {
         <ObjectTreeItemLabel
           :item="item as unknown as DisplayItem"
           :is-leaf="isLeaf"
+          :model-id="id"
           show-tooltip
           class="text-body-1"
           @contextmenu="showContextMenu($event, item as unknown as CollectionTreeItem)"

@@ -10,7 +10,7 @@ const DEFAULT_END_CHARS = 6;
  * @param {number} endChars - Number of characters to keep at the end.
  * @returns {string} The truncated string.
  */
-export function middleTruncate(
+function middleTruncate(
   text: string | undefined | null,
   maxLength: number = DEFAULT_MAX_LENGTH,
   startChars: number = DEFAULT_START_CHARS,
@@ -24,3 +24,17 @@ export function middleTruncate(
   const end = text.slice(-endChars);
   return `${start}...${end}`;
 }
+
+/**
+ * Pluralizes an English noun.
+ * @param {string} word - The singular noun.
+ * @returns {string} The plural form.
+ */
+function pluralize(word: string): string {
+  if (word.endsWith("y")) {
+    return `${word.slice(0, -1)}ies`;
+  }
+  return `${word}s`;
+}
+
+export { middleTruncate, pluralize };
