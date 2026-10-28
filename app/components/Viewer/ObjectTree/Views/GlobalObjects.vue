@@ -182,7 +182,10 @@ function expandAll(): void {
       class="transparent-treeview virtual-tree-height"
       @update:selected="(val) => onUpdateSelection(val as string[])"
       @update:scroll-top="treeviewStore.setScrollTop(mainView?.id ?? '', $event)"
-      @hover:enter="({ item }) => handleHoverEnter({ item: item as unknown as TreeGroupItem })"
+      @hover:enter="
+        ({ item, immediate }) =>
+          handleHoverEnter({ item: item as unknown as TreeGroupItem, immediate })
+      "
       @hover:leave="({ item }) => handleHoverLeave({ item: item as unknown as TreeGroupItem })"
       @contextmenu="showMenu($event.event, $event.item as unknown as TreeGroupItem)"
     >
