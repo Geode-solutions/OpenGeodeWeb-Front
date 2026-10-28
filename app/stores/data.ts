@@ -9,6 +9,7 @@ import { type ModelComponentRecord, useDataMesh } from "./data_helpers/mesh.js";
 import { database } from "@ogw_internal/database/database.js";
 import { liveObservable } from "@ogw_front/utils/live_observable";
 import { useDataCollections } from "./data_helpers/collections.js";
+import { useDataRelations } from "./data_helpers/relations.js";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 interface DataItem {
@@ -125,6 +126,7 @@ export const useDataStore = defineStore("data", () => {
     formatedCollectionComponents,
     refFormatedCollectionComponents,
   } = useDataCollections();
+  const { getComponentRelations } = useDataRelations();
   async function item(id: string): Promise<DataItem> {
     const data_item = await data_db.get(id);
     if (!data_item) {
@@ -395,6 +397,7 @@ export const useDataStore = defineStore("data", () => {
     fetchAllCollectionComponents,
     formatedCollectionComponents,
     refFormatedCollectionComponents,
+    getComponentRelations,
   };
 });
 

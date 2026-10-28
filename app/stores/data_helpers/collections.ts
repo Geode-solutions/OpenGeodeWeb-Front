@@ -3,6 +3,7 @@ import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import type { Ref } from "vue";
 import { getTable } from "@ogw_internal/database/database.js";
 import { liveObservable } from "@ogw_front/utils/live_observable";
+import { pluralize } from "@ogw_front/utils/string";
 import { useObservable } from "@vueuse/rxjs";
 
 interface ModelComponentRelationRecord {
@@ -20,13 +21,6 @@ interface CollectionComponentGroup {
   id: string;
   title: string;
   readonly children: readonly CollectionComponent[];
-}
-
-function pluralize(type: string): string {
-  if (type.endsWith("y")) {
-    return `${type.slice(0, -1)}ies`;
-  }
-  return `${type}s`;
 }
 
 // oxlint-disable-next-line eslint/max-lines-per-function
