@@ -276,7 +276,22 @@ const { handleKeyDown } = useTreeKeyboardNav(
 }
 
 .tree-row-wrapper.is-active {
-  background-color: rgba(0, 0, 0, 0.08) !important;
+  background-color: rgba(var(--v-theme-primary), 0.3) !important;
+}
+
+.tree-row-wrapper.is-active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 3px;
+  border-radius: 2px;
+  background-color: rgb(var(--v-theme-primary));
+}
+
+.tree-row-wrapper.is-active.is-focused {
+  box-shadow: inset 0 0 0 2px rgba(var(--v-theme-primary), 0.6);
 }
 
 .tree-row-wrapper:hover:not(.is-focused):not(.is-active) {
