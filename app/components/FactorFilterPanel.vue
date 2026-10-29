@@ -43,7 +43,7 @@ const targetAllVisible = ref<boolean>(true);
 const selectedDatasetIds = ref<string[]>([]);
 const factor = ref<number>(factorRange.defaultValue);
 
-const allItems = dataStore.refAllItems();
+const allItems = dataStore.refRegisteredItems();
 const availableDatasets = computed<{ title: string; value: string }[]>(() =>
   allItems.value.map((item) => ({
     title: item.name || item.id,
