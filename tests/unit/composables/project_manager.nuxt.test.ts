@@ -4,30 +4,12 @@
 // oxlint-disable jest/prefer-ending-with-an-expect
 
 // Third party imports
-import {
-  $fetch,
-  type FetchOptions,
-  type FetchRequest,
-  type FetchResponse,
-  type ResolvedFetchOptions,
-} from "ofetch";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { exportProject, importProject } from "@ogw_front/composables/project_manager";
-import type { api_fetch as apiFetchType } from "@ogw_internal/utils/api_fetch";
 import { appMode } from "@ogw_shared/app_mode";
 import backSchemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { setupActivePinia } from "@ogw_tests/utils";
-
-vi.mock(import("ofetch"), () => ({
-  $fetch: Object.assign(vi.fn(), {
-    raw: vi.fn(),
-    native: vi.fn(),
-    create: vi.fn(),
-  }),
-}));
-
-const mockedFetch = vi.mocked($fetch);
 
 // Constants
 const PANEL_WIDTH = 300;
@@ -102,11 +84,15 @@ const snapshotMock = {
   },
 };
 
+const exportProjectBlob = new Blob(["veasecontent"], { type: "application/octet-stream" });
+
 const backStoreMock = {
-  start_request: vi.fn(),
-  stop_request: vi.fn(),
-  base_url: vi.fn(() => ""),
-  $reset: vi.fn(),
+  request: vi.fn(async ({ schema }: { schema: { $id: string } }) => {
+    await Promise.resolve();
+    return schema.$id === backSchemas.opengeodeweb_back.export_project.$id
+      ? exportProjectBlob
+      : { snapshot: snapshotMock };
+  }),
 };
 const infraStoreMock = {
   app_mode: appMode.BROWSER,
@@ -168,60 +154,10 @@ const hybridViewerStoreMock = {
 };
 
 // MOCKS
-// Resolves a mocked `$fetch` call's `onResponse` hook with a successful response.
-// Mirrors the pattern used in tests/unit/stores/infra.nuxt.test.ts.
-async function respondWithSuccess(
-  options: FetchOptions | undefined,
-  request: FetchRequest,
-  data: unknown,
-): Promise<void> {
-  const onResponse = options?.onResponse;
-  if (typeof onResponse !== "function") {
-    return;
-  }
-  const response: FetchResponse<typeof data> = Object.assign(
-    new Response(undefined, { status: 200 }),
-    { _data: data },
-  );
-  const resolvedOptions: ResolvedFetchOptions = { headers: new Headers() };
-  await onResponse({ request, options: resolvedOptions, response });
-}
-
-const exportProjectBlob = new Blob(["veasecontent"], { type: "application/octet-stream" });
-
-mockedFetch.mockImplementation(async (route, options) => {
-  const data =
-    route === backSchemas.opengeodeweb_back.export_project.$id
-      ? exportProjectBlob
-      : { snapshot: snapshotMock };
-  await respondWithSuccess(options, route, data);
-  return data;
-});
 vi.mock(import("@ogw_internal/utils/viewer_call"), () => ({
   viewer_call: viewer_call_mock_fn,
 }));
 
-// Derived from the real `api_fetch` signature so the mock stays structurally honest instead of redeclaring (and risking drift from) its parameter shapes.
-type ApiFetchParams = Parameters<typeof apiFetchType>[1];
-type ApiFetchHandlers = Parameters<typeof apiFetchType>[2];
-
-vi.mock(import("@ogw_internal/utils/api_fetch"), () => ({
-  api_fetch: vi.fn(
-    async (_microservice: unknown, _params: ApiFetchParams, options: ApiFetchHandlers = {}) => {
-      const response = {
-        _data: new Blob(["zipcontent"], { type: "application/zip" }),
-        headers: {
-          get: (k: string): string | undefined =>
-            k === "new-file-name" ? "project_123.vease" : undefined,
-        },
-      };
-      if (options.response_function) {
-        await options.response_function(response);
-      }
-      return response;
-    },
-  ),
-}));
 vi.mock(import("js-file-download"), () => ({
   default: vi.fn((): void => undefined),
 }));
@@ -320,6 +256,7 @@ describe("projectManager composable (compact)", () => {
     setupActivePinia();
     // oxlint-disable-next-line eslint/id-length -- mirrors the real ofetch/vitest API field name (`ok`/`fn`)
     const storesList: Record<string, ReturnType<typeof vi.fn>>[] = [
+      backStoreMock,
       viewerStoreMock,
       treeviewStoreMock,
       dataStoreMock,
@@ -343,6 +280,10 @@ describe("projectManager composable (compact)", () => {
 
     await exportProject();
 
+    expect(backStoreMock.request).toHaveBeenCalledWith({
+      schema: backSchemas.opengeodeweb_back.export_project,
+      params: { snapshot: { projectName: "mockedProject" }, filename: "project.vease" },
+    });
     expect(fileDownload).toHaveBeenCalledWith(exportProjectBlob, "project.vease");
     expect(feedbackStoreMock.add_success).toHaveBeenCalledWith("Project exported successfully");
   });
@@ -354,6 +295,11 @@ describe("projectManager composable (compact)", () => {
 
     await importProject(file);
 
+    expect(backStoreMock.request).toHaveBeenCalledWith({
+      schema: backSchemas.opengeodeweb_back.import_project,
+      // oxlint-disable-next-line no-unsafe-assignment -- expect.any(FormData) is untyped by design, this is a vitest matcher not a real body.
+      params: expect.any(FormData),
+    });
     verifyViewerCalls();
     verifyStoreImports();
   });
