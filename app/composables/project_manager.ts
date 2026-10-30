@@ -8,7 +8,6 @@ import { type TreeviewSnapshot, useTreeviewStore } from "@ogw_front/stores/treev
 import type { CameraSnapshot } from "@ogw_internal/stores/hybrid_viewer/camera";
 import type { ModelComponentRecord } from "@ogw_front/stores/data_helpers/mesh.js";
 import type { ModelComponentRelationRecord } from "@ogw_front/stores/data.js";
-import { fetchRaw } from "@ogw_shared/utils/fetch_raw";
 import { importWorkflowFromSnapshot } from "@ogw_front/utils/import_workflow";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useBackStore } from "@ogw_front/stores/back";
@@ -29,23 +28,7 @@ interface ProjectSnapshot {
   dataStyle?: DataStyleSnapshot;
 }
 
-// The backend response is an untyped network payload; this is the one place its shape is asserted.
-function isImportSnapshotResponse(value: unknown): value is { snapshot?: ProjectSnapshot } {
-  return typeof value === "object" && value !== null;
-}
-
-function isFileDownloadData(
-  value: unknown,
-): value is string | ArrayBuffer | ArrayBufferView | Blob {
-  return (
-    typeof value === "string" ||
-    value instanceof ArrayBuffer ||
-    ArrayBuffer.isView(value) ||
-    value instanceof Blob
-  );
-}
-
-async function exportProject(): Promise<{ result: unknown }> {
+async function exportProject(): Promise<{ result: Blob }> {
   const appStore = useAppStore();
   const backStore = useBackStore();
   const feedbackStore = useFeedbackStore();
@@ -53,16 +36,7 @@ async function exportProject(): Promise<{ result: unknown }> {
   const schema = back_schemas.opengeodeweb_back.export_project;
   const defaultName = "project.vease";
   const params = { snapshot, filename: defaultName };
-  const result = await fetchRaw({
-    route: schema.$id,
-    params,
-    method: schema.methods[0],
-    baseURL: backStore.base_url,
-  });
-
-  if (!isFileDownloadData(result)) {
-    throw new Error("Unexpected export_project response type");
-  }
+  const result = await backStore.request({ schema, params });
   fileDownload(result, defaultName);
   feedbackStore.add_success("Project exported successfully");
   return { result };
@@ -119,13 +93,8 @@ async function importProject(file: File): Promise<void> {
   }
   form.append("file", file, originalFileName);
 
-  const result = await fetchRaw({
-    route: importProjectSchema.$id,
-    params: form,
-    method: importProjectSchema.methods[0],
-    baseURL: backStore.base_url,
-  });
-  const snapshot = (isImportSnapshotResponse(result) ? result.snapshot : undefined) ?? {};
+  const result = await backStore.request({ schema: importProjectSchema, params: form });
+  const snapshot: ProjectSnapshot = result.snapshot;
 
   treeviewStore.isImporting = true;
 
