@@ -157,6 +157,30 @@ const { handleKeyDown } = useTreeKeyboardNav(
   getScrollInfo,
   focusedIndex,
 );
+
+function selectAllLeaves(): void {
+  const leafIds = displayItems.value
+    .filter((rowItem) => rowItem.isLeaf)
+    .map((rowItem) => rowItem.raw[actualItemProps.value.value]);
+  emit("update:active", leafIds);
+}
+
+function clearActive(): void {
+  lastActiveIndex.value = -1;
+  emit("update:active", []);
+}
+
+function handleShortcutKeyDown(event: KeyboardEvent): void {
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "a") {
+    event.preventDefault();
+    selectAllLeaves();
+  } else if (event.key === "Escape" && active.length > 0) {
+    event.preventDefault();
+    clearActive();
+  } else {
+    handleKeyDown(event);
+  }
+}
 </script>
 
 <template>
@@ -164,7 +188,7 @@ const { handleKeyDown } = useTreeKeyboardNav(
     ref="treeWrapper"
     class="common-tree-view-wrapper"
     tabindex="0"
-    @keydown="handleKeyDown"
+    @keydown="handleShortcutKeyDown"
     @mousedown="treeWrapper?.focus()"
     @mouseenter="treeWrapper?.focus()"
   >
