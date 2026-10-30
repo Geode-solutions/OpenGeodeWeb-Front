@@ -52,6 +52,17 @@ function slerp(from: Vector3, target: Vector3, ratio: number, mid?: Vector3): Ve
   ];
 }
 
+function getCameraOptions(camera: vtkCamera): CameraOptions {
+  return {
+    focal_point: [...(camera.getFocalPoint() ?? [0, 0, 0])] as Vector3,
+    view_up: [...(camera.getViewUp() ?? [0, 0, 0])] as Vector3,
+    position: [...(camera.getPosition() ?? [0, 0, 0])] as Vector3,
+    view_angle: camera.getViewAngle(),
+    clipping_range: [...(camera.getClippingRange() ?? [0, 0])] as [number, number],
+    distance: camera.getDistance(),
+  };
+}
+
 function computeAnimationDuration(startState: CameraOptions, targetState: CameraOptions): number {
   const startDir = vecNormalize(vecSub(startState.position, startState.focal_point));
   const targetDir = vecNormalize(vecSub(targetState.position, targetState.focal_point));
@@ -145,4 +156,5 @@ export {
   SHORT_ANIMATION_DURATION,
   animateCamera,
   computeAnimationDuration,
+  getCameraOptions,
 };
