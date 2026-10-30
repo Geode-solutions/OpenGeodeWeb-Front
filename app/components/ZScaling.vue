@@ -36,7 +36,8 @@ function apply(): void {
   >
     <v-container class="pa-3 py-1">
       <v-row dense>
-        <v-col cols="12" class="py-1">
+        <!-- ToolPanel clips its content: leave room above the slider for its thumb label -->
+        <v-col cols="12" class="pt-7 pb-1">
           <v-slider
             v-model="zScale"
             :min="1"
