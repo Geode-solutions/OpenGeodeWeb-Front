@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import { formatCrs, formatCrsCode } from "@ogw_front/utils/crs";
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
-import { formatCrs } from "@ogw_front/utils/crs";
 import { middleTruncate } from "@ogw_front/utils/string";
 import { useClipboard } from "@vueuse/core";
 import { useCrsStore } from "@ogw_front/stores/crs";
@@ -72,6 +72,15 @@ const crsLabel = computed<string>(
       TOOLTIP_NAME_START_CHARS,
       TOOLTIP_NAME_END_CHARS,
     ) ?? "",
+);
+
+// Read from the store map: one database query for the whole tree, not one per row
+const mismatchedCrs = computed(() =>
+  showCrs ? crsStore.mismatchedCrs.get(actualItem.value.id) : undefined,
+);
+const mismatchTooltip = computed<string>(
+  () =>
+    `In ${formatCrsCode(mismatchedCrs.value)}, project in ${formatCrsCode(crsStore.projectCrs)}. Convert it to show it on the map.`,
 );
 
 const tooltipDisabled = computed<boolean>(() => {
@@ -170,6 +179,19 @@ async function copyToClipboard(text: string, label: string): Promise<void> {
           <i class="ml-1">{{ actualItem.is_active ? "Active" : "Inactive" }}</i>
         </span>
       </div>
+    </v-tooltip>
+    <v-tooltip v-if="mismatchedCrs" location="right">
+      <template #activator="{ props: warningProps }">
+        <v-icon
+          v-bind="warningProps"
+          data-testid="crsMismatchIcon"
+          icon="mdi-alert"
+          color="warning"
+          size="14"
+          class="ml-1 flex-shrink-0"
+        />
+      </template>
+      {{ mismatchTooltip }}
     </v-tooltip>
   </div>
 </template>

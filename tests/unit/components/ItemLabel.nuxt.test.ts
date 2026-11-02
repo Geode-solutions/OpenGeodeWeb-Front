@@ -1,5 +1,6 @@
 // Third party imports
 import { describe, expect, test, vi } from "vitest";
+import type { VueWrapper } from "@vue/test-utils";
 import { mountSuspended } from "@nuxt/test-utils/runtime";
 
 // Local imports
@@ -122,5 +123,51 @@ describe("item label tooltip", () => {
       showCrs: true,
     });
     expect(wrapper.get('[data-testid="tooltipCrsValue"]').text()).toContain("EPSG:2154");
+  });
+});
+
+describe("item label crs mismatch", () => {
+  const LAMBERT = { authority: "EPSG", code: "2154", name: "RGF93 v1 / Lambert-93" };
+  const UTM = { authority: "EPSG", code: "32631", name: "WGS 84 / UTM zone 31N" };
+
+  // A pinia per row: the crs store reads the data when it is created
+  async function mountRow(id: string, showCrs = true): Promise<VueWrapper> {
+    const pinia = setupActivePinia();
+    const dataStore = useDataStore();
+    dataStore.refAllItems = mockAs<typeof dataStore.refAllItems>(() =>
+      ref([
+        { id: "a", created_at: "1", crs: LAMBERT },
+        { id: "b", created_at: "2", crs: UTM },
+        { id: "local", created_at: "3" },
+      ]),
+    );
+    useCrsStore();
+    const wrapper = await mountSuspended(ItemLabel, {
+      global: { plugins: [vuetify, pinia], stubs: { VTooltip: VTooltipStub } },
+      props: { item: leaf({ id, title: id }), isLeaf: true, showCrs },
+    });
+    return wrapper;
+  }
+
+  test("warns about data in another crs than the project", async () => {
+    const wrapper = await mountRow("b");
+    expect(wrapper.find('[data-testid="crsMismatchIcon"]').exists()).toBe(true);
+    expect(wrapper.text()).toContain(
+      "In EPSG:32631, project in EPSG:2154. Convert it to show it on the map.",
+    );
+  });
+
+  test("no warning for data in the project crs, without crs, or outside data rows", async () => {
+    const rows: [string, boolean][] = [
+      ["a", true],
+      ["local", true],
+      ["b", false],
+    ];
+    // oxlint-disable no-await-in-loop
+    for (const [id, showCrs] of rows) {
+      const wrapper = await mountRow(id, showCrs);
+      expect(wrapper.find('[data-testid="crsMismatchIcon"]').exists()).toBe(false);
+    }
+    // oxlint-enable no-await-in-loop
   });
 });
