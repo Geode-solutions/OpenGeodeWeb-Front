@@ -84,6 +84,13 @@ const mismatchTooltip = computed<string>(() => {
     : `In ${formatCrsCode(crs)}, project in ${project}. Convert it to show it on the map.`;
 });
 
+// The warning opens the CRS dialog of the data, when the app hosts it
+function editCrs(): void {
+  if (crsStore.crsEditEnabled) {
+    crsStore.requestCrsEdit(actualItem.value.id);
+  }
+}
+
 const tooltipDisabled = computed<boolean>(() => {
   if (actualItem.value.category !== undefined) {
     return false;
@@ -190,6 +197,8 @@ async function copyToClipboard(text: string, label: string): Promise<void> {
           color="warning"
           size="14"
           class="ml-1 flex-shrink-0"
+          :class="{ 'cursor-pointer': crsStore.crsEditEnabled }"
+          @click.stop="editCrs"
         />
       </template>
       {{ mismatchTooltip }}

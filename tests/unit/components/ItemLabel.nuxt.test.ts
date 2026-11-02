@@ -157,6 +157,17 @@ describe("item label crs mismatch", () => {
     );
   });
 
+  test("a click on the warning asks for the crs edit of the data", async () => {
+    const wrapper = await mountRow("b");
+    const crsStore = useCrsStore();
+    await wrapper.find('[data-testid="crsMismatchIcon"]').trigger("click");
+    // No app hosts the dialog yet: nothing is asked
+    expect(crsStore.crsEditRequest).toBeUndefined();
+    crsStore.enableCrsEdit();
+    await wrapper.find('[data-testid="crsMismatchIcon"]').trigger("click");
+    expect(crsStore.crsEditRequest).toBe("b");
+  });
+
   test("warns about data without crs once the project has one", async () => {
     const wrapper = await mountRow("local");
     expect(wrapper.find('[data-testid="crsMismatchIcon"]').exists()).toBe(true);
