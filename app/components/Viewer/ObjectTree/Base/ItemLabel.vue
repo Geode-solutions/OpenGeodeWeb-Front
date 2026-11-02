@@ -75,13 +75,14 @@ const crsLabel = computed<string>(
 );
 
 // Read from the store map: one database query for the whole tree, not one per row
-const mismatchedCrs = computed(() =>
-  showCrs ? crsStore.mismatchedCrs.get(actualItem.value.id) : undefined,
-);
-const mismatchTooltip = computed<string>(
-  () =>
-    `In ${formatCrsCode(mismatchedCrs.value)}, project in ${formatCrsCode(crsStore.projectCrs)}. Convert it to show it on the map.`,
-);
+const mismatched = computed(() => showCrs && crsStore.mismatchedCrs.has(actualItem.value.id));
+const mismatchTooltip = computed<string>(() => {
+  const project = formatCrsCode(crsStore.projectCrs);
+  const crs = crsStore.mismatchedCrs.get(actualItem.value.id);
+  return crs === undefined
+    ? `No CRS, project in ${project}. Georeference it to show it on the map.`
+    : `In ${formatCrsCode(crs)}, project in ${project}. Convert it to show it on the map.`;
+});
 
 const tooltipDisabled = computed<boolean>(() => {
   if (actualItem.value.category !== undefined) {
@@ -180,7 +181,7 @@ async function copyToClipboard(text: string, label: string): Promise<void> {
         </span>
       </div>
     </v-tooltip>
-    <v-tooltip v-if="mismatchedCrs" location="right">
+    <v-tooltip v-if="mismatched" location="right">
       <template #activator="{ props: warningProps }">
         <v-icon
           v-bind="warningProps"

@@ -15,7 +15,7 @@ const label = computed<string>(() =>
   <v-btn
     data-testid="projectCrs"
     class="project-crs text-none"
-    size="x-small"
+    size="small"
     variant="tonal"
     prepend-icon="mdi-earth"
     :disabled="!crsStore.crsEditEnabled"
@@ -29,9 +29,9 @@ const label = computed<string>(() =>
 <style scoped>
 .project-crs {
   position: absolute;
-  right: 8px;
-  bottom: 4px;
+  right: 16px;
+  bottom: 12px;
   z-index: 1;
-  max-width: 20%;
+  max-width: 360px;
 }
 </style>

@@ -134,7 +134,7 @@ describe("item label crs mismatch", () => {
   async function mountRow(id: string, showCrs = true): Promise<VueWrapper> {
     const pinia = setupActivePinia();
     const dataStore = useDataStore();
-    dataStore.refAllItems = mockAs<typeof dataStore.refAllItems>(() =>
+    dataStore.refCrsItems = mockAs<typeof dataStore.refCrsItems>(() =>
       ref([
         { id: "a", created_at: "1", crs: LAMBERT },
         { id: "b", created_at: "2", crs: UTM },
@@ -157,10 +157,17 @@ describe("item label crs mismatch", () => {
     );
   });
 
-  test("no warning for data in the project crs, without crs, or outside data rows", async () => {
+  test("warns about data without crs once the project has one", async () => {
+    const wrapper = await mountRow("local");
+    expect(wrapper.find('[data-testid="crsMismatchIcon"]').exists()).toBe(true);
+    expect(wrapper.text()).toContain(
+      "No CRS, project in EPSG:2154. Georeference it to show it on the map.",
+    );
+  });
+
+  test("no warning for data in the project crs, or outside data rows", async () => {
     const rows: [string, boolean][] = [
       ["a", true],
-      ["local", true],
       ["b", false],
     ];
     // oxlint-disable no-await-in-loop

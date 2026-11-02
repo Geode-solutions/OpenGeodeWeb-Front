@@ -20,7 +20,7 @@ async function mountWidget(
 ): Promise<VueWrapper> {
   const pinia = setupActivePinia();
   const dataStore = useDataStore();
-  dataStore.refAllItems = mockAs<typeof dataStore.refAllItems>(() => ref([]));
+  dataStore.refCrsItems = mockAs<typeof dataStore.refCrsItems>(() => ref([]));
   setup(useCrsStore());
   const wrapper = await mountSuspended(ProjectCrs, { global: { plugins: [vuetify, pinia] } });
   return wrapper;
