@@ -17,7 +17,7 @@ const basemapStore = useBasemapStore();
 <style scoped>
 .basemap-attribution {
   position: absolute;
-  right: 8px;
+  left: 8px;
   bottom: 4px;
   z-index: 1;
   background: rgba(var(--v-theme-surface), 0.6);
