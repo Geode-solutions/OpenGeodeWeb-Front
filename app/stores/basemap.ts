@@ -57,7 +57,6 @@ export const useBasemapStore = defineStore("basemap", () => {
   const loading = ref(false);
   const crsStore = useCrsStore();
   const crs = computed(() => crsStore.projectCrs);
-  const available = computed(() => crs.value !== undefined);
   // Each build gets a number: a build finishing after a newer one started is discarded
   let lastBuild = 0;
   // Builds up to this number belong to a project the viewer and the back already cleared
@@ -70,6 +69,9 @@ export const useBasemapStore = defineStore("basemap", () => {
       .filter((item) => sameCrs(item.crs, crs.value))
       .map((item) => item.id);
   }
+  // A map needs at least one data in the project CRS to lie under
+  const available = computed(() => crs.value !== undefined && georeferencedIds().length > 0);
+
 
   // Unscaled polydata bounds: the actor bounds would include the z scale
   function dataBounds(): { bounds: Bounds; z: number } | undefined {

@@ -218,8 +218,8 @@ describe("basemap store", () => {
     await vi.advanceTimersByTimeAsync(REBUILD_DELAY);
     expect(deregisterObject).toHaveBeenCalledWith("basemap-1");
     expect(store.basemapId).toBeUndefined();
-    // The project keeps its CRS: the basemap comes back with georeferenced data
-    expect(store.available).toBe(true);
+    // No data in the project CRS: no map, so no Basemap category either
+    expect(store.available).toBe(false);
   });
 
   test("exports the visible map and the opacities, rebuilds on import", async () => {
