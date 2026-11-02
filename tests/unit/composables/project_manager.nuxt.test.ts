@@ -388,8 +388,9 @@ describe("projectManager composable (compact)", () => {
     expect(crsStoreMock.importStores).toHaveBeenCalledWith(snapshotMock.crs);
     const dataOrder = Math.min(...dataStoreMock.importStores.mock.invocationCallOrder);
     expect(Math.min(...crsStoreMock.reset.mock.invocationCallOrder)).toBeLessThan(dataOrder);
+    // Once every data item is added: partial data would make the project crs follow them
     expect(Math.min(...crsStoreMock.importStores.mock.invocationCallOrder)).toBeGreaterThan(
-      dataOrder,
+      Math.max(...dataStoreMock.addItem.mock.invocationCallOrder),
     );
   });
 
