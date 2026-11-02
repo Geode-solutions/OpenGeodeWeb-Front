@@ -14,7 +14,7 @@ const CRS_LIST = [{ authority: "EPSG", code: "2154", name: "RGF93 v1 / Lambert-9
 function mockItems(items: DataItem[]): Ref<DataItem[]> {
   const data = ref(items);
   const dataStore = useDataStore();
-  dataStore.refAllItems = mockAs<typeof dataStore.refAllItems>(() => data);
+  dataStore.refCrsItems = mockAs<typeof dataStore.refCrsItems>(() => data);
   return data;
 }
 
@@ -89,19 +89,40 @@ describe("project crs", () => {
     setupActivePinia();
   });
 
-  test("the first georeferenced data sets it, later data do not change it", async () => {
+  test("follows when every georeferenced data is in one crs", async () => {
     const data = mockItems([]);
     const crsStore = useCrsStore();
-    expect(crsStore.projectCrs).toBeUndefined();
     data.value = mockAs<DataItem[]>([{ id: "a", created_at: "1", crs: LAMBERT }]);
+    await nextTick();
+    expect(crsStore.projectCrs).toStrictEqual(LAMBERT);
+    // One data converted alone: mixed, the project keeps its crs
+    data.value = mockAs<DataItem[]>([
+      { id: "a", created_at: "1", crs: UTM },
+      { id: "b", created_at: "2", crs: LAMBERT },
+      { id: "local", created_at: "3" },
+    ]);
     await nextTick();
     expect(crsStore.projectCrs).toStrictEqual(LAMBERT);
     data.value = mockAs<DataItem[]>([
       { id: "a", created_at: "1", crs: UTM },
       { id: "b", created_at: "2", crs: UTM },
+      { id: "local", created_at: "3" },
     ]);
     await nextTick();
-    expect(crsStore.projectCrs).toStrictEqual(LAMBERT);
+    expect(crsStore.projectCrs).toStrictEqual(UTM);
+  });
+
+  test("an imported project crs is kept while the data are mixed", async () => {
+    mockItems(
+      mockAs<DataItem[]>([
+        { id: "a", created_at: "1", crs: LAMBERT },
+        { id: "b", created_at: "2", crs: UTM },
+      ]),
+    );
+    const crsStore = useCrsStore();
+    crsStore.importStores({ projectCrs: UTM });
+    await nextTick();
+    expect(crsStore.projectCrs).toStrictEqual(UTM);
   });
 
   test("lists the data in another crs than the project", () => {
@@ -113,7 +134,11 @@ describe("project crs", () => {
       ]),
     );
     const crsStore = useCrsStore();
-    expect([...crsStore.mismatchedCrs.entries()]).toStrictEqual([["b", UTM]]);
+    // Data without CRS too: they could not follow the project
+    expect([...crsStore.mismatchedCrs.entries()]).toStrictEqual([
+      ["b", UTM],
+      ["local", undefined],
+    ]);
   });
 
   test("is exported and imported with the project", () => {

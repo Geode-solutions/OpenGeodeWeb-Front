@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from "vitest";
-import { formatCrs, formatCrsCode, oldestCrs, sameCrs } from "@ogw_front/utils/crs";
+import { formatCrs, formatCrsCode, oldestCrs, sameCrs, sameCrsState } from "@ogw_front/utils/crs";
 import type { DataItem } from "@ogw_front/stores/data";
 import { mockAs } from "@ogw_tests/utils";
 
@@ -45,5 +45,14 @@ describe("oldest crs", () => {
     ]);
     expect(oldestCrs(items)).toStrictEqual(LAMBERT);
     expect(oldestCrs([])).toBeUndefined();
+  });
+});
+
+describe("same crs state", () => {
+  test("two data without crs share the same state", () => {
+    expect(sameCrsState(undefined, undefined)).toBe(true);
+    expect(sameCrsState(LAMBERT, { ...LAMBERT, name: "renamed" })).toBe(true);
+    expect(sameCrsState(LAMBERT, undefined)).toBe(false);
+    expect(sameCrsState(LAMBERT, UTM)).toBe(false);
   });
 });

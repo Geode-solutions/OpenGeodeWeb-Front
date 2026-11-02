@@ -1,4 +1,4 @@
-import type { DataItem, NewDataItem } from "@ogw_front/stores/data";
+import type { CrsItem, NewDataItem } from "@ogw_front/stores/data";
 import type { CRSList } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 
 function formatCrs(crs: CRSList | undefined): string {
@@ -20,9 +20,14 @@ function sameCrs(left: CRSList | undefined, right: CRSList | undefined): boolean
   );
 }
 
+// Same CRS, or both still in local coordinates
+function sameCrsState(left: CRSList | undefined, right: CRSList | undefined): boolean {
+  return (left === undefined && right === undefined) || sameCrs(left, right);
+}
+
 // The CRS of the oldest georeferenced data: the project CRS of a project saved before it was stored
 function oldestCrs(
-  items: readonly Pick<DataItem, "crs" | "created_at">[] | readonly NewDataItem[],
+  items: readonly Pick<CrsItem, "crs" | "created_at">[] | readonly NewDataItem[],
 ): CRSList | undefined {
   return items
     .filter((item) => item.crs !== undefined)
@@ -30,4 +35,4 @@ function oldestCrs(
     ?.crs;
 }
 
-export { formatCrs, formatCrsCode, oldestCrs, sameCrs };
+export { formatCrs, formatCrsCode, oldestCrs, sameCrs, sameCrsState };

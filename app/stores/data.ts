@@ -25,6 +25,9 @@ interface DataItem {
   crs?: CRSList;
 }
 
+// What the CRS features read of a data: light to copy on each change
+type CrsItem = Pick<DataItem, "id" | "name" | "crs" | "created_at">;
+
 interface ModelComponentInput {
   geode_id: string;
   type: string;
@@ -153,6 +156,17 @@ export const useDataStore = defineStore("data", () => {
       },
     );
   }
+  // The CRS features only need these fields: the geometry stays out of the copies made on each change
+  function refCrsItems(): Ref<CrsItem[]> {
+    return useObservable(
+      liveObservable(async () => {
+        const items = await data_db.toArray();
+        return items.map(({ id, name, crs, created_at }) => ({ id, name, crs, created_at }));
+      }),
+      { initialValue: [] as CrsItem[] },
+    );
+  }
+
   function refAllItems(): Ref<DataItem[]> {
     return useObservable(
       liveObservable(async () => {
@@ -369,6 +383,7 @@ export const useDataStore = defineStore("data", () => {
   }
   return {
     refAllItems,
+    refCrsItems,
     item,
     allItems,
     refItem,
@@ -406,4 +421,4 @@ export const useDataStore = defineStore("data", () => {
   };
 });
 
-export type { DataItem, NewDataItem, ModelComponentInput, ModelComponentRelationRecord };
+export type { CrsItem, DataItem, NewDataItem, ModelComponentInput, ModelComponentRelationRecord };

@@ -14,27 +14,38 @@ export const useCrsStore = defineStore("crs", () => {
   const crsEditEnabled = ref(false);
   const crsEditRequest = ref<string | undefined>(undefined);
   const dataStore = useDataStore();
-  const items = dataStore.refAllItems();
+  const crsItems = dataStore.refCrsItems();
   const projectCrs = ref<CRSList | undefined>(undefined);
   const projectCrsEditRequest = ref(false);
 
-  // The first georeferenced data sets the project CRS; then only a project CRS change does
+  // The project follows its data: once every georeferenced data is in one CRS, it is the project
+  // CRS. Data already mixed before any project CRS: the oldest one is the reference
   watch(
-    () => oldestCrs(items.value ?? []),
-    (crs) => {
-      if (projectCrs.value === undefined && crs !== undefined) {
-        projectCrs.value = crs;
+    () => {
+      const georeferenced = crsItems.value.filter((item) => item.crs !== undefined);
+      const [first] = georeferenced;
+      if (first === undefined) {
+        return undefined;
+      }
+      if (georeferenced.every((item) => sameCrs(item.crs, first.crs))) {
+        return first.crs;
+      }
+      return projectCrs.value ?? oldestCrs(georeferenced);
+    },
+    (reference) => {
+      if (reference !== undefined && !sameCrs(reference, projectCrs.value)) {
+        projectCrs.value = reference;
       }
     },
     { immediate: true },
   );
 
-  // Data without a CRS are not listed: they are not in another CRS, they have none
+  // Data without CRS are listed too (value undefined): they could not follow the project
   const mismatchedCrs = computed(() => {
     const project = projectCrs.value;
-    const mismatched = new Map<string, CRSList>();
-    for (const item of items.value ?? []) {
-      if (project !== undefined && item.crs !== undefined && !sameCrs(item.crs, project)) {
+    const mismatched = new Map<string, CRSList | undefined>();
+    for (const item of crsItems.value) {
+      if (project !== undefined && !sameCrs(item.crs, project)) {
         mismatched.set(item.id, item.crs);
       }
     }
@@ -101,10 +112,11 @@ export const useCrsStore = defineStore("crs", () => {
 
   // Called once the project data is imported: a project saved without it falls back to its oldest data
   function importStores(snapshot: { projectCrs?: CRSList } | undefined): void {
-    projectCrs.value = snapshot?.projectCrs ?? oldestCrs(items.value ?? []);
+    projectCrs.value = snapshot?.projectCrs ?? oldestCrs(crsItems.value);
   }
 
   return {
+    crsItems,
     geographicList,
     crsEditEnabled,
     enableCrsEdit,
