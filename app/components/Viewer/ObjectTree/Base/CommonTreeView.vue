@@ -148,6 +148,22 @@ function handleItemClick(
   }
 }
 
+function selectAllLeaves(): void {
+  const leafIds = displayItems.value
+    .filter((rowItem) => rowItem.isLeaf)
+    .map((rowItem) => rowItem.raw[actualItemProps.value.value]);
+  emit("update:active", leafIds);
+}
+
+function clearActive(): boolean {
+  if (active.length === 0) {
+    return false;
+  }
+  lastActiveIndex.value = -1;
+  emit("update:active", []);
+  return true;
+}
+
 const { handleKeyDown } = useTreeKeyboardNav(
   displayItems,
   emit as EmitFn,
@@ -156,6 +172,8 @@ const { handleKeyDown } = useTreeKeyboardNav(
   handleItemClick,
   getScrollInfo,
   focusedIndex,
+  selectAllLeaves,
+  clearActive,
 );
 </script>
 

@@ -17,6 +17,8 @@ type ReadonlyDisplayItem = Omit<DisplayItem, "raw"> & {
 
 interface KeyboardEventLike {
   readonly key: string;
+  readonly ctrlKey: boolean;
+  readonly metaKey: boolean;
   preventDefault: () => void;
 }
 
@@ -56,6 +58,8 @@ export function useTreeKeyboardNav(
   handleItemClick: (item: ReadonlyDisplayItem, index: number) => void,
   getScrollInfo: (() => ScrollInfo | undefined) | undefined,
   externalFocusedIndex: Ref<number> | undefined,
+  selectAll: () => void,
+  clearActive: () => boolean,
 ): UseTreeKeyboardNavReturn {
   const focusedIndex = externalFocusedIndex ?? ref(-1);
 
@@ -143,8 +147,21 @@ export function useTreeKeyboardNav(
     return currentIndex;
   }
 
+  function handleSelectionShortcut(event: KeyboardEventLike): boolean {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "a") {
+      event.preventDefault();
+      selectAll();
+      return true;
+    }
+    if (event.key === "Escape" && clearActive()) {
+      event.preventDefault();
+      return true;
+    }
+    return false;
+  }
+
   function handleKeyDown(event: KeyboardEventLike): void {
-    if (displayItems.value.length === 0) {
+    if (handleSelectionShortcut(event) || displayItems.value.length === 0) {
       return;
     }
 
