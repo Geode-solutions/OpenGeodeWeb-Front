@@ -1,4 +1,6 @@
 // oxlint-disable vitest/require-mock-type-parameters
+import { type DataItem, useDataStore } from "@ogw_front/stores/data";
+import { type Ref, nextTick, ref } from "vue";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { mockAs, setupActivePinia } from "@ogw_tests/utils";
 import { useBackStore } from "@ogw_front/stores/back";
@@ -9,9 +11,17 @@ vi.setConfig({ testTimeout: 10_000 });
 const EXPECTED_REQUESTS = 1;
 const CRS_LIST = [{ authority: "EPSG", code: "2154", name: "RGF93 v1 / Lambert-93" }];
 
+function mockItems(items: DataItem[]): Ref<DataItem[]> {
+  const data = ref(items);
+  const dataStore = useDataStore();
+  dataStore.refAllItems = mockAs<typeof dataStore.refAllItems>(() => data);
+  return data;
+}
+
 describe("crs store", () => {
   beforeEach(() => {
     setupActivePinia();
+    mockItems([]);
   });
 
   test("loads the geographic list once, whatever the object type", async () => {
@@ -68,5 +78,74 @@ describe("crs store", () => {
     expect(crsStore.crsEditRequest).toBe("data-1");
     crsStore.clearCrsEditRequest();
     expect(crsStore.crsEditRequest).toBeUndefined();
+  });
+});
+
+const LAMBERT = { authority: "EPSG", code: "2154", name: "RGF93 v1 / Lambert-93" };
+const UTM = { authority: "EPSG", code: "32631", name: "WGS 84 / UTM zone 31N" };
+
+describe("project crs", () => {
+  beforeEach(() => {
+    setupActivePinia();
+  });
+
+  test("the first georeferenced data sets it, later data do not change it", async () => {
+    const data = mockItems([]);
+    const crsStore = useCrsStore();
+    expect(crsStore.projectCrs).toBeUndefined();
+    data.value = mockAs<DataItem[]>([{ id: "a", created_at: "1", crs: LAMBERT }]);
+    await nextTick();
+    expect(crsStore.projectCrs).toStrictEqual(LAMBERT);
+    data.value = mockAs<DataItem[]>([
+      { id: "a", created_at: "1", crs: UTM },
+      { id: "b", created_at: "2", crs: UTM },
+    ]);
+    await nextTick();
+    expect(crsStore.projectCrs).toStrictEqual(LAMBERT);
+  });
+
+  test("lists the data in another crs than the project", () => {
+    mockItems(
+      mockAs<DataItem[]>([
+        { id: "a", created_at: "1", crs: LAMBERT },
+        { id: "b", created_at: "2", crs: UTM },
+        { id: "local", created_at: "3" },
+      ]),
+    );
+    const crsStore = useCrsStore();
+    expect([...crsStore.mismatchedCrs.entries()]).toStrictEqual([["b", UTM]]);
+  });
+
+  test("is exported and imported with the project", () => {
+    mockItems(mockAs<DataItem[]>([{ id: "a", created_at: "1", crs: LAMBERT }]));
+    const crsStore = useCrsStore();
+    crsStore.setProjectCrs(UTM);
+    expect(crsStore.exportStores()).toStrictEqual({ projectCrs: UTM });
+    crsStore.reset();
+    expect(crsStore.projectCrs).toBeUndefined();
+    crsStore.importStores({ projectCrs: UTM });
+    expect(crsStore.projectCrs).toStrictEqual(UTM);
+  });
+
+  test("a project saved without it takes the crs of its oldest georeferenced data", () => {
+    mockItems(
+      mockAs<DataItem[]>([
+        { id: "b", created_at: "2", crs: UTM },
+        { id: "a", created_at: "1", crs: LAMBERT },
+      ]),
+    );
+    const crsStore = useCrsStore();
+    crsStore.reset();
+    crsStore.importStores(undefined);
+    expect(crsStore.projectCrs).toStrictEqual(LAMBERT);
+  });
+
+  test("forwards a project crs edit request until it is cleared", () => {
+    mockItems([]);
+    const crsStore = useCrsStore();
+    crsStore.requestProjectCrsEdit();
+    expect(crsStore.projectCrsEditRequest).toBe(true);
+    crsStore.clearProjectCrsEditRequest();
+    expect(crsStore.projectCrsEditRequest).toBe(false);
   });
 });

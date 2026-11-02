@@ -53,6 +53,7 @@ const VIEWER_CALL_COUNT = 1;
 
 // Snapshot
 const snapshotMock = {
+  crs: { projectCrs: { authority: "EPSG", code: "32631", name: "WGS 84 / UTM zone 31N" } },
   data: {
     items: [
       {
@@ -249,6 +250,13 @@ vi.mock(import("@ogw_front/stores/back") as Promise<unknown>, () => ({
 vi.mock(import("@ogw_front/stores/feedback") as Promise<unknown>, () => ({
   useFeedbackStore: (): typeof feedbackStoreMock => feedbackStoreMock,
 }));
+const crsStoreMock = {
+  reset: vi.fn(),
+  importStores: vi.fn(),
+};
+vi.mock(import("@ogw_front/stores/crs") as Promise<unknown>, () => ({
+  useCrsStore: (): typeof crsStoreMock => crsStoreMock,
+}));
 const appStoreMock = {
   exportStores: vi.fn(() => ({ projectName: "mockedProject" })),
 };
@@ -326,6 +334,7 @@ describe("projectManager composable (compact)", () => {
       dataStyleStoreMock,
       hybridViewerStoreMock,
       feedbackStoreMock,
+      crsStoreMock,
     ];
     for (const store of storesList) {
       const values = Object.values(store);
@@ -367,5 +376,20 @@ describe("projectManager composable (compact)", () => {
 
     verifyDataManagement();
     verifyRemaining();
+  });
+
+  test("importProjectFile restores the project crs once the data are imported", async () => {
+    const file = new File(['{"dataBase":{"db":{}}}'], "project.vease", {
+      type: "application/json",
+    });
+
+    await importProject(file);
+
+    expect(crsStoreMock.importStores).toHaveBeenCalledWith(snapshotMock.crs);
+    const dataOrder = Math.min(...dataStoreMock.importStores.mock.invocationCallOrder);
+    expect(Math.min(...crsStoreMock.reset.mock.invocationCallOrder)).toBeLessThan(dataOrder);
+    expect(Math.min(...crsStoreMock.importStores.mock.invocationCallOrder)).toBeGreaterThan(
+      dataOrder,
+    );
   });
 });

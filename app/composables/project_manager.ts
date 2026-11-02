@@ -1,4 +1,6 @@
-import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
+import back_schemas, {
+  type CRSList,
+} from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import fileDownload from "js-file-download";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
@@ -12,6 +14,7 @@ import { fetchRaw } from "@ogw_shared/utils/fetch_raw";
 import { importWorkflowFromSnapshot } from "@ogw_front/utils/import_workflow";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useBackStore } from "@ogw_front/stores/back";
+import { useCrsStore } from "@ogw_front/stores/crs";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -27,6 +30,7 @@ interface ProjectSnapshot {
   data?: ProjectDataSnapshot;
   hybridViewer?: CameraSnapshot;
   dataStyle?: DataStyleSnapshot;
+  crs?: { projectCrs?: CRSList };
 }
 
 // The backend response is an untyped network payload; this is the one place its shape is asserted.
@@ -99,6 +103,7 @@ async function importProject(file: File): Promise<void> {
   const dataStore = useDataStore();
   const treeviewStore = useTreeviewStore();
   const hybridViewerStore = useHybridViewerStore();
+  const crsStore = useCrsStore();
 
   await viewerStore.ws_connect();
 
@@ -110,6 +115,7 @@ async function importProject(file: File): Promise<void> {
   treeviewStore.clear();
   await dataStore.clear();
   hybridViewerStore.clear();
+  crsStore.reset();
 
   const importProjectSchema = back_schemas.opengeodeweb_back.import_project;
   const form = new FormData();
@@ -135,6 +141,8 @@ async function importProject(file: File): Promise<void> {
   if (snapshot.data !== undefined) {
     await dataStore.importStores(snapshot.data);
   }
+  // After the data: a project saved without a project CRS takes the one of its oldest data
+  crsStore.importStores(snapshot.crs);
   await hybridViewerStore.initHybridViewer();
 
   const items = snapshot.data?.items ?? [];
