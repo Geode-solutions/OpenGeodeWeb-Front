@@ -14,10 +14,10 @@ import {
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { exportProject, importProject } from "@ogw_front/composables/project_manager";
+import { mockAs, setupActivePinia } from "@ogw_tests/utils";
 import type { api_fetch as apiFetchType } from "@ogw_internal/utils/api_fetch";
 import { appMode } from "@ogw_shared/app_mode";
 import backSchemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
-import { setupActivePinia } from "@ogw_tests/utils";
 
 vi.mock(import("ofetch"), () => ({
   $fetch: Object.assign(vi.fn(), {
@@ -391,5 +391,29 @@ describe("projectManager composable (compact)", () => {
     expect(Math.min(...crsStoreMock.importStores.mock.invocationCallOrder)).toBeGreaterThan(
       dataOrder,
     );
+  });
+
+  // Data items are added after the store imports: the snapshot keeps their original dates
+  test("importProjectFile without project crs takes the one of the oldest saved data", async () => {
+    const file = new File(['{"dataBase":{"db":{}}}'], "project.vease", {
+      type: "application/json",
+    });
+    const { crs, data } = snapshotMock;
+    const savedItems = data.items;
+    const utm = { authority: "EPSG", code: "32631", name: "WGS 84 / UTM zone 31N" };
+    const lambert = { authority: "EPSG", code: "2154", name: "RGF93 v1 / Lambert-93" };
+    Reflect.deleteProperty(snapshotMock, "crs");
+    data.items = mockAs<typeof savedItems>([
+      { ...savedItems[0], crs: utm, created_at: "2026-01-02T00:00:00.000Z" },
+      { ...savedItems[0], id: "older", crs: lambert, created_at: "2026-01-01T00:00:00.000Z" },
+    ]);
+    try {
+      await importProject(file);
+    } finally {
+      Object.assign(snapshotMock, { crs });
+      data.items = savedItems;
+    }
+
+    expect(crsStoreMock.importStores).toHaveBeenCalledWith({ projectCrs: lambert });
   });
 });

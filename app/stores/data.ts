@@ -45,6 +45,8 @@ interface NewDataItem {
   is_viewable?: boolean;
   binary_light_viewable?: string;
   crs?: CRSList;
+  // Set on saved data: kept by the project snapshot
+  created_at?: string;
   mesh_components?: ModelComponentInput[];
   collection_components?: ModelComponentInput[];
   nb_vertices?: number;

@@ -12,6 +12,7 @@ import type { ModelComponentRecord } from "@ogw_front/stores/data_helpers/mesh.j
 import type { ModelComponentRelationRecord } from "@ogw_front/stores/data.js";
 import { fetchRaw } from "@ogw_shared/utils/fetch_raw";
 import { importWorkflowFromSnapshot } from "@ogw_front/utils/import_workflow";
+import { oldestCrs } from "@ogw_front/utils/crs";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useCrsStore } from "@ogw_front/stores/crs";
@@ -141,8 +142,13 @@ async function importProject(file: File): Promise<void> {
   if (snapshot.data !== undefined) {
     await dataStore.importStores(snapshot.data);
   }
-  // After the data: a project saved without a project CRS takes the one of its oldest data
-  crsStore.importStores(snapshot.crs);
+  // A project saved without a project CRS takes the one of its oldest data. The snapshot is
+  // Read, not the stored items: they are added later, with the import time as creation date
+  crsStore.importStores(
+    snapshot.crs?.projectCrs === undefined
+      ? { projectCrs: oldestCrs(snapshot.data?.items ?? []) }
+      : snapshot.crs,
+  );
   await hybridViewerStore.initHybridViewer();
 
   const items = snapshot.data?.items ?? [];
