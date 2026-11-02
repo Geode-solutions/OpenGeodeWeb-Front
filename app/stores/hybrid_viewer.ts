@@ -2,13 +2,10 @@ import {
   type ViewStreamLike,
   useHybridViewerViewport,
 } from "@ogw_internal/stores/hybrid_viewer/viewport";
-import {
-  applySnapshot,
-  getCameraOptions,
-  useHybridViewerCamera,
-} from "@ogw_internal/stores/hybrid_viewer/camera";
+import { applySnapshot, useHybridViewerCamera } from "@ogw_internal/stores/hybrid_viewer/camera";
 import { BACKGROUND_COLOR } from "@ogw_internal/stores/hybrid_viewer/constants";
 import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types";
+import { getCameraOptions } from "@ogw_internal/stores/hybrid_viewer/camera_animation";
 import { useHybridViewerBrightness } from "@ogw_internal/stores/hybrid_viewer/brightness";
 import { useHybridViewerCore } from "@ogw_internal/stores/hybrid_viewer/core";
 import { useHybridViewerFilters } from "@ogw_internal/stores/hybrid_viewer/filters";

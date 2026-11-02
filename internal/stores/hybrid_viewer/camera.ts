@@ -4,6 +4,7 @@ import {
   SHORT_ANIMATION_DURATION,
   animateCamera,
   computeAnimationDuration,
+  getCameraOptions,
 } from "./camera_animation";
 import { requireRenderWindow, useHybridViewerCore } from "./core";
 import { dot } from "@kitware/vtk.js/Common/Core/Math";
@@ -58,17 +59,6 @@ function getImageStyle(): CSSStyleDeclaration | undefined {
   const webGLRenderWindow = apiSpecificRenderWindow as unknown as vtkOpenGLRenderWindow;
   const bgImage: unknown = webGLRenderWindow.getReferenceByName("bgImage");
   return bgImage instanceof HTMLImageElement ? bgImage.style : undefined;
-}
-
-function getCameraOptions(camera: vtkCamera): CameraOptions {
-  return {
-    focal_point: [...(camera.getFocalPoint() ?? [0, 0, 0])] as Vector3,
-    view_up: [...(camera.getViewUp() ?? [0, 0, 0])] as Vector3,
-    position: [...(camera.getPosition() ?? [0, 0, 0])] as Vector3,
-    view_angle: camera.getViewAngle(),
-    clipping_range: [...(camera.getClippingRange() ?? [0, 0])] as [number, number],
-    distance: camera.getDistance(),
-  };
 }
 
 function applyCameraOptions(
@@ -321,7 +311,6 @@ export {
   applyCameraOptions,
   applySnapshot,
   centerCameraOnPosition,
-  getCameraOptions,
   useHybridViewerCamera,
 };
 export type { CameraSnapshot };

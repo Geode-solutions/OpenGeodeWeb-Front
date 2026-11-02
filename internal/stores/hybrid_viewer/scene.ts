@@ -1,10 +1,11 @@
 import { ACTOR_COLOR, RGB_MAX } from "./constants";
-import type { HybridDb, vtkActor as VtkActorInstance } from "./vtk_types";
+import type { HybridDb, vtkActor as VtkActorInstance, vtkCamera } from "./vtk_types";
 import { requireRenderWindow, useHybridViewerCore } from "./core";
 import viewer_schemas, {
   type ViewerSetBackgroundColorParams,
 } from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 import { base64ToArrayBuffer } from "./base64";
+import { getCameraOptions } from "./camera_animation";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
@@ -28,6 +29,15 @@ async function setBackgroundColor(color: ViewerSetBackgroundColorParams["color"]
     params,
   });
   await remoteRender();
+}
+
+// The actors are stretched along z around the origin: translate the camera along z so the point it looks at stays under it, keeping the user's view instead of jumping back to the whole scene.
+function followZScaling(camera: vtkCamera, ratio: number): void {
+  const [focalX, focalY, focalZ] = camera.getFocalPoint();
+  const [positionX, positionY, positionZ] = camera.getPosition();
+  const offset = focalZ * (ratio - 1);
+  camera.setFocalPoint(focalX, focalY, focalZ + offset);
+  camera.setPosition(positionX, positionY, positionZ + offset);
 }
 
 // Shared via createSharedComposable (rather than merged into the parent hybridViewer store) so sibling slices, e.g. camera.ts and ruler.ts, can read hybridDb/setZScaling directly without importing the parent store and creating a cycle. A Pinia store would work too but its $id/$patch/... properties would leak into the composed store's spread and collapse its inferred type.
@@ -100,6 +110,7 @@ const useHybridViewerScene = createSharedComposable(() => {
 
   async function setZScaling(z_scale: number): Promise<void> {
     const { genericRenderWindow, remoteRender } = useHybridViewerCore();
+    const ratio = z_scale / zScale.value;
     zScale.value = z_scale;
     const renderer = requireRenderWindow(genericRenderWindow).getRenderer();
     // oxlint-disable-next-line no-unsafe-type-assertion -- renderer.getActors() is typed as vtkProp[] in vtk.js, but this scene only ever adds vtkActor instances.
@@ -107,17 +118,23 @@ const useHybridViewerScene = createSharedComposable(() => {
       const scale = actor.getScale();
       actor.setScale(scale[0] ?? 1, scale[1] ?? 1, z_scale);
     }
-    renderer.resetCamera();
+    const camera = renderer.getActiveCamera();
+    followZScaling(camera, ratio);
+    renderer.resetCameraClippingRange();
     const renderWindow = requireRenderWindow(genericRenderWindow).getRenderWindow();
     renderWindow.render();
     const viewerStore = useViewerStore();
-    const schema = viewer_schemas.opengeodeweb_viewer.viewer.set_z_scaling;
-    const params = {
-      z_scale,
-    };
     await viewerStore.request({
-      schema,
-      params,
+      schema: viewer_schemas.opengeodeweb_viewer.viewer.set_z_scaling,
+      params: {
+        z_scale,
+      },
+    });
+    await viewerStore.request({
+      schema: viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
+      params: {
+        camera_options: getCameraOptions(camera),
+      },
     });
     await remoteRender();
   }
@@ -147,4 +164,4 @@ const useHybridViewerScene = createSharedComposable(() => {
   };
 });
 
-export { useHybridViewerScene };
+export { followZScaling, useHybridViewerScene };
