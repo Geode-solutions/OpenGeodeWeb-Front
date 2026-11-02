@@ -10,6 +10,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 vi.setConfig({ testTimeout: 10_000 });
 
+const OPAQUE = { satellite: 1, streets: 1, topo: 1 };
 const LAMBERT = { authority: "EPSG", code: "2154", name: "RGF93 v1 / Lambert-93" };
 const REBUILD_DELAY = 500;
 const HALF_DELAY = 100;
@@ -221,11 +222,15 @@ describe("basemap store", () => {
     expect(store.available).toBe(true);
   });
 
-  test("exports the style and opacity, rebuilds on import", async () => {
+  test("exports the visible map and the opacities, rebuilds on import", async () => {
     const store = setup();
     await store.setStyle("satellite");
-    expect(store.exportStores()).toStrictEqual({ style: "satellite", opacity: 1, around: true });
-    await store.importStores({ style: "topo" });
+    expect(store.exportStores()).toStrictEqual({
+      style: "satellite",
+      opacities: OPAQUE,
+      around: true,
+    });
+    await store.importStores({ style: "topo", opacities: OPAQUE });
     const topoParams: unknown = expect.objectContaining({ style: "topo" });
     expect(backRequest).toHaveBeenLastCalledWith(expect.objectContaining({ params: topoParams }));
   });
@@ -319,7 +324,7 @@ describe("basemap store", () => {
     await store.setStyle("satellite");
     viewerRequest.mockClear();
     remoteRender.mockClear();
-    await store.setOpacity(0.5);
+    await store.setOpacity("satellite", 0.5);
     expect(store.opacity).toBe(0.5);
     expect(viewerRequest).toHaveBeenCalledExactlyOnceWith(
       expect.objectContaining({ params: { id: "basemap-1", opacity: 0.5 } }),
@@ -330,14 +335,14 @@ describe("basemap store", () => {
 
   test("setOpacity without basemap only stores the value", async () => {
     const store = setup();
-    await store.setOpacity(0.4);
+    await store.setOpacity("satellite", 0.4);
     expect(store.opacity).toBe(0.4);
     expect(viewerRequest).not.toHaveBeenCalled();
   });
 
   test("a rebuild applies the opacity again", async () => {
     const store = setup();
-    await store.setOpacity(0.5);
+    await store.setOpacity("satellite", 0.5);
     await store.setStyle("satellite");
     // Apply, drape, then opacity
     expect(viewerRequest).toHaveBeenCalledTimes(THRICE);
@@ -353,14 +358,43 @@ describe("basemap store", () => {
     expect(viewerRequest).toHaveBeenCalledTimes(TWICE);
   });
 
-  test("exports and imports the opacity", async () => {
+  test("each map keeps its own opacity, only the visible one reaches the viewer", async () => {
     const store = setup();
-    await store.setOpacity(0.7);
-    expect(store.exportStores()).toStrictEqual({ style: "none", opacity: 0.7, around: true });
-    await store.importStores({ style: "none" });
-    expect(store.opacity).toBe(1);
-    await store.importStores({ style: "none", opacity: 0.3 });
-    expect(store.opacity).toBe(0.3);
+    await store.setStyle("streets");
+    await store.setOpacity("streets", 0.4);
+    await store.setOpacity("topo", 0.7);
+    expect(store.opacity).toBe(0.4);
+    expect(viewerRequest).toHaveBeenCalledWith(
+      expect.objectContaining({ params: { id: "basemap-1", opacity: 0.4 } }),
+    );
+    // Topo is hidden: its opacity waits until it is shown
+    expect(viewerRequest).not.toHaveBeenCalledWith(
+      expect.objectContaining({ params: { id: "basemap-1", opacity: 0.7 } }),
+    );
+    await store.setStyle("topo");
+    expect(store.opacity).toBe(0.7);
+  });
+
+  test("hiding keeps the last map", async () => {
+    const store = setup();
+    await store.setStyle("topo");
+    await store.setStyle("none");
+    expect(store.style).toBe("none");
+    expect(store.map).toBe("topo");
+  });
+
+  test("imports the visible map and the opacity of each map", async () => {
+    const store = setup();
+    await store.importStores({ style: "none", opacities: { streets: 0.5 } });
+    expect(store.style).toBe("none");
+    expect(store.opacities).toStrictEqual({ satellite: 1, streets: 0.5, topo: 1 });
+  });
+
+  test("an old project shows satellite with its single opacity on every map", async () => {
+    const store = setup();
+    await store.importStores({ style: "none", opacity: 0.4 });
+    expect(store.style).toBe("satellite");
+    expect(store.opacities).toStrictEqual({ satellite: 0.4, streets: 0.4, topo: 0.4 });
   });
 
   test("drapes on the georeferenced data after each build", async () => {
@@ -399,10 +433,41 @@ describe("basemap store", () => {
   test("exports and imports map around", async () => {
     const store = setup();
     await store.setAround(false);
-    expect(store.exportStores()).toStrictEqual({ style: "none", opacity: 1, around: false });
+    expect(store.exportStores()).toStrictEqual({
+      style: "satellite",
+      opacities: OPAQUE,
+      around: false,
+    });
     await store.importStores({ style: "none" });
     expect(store.around).toBe(true);
     await store.importStores({ style: "none", around: false });
     expect(store.around).toBe(false);
+  });
+
+  test("shows satellite on its own once georeferenced data arrives", async () => {
+    const store = setup();
+    expect(store.style).toBe("satellite");
+    // No setStyle call: a data change is enough to build the default map
+    items.value = georeferenced().slice(0, 1);
+    await nextTick();
+    await vi.advanceTimersByTimeAsync(REBUILD_DELAY);
+    const satelliteParams: unknown = expect.objectContaining({ style: "satellite" });
+    expect(backRequest).toHaveBeenCalledWith(expect.objectContaining({ params: satelliteParams }));
+  });
+
+  test("data in another crs than the project stays out of the basemap", async () => {
+    const store = setup();
+    items.value = mockAs<DataItem[]>([
+      { id: "a", created_at: "1", crs: LAMBERT },
+      { id: "c", created_at: "3", crs: { authority: "EPSG", code: "32631", name: "UTM" } },
+    ]);
+    await nextTick();
+    await store.setStyle("satellite");
+    // BOX_A only: c is in UTM
+    const boxAParams: unknown = expect.objectContaining({
+      bounds: { x_min: 0, x_max: 10, y_min: 0, y_max: 20 },
+      z: 5,
+    });
+    expect(backRequest).toHaveBeenLastCalledWith(expect.objectContaining({ params: boxAParams }));
   });
 });

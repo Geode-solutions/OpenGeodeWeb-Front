@@ -1,4 +1,6 @@
+import type { BasemapStyle, MapStyle } from "@ogw_front/utils/basemap_tree";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
+import { sameCrs } from "@ogw_front/utils/crs";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useCrsStore } from "@ogw_front/stores/crs";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -7,7 +9,13 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
-type BasemapStyle = "none" | "satellite" | "streets" | "topo";
+interface BasemapSnapshot {
+  style?: BasemapStyle;
+  opacities?: Partial<Record<MapStyle, number>>;
+  // A project saved with the toolbar tool: one opacity for the single map
+  opacity?: number;
+  around?: boolean;
+}
 interface Bounds {
   x_min: number;
   y_min: number;
@@ -23,6 +31,10 @@ const Y_MIN = 2;
 const Y_MAX = 3;
 const Z_MAX = 5;
 
+function fullOpacities(value: number): Record<MapStyle, number> {
+  return { satellite: value, streets: value, topo: value };
+}
+
 // oxlint-disable max-lines-per-function, max-statements
 export const useBasemapStore = defineStore("basemap", () => {
   const backStore = useBackStore();
@@ -31,8 +43,13 @@ export const useBasemapStore = defineStore("basemap", () => {
   const hybridViewerStore = useHybridViewerStore();
   const items = dataStore.refAllItems();
 
-  const style = ref<BasemapStyle>("none");
-  const opacity = ref(1);
+  // The last chosen map: shown again when the basemap is shown again
+  const map = ref<MapStyle>("satellite");
+  // Shown as soon as the project has a CRS, until the user hides it
+  const hidden = ref(false);
+  const style = computed<BasemapStyle>(() => (hidden.value ? "none" : map.value));
+  const opacities = ref<Record<MapStyle, number>>(fullOpacities(1));
+  const opacity = computed(() => (style.value === "none" ? 1 : opacities.value[style.value]));
   // The flat map around the draped top surfaces
   const around = ref(true);
   const basemapId = ref<string | undefined>(undefined);
@@ -46,9 +63,12 @@ export const useBasemapStore = defineStore("basemap", () => {
   // Builds up to this number belong to a project the viewer and the back already cleared
   let lastBuildOfPreviousProject = 0;
 
-  // Data without a CRS is still in local coordinates: never under the basemap
+  // Data without a CRS is still in local coordinates, and data in another CRS than the
+  // Project would be misplaced: only the data in the project CRS are under the basemap
   function georeferencedIds(): string[] {
-    return (items.value ?? []).filter((item) => item.crs !== undefined).map((item) => item.id);
+    return (items.value ?? [])
+      .filter((item) => sameCrs(item.crs, crs.value))
+      .map((item) => item.id);
   }
 
   // Unscaled polydata bounds: the actor bounds would include the z scale
@@ -133,10 +153,10 @@ export const useBasemapStore = defineStore("basemap", () => {
     await hybridViewerStore.remoteRender();
   }
 
-  // No rebuild: only the opacity of the displayed basemap changes
-  async function setOpacity(value: number): Promise<void> {
-    opacity.value = value;
-    if (basemapId.value === undefined) {
+  // No rebuild: each map keeps its opacity, only the visible one reaches the viewer
+  async function setOpacity(mapStyle: MapStyle, value: number): Promise<void> {
+    opacities.value = { ...opacities.value, [mapStyle]: value };
+    if (mapStyle !== style.value || basemapId.value === undefined) {
       return;
     }
     await applyOpacity(basemapId.value);
@@ -206,7 +226,7 @@ export const useBasemapStore = defineStore("basemap", () => {
     } catch {
       // The request feedback already shows the error: data changes must not repeat it forever
       if (build === lastBuild) {
-        style.value = "none";
+        hidden.value = true;
         await clear().catch(() => {
           // Already reported by the request feedback
         });
@@ -227,8 +247,14 @@ export const useBasemapStore = defineStore("basemap", () => {
     loading.value = false;
   }
 
+  // "none" hides the basemap and keeps the last map, to show it again
   async function setStyle(newStyle: BasemapStyle): Promise<void> {
-    style.value = newStyle;
+    if (newStyle === "none") {
+      hidden.value = true;
+    } else {
+      map.value = newStyle;
+      hidden.value = false;
+    }
     await rebuild();
   }
 
@@ -244,7 +270,7 @@ export const useBasemapStore = defineStore("basemap", () => {
       // Also rebuilt when the georeferenced extent changes: data displayed after a project
       // Import, or moved by an align/convert that keeps the same CRS
       const extentKey = JSON.stringify(dataBounds() ?? "none");
-      return `${dataKey}|${extentKey}`;
+      return `${crs.value?.authority}:${crs.value?.code}|${dataKey}|${extentKey}`;
     },
     () => {
       if (style.value !== "none") {
@@ -253,23 +279,31 @@ export const useBasemapStore = defineStore("basemap", () => {
     },
   );
 
-  function exportStores(): { style: BasemapStyle; opacity: number; around: boolean } {
-    return { style: style.value, opacity: opacity.value, around: around.value };
+  function exportStores(): {
+    style: BasemapStyle;
+    opacities: Record<MapStyle, number>;
+    around: boolean;
+  } {
+    return { style: style.value, opacities: opacities.value, around: around.value };
   }
 
   // Called once the project data is imported. When the data is not displayed yet,
   // The rebuild finds no bounds and the watch above rebuilds once it is displayed.
-  async function importStores(
-    snapshot: { style?: BasemapStyle; opacity?: number; around?: boolean } | undefined,
-  ): Promise<void> {
-    opacity.value = snapshot?.opacity ?? 1;
+  async function importStores(snapshot: BasemapSnapshot | undefined): Promise<void> {
+    // A project saved with the toolbar tool had one opacity, and "none" was only its default
+    const legacy = snapshot?.opacities === undefined;
+    opacities.value = { ...fullOpacities(snapshot?.opacity ?? 1), ...snapshot?.opacities };
     around.value = snapshot?.around ?? true;
-    await setStyle(snapshot?.style ?? "none");
+    const saved = snapshot?.style ?? "satellite";
+    await setStyle(legacy && saved === "none" ? "satellite" : saved);
   }
+
 
   return {
     style,
+    map,
     opacity,
+    opacities,
     around,
     basemapId,
     attribution,
@@ -285,4 +319,5 @@ export const useBasemapStore = defineStore("basemap", () => {
   };
 });
 
-export type { BasemapStyle };
+export type { BasemapSnapshot };
+export type { BasemapStyle } from "@ogw_front/utils/basemap_tree";

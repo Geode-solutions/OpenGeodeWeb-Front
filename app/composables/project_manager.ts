@@ -4,7 +4,7 @@ import back_schemas, {
 import fileDownload from "js-file-download";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
-import { type BasemapStyle, useBasemapStore } from "@ogw_front/stores/basemap";
+import { type BasemapSnapshot, useBasemapStore } from "@ogw_front/stores/basemap";
 import { type DataStyleSnapshot, useDataStyleStore } from "@ogw_front/stores/data_style";
 import { type NewDataItem, useDataStore } from "@ogw_front/stores/data";
 import { type TreeviewSnapshot, useTreeviewStore } from "@ogw_front/stores/treeview";
@@ -32,7 +32,7 @@ interface ProjectSnapshot {
   hybridViewer?: CameraSnapshot;
   dataStyle?: DataStyleSnapshot;
   crs?: { projectCrs?: CRSList };
-  basemap?: { style?: BasemapStyle };
+  basemap?: BasemapSnapshot;
 }
 
 async function exportProject(): Promise<{ result: Blob }> {
