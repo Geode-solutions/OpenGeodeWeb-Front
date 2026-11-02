@@ -30,10 +30,7 @@ function itemProps(id: string): Record<string, unknown> {
   };
 }
 
-async function mountOptions(
-  component: Component,
-  id: string,
-): Promise<VueWrapper> {
+async function mountOptions(component: Component, id: string): Promise<VueWrapper> {
   const pinia = setupActivePinia();
   const dataStore = useDataStore();
   dataStore.refAllItems = mockAs<typeof dataStore.refAllItems>(() => ref([]));

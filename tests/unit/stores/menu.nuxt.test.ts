@@ -12,7 +12,11 @@ describe("menu store", () => {
   test("registers the basemap menus", () => {
     setupActivePinia();
     const menuStore = useMenuStore();
-    expect(componentNames(menuStore.getMenuItems("basemap", "Map"))).toStrictEqual(["ViewerBasemapOpacityOptions"]);
-    expect(componentNames(menuStore.getMenuItems("basemap", "Basemap"))).toStrictEqual(["ViewerBasemapAroundOptions"]);
+    expect(componentNames(menuStore.getMenuItems("basemap", "Map"))).toStrictEqual([
+      "ViewerBasemapOpacityOptions",
+    ]);
+    expect(componentNames(menuStore.getMenuItems("basemap", "Basemap"))).toStrictEqual([
+      "ViewerBasemapAroundOptions",
+    ]);
   });
 });

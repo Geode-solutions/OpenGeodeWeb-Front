@@ -72,7 +72,6 @@ export const useBasemapStore = defineStore("basemap", () => {
   // A map needs at least one data in the project CRS to lie under
   const available = computed(() => crs.value !== undefined && georeferencedIds().length > 0);
 
-
   // Unscaled polydata bounds: the actor bounds would include the z scale
   function dataBounds(): { bounds: Bounds; z: number } | undefined {
     // The basemap is never in hybridDb: every entry is project data. Data without a CRS is
@@ -299,7 +298,6 @@ export const useBasemapStore = defineStore("basemap", () => {
     const saved = snapshot?.style ?? "satellite";
     await setStyle(legacy && saved === "none" ? "satellite" : saved);
   }
-
 
   return {
     style,
