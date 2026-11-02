@@ -64,9 +64,7 @@ export const useBasemapStore = defineStore("basemap", () => {
   // Data without a CRS is still in local coordinates, and data in another CRS than the
   // Project would be misplaced: only the data in the project CRS are under the basemap
   function georeferencedIds(): string[] {
-    return crsStore.crsItems
-      .filter((item) => sameCrs(item.crs, crs.value))
-      .map((item) => item.id);
+    return crsStore.crsItems.filter((item) => sameCrs(item.crs, crs.value)).map((item) => item.id);
   }
   // A map needs at least one data in the project CRS to lie under
   const available = computed(() => crs.value !== undefined && georeferencedIds().length > 0);
