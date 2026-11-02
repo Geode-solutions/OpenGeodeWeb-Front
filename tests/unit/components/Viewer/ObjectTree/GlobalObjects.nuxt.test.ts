@@ -33,7 +33,7 @@ async function mountTree(withCrs: boolean): Promise<VueWrapper> {
   const dataStore = useDataStore();
   // A data in the project CRS: the basemap has something to lie under
   const items = withCrs ? [{ id: "a", created_at: "1", crs: LAMBERT }] : [];
-  dataStore.refAllItems = mockAs<typeof dataStore.refAllItems>(() => ref(items));
+  dataStore.refCrsItems = mockAs<typeof dataStore.refCrsItems>(() => ref(items));
   useCrsStore();
   // Calls through: without displayed data, a build only clears the basemap
   vi.spyOn(useBasemapStore(), "setStyle");

@@ -82,7 +82,7 @@ describe("basemap store", () => {
     const viewerStore = useViewerStore();
     viewerStore.request = mockAs<typeof viewerStore.request>(viewerRequest);
     const dataStore = useDataStore();
-    dataStore.refAllItems = mockAs<typeof dataStore.refAllItems>(() => items);
+    dataStore.refCrsItems = mockAs<typeof dataStore.refCrsItems>(() => items);
     dataStore.registerObject = mockAs<typeof dataStore.registerObject>(registerObject);
     dataStore.deregisterObject = mockAs<typeof dataStore.deregisterObject>(deregisterObject);
     const hybridViewerStore = useHybridViewerStore();

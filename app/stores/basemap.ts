@@ -41,7 +41,6 @@ export const useBasemapStore = defineStore("basemap", () => {
   const viewerStore = useViewerStore();
   const dataStore = useDataStore();
   const hybridViewerStore = useHybridViewerStore();
-  const items = dataStore.refAllItems();
 
   // The last chosen map: shown again when the basemap is shown again
   const map = ref<MapStyle>("satellite");
@@ -65,7 +64,7 @@ export const useBasemapStore = defineStore("basemap", () => {
   // Data without a CRS is still in local coordinates, and data in another CRS than the
   // Project would be misplaced: only the data in the project CRS are under the basemap
   function georeferencedIds(): string[] {
-    return (items.value ?? [])
+    return crsStore.crsItems
       .filter((item) => sameCrs(item.crs, crs.value))
       .map((item) => item.id);
   }
@@ -265,7 +264,7 @@ export const useBasemapStore = defineStore("basemap", () => {
   // Rebuilt when data is added, removed, converted or aligned (its id or CRS changes)
   watch(
     () => {
-      const dataKey = (items.value ?? [])
+      const dataKey = crsStore.crsItems
         .map((item) => `${item.id}:${item.crs?.authority}:${item.crs?.code}`)
         .join(",");
       // Also rebuilt when the georeferenced extent changes: data displayed after a project

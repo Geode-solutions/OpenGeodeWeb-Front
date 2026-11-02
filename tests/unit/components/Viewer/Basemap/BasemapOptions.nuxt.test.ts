@@ -33,7 +33,7 @@ function itemProps(id: string): Record<string, unknown> {
 async function mountOptions(component: Component, id: string): Promise<VueWrapper> {
   const pinia = setupActivePinia();
   const dataStore = useDataStore();
-  dataStore.refAllItems = mockAs<typeof dataStore.refAllItems>(() => ref([]));
+  dataStore.refCrsItems = mockAs<typeof dataStore.refCrsItems>(() => ref([]));
   const basemapStore = useBasemapStore();
   basemapStore.setOpacity = mockAs<typeof basemapStore.setOpacity>(
     vi.fn().mockResolvedValue(undefined),
