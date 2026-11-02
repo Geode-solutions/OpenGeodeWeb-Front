@@ -1,13 +1,17 @@
 <script setup lang="ts">
+// oxlint-disable max-dependencies
+import { type TreeMenuPayload, compareSelections } from "@ogw_front/utils/treeview";
 import {
-  type DataMenuPayload,
-  type GeodeObjectTypeMenuPayload,
-  compareSelections,
-} from "@ogw_front/utils/treeview";
+  basemapGroup,
+  isBasemapId,
+  nextBasemapStyle,
+  withBasemapSelection,
+} from "@ogw_front/utils/basemap_tree";
 import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
+import { useBasemapStore } from "@ogw_front/stores/basemap";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
@@ -19,10 +23,11 @@ const treeviewStore = useTreeviewStore();
 const dataStore = useDataStore();
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
+const basemapStore = useBasemapStore();
 const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 
 interface Emits {
-  "show-menu": [payload: DataMenuPayload | GeodeObjectTypeMenuPayload];
+  "show-menu": [payload: TreeMenuPayload];
 }
 
 const emit = defineEmits<Emits>();
@@ -53,6 +58,27 @@ const {
   applySearchFilter,
 } = useTreeFilter(() => treeviewStore.items, { recursiveSort: true });
 
+// The basemap category comes first, out of the data sort and filters
+const displayedItems = computed(() =>
+  basemapStore.available ? [basemapGroup(), ...processedItems.value] : processedItems.value,
+);
+
+function basemapIds(selection: readonly string[]): string {
+  return selection.filter((id) => isBasemapId(id)).join(",");
+}
+
+// The tree shows the basemap state: one visible map, or none
+watch(
+  () => basemapStore.style,
+  (style) => {
+    const synced = withBasemapSelection(treeviewStore.selection, style);
+    if (basemapIds(synced) !== basemapIds(treeviewStore.selection)) {
+      treeviewStore.selection = synced;
+    }
+  },
+  { immediate: true },
+);
+
 function onUpdateSelection(val: string[]): void {
   treeviewStore.selection = applySearchFilter(val, treeviewStore.selection);
 }
@@ -68,6 +94,16 @@ watch(
     }
 
     const { added, removed } = compareSelections(current, previous);
+
+    // Basemap rows are no data: their clicks choose the visible map
+    const expected = withBasemapSelection(current, basemapStore.style);
+    if (basemapIds(current) !== basemapIds(expected)) {
+      const style = nextBasemapStyle(basemapStore.style, basemapStore.map, added, removed);
+      // The store state changes at once: the selection written below is then already in sync
+      const shown = basemapStore.setStyle(style);
+      treeviewStore.selection = withBasemapSelection(current, style);
+      await shown;
+    }
 
     const allObjectIds = new Set(
       treeviewStore.items.flatMap((group) => group.children.map((child) => child.id)),
@@ -88,6 +124,10 @@ watch(
 
 function showMenu(event: MouseEvent, item: TreeGroupItem): void {
   const actualItem = item.raw || item;
+  if (isBasemapId(actualItem.id)) {
+    emit("show-menu", { event, itemId: actualItem.id, context_type: "basemap" });
+    return;
+  }
   if (!actualItem.children) {
     emit("show-menu", { event, itemId: actualItem.id });
     return;
@@ -150,7 +190,7 @@ function expandAll(): void {
       }
     }
   }
-  traverse(treeviewStore.items);
+  traverse(displayedItems.value);
   opened.value = allIds;
 }
 </script>
@@ -172,7 +212,7 @@ function expandAll(): void {
       :selected="visibleSelection"
       v-model:opened="opened"
       v-model:active="treeviewStore.activeItems"
-      :items="processedItems"
+      :items="displayedItems"
       :options="{
         selection: { selectable: true },
         search,
@@ -193,7 +233,7 @@ function expandAll(): void {
         <ObjectTreeItemLabel
           :item="item as unknown as DisplayItem"
           :is-leaf="isLeaf"
-          :show-crs="isLeaf"
+          :show-crs="isLeaf && !isBasemapId(item.id as string)"
           @contextmenu="showMenu($event, item as unknown as TreeGroupItem)"
         />
       </template>
