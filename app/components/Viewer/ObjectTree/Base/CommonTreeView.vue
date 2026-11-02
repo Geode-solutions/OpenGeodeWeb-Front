@@ -148,6 +148,22 @@ function handleItemClick(
   }
 }
 
+function selectAllLeaves(): void {
+  const leafIds = displayItems.value
+    .filter((rowItem) => rowItem.isLeaf)
+    .map((rowItem) => rowItem.raw[actualItemProps.value.value]);
+  emit("update:active", leafIds);
+}
+
+function clearActive(): boolean {
+  if (active.length === 0) {
+    return false;
+  }
+  lastActiveIndex.value = -1;
+  emit("update:active", []);
+  return true;
+}
+
 const { handleKeyDown } = useTreeKeyboardNav(
   displayItems,
   emit as EmitFn,
@@ -156,31 +172,9 @@ const { handleKeyDown } = useTreeKeyboardNav(
   handleItemClick,
   getScrollInfo,
   focusedIndex,
+  selectAllLeaves,
+  clearActive,
 );
-
-function selectAllLeaves(): void {
-  const leafIds = displayItems.value
-    .filter((rowItem) => rowItem.isLeaf)
-    .map((rowItem) => rowItem.raw[actualItemProps.value.value]);
-  emit("update:active", leafIds);
-}
-
-function clearActive(): void {
-  lastActiveIndex.value = -1;
-  emit("update:active", []);
-}
-
-function handleShortcutKeyDown(event: KeyboardEvent): void {
-  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "a") {
-    event.preventDefault();
-    selectAllLeaves();
-  } else if (event.key === "Escape" && active.length > 0) {
-    event.preventDefault();
-    clearActive();
-  } else {
-    handleKeyDown(event);
-  }
-}
 </script>
 
 <template>
@@ -188,7 +182,7 @@ function handleShortcutKeyDown(event: KeyboardEvent): void {
     ref="treeWrapper"
     class="common-tree-view-wrapper"
     tabindex="0"
-    @keydown="handleShortcutKeyDown"
+    @keydown="handleKeyDown"
     @mousedown="treeWrapper?.focus()"
     @mouseenter="treeWrapper?.focus()"
   >
