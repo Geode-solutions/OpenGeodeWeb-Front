@@ -193,6 +193,7 @@ function expandAll(): void {
         <ObjectTreeItemLabel
           :item="item as unknown as DisplayItem"
           :is-leaf="isLeaf"
+          :show-crs="isLeaf"
           @contextmenu="showMenu($event, item as unknown as TreeGroupItem)"
         />
       </template>

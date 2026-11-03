@@ -7,9 +7,9 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { exportProject, importProject } from "@ogw_front/composables/project_manager";
+import { mockAs, setupActivePinia } from "@ogw_tests/utils";
 import { appMode } from "@ogw_shared/app_mode";
 import backSchemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
-import { setupActivePinia } from "@ogw_tests/utils";
 
 // Constants
 const PANEL_WIDTH = 300;
@@ -35,6 +35,7 @@ const VIEWER_CALL_COUNT = 1;
 
 // Snapshot
 const snapshotMock = {
+  crs: { projectCrs: { authority: "EPSG", code: "32631", name: "WGS 84 / UTM zone 31N" } },
   data: {
     items: [
       {
@@ -185,6 +186,13 @@ vi.mock(import("@ogw_front/stores/back") as Promise<unknown>, () => ({
 vi.mock(import("@ogw_front/stores/feedback") as Promise<unknown>, () => ({
   useFeedbackStore: (): typeof feedbackStoreMock => feedbackStoreMock,
 }));
+const crsStoreMock = {
+  reset: vi.fn(),
+  importStores: vi.fn(),
+};
+vi.mock(import("@ogw_front/stores/crs") as Promise<unknown>, () => ({
+  useCrsStore: (): typeof crsStoreMock => crsStoreMock,
+}));
 const appStoreMock = {
   exportStores: vi.fn(() => ({ projectName: "mockedProject" })),
 };
@@ -263,6 +271,7 @@ describe("projectManager composable (compact)", () => {
       dataStyleStoreMock,
       hybridViewerStoreMock,
       feedbackStoreMock,
+      crsStoreMock,
     ];
     for (const store of storesList) {
       const values = Object.values(store);
@@ -313,5 +322,45 @@ describe("projectManager composable (compact)", () => {
 
     verifyDataManagement();
     verifyRemaining();
+  });
+
+  test("importProjectFile restores the project crs once the data are imported", async () => {
+    const file = new File(['{"dataBase":{"db":{}}}'], "project.vease", {
+      type: "application/json",
+    });
+
+    await importProject(file);
+
+    expect(crsStoreMock.importStores).toHaveBeenCalledWith(snapshotMock.crs);
+    const dataOrder = Math.min(...dataStoreMock.importStores.mock.invocationCallOrder);
+    expect(Math.min(...crsStoreMock.reset.mock.invocationCallOrder)).toBeLessThan(dataOrder);
+    // Once every data item is added: partial data would make the project crs follow them
+    expect(Math.min(...crsStoreMock.importStores.mock.invocationCallOrder)).toBeGreaterThan(
+      Math.max(...dataStoreMock.addItem.mock.invocationCallOrder),
+    );
+  });
+
+  // Data items are added after the store imports: the snapshot keeps their original dates
+  test("importProjectFile without project crs takes the one of the oldest saved data", async () => {
+    const file = new File(['{"dataBase":{"db":{}}}'], "project.vease", {
+      type: "application/json",
+    });
+    const { crs, data } = snapshotMock;
+    const savedItems = data.items;
+    const utm = { authority: "EPSG", code: "32631", name: "WGS 84 / UTM zone 31N" };
+    const lambert = { authority: "EPSG", code: "2154", name: "RGF93 v1 / Lambert-93" };
+    Reflect.deleteProperty(snapshotMock, "crs");
+    data.items = mockAs<typeof savedItems>([
+      { ...savedItems[0], crs: utm, created_at: "2026-01-02T00:00:00.000Z" },
+      { ...savedItems[0], id: "older", crs: lambert, created_at: "2026-01-01T00:00:00.000Z" },
+    ]);
+    try {
+      await importProject(file);
+    } finally {
+      Object.assign(snapshotMock, { crs });
+      data.items = savedItems;
+    }
+
+    expect(crsStoreMock.importStores).toHaveBeenCalledWith({ projectCrs: lambert });
   });
 });

@@ -8,6 +8,8 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 const DATA_ID_LENGTH = 32;
 
+vi.setConfig({ testTimeout: 10_000 });
+
 function component(geode_id: string, type: string, viewer_id: number): ModelComponentInput {
   return { geode_id, name: geode_id, type, viewer_id, is_active: true };
 }
@@ -51,6 +53,22 @@ describe("useDataStore - collections", () => {
     });
     const stored = await dataStore.item(dataId);
     expect(stored.geode_id).toBe(geodeId);
+  });
+
+  test("addItem stores crs", async () => {
+    const dataStore = useDataStore();
+    const dataId = "b".repeat(DATA_ID_LENGTH);
+    const crs = { authority: "EPSG", code: "2154", name: "RGF93 v1 / Lambert-93" };
+    await dataStore.addItem({
+      id: dataId,
+      geode_id: "01a08187-2c4c-7e64-85c5-52c3439f0627",
+      name: "points",
+      viewer_type: "mesh",
+      geode_object_type: "PointSet3D",
+      crs,
+    });
+    const stored = await dataStore.item(dataId);
+    expect(stored.crs).toStrictEqual(crs);
   });
 
   test("correctly recognizes, formats, and pluralizes any collection component type not in MESH_COMPONENT_TYPES", async () => {

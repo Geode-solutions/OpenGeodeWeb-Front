@@ -1,4 +1,6 @@
-import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
+import back_schemas, {
+  type CRSList,
+} from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import fileDownload from "js-file-download";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
@@ -9,8 +11,10 @@ import type { CameraSnapshot } from "@ogw_internal/stores/hybrid_viewer/camera";
 import type { ModelComponentRecord } from "@ogw_front/stores/data_helpers/mesh.js";
 import type { ModelComponentRelationRecord } from "@ogw_front/stores/data.js";
 import { importWorkflowFromSnapshot } from "@ogw_front/utils/import_workflow";
+import { oldestCrs } from "@ogw_front/utils/crs";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useBackStore } from "@ogw_front/stores/back";
+import { useCrsStore } from "@ogw_front/stores/crs";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -26,6 +30,7 @@ interface ProjectSnapshot {
   data?: ProjectDataSnapshot;
   hybridViewer?: CameraSnapshot;
   dataStyle?: DataStyleSnapshot;
+  crs?: { projectCrs?: CRSList };
 }
 
 async function exportProject(): Promise<{ result: Blob }> {
@@ -73,6 +78,7 @@ async function importProject(file: File): Promise<void> {
   const dataStore = useDataStore();
   const treeviewStore = useTreeviewStore();
   const hybridViewerStore = useHybridViewerStore();
+  const crsStore = useCrsStore();
 
   await viewerStore.ws_connect();
 
@@ -84,6 +90,7 @@ async function importProject(file: File): Promise<void> {
   treeviewStore.clear();
   await dataStore.clear();
   hybridViewerStore.clear();
+  crsStore.reset();
 
   const importProjectSchema = back_schemas.opengeodeweb_back.import_project;
   const form = new FormData();
@@ -108,6 +115,14 @@ async function importProject(file: File): Promise<void> {
 
   const items = snapshot.data?.items ?? [];
   await importWorkflowFromSnapshot(items);
+  // After every data item is added: on partial data the project CRS would follow them.
+  // A project saved without a project CRS takes the one of its oldest data, read in the
+  // Snapshot: the stored items carry the import time as creation date
+  crsStore.importStores(
+    snapshot.crs?.projectCrs === undefined
+      ? { projectCrs: oldestCrs(snapshot.data?.items ?? []) }
+      : snapshot.crs,
+  );
   await hybridViewerStore.importStores(snapshot.hybridViewer);
   if (snapshot.dataStyle !== undefined) {
     await dataStyleStore.importStores(snapshot.dataStyle);
