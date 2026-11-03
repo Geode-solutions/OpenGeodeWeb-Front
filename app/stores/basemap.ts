@@ -199,26 +199,27 @@ export const useBasemapStore = defineStore("basemap", () => {
     await hybridViewerStore.remoteRender();
   }
 
+  function layersParams(): { map: string; visible: boolean; opacity: number; crop: boolean }[] {
+    return built.value.flatMap(({ map }) => {
+      const mapStyle = openMap(map);
+      return mapStyle === undefined
+        ? []
+        : [
+            {
+              map,
+              visible: maps.value.includes(mapStyle),
+              opacity: opacities.value[mapStyle],
+              crop: crop.value[mapStyle],
+            },
+          ];
+    });
+  }
+
   // The viewer recomposes its textures: no download, no new mesh
   async function applyLayers(id: string): Promise<void> {
     await viewerStore.request({
       schema: viewer_schemas.opengeodeweb_viewer.mesh.basemap_layers,
-      params: {
-        id,
-        layers: built.value.flatMap(({ map }) => {
-          const mapStyle = openMap(map);
-          return mapStyle === undefined
-            ? []
-            : [
-                {
-                  map,
-                  visible: maps.value.includes(mapStyle),
-                  opacity: opacities.value[mapStyle],
-                  crop: crop.value[mapStyle],
-                },
-              ];
-        }),
-      },
+      params: { id, layers: layersParams() },
     });
   }
 
@@ -255,6 +256,8 @@ export const useBasemapStore = defineStore("basemap", () => {
     const previous = { id: basemapId.value, built: built.value };
     try {
       await dataStore.registerObject(response.id, BASEMAP_NAME);
+      // The layers are computed from the maps just built
+      built.value = response.maps;
       await viewerStore.request({
         schema: viewer_schemas.opengeodeweb_viewer.mesh.apply_basemap,
         params: {
@@ -263,10 +266,9 @@ export const useBasemapStore = defineStore("basemap", () => {
           columns: response.columns,
           rows: response.rows,
           maps: response.maps,
+          layers: layersParams(),
         },
       });
-      built.value = response.maps;
-      await applyLayers(response.id);
       await applyDrape(response.id);
     } catch (error) {
       built.value = previous.built;

@@ -7,6 +7,7 @@ import { useBackStore } from "@ogw_front/stores/back";
 import { useBasemapStore } from "@ogw_front/stores/basemap";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 vi.setConfig({ testTimeout: 10_000 });
 
@@ -27,6 +28,10 @@ const DELETE_ROUTE = back_schemas.opengeodeweb_back.basemap.delete.$id;
 
 function fakeActor(bounds: number[]): unknown {
   return { polydata: { getBounds: () => bounds } };
+}
+
+interface Request {
+  schema: { $id: string };
 }
 
 function buildResponse(id: string): Record<string, unknown> {
@@ -125,6 +130,7 @@ describe("basemap store", () => {
           columns: 2,
           rows: 3,
           maps: buildResponse("basemap-1").maps,
+          layers: [{ map: "satellite", visible: true, opacity: 1, crop: false }],
         },
       }),
     );
@@ -329,8 +335,13 @@ describe("basemap store", () => {
     const apply: unknown = expect.objectContaining({
       id: "basemap-1",
       maps: buildResponse("basemap-1").maps,
+      layers: [{ map: "satellite", visible: true, opacity: 1, crop: false }],
     });
     expect(viewerRequest).toHaveBeenCalledWith(expect.objectContaining({ params: apply }));
+    // The states go with the basemap: no second composition
+    const layersRoute = viewer_schemas.opengeodeweb_viewer.mesh.basemap_layers.$id;
+    const calls = viewerRequest.mock.calls.map(([request]) => mockAs<Request>(request).schema.$id);
+    expect(calls).not.toContain(layersRoute);
   });
 
   test("hiding a map built in the basemap only recomposes it", async () => {
