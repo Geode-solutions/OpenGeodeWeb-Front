@@ -4,6 +4,7 @@ import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { RangesPerData } from "@ogw_front/composables/batch_style";
 import ViewerOptionsAttributeSelector from "@ogw_front/components/Viewer/Options/AttributeSelector.vue";
 import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
+import ViewerOptionsOpacitySlider from "@ogw_front/components/Viewer/Options/Sliders/Opacity.vue";
 import ViewerOptionsTexturesSelector from "@ogw_front/components/Viewer/Options/TexturesSelector.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 
@@ -38,6 +39,7 @@ interface Emits {
 const emit = defineEmits<Emits>();
 
 const color = defineModel<RGBAColor>("color");
+const opacity = defineModel<number>("opacity");
 const textures = defineModel<Texture[]>("textures");
 
 const vertex_attribute_name = defineModel<string>("vertex_attribute_name");
@@ -207,6 +209,11 @@ const active_key = computed<string | undefined>(() => {
   return index === -1 ? coloring_style_key.value : coloring_styles.value.values[index];
 });
 
+// The constant color picker already edits the opacity as its alpha
+const has_opacity = computed<boolean>(
+  () => opacity.value !== undefined && active_key.value !== color_dict.value,
+);
+
 watch(
   [
     coloring_style_label,
@@ -340,6 +347,11 @@ watch(
           :schemas="polyhedronSchemas"
         />
       </template>
+    </v-col>
+  </v-row>
+  <v-row v-if="has_opacity" class="mt-2" no-gutters>
+    <v-col cols="12">
+      <ViewerOptionsOpacitySlider v-model="opacity" />
     </v-col>
   </v-row>
 </template>
