@@ -51,7 +51,7 @@ function handleMeshEdgesEdgeColoring(
   return edgeAttributeStyle.setMeshEdgesEdgeAttribute(id, edge_attribute);
 }
 
-async function setMeshEdgesActiveColoring(
+async function applyMeshEdgesActiveColoring(
   id: string,
   type: string | undefined,
   deps: MeshEdgesActiveColoringDeps,
@@ -75,6 +75,22 @@ async function setMeshEdgesActiveColoring(
     return result;
   }
   throw new Error(`Unknown mesh edges coloring type: ${type}`);
+}
+
+async function setMeshEdgesActiveColoring(
+  id: string,
+  type: string | undefined,
+  deps: MeshEdgesActiveColoringDeps,
+): Promise<unknown> {
+  const result = await applyMeshEdgesActiveColoring(id, type, deps);
+  if (type !== "constant") {
+    // Attribute and textures colorings keep the actor opacity: restore the stored one
+    await whenDefined(deps.colorStyle.meshEdgesOpacity(id), async (value) => {
+      const applied = await deps.colorStyle.setMeshEdgesOpacity(id, value);
+      return applied;
+    });
+  }
+  return result;
 }
 
 async function applyMeshEdgesStyle(
