@@ -3,13 +3,14 @@ import {
   type ModelMenuItemProps,
   useModelMenuContext,
 } from "@ogw_front/composables/model_menu_context";
-import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
+import ModelCardTabs from "./ModelCardTabs.vue";
 import ViewerGenericModelComponentPointsOptions from "@ogw_front/components/Viewer/Generic/Model/ComponentPointsOptions.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import { useModelTabs } from "@ogw_front/composables/model_tabs";
 
 // Corners have no points options: their points are the corners themselves
 const POINTS_TYPE_TITLES = {
@@ -85,51 +86,57 @@ const componentTargets = computed(() =>
     ? []
     : [{ componentType: pointsComponentType.value, componentIds: [componentId.value] }],
 );
+
+const { tabs, activeTab } = useModelTabs({
+  componentType,
+  componentId,
+  isTypeSupported: (type) => isPointsComponentType(type),
+  hasComponentsOptions: computed(() => allComponentsTargets.value.length > 0),
+});
 </script>
 
 <template>
   <v-sheet class="model-points-card" color="transparent">
-    <OptionsSection title="Model Points Options">
-      <VisibilitySwitch data-testid="modelPointsVisibilitySwitch" v-model="modelPointsVisibility" />
-    </OptionsSection>
+    <ModelCardTabs v-model="activeTab" :tabs="tabs" />
 
-    <OptionsSection
+    <div v-show="activeTab === 'model'">
+      <VisibilitySwitch data-testid="modelPointsVisibilitySwitch" v-model="modelPointsVisibility" />
+    </div>
+
+    <div
       v-if="!componentType && !componentId && allComponentsTargets.length > 0"
-      title="Components Points Options"
+      v-show="activeTab === 'components'"
       data-testid="modelPointsComponentsOptions"
-      class="mt-4"
     >
       <ViewerGenericModelComponentPointsOptions
         :modelId="modelId"
         :targets="allComponentsTargets"
       />
-    </OptionsSection>
+    </div>
 
-    <OptionsSection
+    <div
       v-if="pointsComponentType"
-      :title="POINTS_TYPE_TITLES[pointsComponentType]"
+      v-show="activeTab === 'type'"
       data-testid="modelPointsComponentTypeOptions"
-      class="mt-4"
     >
       <ViewerGenericModelComponentPointsOptions
         :modelId="modelId"
         :targets="typeTargets"
         :referenceComponentId="typeReferenceId"
       />
-    </OptionsSection>
+    </div>
 
-    <OptionsSection
+    <div
       v-if="pointsComponentType && componentId"
-      title="Component Points Options"
+      v-show="activeTab === 'component'"
       data-testid="modelPointsComponentOptions"
-      class="mt-4"
     >
       <ViewerGenericModelComponentPointsOptions
         :modelId="modelId"
         :targets="componentTargets"
         :referenceComponentId="componentId"
       />
-    </OptionsSection>
+    </div>
   </v-sheet>
 </template>
 
