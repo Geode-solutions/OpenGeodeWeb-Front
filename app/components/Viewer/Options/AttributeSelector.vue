@@ -1,18 +1,21 @@
 <script setup lang="ts">
 import {
-  type AttributeRange,
-  type RangesPerData,
-  useBatchGroup,
-} from "@ogw_front/composables/batch_style";
+  type AttributeInfo,
+  attributeItemOptions,
+  attributeRangesPerTarget,
+  useAttributeRangeBounds,
+  useSeriesTimeStepCommit,
+} from "@ogw_front/composables/attribute_selector";
 import {
   type AttributeRangeInfo,
   type AttributeSchemas,
   fetchAttributeRange,
 } from "@ogw_front/utils/attribute_range";
+import { type RangesPerData, useBatchGroup } from "@ogw_front/composables/batch_style";
 import { getAttributeRange, intersectAttributes } from "@ogw_front/utils/attributes";
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar.vue";
-import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
+import ViewerOptionsNoDataColorInfo from "@ogw_front/components/Viewer/Options/NoDataColorInfo.vue";
 import ViewerOptionsTimeStepSlider from "@ogw_front/components/Viewer/Options/TimeStepSlider.vue";
 import { requestForTargets } from "@ogw_front/utils/request_for_targets";
 import { useBackStore } from "@ogw_front/stores/back";
@@ -44,13 +47,6 @@ interface Emits {
 
 const emit = defineEmits<Emits>();
 
-interface AttributeInfo {
-  attribute_name: string;
-  nb_items: number;
-  time_steps?: number[];
-  [key: string]: unknown;
-}
-
 const attributes = ref<AttributeInfo[]>([]);
 let attributesPerTarget = new Map<string, AttributeInfo[]>();
 const rangesPerTarget = ref(new Map<string, AttributeRangeInfo>());
@@ -67,68 +63,20 @@ const noData = computed<boolean>(() =>
   [...rangesPerTarget.value.values()].some((range) => range.no_data),
 );
 
-let committedSeries: string | undefined = undefined;
-
-function commitSeriesTimeStep(): void {
-  if (timeSteps.value.length === 0) {
-    committedSeries = undefined;
-    return;
-  }
-  const name = currentAttribute.value?.attribute_name;
-  if (name === committedSeries) {
-    return;
-  }
-  committedSeries = name;
-  const current = attributeTimeStep.value;
-  const valid = current !== undefined && current >= 0 && current < timeSteps.value.length;
-  // A valid step is already stored and applied with the series: emitting it again re-applies the attribute
-  if (!valid) {
+const commitSeriesTimeStep = useSeriesTimeStepCommit(
+  timeSteps,
+  () => currentAttribute.value?.attribute_name,
+  attributeTimeStep,
+  () => {
     emit("update:attributeTimeStep", 0);
-  }
-}
-
-const cssNoDataColor = computed<string>(() => {
-  const { red, green, blue, alpha } = attributeNoDataColor.value ?? DEFAULT_NO_DATA_COLOR;
-  return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
-});
-const rangeMin = computed<number | undefined>({
-  get: () => attributeRange.value[0],
-  set: (val: number | undefined) => {
-    if (val === undefined) {
-      return;
-    }
-    const [, currentMax] = attributeRange.value;
-    let newMin = val;
-    if (typeof currentMax === "number" && val > currentMax) {
-      newMin = currentMax;
-    }
-    attributeRange.value = [newMin, currentMax];
   },
-});
-const rangeMax = computed<number | undefined>({
-  get: () => attributeRange.value[1],
-  set: (val: number | undefined) => {
-    if (val === undefined) {
-      return;
-    }
-    const [currentMin] = attributeRange.value;
-    let newMax = val;
-    if (typeof currentMin === "number" && val < currentMin) {
-      newMax = currentMin;
-    }
-    attributeRange.value = [currentMin, newMax];
-  },
-});
+);
 
-const componentItems = computed<{ title: string; value: number }[]>(() => {
-  if (!currentAttribute.value) {
-    return [];
-  }
-  return Array.from({ length: currentAttribute.value.nb_items }, (_, index) => ({
-    title: `Item ${index + 1}`,
-    value: index,
-  }));
-});
+const { rangeMin, rangeMax } = useAttributeRangeBounds(attributeRange);
+
+const componentItems = computed<{ title: string; value: number }[]>(() =>
+  currentAttribute.value ? attributeItemOptions(currentAttribute.value.nb_items) : [],
+);
 
 function hasSelectedComponent(components: unknown): boolean {
   return Array.isArray(components) && components.length > 0;
@@ -206,13 +154,8 @@ async function initGroupAttribute(name: string, item: number): Promise<void> {
   if (attributeName.value !== name) {
     return;
   }
-  const ranges = new Map<string, AttributeRange>();
-  for (const [targetId, range] of rangesPerTarget.value) {
-    const { min, max } = getAttributeRange(range, item);
-    ranges.set(targetId, [min, max]);
-  }
   emit("update:attributeColorMap", attributeColorMap.value ?? "batlow");
-  emit("ranges_per_data", ranges);
+  emit("ranges_per_data", attributeRangesPerTarget(rangesPerTarget.value, item));
 }
 
 async function getAttributes(): Promise<void> {
@@ -300,29 +243,7 @@ watch([attributeName, attributeItem, currentAttribute], async () => {
     hide-details
   />
   <ViewerOptionsTimeStepSlider v-model="attributeTimeStep" :time-steps="timeSteps" />
-  <div
-    v-if="currentAttribute && noData"
-    class="text-caption text-high-emphasis mt-1 d-flex align-center ga-1"
-    data-testid="noDataInfo"
-  >
-    <v-icon icon="mdi-information-outline" size="14" color="info" />
-    <span>Contains unmapped elements</span>
-    <v-menu :close-on-content-click="false">
-      <template #activator="{ props }">
-        <button
-          v-bind="props"
-          type="button"
-          class="color-picker-rect-btn ml-1"
-          :style="{ backgroundColor: cssNoDataColor }"
-          v-tooltip="'Change unmapped elements color'"
-          data-testid="noDataColorBtn"
-        />
-      </template>
-      <v-card class="pa-2">
-        <ViewerOptionsColorPicker v-model="attributeNoDataColor" disabled-alpha />
-      </v-card>
-    </v-menu>
-  </div>
+  <ViewerOptionsNoDataColorInfo v-if="currentAttribute && noData" v-model="attributeNoDataColor" />
   <ViewerOptionsAttributeColorBar
     v-if="attributeName"
     v-model:minimum="rangeMin"
@@ -332,23 +253,3 @@ watch([attributeName, attributeItem, currentAttribute], async () => {
     @reset="resetRange"
   />
 </template>
-
-<style scoped>
-.color-picker-rect-btn {
-  width: 26px;
-  height: 15px;
-  border-radius: 3px;
-  border: 2px solid rgba(255, 255, 255, 0.912);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  cursor: pointer;
-  outline: none;
-  transition:
-    border-color 0.15s ease,
-    transform 0.15s ease;
-}
-
-.color-picker-rect-btn:hover {
-  border-color: rgba(255, 255, 255, 0.9);
-  transform: scale(1.1);
-}
-</style>

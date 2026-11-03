@@ -1,16 +1,9 @@
 <script setup lang="ts">
-import { type AttributeSchemas, fetchAttributeRange } from "@ogw_front/utils/attribute_range";
-import {
-  MESH_ELEMENT_KINDS,
-  MODEL_COMPONENT_ATTRIBUTE_SCHEMAS,
-  MODEL_COMPONENT_KINDS,
-  attributeArrayName,
-  getAttributeRange,
-} from "@ogw_front/utils/attributes";
-import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
+import { type AttributeSource, fetchSources } from "@ogw_front/utils/threshold_sources";
+import { attributeArrayName, getAttributeRange } from "@ogw_front/utils/attributes";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import ViewerOptionsAttributeRangeSelector from "@ogw_front/components/Viewer/Options/AttributeRangeSelector.vue";
-import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
+import { fetchAttributeRange } from "@ogw_front/utils/attribute_range";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -24,14 +17,6 @@ interface Props {
 }
 
 const { escapeFunction = undefined } = defineProps<Props>();
-
-interface AttributeSource {
-  title: string;
-  schemas: AttributeSchemas;
-  timeStepKey: string;
-  params: { id: string; component_ids?: string[] };
-  location: "point" | "cell";
-}
 
 interface AttributeInfo {
   attribute_name: string;
@@ -87,52 +72,6 @@ const itemOptions = computed<{ title: string; value: number }[]>(() =>
   })),
 );
 
-function attributeSchema(kind: string, isModel: boolean, route: "names" | "range"): JsonRpcSchema {
-  const prefix = isModel ? "model_component_" : "";
-  return back_schemas.opengeodeweb_back[
-    `${prefix}${kind}_attribute_${route}` as keyof typeof back_schemas.opengeodeweb_back
-  ] as JsonRpcSchema;
-}
-
-function attributeSource(
-  kind: string,
-  title: string,
-  params: { id: string; component_ids?: string[] },
-  modelType?: string,
-): AttributeSource {
-  const isModel = modelType !== undefined;
-  const schema = attributeSchema(kind, isModel, "names");
-  return {
-    title: `${title}${kind} attribute`,
-    schemas: { names: schema, range: attributeSchema(kind, isModel, "range") },
-    timeStepKey:
-      modelType === undefined
-        ? schema.$id
-        : (MODEL_COMPONENT_ATTRIBUTE_SCHEMAS[modelType]?.[kind]?.$id ?? schema.$id),
-    params,
-    location: kind === "vertex" ? "point" : "cell",
-  };
-}
-
-async function fetchSources(id: string): Promise<AttributeSource[]> {
-  const item = await dataStore.item(id);
-  if (item.viewer_type !== "model") {
-    return ["vertex", MESH_ELEMENT_KINDS[item.geode_object_type]]
-      .filter((kind): kind is string => kind !== undefined)
-      .map((kind) => attributeSource(kind, "", { id }));
-  }
-  const modelSources = await Promise.all(
-    Object.entries(MODEL_COMPONENT_KINDS).map(async ([type, kinds]) => {
-      const component_ids = await dataStore.getMeshComponentGeodeIds(id, type);
-      if (component_ids.length === 0) {
-        return [];
-      }
-      return kinds.map((kind) => attributeSource(kind, `${type} `, { id, component_ids }, type));
-    }),
-  );
-  return modelSources.flat();
-}
-
 async function applyThreshold(): Promise<void> {
   const source = sources.value[selectedSourceIndex.value ?? -1];
   if (
@@ -183,7 +122,7 @@ watch(selectedDatasetId, async (id, previousId) => {
     await hybridViewerStore.setThreshold([previousId]);
   }
   selectedSourceIndex.value = undefined;
-  sources.value = id ? await fetchSources(id) : [];
+  sources.value = id ? await fetchSources(dataStore, id) : [];
 });
 
 watch(selectedSourceIndex, async (index) => {
