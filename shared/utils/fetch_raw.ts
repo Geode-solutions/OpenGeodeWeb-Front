@@ -58,8 +58,8 @@ async function performFetch({
     baseURL,
     method,
     headers,
-    ...(hasBody(params) ? { body: params } : {}),
-    ...(max_retry === undefined ? {} : { retry: max_retry }),
+    ...(hasBody(params) && { body: params }),
+    ...(max_retry !== undefined && { retry: max_retry }),
     async onRequestError({ error }: { error: unknown }) {
       if (request_error_function) {
         await request_error_function(error);

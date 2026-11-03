@@ -31,7 +31,10 @@ function summarize(components: readonly FormattedComponent[]): string {
   return MESH_COMPONENT_TYPES.filter((type) => counts.has(type))
     .map((type) => {
       const count = counts.get(type) ?? 0;
-      return `${count} ${count > 1 ? pluralize(type) : type}`;
+      if (count > 1) {
+        return `${count} ${pluralize(type)}`;
+      }
+      return `${count} ${type}`;
     })
     .join(", ");
 }

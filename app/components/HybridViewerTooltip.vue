@@ -92,7 +92,10 @@ function capitalize(val: string): string {
 
 const fieldTypeLabel = computed<string>(() => {
   const fieldType = hybridViewerStore.hoverData?.fieldType;
-  return typeof fieldType === "string" ? capitalize(fieldType.toLowerCase()) : "";
+  if (typeof fieldType !== "string") {
+    return "";
+  }
+  return capitalize(fieldType.toLowerCase());
 });
 
 const coordinates = computed<number[] | undefined>(() => {
@@ -114,7 +117,10 @@ function formatAttributeValue(val: unknown): string {
     return `[ ${formattedValues.join(", ")} ]`;
   }
   if (typeof val === "number") {
-    return Number.isInteger(val) ? String(val) : Number(val).toFixed(4);
+    if (Number.isInteger(val)) {
+      return String(val);
+    }
+    return Number(val).toFixed(4);
   }
   return val;
 }

@@ -80,7 +80,7 @@ export function useAppExtensions(): {
       const store = extensionModule.metadata.store();
       store.$patch?.({
         default_local_port: extensionPort,
-        ...(serverPort === undefined ? {} : { nitro_port: serverPort }),
+        ...(serverPort !== undefined && { nitro_port: serverPort }),
       });
 
       if (finalURL !== path && finalURL.startsWith("blob:")) {

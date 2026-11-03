@@ -97,13 +97,19 @@ function computeAverageBrightness(rect: Rect, options: BrightnessOptions): numbe
     return BACKGROUND_GREY_VALUE / RGB_MAX;
   }
 }
+function createOffscreenCanvas(): HTMLCanvasElement | undefined {
+  if (typeof document === "undefined") {
+    return undefined;
+  }
+  return document.createElement("canvas");
+}
+
 function useHybridViewerBrightness(): {
   latestImage: Ref<DrawableImage | undefined>;
   getAverageBrightness: (rect: Rect) => number;
 } {
   const latestImage = ref<DrawableImage | undefined>(undefined);
-  const offscreenCanvas: HTMLCanvasElement | undefined =
-    typeof document === "undefined" ? undefined : document.createElement("canvas");
+  const offscreenCanvas: HTMLCanvasElement | undefined = createOffscreenCanvas();
   const offscreenCtx: CanvasRenderingContext2D | undefined = offscreenCanvas
     ? (offscreenCanvas.getContext("2d", {
         willReadFrequently: true,

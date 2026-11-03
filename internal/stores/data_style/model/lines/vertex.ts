@@ -322,16 +322,20 @@ function useModelLinesVertexAttribute(): UseModelLinesVertexAttributeReturn {
       reapplySameSeries(
         await dataStore.getLinesGeodeIds(modelId),
         lineIds,
-        (id) =>
-          modelLinesCommonStyle.modelLineColoring(modelId, id).active === "vertex" &&
-          modelLinesVertexAttributeName(modelId, id) === name
-            ? [
-                modelLinesVertexAttributeItem(modelId, id),
-                modelLinesVertexAttributeRange(modelId, id),
-                modelLinesVertexAttributeColorMap(modelId, id),
-                JSON.stringify(modelLinesVertexAttributeNoDataColor(modelId, id)),
-              ].join("|")
-            : undefined,
+        (id) => {
+          if (
+            modelLinesCommonStyle.modelLineColoring(modelId, id).active === "vertex" &&
+            modelLinesVertexAttributeName(modelId, id) === name
+          ) {
+            return [
+              modelLinesVertexAttributeItem(modelId, id),
+              modelLinesVertexAttributeRange(modelId, id),
+              modelLinesVertexAttributeColorMap(modelId, id),
+              JSON.stringify(modelLinesVertexAttributeNoDataColor(modelId, id)),
+            ].join("|");
+          }
+          return undefined;
+        },
         async (ids) => {
           await applyVertexAttribute(modelId, ids);
         },

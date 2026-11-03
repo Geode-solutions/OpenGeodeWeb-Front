@@ -14,7 +14,10 @@ function uploadPath(file: UploadFile): string {
 function fileExtension(path: string): string {
   const name = path.slice(path.lastIndexOf("/") + 1);
   const index = name.lastIndexOf(".");
-  return index === -1 ? "" : name.slice(index + 1).toLowerCase();
+  if (index === -1) {
+    return "";
+  }
+  return name.slice(index + 1).toLowerCase();
 }
 
 type FileMatch =
@@ -33,11 +36,11 @@ function matchScore(path: string, expected_path: string): number {
   for (const segment of segments) {
     const current = [0];
     for (const [index, expected_segment] of expected_segments.entries()) {
-      current.push(
-        segment === expected_segment
-          ? (previous[index] ?? 0) + 1
-          : Math.max(previous[index + 1] ?? 0, current[index] ?? 0),
-      );
+      if (segment === expected_segment) {
+        current.push((previous[index] ?? 0) + 1);
+      } else {
+        current.push(Math.max(previous[index + 1] ?? 0, current[index] ?? 0));
+      }
     }
     previous = current;
   }
@@ -57,9 +60,12 @@ function matchExpectedFiles(paths: readonly string[], expected: readonly string[
   const indices: (number | undefined)[] = [];
   for (const [expected_index, expected_scores] of scores.entries()) {
     const best = Math.max(0, ...expected_scores);
-    const candidates = expected_scores.flatMap((score, index) =>
-      best > 0 && score === best && path_best_scores[index] === best ? [index] : [],
-    );
+    const candidates = expected_scores.flatMap((score, index) => {
+      if (best > 0 && score === best && path_best_scores[index] === best) {
+        return [index];
+      }
+      return [];
+    });
     if (candidates.length > 1) {
       return { status: "ambiguous", path: expected[expected_index] ?? "" };
     }
