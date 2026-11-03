@@ -26,9 +26,7 @@ const {
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
-const referenceLineId = computed<string | undefined>(() =>
-  collections ? targetLineIds[0] : undefined,
-);
+const referenceLineId = computed(() => (collections ? targetLineIds[0] : undefined));
 
 const lineComponentIds = computed<string[]>(() => (lineId !== undefined && [lineId]) || []);
 

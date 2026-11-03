@@ -13,9 +13,9 @@ const SURFACE_TAB = { label: "Surface", value: "component", testId: "modelTab_co
 function setupModelTabs(type?: string, id?: string, supportedTypes?: string[]) {
   const componentType = ref<string | undefined>(type);
   const componentId = ref<string | undefined>(id);
-  const isTypeSupported = supportedTypes
-    ? (componentTypeName: string): boolean => supportedTypes.includes(componentTypeName)
-    : undefined;
+  function isTypeSupported(componentTypeName: string): boolean {
+    return supportedTypes === undefined || supportedTypes.includes(componentTypeName);
+  }
   return {
     componentType,
     componentId,
