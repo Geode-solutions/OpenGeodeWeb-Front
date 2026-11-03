@@ -95,8 +95,9 @@ watch(textureId, (value) => {
 </style>
 
 <template>
-  <v-col cols="8" class="pa-1">
+  <v-col class="pa-1">
     <v-select
+      data-testid="textureNameSelector"
       v-model="textureName"
       :items="textureCoordinates"
       label="Select a texture"
@@ -104,7 +105,7 @@ watch(textureId, (value) => {
       hide-details
     />
   </v-col>
-  <v-col cols="1" class="ma-1 d-flex justify-center align-center">
+  <v-col cols="auto" class="pa-1 d-flex justify-center align-center">
     <v-badge :model-value="textureId !== ''" color="white" floating dot offset-x="10" offset-y="10">
       <FileUploader
         @files_uploaded="files_uploaded_event($event)"
@@ -116,7 +117,7 @@ watch(textureId, (value) => {
       />
     </v-badge>
   </v-col>
-  <v-col v-if="textureName === '' || textureId === ''" cols="1">
+  <v-col v-if="textureName === '' || textureId === ''" cols="auto">
     <v-icon size="20" icon="mdi-close-circle" v-tooltip:bottom="'Invalid texture'" />
   </v-col>
 </template>

@@ -1,3 +1,5 @@
+import type { MeshApplyTexturesParams } from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
+
 import {
   type AttributeConfig,
   CELLS_DEFAULT_COLOR,
@@ -32,13 +34,11 @@ interface MeshEdgesColoring extends MeshComponentColoring {
 
 interface MeshCellsColoring extends MeshComponentColoring {
   cell: AttributeConfig;
-  // oxlint-disable-next-line unicorn/no-null
-  textures: null;
+  textures: MeshApplyTexturesParams["textures"];
 }
 
 interface MeshPolygonsColoring extends MeshComponentColoring {
-  // oxlint-disable-next-line unicorn/no-null
-  textures: null;
+  textures: MeshApplyTexturesParams["textures"];
   polygon: AttributeConfig;
 }
 
@@ -157,8 +157,7 @@ function meshCellsDefaultStyle(
       active: MESH_DEFAULT_ACTIVE_COLORING,
       cell: emptyAttributeConfig(),
       constant,
-      // oxlint-disable-next-line unicorn/no-null
-      textures: null,
+      textures: [],
       vertex: emptyAttributeConfig(),
     },
   };
@@ -173,8 +172,7 @@ function meshPolygonsDefaultStyle(
     coloring: {
       active: MESH_DEFAULT_ACTIVE_COLORING,
       constant,
-      // oxlint-disable-next-line unicorn/no-null
-      textures: null,
+      textures: [],
       polygon: emptyAttributeConfig(),
       vertex: emptyAttributeConfig(),
     },

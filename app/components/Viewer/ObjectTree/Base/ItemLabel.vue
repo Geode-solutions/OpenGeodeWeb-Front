@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { formatCrs, formatCrsCode } from "@ogw_front/utils/crs";
+import ComponentRelations from "@ogw_front/components/Viewer/ObjectTree/Base/ComponentRelations.vue";
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import { middleTruncate } from "@ogw_front/utils/string";
 import { useClipboard } from "@vueuse/core";
@@ -15,9 +16,10 @@ interface Props {
   item: DisplayItem;
   isLeaf?: boolean;
   showCrs?: boolean;
+  modelId?: string;
 }
 
-const { item, isLeaf, showCrs = false } = defineProps<Props>();
+const { item, isLeaf, showCrs = false, modelId = "" } = defineProps<Props>();
 
 interface Emits {
   contextmenu: [event: MouseEvent];
@@ -186,6 +188,11 @@ async function copyToClipboard(text: string, label: string): Promise<void> {
           <strong class="text-white mr-1">Status:</strong>
           <i class="ml-1">{{ actualItem.is_active ? "Active" : "Inactive" }}</i>
         </span>
+        <ComponentRelations
+          v-if="modelId && actualItem.geode_id"
+          :model-id="modelId"
+          :component-id="actualItem.geode_id"
+        />
       </div>
     </v-tooltip>
     <v-tooltip v-if="mismatched" location="right">

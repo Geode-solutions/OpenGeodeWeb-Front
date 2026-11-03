@@ -10,6 +10,7 @@ import { type ModelComponentRecord, useDataMesh } from "./data_helpers/mesh.js";
 import { database } from "@ogw_internal/database/database.js";
 import { liveObservable } from "@ogw_front/utils/live_observable";
 import { useDataCollections } from "./data_helpers/collections.js";
+import { useDataRelations } from "./data_helpers/relations.js";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 interface DataItem {
@@ -133,6 +134,9 @@ export const useDataStore = defineStore("data", () => {
     formatedCollectionComponents,
     refFormatedCollectionComponents,
   } = useDataCollections();
+  const { getComponentRelations } = useDataRelations();
+  // Ids the viewer holds a pipeline for: an item is stored before it is registered, and non viewable items never are
+  const registeredIds = reactive(new Set<string>());
   async function item(id: string): Promise<DataItem> {
     const data_item = await data_db.get(id);
     if (!data_item) {
@@ -178,6 +182,13 @@ export const useDataStore = defineStore("data", () => {
       },
     );
   }
+  function isRegistered(id: string): boolean {
+    return registeredIds.has(id);
+  }
+  function refRegisteredItems(): ComputedRef<DataItem[]> {
+    const items = refAllItems();
+    return computed(() => items.value.filter((data_item) => isRegistered(data_item.id)));
+  }
   async function meshComponentType(modelId: string, geode_id: string): Promise<string | undefined> {
     const component = await model_components_db
       .where("[id+geode_id]")
@@ -196,6 +207,7 @@ export const useDataStore = defineStore("data", () => {
       params,
       timeout: 0,
     });
+    registeredIds.add(id);
     return result;
   }
   async function deregisterObject(id: string): Promise<unknown> {
@@ -203,6 +215,7 @@ export const useDataStore = defineStore("data", () => {
     const params = {
       id,
     };
+    registeredIds.delete(id);
     const result = await viewerStore.request({
       schema,
       params,
@@ -366,6 +379,7 @@ export const useDataStore = defineStore("data", () => {
   }
 
   async function clear(): Promise<void> {
+    registeredIds.clear();
     await data_db.clear();
     await model_components_db.clear();
     await model_components_relation_db.clear();
@@ -384,6 +398,8 @@ export const useDataStore = defineStore("data", () => {
   return {
     refAllItems,
     refCrsItems,
+    refRegisteredItems,
+    isRegistered,
     item,
     allItems,
     refItem,
@@ -418,6 +434,7 @@ export const useDataStore = defineStore("data", () => {
     fetchAllCollectionComponents,
     formatedCollectionComponents,
     refFormatedCollectionComponents,
+    getComponentRelations,
   };
 });
 

@@ -78,10 +78,12 @@ async function setMeshPolygonsActiveColoring(
     return result;
   }
   if (type === "textures") {
-    const result = await whenDefined(deps.texturesStyle.meshPolygonsTextures(id), async (value) => {
-      const applied = await deps.texturesStyle.setMeshPolygonsTextures(id, value);
-      return applied;
-    });
+    const textures = deps.texturesStyle.meshPolygonsTextures(id);
+    // The viewer requires at least one texture: nothing to apply until one is picked.
+    if (textures === undefined || textures.length === 0) {
+      return undefined;
+    }
+    const result = await deps.texturesStyle.setMeshPolygonsTextures(id, textures);
     return result;
   }
   if (type === "vertex") {
