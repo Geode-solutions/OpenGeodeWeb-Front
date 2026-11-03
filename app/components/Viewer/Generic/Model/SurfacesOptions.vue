@@ -30,14 +30,18 @@ const referenceSurfaceId = computed<string | undefined>(() =>
   collections ? targetSurfaceIds[0] : undefined,
 );
 
-const surfaceComponentIds = computed<string[]>(() => (surfaceId === undefined ? [] : [surfaceId]));
+const surfaceComponentIds = computed<string[]>(
+  () => (surfaceId !== undefined && [surfaceId]) || [],
+);
 
 // Visibility
 const surfacesVisibility = computed<boolean>({
-  get: () =>
-    collections
-      ? targetSurfaceIds.every((id) => dataStyleStore.modelSurfaceVisibility(modelId, id))
-      : dataStyleStore.modelComponentTypeVisibility(modelId, "Surface"),
+  get: () => {
+    if (collections) {
+      return targetSurfaceIds.every((id) => dataStyleStore.modelSurfaceVisibility(modelId, id));
+    }
+    return dataStyleStore.modelComponentTypeVisibility(modelId, "Surface");
+  },
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesVisibility(modelId, targetSurfaceIds, newValue);
     hybridViewerStore.remoteRender();

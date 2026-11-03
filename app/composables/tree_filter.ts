@@ -1,4 +1,4 @@
-import type { Ref } from "vue";
+import type { ComputedRef, Ref } from "vue";
 
 // Same shape as Vue's MaybeRefOrGetter<T>, kept as a local alias for readability at call sites.
 type ReadonlyMaybeRefOrGetter<Value> = Value | Ref<Value> | (() => Value);
@@ -98,11 +98,20 @@ function sortAndFormatItems(
   return sorted;
 }
 
+function toItemsRef(
+  itemsIn: ReadonlyMaybeRefOrGetter<readonly FilterableItem[]>,
+): ComputedRef<readonly FilterableItem[]> | Ref<readonly FilterableItem[]> {
+  if (typeof itemsIn === "function") {
+    return computed(itemsIn);
+  }
+  return toRef(itemsIn);
+}
+
 function useTreeFilter(
   itemsIn: ReadonlyMaybeRefOrGetter<readonly FilterableItem[]>,
   options: TreeFilterOptions = {},
 ): UseTreeFilterReturn {
-  const rawItems = typeof itemsIn === "function" ? computed(itemsIn) : toRef(itemsIn);
+  const rawItems = toItemsRef(itemsIn);
   const search = ref("");
   const sortType = ref(options.defaultSort ?? "name");
   const filterOptions = ref<Record<string, boolean>>({ ...options.defaultFilters });

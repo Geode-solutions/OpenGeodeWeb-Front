@@ -87,20 +87,22 @@ watch(
   { immediate: true },
 );
 
-const typeTargets = computed(() =>
-  edgesComponentType.value === undefined
-    ? []
-    : [{ componentType: edgesComponentType.value, componentIds: targetComponentIds.value }],
-);
+const typeTargets = computed(() => {
+  if (edgesComponentType.value === undefined) {
+    return [];
+  }
+  return [{ componentType: edgesComponentType.value, componentIds: targetComponentIds.value }];
+});
 const typeReferenceId = computed<string | undefined>(() =>
   collections.value ? targetComponentIds.value[0] : undefined,
 );
 
-const componentTargets = computed(() =>
-  edgesComponentType.value === undefined || componentId.value === undefined
-    ? []
-    : [{ componentType: edgesComponentType.value, componentIds: [componentId.value] }],
-);
+const componentTargets = computed(() => {
+  if (edgesComponentType.value === undefined || componentId.value === undefined) {
+    return [];
+  }
+  return [{ componentType: edgesComponentType.value, componentIds: [componentId.value] }];
+});
 </script>
 
 <template>

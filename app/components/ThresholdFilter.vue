@@ -183,7 +183,11 @@ watch(selectedDatasetId, async (id, previousId) => {
     await hybridViewerStore.setThreshold([previousId]);
   }
   selectedSourceIndex.value = undefined;
-  sources.value = id ? await fetchSources(id) : [];
+  if (id) {
+    sources.value = await fetchSources(id);
+  } else {
+    sources.value = [];
+  }
 });
 
 watch(selectedSourceIndex, async (index) => {

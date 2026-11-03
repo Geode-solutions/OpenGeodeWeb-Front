@@ -55,10 +55,12 @@ async function runSingleExtension(
     port,
   });
 
-  const serverPort =
-    server === undefined
-      ? undefined
-      : await runExtensionServer(extensionServerEntryPath(unzippedExtensionPath, server.entry));
+  let serverPort: number | undefined = undefined;
+  if (server !== undefined) {
+    serverPort = await runExtensionServer(
+      extensionServerEntryPath(unzippedExtensionPath, server.entry),
+    );
+  }
   if (serverPort !== undefined) {
     setExtensionServerPort(id, serverPort);
   }

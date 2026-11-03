@@ -27,6 +27,13 @@ const INTERNAL_SERVER_ERROR = 500;
 type RouteSchema = JsonRpcSchema & { readonly response?: object };
 
 // Same body as the Flask microservices' errors, so the client reads every error the same way
+function describeError(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return String(error);
+}
+
 function toErrorResponse(error: unknown): ErrorResponse {
   if (isError(error)) {
     return {
@@ -38,7 +45,7 @@ function toErrorResponse(error: unknown): ErrorResponse {
   return {
     code: INTERNAL_SERVER_ERROR,
     name: "Internal Server Error",
-    description: error instanceof Error ? error.message : String(error),
+    description: describeError(error),
   };
 }
 

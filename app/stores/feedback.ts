@@ -47,7 +47,7 @@ export const useFeedbackStore = defineStore("feedback", {
         id: feedbackId,
         type: "success",
         description,
-        ...(action === undefined ? {} : { action }),
+        ...(action !== undefined && { action }),
       });
       setTimeout(() => {
         this.delete_feedback(feedbackId);
@@ -59,7 +59,7 @@ export const useFeedbackStore = defineStore("feedback", {
         id: feedbackId,
         type: "warning",
         description,
-        ...(action === undefined ? {} : { action }),
+        ...(action !== undefined && { action }),
       });
       setTimeout(() => {
         this.delete_feedback(feedbackId);

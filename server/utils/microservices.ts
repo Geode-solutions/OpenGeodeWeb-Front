@@ -63,15 +63,22 @@ function isPortInUseError(error: unknown): boolean {
   return /EADDRINUSE|address already in use|port already in use/iu.test(String(error));
 }
 
+function resolveUploadFolderPath(
+  projectFolderPath: string,
+  uploadFolderPath: string | undefined,
+): string {
+  if (uploadFolderPath !== undefined && uploadFolderPath !== "") {
+    return uploadFolderPath;
+  }
+  return path.join(projectFolderPath, "uploads");
+}
+
 function backArgs(args: RunArgs, port: number): string[] {
   const { projectFolderPath } = args;
   if (!projectFolderPath) {
     throw new Error("projectFolderPath is required");
   }
-  const uploadFolderPath =
-    args.uploadFolderPath !== undefined && args.uploadFolderPath !== ""
-      ? args.uploadFolderPath
-      : path.join(projectFolderPath, "uploads");
+  const uploadFolderPath = resolveUploadFolderPath(projectFolderPath, args.uploadFolderPath);
   const executableArgs = [
     "--port",
     String(port),

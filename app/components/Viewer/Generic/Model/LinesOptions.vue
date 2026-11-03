@@ -29,14 +29,16 @@ const referenceLineId = computed<string | undefined>(() =>
   collections ? targetLineIds[0] : undefined,
 );
 
-const lineComponentIds = computed<string[]>(() => (lineId === undefined ? [] : [lineId]));
+const lineComponentIds = computed<string[]>(() => (lineId !== undefined && [lineId]) || []);
 
 // Visibility
 const linesVisibility = computed<boolean>({
-  get: () =>
-    collections
-      ? targetLineIds.every((id) => dataStyleStore.modelLineVisibility(modelId, id))
-      : dataStyleStore.modelComponentTypeVisibility(modelId, "Line"),
+  get: () => {
+    if (collections) {
+      return targetLineIds.every((id) => dataStyleStore.modelLineVisibility(modelId, id));
+    }
+    return dataStyleStore.modelComponentTypeVisibility(modelId, "Line");
+  },
   set: async (newValue) => {
     await dataStyleStore.setModelLinesVisibility(modelId, targetLineIds, newValue);
     hybridViewerStore.remoteRender();

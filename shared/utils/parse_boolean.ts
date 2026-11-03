@@ -2,7 +2,10 @@ const TRUTHY_VALUES = new Set([true, 1, "1", "true", "yes"]);
 const FALSY_VALUES = new Set([false, 0, "0", "false", "no"]);
 
 function parseBoolean(value: string | number | boolean): boolean {
-  const normalized = typeof value === "string" ? value.trim().toLowerCase() : value;
+  let normalized: string | number | boolean = value;
+  if (typeof value === "string") {
+    normalized = value.trim().toLowerCase();
+  }
 
   if (TRUTHY_VALUES.has(normalized)) {
     return true;

@@ -146,9 +146,10 @@ function resolveActiveActors(
   selectedDatasetIds: readonly string[],
   hybridDb: Record<string, ActorEntry | undefined>,
 ): vtkActor[] {
-  const targetIds = targetAllVisible
-    ? allItems.map((item: { id: string }) => item.id)
-    : selectedDatasetIds;
+  let targetIds: readonly string[] = selectedDatasetIds;
+  if (targetAllVisible) {
+    targetIds = allItems.map((item: { id: string }) => item.id);
+  }
   const targeted = targetIds
     .map((id) => hybridDb[id]?.actor)
     .filter((actor: vtkActor | undefined): actor is vtkActor => actor !== undefined);

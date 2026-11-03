@@ -30,14 +30,16 @@ const referenceBlockId = computed<string | undefined>(() =>
   collections ? targetBlockIds[0] : undefined,
 );
 
-const blockComponentIds = computed<string[]>(() => (blockId === undefined ? [] : [blockId]));
+const blockComponentIds = computed<string[]>(() => (blockId !== undefined && [blockId]) || []);
 
 // Visibility
 const blocksVisibility = computed<boolean>({
-  get: () =>
-    collections
-      ? targetBlockIds.every((id) => dataStyleStore.modelBlockVisibility(modelId, id))
-      : dataStyleStore.modelComponentTypeVisibility(modelId, "Block"),
+  get: () => {
+    if (collections) {
+      return targetBlockIds.every((id) => dataStyleStore.modelBlockVisibility(modelId, id));
+    }
+    return dataStyleStore.modelComponentTypeVisibility(modelId, "Block");
+  },
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksVisibility(modelId, targetBlockIds, newValue);
     hybridViewerStore.remoteRender();

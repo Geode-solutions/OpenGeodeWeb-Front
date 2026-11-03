@@ -330,16 +330,20 @@ function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
       reapplySameSeries(
         await dataStore.getBlocksGeodeIds(modelId),
         blockIds,
-        (id) =>
-          modelBlocksCommonStyle.modelBlockColoring(modelId, id).active === "vertex" &&
-          modelBlocksVertexAttributeName(modelId, id) === name
-            ? [
-                modelBlocksVertexAttributeItem(modelId, id),
-                modelBlocksVertexAttributeRange(modelId, id),
-                modelBlocksVertexAttributeColorMap(modelId, id),
-                JSON.stringify(modelBlocksVertexAttributeNoDataColor(modelId, id)),
-              ].join("|")
-            : undefined,
+        (id) => {
+          if (
+            modelBlocksCommonStyle.modelBlockColoring(modelId, id).active === "vertex" &&
+            modelBlocksVertexAttributeName(modelId, id) === name
+          ) {
+            return [
+              modelBlocksVertexAttributeItem(modelId, id),
+              modelBlocksVertexAttributeRange(modelId, id),
+              modelBlocksVertexAttributeColorMap(modelId, id),
+              JSON.stringify(modelBlocksVertexAttributeNoDataColor(modelId, id)),
+            ].join("|");
+          }
+          return undefined;
+        },
         async (ids) => {
           await applyVertexAttribute(modelId, ids);
         },
