@@ -46,6 +46,18 @@ describe("validate schema", () => {
   );
 
   test(
+    "multipart body is not validated against params schema",
+    () => {
+      const params = new FormData();
+      params.append("file", new Blob(["content"]), "project.vease");
+      const { valid, error } = validateSchema(schema, params);
+      expect(valid).toBe(true);
+      expect(error).toBe("No errors");
+    },
+    TIMEOUT_MS,
+  );
+
+  test(
     "response schema is ignored for params",
     () => {
       const schema_with_response = {

@@ -237,7 +237,10 @@ function getLeafViewerIds(item: CollectionTreeItem): number[] {
       @update:selected="(val) => onUpdateSelection(val as string[])"
       @click:item="onUpdateSelection([$event.id as string, ...visibleComponents])"
       @update:scroll-top="treeviewStore.setScrollTop(id, $event)"
-      @hover:enter="({ item }) => handleHoverEnter({ item: item as unknown as CollectionTreeItem })"
+      @hover:enter="
+        ({ item, immediate }) =>
+          handleHoverEnter({ item: item as unknown as CollectionTreeItem, immediate })
+      "
       @hover:leave="handleHoverLeave"
       @contextmenu="showContextMenu($event.event, $event.item as unknown as CollectionTreeItem)"
     >
@@ -245,6 +248,7 @@ function getLeafViewerIds(item: CollectionTreeItem): number[] {
         <ObjectTreeItemLabel
           :item="item as unknown as DisplayItem"
           :is-leaf="isLeaf"
+          :model-id="id"
           show-tooltip
           class="text-body-1"
           @contextmenu="showContextMenu($event, item as unknown as CollectionTreeItem)"

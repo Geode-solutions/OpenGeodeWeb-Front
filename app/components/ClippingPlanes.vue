@@ -32,7 +32,7 @@ function newItemId(): number {
   return lastItemId;
 }
 const planes = ref<ClippingPlane[]>([{ id: newItemId(), origin: undefined, normal: [1, 0, 0] }]);
-const allItems = dataStore.refAllItems();
+const allItems = dataStore.refRegisteredItems();
 const sliceEnabled = ref<boolean>(false);
 const slices = ref<{ id: number; axis: SliceAxis; index: number }[]>([
   { id: newItemId(), axis: DEFAULT_SLICE_AXIS, index: 0 },

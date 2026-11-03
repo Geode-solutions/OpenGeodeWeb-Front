@@ -3,5 +3,5 @@ const model = defineModel<number>();
 </script>
 
 <template>
-  <v-slider v-model="model" hide-details min="0" max="20" step="2" density="compact" />
+  <v-slider v-model="model" hide-details min="0" max="20" step="1" density="compact" />
 </template>

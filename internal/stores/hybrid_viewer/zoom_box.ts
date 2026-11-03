@@ -1,12 +1,8 @@
 import type { CameraOptions, Vector3 } from "./vtk_types";
-import {
-  applyCameraOptions,
-  centerCameraOnPosition,
-  getCameraOptions,
-  useHybridViewerCamera,
-} from "./camera";
+import { applyCameraOptions, centerCameraOnPosition, useHybridViewerCamera } from "./camera";
 import { requireRenderWindow, useHybridViewerCore } from "./core";
 import type { Position } from "@vueuse/core";
+import { getCameraOptions } from "./camera_animation";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import { newInstance as vtkCamera } from "@kitware/vtk.js/Rendering/Core/Camera";
 
