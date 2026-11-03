@@ -15,7 +15,8 @@ const search = ref<string>("");
 const data_table_loading = ref<boolean>(false);
 // Thousands of rows that are never mutated: no deep reactivity
 const crs_list = shallowRef<CRSList[]>([]);
-const selected_crs = ref<unknown[]>([]);
+// Keys of the selected rows: the item-value of the table, "AUTHORITY:CODE"
+const selected_crs = ref<string[]>([]);
 const toggle_loading = useToggle(data_table_loading);
 const crsStore = useCrsStore();
 
@@ -24,7 +25,7 @@ function crs_key(crs: CRSList): string {
   return `${crs.authority}:${crs.code}`;
 }
 
-function get_selected_crs(key: unknown): CRSList | undefined {
+function get_selected_crs(key: string | undefined): CRSList | undefined {
   return crs_list.value.find((crs) => crs_key(crs) === key);
 }
 
