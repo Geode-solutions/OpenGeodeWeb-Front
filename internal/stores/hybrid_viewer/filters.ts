@@ -60,29 +60,63 @@ interface ThresholdAttribute {
   minimum: number;
   maximum: number;
 }
+interface Threshold {
+  id: number;
+  sourceIndex: number | undefined;
+  attributeName: string | undefined;
+  item: number;
+  minimum: number | undefined;
+  maximum: number | undefined;
+  thresholdAttribute: ThresholdAttribute | undefined;
+}
 async function setThreshold(ids: string[], attributes: ThresholdAttribute[]): Promise<void> {
   await requestAndRender(viewer_schemas.opengeodeweb_viewer.viewer.threshold, {
     ids,
     attributes,
   });
 }
-function useHybridViewerFilters(): {
-  setClippingPlanes: (ids: string[], planes: ViewerClippingPlanesParams["planes"]) => Promise<void>;
-  setShrink: (ids: string[], shrink_factor: number) => Promise<void>;
-  setExplode: (ids: string[], explode_factor: number) => Promise<void>;
-  setSlice: (
-    ids: string[],
-    slices: { axis: SliceAxis; index: number }[],
-  ) => Promise<[number, number, number]>;
-  setThreshold: (ids: string[], attributes: ThresholdAttribute[]) => Promise<void>;
-} {
+// oxlint-disable-next-line typescript/explicit-function-return-type, typescript/explicit-module-boundary-types
+function useHybridViewerFilters() {
+  const thresholds = reactive<Record<string, Threshold[]>>({});
+  let lastThresholdId = 0;
+
+  function getThresholds(id: string): Threshold[] {
+    return thresholds[id] ?? [];
+  }
+
+  function addThreshold(id: string): void {
+    lastThresholdId += 1;
+    thresholds[id] ??= [];
+    thresholds[id].push({
+      id: lastThresholdId,
+      sourceIndex: undefined,
+      attributeName: undefined,
+      item: 0,
+      minimum: undefined,
+      maximum: undefined,
+      thresholdAttribute: undefined,
+    });
+  }
+
+  function removeThreshold(id: string, index: number): void {
+    thresholds[id]?.splice(index, 1);
+  }
+
+  function removeThresholds(id: string): void {
+    thresholds[id] = [];
+  }
+
   return {
     setClippingPlanes,
     setShrink,
     setExplode,
     setSlice,
     setThreshold,
+    getThresholds,
+    addThreshold,
+    removeThreshold,
+    removeThresholds,
   };
 }
 export { useHybridViewerFilters };
-export type { ThresholdAttribute };
+export type { Threshold, ThresholdAttribute };

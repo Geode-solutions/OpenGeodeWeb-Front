@@ -4,9 +4,9 @@ import {
   MODEL_COMPONENT_ATTRIBUTE_SCHEMAS,
   MODEL_COMPONENT_KINDS,
 } from "@ogw_front/utils/attributes";
+import type { Threshold, ThresholdAttribute } from "@ogw_internal/stores/hybrid_viewer/filters";
 import type { AttributeSource } from "@ogw_front/utils/threshold";
 import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
-import type { ThresholdAttribute } from "@ogw_internal/stores/hybrid_viewer/filters";
 import ThresholdCard from "@ogw_front/components/ThresholdCard.vue";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
@@ -22,22 +22,14 @@ interface Props {
 
 const { escapeFunction = undefined } = defineProps<Props>();
 
-interface Threshold {
-  id: number;
-  attribute?: ThresholdAttribute;
-}
-
 const show = defineModel<boolean>("show", { default: false });
 const dataStore = useDataStore();
 const hybridViewerStore = useHybridViewerStore();
 const selectedDatasetId = ref<string>();
 const sources = ref<AttributeSource[]>([]);
-let lastThresholdId = 0;
-function newThreshold(): Threshold {
-  lastThresholdId += 1;
-  return { id: lastThresholdId };
-}
-const thresholds = ref<Threshold[]>([newThreshold()]);
+const thresholds = computed<Threshold[]>(() =>
+  selectedDatasetId.value ? hybridViewerStore.getThresholds(selectedDatasetId.value) : [],
+);
 const cards = useTemplateRef("cards");
 
 const allItems = dataStore.refAllItems();
@@ -101,7 +93,7 @@ async function applyThresholds(): Promise<void> {
   await hybridViewerStore.setThreshold(
     [selectedDatasetId.value],
     thresholds.value
-      .map((threshold) => threshold.attribute)
+      .map((threshold) => threshold.thresholdAttribute)
       .filter((attribute): attribute is ThresholdAttribute => attribute !== undefined),
   );
 }
@@ -109,11 +101,20 @@ async function applyThresholds(): Promise<void> {
 const debouncedApply = useDebounceFn(() => applyThresholds(), DEBOUNCE_DELAY);
 
 function addThreshold(): void {
-  thresholds.value.push(newThreshold());
+  if (selectedDatasetId.value) {
+    hybridViewerStore.addThreshold(selectedDatasetId.value);
+  }
 }
 
 function removeThreshold(index: number): void {
-  thresholds.value.splice(index, 1);
+  if (selectedDatasetId.value) {
+    hybridViewerStore.removeThreshold(selectedDatasetId.value, index);
+  }
+}
+
+async function clearThresholds(id: string): Promise<void> {
+  hybridViewerStore.removeThresholds(id);
+  await hybridViewerStore.setThreshold([id], []);
 }
 
 async function resetRanges(): Promise<void> {
@@ -121,18 +122,20 @@ async function resetRanges(): Promise<void> {
 }
 
 async function removeThresholds(): Promise<void> {
-  thresholds.value = [newThreshold()];
   if (selectedDatasetId.value) {
-    await hybridViewerStore.setThreshold([selectedDatasetId.value], []);
+    await clearThresholds(selectedDatasetId.value);
+    hybridViewerStore.addThreshold(selectedDatasetId.value);
   }
 }
 
 watch(selectedDatasetId, async (id, previousId) => {
   if (previousId) {
-    await hybridViewerStore.setThreshold([previousId], []);
+    await clearThresholds(previousId);
   }
-  thresholds.value = [newThreshold()];
   sources.value = id ? await fetchSources(id) : [];
+  if (id && hybridViewerStore.getThresholds(id).length === 0) {
+    hybridViewerStore.addThreshold(id);
+  }
 });
 
 watch(
@@ -191,7 +194,7 @@ watch(show, (visible) => {
           v-for="(threshold, idx) in thresholds"
           :key="threshold.id"
           ref="cards"
-          v-model:threshold="threshold.attribute"
+          :threshold="threshold"
           :dataset-id="selectedDatasetId"
           :sources="sources"
           :index="idx"
@@ -210,7 +213,7 @@ watch(show, (visible) => {
           class="text-caption text-none"
           @click="removeThresholds"
         >
-          Remove Threshold
+          Remove all thresholds
         </v-btn>
         <v-btn
           data-testid="resetThresholdButton"

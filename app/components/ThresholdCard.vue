@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import type { AttributeInfo, AttributeSource } from "@ogw_front/utils/threshold";
+import {
+  type AttributeInfo,
+  type AttributeSource,
+  isValidThresholdAttribute,
+} from "@ogw_front/utils/threshold";
+import type { Threshold, ThresholdAttribute } from "@ogw_internal/stores/hybrid_viewer/filters";
 import { attributeArrayName, getAttributeRange } from "@ogw_front/utils/attributes";
-import type { ThresholdAttribute } from "@ogw_internal/stores/hybrid_viewer/filters";
 import ViewerOptionsAttributeRangeSelector from "@ogw_front/components/Viewer/Options/AttributeRangeSelector.vue";
 import { fetchAttributeRange } from "@ogw_front/utils/attribute_range";
 import { useBackStore } from "@ogw_front/stores/back";
@@ -11,9 +15,10 @@ interface Props {
   datasetId: string;
   sources: AttributeSource[];
   index: number;
+  threshold: Threshold;
 }
 
-const { datasetId, sources, index } = defineProps<Props>();
+const { datasetId, sources, index, threshold } = defineProps<Props>();
 
 interface Emits {
   remove: [];
@@ -21,15 +26,17 @@ interface Emits {
 
 const emit = defineEmits<Emits>();
 
-const threshold = defineModel<ThresholdAttribute | undefined>("threshold");
 const backStore = useBackStore();
 const dataStyleStore = useDataStyleStore();
-const selectedSourceIndex = ref<number>();
+const {
+  sourceIndex: selectedSourceIndex,
+  attributeName,
+  item: attributeItem,
+  minimum,
+  maximum,
+  thresholdAttribute,
+} = toRefs(threshold);
 const attributes = ref<AttributeInfo[]>([]);
-const attributeName = ref<string>();
-const attributeItem = ref<number>(0);
-const minimum = ref<number>();
-const maximum = ref<number>();
 
 const availableSources = computed<{ title: string; value: number }[]>(() =>
   sources.map((source, sourceIndex) => ({
@@ -61,23 +68,18 @@ const itemOptions = computed<{ title: string; value: number }[]>(() =>
     value: itemIndex,
   })),
 );
-const currentThreshold = computed<ThresholdAttribute | undefined>(() => {
-  if (
-    !currentSource.value ||
-    !attributeName.value ||
-    minimum.value === undefined ||
-    maximum.value === undefined ||
-    minimum.value > maximum.value
-  ) {
-    return undefined;
-  }
-  return {
-    name: attributeArrayName(attributeName.value, currentTimeStep.value),
-    location: currentSource.value.location,
+const currentThresholdAttribute = computed<ThresholdAttribute | undefined>(() => {
+  const attribute = {
+    name:
+      currentAttribute.value === undefined
+        ? undefined
+        : attributeArrayName(currentAttribute.value.attribute_name, currentTimeStep.value),
+    location: currentSource.value?.location,
     item: attributeItem.value,
     minimum: minimum.value,
     maximum: maximum.value,
   };
+  return isValidThresholdAttribute(attribute) ? attribute : undefined;
 });
 
 async function resetRange(): Promise<void> {
@@ -95,8 +97,7 @@ async function resetRange(): Promise<void> {
   maximum.value = max;
 }
 
-watch(selectedSourceIndex, async () => {
-  attributeName.value = undefined;
+async function fetchAttributes(): Promise<void> {
   attributes.value = [];
   const source = currentSource.value;
   if (!source) {
@@ -107,6 +108,13 @@ watch(selectedSourceIndex, async () => {
     params: source.params,
   })) as { attributes: AttributeInfo[] };
   attributes.value = response.attributes;
+}
+
+onMounted(fetchAttributes);
+
+watch(selectedSourceIndex, async () => {
+  attributeName.value = undefined;
+  await fetchAttributes();
 });
 
 watch(attributeName, async () => {
@@ -118,8 +126,8 @@ watch(attributeItem, async () => {
   await resetRange();
 });
 
-watch(currentThreshold, (value) => {
-  threshold.value = value;
+watch(currentThresholdAttribute, (value) => {
+  thresholdAttribute.value = value;
 });
 
 defineExpose({ resetRange });
