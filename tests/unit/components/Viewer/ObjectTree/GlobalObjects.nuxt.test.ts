@@ -32,7 +32,10 @@ async function mountTree(withCrs: boolean): Promise<VueWrapper> {
   const pinia = setupActivePinia();
   const dataStore = useDataStore();
   // A data in the project CRS: the basemap has something to lie under
-  const items = withCrs ? [{ id: "a", created_at: "1", crs: LAMBERT }] : [];
+  const items: { id: string; created_at: string; crs: typeof LAMBERT }[] = [];
+  if (withCrs) {
+    items.push({ id: "a", created_at: "1", crs: LAMBERT });
+  }
   dataStore.refCrsItems = mockAs<typeof dataStore.refCrsItems>(() => ref(items));
   useCrsStore();
   // Calls through: without displayed data, a build only clears the basemap

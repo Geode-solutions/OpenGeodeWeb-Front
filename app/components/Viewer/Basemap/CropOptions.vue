@@ -16,7 +16,10 @@ const basemapStore = useBasemapStore();
 // A map menu crops that map, the basemap category menu crops every map
 const mapStyles = computed(() => {
   const mapStyle = mapStyleOf(itemProps.id);
-  return mapStyle === undefined ? MAP_STYLES : [mapStyle];
+  if (mapStyle === undefined) {
+    return MAP_STYLES;
+  }
+  return [mapStyle];
 });
 // Cropped: only the map draped on the top surfaces, without the flat map around
 const cropped = computed(() => mapStyles.value.map((mapStyle) => basemapStore.crop[mapStyle]));

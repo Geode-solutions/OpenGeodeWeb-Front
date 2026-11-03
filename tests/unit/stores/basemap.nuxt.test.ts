@@ -388,6 +388,52 @@ describe("basemap store", () => {
     );
   });
 
+  test("a layer change while the basemap is applied reaches the new basemap", async () => {
+    const store = setup();
+    // The first viewer request is the apply of the new basemap
+    const apply = Promise.withResolvers<object>();
+    viewerRequest.mockReturnValueOnce(apply.promise);
+    const building = store.setMaps(["satellite"]);
+    await vi.waitFor(() => {
+      expect(viewerRequest).toHaveBeenCalledTimes(ONCE);
+    });
+    // The new basemap is not the current one yet: this change has nobody to go to
+    await store.setOpacity("satellite", 0.3);
+    apply.resolve({});
+    await building;
+    expect(viewerRequest).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        schema: viewer_schemas.opengeodeweb_viewer.mesh.basemap_layers,
+        params: {
+          id: "basemap-1",
+          layers: [{ map: "satellite", visible: true, opacity: 0.3, crop: false }],
+        },
+      }),
+    );
+  });
+
+  test("quick opacity changes are sent as one request after the running one", async () => {
+    const store = setup();
+    await store.setMaps(["satellite"]);
+    viewerRequest.mockClear();
+    const running = Promise.withResolvers<object>();
+    viewerRequest.mockReturnValueOnce(running.promise);
+    const first = store.setOpacity("satellite", 0.2);
+    const second = store.setOpacity("satellite", 0.4);
+    const third = store.setOpacity("satellite", 0.6);
+    running.resolve({});
+    await Promise.all([first, second, third]);
+    expect(viewerRequest).toHaveBeenCalledTimes(TWICE);
+    expect(viewerRequest).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        params: {
+          id: "basemap-1",
+          layers: [{ map: "satellite", visible: true, opacity: 0.6, crop: false }],
+        },
+      }),
+    );
+  });
+
   test("no visible map removes the basemap", async () => {
     const store = setup();
     await store.setMaps(["satellite"]);

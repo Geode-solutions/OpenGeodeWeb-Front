@@ -105,7 +105,7 @@ function importedOpacities(snapshot: BasemapSnapshot | undefined): Record<MapSty
   return values;
 }
 
-// oxlint-disable max-lines-per-function, max-statements
+// oxlint-disable max-lines, max-lines-per-function, max-statements
 export const useBasemapStore = defineStore("basemap", () => {
   const backStore = useBackStore();
   const viewerStore = useViewerStore();
@@ -232,12 +232,37 @@ export const useBasemapStore = defineStore("basemap", () => {
     });
   }
 
-  async function recompose(): Promise<void> {
-    if (basemapId.value === undefined) {
+  // At most one recomposition runs: changes made meanwhile (a slider dragged) are sent
+  // Once, with the latest states, when it returns
+  let recomposing: Promise<void> | undefined = undefined;
+  let recomposeAgain = false;
+
+  async function recomposeLatest(): Promise<void> {
+    recomposeAgain = false;
+    const id = basemapId.value;
+    if (id === undefined) {
       return;
     }
-    await applyLayers(basemapId.value);
+    await applyLayers(id);
     await hybridViewerStore.remoteRender();
+    if (recomposeAgain) {
+      await recomposeLatest();
+    }
+  }
+
+  async function recompose(): Promise<void> {
+    if (recomposing !== undefined) {
+      recomposeAgain = true;
+      await recomposing;
+      return;
+    }
+    recomposing = recomposeLatest();
+    try {
+      await recomposing;
+    } finally {
+      recomposing = undefined;
+      recomposeAgain = false;
+    }
   }
 
   async function display(build: number, extent: Extent): Promise<void> {
@@ -255,10 +280,12 @@ export const useBasemapStore = defineStore("basemap", () => {
       return;
     }
     const previous = { id: basemapId.value, built: built.value };
+    let sentLayers = "";
     try {
       await dataStore.registerObject(response.id, BASEMAP_NAME);
       // The layers are computed from the maps just built
       built.value = response.maps;
+      sentLayers = JSON.stringify(layersParams());
       await viewerStore.request({
         schema: viewer_schemas.opengeodeweb_viewer.mesh.apply_basemap,
         params: {
@@ -287,6 +314,10 @@ export const useBasemapStore = defineStore("basemap", () => {
     attribution.value = response.attribution;
     if (previous.id !== undefined) {
       await discard(build, previous.id, true);
+    }
+    // The states changed while the basemap was built: the viewer still has the old ones
+    if (JSON.stringify(layersParams()) !== sentLayers) {
+      await applyLayers(response.id);
     }
     // Always render: the first build has no previous basemap whose removal would render
     await hybridViewerStore.remoteRender();

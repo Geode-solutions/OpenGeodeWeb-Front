@@ -58,7 +58,10 @@ function nextBasemapMaps(
 ): MapStyle[] {
   const addedMaps = added.flatMap((id) => mapStyleOf(id) ?? []);
   if (added.includes(BASEMAP_GROUP_ID) || addedMaps.length > 1) {
-    return current.length === 0 ? [...last] : [];
+    if (current.length === 0) {
+      return [...last];
+    }
+    return [];
   }
   const removedMaps = removed.flatMap((id) => mapStyleOf(id) ?? []);
   if (removed.includes(BASEMAP_GROUP_ID) && removedMaps.length === 0) {
