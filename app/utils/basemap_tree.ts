@@ -1,4 +1,4 @@
-type MapStyle = "satellite" | "streets" | "topo";
+type MapStyle = "satellite" | "plan" | "routes";
 type BasemapStyle = "none" | MapStyle;
 
 interface BasemapTreeGroup {
@@ -7,11 +7,12 @@ interface BasemapTreeGroup {
   children: { id: string; title: string }[];
 }
 
-const MAP_STYLES: readonly MapStyle[] = ["satellite", "streets", "topo"];
+// Tree order and stacking order: from the bottom up, the routes stay readable on top
+const MAP_STYLES: readonly MapStyle[] = ["satellite", "plan", "routes"];
 const MAP_TITLES: Record<MapStyle, string> = {
   satellite: "Satellite",
-  streets: "Streets",
-  topo: "Topo",
+  plan: "Plan",
+  routes: "Routes",
 };
 const BASEMAP_GROUP_ID = "basemap";
 const MAP_ID_PREFIX = `${BASEMAP_GROUP_ID}:`;
@@ -24,15 +25,8 @@ function mapStyleOf(id: string): MapStyle | undefined {
   return MAP_STYLES.find((style) => mapId(style) === id);
 }
 
-// The fixed stacking order, from the bottom: the imagery under the maps, streets on top
-const STACKED_MAPS: readonly MapStyle[] = ["satellite", "topo", "streets"];
-
 function sortedMaps(maps: readonly string[]): MapStyle[] {
-  return STACKED_MAPS.filter((style) => maps.includes(style));
-}
-
-function mapLayer(style: MapStyle): number {
-  return STACKED_MAPS.indexOf(style);
+  return MAP_STYLES.filter((style) => maps.includes(style));
 }
 
 // Tree ids of the basemap: never project data
@@ -80,7 +74,6 @@ export {
   basemapGroup,
   isBasemapId,
   mapId,
-  mapLayer,
   mapStyleOf,
   nextBasemapMaps,
   sortedMaps,

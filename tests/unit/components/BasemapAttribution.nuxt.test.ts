@@ -13,7 +13,7 @@ describe("basemap attribution", () => {
   test(
     "shows the attribution when defined",
     async () => {
-      useBasemapStore().attributions = { satellite: "© Test tiles" };
+      useBasemapStore().attribution = "© Test tiles";
       const wrapper = await mountSuspended(BasemapAttribution);
       expect(wrapper.html()).toContain(ATTRIBUTION);
       expect(wrapper.text()).toBe("© Test tiles");
@@ -24,7 +24,7 @@ describe("basemap attribution", () => {
   test(
     "shows nothing without attribution",
     async () => {
-      useBasemapStore().attributions = {};
+      useBasemapStore().attribution = undefined;
       const wrapper = await mountSuspended(BasemapAttribution);
       expect(wrapper.html()).not.toContain(ATTRIBUTION);
     },

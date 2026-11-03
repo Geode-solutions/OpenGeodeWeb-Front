@@ -11,8 +11,8 @@ import { useDataStore } from "@ogw_front/stores/data";
 
 vi.setConfig({ testTimeout: 10_000 });
 
-const TOPO_OPACITY = 0.4;
-const TOPO_PERCENT = 40;
+const ROUTES_OPACITY = 0.4;
+const ROUTES_PERCENT = 40;
 const NEW_PERCENT = 70;
 const NEW_OPACITY = 0.7;
 
@@ -38,10 +38,8 @@ async function mountOptions(component: Component, id: string): Promise<VueWrappe
   basemapStore.setOpacity = mockAs<typeof basemapStore.setOpacity>(
     vi.fn().mockResolvedValue(undefined),
   );
-  basemapStore.setAround = mockAs<typeof basemapStore.setAround>(
-    vi.fn().mockResolvedValue(undefined),
-  );
-  basemapStore.opacities = { satellite: 1, streets: 1, topo: TOPO_OPACITY };
+  basemapStore.setCrop = mockAs<typeof basemapStore.setCrop>(vi.fn().mockResolvedValue(undefined));
+  basemapStore.opacities = { satellite: 1, plan: 1, routes: ROUTES_OPACITY };
   const wrapper = await mountSuspended(component, {
     props: { itemProps: itemProps(id) },
     global: { plugins: [vuetify, pinia], stubs: { ViewerContextMenuItem: MENU_ITEM_STUB } },
@@ -51,35 +49,31 @@ async function mountOptions(component: Component, id: string): Promise<VueWrappe
 
 describe("basemap context menus", () => {
   test("the opacity of a map follows its own value, in percent", async () => {
-    const wrapper = await mountOptions(OpacityOptions, "basemap:topo");
+    const wrapper = await mountOptions(OpacityOptions, "basemap:routes");
     const slider = wrapper.getComponent({ name: "VSlider" });
-    expect(slider.props("modelValue")).toBe(TOPO_PERCENT);
+    expect(slider.props("modelValue")).toBe(ROUTES_PERCENT);
     await slider.setValue(NEW_PERCENT);
     await flushPromises();
-    expect(useBasemapStore().setOpacity).toHaveBeenCalledWith("topo", NEW_OPACITY);
+    expect(useBasemapStore().setOpacity).toHaveBeenCalledWith("routes", NEW_OPACITY);
   });
 
   test("a map menu crops that map only", async () => {
-    const wrapper = await mountOptions(CropOptions, "basemap:topo");
+    const wrapper = await mountOptions(CropOptions, "basemap:routes");
     const crop = wrapper.getComponent({ name: "VSwitch" });
     expect(crop.props("modelValue")).toBe(false);
     await crop.setValue(true);
     await flushPromises();
-    expect(useBasemapStore().setAround).toHaveBeenCalledWith(false, ["topo"]);
+    expect(useBasemapStore().setCrop).toHaveBeenCalledWith(true, ["routes"]);
   });
 
   test("the basemap category crops every map, mixed when the maps differ", async () => {
     const wrapper = await mountOptions(CropOptions, "basemap");
-    useBasemapStore().around = { satellite: true, streets: true, topo: false };
+    useBasemapStore().crop = { satellite: false, plan: false, routes: true };
     await flushPromises();
     const crop = wrapper.getComponent({ name: "VSwitch" });
     expect(crop.props("indeterminate")).toBe(true);
     await crop.setValue(true);
     await flushPromises();
-    expect(useBasemapStore().setAround).toHaveBeenCalledWith(false, [
-      "satellite",
-      "streets",
-      "topo",
-    ]);
+    expect(useBasemapStore().setCrop).toHaveBeenCalledWith(true, ["satellite", "plan", "routes"]);
   });
 });

@@ -23,8 +23,8 @@ const TREE_STUB = {
   props: ["items", "selected"],
   emits: ["update:selected", "contextmenu"],
   template: `<div>
-    <button data-testid='streetsRow' @click="$emit('contextmenu', { event: $event, item: { id: 'basemap:streets' } })" />
-    <button data-testid='topoEye' @click="$emit('update:selected', [...selected, 'basemap:topo'])" />
+    <button data-testid='planRow' @click="$emit('contextmenu', { event: $event, item: { id: 'basemap:plan' } })" />
+    <button data-testid='routesEye' @click="$emit('update:selected', [...selected, 'basemap:routes'])" />
   </div>`,
 };
 
@@ -77,10 +77,10 @@ describe("global objects basemap category", () => {
   test("a map eye adds that map, never as a data visibility", async () => {
     const wrapper = await mountTree(true);
     const treeviewStore = useTreeviewStore();
-    await wrapper.get('[data-testid="topoEye"]').trigger("click");
+    await wrapper.get('[data-testid="routesEye"]').trigger("click");
     await flushPromises();
-    expect(useBasemapStore().setMaps).toHaveBeenCalledWith(["satellite", "topo"]);
-    expect(treeviewStore.selection).toStrictEqual(["basemap:satellite", "basemap:topo"]);
+    expect(useBasemapStore().setMaps).toHaveBeenCalledWith(["satellite", "routes"]);
+    expect(treeviewStore.selection).toStrictEqual(["basemap:satellite", "basemap:routes"]);
     expect(useDataStyleStore().setVisibility).not.toHaveBeenCalled();
   });
 
@@ -96,9 +96,9 @@ describe("global objects basemap category", () => {
 
   test("right click on a map opens the basemap menu", async () => {
     const wrapper = await mountTree(true);
-    await wrapper.get('[data-testid="streetsRow"]').trigger("click");
+    await wrapper.get('[data-testid="planRow"]').trigger("click");
     expect(wrapper.emitted("show-menu")).toStrictEqual([
-      [expect.objectContaining({ itemId: "basemap:streets", context_type: "basemap" })],
+      [expect.objectContaining({ itemId: "basemap:plan", context_type: "basemap" })],
     ]);
   });
 });

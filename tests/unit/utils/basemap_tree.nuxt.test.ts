@@ -3,7 +3,6 @@ import {
   basemapGroup,
   isBasemapId,
   mapId,
-  mapLayer,
   mapStyleOf,
   nextBasemapMaps,
   sortedMaps,
@@ -18,73 +17,71 @@ describe("basemap tree", () => {
       title: "Basemap",
       children: [
         { id: "basemap:satellite", title: "Satellite" },
-        { id: "basemap:streets", title: "Streets" },
-        { id: "basemap:topo", title: "Topo" },
+        { id: "basemap:plan", title: "Plan" },
+        { id: "basemap:routes", title: "Routes" },
       ],
     });
   });
 
   test("map ids are reserved for the basemap", () => {
-    expect(mapStyleOf(mapId("topo"))).toBe("topo");
+    expect(mapStyleOf(mapId("routes"))).toBe("routes");
     expect(mapStyleOf(BASEMAP_GROUP_ID)).toBeUndefined();
     expect(mapStyleOf("basemap:unknown")).toBeUndefined();
   });
 
   test("basemap rows are never data rows", () => {
     expect(isBasemapId("basemap")).toBe(true);
-    expect(isBasemapId("basemap:streets")).toBe(true);
+    expect(isBasemapId("basemap:plan")).toBe(true);
     expect(isBasemapId("a1b2")).toBe(false);
   });
 
   test("the selection shows the visible maps", () => {
-    const selection = ["a", "basemap:topo", "basemap"];
-    expect(withBasemapSelection(selection, ["satellite", "streets"])).toStrictEqual([
+    const selection = ["a", "basemap:routes", "basemap"];
+    expect(withBasemapSelection(selection, ["satellite", "plan"])).toStrictEqual([
       "a",
       "basemap:satellite",
-      "basemap:streets",
+      "basemap:plan",
     ]);
-    expect(withBasemapSelection(["a", "basemap:topo"], [])).toStrictEqual(["a"]);
+    expect(withBasemapSelection(["a", "basemap:routes"], [])).toStrictEqual(["a"]);
   });
 
   test("checking a map adds it, in the stacking order", () => {
-    expect(nextBasemapMaps(["topo"], ["topo"], ["basemap:satellite"], [])).toStrictEqual([
+    expect(nextBasemapMaps(["routes"], ["routes"], ["basemap:satellite"], [])).toStrictEqual([
       "satellite",
-      "topo",
+      "routes",
     ]);
-    expect(nextBasemapMaps([], ["streets"], ["basemap:topo"], [])).toStrictEqual(["topo"]);
+    expect(nextBasemapMaps([], ["plan"], ["basemap:routes"], [])).toStrictEqual(["routes"]);
   });
 
-  test("streets on top of topo, on top of satellite", () => {
-    expect(sortedMaps(["streets", "satellite", "topo"])).toStrictEqual([
+  test("routes on top of plan, on top of satellite", () => {
+    expect(sortedMaps(["routes", "satellite", "plan"])).toStrictEqual([
       "satellite",
-      "topo",
-      "streets",
+      "plan",
+      "routes",
     ]);
-    expect(mapLayer("satellite")).toBe(0);
-    expect(mapLayer("streets")).toBe(2);
   });
 
   test("unchecking a map hides that map only", () => {
-    const both = ["satellite", "topo"] as const;
-    expect(nextBasemapMaps(both, both, [], ["basemap:topo"])).toStrictEqual(["satellite"]);
-    expect(nextBasemapMaps(["topo"], ["topo"], [], ["basemap:topo"])).toStrictEqual([]);
+    const both = ["satellite", "routes"] as const;
+    expect(nextBasemapMaps(both, both, [], ["basemap:routes"])).toStrictEqual(["satellite"]);
+    expect(nextBasemapMaps(["routes"], ["routes"], [], ["basemap:routes"])).toStrictEqual([]);
   });
 
   test("the group eye hides the visible maps and shows the last maps again", () => {
     // Classic tree: a click on the indeterminate group adds the group and every other map
-    const others = ["basemap", "basemap:satellite", "basemap:streets"];
-    expect(nextBasemapMaps(["topo"], ["topo"], others, [])).toStrictEqual([]);
-    const all = [...others, "basemap:topo"];
-    expect(nextBasemapMaps([], ["satellite", "topo"], all, [])).toStrictEqual([
+    const others = ["basemap", "basemap:satellite", "basemap:plan"];
+    expect(nextBasemapMaps(["routes"], ["routes"], others, [])).toStrictEqual([]);
+    const all = [...others, "basemap:routes"];
+    expect(nextBasemapMaps([], ["satellite", "routes"], all, [])).toStrictEqual([
       "satellite",
-      "topo",
+      "routes",
     ]);
     // Every map visible: the click unchecks them all
-    const maps = ["basemap:satellite", "basemap:streets", "basemap:topo"];
-    expect(nextBasemapMaps(["satellite", "streets", "topo"], [], [], maps)).toStrictEqual([]);
+    const maps = ["basemap:satellite", "basemap:plan", "basemap:routes"];
+    expect(nextBasemapMaps(["satellite", "plan", "routes"], [], [], maps)).toStrictEqual([]);
   });
 
   test("data changes keep the basemap", () => {
-    expect(nextBasemapMaps(["topo"], ["topo"], ["a"], ["b"])).toStrictEqual(["topo"]);
+    expect(nextBasemapMaps(["routes"], ["routes"], ["a"], ["b"])).toStrictEqual(["routes"]);
   });
 });

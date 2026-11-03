@@ -24,12 +24,12 @@ describe("viewer context menu", () => {
     const event = new MouseEvent("contextmenu");
 
     await openTreeMenu({ event, itemId: "basemap", context_type: "basemap" });
-    await openTreeMenu({ event, itemId: "basemap:topo", context_type: "basemap" });
+    await openTreeMenu({ event, itemId: "basemap:routes", context_type: "basemap" });
 
     expect(item).not.toHaveBeenCalled();
     expect(openMenu.mock.calls.map(([options]) => [options.id, options.meta_data])).toStrictEqual([
       ["basemap", { viewer_type: "basemap", geode_object_type: "Basemap" }],
-      ["basemap:topo", { viewer_type: "basemap", geode_object_type: "Map" }],
+      ["basemap:routes", { viewer_type: "basemap", geode_object_type: "Map" }],
     ]);
   });
 });

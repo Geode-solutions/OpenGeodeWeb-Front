@@ -19,7 +19,7 @@ const mapStyles = computed(() => {
   return mapStyle === undefined ? MAP_STYLES : [mapStyle];
 });
 // Cropped: only the map draped on the top surfaces, without the flat map around
-const cropped = computed(() => mapStyles.value.map((mapStyle) => !basemapStore.around[mapStyle]));
+const cropped = computed(() => mapStyles.value.map((mapStyle) => basemapStore.crop[mapStyle]));
 const indeterminate = computed(() => new Set(cropped.value).size > 1);
 </script>
 
@@ -41,7 +41,7 @@ const indeterminate = computed(() => new Set(cropped.value).size > 1);
         color="primary"
         hide-details
         class="px-1"
-        @update:model-value="(value) => basemapStore.setAround(!value, mapStyles)"
+        @update:model-value="(value) => basemapStore.setCrop(Boolean(value), mapStyles)"
       />
     </template>
   </ViewerContextMenuItem>
