@@ -56,9 +56,12 @@ const mandatory_files = ref<string[]>([]);
 const additional_files = ref<string[]>([]);
 const missing_by_file = ref<FileMissingFiles[]>([]);
 // Files left out at the data type step are not checked
-const checked_filenames = computed(() =>
-  timeSeries ? filenames : filenames.filter((filename) => filename in geodeObjectTypes),
-);
+const checked_filenames = computed(() => {
+  if (timeSeries) {
+    return filenames;
+  }
+  return filenames.filter((filename) => filename in geodeObjectTypes);
+});
 // Files whose mandatory files are missing are skipped when the step is skipped
 const files_without_mandatory = computed(() =>
   checked_filenames.value.filter(
@@ -160,9 +163,10 @@ async function upload_missing_from(
   }
   const found = expected.flatMap((expected_path, index) => {
     const file = folder_files[match.indices[index] ?? -1];
-    return file && !uploaded.includes(file)
-      ? [Object.assign(file, { relativePath: expected_path })]
-      : [];
+    if (file && !uploaded.includes(file)) {
+      return [Object.assign(file, { relativePath: expected_path })];
+    }
+    return [];
   });
   if (found.length === 0) {
     useFeedbackStore().add_warning(`The selected folder does not contain: ${expected.join(", ")}`);

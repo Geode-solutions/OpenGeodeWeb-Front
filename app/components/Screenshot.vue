@@ -23,6 +23,13 @@ interface Props {
 
 const { width = DEFAULT_PANEL_WIDTH, escapeFunction = undefined } = defineProps<Props>();
 
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return String(error);
+}
+
 const output_extensions =
   viewer_schemas.opengeodeweb_viewer.viewer.take_screenshot.properties.output_extension.enum;
 const filename = ref<string>("");
@@ -64,7 +71,7 @@ async function deliverScreenshot(blob: Blob | Uint8Array, current_filename: stri
     await copy([new ClipboardItem({ "image/png": pngBlob })]);
     feedbackStore.add_success("Screenshot copied to clipboard");
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
+    const message = getErrorMessage(error);
     feedbackStore.add_error(
       0,
       "",
@@ -138,7 +145,7 @@ async function takeUiScreenshot(current_filename: string): Promise<void> {
     const blob = await captureTab(mime_type);
     await deliverScreenshot(blob, current_filename);
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
+    const message = getErrorMessage(error);
     feedbackStore.add_error(0, "", "Screenshot Error", `Failed to capture the page: ${message}`);
   }
 }

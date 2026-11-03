@@ -172,11 +172,11 @@ export function useOverlappingPicker(): UseOverlappingPickerReturn {
     return new Promise<ViewerIdResult>((resolve) => {
       resolveIntermediate = (chosenResult: ProposedItem | undefined): void => {
         displayIntermediate.value = false;
-        resolve(
-          chosenResult
-            ? { id: chosenResult.id, viewer_id: chosenResult.viewer_id }
-            : { id: undefined, viewer_id: undefined },
-        );
+        if (chosenResult) {
+          resolve({ id: chosenResult.id, viewer_id: chosenResult.viewer_id });
+        } else {
+          resolve({ id: undefined, viewer_id: undefined });
+        }
       };
     });
   }

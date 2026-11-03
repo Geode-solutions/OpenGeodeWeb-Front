@@ -37,9 +37,10 @@ function slerp(from: Vector3, target: Vector3, ratio: number, mid?: Vector3): Ve
     ]);
   }
   if (dotProduct < -SLERP_LINEAR_THRESHOLD && mid) {
-    return ratio < MID_ANIMATION_RATIO
-      ? slerp(normFrom, mid, ratio * 2)
-      : slerp(mid, normTarget, (ratio - MID_ANIMATION_RATIO) * 2);
+    if (ratio < MID_ANIMATION_RATIO) {
+      return slerp(normFrom, mid, ratio * 2);
+    }
+    return slerp(mid, normTarget, (ratio - MID_ANIMATION_RATIO) * 2);
   }
   const theta = Math.acos(dotProduct);
   const sinTheta = Math.sin(theta);

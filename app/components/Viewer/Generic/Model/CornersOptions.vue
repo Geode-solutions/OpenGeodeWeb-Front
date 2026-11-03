@@ -30,14 +30,16 @@ const referenceCornerId = computed<string | undefined>(() =>
   collections ? targetCornerIds[0] : undefined,
 );
 
-const cornerComponentIds = computed<string[]>(() => (cornerId === undefined ? [] : [cornerId]));
+const cornerComponentIds = computed<string[]>(() => (cornerId !== undefined && [cornerId]) || []);
 
 // Visibility
 const cornersVisibility = computed<boolean>({
-  get: () =>
-    collections
-      ? targetCornerIds.every((id) => dataStyleStore.modelCornerVisibility(modelId, id))
-      : dataStyleStore.modelComponentTypeVisibility(modelId, "Corner"),
+  get: () => {
+    if (collections) {
+      return targetCornerIds.every((id) => dataStyleStore.modelCornerVisibility(modelId, id));
+    }
+    return dataStyleStore.modelComponentTypeVisibility(modelId, "Corner");
+  },
   set: async (newValue) => {
     await dataStyleStore.setModelCornersVisibility(modelId, targetCornerIds, newValue);
     hybridViewerStore.remoteRender();

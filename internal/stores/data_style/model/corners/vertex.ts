@@ -304,16 +304,20 @@ function useModelCornersVertexAttribute(): ModelCornersVertexAttributeApi {
       reapplySameSeries(
         await dataStore.getCornersGeodeIds(modelId),
         cornerIds,
-        (id) =>
-          modelCornersCommonStyle.modelCornerColoring(modelId, id).active === "vertex" &&
-          modelCornersVertexAttributeName(modelId, id) === name
-            ? [
-                modelCornersVertexAttributeItem(modelId, id),
-                modelCornersVertexAttributeRange(modelId, id),
-                modelCornersVertexAttributeColorMap(modelId, id),
-                JSON.stringify(modelCornersVertexAttributeNoDataColor(modelId, id)),
-              ].join("|")
-            : undefined,
+        (id) => {
+          if (
+            modelCornersCommonStyle.modelCornerColoring(modelId, id).active === "vertex" &&
+            modelCornersVertexAttributeName(modelId, id) === name
+          ) {
+            return [
+              modelCornersVertexAttributeItem(modelId, id),
+              modelCornersVertexAttributeRange(modelId, id),
+              modelCornersVertexAttributeColorMap(modelId, id),
+              JSON.stringify(modelCornersVertexAttributeNoDataColor(modelId, id)),
+            ].join("|");
+          }
+          return undefined;
+        },
         async (ids) => {
           await applyVertexAttribute(modelId, ids);
         },
