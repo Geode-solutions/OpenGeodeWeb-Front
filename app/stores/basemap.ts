@@ -77,10 +77,10 @@ function importedMaps(snapshot: BasemapSnapshot | undefined): MapStyle[] {
   const legacy = snapshot?.opacities === undefined;
   const saved = snapshot?.style ?? "satellite";
   if (saved === "none") {
-    return legacy ? ["satellite"] : [];
+    const fallback: MapStyle[] = ["satellite"];
+    return legacy ? fallback : [];
   }
-  const mapStyle = openMap(saved);
-  return mapStyle === undefined ? [] : [mapStyle];
+  return [saved].flatMap((name) => openMap(name) ?? []);
 }
 
 function importedCrop(snapshot: BasemapSnapshot | undefined): Record<MapStyle, boolean> {
@@ -90,7 +90,7 @@ function importedCrop(snapshot: BasemapSnapshot | undefined): Record<MapStyle, b
   }
   const values = everyMap(false);
   for (const mapStyle of MAP_STYLES) {
-    const aroundValue = around === undefined ? undefined : savedValue(around, mapStyle);
+    const aroundValue = savedValue(around ?? {}, mapStyle);
     values[mapStyle] = crop?.[mapStyle] ?? (aroundValue === undefined ? false : !aroundValue);
   }
   return values;
@@ -182,7 +182,7 @@ export const useBasemapStore = defineStore("basemap", () => {
     if (build <= lastBuildOfPreviousProject) {
       return;
     }
-    await (registered ? remove(id) : deleteData(id)).catch(() => {
+    await (registered ? remove : deleteData)(id).catch(() => {
       // Already reported by the request feedback
     });
   }
@@ -202,16 +202,17 @@ export const useBasemapStore = defineStore("basemap", () => {
   function layersParams(): { map: string; visible: boolean; opacity: number; crop: boolean }[] {
     return built.value.flatMap(({ map }) => {
       const mapStyle = openMap(map);
-      return mapStyle === undefined
-        ? []
-        : [
-            {
-              map,
-              visible: maps.value.includes(mapStyle),
-              opacity: opacities.value[mapStyle],
-              crop: crop.value[mapStyle],
-            },
-          ];
+      if (mapStyle === undefined) {
+        return [];
+      }
+      return [
+        {
+          map,
+          visible: maps.value.includes(mapStyle),
+          opacity: opacities.value[mapStyle],
+          crop: crop.value[mapStyle],
+        },
+      ];
     });
   }
 
