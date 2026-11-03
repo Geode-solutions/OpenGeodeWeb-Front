@@ -4,12 +4,13 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed
 
 // Local imports
 import { useMeshCellsCommonStyle } from "./common";
+import { useMeshCellsOpacityStyle } from "./opacity";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
 const schema = viewer_schemas.opengeodeweb_viewer.mesh.cells.color;
 
-export function useMeshCellsColorStyle(): {
+export function useMeshCellsColorStyle(): ReturnType<typeof useMeshCellsOpacityStyle> & {
   meshCellsColor: (id: string) => RGBAColor | undefined;
   setMeshCellsColor: (id: string, color: RGBAColor) => Promise<unknown>;
 } {
@@ -42,5 +43,6 @@ export function useMeshCellsColorStyle(): {
   return {
     meshCellsColor,
     setMeshCellsColor,
+    ...useMeshCellsOpacityStyle(),
   };
 }
