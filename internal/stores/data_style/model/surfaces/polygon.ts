@@ -333,16 +333,20 @@ function useModelSurfacesPolygonAttribute(): UseModelSurfacesPolygonAttributeRet
       reapplySameSeries(
         await dataStore.getSurfacesGeodeIds(modelId),
         surfaceIds,
-        (id) =>
-          modelSurfacesCommonStyle.modelSurfaceColoring(modelId, id).active === "polygon" &&
-          modelSurfacesPolygonAttributeName(modelId, id) === name
-            ? [
-                modelSurfacesPolygonAttributeItem(modelId, id),
-                modelSurfacesPolygonAttributeRange(modelId, id),
-                modelSurfacesPolygonAttributeColorMap(modelId, id),
-                JSON.stringify(modelSurfacesPolygonAttributeNoDataColor(modelId, id)),
-              ].join("|")
-            : undefined,
+        (id) => {
+          if (
+            modelSurfacesCommonStyle.modelSurfaceColoring(modelId, id).active === "polygon" &&
+            modelSurfacesPolygonAttributeName(modelId, id) === name
+          ) {
+            return [
+              modelSurfacesPolygonAttributeItem(modelId, id),
+              modelSurfacesPolygonAttributeRange(modelId, id),
+              modelSurfacesPolygonAttributeColorMap(modelId, id),
+              JSON.stringify(modelSurfacesPolygonAttributeNoDataColor(modelId, id)),
+            ].join("|");
+          }
+          return undefined;
+        },
         async (ids) => {
           await applyPolygonAttribute(modelId, ids);
         },

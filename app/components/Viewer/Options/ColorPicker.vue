@@ -50,7 +50,10 @@ function onPickerUpdate(color: VuetifyColor): void {
   const red = Math.round(color.r);
   const green = Math.round(color.g);
   const blue = Math.round(color.b);
-  const alpha = disabledAlpha ? 1 : Number(color.a.toFixed(2));
+  let alpha = 1;
+  if (!disabledAlpha) {
+    alpha = Number(color.a.toFixed(2));
+  }
 
   vuetifyColor.value = { r: red, g: green, b: blue, a: alpha };
   updateInputTextFromColor(red, green, blue, alpha);

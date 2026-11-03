@@ -82,8 +82,10 @@ export function useTreeKeyboardNav(
       return undefined;
     }
     const firstVisible = Math.max(0, Math.floor(info.scrollTop / info.itemHeight));
-    const visibleCount =
-      info.containerHeight > 0 ? Math.floor(info.containerHeight / info.itemHeight) : 1;
+    let visibleCount = 1;
+    if (info.containerHeight > 0) {
+      visibleCount = Math.floor(info.containerHeight / info.itemHeight);
+    }
     const lastVisible = Math.max(firstVisible, firstVisible + visibleCount - 1);
     return { firstVisible, lastVisible };
   }

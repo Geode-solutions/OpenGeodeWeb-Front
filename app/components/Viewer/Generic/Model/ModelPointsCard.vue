@@ -72,20 +72,22 @@ watch(
   { immediate: true },
 );
 
-const typeTargets = computed(() =>
-  pointsComponentType.value === undefined
-    ? []
-    : [{ componentType: pointsComponentType.value, componentIds: targetComponentIds.value }],
-);
+const typeTargets = computed(() => {
+  if (pointsComponentType.value === undefined) {
+    return [];
+  }
+  return [{ componentType: pointsComponentType.value, componentIds: targetComponentIds.value }];
+});
 const typeReferenceId = computed<string | undefined>(() =>
   collections.value ? targetComponentIds.value[0] : undefined,
 );
 
-const componentTargets = computed(() =>
-  pointsComponentType.value === undefined || componentId.value === undefined
-    ? []
-    : [{ componentType: pointsComponentType.value, componentIds: [componentId.value] }],
-);
+const componentTargets = computed(() => {
+  if (pointsComponentType.value === undefined || componentId.value === undefined) {
+    return [];
+  }
+  return [{ componentType: pointsComponentType.value, componentIds: [componentId.value] }];
+});
 
 const { tabs, activeTab } = useModelTabs({
   componentType,

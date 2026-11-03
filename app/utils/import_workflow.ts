@@ -34,10 +34,12 @@ async function importItem(item: NewDataItem): Promise<string> {
     }
     return dataStore.registerObject(item.id, item.name ?? item.id);
   });
-  const addDataComponentsTask =
-    item.viewer_type === "model" ? dataStore.addComponents(item) : Promise.resolve();
-  const addDataRelationsTask =
-    item.viewer_type === "model" ? dataStore.addComponentRelations(item) : Promise.resolve();
+  let addDataComponentsTask: Promise<string | undefined> = Promise.resolve(undefined);
+  let addDataRelationsTask: Promise<string | undefined> = Promise.resolve(undefined);
+  if (item.viewer_type === "model") {
+    addDataComponentsTask = dataStore.addComponents(item);
+    addDataRelationsTask = dataStore.addComponentRelations(item);
+  }
   treeviewStore.addItem(
     item.geode_object_type,
     item.name ?? item.id,

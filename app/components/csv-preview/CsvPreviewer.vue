@@ -105,7 +105,10 @@ function parseContent(): string[] {
 
   const allLines = rawContent.value.split(/\r?\n/u).filter((line) => line.trim() !== "");
   const headerLine = allLines[headerRow.value];
-  const rawHeaders = headerLine ? splitLine(headerLine) : [];
+  let rawHeaders: string[] = [];
+  if (headerLine) {
+    rawHeaders = splitLine(headerLine);
+  }
 
   previewHeaders.value = rawHeaders.map((header, index) => ({
     title: header || `Column ${index + 1}`,

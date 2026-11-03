@@ -40,11 +40,12 @@ export function useHoverhighlight(): {
         return;
       }
 
-      let block_ids: number[] = [
-        ...(typeof block_ids_provider === "function"
-          ? await block_ids_provider()
-          : block_ids_provider),
-      ];
+      let block_ids: number[] = [];
+      if (typeof block_ids_provider === "function") {
+        block_ids = [...(await block_ids_provider())];
+      } else {
+        block_ids = [...block_ids_provider];
+      }
 
       block_ids = (Array.isArray(block_ids) ? block_ids : [])
         .map((blockId) => Math.trunc(blockId))

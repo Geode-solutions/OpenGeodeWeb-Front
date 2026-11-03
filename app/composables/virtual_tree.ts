@@ -171,8 +171,20 @@ function useVirtualTree(
     emit("update:selected", [...newSelected]);
   }
 
+  function matchesSearch(item: TreeItem, id: unknown, search: string): boolean {
+    const { customFilter } = props.value;
+    if (customFilter) {
+      return customFilter(id, search, { raw: item });
+    }
+    const lowerSearch = search.toLowerCase();
+    return (
+      toDisplayString(item[actualItemProps.value.title]).toLowerCase().includes(lowerSearch) ||
+      toDisplayString(id).toLowerCase().includes(lowerSearch)
+    );
+  }
+
   function flattenTree(itemsList: readonly TreeItem[], depth = 0): DisplayItem[] {
-    const { search, customFilter } = props.value;
+    const { search } = props.value;
     const result: DisplayItem[] = [];
 
     for (const item of itemsList) {
@@ -184,12 +196,7 @@ function useVirtualTree(
       const isActive = activeSet.value.has(id);
 
       if (search !== undefined && search !== "") {
-        const lowerSearch = search.toLowerCase();
-        const matches = customFilter
-          ? customFilter(id, search, { raw: item })
-          : toDisplayString(item[actualItemProps.value.title])
-              .toLowerCase()
-              .includes(lowerSearch) || toDisplayString(id).toLowerCase().includes(lowerSearch);
+        const matches = matchesSearch(item, id, search);
 
         if (hasChildren) {
           const subtree = flattenTree(children ?? [], depth + 1);

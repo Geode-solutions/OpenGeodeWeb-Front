@@ -55,12 +55,15 @@ const toggle_loading = useToggle(loading);
 
 function files_uploaded_event(value: unknown[]): void {
   if (value.length > 0) {
-    emit(
-      "update_values",
-      timeSeries
-        ? { files: value, autoUpload: false, time_series: time_series.value }
-        : { files: value, autoUpload: false },
-    );
+    if (timeSeries) {
+      emit("update_values", {
+        files: value,
+        autoUpload: false,
+        time_series: time_series.value,
+      });
+    } else {
+      emit("update_values", { files: value, autoUpload: false });
+    }
     emit("increment_step");
   }
 }

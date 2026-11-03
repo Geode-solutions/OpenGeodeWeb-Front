@@ -118,11 +118,11 @@ async function importProject(file: File): Promise<void> {
   // After every data item is added: on partial data the project CRS would follow them.
   // A project saved without a project CRS takes the one of its oldest data, read in the
   // Snapshot: the stored items carry the import time as creation date
-  crsStore.importStores(
-    snapshot.crs?.projectCrs === undefined
-      ? { projectCrs: oldestCrs(snapshot.data?.items ?? []) }
-      : snapshot.crs,
-  );
+  if (snapshot.crs?.projectCrs === undefined) {
+    crsStore.importStores({ projectCrs: oldestCrs(snapshot.data?.items ?? []) });
+  } else {
+    crsStore.importStores(snapshot.crs);
+  }
   await hybridViewerStore.importStores(snapshot.hybridViewer);
   if (snapshot.dataStyle !== undefined) {
     await dataStyleStore.importStores(snapshot.dataStyle);

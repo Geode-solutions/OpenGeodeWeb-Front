@@ -96,7 +96,7 @@ async function registerRunningExtensions(): Promise<RegisteredExtension[]> {
       const extensionModule = await appStore.loadExtension(
         blobUrl,
         String(port),
-        serverPort === undefined ? undefined : String(serverPort),
+        serverPort?.toString(),
       );
       consola.info("[ExtensionManager] Extension loaded:", id);
       const storeFactory = extensionModule.metadata.store;

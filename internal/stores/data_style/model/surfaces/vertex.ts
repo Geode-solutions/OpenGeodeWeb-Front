@@ -328,16 +328,20 @@ function useModelSurfacesVertexAttribute(): UseModelSurfacesVertexAttributeRetur
       reapplySameSeries(
         await dataStore.getSurfacesGeodeIds(modelId),
         surfaceIds,
-        (id) =>
-          modelSurfacesCommonStyle.modelSurfaceColoring(modelId, id).active === "vertex" &&
-          modelSurfacesVertexAttributeName(modelId, id) === name
-            ? [
-                modelSurfacesVertexAttributeItem(modelId, id),
-                modelSurfacesVertexAttributeRange(modelId, id),
-                modelSurfacesVertexAttributeColorMap(modelId, id),
-                JSON.stringify(modelSurfacesVertexAttributeNoDataColor(modelId, id)),
-              ].join("|")
-            : undefined,
+        (id) => {
+          if (
+            modelSurfacesCommonStyle.modelSurfaceColoring(modelId, id).active === "vertex" &&
+            modelSurfacesVertexAttributeName(modelId, id) === name
+          ) {
+            return [
+              modelSurfacesVertexAttributeItem(modelId, id),
+              modelSurfacesVertexAttributeRange(modelId, id),
+              modelSurfacesVertexAttributeColorMap(modelId, id),
+              JSON.stringify(modelSurfacesVertexAttributeNoDataColor(modelId, id)),
+            ].join("|");
+          }
+          return undefined;
+        },
         async (ids) => {
           await applyVertexAttribute(modelId, ids);
         },
