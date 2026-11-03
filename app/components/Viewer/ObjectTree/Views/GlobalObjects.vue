@@ -60,9 +60,12 @@ const {
 } = useTreeFilter(() => treeviewStore.items, { recursiveSort: true });
 
 // The basemap category comes first, out of the data sort and filters
-const displayedItems = computed(() =>
-  basemapStore.available ? [basemapGroup(), ...processedItems.value] : processedItems.value,
-);
+const displayedItems = computed(() => {
+  if (!basemapStore.available) {
+    return processedItems.value;
+  }
+  return [basemapGroup(), ...processedItems.value];
+});
 
 function basemapIds(selection: readonly string[]): string {
   return selection.filter((id) => isBasemapId(id)).join(",");
