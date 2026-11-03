@@ -62,6 +62,18 @@ const color = computed<RGBAColor | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
+const opacity = computed<number | undefined>({
+  get: () => dataStyleStore.meshCellsOpacity(id.value),
+  set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
+    await applyBatchStyle(id.value, (targetId: string) =>
+      dataStyleStore.setMeshCellsOpacity(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
 const textures = computed<Texture[] | undefined>({
   get: () => dataStyleStore.meshCellsTextures(id.value) as Texture[] | undefined,
   set: async (newValue) => {
@@ -237,6 +249,7 @@ async function setCellAttributeRangesPerData(ranges: RangesPerData): Promise<voi
           :id="id"
           v-model:coloring_style_key="coloring_style_key"
           v-model:color="color"
+          v-model:opacity="opacity"
           v-model:textures="textures"
           v-model:vertex_attribute_name="vertex_attribute_name"
           v-model:vertex_attribute_item="vertex_attribute_item"

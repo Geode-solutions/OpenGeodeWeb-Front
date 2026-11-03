@@ -66,6 +66,18 @@ const color = computed<RGBAColor | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
+const opacity = computed<number | undefined>({
+  get: () => dataStyleStore.meshEdgesOpacity(id.value),
+  set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
+    await applyBatchStyle(id.value, (targetId: string) =>
+      dataStyleStore.setMeshEdgesOpacity(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
 const vertex_attribute_name = computed<string | undefined>({
   get: () => dataStyleStore.meshEdgesVertexAttributeName(id.value),
   set: async (newValue) => {
@@ -229,6 +241,7 @@ async function setEdgeAttributeRangesPerData(ranges: RangesPerData): Promise<voi
           :id="id"
           v-model:coloring_style_key="coloring_style_key"
           v-model:color="color"
+          v-model:opacity="opacity"
           v-model:vertex_attribute_name="vertex_attribute_name"
           v-model:vertex_attribute_item="vertex_attribute_item"
           v-model:vertex_attribute_range="vertex_attribute_range"

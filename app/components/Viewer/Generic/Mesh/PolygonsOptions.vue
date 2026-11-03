@@ -73,6 +73,18 @@ const color = computed<RGBAColor | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
+const opacity = computed<number | undefined>({
+  get: () => dataStyleStore.meshPolygonsOpacity(id.value),
+  set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
+    await applyBatchStyle(id.value, (targetId: string) =>
+      dataStyleStore.setMeshPolygonsOpacity(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
 const textures = computed<Texture[] | undefined>({
   get: () => dataStyleStore.meshPolygonsTextures(id.value) as Texture[] | undefined,
   set: async (newValue) => {
@@ -255,6 +267,7 @@ async function setPolygonAttributeRangesPerData(ranges: RangesPerData): Promise<
           :id="id"
           v-model:coloring_style_key="coloring_style_key"
           v-model:color="color"
+          v-model:opacity="opacity"
           v-model:textures="textures"
           v-model:vertex_attribute_name="vertex_attribute_name"
           v-model:vertex_attribute_item="vertex_attribute_item"
