@@ -1,4 +1,10 @@
-import type { BasemapStyle, MapStyle } from "@ogw_front/utils/basemap_tree";
+import {
+  type BasemapStyle,
+  MAP_STYLES,
+  type MapStyle,
+  mapLayer,
+  sortedMaps,
+} from "@ogw_front/utils/basemap_tree";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { sameCrs } from "@ogw_front/utils/crs";
 import { useBackStore } from "@ogw_front/stores/back";
@@ -10,11 +16,14 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 interface BasemapSnapshot {
+  maps?: MapStyle[];
+  // A project saved with a single visible map
   style?: BasemapStyle;
-  opacities?: Partial<Record<MapStyle, number>>;
+  opacities?: MapRecord<number>;
   // A project saved with the toolbar tool: one opacity for the single map
   opacity?: number;
-  around?: boolean;
+  // A project saved with a single visible map: one "Map around" for every map
+  around?: boolean | MapRecord<boolean>;
 }
 interface Bounds {
   x_min: number;
@@ -22,17 +31,41 @@ interface Bounds {
   x_max: number;
   y_max: number;
 }
+// One value per map, for the maps that have one
+type MapRecord<Value> = Partial<Record<MapStyle, Value>>;
+interface Extent {
+  bounds: Bounds;
+  z: number;
+}
 
 const REBUILD_DELAY_MILLISECONDS = 500;
 const BASEMAP_NAME = "basemap";
+const ATTRIBUTION_SEPARATOR = " | ";
 const X_MIN = 0;
 const X_MAX = 1;
 const Y_MIN = 2;
 const Y_MAX = 3;
 const Z_MAX = 5;
 
-function fullOpacities(value: number): Record<MapStyle, number> {
+function everyMap<Value>(value: Value): Record<MapStyle, Value> {
   return { satellite: value, streets: value, topo: value };
+}
+
+function without<Value>(record: MapRecord<Value>, mapStyle: MapStyle): MapRecord<Value> {
+  return Object.fromEntries(Object.entries(record).filter(([key]) => key !== mapStyle));
+}
+
+function importedMaps(snapshot: BasemapSnapshot | undefined): MapStyle[] {
+  if (snapshot?.maps !== undefined) {
+    return snapshot.maps;
+  }
+  // A project saved with the toolbar tool had one opacity, and "none" was only its default
+  const legacy = snapshot?.opacities === undefined;
+  const saved = snapshot?.style ?? "satellite";
+  if (saved === "none") {
+    return legacy ? ["satellite"] : [];
+  }
+  return [saved];
 }
 
 // oxlint-disable max-lines-per-function, max-statements
@@ -42,22 +75,31 @@ export const useBasemapStore = defineStore("basemap", () => {
   const dataStore = useDataStore();
   const hybridViewerStore = useHybridViewerStore();
 
-  // The last chosen map: shown again when the basemap is shown again
-  const map = ref<MapStyle>("satellite");
+  // The last chosen maps: shown again when the basemap is shown again
+  const shown = ref<MapStyle[]>(["satellite"]);
   // Shown as soon as the project has a CRS, until the user hides it
   const hidden = ref(false);
-  const style = computed<BasemapStyle>(() => (hidden.value ? "none" : map.value));
-  const opacities = ref<Record<MapStyle, number>>(fullOpacities(1));
-  const opacity = computed(() => (style.value === "none" ? 1 : opacities.value[style.value]));
-  // The flat map around the draped top surfaces
-  const around = ref(true);
-  const basemapId = ref<string | undefined>(undefined);
-  const attribution = ref<string | undefined>(undefined);
-  const loading = ref(false);
+  // The visible maps, from the bottom one to the top one
+  const maps = computed<MapStyle[]>(() => (hidden.value ? [] : shown.value));
+  const opacities = ref<Record<MapStyle, number>>(everyMap(1));
+  // The flat map around the draped top surfaces: off crops the map to the data
+  const around = ref<Record<MapStyle, boolean>>(everyMap(true));
+  const basemapIds = ref<MapRecord<string>>({});
+  const attributions = ref<MapRecord<string>>({});
+  // The visible maps share their providers: each one is credited once
+  const attribution = computed(() => {
+    const parts = sortedMaps(Object.keys(attributions.value)).flatMap(
+      (mapStyle) => attributions.value[mapStyle]?.split(ATTRIBUTION_SEPARATOR) ?? [],
+    );
+    return parts.length === 0 ? undefined : [...new Set(parts)].join(ATTRIBUTION_SEPARATOR);
+  });
+  const loadings = ref<MapRecord<boolean>>({});
+  const loading = computed(() => Object.values(loadings.value).some(Boolean));
   const crsStore = useCrsStore();
   const crs = computed(() => crsStore.projectCrs);
-  // Each build gets a number: a build finishing after a newer one started is discarded
-  let lastBuild = 0;
+  // Each build gets a number: a build finishing after a newer one of its map started is discarded
+  let builds = 0;
+  const lastBuilds: MapRecord<number> = {};
   // Builds up to this number belong to a project the viewer and the back already cleared
   let lastBuildOfPreviousProject = 0;
 
@@ -70,7 +112,7 @@ export const useBasemapStore = defineStore("basemap", () => {
   const available = computed(() => crs.value !== undefined && georeferencedIds().length > 0);
 
   // Unscaled polydata bounds: the actor bounds would include the z scale
-  function dataBounds(): { bounds: Bounds; z: number } | undefined {
+  function dataBounds(): Extent | undefined {
     // The basemap is never in hybridDb: every entry is project data. Data without a CRS is
     // Still in local coordinates and would move the basemap away from the georeferenced data
     const georeferenced = new Set(georeferencedIds());
@@ -115,10 +157,10 @@ export const useBasemapStore = defineStore("basemap", () => {
     });
   }
 
-  async function clear(): Promise<void> {
-    const id = basemapId.value;
-    basemapId.value = undefined;
-    attribution.value = undefined;
+  async function clear(mapStyle: MapStyle): Promise<void> {
+    const id = basemapIds.value[mapStyle];
+    basemapIds.value = without(basemapIds.value, mapStyle);
+    attributions.value = without(attributions.value, mapStyle);
     if (id === undefined) {
       return;
     }
@@ -126,51 +168,67 @@ export const useBasemapStore = defineStore("basemap", () => {
     await hybridViewerStore.remoteRender();
   }
 
-  async function applyOpacity(id: string): Promise<void> {
+  async function applyOpacity(mapStyle: MapStyle, id: string): Promise<void> {
     await viewerStore.request({
       schema: viewer_schemas.opengeodeweb_viewer.mesh.basemap_opacity,
-      params: { id, opacity: opacity.value },
+      params: { id, opacity: opacities.value[mapStyle] },
     });
   }
 
   // The viewer drapes the top surfaces of these data and hides the flat map on request
-  async function applyDrape(id: string): Promise<void> {
+  async function applyDrape(mapStyle: MapStyle, id: string): Promise<void> {
     await viewerStore.request({
       schema: viewer_schemas.opengeodeweb_viewer.mesh.basemap_drape,
-      params: { id, around: around.value, data_ids: georeferencedIds() },
+      params: {
+        id,
+        around: around.value[mapStyle],
+        data_ids: georeferencedIds(),
+      },
     });
   }
 
-  // No rebuild: only the flat map around the drape is shown or hidden
-  async function setAround(value: boolean): Promise<void> {
-    around.value = value;
-    if (basemapId.value === undefined) {
+  // No rebuild: only the flat map around the drape is shown or hidden.
+  // Without maps, it is set for every map, as the switch of the basemap category does
+  async function setAround(
+    value: boolean,
+    mapStyles: readonly MapStyle[] = MAP_STYLES,
+  ): Promise<void> {
+    around.value = {
+      ...around.value,
+      ...Object.fromEntries(mapStyles.map((mapStyle) => [mapStyle, value])),
+    };
+    const applied = mapStyles.flatMap((mapStyle) => {
+      const id = basemapIds.value[mapStyle];
+      return id === undefined ? [] : [applyDrape(mapStyle, id)];
+    });
+    if (applied.length === 0) {
       return;
     }
-    await applyDrape(basemapId.value);
+    await Promise.all(applied);
     await hybridViewerStore.remoteRender();
   }
 
-  // No rebuild: each map keeps its opacity, only the visible one reaches the viewer
+  // No rebuild: each map keeps its opacity, only the visible ones reach the viewer
   async function setOpacity(mapStyle: MapStyle, value: number): Promise<void> {
     opacities.value = { ...opacities.value, [mapStyle]: value };
-    if (mapStyle !== style.value || basemapId.value === undefined) {
+    const id = basemapIds.value[mapStyle];
+    if (id === undefined) {
       return;
     }
-    await applyOpacity(basemapId.value);
+    await applyOpacity(mapStyle, id);
     await hybridViewerStore.remoteRender();
   }
 
-  async function display(build: number, extent: { bounds: Bounds; z: number }): Promise<void> {
-    if (style.value === "none" || crs.value === undefined) {
+  async function display(mapStyle: MapStyle, build: number, extent: Extent): Promise<void> {
+    if (crs.value === undefined) {
       return;
     }
     const response = await backStore.request({
       schema: back_schemas.opengeodeweb_back.basemap.build,
-      params: { style: style.value, crs: crs.value, ...extent },
+      params: { style: mapStyle, crs: crs.value, ...extent },
     });
-    if (build !== lastBuild) {
-      // A newer build started: this result is obsolete
+    if (build !== lastBuilds[mapStyle]) {
+      // A newer build of this map started: this result is obsolete
       await discard(build, response.id, false);
       return;
     }
@@ -183,25 +241,30 @@ export const useBasemapStore = defineStore("basemap", () => {
           tiles_folder: response.tiles_folder,
           columns: response.columns,
           rows: response.rows,
+          // Maps shown together are stacked in a fixed order
+          layer: mapLayer(mapStyle),
         },
       });
-      await applyDrape(response.id);
-      if (opacity.value < 1) {
-        await applyOpacity(response.id);
+      await applyDrape(mapStyle, response.id);
+      if (opacities.value[mapStyle] < 1) {
+        await applyOpacity(mapStyle, response.id);
       }
     } catch (error) {
       // The new mesh must not stay registered without anyone tracking it
       await discard(build, response.id, true);
       throw error;
     }
-    if (build !== lastBuild) {
+    if (build !== lastBuilds[mapStyle]) {
       // Superseded while applying: the new basemap must not stay displayed
       await discard(build, response.id, true);
       return;
     }
-    const previous = basemapId.value;
-    basemapId.value = response.id;
-    attribution.value = response.attribution;
+    const previous = basemapIds.value[mapStyle];
+    basemapIds.value = { ...basemapIds.value, [mapStyle]: response.id };
+    attributions.value = {
+      ...attributions.value,
+      [mapStyle]: response.attribution,
+    };
     if (previous !== undefined) {
       await discard(build, previous, true);
     }
@@ -209,51 +272,82 @@ export const useBasemapStore = defineStore("basemap", () => {
     await hybridViewerStore.remoteRender();
   }
 
-  async function rebuild(): Promise<void> {
-    lastBuild += 1;
-    const build = lastBuild;
-    const extent = dataBounds();
-    if (style.value === "none" || crs.value === undefined || extent === undefined) {
-      loading.value = false;
-      await clear();
+  // The failed map is unchecked: data changes must not repeat its error forever
+  function giveUp(mapStyle: MapStyle): void {
+    const others = shown.value.filter((other) => other !== mapStyle);
+    if (others.length === 0) {
+      hidden.value = true;
+    } else {
+      shown.value = others;
+    }
+  }
+
+  async function rebuildMap(mapStyle: MapStyle, extent: Extent | undefined): Promise<void> {
+    builds += 1;
+    const build = builds;
+    lastBuilds[mapStyle] = build;
+    if (!maps.value.includes(mapStyle) || crs.value === undefined || extent === undefined) {
+      loadings.value = { ...loadings.value, [mapStyle]: false };
+      await clear(mapStyle);
       return;
     }
-    loading.value = true;
+    loadings.value = { ...loadings.value, [mapStyle]: true };
     try {
-      await display(build, extent);
+      await display(mapStyle, build, extent);
     } catch {
-      // The request feedback already shows the error: data changes must not repeat it forever
-      if (build === lastBuild) {
-        hidden.value = true;
-        await clear().catch(() => {
+      // The request feedback already shows the error
+      if (build === lastBuilds[mapStyle]) {
+        giveUp(mapStyle);
+        await clear(mapStyle).catch(() => {
           // Already reported by the request feedback
         });
       }
     } finally {
-      if (build === lastBuild) {
-        loading.value = false;
+      if (build === lastBuilds[mapStyle]) {
+        loadings.value = { ...loadings.value, [mapStyle]: false };
       }
     }
   }
 
-  // A new project: the viewer and the back were cleared, so nothing is requested
-  function reset(): void {
-    lastBuild += 1;
-    lastBuildOfPreviousProject = lastBuild;
-    basemapId.value = undefined;
-    attribution.value = undefined;
-    loading.value = false;
+  // Each map is built, or removed when it is not visible anymore
+  async function rebuild(mapStyles: readonly MapStyle[] = MAP_STYLES): Promise<void> {
+    const extent = dataBounds();
+    await Promise.all(
+      mapStyles.map(async (mapStyle) => {
+        await rebuildMap(mapStyle, extent);
+      }),
+    );
   }
 
-  // "none" hides the basemap and keeps the last map, to show it again
-  async function setStyle(newStyle: BasemapStyle): Promise<void> {
-    if (newStyle === "none") {
+  // A new project: the viewer and the back were cleared, so nothing is requested
+  function reset(): void {
+    builds += 1;
+    lastBuildOfPreviousProject = builds;
+    // The builds in flight are obsolete
+    for (const mapStyle of MAP_STYLES) {
+      Reflect.deleteProperty(lastBuilds, mapStyle);
+    }
+    basemapIds.value = {};
+    attributions.value = {};
+    loadings.value = {};
+  }
+
+  // No map hides the basemap and keeps the last maps, to show them again
+  async function setMaps(newMaps: readonly MapStyle[]): Promise<void> {
+    if (newMaps.length === 0) {
       hidden.value = true;
     } else {
-      map.value = newStyle;
+      shown.value = sortedMaps(newMaps);
       hidden.value = false;
     }
-    await rebuild();
+    // The maps already shown stay as they are: only the new ones are built
+    await rebuild(
+      MAP_STYLES.filter(
+        (mapStyle) =>
+          !maps.value.includes(mapStyle) ||
+          (basemapIds.value[mapStyle] === undefined && loadings.value[mapStyle] !== true),
+      ),
+    );
   }
 
   const scheduleRebuild = useDebounceFn(() => {
@@ -271,42 +365,43 @@ export const useBasemapStore = defineStore("basemap", () => {
       return `${crs.value?.authority}:${crs.value?.code}|${dataKey}|${extentKey}`;
     },
     () => {
-      if (style.value !== "none") {
+      if (maps.value.length > 0) {
         void scheduleRebuild();
       }
     },
   );
 
   function exportStores(): {
-    style: BasemapStyle;
+    maps: MapStyle[];
     opacities: Record<MapStyle, number>;
-    around: boolean;
+    around: Record<MapStyle, boolean>;
   } {
-    return { style: style.value, opacities: opacities.value, around: around.value };
+    return { maps: maps.value, opacities: opacities.value, around: around.value };
   }
 
   // Called once the project data is imported. When the data is not displayed yet,
   // The rebuild finds no bounds and the watch above rebuilds once it is displayed.
   async function importStores(snapshot: BasemapSnapshot | undefined): Promise<void> {
-    // A project saved with the toolbar tool had one opacity, and "none" was only its default
-    const legacy = snapshot?.opacities === undefined;
-    opacities.value = { ...fullOpacities(snapshot?.opacity ?? 1), ...snapshot?.opacities };
-    around.value = snapshot?.around ?? true;
-    const saved = snapshot?.style ?? "satellite";
-    await setStyle(legacy && saved === "none" ? "satellite" : saved);
+    opacities.value = { ...everyMap(snapshot?.opacity ?? 1), ...snapshot?.opacities };
+    const savedAround = snapshot?.around ?? true;
+    around.value =
+      typeof savedAround === "boolean"
+        ? everyMap(savedAround)
+        : { ...everyMap(true), ...savedAround };
+    await setMaps(importedMaps(snapshot));
   }
 
   return {
-    style,
-    map,
-    opacity,
+    maps,
+    shown,
     opacities,
     around,
-    basemapId,
+    basemapIds,
+    attributions,
     attribution,
     loading,
     available,
-    setStyle,
+    setMaps,
     setOpacity,
     setAround,
     rebuild,
@@ -317,4 +412,4 @@ export const useBasemapStore = defineStore("basemap", () => {
 });
 
 export type { BasemapSnapshot };
-export type { BasemapStyle } from "@ogw_front/utils/basemap_tree";
+export type { BasemapStyle, MapStyle } from "@ogw_front/utils/basemap_tree";

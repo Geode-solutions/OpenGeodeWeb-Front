@@ -3,7 +3,7 @@ import { type Component, ref } from "vue";
 import { type VueWrapper, flushPromises } from "@vue/test-utils";
 import { describe, expect, test, vi } from "vitest";
 import { mockAs, setupActivePinia, vuetify } from "@ogw_tests/utils";
-import AroundOptions from "@ogw_front/components/Viewer/Basemap/AroundOptions.vue";
+import CropOptions from "@ogw_front/components/Viewer/Basemap/CropOptions.vue";
 import OpacityOptions from "@ogw_front/components/Viewer/Basemap/OpacityOptions.vue";
 import { mountSuspended } from "@nuxt/test-utils/runtime";
 import { useBasemapStore } from "@ogw_front/stores/basemap";
@@ -59,12 +59,27 @@ describe("basemap context menus", () => {
     expect(useBasemapStore().setOpacity).toHaveBeenCalledWith("topo", NEW_OPACITY);
   });
 
-  test("map around is set from the basemap category", async () => {
-    const wrapper = await mountOptions(AroundOptions, "basemap");
-    const around = wrapper.getComponent({ name: "VSwitch" });
-    expect(around.props("modelValue")).toBe(true);
-    await around.setValue(false);
+  test("a map menu crops that map only", async () => {
+    const wrapper = await mountOptions(CropOptions, "basemap:topo");
+    const crop = wrapper.getComponent({ name: "VSwitch" });
+    expect(crop.props("modelValue")).toBe(false);
+    await crop.setValue(true);
     await flushPromises();
-    expect(useBasemapStore().setAround).toHaveBeenCalledWith(false);
+    expect(useBasemapStore().setAround).toHaveBeenCalledWith(false, ["topo"]);
+  });
+
+  test("the basemap category crops every map, mixed when the maps differ", async () => {
+    const wrapper = await mountOptions(CropOptions, "basemap");
+    useBasemapStore().around = { satellite: true, streets: true, topo: false };
+    await flushPromises();
+    const crop = wrapper.getComponent({ name: "VSwitch" });
+    expect(crop.props("indeterminate")).toBe(true);
+    await crop.setValue(true);
+    await flushPromises();
+    expect(useBasemapStore().setAround).toHaveBeenCalledWith(false, [
+      "satellite",
+      "streets",
+      "topo",
+    ]);
   });
 });

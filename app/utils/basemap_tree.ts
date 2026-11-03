@@ -24,6 +24,17 @@ function mapStyleOf(id: string): MapStyle | undefined {
   return MAP_STYLES.find((style) => mapId(style) === id);
 }
 
+// The fixed stacking order, from the bottom: the imagery under the maps, streets on top
+const STACKED_MAPS: readonly MapStyle[] = ["satellite", "topo", "streets"];
+
+function sortedMaps(maps: readonly string[]): MapStyle[] {
+  return STACKED_MAPS.filter((style) => maps.includes(style));
+}
+
+function mapLayer(style: MapStyle): number {
+  return STACKED_MAPS.indexOf(style);
+}
+
 // Tree ids of the basemap: never project data
 function isBasemapId(id: string): boolean {
   return id === BASEMAP_GROUP_ID || id.startsWith(MAP_ID_PREFIX);
@@ -37,35 +48,29 @@ function basemapGroup(): BasemapTreeGroup {
   };
 }
 
-// The tree selection shows the basemap state: the visible map, or nothing
-function withBasemapSelection(selection: readonly string[], style: BasemapStyle): string[] {
+// The tree selection shows the basemap state: the visible maps
+function withBasemapSelection(selection: readonly string[], maps: readonly MapStyle[]): string[] {
   const data = selection.filter((id) => !isBasemapId(id));
-  return style === "none" ? data : [...data, mapId(style)];
+  return [...data, ...maps.map((style) => mapId(style))];
 }
 
-// One map at a time. The classic tree adds the group and every map on a group click:
-// That click toggles the basemap, back to the last visible map
-function nextBasemapStyle(
-  current: BasemapStyle,
-  last: MapStyle,
+// Each map eye shows or hides its map. The classic tree adds the group and every map on a
+// Group click: that click hides the visible maps, or shows the last visible maps again
+function nextBasemapMaps(
+  current: readonly MapStyle[],
+  last: readonly MapStyle[],
   added: readonly string[],
   removed: readonly string[],
-): BasemapStyle {
+): MapStyle[] {
   const addedMaps = added.flatMap((id) => mapStyleOf(id) ?? []);
   if (added.includes(BASEMAP_GROUP_ID) || addedMaps.length > 1) {
-    return current === "none" ? last : "none";
+    return current.length === 0 ? [...last] : [];
   }
-  const [addedMap] = addedMaps;
-  if (addedMap !== undefined) {
-    return addedMap;
+  const removedMaps = removed.flatMap((id) => mapStyleOf(id) ?? []);
+  if (removed.includes(BASEMAP_GROUP_ID) && removedMaps.length === 0) {
+    return [];
   }
-  if (
-    removed.includes(BASEMAP_GROUP_ID) ||
-    (current !== "none" && removed.includes(mapId(current)))
-  ) {
-    return "none";
-  }
-  return current;
+  return sortedMaps([...current, ...addedMaps].filter((style) => !removedMaps.includes(style)));
 }
 
 export type { BasemapStyle, BasemapTreeGroup, MapStyle };
@@ -75,7 +80,9 @@ export {
   basemapGroup,
   isBasemapId,
   mapId,
+  mapLayer,
   mapStyleOf,
-  nextBasemapStyle,
+  nextBasemapMaps,
+  sortedMaps,
   withBasemapSelection,
 };

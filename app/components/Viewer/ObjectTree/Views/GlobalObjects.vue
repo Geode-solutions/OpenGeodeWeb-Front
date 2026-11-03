@@ -1,10 +1,10 @@
 <script setup lang="ts">
 // oxlint-disable max-dependencies
 import {
-  type BasemapStyle,
+  type MapStyle,
   basemapGroup,
   isBasemapId,
-  nextBasemapStyle,
+  nextBasemapMaps,
   withBasemapSelection,
 } from "@ogw_front/utils/basemap_tree";
 import { type TreeMenuPayload, compareSelections } from "@ogw_front/utils/treeview";
@@ -68,11 +68,11 @@ function basemapIds(selection: readonly string[]): string {
   return selection.filter((id) => isBasemapId(id)).join(",");
 }
 
-// The tree shows the basemap state: one visible map, or none
+// The tree shows the basemap state: the visible maps
 watch(
-  () => basemapStore.style,
-  (style) => {
-    const synced = withBasemapSelection(treeviewStore.selection, style);
+  () => basemapStore.maps,
+  (maps) => {
+    const synced = withBasemapSelection(treeviewStore.selection, maps);
     if (basemapIds(synced) !== basemapIds(treeviewStore.selection)) {
       treeviewStore.selection = synced;
     }
@@ -84,25 +84,25 @@ function withoutBasemap(selection: readonly string[]): string[] {
   return selection.filter((id) => !isBasemapId(id));
 }
 
-async function showBasemap(style: BasemapStyle): Promise<void> {
+async function showBasemap(maps: MapStyle[]): Promise<void> {
   try {
-    await basemapStore.setStyle(style);
+    await basemapStore.setMaps(maps);
   } catch {
     // Already reported by the request feedback
   }
 }
 
-// Only user clicks choose the visible map: clear and import rewrite the selection with data only.
+// Only user clicks choose the visible maps: clear and import rewrite the selection with data only.
 // Basemap rows are never filtered out by the search
 function onUpdateSelection(val: string[]): void {
   const previous = treeviewStore.selection;
   const { added, removed } = compareSelections(val, previous);
-  const style = nextBasemapStyle(basemapStore.style, basemapStore.map, added, removed);
-  if (style !== basemapStore.style) {
-    void showBasemap(style);
+  const maps = nextBasemapMaps(basemapStore.maps, basemapStore.shown, added, removed);
+  if (maps.join(",") !== basemapStore.maps.join(",")) {
+    void showBasemap(maps);
   }
   const data = applySearchFilter(withoutBasemap(val), withoutBasemap(previous));
-  treeviewStore.selection = withBasemapSelection(data, style);
+  treeviewStore.selection = withBasemapSelection(data, maps);
 }
 
 const visibleSelection = computed<string[]>(() => [
@@ -121,7 +121,7 @@ watch(
     const { added, removed } = compareSelections(current, previous);
 
     // A selection written without the basemap rows (clear, import) shows the basemap state again
-    const synced = withBasemapSelection(current, basemapStore.style);
+    const synced = withBasemapSelection(current, basemapStore.maps);
     if (basemapIds(current) !== basemapIds(synced)) {
       treeviewStore.selection = synced;
     }

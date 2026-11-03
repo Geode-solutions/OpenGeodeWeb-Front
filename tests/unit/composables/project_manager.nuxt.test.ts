@@ -73,7 +73,7 @@ const snapshotMock = {
       },
     },
   },
-  basemap: { style: "satellite" },
+  basemap: { maps: ["satellite"] },
   hybridViewer: {
     zScale: Z_SCALE,
     camera_options: {

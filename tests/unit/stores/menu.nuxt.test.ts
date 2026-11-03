@@ -14,9 +14,10 @@ describe("menu store", () => {
     const menuStore = useMenuStore();
     expect(componentNames(menuStore.getMenuItems("basemap", "Map"))).toStrictEqual([
       "ViewerBasemapOpacityOptions",
+      "ViewerBasemapCropOptions",
     ]);
     expect(componentNames(menuStore.getMenuItems("basemap", "Basemap"))).toStrictEqual([
-      "ViewerBasemapAroundOptions",
+      "ViewerBasemapCropOptions",
     ]);
   });
 });

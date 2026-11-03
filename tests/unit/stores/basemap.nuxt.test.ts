@@ -11,6 +11,7 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 vi.setConfig({ testTimeout: 10_000 });
 
 const OPAQUE = { satellite: 1, streets: 1, topo: 1 };
+const AROUND = { satellite: true, streets: true, topo: true };
 const LAMBERT = { authority: "EPSG", code: "2154", name: "RGF93 v1 / Lambert-93" };
 const REBUILD_DELAY = 500;
 const HALF_DELAY = 100;
@@ -104,7 +105,7 @@ describe("basemap store", () => {
 
   test("setStyle builds the basemap from the data bounds and the project crs", async () => {
     const store = setup();
-    await store.setStyle("satellite");
+    await store.setMaps(["satellite"]);
     expect(backRequest).toHaveBeenCalledWith(
       expect.objectContaining({
         params: {
@@ -118,10 +119,10 @@ describe("basemap store", () => {
     expect(registerObject).toHaveBeenCalledWith("basemap-1", "basemap");
     expect(viewerRequest).toHaveBeenCalledWith(
       expect.objectContaining({
-        params: { id: "basemap-1", tiles_folder: "tiles", columns: 2, rows: 3 },
+        params: { id: "basemap-1", tiles_folder: "tiles", columns: 2, rows: 3, layer: 0 },
       }),
     );
-    expect(store.basemapId).toBe("basemap-1");
+    expect(store.basemapIds.satellite).toBe("basemap-1");
     expect(store.attribution).toBe("Powered by Esri | test");
   });
 
@@ -131,7 +132,7 @@ describe("basemap store", () => {
     Object.assign(useHybridViewerStore().hybridDb, {
       [LOCAL_DATA]: fakeActor([0, 1e9, 0, 1e9, -1e9, 0]),
     });
-    await store.setStyle("satellite");
+    await store.setMaps(["satellite"]);
     const params: unknown = expect.objectContaining({
       bounds: { x_min: 0, y_min: -10, x_max: 30, y_max: 20 },
       z: 5,
@@ -141,7 +142,7 @@ describe("basemap store", () => {
 
   test("rebuilds when georeferenced data moves without a crs change", async () => {
     const store = setup();
-    await store.setStyle("satellite");
+    await store.setMaps(["satellite"]);
     expect(backRequest).toHaveBeenCalledTimes(ONCE);
     // A re-align keeps the CRS but rebuilds the local actor at the new place
     Object.assign(useHybridViewerStore().hybridDb, {
@@ -158,21 +159,21 @@ describe("basemap store", () => {
 
   test("the first build renders the viewer", async () => {
     const store = setup();
-    await store.setStyle("satellite");
+    await store.setMaps(["satellite"]);
     // No previous basemap to remove: the build itself must render
     expect(remoteRender).toHaveBeenCalledWith();
   });
 
   test("none removes the basemap", async () => {
     const store = setup();
-    await store.setStyle("satellite");
-    await store.setStyle("none");
+    await store.setMaps(["satellite"]);
+    await store.setMaps([]);
     expect(deleteRequest).toHaveBeenCalledWith(
       expect.objectContaining({ params: { id: "basemap-1" } }),
     );
     // The viewer lets the mesh go before the back deletes its files
     expect(deregisterObject).toHaveBeenCalledBefore(deleteRequest);
-    expect(store.basemapId).toBeUndefined();
+    expect(store.basemapIds.satellite).toBeUndefined();
     expect(store.attribution).toBeUndefined();
   });
 
@@ -180,11 +181,11 @@ describe("basemap store", () => {
     const store = setup();
     const slow = Promise.withResolvers();
     backRequest.mockReturnValueOnce(slow.promise).mockResolvedValueOnce(buildResponse("basemap-2"));
-    const first = store.setStyle("satellite");
-    await store.setStyle("topo");
+    const first = store.setMaps(["satellite"]);
+    await store.setMaps(["topo"]);
     slow.resolve(buildResponse("basemap-1"));
     await first;
-    expect(store.basemapId).toBe("basemap-2");
+    expect(store.basemapIds.topo).toBe("basemap-2");
     expect(registerObject).not.toHaveBeenCalledWith("basemap-1", "basemap");
     // Never registered in the viewer: only its back data is deleted
     expect(deregisterObject).not.toHaveBeenCalledWith("basemap-1");
@@ -196,7 +197,7 @@ describe("basemap store", () => {
 
   test("rebuilds once, 500 ms after the data changed", async () => {
     const store = setup();
-    await store.setStyle("satellite");
+    await store.setMaps(["satellite"]);
     expect(backRequest).toHaveBeenCalledTimes(ONCE);
     items.value = [...georeferenced(), mockAs<DataItem>({ id: "c", created_at: "3" })];
     await nextTick();
@@ -211,46 +212,46 @@ describe("basemap store", () => {
 
   test("removes the basemap when no data is georeferenced anymore", async () => {
     const store = setup();
-    await store.setStyle("satellite");
+    await store.setMaps(["satellite"]);
     expect(store.available).toBe(true);
     items.value = mockAs<DataItem[]>([{ id: "a", created_at: "1" }]);
     await nextTick();
     await vi.advanceTimersByTimeAsync(REBUILD_DELAY);
     expect(deregisterObject).toHaveBeenCalledWith("basemap-1");
-    expect(store.basemapId).toBeUndefined();
+    expect(store.basemapIds.satellite).toBeUndefined();
     // No data in the project CRS: no map, so no Basemap category either
     expect(store.available).toBe(false);
   });
 
-  test("exports the visible map and the opacities, rebuilds on import", async () => {
+  test("exports the visible maps and the opacities, rebuilds on import", async () => {
     const store = setup();
-    await store.setStyle("satellite");
+    await store.setMaps(["satellite"]);
     expect(store.exportStores()).toStrictEqual({
-      style: "satellite",
+      maps: ["satellite"],
       opacities: OPAQUE,
-      around: true,
+      around: AROUND,
     });
-    await store.importStores({ style: "topo", opacities: OPAQUE });
+    await store.importStores({ maps: ["topo"], opacities: OPAQUE });
     const topoParams: unknown = expect.objectContaining({ style: "topo" });
     expect(backRequest).toHaveBeenLastCalledWith(expect.objectContaining({ params: topoParams }));
   });
 
-  test("a build finishing its apply after the style went to none is discarded", async () => {
+  test("a build finishing its apply after the basemap was hidden is discarded", async () => {
     const store = setup();
     const apply = Promise.withResolvers();
     viewerRequest.mockReturnValueOnce(apply.promise);
-    const building = store.setStyle("satellite");
+    const building = store.setMaps(["satellite"]);
     await vi.waitFor(() => {
       expect(viewerRequest).toHaveBeenCalledTimes(ONCE);
     });
-    await store.setStyle("none");
+    await store.setMaps([]);
     apply.resolve({});
     await building;
     expect(deregisterObject).toHaveBeenCalledWith("basemap-1");
     expect(deleteRequest).toHaveBeenCalledWith(
       expect.objectContaining({ params: { id: "basemap-1" } }),
     );
-    expect(store.basemapId).toBeUndefined();
+    expect(store.basemapIds.satellite).toBeUndefined();
     expect(store.attribution).toBeUndefined();
   });
 
@@ -266,27 +267,27 @@ describe("basemap store", () => {
     await nextTick();
     await vi.advanceTimersByTimeAsync(REBUILD_DELAY);
     expect(backRequest).toHaveBeenCalledTimes(ONCE);
-    expect(store.basemapId).toBe("basemap-1");
+    expect(store.basemapIds.satellite).toBe("basemap-1");
   });
 
   test("a failed apply removes the new basemap and goes back to none", async () => {
     const store = setup();
     viewerRequest.mockRejectedValueOnce(new Error("apply failed"));
-    await store.setStyle("satellite");
+    await store.setMaps(["satellite"]);
     expect(deregisterObject).toHaveBeenCalledWith("basemap-1");
     expect(deleteRequest).toHaveBeenCalledWith(
       expect.objectContaining({ params: { id: "basemap-1" } }),
     );
-    expect(store.basemapId).toBeUndefined();
-    expect(store.style).toBe("none");
+    expect(store.basemapIds.satellite).toBeUndefined();
+    expect(store.maps).toStrictEqual([]);
     expect(store.loading).toBe(false);
   });
 
   test("a failed build goes back to none and data changes no longer rebuild", async () => {
     const store = setup();
     backRequest.mockRejectedValueOnce(new Error("Basemap unavailable: no API key"));
-    await store.setStyle("satellite");
-    expect(store.style).toBe("none");
+    await store.setMaps(["satellite"]);
+    expect(store.maps).toStrictEqual([]);
     items.value = georeferenced().slice(0, 1);
     await nextTick();
     await vi.advanceTimersByTimeAsync(REBUILD_DELAY);
@@ -295,10 +296,10 @@ describe("basemap store", () => {
 
   test("reset forgets the basemap without any request", async () => {
     const store = setup();
-    await store.setStyle("satellite");
+    await store.setMaps(["satellite"]);
     deregisterObject.mockClear();
     store.reset();
-    expect(store.basemapId).toBeUndefined();
+    expect(store.basemapIds.satellite).toBeUndefined();
     expect(store.attribution).toBeUndefined();
     expect(store.loading).toBe(false);
     expect(deregisterObject).not.toHaveBeenCalled();
@@ -309,23 +310,23 @@ describe("basemap store", () => {
     const store = setup();
     const slow = Promise.withResolvers();
     backRequest.mockReturnValueOnce(slow.promise);
-    const building = store.setStyle("satellite");
+    const building = store.setMaps(["satellite"]);
     store.reset();
     slow.resolve(buildResponse("basemap-1"));
     await building;
     expect(registerObject).not.toHaveBeenCalled();
     // The previous project's back was already cleared
     expect(deleteRequest).not.toHaveBeenCalled();
-    expect(store.basemapId).toBeUndefined();
+    expect(store.basemapIds.satellite).toBeUndefined();
   });
 
   test("setOpacity asks the viewer without building again", async () => {
     const store = setup();
-    await store.setStyle("satellite");
+    await store.setMaps(["satellite"]);
     viewerRequest.mockClear();
     remoteRender.mockClear();
     await store.setOpacity("satellite", 0.5);
-    expect(store.opacity).toBe(0.5);
+    expect(store.opacities.satellite).toBe(0.5);
     expect(viewerRequest).toHaveBeenCalledExactlyOnceWith(
       expect.objectContaining({ params: { id: "basemap-1", opacity: 0.5 } }),
     );
@@ -336,14 +337,14 @@ describe("basemap store", () => {
   test("setOpacity without basemap only stores the value", async () => {
     const store = setup();
     await store.setOpacity("satellite", 0.4);
-    expect(store.opacity).toBe(0.4);
+    expect(store.opacities.satellite).toBe(0.4);
     expect(viewerRequest).not.toHaveBeenCalled();
   });
 
   test("a rebuild applies the opacity again", async () => {
     const store = setup();
     await store.setOpacity("satellite", 0.5);
-    await store.setStyle("satellite");
+    await store.setMaps(["satellite"]);
     // Apply, drape, then opacity
     expect(viewerRequest).toHaveBeenCalledTimes(THRICE);
     expect(viewerRequest).toHaveBeenLastCalledWith(
@@ -353,53 +354,106 @@ describe("basemap store", () => {
 
   test("a full opacity is not applied after a build", async () => {
     const store = setup();
-    await store.setStyle("satellite");
+    await store.setMaps(["satellite"]);
     // Apply and drape only
     expect(viewerRequest).toHaveBeenCalledTimes(TWICE);
   });
 
-  test("each map keeps its own opacity, only the visible one reaches the viewer", async () => {
+  test("each map keeps its own opacity, only the visible ones reach the viewer", async () => {
     const store = setup();
-    await store.setStyle("streets");
+    await store.setMaps(["streets"]);
     await store.setOpacity("streets", 0.4);
     await store.setOpacity("topo", 0.7);
-    expect(store.opacity).toBe(0.4);
     expect(viewerRequest).toHaveBeenCalledWith(
       expect.objectContaining({ params: { id: "basemap-1", opacity: 0.4 } }),
     );
     // Topo is hidden: its opacity waits until it is shown
+    const topoOpacity: unknown = expect.objectContaining({ opacity: 0.7 });
     expect(viewerRequest).not.toHaveBeenCalledWith(
-      expect.objectContaining({ params: { id: "basemap-1", opacity: 0.7 } }),
+      expect.objectContaining({ params: topoOpacity }),
     );
-    await store.setStyle("topo");
-    expect(store.opacity).toBe(0.7);
+    backRequest.mockResolvedValueOnce(buildResponse("basemap-2"));
+    await store.setMaps(["streets", "topo"]);
+    expect(viewerRequest).toHaveBeenCalledWith(
+      expect.objectContaining({ params: { id: "basemap-2", opacity: 0.7 } }),
+    );
   });
 
-  test("hiding keeps the last map", async () => {
+  test("hiding keeps the last maps", async () => {
     const store = setup();
-    await store.setStyle("topo");
-    await store.setStyle("none");
-    expect(store.style).toBe("none");
-    expect(store.map).toBe("topo");
+    await store.setMaps(["topo", "satellite"]);
+    await store.setMaps([]);
+    expect(store.maps).toStrictEqual([]);
+    expect(store.shown).toStrictEqual(["satellite", "topo"]);
   });
 
-  test("imports the visible map and the opacity of each map", async () => {
+  test("maps shown together are built apart and stacked in a fixed order", async () => {
     const store = setup();
-    await store.importStores({ style: "none", opacities: { streets: 0.5 } });
-    expect(store.style).toBe("none");
+    backRequest
+      .mockResolvedValueOnce(buildResponse("basemap-1"))
+      .mockResolvedValueOnce(buildResponse("basemap-2"));
+    await store.setMaps(["streets", "satellite"]);
+    expect(store.maps).toStrictEqual(["satellite", "streets"]);
+    expect(store.basemapIds).toStrictEqual({ satellite: "basemap-1", streets: "basemap-2" });
+    // Satellite at the bottom, streets on top
+    const bottom: unknown = expect.objectContaining({ id: "basemap-1", layer: 0 });
+    const top: unknown = expect.objectContaining({ id: "basemap-2", layer: 2 });
+    expect(viewerRequest).toHaveBeenCalledWith(expect.objectContaining({ params: bottom }));
+    expect(viewerRequest).toHaveBeenCalledWith(expect.objectContaining({ params: top }));
+    // Both from the same provider: credited once
+    expect(store.attribution).toBe("Powered by Esri | test");
+  });
+
+  test("unchecking one map removes only that map", async () => {
+    const store = setup();
+    backRequest
+      .mockResolvedValueOnce(buildResponse("basemap-1"))
+      .mockResolvedValueOnce(buildResponse("basemap-2"));
+    await store.setMaps(["satellite", "topo"]);
+    backRequest.mockClear();
+    await store.setMaps(["satellite"]);
+    expect(deregisterObject).toHaveBeenCalledExactlyOnceWith("basemap-2");
+    expect(backRequest).not.toHaveBeenCalled();
+    expect(store.basemapIds.satellite).toBe("basemap-1");
+    expect(store.basemapIds.topo).toBeUndefined();
+  });
+
+  test("a failed map is unchecked, the other maps stay", async () => {
+    const store = setup();
+    backRequest
+      .mockResolvedValueOnce(buildResponse("basemap-1"))
+      .mockRejectedValueOnce(new Error("Basemap unavailable"));
+    await store.setMaps(["satellite", "topo"]);
+    expect(store.maps).toStrictEqual(["satellite"]);
+    expect(store.basemapIds.satellite).toBe("basemap-1");
+  });
+
+  test("imports the visible maps and the opacity of each map", async () => {
+    const store = setup();
+    await store.importStores({ maps: [], opacities: { streets: 0.5 } });
+    expect(store.maps).toStrictEqual([]);
     expect(store.opacities).toStrictEqual({ satellite: 1, streets: 0.5, topo: 1 });
+  });
+
+  test("a project with a single visible map shows that map", async () => {
+    const store = setup();
+    await store.importStores({ style: "topo", opacities: OPAQUE, around: false });
+    expect(store.maps).toStrictEqual(["topo"]);
+    expect(store.around).toStrictEqual({ satellite: false, streets: false, topo: false });
+    await store.importStores({ style: "none", opacities: OPAQUE });
+    expect(store.maps).toStrictEqual([]);
   });
 
   test("an old project shows satellite with its single opacity on every map", async () => {
     const store = setup();
     await store.importStores({ style: "none", opacity: 0.4 });
-    expect(store.style).toBe("satellite");
+    expect(store.maps).toStrictEqual(["satellite"]);
     expect(store.opacities).toStrictEqual({ satellite: 0.4, streets: 0.4, topo: 0.4 });
   });
 
   test("drapes on the georeferenced data after each build", async () => {
     const store = setup();
-    await store.setStyle("satellite");
+    await store.setMaps(["satellite"]);
     expect(viewerRequest).toHaveBeenCalledWith(
       expect.objectContaining({
         params: { id: "basemap-1", around: true, data_ids: ["a", "c"] },
@@ -409,11 +463,11 @@ describe("basemap store", () => {
 
   test("setAround asks the viewer without building again", async () => {
     const store = setup();
-    await store.setStyle("satellite");
+    await store.setMaps(["satellite"]);
     viewerRequest.mockClear();
     remoteRender.mockClear();
     await store.setAround(false);
-    expect(store.around).toBe(false);
+    expect(store.around).toStrictEqual({ satellite: false, streets: false, topo: false });
     expect(viewerRequest).toHaveBeenCalledExactlyOnceWith(
       expect.objectContaining({
         params: { id: "basemap-1", around: false, data_ids: ["a", "c"] },
@@ -425,28 +479,44 @@ describe("basemap store", () => {
 
   test("setAround without basemap only stores the value", async () => {
     const store = setup();
-    await store.setAround(false);
-    expect(store.around).toBe(false);
+    await store.setAround(false, ["topo"]);
+    expect(store.around).toStrictEqual({ ...AROUND, topo: false });
     expect(viewerRequest).not.toHaveBeenCalled();
+  });
+
+  test("each map is cropped to the data on its own", async () => {
+    const store = setup();
+    backRequest
+      .mockResolvedValueOnce(buildResponse("basemap-1"))
+      .mockResolvedValueOnce(buildResponse("basemap-2"));
+    await store.setMaps(["satellite", "topo"]);
+    viewerRequest.mockClear();
+    await store.setAround(false, ["topo"]);
+    expect(viewerRequest).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({
+        params: { id: "basemap-2", around: false, data_ids: ["a", "c"] },
+      }),
+    );
+    expect(store.around).toStrictEqual({ ...AROUND, topo: false });
   });
 
   test("exports and imports map around", async () => {
     const store = setup();
-    await store.setAround(false);
+    await store.setAround(false, ["streets"]);
     expect(store.exportStores()).toStrictEqual({
-      style: "satellite",
+      maps: ["satellite"],
       opacities: OPAQUE,
-      around: false,
+      around: { ...AROUND, streets: false },
     });
-    await store.importStores({ style: "none" });
-    expect(store.around).toBe(true);
-    await store.importStores({ style: "none", around: false });
-    expect(store.around).toBe(false);
+    await store.importStores({ maps: [] });
+    expect(store.around).toStrictEqual(AROUND);
+    await store.importStores({ maps: [], around: { topo: false } });
+    expect(store.around).toStrictEqual({ ...AROUND, topo: false });
   });
 
   test("shows satellite on its own once georeferenced data arrives", async () => {
     const store = setup();
-    expect(store.style).toBe("satellite");
+    expect(store.maps).toStrictEqual(["satellite"]);
     // No setStyle call: a data change is enough to build the default map
     items.value = georeferenced().slice(0, 1);
     await nextTick();
@@ -462,7 +532,7 @@ describe("basemap store", () => {
       { id: "c", created_at: "3", crs: { authority: "EPSG", code: "32631", name: "UTM" } },
     ]);
     await nextTick();
-    await store.setStyle("satellite");
+    await store.setMaps(["satellite"]);
     // BOX_A only: c is in UTM
     const boxAParams: unknown = expect.objectContaining({
       bounds: { x_min: 0, x_max: 10, y_min: 0, y_max: 20 },

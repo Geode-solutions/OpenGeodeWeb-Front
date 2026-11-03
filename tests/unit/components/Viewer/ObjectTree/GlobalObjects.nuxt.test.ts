@@ -36,7 +36,7 @@ async function mountTree(withCrs: boolean): Promise<VueWrapper> {
   dataStore.refCrsItems = mockAs<typeof dataStore.refCrsItems>(() => ref(items));
   useCrsStore();
   // Calls through: without displayed data, a build only clears the basemap
-  vi.spyOn(useBasemapStore(), "setStyle");
+  vi.spyOn(useBasemapStore(), "setMaps");
   const dataStyleStore = useDataStyleStore();
   dataStyleStore.setVisibility = mockAs<typeof dataStyleStore.setVisibility>(
     vi.fn().mockResolvedValue(undefined),
@@ -74,13 +74,13 @@ describe("global objects basemap category", () => {
     expect(treeItems(wrapper).map(({ id }) => id)).not.toContain("basemap");
   });
 
-  test("a map eye shows that map alone, never as a data visibility", async () => {
+  test("a map eye adds that map, never as a data visibility", async () => {
     const wrapper = await mountTree(true);
     const treeviewStore = useTreeviewStore();
     await wrapper.get('[data-testid="topoEye"]').trigger("click");
     await flushPromises();
-    expect(useBasemapStore().setStyle).toHaveBeenCalledWith("topo");
-    expect(treeviewStore.selection).toStrictEqual(["basemap:topo"]);
+    expect(useBasemapStore().setMaps).toHaveBeenCalledWith(["satellite", "topo"]);
+    expect(treeviewStore.selection).toStrictEqual(["basemap:satellite", "basemap:topo"]);
     expect(useDataStyleStore().setVisibility).not.toHaveBeenCalled();
   });
 
@@ -90,7 +90,7 @@ describe("global objects basemap category", () => {
     const treeviewStore = useTreeviewStore();
     treeviewStore.selection = [];
     await flushPromises();
-    expect(useBasemapStore().setStyle).not.toHaveBeenCalled();
+    expect(useBasemapStore().setMaps).not.toHaveBeenCalled();
     expect(treeviewStore.selection).toStrictEqual(["basemap:satellite"]);
   });
 

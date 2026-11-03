@@ -34,7 +34,7 @@ import TetrahedralSolidTetrahedraOptions from "@ogw_front/components/Viewer/Tetr
 import TetrahedralSolidTrianglesOptions from "@ogw_front/components/Viewer/TetrahedralSolid/TrianglesOptions.vue";
 
 // Basemap components
-import BasemapAroundOptions from "@ogw_front/components/Viewer/Basemap/AroundOptions.vue";
+import BasemapCropOptions from "@ogw_front/components/Viewer/Basemap/CropOptions.vue";
 import BasemapOpacityOptions from "@ogw_front/components/Viewer/Basemap/OpacityOptions.vue";
 // Model components
 import ModelEdgesOptions from "@ogw_front/components/Viewer/Generic/Model/EdgesOptions.vue";
@@ -143,8 +143,8 @@ const menusData: Record<string, Record<string, MenuItems>> = {
     component: ModelComponent_menu,
   },
   basemap: {
-    Basemap: [BasemapAroundOptions],
-    Map: [BasemapOpacityOptions],
+    Basemap: [BasemapCropOptions],
+    Map: [BasemapOpacityOptions, BasemapCropOptions],
   },
 };
 
