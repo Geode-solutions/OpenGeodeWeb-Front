@@ -126,7 +126,12 @@ function handleHoverEnter({
 
   onHoverEnter(
     actualItem.id,
-    async () => (is_model ? await dataStore.getAllModelComponentsViewerIds(actualItem.id) : []),
+    async () => {
+      if (is_model) {
+        return await dataStore.getAllModelComponentsViewerIds(actualItem.id);
+      }
+      return [];
+    },
     is_model ? "model" : "mesh",
     immediate,
   );
@@ -182,7 +187,10 @@ function expandAll(): void {
       class="transparent-treeview virtual-tree-height"
       @update:selected="(val) => onUpdateSelection(val as string[])"
       @update:scroll-top="treeviewStore.setScrollTop(mainView?.id ?? '', $event)"
-      @hover:enter="({ item }) => handleHoverEnter({ item: item as unknown as TreeGroupItem })"
+      @hover:enter="
+        ({ item, immediate }) =>
+          handleHoverEnter({ item: item as unknown as TreeGroupItem, immediate })
+      "
       @hover:leave="({ item }) => handleHoverLeave({ item: item as unknown as TreeGroupItem })"
       @contextmenu="showMenu($event.event, $event.item as unknown as TreeGroupItem)"
     >
@@ -190,6 +198,7 @@ function expandAll(): void {
         <ObjectTreeItemLabel
           :item="item as unknown as DisplayItem"
           :is-leaf="isLeaf"
+          :show-crs="isLeaf"
           @contextmenu="showMenu($event, item as unknown as TreeGroupItem)"
         />
       </template>

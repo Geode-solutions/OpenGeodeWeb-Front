@@ -27,9 +27,12 @@ const dataStore = useDataStore();
 const hybridViewerStore = useHybridViewerStore();
 const selectedDatasetId = ref<string>();
 const sources = ref<AttributeSource[]>([]);
-const thresholds = computed<Threshold[]>(() =>
-  selectedDatasetId.value ? hybridViewerStore.getThresholds(selectedDatasetId.value) : [],
-);
+const thresholds = computed<Threshold[]>(() => {
+  if (!selectedDatasetId.value) {
+    return [];
+  }
+  return hybridViewerStore.getThresholds(selectedDatasetId.value);
+});
 const cards = useTemplateRef("cards");
 
 const allItems = dataStore.refAllItems();
@@ -132,7 +135,11 @@ watch(selectedDatasetId, async (id, previousId) => {
   if (previousId) {
     await clearThresholds(previousId);
   }
-  sources.value = id ? await fetchSources(id) : [];
+  if (id) {
+    sources.value = await fetchSources(id);
+  } else {
+    sources.value = [];
+  }
   if (id && hybridViewerStore.getThresholds(id).length === 0) {
     hybridViewerStore.addThreshold(id);
   }

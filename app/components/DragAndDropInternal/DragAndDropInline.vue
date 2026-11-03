@@ -59,12 +59,14 @@ const emit = defineEmits<Emits>();
       </v-sheet>
 
       <v-card-text class="pa-0">
-        <v-sheet class="text-h6 font-weight-bold text-white d-block mb-1 bg-transparent">
+        <v-sheet
+          class="text-headline-small font-weight-bold text-white d-block mb-1 bg-transparent"
+        >
           {{ loading ? texts.loading : isDragging ? texts.drop : texts.idle }}
         </v-sheet>
         <v-sheet
           v-if="accept && showExtensions"
-          class="text-body-2 text-white opacity-60 bg-transparent"
+          class="text-body-medium text-white opacity-60 bg-transparent"
         >
           {{ Array.isArray(accept) ? accept.join(", ") : accept }}
         </v-sheet>

@@ -70,15 +70,16 @@ const useHybridViewerHighlight = createSharedComposable(() => {
   const hoverHighlight = useDebounceFn((event: MouseEvent) => {
     const { genericRenderWindow } = useHybridViewerCore();
     const containerElement = genericRenderWindow.value?.getContainer();
-    const relativeMousePosition = containerElement
-      ? {
-          x: event.clientX - containerElement.getBoundingClientRect().left,
-          y: event.clientY - containerElement.getBoundingClientRect().top,
-        }
-      : {
-          x: event.clientX,
-          y: event.clientY,
-        };
+    let relativeMousePosition = {
+      x: event.clientX,
+      y: event.clientY,
+    };
+    if (containerElement) {
+      relativeMousePosition = {
+        x: event.clientX - containerElement.getBoundingClientRect().left,
+        y: event.clientY - containerElement.getBoundingClientRect().top,
+      };
+    }
     requestHoverHighlight(event, async (response) => {
       if (
         !is_hover_highlight.value ||

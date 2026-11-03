@@ -32,15 +32,18 @@ function newItemId(): number {
   return lastItemId;
 }
 const planes = ref<ClippingPlane[]>([{ id: newItemId(), origin: undefined, normal: [1, 0, 0] }]);
-const allItems = dataStore.refAllItems();
+const allItems = dataStore.refRegisteredItems();
 const sliceEnabled = ref<boolean>(false);
 const slices = ref<{ id: number; axis: SliceAxis; index: number }[]>([
   { id: newItemId(), axis: DEFAULT_SLICE_AXIS, index: 0 },
 ]);
 const sliceMaxIndices = ref<[number, number, number]>([0, 0, 0]);
-const targetIds = computed<string[]>(() =>
-  targetAllVisible.value ? allItems.value.map((item) => item.id) : selectedDatasetIds.value,
-);
+const targetIds = computed<string[]>(() => {
+  if (targetAllVisible.value) {
+    return allItems.value.map((item) => item.id);
+  }
+  return selectedDatasetIds.value;
+});
 const isAllGrid = computed<boolean>(() => areAllGrids(allItems.value, targetIds.value));
 const isSliceActive = computed<boolean>(() => isAllGrid.value && sliceEnabled.value);
 const availableDatasets = computed<{ title: string; value: string }[]>(() =>
@@ -97,6 +100,13 @@ async function applyClippingPlanes(): Promise<void> {
   }
 }
 
+function getSlicesPayload(isActive: boolean): { axis: SliceAxis; index: number }[] {
+  if (!isActive) {
+    return [];
+  }
+  return slices.value.map(({ axis, index }) => ({ axis, index }));
+}
+
 async function sendSlices(): Promise<void> {
   if (!isAllGrid.value && !areSlicesApplied) {
     return;
@@ -106,7 +116,7 @@ async function sendSlices(): Promise<void> {
   if (targetIds.value.length > 0) {
     const maxIndices = await hybridViewerStore.setSlice(
       targetIds.value,
-      isActive ? slices.value.map(({ axis, index }) => ({ axis, index })) : [],
+      getSlicesPayload(isActive),
     );
     if (isAllGrid.value) {
       sliceMaxIndices.value = maxIndices;

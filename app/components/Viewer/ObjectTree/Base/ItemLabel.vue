@@ -1,8 +1,12 @@
 <script setup lang="ts">
+import { formatCrs, formatCrsCode } from "@ogw_front/utils/crs";
+import ComponentRelations from "@ogw_front/components/Viewer/ObjectTree/Base/ComponentRelations.vue";
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import { middleTruncate } from "@ogw_front/utils/string";
 import { useClipboard } from "@vueuse/core";
+import { useCrsStore } from "@ogw_front/stores/crs";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
+import { useLiveDataItem } from "@ogw_front/composables/live_data_item";
 import { useResponsiveMiddleTruncate } from "@ogw_front/composables/responsive_middle_truncate";
 
 const feedbackStore = useFeedbackStore();
@@ -11,9 +15,11 @@ const { copy } = useClipboard();
 interface Props {
   item: DisplayItem;
   isLeaf?: boolean;
+  showCrs?: boolean;
+  modelId?: string;
 }
 
-const { item, isLeaf } = defineProps<Props>();
+const { item, isLeaf, showCrs = false, modelId = "" } = defineProps<Props>();
 
 interface Emits {
   contextmenu: [event: MouseEvent];
@@ -53,6 +59,40 @@ const tooltipTitle = computed<string>(() =>
   ),
 );
 
+const crsStore = useCrsStore();
+const tooltipOpen = ref(false);
+// Only top-level data carry a CRS: their stored item is read live, and only while the
+// Tooltip is open, so the rows of a long tree do not each keep a database query
+const dataItem = useLiveDataItem(() =>
+  showCrs && tooltipOpen.value ? actualItem.value.id : undefined,
+);
+const crsLabel = computed<string>(
+  () =>
+    middleTruncate(
+      formatCrs(dataItem.value?.crs),
+      TOOLTIP_NAME_MAX_LENGTH,
+      TOOLTIP_NAME_START_CHARS,
+      TOOLTIP_NAME_END_CHARS,
+    ) ?? "",
+);
+
+// Read from the store map: one database query for the whole tree, not one per row
+const mismatched = computed(() => showCrs && crsStore.mismatchedCrs.has(actualItem.value.id));
+const mismatchTooltip = computed<string>(() => {
+  const project = formatCrsCode(crsStore.projectCrs);
+  const crs = crsStore.mismatchedCrs.get(actualItem.value.id);
+  return crs === undefined
+    ? `No CRS, project in ${project}. Georeference it to show it on the map.`
+    : `In ${formatCrsCode(crs)}, project in ${project}. Convert it to show it on the map.`;
+});
+
+// The warning opens the CRS dialog of the data, when the app hosts it
+function editCrs(): void {
+  if (crsStore.crsEditEnabled) {
+    crsStore.requestCrsEdit(actualItem.value.id);
+  }
+}
+
 const tooltipDisabled = computed<boolean>(() => {
   if (actualItem.value.category !== undefined) {
     return false;
@@ -76,6 +116,7 @@ async function copyToClipboard(text: string, label: string): Promise<void> {
     class="tree-item-label-container w-100"
   >
     <v-tooltip
+      v-model="tooltipOpen"
       :disabled="tooltipDisabled"
       location="right"
       open-delay="400"
@@ -127,11 +168,47 @@ async function copyToClipboard(text: string, label: string): Promise<void> {
             <v-icon size="12">mdi-content-copy</v-icon>
           </v-btn>
         </span>
+        <span v-if="showCrs" class="text-caption d-flex align-center">
+          <strong class="text-white mr-1">CRS:</strong>
+          <span data-testid="tooltipCrsValue">{{ crsLabel }}</span>
+          <v-btn
+            v-if="crsStore.crsEditEnabled"
+            data-testid="editCrsBtn"
+            icon
+            variant="text"
+            density="compact"
+            class="ml-1 text-white"
+            style="width: 18px; height: 18px; min-width: 18px; min-height: 18px"
+            @click.stop="crsStore.requestCrsEdit(actualItem.id)"
+          >
+            <v-icon size="12">mdi-pencil</v-icon>
+          </v-btn>
+        </span>
         <span v-if="actualItem.is_active !== undefined" class="text-caption d-flex align-center">
           <strong class="text-white mr-1">Status:</strong>
           <i class="ml-1">{{ actualItem.is_active ? "Active" : "Inactive" }}</i>
         </span>
+        <ComponentRelations
+          v-if="modelId && actualItem.geode_id"
+          :model-id="modelId"
+          :component-id="actualItem.geode_id"
+        />
       </div>
+    </v-tooltip>
+    <v-tooltip v-if="mismatched" location="right">
+      <template #activator="{ props: warningProps }">
+        <v-icon
+          v-bind="warningProps"
+          data-testid="crsMismatchIcon"
+          icon="mdi-alert"
+          color="warning"
+          size="14"
+          class="ml-1 flex-shrink-0"
+          :class="{ 'cursor-pointer': crsStore.crsEditEnabled }"
+          @click.stop="editCrs"
+        />
+      </template>
+      {{ mismatchTooltip }}
     </v-tooltip>
   </div>
 </template>

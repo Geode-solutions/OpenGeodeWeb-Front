@@ -9,7 +9,8 @@ import {
   useHybridViewerZoomBox,
   viewportShapedBox,
 } from "@ogw_internal/stores/hybrid_viewer/zoom_box";
-import { getCameraOptions, useHybridViewerCamera } from "@ogw_internal/stores/hybrid_viewer/camera";
+import { getCameraOptions } from "@ogw_internal/stores/hybrid_viewer/camera_animation";
+import { useHybridViewerCamera } from "@ogw_internal/stores/hybrid_viewer/camera";
 import { useHybridViewerCore } from "@ogw_internal/stores/hybrid_viewer/core";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 

@@ -19,6 +19,18 @@ const { dataId = undefined, blockIds = undefined, x, y } = defineProps<Props>();
 const show = defineModel<boolean>("show", { default: false });
 
 const dataIdRef = computed<string>(() => dataId);
+function useAttributeStyle():
+  | ReturnType<typeof useGlobalAttributeStyle>
+  | ReturnType<typeof useModelAttributeStyle> {
+  if (blockIds === undefined) {
+    return useGlobalAttributeStyle(dataIdRef);
+  }
+  return useModelAttributeStyle(
+    dataIdRef,
+    computed<number[]>(() => blockIds),
+  );
+}
+
 // The parent keys this picker on the picked data: a mesh or a model, so the style is chosen once here
 const {
   currentColormap,
@@ -28,13 +40,7 @@ const {
   currentTimeSteps,
   currentTimeStep,
   loadTimeSteps,
-} =
-  blockIds === undefined
-    ? useGlobalAttributeStyle(dataIdRef)
-    : useModelAttributeStyle(
-        dataIdRef,
-        computed<number[]>(() => blockIds),
-      );
+} = useAttributeStyle();
 
 watch(show, async (isShown) => {
   if (isShown) {

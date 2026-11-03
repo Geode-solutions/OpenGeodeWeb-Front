@@ -61,9 +61,10 @@ export function useGlobalAttributeStyle(
     return MESH_ELEMENTS.flatMap((element) => {
       const coloring: unknown = style[element.styleKey]?.coloring;
       const activeColoring = isColoring(coloring) ? coloring.active : undefined;
-      return activeColoring !== undefined && ATTRIBUTE_COLORINGS.has(activeColoring)
-        ? [meshColoring(dataId, element, activeColoring)]
-        : [];
+      if (activeColoring !== undefined && ATTRIBUTE_COLORINGS.has(activeColoring)) {
+        return [meshColoring(dataId, element, activeColoring)];
+      }
+      return [];
     });
   });
 

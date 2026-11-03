@@ -70,6 +70,15 @@ interface ReadonlyTreeviewSnapshot {
   selection?: readonly (string | { id: string })[];
 }
 
+function snapshotSelectionIds(snapshot: ReadonlyTreeviewSnapshot | undefined): string[] {
+  if (snapshot?.selectionIds) {
+    return [...snapshot.selectionIds];
+  }
+  return (snapshot?.selection ?? []).map((selectionItem: string | { id: string }) =>
+    typeof selectionItem === "string" ? selectionItem : selectionItem.id,
+  );
+}
+
 // oxlint-disable-next-line max-lines-per-function, max-statements
 export const useTreeviewStore = defineStore("treeview", () => {
   const items = ref<TreeviewGroup[]>([]);
@@ -241,18 +250,16 @@ export const useTreeviewStore = defineStore("treeview", () => {
   }
 
   function importStores(snapshot: ReadonlyTreeviewSnapshot | undefined): void {
-    opened_views.value = snapshot?.opened_views
-      ? // oxlint-disable-next-line no-unsafe-type-assertion -- narrowing the readonly parameter view back to the mutable working type; these objects aren't actually frozen at runtime.
-        ([...snapshot.opened_views] as OpenedView[])
-      : defaultOpenedViews();
+    if (snapshot?.opened_views) {
+      // oxlint-disable-next-line no-unsafe-type-assertion -- narrowing the readonly parameter view back to the mutable working type; these objects aren't actually frozen at runtime.
+      opened_views.value = [...snapshot.opened_views] as OpenedView[];
+    } else {
+      opened_views.value = defaultOpenedViews();
+    }
     panelWidth.value = snapshot?.panelWidth ?? PANEL_WIDTH;
     additionalPanelWidth.value = snapshot?.additionalPanelWidth ?? PANEL_WIDTH;
-    rowHeights.value = snapshot?.rowHeights ? [...snapshot.rowHeights] : [];
-    pendingSelectionIds.value = snapshot?.selectionIds
-      ? [...snapshot.selectionIds]
-      : (snapshot?.selection ?? []).map((selectionItem: string | { id: string }) =>
-          typeof selectionItem === "string" ? selectionItem : selectionItem.id,
-        );
+    rowHeights.value = [...(snapshot?.rowHeights ?? [])];
+    pendingSelectionIds.value = snapshotSelectionIds(snapshot);
   }
 
   function finalizeImportSelection(): void {

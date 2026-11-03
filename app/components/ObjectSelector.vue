@@ -131,9 +131,12 @@ function resolvePerFile(allowedObjectsList: readonly AllowedObjectMap[]): boolea
   }
   const pending = loadable.filter((file) => file.selectedGeodeObject === undefined);
   resolvedTypes.value = Object.fromEntries(
-    loadable.flatMap((file) =>
-      file.selectedGeodeObject === undefined ? [] : [[file.filename, file.selectedGeodeObject]],
-    ),
+    loadable.flatMap((file) => {
+      if (file.selectedGeodeObject === undefined) {
+        return [];
+      }
+      return [[file.filename, file.selectedGeodeObject]];
+    }),
   );
   pendingFilenames.value = pending.map((file) => file.filename);
   skippedFiles.value = files

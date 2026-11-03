@@ -77,6 +77,25 @@ describe("feedback store", () => {
         vi.runAllTimers();
         expect(feedbackStore.feedbacks).toHaveLength(0);
       });
+
+      test("stores the action when given", () => {
+        const feedbackStore = useFeedbackStore();
+        const onClick = vi.fn<() => void>();
+        feedbackStore.add_warning("test description", { label: "Edit CRS", onClick });
+        const [feedback] = feedbackStore.feedbacks;
+        assertIsDefined(feedback);
+        expect(feedback.action?.label).toBe("Edit CRS");
+        feedback.action?.onClick();
+        expect(onClick).toHaveBeenCalledExactlyOnceWith();
+      });
+
+      test("has no action by default", () => {
+        const feedbackStore = useFeedbackStore();
+        feedbackStore.add_warning("test description");
+        const [feedback] = feedbackStore.feedbacks;
+        assertIsDefined(feedback);
+        expect(feedback).not.toHaveProperty("action");
+      });
     });
 
     describe("delete_feedback", () => {

@@ -69,11 +69,11 @@ const itemOptions = computed<{ title: string; value: number }[]>(() =>
   })),
 );
 const currentThresholdAttribute = computed<ThresholdAttribute | undefined>(() => {
+  if (!currentAttribute.value) {
+    return undefined;
+  }
   const attribute = {
-    name:
-      currentAttribute.value === undefined
-        ? undefined
-        : attributeArrayName(currentAttribute.value.attribute_name, currentTimeStep.value),
+    name: attributeArrayName(currentAttribute.value.attribute_name, currentTimeStep.value),
     location: currentSource.value?.location,
     item: attributeItem.value,
     minimum: minimum.value,

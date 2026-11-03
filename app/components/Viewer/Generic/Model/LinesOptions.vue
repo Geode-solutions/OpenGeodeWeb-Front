@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
-import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
@@ -13,6 +12,7 @@ interface Props {
   lineId?: string;
   targetLineIds: string[];
   collections?: CollectionComponent[];
+  activeTab?: string;
 }
 
 const {
@@ -20,23 +20,24 @@ const {
   lineId = undefined,
   targetLineIds,
   collections = undefined,
+  activeTab = undefined,
 } = defineProps<Props>();
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
-const referenceLineId = computed<string | undefined>(() =>
-  collections ? targetLineIds[0] : undefined,
-);
+const referenceLineId = computed(() => (collections ? targetLineIds[0] : undefined));
 
-const lineComponentIds = computed<string[]>(() => (lineId === undefined ? [] : [lineId]));
+const lineComponentIds = computed<string[]>(() => (lineId !== undefined && [lineId]) || []);
 
 // Visibility
 const linesVisibility = computed<boolean>({
-  get: () =>
-    collections
-      ? targetLineIds.every((id) => dataStyleStore.modelLineVisibility(modelId, id))
-      : dataStyleStore.modelComponentTypeVisibility(modelId, "Line"),
+  get: () => {
+    if (collections) {
+      return targetLineIds.every((id) => dataStyleStore.modelLineVisibility(modelId, id));
+    }
+    return dataStyleStore.modelComponentTypeVisibility(modelId, "Line");
+  },
   set: async (newValue) => {
     await dataStyleStore.setModelLinesVisibility(modelId, targetLineIds, newValue);
     hybridViewerStore.remoteRender();
@@ -391,7 +392,7 @@ const attributeSchemas = {
 </script>
 
 <template>
-  <OptionsSection title="Lines Options" class="mt-4" data-testid="modelComponentTypeOptions">
+  <div v-show="!activeTab || activeTab === 'type'" data-testid="modelComponentTypeOptions">
     <VisibilitySwitch data-testid="modelLinesVisibilitySwitch" v-model="linesVisibility" />
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
@@ -414,12 +415,11 @@ const attributeSchemas = {
       :schemas="attributeSchemas"
       :allowRandom="true"
     />
-  </OptionsSection>
+  </div>
 
-  <OptionsSection
+  <div
     v-if="lineId"
-    title="Component Options"
-    class="mt-4"
+    v-show="!activeTab || activeTab === 'component'"
     data-testid="modelComponentOptions"
   >
     <VisibilitySwitch v-model="lineVisibility" />
@@ -444,5 +444,5 @@ const attributeSchemas = {
       :schemas="attributeSchemas"
       :allowRandom="true"
     />
-  </OptionsSection>
+  </div>
 </template>

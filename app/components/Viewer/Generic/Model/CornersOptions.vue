@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
-import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
@@ -13,6 +12,7 @@ interface Props {
   cornerId?: string;
   targetCornerIds: string[];
   collections?: CollectionComponent[];
+  activeTab?: string;
 }
 
 const {
@@ -20,6 +20,7 @@ const {
   cornerId = undefined,
   targetCornerIds,
   collections = undefined,
+  activeTab = undefined,
 } = defineProps<Props>();
 
 const dataStyleStore = useDataStyleStore();
@@ -29,14 +30,16 @@ const referenceCornerId = computed<string | undefined>(() =>
   collections ? targetCornerIds[0] : undefined,
 );
 
-const cornerComponentIds = computed<string[]>(() => (cornerId === undefined ? [] : [cornerId]));
+const cornerComponentIds = computed<string[]>(() => (cornerId !== undefined && [cornerId]) || []);
 
 // Visibility
 const cornersVisibility = computed<boolean>({
-  get: () =>
-    collections
-      ? targetCornerIds.every((id) => dataStyleStore.modelCornerVisibility(modelId, id))
-      : dataStyleStore.modelComponentTypeVisibility(modelId, "Corner"),
+  get: () => {
+    if (collections) {
+      return targetCornerIds.every((id) => dataStyleStore.modelCornerVisibility(modelId, id));
+    }
+    return dataStyleStore.modelComponentTypeVisibility(modelId, "Corner");
+  },
   set: async (newValue) => {
     await dataStyleStore.setModelCornersVisibility(modelId, targetCornerIds, newValue);
     hybridViewerStore.remoteRender();
@@ -270,7 +273,7 @@ const attributeSchemas = {
 </script>
 
 <template>
-  <OptionsSection title="Corners Options" class="mt-4" data-testid="modelComponentTypeOptions">
+  <div v-show="!activeTab || activeTab === 'type'" data-testid="modelComponentTypeOptions">
     <VisibilitySwitch data-testid="modelCornersVisibilitySwitch" v-model="cornersVisibility" />
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
@@ -287,12 +290,11 @@ const attributeSchemas = {
       :schemas="attributeSchemas"
       :allowRandom="true"
     />
-  </OptionsSection>
+  </div>
 
-  <OptionsSection
+  <div
     v-if="cornerId"
-    title="Component Options"
-    class="mt-4"
+    v-show="!activeTab || activeTab === 'component'"
     data-testid="modelComponentOptions"
   >
     <VisibilitySwitch v-model="cornerVisibility" />
@@ -311,5 +313,5 @@ const attributeSchemas = {
       :schemas="attributeSchemas"
       :allowRandom="true"
     />
-  </OptionsSection>
+  </div>
 </template>

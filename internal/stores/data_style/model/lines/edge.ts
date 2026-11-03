@@ -321,16 +321,20 @@ function useModelLinesEdgeAttribute(): UseModelLinesEdgeAttributeReturn {
       reapplySameSeries(
         await dataStore.getLinesGeodeIds(modelId),
         lineIds,
-        (id) =>
-          modelLinesCommonStyle.modelLineColoring(modelId, id).active === "edge" &&
-          modelLinesEdgeAttributeName(modelId, id) === name
-            ? [
-                modelLinesEdgeAttributeItem(modelId, id),
-                modelLinesEdgeAttributeRange(modelId, id),
-                modelLinesEdgeAttributeColorMap(modelId, id),
-                JSON.stringify(modelLinesEdgeAttributeNoDataColor(modelId, id)),
-              ].join("|")
-            : undefined,
+        (id) => {
+          if (
+            modelLinesCommonStyle.modelLineColoring(modelId, id).active === "edge" &&
+            modelLinesEdgeAttributeName(modelId, id) === name
+          ) {
+            return [
+              modelLinesEdgeAttributeItem(modelId, id),
+              modelLinesEdgeAttributeRange(modelId, id),
+              modelLinesEdgeAttributeColorMap(modelId, id),
+              JSON.stringify(modelLinesEdgeAttributeNoDataColor(modelId, id)),
+            ].join("|");
+          }
+          return undefined;
+        },
         async (ids) => {
           await applyEdgeAttribute(modelId, ids);
         },

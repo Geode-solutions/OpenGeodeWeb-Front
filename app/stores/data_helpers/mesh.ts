@@ -39,7 +39,7 @@ function toFormattedComponent(meshComponent: ModelComponentRecord): FormattedCom
 }
 
 // oxlint-disable-next-line eslint/max-lines-per-function
-export function useDataMesh(): {
+function useDataMesh(): {
   formatedMeshComponents: typeof formatedMeshComponents;
   refFormatedMeshComponents: typeof refFormatedMeshComponents;
   getMeshComponentsByType: typeof getMeshComponentsByType;
@@ -167,4 +167,5 @@ export function useDataMesh(): {
   };
 }
 
+export { toFormattedComponent, useDataMesh };
 export type { ModelComponentRecord, FormattedComponent, FormattedComponentGroup };

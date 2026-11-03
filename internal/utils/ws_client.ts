@@ -25,13 +25,20 @@ function isVtkWSLinkClient(value: unknown): value is VtkWSLinkClient {
   );
 }
 
+function resolveClient(initialClient: unknown): VtkWSLinkClient {
+  if (isVtkWSLinkClient(initialClient)) {
+    return initialClient;
+  }
+  return newInstance();
+}
+
 async function initWebSocketClient(
   baseUrl: string,
   initialClient: unknown = {},
   { onConnectionClose }: WsClientCallbacks = {},
 ): Promise<VtkWSLinkClient> {
   vtkWSLinkClient.setSmartConnectClass(SmartConnect);
-  const client = isVtkWSLinkClient(initialClient) ? initialClient : newInstance();
+  const client = resolveClient(initialClient);
 
   client.onConnectionError((httpReq: WsConnectionEvent) => {
     const message = httpReq.response?.error ?? "Connection error";
