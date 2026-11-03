@@ -28,9 +28,12 @@ function newItemId(): number {
 }
 const planes = ref<ClippingPlane[]>([{ id: newItemId(), origin: undefined, normal: [1, 0, 0] }]);
 const allItems = dataStore.refRegisteredItems();
-const targetIds = computed<string[]>(() =>
-  targetAllVisible.value ? allItems.value.map((item) => item.id) : selectedDatasetIds.value,
-);
+const targetIds = computed<string[]>(() => {
+  if (targetAllVisible.value) {
+    return allItems.value.map((item) => item.id);
+  }
+  return selectedDatasetIds.value;
+});
 const availableDatasets = computed<{ title: string; value: string }[]>(() =>
   allItems.value.map((item) => ({
     title: item.name || item.id,

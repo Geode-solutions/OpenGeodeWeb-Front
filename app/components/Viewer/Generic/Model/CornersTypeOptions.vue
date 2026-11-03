@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import { MODEL_VERTEX_COLORING } from "@ogw_front/utils/model_component_coloring";
-import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
@@ -12,9 +11,15 @@ interface Props {
   modelId: string;
   targetCornerIds: string[];
   collections?: CollectionComponent[];
+  activeTab?: string;
 }
 
-const { modelId, targetCornerIds, collections = undefined } = defineProps<Props>();
+const {
+  modelId,
+  targetCornerIds,
+  collections = undefined,
+  activeTab = undefined,
+} = defineProps<Props>();
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
@@ -25,10 +30,12 @@ const referenceCornerId = computed<string | undefined>(() =>
 
 // Visibility
 const cornersVisibility = computed<boolean>({
-  get: () =>
-    collections
-      ? targetCornerIds.every((id) => dataStyleStore.modelCornerVisibility(modelId, id))
-      : dataStyleStore.modelComponentTypeVisibility(modelId, "Corner"),
+  get: () => {
+    if (collections) {
+      return targetCornerIds.every((id) => dataStyleStore.modelCornerVisibility(modelId, id));
+    }
+    return dataStyleStore.modelComponentTypeVisibility(modelId, "Corner");
+  },
   set: async (newValue) => {
     await dataStyleStore.setModelCornersVisibility(modelId, targetCornerIds, newValue);
     hybridViewerStore.remoteRender();
@@ -145,7 +152,7 @@ const { capabilities, schemas: attributeSchemas } = MODEL_VERTEX_COLORING;
 </script>
 
 <template>
-  <OptionsSection title="Corners Options" class="mt-4" data-testid="modelComponentTypeOptions">
+  <div v-show="!activeTab || activeTab === 'type'" data-testid="modelComponentTypeOptions">
     <VisibilitySwitch data-testid="modelCornersVisibilitySwitch" v-model="cornersVisibility" />
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
@@ -162,5 +169,5 @@ const { capabilities, schemas: attributeSchemas } = MODEL_VERTEX_COLORING;
       :schemas="attributeSchemas"
       :allowRandom="true"
     />
-  </OptionsSection>
+  </div>
 </template>

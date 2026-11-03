@@ -39,11 +39,12 @@ const {
   // oxlint-disable-next-line vue/max-props
 } = defineProps<Props>();
 
-const displayed_texts = computed<DragAndDropTexts>(() =>
-  directory
-    ? { ...texts, idle: "Click or drag and drop a folder", drop: "Drop the folder here" }
-    : texts,
-);
+const displayed_texts = computed<DragAndDropTexts>(() => {
+  if (directory) {
+    return { ...texts, idle: "Click or drag and drop a folder", drop: "Drop the folder here" };
+  }
+  return texts;
+});
 
 const emit = defineEmits<{
   "files-selected": [files: UploadFile[]];
@@ -55,6 +56,13 @@ const isDragging = ref(false);
 const isInternalDrag = ref(false);
 const dragCounter = ref(0);
 const fileInput = ref<HTMLInputElement | undefined>(undefined);
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return String(error);
+}
 
 function triggerFileDialog(): void {
   fileInput.value?.click();
@@ -87,7 +95,10 @@ async function emitDroppedEntries(entries: FileSystemEntry[]): Promise<void> {
       entries.map(async (entry) => {
         const files = await filesFromEntry(entry, entry.name);
         // Files inside a dropped folder are all needed: never filtered out.
-        return entry.isDirectory ? files : files.filter((file) => isFileAccepted(file, accept));
+        if (entry.isDirectory) {
+          return files;
+        }
+        return files.filter((file) => isFileAccepted(file, accept));
       }),
     );
     const files = groups.flat();
@@ -95,8 +106,7 @@ async function emitDroppedEntries(entries: FileSystemEntry[]): Promise<void> {
       emit("files-selected", files);
     }
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    emit("folder-read-error", message);
+    emit("folder-read-error", getErrorMessage(error));
   }
 }
 

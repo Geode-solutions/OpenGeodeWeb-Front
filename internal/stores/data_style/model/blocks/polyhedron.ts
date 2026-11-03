@@ -343,16 +343,20 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
       reapplySameSeries(
         await dataStore.getBlocksGeodeIds(modelId),
         blockIds,
-        (id) =>
-          modelBlocksCommonStyle.modelBlockColoring(modelId, id).active === "polyhedron" &&
-          modelBlocksPolyhedronAttributeName(modelId, id) === name
-            ? [
-                modelBlocksPolyhedronAttributeItem(modelId, id),
-                modelBlocksPolyhedronAttributeRange(modelId, id),
-                modelBlocksPolyhedronAttributeColorMap(modelId, id),
-                JSON.stringify(modelBlocksPolyhedronAttributeNoDataColor(modelId, id)),
-              ].join("|")
-            : undefined,
+        (id) => {
+          if (
+            modelBlocksCommonStyle.modelBlockColoring(modelId, id).active === "polyhedron" &&
+            modelBlocksPolyhedronAttributeName(modelId, id) === name
+          ) {
+            return [
+              modelBlocksPolyhedronAttributeItem(modelId, id),
+              modelBlocksPolyhedronAttributeRange(modelId, id),
+              modelBlocksPolyhedronAttributeColorMap(modelId, id),
+              JSON.stringify(modelBlocksPolyhedronAttributeNoDataColor(modelId, id)),
+            ].join("|");
+          }
+          return undefined;
+        },
         async (ids) => {
           reapplied = (await applyPolyhedronAttribute(modelId, ids)) || reapplied;
         },

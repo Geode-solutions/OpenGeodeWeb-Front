@@ -33,7 +33,10 @@ class Database extends BaseDatabase {
       for (const table of tempDb.tables) {
         const keyPath = table.schema.primKey.src;
         const indexes = table.schema.indexes.map((index) => index.src);
-        const parts = keyPath ? [keyPath, ...indexes] : indexes;
+        let parts = indexes;
+        if (keyPath) {
+          parts = [keyPath, ...indexes];
+        }
         currentStores[table.name] = parts.join(",");
       }
 

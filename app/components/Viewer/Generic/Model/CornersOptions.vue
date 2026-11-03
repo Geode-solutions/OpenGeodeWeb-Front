@@ -8,6 +8,7 @@ interface Props {
   cornerId?: string;
   targetCornerIds: string[];
   collections?: CollectionComponent[];
+  activeTab?: string;
 }
 
 const {
@@ -15,6 +16,7 @@ const {
   cornerId = undefined,
   targetCornerIds,
   collections = undefined,
+  activeTab = undefined,
 } = defineProps<Props>();
 </script>
 
@@ -23,10 +25,12 @@ const {
     :modelId="modelId"
     :targetCornerIds="targetCornerIds"
     :collections="collections"
+    :activeTab="activeTab"
   />
   <ViewerGenericModelCornerComponentOptions
     v-if="cornerId"
     :modelId="modelId"
     :cornerId="cornerId"
+    :activeTab="activeTab"
   />
 </template>

@@ -94,6 +94,13 @@ function useSliceSync(params: SliceSyncParams): {
   const queueSliceTask = createSliceQueue();
   let areSlicesApplied = false;
 
+  function getSlicesPayload(isActive: boolean): { axis: SliceAxis; index: number }[] {
+    if (!isActive) {
+      return [];
+    }
+    return slices.value.map(({ axis, index }) => ({ axis, index }));
+  }
+
   async function sendSlices(): Promise<void> {
     if (!isAllGrid.value && !areSlicesApplied) {
       return;
@@ -103,7 +110,7 @@ function useSliceSync(params: SliceSyncParams): {
     if (targetIds.value.length > 0) {
       const maxIndices = await hybridViewerStore.setSlice(
         targetIds.value,
-        isActive ? slices.value.map(({ axis, index }) => ({ axis, index })) : [],
+        getSlicesPayload(isActive),
       );
       if (isAllGrid.value) {
         sliceMaxIndices.value = maxIndices;

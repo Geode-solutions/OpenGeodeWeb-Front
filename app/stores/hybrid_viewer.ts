@@ -111,7 +111,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     const camera = renderer?.getActiveCamera();
     return {
       zScale: sceneStore.zScale.value,
-      camera_options: (camera ? getCameraOptions(camera) : undefined) ?? cameraStore.camera_options,
+      camera_options: (camera && getCameraOptions(camera)) ?? cameraStore.camera_options,
     };
   }
 

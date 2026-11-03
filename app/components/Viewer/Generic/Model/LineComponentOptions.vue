@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { MODEL_LINE_COLORING } from "@ogw_front/utils/model_component_coloring";
-import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
@@ -10,14 +9,15 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 interface Props {
   modelId: string;
   lineId?: string;
+  activeTab?: string;
 }
 
-const { modelId, lineId = undefined } = defineProps<Props>();
+const { modelId, lineId = undefined, activeTab = undefined } = defineProps<Props>();
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
-const lineComponentIds = computed<string[]>(() => (lineId === undefined ? [] : [lineId]));
+const lineComponentIds = computed<string[]>(() => (lineId !== undefined && [lineId]) || []);
 
 const lineVisibility = computed<boolean | undefined>({
   get: () => dataStyleStore.modelLineVisibility(modelId, lineId) as boolean | undefined,
@@ -191,7 +191,7 @@ const { capabilities, schemas: attributeSchemas } = MODEL_LINE_COLORING;
 </script>
 
 <template>
-  <OptionsSection title="Component Options" class="mt-4" data-testid="modelComponentOptions">
+  <div v-show="!activeTab || activeTab === 'component'" data-testid="modelComponentOptions">
     <VisibilitySwitch v-model="lineVisibility" />
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
@@ -214,5 +214,5 @@ const { capabilities, schemas: attributeSchemas } = MODEL_LINE_COLORING;
       :schemas="attributeSchemas"
       :allowRandom="true"
     />
-  </OptionsSection>
+  </div>
 </template>

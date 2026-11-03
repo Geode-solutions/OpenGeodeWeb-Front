@@ -90,9 +90,10 @@ const exportProjectBlob = new Blob(["veasecontent"], { type: "application/octet-
 const backStoreMock = {
   request: vi.fn(async ({ schema }: { schema: { $id: string } }) => {
     await Promise.resolve();
-    return schema.$id === backSchemas.opengeodeweb_back.export_project.$id
-      ? exportProjectBlob
-      : { snapshot: snapshotMock };
+    if (schema.$id === backSchemas.opengeodeweb_back.export_project.$id) {
+      return exportProjectBlob;
+    }
+    return { snapshot: snapshotMock };
   }),
 };
 const infraStoreMock = {

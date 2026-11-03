@@ -15,8 +15,20 @@ interface FlattenContext {
   getChildrenOf: (item: TreeItem) => TreeItem[] | undefined;
 }
 
+function matchesSearch(ctx: FlattenContext, item: TreeItem, id: unknown, search: string): boolean {
+  const { customFilter } = ctx.props.value;
+  if (customFilter) {
+    return customFilter(id, search, { raw: item });
+  }
+  const lowerSearch = search.toLowerCase();
+  return (
+    toDisplayString(item[ctx.actualItemProps.value.title]).toLowerCase().includes(lowerSearch) ||
+    toDisplayString(id).toLowerCase().includes(lowerSearch)
+  );
+}
+
 function flattenTree(ctx: FlattenContext, nodes: readonly TreeItem[], depth = 0): DisplayItem[] {
-  const { search, customFilter } = ctx.props.value;
+  const { search } = ctx.props.value;
   const result: DisplayItem[] = [];
 
   for (const item of nodes) {
@@ -28,12 +40,7 @@ function flattenTree(ctx: FlattenContext, nodes: readonly TreeItem[], depth = 0)
     const isActive = ctx.activeSet.value.has(id);
 
     if (search !== undefined && search !== "") {
-      const lowerSearch = search.toLowerCase();
-      const matches = customFilter
-        ? customFilter(id, search, { raw: item })
-        : toDisplayString(item[ctx.actualItemProps.value.title])
-            .toLowerCase()
-            .includes(lowerSearch) || toDisplayString(id).toLowerCase().includes(lowerSearch);
+      const matches = matchesSearch(ctx, item, id, search);
 
       if (hasChildren) {
         const subtree = flattenTree(ctx, children ?? [], depth + 1);

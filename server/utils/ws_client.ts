@@ -31,7 +31,20 @@ function rawDataToBlob(raw: WebSocket.RawData): Blob {
   if (raw instanceof ArrayBuffer) {
     return new Blob([raw]);
   }
-  return new Blob([Uint8Array.from(Array.isArray(raw) ? Buffer.concat(raw) : raw)]);
+  if (Array.isArray(raw)) {
+    return new Blob([Uint8Array.from(Buffer.concat(raw))]);
+  }
+  return new Blob([Uint8Array.from(raw)]);
+}
+
+function findPendingCall(
+  pending: ReadonlyMap<string, PendingCall>,
+  id: string | undefined,
+): PendingCall | undefined {
+  if (id === undefined) {
+    return undefined;
+  }
+  return pending.get(id);
 }
 
 interface ServerWsRpcClient {
@@ -98,7 +111,7 @@ function createServerWsRpcClient(baseUrl: string): ServerWsRpcClient {
         return;
       }
 
-      const entry = message.id === undefined ? undefined : pending.get(message.id);
+      const entry = findPendingCall(pending, message.id);
       if (!entry || message.id === undefined) {
         return;
       }

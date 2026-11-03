@@ -74,9 +74,12 @@ const commitSeriesTimeStep = useSeriesTimeStepCommit(
 
 const { rangeMin, rangeMax } = useAttributeRangeBounds(attributeRange);
 
-const componentItems = computed<{ title: string; value: number }[]>(() =>
-  currentAttribute.value ? attributeItemOptions(currentAttribute.value.nb_items) : [],
-);
+const componentItems = computed<{ title: string; value: number }[]>(() => {
+  if (currentAttribute.value) {
+    return attributeItemOptions(currentAttribute.value.nb_items);
+  }
+  return [];
+});
 
 function hasSelectedComponent(components: unknown): boolean {
   return Array.isArray(components) && components.length > 0;
@@ -87,24 +90,35 @@ function requestParams(): { id: string; component_ids?: string[] } | undefined {
   if (schemaProperties?.component_ids === undefined) {
     return { id };
   }
-  return hasSelectedComponent(componentIds) ? { id, component_ids: componentIds } : undefined;
+  if (!hasSelectedComponent(componentIds)) {
+    return undefined;
+  }
+  return { id, component_ids: componentIds };
+}
+
+function getRangeTargets(
+  name: string,
+): [string, { id: string; component_ids?: string[] } | undefined][] {
+  if (groupTargetIds.value) {
+    return [...attributesPerTarget]
+      .filter(([, targetAttributes]) =>
+        targetAttributes.some((attribute) => attribute.attribute_name === name),
+      )
+      .map(([targetId]) => [targetId, { id: targetId }]);
+  }
+  return [[id, requestParams()]];
 }
 
 // Ranges are computed by the back for the selected attribute only, as scanning every step of every series is slow
 async function requestRanges(name: string): Promise<void> {
-  const targets: [string, { id: string; component_ids?: string[] } | undefined][] =
-    groupTargetIds.value
-      ? [...attributesPerTarget]
-          .filter(([, targetAttributes]) =>
-            targetAttributes.some((attribute) => attribute.attribute_name === name),
-          )
-          .map(([targetId]) => [targetId, { id: targetId }])
-      : [[id, requestParams()]];
+  const targets = getRangeTargets(name);
   const entries = await Promise.all(
-    targets.map(async ([targetId, params]): Promise<[string, AttributeRangeInfo | undefined]> => [
-      targetId,
-      params ? await fetchAttributeRange(schemas.range, params, name) : undefined,
-    ]),
+    targets.map(async ([targetId, params]): Promise<[string, AttributeRangeInfo | undefined]> => {
+      if (!params) {
+        return [targetId, undefined];
+      }
+      return [targetId, await fetchAttributeRange(schemas.range, params, name)];
+    }),
   );
   if (rangesName !== name) {
     return;

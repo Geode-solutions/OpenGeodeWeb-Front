@@ -28,7 +28,10 @@ function toHookArray<Hook>(hooks: Hook | Hook[] | undefined): Hook[] {
   if (Array.isArray(hooks)) {
     return hooks;
   }
-  return hooks === undefined ? [] : [hooks];
+  if (hooks === undefined) {
+    return [];
+  }
+  return [hooks];
 }
 
 // Builds a minimal, real `FetchResponse` (a `Response` with an attached `_data`) so

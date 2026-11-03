@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { MODEL_VERTEX_COLORING } from "@ogw_front/utils/model_component_coloring";
-import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
@@ -10,14 +9,15 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 interface Props {
   modelId: string;
   cornerId?: string;
+  activeTab?: string;
 }
 
-const { modelId, cornerId = undefined } = defineProps<Props>();
+const { modelId, cornerId = undefined, activeTab = undefined } = defineProps<Props>();
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
-const cornerComponentIds = computed<string[]>(() => (cornerId === undefined ? [] : [cornerId]));
+const cornerComponentIds = computed<string[]>(() => (cornerId !== undefined && [cornerId]) || []);
 
 const cornerVisibility = computed<boolean | undefined>({
   get: () => dataStyleStore.modelCornerVisibility(modelId, cornerId) as boolean | undefined,
@@ -124,7 +124,7 @@ const { capabilities, schemas: attributeSchemas } = MODEL_VERTEX_COLORING;
 </script>
 
 <template>
-  <OptionsSection title="Component Options" class="mt-4" data-testid="modelComponentOptions">
+  <div v-show="!activeTab || activeTab === 'component'" data-testid="modelComponentOptions">
     <VisibilitySwitch v-model="cornerVisibility" />
     <ViewerOptionsColoringTypeSelector
       :id="modelId"
@@ -141,5 +141,5 @@ const { capabilities, schemas: attributeSchemas } = MODEL_VERTEX_COLORING;
       :schemas="attributeSchemas"
       :allowRandom="true"
     />
-  </OptionsSection>
+  </div>
 </template>

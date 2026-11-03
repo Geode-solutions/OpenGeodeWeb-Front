@@ -78,7 +78,10 @@ function useAttributeColoringStyle(colorings: Ref<AttributeColoring[]>): Attribu
 
   const currentColormap = computed((): string => {
     const [coloring] = colorings.value;
-    return coloring ? String(coloring.read("ColorMap")) : "batlow";
+    if (!coloring) {
+      return "batlow";
+    }
+    return String(coloring.read("ColorMap"));
   });
 
   async function applyGlobalColormap(colorMap: string): Promise<void> {
@@ -152,7 +155,10 @@ function useAttributeColoringStyle(colorings: Ref<AttributeColoring[]>): Attribu
   const currentTimeStep = computed<number>({
     get(): number {
       const coloring = temporalColoring.value;
-      return coloring ? Number(coloring.read("TimeStep") ?? 0) : 0;
+      if (!coloring) {
+        return 0;
+      }
+      return Number(coloring.read("TimeStep") ?? 0);
     },
     // Setter cannot be async (see `currentRange`), so the write is delegated.
     set: (step: number): void => {

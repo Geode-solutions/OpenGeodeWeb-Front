@@ -8,6 +8,7 @@ interface Props {
   lineId?: string;
   targetLineIds: string[];
   collections?: CollectionComponent[];
+  activeTab?: string;
 }
 
 const {
@@ -15,6 +16,7 @@ const {
   lineId = undefined,
   targetLineIds,
   collections = undefined,
+  activeTab = undefined,
 } = defineProps<Props>();
 </script>
 
@@ -23,6 +25,12 @@ const {
     :modelId="modelId"
     :targetLineIds="targetLineIds"
     :collections="collections"
+    :activeTab="activeTab"
   />
-  <ViewerGenericModelLineComponentOptions v-if="lineId" :modelId="modelId" :lineId="lineId" />
+  <ViewerGenericModelLineComponentOptions
+    v-if="lineId"
+    :modelId="modelId"
+    :lineId="lineId"
+    :activeTab="activeTab"
+  />
 </template>
