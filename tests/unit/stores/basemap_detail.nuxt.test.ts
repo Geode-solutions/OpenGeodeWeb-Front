@@ -210,8 +210,11 @@ describe("basemap detail store", () => {
     Object.assign(hybridViewerStore.camera_options, TOP_VIEW);
     hybridViewerStore.is_moving = false;
     hybridViewerStore.zScale = 1;
+    // Same shape as the store: a holder with the render window in its value
     hybridViewerStore.genericRenderWindow = mockAs<typeof hybridViewerStore.genericRenderWindow>({
-      getApiSpecificRenderWindow: () => ({ getSize: (): [number, number] => [1000, 800] }),
+      value: {
+        getApiSpecificRenderWindow: () => ({ getSize: (): [number, number] => [1000, 800] }),
+      },
     });
     const basemap = useBasemapStore();
     const detail = useBasemapDetailStore();

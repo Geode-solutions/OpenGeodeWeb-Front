@@ -71,9 +71,9 @@ export const useBasemapDetailStore = defineStore("basemapDetail", () => {
   }
 
   function viewportSize(): [number, number] | undefined {
-    // Pinia unwraps the ref: the vtk.js typing of the render window is lost on the way
+    // The store holds the render window in a holder: the vtk.js typing of its API is partial
     // oxlint-disable-next-line no-unsafe-type-assertion -- vtk.js render window API boundary
-    const renderWindow = hybridViewerStore.genericRenderWindow as unknown as
+    const renderWindow = hybridViewerStore.genericRenderWindow.value as unknown as
       | RenderWindowLike
       | undefined;
     const size = renderWindow?.getApiSpecificRenderWindow().getSize();
@@ -245,8 +245,11 @@ export const useBasemapDetailStore = defineStore("basemapDetail", () => {
   async function refreshQuietly(): Promise<void> {
     try {
       await refresh();
-    } catch {
-      // Nothing more to do
+    } catch (error) {
+      // Request failures are shown by the request feedback; logged too, so a programming error
+      // Is never hidden
+      // oxlint-disable-next-line no-console -- no other channel for an error nobody awaits
+      console.error("Basemap detail refresh failed", error);
     }
   }
 
