@@ -61,6 +61,10 @@ function treeItems(wrapper: VueWrapper): { id: string }[] {
   return mockAs<{ id: string }[]>(wrapper.getComponent({ name: "CommonTreeView" }).props("items"));
 }
 
+function treeSelection(wrapper: VueWrapper): string[] {
+  return mockAs<string[]>(wrapper.getComponent({ name: "CommonTreeView" }).props("selected"));
+}
+
 describe("global objects basemap category", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
@@ -69,7 +73,9 @@ describe("global objects basemap category", () => {
   test("comes first once data is in the project crs", async () => {
     const wrapper = await mountTree(true);
     expect(treeItems(wrapper)[0]?.id).toBe("basemap");
-    expect(useTreeviewStore().selection).toStrictEqual(["basemap:satellite"]);
+    expect(treeSelection(wrapper)).toStrictEqual(["basemap:satellite"]);
+    // The data selection, saved with the project, never holds the basemap rows
+    expect(useTreeviewStore().selection).toStrictEqual([]);
   });
 
   test("is absent without data in a crs", async () => {
@@ -83,18 +89,9 @@ describe("global objects basemap category", () => {
     await wrapper.get('[data-testid="routesEye"]').trigger("click");
     await flushPromises();
     expect(useBasemapStore().setMaps).toHaveBeenCalledWith(["satellite", "routes"]);
-    expect(treeviewStore.selection).toStrictEqual(["basemap:satellite", "basemap:routes"]);
+    expect(treeSelection(wrapper)).toStrictEqual(["basemap:satellite", "basemap:routes"]);
+    expect(treeviewStore.selection).toStrictEqual([]);
     expect(useDataStyleStore().setVisibility).not.toHaveBeenCalled();
-  });
-
-  // Clear and import rewrite the selection with data only: the basemap stays as it is
-  test("a selection written without basemap rows keeps the basemap", async () => {
-    await mountTree(true);
-    const treeviewStore = useTreeviewStore();
-    treeviewStore.selection = [];
-    await flushPromises();
-    expect(useBasemapStore().setMaps).not.toHaveBeenCalled();
-    expect(treeviewStore.selection).toStrictEqual(["basemap:satellite"]);
   });
 
   test("right click on a map opens the basemap menu", async () => {

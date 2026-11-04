@@ -1,4 +1,6 @@
-type Vector3 = [number, number, number];
+import { cross, multiplyAccumulate, normalize, subtract } from "@kitware/vtk.js/Common/Core/Math";
+import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types";
+import type { Vector3 } from "@kitware/vtk.js/types";
 
 interface MapBounds {
   x_min: number;
@@ -7,13 +9,16 @@ interface MapBounds {
   y_max: number;
 }
 
-interface ViewCamera {
-  position: Vector3;
-  focal_point: Vector3;
-  view_up: Vector3;
-  view_angle: number;
-  distance: number;
+// A map built by the back: its area and its number of tile columns
+interface MapGrid {
+  bounds: MapBounds;
+  columns: number;
 }
+
+type ViewCamera = Pick<
+  CameraOptions,
+  "position" | "focal_point" | "view_up" | "view_angle" | "distance"
+>;
 
 // About one tile level (x2): the map changes by steps, not at every small move
 const DETAIL_RATIO = 1.5;
@@ -21,25 +26,9 @@ const TILE_SIZE = 256;
 const DEGREES = 180;
 const HALF = 2;
 
-function sub(first: Vector3, second: Vector3): Vector3 {
-  return [first[0] - second[0], first[1] - second[1], first[2] - second[2]];
-}
-
-function add(first: Vector3, second: Vector3, scale: number): Vector3 {
-  return [first[0] + second[0] * scale, first[1] + second[1] * scale, first[2] + second[2] * scale];
-}
-
-function cross(first: Vector3, second: Vector3): Vector3 {
-  return [
-    first[1] * second[2] - first[2] * second[1],
-    first[2] * second[0] - first[0] * second[2],
-    first[0] * second[1] - first[1] * second[0],
-  ];
-}
-
-function normalized(vector: Vector3): Vector3 {
-  const length = Math.hypot(...vector);
-  return [vector[0] / length, vector[1] / length, vector[2] / length];
+// The ground size of one pixel of the map
+function mapResolution(grid: MapGrid): number {
+  return (grid.bounds.x_max - grid.bounds.x_min) / (grid.columns * TILE_SIZE);
 }
 
 // Where a corner ray meets the map plane, or, past the horizon, the base edge in its direction
@@ -64,9 +53,11 @@ function visibleMapArea(
   planeZ: number,
   base: MapBounds,
 ): MapBounds | undefined {
-  const forward = normalized(sub(camera.focal_point, camera.position));
-  const right = normalized(cross(forward, camera.view_up));
-  const upward = cross(right, forward);
+  const forward = subtract(camera.focal_point, camera.position, [0, 0, 0]);
+  normalize(forward);
+  const right = cross(forward, camera.view_up, [0, 0, 0]);
+  normalize(right);
+  const upward = cross(right, forward, [0, 0, 0]);
   const halfHeight = Math.tan((camera.view_angle * Math.PI) / DEGREES / HALF);
   const halfWidth = halfHeight * aspect;
   const reach = Math.hypot(base.x_max - base.x_min, base.y_max - base.y_min);
@@ -75,12 +66,9 @@ function visibleMapArea(
     [1, -1],
     [1, 1],
     [-1, 1],
-  ].map(([column, row]) => {
-    const direction = add(
-      add(forward, right, (column ?? 0) * halfWidth),
-      upward,
-      (row ?? 0) * halfHeight,
-    );
+  ].map(([column = 0, row = 0]) => {
+    const direction = multiplyAccumulate(forward, right, column * halfWidth, [0, 0, 0]);
+    multiplyAccumulate(direction, upward, row * halfHeight, direction);
     return groundPoint(camera.position, direction, planeZ, reach);
   });
   const xValues = corners.map((corner) => corner[0]);
@@ -110,7 +98,6 @@ function needsSharperMap(baseResolution: number, wanted: number): boolean {
   return baseResolution > DETAIL_RATIO * wanted;
 }
 
-// A detail map stays while the view keeps within its area and its step of resolution
 // Whether the map area covers the whole visible area
 function covers(area: MapBounds, visible: MapBounds): boolean {
   return (
@@ -121,12 +108,9 @@ function covers(area: MapBounds, visible: MapBounds): boolean {
   );
 }
 
-function stillSharp(
-  detail: { bounds: MapBounds; columns: number },
-  visible: MapBounds,
-  wanted: number,
-): boolean {
-  const resolution = (detail.bounds.x_max - detail.bounds.x_min) / (detail.columns * TILE_SIZE);
+// A detail map stays while the view keeps within its area and its step of resolution
+function stillSharp(detail: MapGrid, visible: MapBounds, wanted: number): boolean {
+  const resolution = mapResolution(detail);
   return (
     covers(detail.bounds, visible) &&
     resolution <= wanted * DETAIL_RATIO &&
@@ -134,5 +118,12 @@ function stillSharp(
   );
 }
 
-export type { MapBounds, ViewCamera };
-export { covers, needsSharperMap, screenPixelGroundSize, stillSharp, visibleMapArea };
+export type { MapBounds, MapGrid, ViewCamera };
+export {
+  covers,
+  mapResolution,
+  needsSharperMap,
+  screenPixelGroundSize,
+  stillSharp,
+  visibleMapArea,
+};

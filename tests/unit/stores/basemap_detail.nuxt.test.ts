@@ -33,7 +33,6 @@ const FIRST_DATA = "a";
 const DETAIL_MARGIN = 50;
 const DETAIL_COLUMNS = 5;
 const DETAIL_ZOOM = 18;
-const MAPS = [{ map: "satellite", sources: ["eox_s2cloudless_2016"] }];
 
 interface Bounds {
   x_min: number;
@@ -51,7 +50,7 @@ interface ViewerRequest {
 }
 interface BuildRequest {
   schema: { $id: string };
-  params: { margin?: boolean; bounds: Bounds };
+  params: { margin?: boolean; bounds: Bounds; maps: string[] };
 }
 
 async function flush(): Promise<void> {
@@ -105,6 +104,11 @@ function layersOf(requests: ViewerRequest[], id: string): ViewerRequest[] {
   );
 }
 
+// The back builds the requested maps
+function builtMaps(request: BuildRequest): { map: string; sources: string[] }[] {
+  return request.params.maps.map((map) => ({ map, sources: [] }));
+}
+
 describe("basemap detail store", () => {
   let backRequest = vi.fn();
   let deleteRequest = vi.fn();
@@ -112,30 +116,33 @@ describe("basemap detail store", () => {
   let deregisterObject = vi.fn();
   let slowDetail: PromiseWithResolvers<unknown> | undefined = undefined;
 
-  function baseResponse(counters: Counters, baseColumns: number): Record<string, unknown> {
+  function baseResponse(
+    counters: Counters,
+    baseColumns: number,
+    request: BuildRequest,
+  ): Record<string, unknown> {
     counters.base += 1;
     return {
       id: `basemap-${counters.base}`,
-      tiles_folder: "tiles",
       columns: baseColumns,
       rows: baseColumns,
       zoom: 14,
       bounds: BASE_BOUNDS,
       attribution: "test",
-      maps: MAPS,
+      maps: builtMaps(request),
     };
   }
 
   // The back widens the requested area to whole tiles
   function detailResponse(
     counters: Counters,
-    bounds: Bounds,
+    request: BuildRequest,
     zoom: number,
   ): Record<string, unknown> {
+    const { bounds } = request.params;
     counters.detail += 1;
     return {
       id: `detail-${counters.detail}`,
-      tiles_folder: "tiles",
       columns: DETAIL_COLUMNS,
       rows: DETAIL_COLUMNS,
       zoom,
@@ -146,7 +153,7 @@ describe("basemap detail store", () => {
         y_max: bounds.y_max + DETAIL_MARGIN,
       },
       attribution: "test",
-      maps: MAPS,
+      maps: builtMaps(request),
     };
   }
 
@@ -178,11 +185,11 @@ describe("basemap detail store", () => {
         }
         await buildSpy(request);
         if (request.params.margin !== false) {
-          return baseResponse(counters, baseColumns);
+          return baseResponse(counters, baseColumns, request);
         }
         const response = detailResponse(
           counters,
-          request.params.bounds,
+          request,
           options.detailZooms?.[counters.detail] ?? DETAIL_ZOOM,
         );
         if (slowDetail !== undefined) {
@@ -349,7 +356,7 @@ describe("basemap detail store", () => {
     expect(deleteRequest).not.toHaveBeenCalled();
   });
 
-  test("no finer zoom: the next rests of the same view build nothing", async () => {
+  test("no finer zoom: the same view builds nothing, a closer view asks again", async () => {
     const { detail } = await setupWithBase({ detailZooms: [14] });
     await vi.advanceTimersByTimeAsync(REST_DELAY);
     expect(detail.detailId).toBeUndefined();
@@ -357,12 +364,6 @@ describe("basemap detail store", () => {
     panCameraSlightly();
     await vi.advanceTimersByTimeAsync(REST_DELAY);
     expect(backRequest).not.toHaveBeenCalled();
-  });
-
-  test("a remembered step never hides a view that needs a finer map", async () => {
-    await setupWithBase({ detailZooms: [14] });
-    await vi.advanceTimersByTimeAsync(REST_DELAY);
-    backRequest.mockClear();
     zoomCamera(0.4);
     await vi.advanceTimersByTimeAsync(REST_DELAY);
     const params: unknown = expect.objectContaining({ margin: false });
@@ -380,5 +381,21 @@ describe("basemap detail store", () => {
     expect(deleteRequest).toHaveBeenCalledWith(
       expect.objectContaining({ params: { id: "detail-1" } }),
     );
+  });
+
+  test("a map shown again but missing from the detail drops it", async () => {
+    const { basemap, detail } = await setupWithBase();
+    await basemap.setMaps(["satellite", "plan"]);
+    // Plan stays in the base: hiding it only recomposes, and the next detail is built without it
+    await basemap.setMaps(["satellite"]);
+    await vi.advanceTimersByTimeAsync(REST_DELAY);
+    expect(detail.detailId).toBe("detail-1");
+    backRequest.mockClear();
+    await basemap.setMaps(["satellite", "plan"]);
+    await flush();
+    expect(detail.detailId).toBeUndefined();
+    await vi.advanceTimersByTimeAsync(REST_DELAY);
+    const params: unknown = expect.objectContaining({ maps: ["satellite", "plan"], margin: false });
+    expect(backRequest).toHaveBeenCalledWith(expect.objectContaining({ params }));
   });
 });

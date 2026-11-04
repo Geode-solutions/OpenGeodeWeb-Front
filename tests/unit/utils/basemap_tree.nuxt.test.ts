@@ -6,7 +6,6 @@ import {
   mapStyleOf,
   nextBasemapMaps,
   sortedMaps,
-  withBasemapSelection,
 } from "@ogw_front/utils/basemap_tree";
 import { describe, expect, test } from "vitest";
 
@@ -33,16 +32,6 @@ describe("basemap tree", () => {
     expect(isBasemapId("basemap")).toBe(true);
     expect(isBasemapId("basemap:plan")).toBe(true);
     expect(isBasemapId("a1b2")).toBe(false);
-  });
-
-  test("the selection shows the visible maps", () => {
-    const selection = ["a", "basemap:routes", "basemap"];
-    expect(withBasemapSelection(selection, ["satellite", "plan"])).toStrictEqual([
-      "a",
-      "basemap:satellite",
-      "basemap:plan",
-    ]);
-    expect(withBasemapSelection(["a", "basemap:routes"], [])).toStrictEqual(["a"]);
   });
 
   test("checking a map adds it, in the stacking order", () => {

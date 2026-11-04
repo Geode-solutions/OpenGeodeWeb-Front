@@ -1,5 +1,4 @@
 type MapStyle = "satellite" | "plan" | "routes";
-type BasemapStyle = "none" | MapStyle;
 
 interface BasemapTreeGroup {
   id: string;
@@ -42,12 +41,6 @@ function basemapGroup(): BasemapTreeGroup {
   };
 }
 
-// The tree selection shows the basemap state: the visible maps
-function withBasemapSelection(selection: readonly string[], maps: readonly MapStyle[]): string[] {
-  const data = selection.filter((id) => !isBasemapId(id));
-  return [...data, ...maps.map((style) => mapId(style))];
-}
-
 // Each map eye shows or hides its map. The classic tree adds the group and every map on a
 // Group click: that click hides the visible maps, or shows the last visible maps again
 function nextBasemapMaps(
@@ -70,7 +63,7 @@ function nextBasemapMaps(
   return sortedMaps([...current, ...addedMaps].filter((style) => !removedMaps.includes(style)));
 }
 
-export type { BasemapStyle, BasemapTreeGroup, MapStyle };
+export type { MapStyle };
 export {
   BASEMAP_GROUP_ID,
   MAP_STYLES,
@@ -80,5 +73,4 @@ export {
   mapStyleOf,
   nextBasemapMaps,
   sortedMaps,
-  withBasemapSelection,
 };

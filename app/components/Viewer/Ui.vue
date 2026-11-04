@@ -12,6 +12,7 @@ import type { TreeMenuPayload } from "@ogw_front/utils/treeview";
 import ViewerContextMenu from "@ogw_front/components/Viewer/ContextMenu/ContextMenu.vue";
 import ViewerObjectTreeLayout from "@ogw_front/components/Viewer/ObjectTree/Layout.vue";
 import { getCurrentInstance } from "vue";
+import { useBasemapDetailStore } from "@ogw_front/stores/basemap_detail";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useMenuStore } from "@ogw_front/stores/menu";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -30,6 +31,8 @@ const emit = defineEmits<{
 const menuStore = useMenuStore();
 const viewerStore = useViewerStore();
 const hybridViewerStore = useHybridViewerStore();
+// The sharper map of the visible area follows the camera of this viewer
+useBasemapDetailStore();
 
 const hoverHighlightLabel = computed(
   () =>

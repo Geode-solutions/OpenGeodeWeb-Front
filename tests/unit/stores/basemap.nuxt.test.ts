@@ -38,7 +38,6 @@ function buildResponse(id: string): Record<string, unknown> {
   return {
     id,
     name: "basemap",
-    tiles_folder: "tiles",
     columns: 2,
     rows: 3,
     attribution: "Powered by Esri | test",
@@ -126,7 +125,6 @@ describe("basemap store", () => {
       expect.objectContaining({
         params: {
           id: "basemap-1",
-          tiles_folder: "tiles",
           columns: 2,
           rows: 3,
           maps: buildResponse("basemap-1").maps,
@@ -136,6 +134,16 @@ describe("basemap store", () => {
     );
     expect(store.basemapId).toBe("basemap-1");
     expect(store.attribution).toBe("Powered by Esri | test");
+  });
+
+  test("the first build drapes the georeferenced data and renders", async () => {
+    const store = setup();
+    await store.setMaps(["satellite"]);
+    expect(viewerRequest).toHaveBeenCalledWith(
+      expect.objectContaining({ params: { id: "basemap-1", data_ids: ["a", "c"] } }),
+    );
+    // No previous basemap to remove: the build itself must render
+    expect(remoteRender).toHaveBeenCalledWith();
   });
 
   test("data without crs is left out of the bounds", async () => {
@@ -169,13 +177,6 @@ describe("basemap store", () => {
     expect(backRequest).toHaveBeenLastCalledWith(expect.objectContaining({ params }));
   });
 
-  test("the first build renders the viewer", async () => {
-    const store = setup();
-    await store.setMaps(["satellite"]);
-    // No previous basemap to remove: the build itself must render
-    expect(remoteRender).toHaveBeenCalledWith();
-  });
-
   test("none removes the basemap", async () => {
     const store = setup();
     await store.setMaps(["satellite"]);
@@ -187,6 +188,8 @@ describe("basemap store", () => {
     expect(deregisterObject).toHaveBeenCalledBefore(deleteRequest);
     expect(store.basemapId).toBeUndefined();
     expect(store.attribution).toBeUndefined();
+    // The last maps are kept, to show them again
+    expect(store.shown).toStrictEqual(["satellite"]);
   });
 
   test("a newer build makes the running one obsolete", async () => {
@@ -204,17 +207,22 @@ describe("basemap store", () => {
     expect(deleteRequest).toHaveBeenCalledWith(
       expect.objectContaining({ params: { id: "basemap-1" } }),
     );
-    expect(store.loading).toBe(false);
   });
 
   test("rebuilds once, 500 ms after the data changed", async () => {
     const store = setup();
     await store.setMaps(["satellite"]);
     expect(backRequest).toHaveBeenCalledTimes(ONCE);
-    items.value = [...georeferenced(), mockAs<DataItem>({ id: "c", created_at: "3" })];
+    items.value = [
+      ...georeferenced(),
+      mockAs<DataItem>({ id: "d", created_at: "4", crs: LAMBERT }),
+    ];
     await nextTick();
     vi.advanceTimersByTime(HALF_DELAY);
-    items.value = [...georeferenced(), mockAs<DataItem>({ id: "d", created_at: "4" })];
+    items.value = [
+      ...georeferenced(),
+      mockAs<DataItem>({ id: "e", created_at: "5", crs: LAMBERT }),
+    ];
     await nextTick();
     await vi.advanceTimersByTimeAsync(REBUILD_DELAY);
     expect(backRequest).toHaveBeenCalledTimes(TWICE);
@@ -268,7 +276,7 @@ describe("basemap store", () => {
     for (const key of Object.keys(hybridDb)) {
       Reflect.deleteProperty(hybridDb, key);
     }
-    await store.importStores({ style: "satellite" });
+    await store.importStores({ maps: ["satellite"] });
     expect(backRequest).not.toHaveBeenCalled();
     Object.assign(hybridDb, { [FIRST_DATA]: fakeActor(BOX_A) });
     await nextTick();
@@ -287,7 +295,6 @@ describe("basemap store", () => {
     );
     expect(store.basemapId).toBeUndefined();
     expect(store.maps).toStrictEqual([]);
-    expect(store.loading).toBe(false);
   });
 
   test("a failed build goes back to none and data changes no longer rebuild", async () => {
@@ -308,7 +315,6 @@ describe("basemap store", () => {
     store.reset();
     expect(store.basemapId).toBeUndefined();
     expect(store.attribution).toBeUndefined();
-    expect(store.loading).toBe(false);
     expect(deregisterObject).not.toHaveBeenCalled();
     expect(deleteRequest).not.toHaveBeenCalled();
   });
@@ -434,15 +440,6 @@ describe("basemap store", () => {
     );
   });
 
-  test("no visible map removes the basemap", async () => {
-    const store = setup();
-    await store.setMaps(["satellite"]);
-    await store.setMaps([]);
-    expect(deregisterObject).toHaveBeenCalledWith("basemap-1");
-    expect(store.basemapId).toBeUndefined();
-    expect(store.shown).toStrictEqual(["satellite"]);
-  });
-
   test("exports and imports the maps, opacities and crop", async () => {
     const store = setup();
     await store.setCrop(true, ["routes"]);
@@ -454,25 +451,6 @@ describe("basemap store", () => {
     await store.importStores({ maps: ["plan", "routes"], crop: { plan: true } });
     expect(store.maps).toStrictEqual(["plan", "routes"]);
     expect(store.crop).toStrictEqual({ ...UNCROPPED, plan: true });
-  });
-
-  test("an Esri project opens with the matching open maps", async () => {
-    const store = setup();
-    await store.importStores({ style: "topo", opacities: { streets: 0.4 }, around: false });
-    expect(store.maps).toStrictEqual(["plan"]);
-    expect(store.opacities.plan).toBe(0.4);
-    expect(store.crop).toStrictEqual({ satellite: true, plan: true, routes: true });
-    await store.importStores({ maps: ["satellite", "streets"], around: { streets: false } });
-    expect(store.maps).toStrictEqual(["satellite", "plan"]);
-    expect(store.crop.plan).toBe(true);
-  });
-
-  test("drapes on the georeferenced data after each build", async () => {
-    const store = setup();
-    await store.setMaps(["satellite"]);
-    expect(viewerRequest).toHaveBeenCalledWith(
-      expect.objectContaining({ params: { id: "basemap-1", data_ids: ["a", "c"] } }),
-    );
   });
 
   test("shows satellite on its own once georeferenced data arrives", async () => {

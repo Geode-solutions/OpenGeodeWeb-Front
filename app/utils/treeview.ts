@@ -44,7 +44,6 @@ type TreeMenuPayload =
 
 export { compareSelections };
 export type {
-  BasemapMenuPayload,
   DataMenuPayload,
   GeodeObjectTypeMenuPayload,
   ModelComponentMenuPayload,
