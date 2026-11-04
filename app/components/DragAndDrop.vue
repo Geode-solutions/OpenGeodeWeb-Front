@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { filesFromEntry, isFileAccepted } from "@ogw_front/utils/drag_and_drop";
 import DragAndDropInline from "./DragAndDropInternal/DragAndDropInline.vue";
 import DragAndDropOverlay from "./DragAndDropInternal/DragAndDropOverlay.vue";
 import type { UploadFile } from "@ogw_front/utils/upload_path";
@@ -56,57 +57,11 @@ const isInternalDrag = ref(false);
 const dragCounter = ref(0);
 const fileInput = ref<HTMLInputElement | undefined>(undefined);
 
-const WILDCARD_SUFFIX_LENGTH = 2;
-
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {
     return error.message;
   }
   return String(error);
-}
-
-function isFileAccepted(file: File, acceptValue: string | string[] | undefined): boolean {
-  const fileName = (file.name || "").toLowerCase();
-  const fileType = (file.type || "").toLowerCase();
-  const isVext = fileName.endsWith(".vext");
-
-  if (!acceptValue) {
-    return !isVext;
-  }
-  let rules: string[] = [];
-  if (Array.isArray(acceptValue)) {
-    rules = acceptValue;
-  } else if (typeof acceptValue === "string") {
-    rules = acceptValue.split(",");
-  }
-  rules = rules.map((rule) => String(rule).trim()).filter(Boolean);
-  if (rules.length === 0) {
-    return !isVext;
-  }
-
-  return rules.some((rule) => {
-    let cleanRule = rule.toLowerCase();
-    if (!cleanRule) {
-      return !isVext;
-    }
-    if (cleanRule === "*" || cleanRule === "*.*") {
-      return !isVext;
-    }
-    if (cleanRule.startsWith("*.")) {
-      cleanRule = cleanRule.slice(1);
-    }
-    if (cleanRule.startsWith(".")) {
-      return fileName.endsWith(cleanRule);
-    }
-    if (cleanRule.includes("/")) {
-      if (cleanRule.endsWith("/*")) {
-        const typeGroup = cleanRule.slice(0, -WILDCARD_SUFFIX_LENGTH);
-        return fileType.startsWith(typeGroup);
-      }
-      return fileType === cleanRule;
-    }
-    return fileName.endsWith(`.${cleanRule}`);
-  });
 }
 
 function triggerFileDialog(): void {
@@ -132,34 +87,6 @@ function onDragOver(event: DragEvent): void {
   if (!isInternalDrag.value && event.dataTransfer?.types.includes("Files")) {
     event.preventDefault();
   }
-}
-
-async function readAllEntries(reader: FileSystemDirectoryReader): Promise<FileSystemEntry[]> {
-  // oxlint-disable-next-line promise/avoid-new
-  const batch = await new Promise<FileSystemEntry[]>((resolve, reject) => {
-    reader.readEntries(resolve, reject);
-  });
-  if (batch.length === 0) {
-    return [];
-  }
-  return [...batch, ...(await readAllEntries(reader))];
-}
-
-async function filesFromEntry(entry: FileSystemEntry, path: string): Promise<UploadFile[]> {
-  if (entry.isFile) {
-    // oxlint-disable-next-line promise/avoid-new
-    const file = await new Promise<File>((resolve, reject) => {
-      // oxlint-disable-next-line no-unsafe-type-assertion -- isFile guarantees a FileSystemFileEntry
-      (entry as FileSystemFileEntry).file(resolve, reject);
-    });
-    return [Object.assign(file, { relativePath: path })];
-  }
-  // oxlint-disable-next-line no-unsafe-type-assertion -- not a file, so a FileSystemDirectoryEntry
-  const children = await readAllEntries((entry as FileSystemDirectoryEntry).createReader());
-  const nested = await Promise.all(
-    children.map((child) => filesFromEntry(child, `${path}/${child.name}`)),
-  );
-  return nested.flat();
 }
 
 async function emitDroppedEntries(entries: FileSystemEntry[]): Promise<void> {

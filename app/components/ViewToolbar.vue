@@ -1,9 +1,5 @@
 <script setup lang="ts">
-import schemas, {
-  type PickedFieldType,
-} from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 import ActionButton from "@ogw_front/components/ActionButton.vue";
-import CameraBookmarkIcon from "@ogw_front/assets/viewer_svgs/camera-bookmark.svg";
 import CameraManager from "@ogw_front/components/CameraManager.vue";
 import CameraOrientation from "@ogw_front/components/CameraOrientation.vue";
 import ClippingPlanes from "@ogw_front/components/ClippingPlanes.vue";
@@ -15,35 +11,25 @@ import ThresholdFilter from "@ogw_front/components/ThresholdFilter.vue";
 import ZScaling from "@ogw_front/components/ZScaling.vue";
 import { onKeyStroke } from "@vueuse/core";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import { useViewerStore } from "@ogw_front/stores/viewer";
+import { useViewToolbarOptions } from "@ogw_front/composables/view_toolbar_options";
+import { useViewToolbarTools } from "@ogw_front/composables/view_toolbar_tools";
 
 const hybridViewerStore = useHybridViewerStore();
-const viewerStore = useViewerStore();
-const { is_picking, is_zoom_box_active } = storeToRefs(hybridViewerStore);
-const { picking_mode } = storeToRefs(viewerStore);
-const showScreenshot = ref<boolean>(false);
-const showCameraManager = ref<boolean>(false);
-const showCameraOrientation = ref<boolean>(false);
-const showZScaling = ref<boolean>(false);
-const showClippingPlanes = ref<boolean>(false);
-const showShrinkFilter = ref<boolean>(false);
-const showExplodeFilter = ref<boolean>(false);
-const showThresholdFilter = ref<boolean>(false);
-const showRuler = ref<boolean>(false);
-const gridScale = ref<boolean>(false);
+const tools = useViewToolbarTools();
+const {
+  showScreenshot,
+  showCameraManager,
+  showCameraOrientation,
+  showZScaling,
+  showClippingPlanes,
+  showShrinkFilter,
+  showExplodeFilter,
+  showThresholdFilter,
+  showRuler,
+} = tools;
 const zScale = ref<number>(hybridViewerStore.zScale);
 const openSubMenus = ref<Record<string, boolean>>({});
-
-interface CameraOptionAction {
-  title?: string;
-  testId: string;
-  tooltip?: string;
-  icon: string;
-  iconSize?: number;
-  color?: string;
-  action?: () => void;
-  menu?: CameraOptionAction[];
-}
+const camera_options = useViewToolbarOptions(tools);
 
 watch(
   () => hybridViewerStore.zScale,
@@ -65,208 +51,6 @@ onKeyStroke("Escape", () => {
     }
   }
 });
-
-function stopHoverHighlight(): void {
-  hybridViewerStore.is_hover_highlight = false;
-  hybridViewerStore.clearHoverHighlight();
-}
-
-function closeAllToolsExcept(toolRef: Ref<boolean>): void {
-  const tools = [
-    showCameraOrientation,
-    showCameraManager,
-    showScreenshot,
-    showZScaling,
-    showClippingPlanes,
-    showShrinkFilter,
-    showExplodeFilter,
-    showThresholdFilter,
-    showRuler,
-    is_picking,
-    is_zoom_box_active,
-    picking_mode,
-  ];
-  for (const tool of tools) {
-    if (tool !== toolRef) {
-      tool.value = false;
-    }
-  }
-  if (toolRef !== showRuler) {
-    void nextTick(stopHoverHighlight);
-  }
-}
-
-function toggleTool(toolRef: Ref<boolean>): void {
-  closeAllToolsExcept(toolRef);
-  toolRef.value = !toolRef.value;
-}
-
-function toggleHoverHighlight(fieldType: PickedFieldType): void {
-  const activate =
-    !hybridViewerStore.is_hover_highlight ||
-    hybridViewerStore.hover_highlight_field_type !== fieldType;
-  closeAllToolsExcept(showRuler);
-  if (activate) {
-    hybridViewerStore.is_hover_highlight = true;
-    hybridViewerStore.hover_highlight_field_type = fieldType;
-  } else {
-    stopHoverHighlight();
-  }
-}
-
-const camera_options = computed<CameraOptionAction[]>(() => [
-  {
-    testId: "resetCameraButton",
-    tooltip: "Reset camera",
-    icon: "mdi-cube-scan",
-    action: (): void => {
-      hybridViewerStore.resetCamera();
-    },
-  },
-  {
-    testId: "centerOnClickButton",
-    tooltip: "Center on click",
-    icon: "mdi-crosshairs-question",
-    color: hybridViewerStore.is_picking ? "primary" : undefined,
-    action: (): void => {
-      toggleTool(is_picking);
-    },
-  },
-  {
-    testId: "zoomToBoxButton",
-    tooltip: "Zoom to box",
-    icon: "mdi-magnify-scan",
-    color: hybridViewerStore.is_zoom_box_active ? "primary" : undefined,
-    action: (): void => {
-      toggleTool(is_zoom_box_active);
-    },
-  },
-  {
-    testId: "highlightOnHoverButton",
-    tooltip: "Highlight on hover",
-    icon: "mdi-cursor-default-click",
-    color: hybridViewerStore.is_hover_highlight ? "primary" : undefined,
-    action: hybridViewerStore.is_hover_highlight ? stopHoverHighlight : undefined,
-    menu: [
-      {
-        title: "Cells",
-        testId: "highlightOnHoverCellsButton",
-        icon: "mdi-select-all",
-        action: (): void => {
-          toggleHoverHighlight("CELL");
-        },
-      },
-      {
-        title: "Points",
-        testId: "highlightOnHoverPointsButton",
-        icon: "mdi-select-drag",
-        action: (): void => {
-          toggleHoverHighlight("POINT");
-        },
-      },
-    ],
-  },
-  {
-    testId: "cameraOrientationButton",
-    tooltip: "Camera orientation",
-    icon: "mdi-rotate-3d",
-    action: (): void => {
-      toggleTool(showCameraOrientation);
-    },
-  },
-  {
-    testId: "cameraManagerButton",
-    tooltip: "Manage camera positions",
-    icon: CameraBookmarkIcon,
-    iconSize: 34,
-    action: (): void => {
-      toggleTool(showCameraManager);
-    },
-  },
-  {
-    testId: "screenshotButton",
-    tooltip: "Take a screenshot",
-    icon: "mdi-camera",
-    action: (): void => {
-      toggleTool(showScreenshot);
-    },
-  },
-  {
-    testId: "gridScaleButton",
-    tooltip: "Toggle grid scale",
-    icon: "mdi-ruler-square",
-    color: gridScale.value ? "primary" : undefined,
-    action: (): void => {
-      const schema = schemas.opengeodeweb_viewer.viewer.grid_scale;
-      const params = { visibility: !gridScale.value };
-      viewerStore.request(
-        {
-          schema,
-          params,
-        },
-        {
-          response_function: () => {
-            gridScale.value = !gridScale.value;
-            hybridViewerStore.remoteRender();
-          },
-        },
-      );
-    },
-  },
-  {
-    testId: "zScalingButton",
-    tooltip: "Z Scaling Control",
-    icon: "mdi-sort",
-    action: (): void => {
-      toggleTool(showZScaling);
-    },
-  },
-  {
-    testId: "clippingPlanesButton",
-    tooltip: "Clipping Planes",
-    icon: "mdi-content-cut",
-    color: showClippingPlanes.value ? "primary" : undefined,
-    action: (): void => {
-      toggleTool(showClippingPlanes);
-    },
-  },
-  {
-    testId: "shrinkFilterButton",
-    tooltip: "Shrink Filter",
-    icon: "mdi-arrow-collapse-all",
-    color: showShrinkFilter.value ? "primary" : undefined,
-    action: (): void => {
-      toggleTool(showShrinkFilter);
-    },
-  },
-  {
-    testId: "explodeFilterButton",
-    tooltip: "Exploded View",
-    icon: "mdi-arrow-expand-all",
-    color: showExplodeFilter.value ? "primary" : undefined,
-    action: (): void => {
-      toggleTool(showExplodeFilter);
-    },
-  },
-  {
-    testId: "thresholdFilterButton",
-    tooltip: "Threshold Filter",
-    icon: "mdi-filter-variant",
-    color: showThresholdFilter.value ? "primary" : undefined,
-    action: (): void => {
-      toggleTool(showThresholdFilter);
-    },
-  },
-  {
-    testId: "rulerButton",
-    tooltip: "Ruler",
-    icon: "mdi-ruler",
-    color: showRuler.value ? "primary" : undefined,
-    action: (): void => {
-      toggleTool(showRuler);
-    },
-  },
-]);
 </script>
 
 <template>

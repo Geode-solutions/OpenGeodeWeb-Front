@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import type { AttributeSchemas } from "@ogw_front/utils/attribute_range";
+import {
+  COLORING_STYLES,
+  type Schemas,
+  buildColoringStyles,
+  resolveAttributeSchemas,
+} from "@ogw_front/utils/coloring_styles";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { RangesPerData } from "@ogw_front/composables/batch_style";
 import ViewerOptionsAttributeSelector from "@ogw_front/components/Viewer/Options/AttributeSelector.vue";
 import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
 import ViewerOptionsTexturesSelector from "@ogw_front/components/Viewer/Options/TexturesSelector.vue";
-import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 
 interface Texture {
   id: string;
@@ -15,14 +19,6 @@ interface Texture {
 interface CapabilityConfig {
   available?: boolean;
   hasColorMap?: boolean;
-}
-
-interface Schemas {
-  vertex?: AttributeSchemas;
-  edge?: AttributeSchemas;
-  cell?: AttributeSchemas;
-  polygon?: AttributeSchemas;
-  polyhedron?: AttributeSchemas;
 }
 
 const coloring_style_key = defineModel<string>("coloring_style_key");
@@ -95,27 +91,13 @@ const {
   allowRandom = false,
 } = defineProps<Props>();
 
-const backSchemas = back_schemas.opengeodeweb_back;
-const vertexSchemas = schemas.vertex ?? {
-  names: backSchemas.vertex_attribute_names,
-  range: backSchemas.vertex_attribute_range,
-};
-const edgeSchemas = schemas.edge ?? {
-  names: backSchemas.edge_attribute_names,
-  range: backSchemas.edge_attribute_range,
-};
-const cellSchemas = schemas.cell ?? {
-  names: backSchemas.cell_attribute_names,
-  range: backSchemas.cell_attribute_range,
-};
-const polygonSchemas = schemas.polygon ?? {
-  names: backSchemas.polygon_attribute_names,
-  range: backSchemas.polygon_attribute_range,
-};
-const polyhedronSchemas = schemas.polyhedron ?? {
-  names: backSchemas.polyhedron_attribute_names,
-  range: backSchemas.polyhedron_attribute_range,
-};
+const {
+  vertex: vertexSchemas,
+  edge: edgeSchemas,
+  cell: cellSchemas,
+  polygon: polygonSchemas,
+  polyhedron: polyhedronSchemas,
+} = resolveAttributeSchemas(schemas);
 
 function isAvailable(key: string): boolean {
   if (capabilities[key] && capabilities[key].available === false) {
@@ -156,49 +138,29 @@ const has_polyhedra = computed<boolean>(
     hasColorMap("polyhedron"),
 );
 
-const color_dict = { name: "Constant", value: "constant" };
-const random_dict = { name: "Random", value: "random" };
-const textures_dict = { name: "Textures", value: "textures" };
-const vertex_dict = { name: "Vertex attribute", value: "vertex" };
-const edge_dict = { name: "Edge attribute", value: "edge" };
-const cell_dict = { name: "Cell attribute", value: "cell" };
-const polygon_dict = { name: "Polygon attribute", value: "polygon" };
-const polyhedron_dict = {
-  name: "Polyhedron attribute",
-  value: "polyhedron",
-};
-const coloring_styles = computed<{ labels: string[]; values: string[] }>(() => {
-  const array = [];
-  if (has_color.value) {
-    array.push(color_dict);
-    if (allowRandom) {
-      array.push(random_dict);
-    }
-  }
-  if (has_textures.value) {
-    array.push(textures_dict);
-  }
-  if (has_vertex.value) {
-    array.push(vertex_dict);
-  }
-  if (has_edge.value) {
-    array.push(edge_dict);
-  }
-  if (has_cells.value) {
-    array.push(cell_dict);
-  }
-  if (has_polygons.value) {
-    array.push(polygon_dict);
-  }
-  if (has_polyhedra.value) {
-    array.push(polyhedron_dict);
-  }
-
-  const labels = array.map((coloring) => coloring.name);
-  const values = array.map((coloring) => coloring.value);
-
-  return { labels, values };
-});
+const {
+  color: color_dict,
+  textures: textures_dict,
+  vertex: vertex_dict,
+  edge: edge_dict,
+  cell: cell_dict,
+  polygon: polygon_dict,
+  polyhedron: polyhedron_dict,
+} = COLORING_STYLES;
+const coloring_styles = computed<{ labels: string[]; values: string[] }>(() =>
+  buildColoringStyles(
+    {
+      color: has_color.value,
+      textures: has_textures.value,
+      vertex: has_vertex.value,
+      edge: has_edge.value,
+      cell: has_cells.value,
+      polygon: has_polygons.value,
+      polyhedron: has_polyhedra.value,
+    },
+    allowRandom,
+  ),
+);
 
 const coloring_style_label = ref<string>("");
 
