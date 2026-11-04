@@ -27,7 +27,6 @@ import type {
   RequestHandlers,
   ResponseOf,
 } from "@ogw_shared/utils/types.js";
-// oxlint-disable-next-line import/max-dependencies -- all imports above are required by this store.
 import type { RpcClient } from "@ogw_shared/utils/call_raw.js";
 
 interface PickedPoint {
