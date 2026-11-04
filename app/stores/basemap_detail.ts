@@ -4,7 +4,7 @@ import {
   covers,
   stillSharp,
 } from "@ogw_front/utils/visible_map_area";
-import { ignoreError, useBasemapViewer } from "./basemap_helpers/viewer.js";
+import { coalesced, ignoreError, useBasemapViewer } from "./basemap_helpers/viewer.js";
 import type { BasemapBuildResponse } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import type { BasemapGrid } from "./basemap_helpers/builds.js";
 import { useBasemapStore } from "@ogw_front/stores/basemap";
@@ -53,9 +53,10 @@ export const useBasemapDetailStore = defineStore("basemapDetail", () => {
     return refreshNumber !== lastRefresh || basemapId !== basemapStore.basemapId;
   }
 
-  // Eye, opacity and crop reach the detail as they reach the base. A visible map the detail was
-  // Built without would be missing from its sharp patch: the detail goes, the next one has it
-  async function syncLayers(): Promise<void> {
+  // Eye, opacity and crop reach the detail as they reach the base, one request at a time while a
+  // Slider is dragged. A visible map the detail was built without would be missing from its sharp
+  // Patch: the detail goes, the next one has it
+  const syncLayers = coalesced(async () => {
     const id = detailId.value;
     if (id === undefined) {
       return;
@@ -66,7 +67,7 @@ export const useBasemapDetailStore = defineStore("basemapDetail", () => {
     }
     await basemapStore.applyLayers(id);
     await hybridViewerStore.remoteRender();
-  }
+  });
 
   async function replaceDetail(response: BasemapBuildResponse, sentLayers: string): Promise<void> {
     const previous = detailId.value;
@@ -213,11 +214,16 @@ export const useBasemapDetailStore = defineStore("basemapDetail", () => {
       }
     },
   );
-  // A detail dropped for a missing map, or built while the maps changed, is built again
   watch(
     () => JSON.stringify(basemapStore.layersParams()),
     async () => {
       await syncLayers();
+    },
+  );
+  // A detail dropped for a missing map, or built while the maps changed, is built again
+  watch(
+    () => basemapStore.maps.join(","),
+    () => {
       void scheduleRefresh();
     },
   );
