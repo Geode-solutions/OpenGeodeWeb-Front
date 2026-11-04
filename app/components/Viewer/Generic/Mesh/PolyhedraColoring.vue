@@ -6,6 +6,7 @@ import {
 } from "@ogw_front/composables/batch_style";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
+import { useBatchStyleModel } from "@ogw_front/composables/batch_style_model";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
@@ -28,18 +29,16 @@ const coloring_style_key = computed<string>({
     hybridViewerStore.remoteRender();
   },
 });
-const color = computed<RGBAColor | undefined>({
-  get: () => dataStyleStore.meshPolyhedraColor(id) as RGBAColor | undefined,
-  set: async (newValue) => {
-    if (newValue === undefined) {
-      return;
-    }
-    await applyBatchStyle(id, (targetId: string) =>
-      dataStyleStore.setMeshPolyhedraColor(targetId, newValue),
-    );
-    hybridViewerStore.remoteRender();
-  },
-});
+const color = useBatchStyleModel<RGBAColor>(
+  () => id,
+  (targetId) => dataStyleStore.meshPolyhedraColor(targetId) as RGBAColor | undefined,
+  (targetId, value) => dataStyleStore.setMeshPolyhedraColor(targetId, value),
+);
+const opacity = useBatchStyleModel<number>(
+  () => id,
+  (targetId) => dataStyleStore.meshPolyhedraOpacity(targetId),
+  (targetId, value) => dataStyleStore.setMeshPolyhedraOpacity(targetId, value),
+);
 const vertex_attribute_name = computed<string | undefined>({
   get: () => dataStyleStore.meshPolyhedraVertexAttributeName(id),
   set: async (newValue) => {
@@ -199,6 +198,7 @@ async function setPolyhedronAttributeRangesPerData(ranges: RangesPerData): Promi
     :id="id"
     v-model:coloring_style_key="coloring_style_key"
     v-model:color="color"
+    v-model:opacity="opacity"
     v-model:vertex_attribute_name="vertex_attribute_name"
     v-model:vertex_attribute_item="vertex_attribute_item"
     v-model:vertex_attribute_range="vertex_attribute_range"

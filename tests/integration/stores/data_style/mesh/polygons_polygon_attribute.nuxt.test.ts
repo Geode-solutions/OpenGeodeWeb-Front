@@ -122,6 +122,23 @@ describe("mesh polygons", () => {
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
 
+    test("coloring vertex restores the opacity", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const spy = vi.spyOn(viewerStore, "request");
+      await dataStyleStore.setMeshPolygonsActiveColoring(id, "vertex");
+      const schema = mesh_polygons_schemas.opacity;
+      const params = { id, opacity: dataStyleStore.meshPolygonsOpacity(id) };
+      expect(spy).toHaveBeenCalledWith(
+        { schema, params },
+        {
+          // oxlint-disable-next-line no-unsafe-assignment -- expect.any(Function) is untyped by design, this is a vitest matcher not a real callback.
+          response_function: expect.any(Function),
+        },
+      );
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+
     test("coloring polygon", async () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();

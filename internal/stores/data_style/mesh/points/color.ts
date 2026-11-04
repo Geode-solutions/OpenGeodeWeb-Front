@@ -4,12 +4,13 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed
 
 // Local imports
 import { useMeshPointsCommonStyle } from "./common";
+import { useMeshPointsOpacityStyle } from "./opacity";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
 const schema = viewer_schemas.opengeodeweb_viewer.mesh.points.color;
 
-export function useMeshPointsColorStyle(): {
+export function useMeshPointsColorStyle(): ReturnType<typeof useMeshPointsOpacityStyle> & {
   meshPointsColor: (id: string) => RGBAColor | undefined;
   setMeshPointsColor: (id: string, color: RGBAColor) => Promise<unknown>;
 } {
@@ -42,5 +43,6 @@ export function useMeshPointsColorStyle(): {
   return {
     meshPointsColor,
     setMeshPointsColor,
+    ...useMeshPointsOpacityStyle(),
   };
 }

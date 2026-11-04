@@ -33,7 +33,7 @@ function handleMeshPointsVertexColoring(
   return vertexAttributeStyle.setMeshPointsVertexAttribute(id, vertex_attribute);
 }
 
-async function setMeshPointsActiveColoring(
+async function applyMeshPointsActiveColoring(
   id: string,
   type: string | undefined,
   deps: MeshPointsActiveColoringDeps,
@@ -53,6 +53,22 @@ async function setMeshPointsActiveColoring(
     return result;
   }
   throw new Error(`Unknown mesh points coloring type: ${type}`);
+}
+
+async function setMeshPointsActiveColoring(
+  id: string,
+  type: string | undefined,
+  deps: MeshPointsActiveColoringDeps,
+): Promise<unknown> {
+  const result = await applyMeshPointsActiveColoring(id, type, deps);
+  if (type !== "constant") {
+    // Attribute and textures colorings keep the actor opacity: restore the stored one
+    await whenDefined(deps.colorStyle.meshPointsOpacity(id), async (value) => {
+      const applied = await deps.colorStyle.setMeshPointsOpacity(id, value);
+      return applied;
+    });
+  }
+  return result;
 }
 
 async function applyMeshPointsStyle(
