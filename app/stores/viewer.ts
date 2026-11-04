@@ -4,24 +4,26 @@ import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry";
 import type { Vector3 } from "@kitware/vtk.js/types";
 import { connectImageStream } from "@kitware/vtk.js/Rendering/Misc/RemoteView";
 import { initWebSocketClient } from "@ogw_internal/utils/ws_client";
-import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_typed_schemas.js";
 import opengeodeweb_viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
+import { type ViewerRequestArgs, callViewer } from "./viewer_helpers/request.js";
+import {
+  fetchViewerVersion,
+  launchViewerMicroservice,
+  pickWorldPosition,
+} from "./viewer_helpers/actions.js";
 import {
   getWebsocketApiPort,
   getWebsocketApiProtocol,
   isCloudMode,
 } from "@ogw_front/utils/stores.js";
 import { Status } from "@ogw_front/utils/status";
-import { useAppStore } from "@ogw_front/stores/app";
 import { useInfraStore } from "@ogw_front/stores/infra";
-import { viewer_call } from "@ogw_internal/utils/viewer_call";
 
 import type {
   JsonRpcSchema,
   MicroserviceVersionSchema,
-  ParamsOf,
   RequestHandlers,
   ResponseOf,
 } from "@ogw_shared/utils/types.js";
@@ -34,9 +36,6 @@ interface PickedPoint {
   z: number | undefined;
 }
 
-const MS_PER_SECOND = 1000;
-const SECONDS_PER_REQUEST = 10;
-const request_timeout = MS_PER_SECOND * SECONDS_PER_REQUEST;
 export const useViewerStore = defineStore(
   "viewer",
   // oxlint-disable-next-line max-lines-per-function, max-statements
@@ -77,15 +76,7 @@ export const useViewerStore = defineStore(
     }
     // oxlint-disable-next-line unicorn/consistent-function-scoping
     async function request<Schema extends JsonRpcSchema>(
-      {
-        schema,
-        params,
-        timeout = request_timeout,
-      }: {
-        schema: Schema;
-        params?: ParamsOf<Schema>;
-        timeout?: number;
-      },
+      args: ViewerRequestArgs<Schema>,
       callbacks: RequestHandlers<ResponseOf<Schema>> = {},
     ): Promise<ResponseOf<Schema>> {
       const microservice = {
@@ -95,38 +86,12 @@ export const useViewerStore = defineStore(
         start_request,
         stop_request,
       };
-      const result = await viewer_call(
-        microservice,
-        {
-          schema,
-          params: params ?? {},
-          timeout,
-        },
-        {
-          ...callbacks,
-          response_function: async (response: unknown) => {
-            if (callbacks.response_function) {
-              // The viewer validates its responses against the schema `response` it was generated from.
-              // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-              await callbacks.response_function(response as ResponseOf<Schema>);
-            }
-          },
-        },
-      );
-      // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-      return result as ResponseOf<Schema>;
+      const result = await callViewer(microservice, args, callbacks);
+      return result;
     }
     async function pick_world_position(x: number, y: number): Promise<Vector3> {
-      const schema = opengeodeweb_viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
-      const {
-        x: world_x,
-        y: world_y,
-        z: world_z,
-      } = await request({
-        schema,
-        params: { x: Math.round(x), y: Math.round(y) },
-      });
-      return [world_x, world_y, world_z];
+      const position = await pickWorldPosition(request, x, y);
+      return position;
     }
     async function set_picked_point(x: number, y: number): Promise<void> {
       const [world_x, world_y, world_z] = await pick_world_position(x, y);
@@ -166,25 +131,9 @@ export const useViewerStore = defineStore(
       });
     }
     async function launch(args: Readonly<{ projectFolderPath: string }>): Promise<unknown> {
-      const appStore = useAppStore();
-      const { COMMAND_VIEWER, NUXT_ROOT_PATH } = useRuntimeConfig().public;
-      const schema = opengeodeweb_front_schemas.api.local.app.run_viewer;
-      const params = {
-        COMMAND_VIEWER,
-        NUXT_ROOT_PATH,
-        args,
-      };
-      const result = await appStore.request(
-        {
-          schema,
-          params,
-        },
-        {
-          response_function: (response) => {
-            default_local_port.value = String(response.port);
-          },
-        },
-      );
+      const result = await launchViewerMicroservice(args, (new_port) => {
+        default_local_port.value = new_port;
+      });
       return result;
     }
     async function connect(): Promise<void> {
@@ -193,19 +142,9 @@ export const useViewerStore = defineStore(
     async function get_version(
       schema: MicroserviceVersionSchema | undefined,
     ): Promise<{ microservice_version: string } | undefined> {
-      if (!schema) {
-        return undefined;
-      }
-      const result = await request(
-        {
-          schema,
-        },
-        {
-          response_function: ({ microservice_version }) => {
-            version.value = microservice_version;
-          },
-        },
-      );
+      const result = await fetchViewerVersion(request, schema, (microservice_version) => {
+        version.value = microservice_version;
+      });
       return result;
     }
     return {

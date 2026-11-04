@@ -1,9 +1,16 @@
 // Third party imports
 import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { beforeAllTimeout, setupIntegrationTests } from "@ogw_tests/integration/setup";
+import {
+  default_vertex_attribute,
+  file_name,
+  geode_object,
+  mesh_points_schemas,
+  mesh_polygons_schemas,
+  range,
+} from "@ogw_tests/integration/stores/data_style/mesh/polygons_helpers";
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 import { Status } from "@ogw_front/utils/status";
 import { cleanupBackend } from "@ogw_server/utils/cleanup";
@@ -12,15 +19,6 @@ import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
-const mesh_polygons_schemas = viewer_schemas.opengeodeweb_viewer.mesh.polygons;
-const mesh_points_schemas = viewer_schemas.opengeodeweb_viewer.mesh.points;
-const file_name = "test.og_psf3d";
-const geode_object = "PolygonalSurface3D";
-const MINIMUM_RANGE = 10;
-const MAXIMUM_RANGE = 20;
-const range: [number, number] = [MINIMUM_RANGE, MAXIMUM_RANGE];
-const default_vertex_attribute = { name: "points", item: 0, range };
-const default_polygon_attribute = { name: "test_attribute", item: 0, range };
 const HALF_OPACITY = 0.5;
 
 let id = "";
@@ -169,154 +167,6 @@ describe("mesh polygons", () => {
       expect(dataStyleStore.meshPolygonsVertexAttributeRange(id)).toStrictEqual(range);
       expect(dataStyleStore.meshPolygonsVertexAttributeColorMap(id)).toBe("budaS");
     });
-  });
-
-  describe("polygons polygon attribute", () => {
-    test("coloring polygon attribute", async () => {
-      const dataStyleStore = useDataStyleStore();
-      const viewerStore = useViewerStore();
-      const spy = vi.spyOn(viewerStore, "request");
-      const polygon_attribute = {
-        name: default_polygon_attribute.name,
-        item: default_polygon_attribute.item,
-        minimum: range[0],
-        maximum: range[1],
-        colorMap: "batlow",
-      };
-      const result = dataStyleStore.setMeshPolygonsPolygonAttribute(id, polygon_attribute);
-      expect(result).toBeInstanceOf(Promise);
-      await result;
-      const schema = mesh_polygons_schemas.attribute.polygon.attribute;
-      const points = getRGBPointsFromPreset(polygon_attribute.colorMap);
-      const params = {
-        id,
-        name: polygon_attribute.name,
-        item: polygon_attribute.item,
-        points,
-        minimum: polygon_attribute.minimum,
-        maximum: polygon_attribute.maximum,
-        no_data_color: DEFAULT_NO_DATA_COLOR,
-      };
-      expect(spy).toHaveBeenCalledWith({ schema, params });
-      expect(dataStyleStore.meshPolygonsPolygonAttributeName(id)).toBe(polygon_attribute.name);
-      expect(viewerStore.status).toBe(Status.CONNECTED);
-    });
-
-    test("stored configs 1 - select attribute test_attribute and item 2", async () => {
-      const dataStyleStore = useDataStyleStore();
-      const polygon_attribute = { name: "test_attribute", item: 2 };
-      await dataStyleStore.setMeshPolygonsPolygonAttributeName(id, polygon_attribute.name);
-      await dataStyleStore.setMeshPolygonsPolygonAttributeItem(id, polygon_attribute.item);
-      expect(dataStyleStore.meshPolygonsPolygonAttributeName(id)).toBe(polygon_attribute.name);
-      expect(dataStyleStore.meshPolygonsPolygonAttributeItem(id)).toBe(polygon_attribute.item);
-    });
-
-    test("stored configs 2 - set range and colormap", async () => {
-      const dataStyleStore = useDataStyleStore();
-      await dataStyleStore.setMeshPolygonsPolygonAttributeRange(id, range[0], range[1]);
-      await dataStyleStore.setMeshPolygonsPolygonAttributeColorMap(id, "budaS");
-      expect(dataStyleStore.meshPolygonsPolygonAttributeRange(id)).toStrictEqual(range);
-      expect(dataStyleStore.meshPolygonsPolygonAttributeColorMap(id)).toBe("budaS");
-    });
-
-    test("stored configs 3 - select dummy_attribute", async () => {
-      const dataStyleStore = useDataStyleStore();
-      await dataStyleStore.setMeshPolygonsPolygonAttributeName(id, "dummy_attribute");
-      await dataStyleStore.setMeshPolygonsPolygonAttributeItem(id, 0);
-      expect(dataStyleStore.meshPolygonsPolygonAttributeName(id)).toBe("dummy_attribute");
-      expect(dataStyleStore.meshPolygonsPolygonAttributeItem(id)).toBe(0);
-    });
-
-    test("stored configs 4 - switch back to test_attribute and verify restoration", async () => {
-      const dataStyleStore = useDataStyleStore();
-      const polygon_attribute = { name: "test_attribute", item: 2 };
-      await dataStyleStore.setMeshPolygonsPolygonAttributeName(id, polygon_attribute.name);
-      expect(dataStyleStore.meshPolygonsPolygonAttributeName(id)).toBe(polygon_attribute.name);
-      expect(dataStyleStore.meshPolygonsPolygonAttributeItem(id)).toBe(polygon_attribute.item);
-      expect(dataStyleStore.meshPolygonsPolygonAttributeRange(id)).toStrictEqual(range);
-      expect(dataStyleStore.meshPolygonsPolygonAttributeColorMap(id)).toBe("budaS");
-    });
-  });
-
-  describe("polygons active coloring", () => {
-    test("coloring color", async () => {
-      const dataStyleStore = useDataStyleStore();
-      const viewerStore = useViewerStore();
-      const coloringName = "constant";
-      const result = dataStyleStore.setMeshPolygonsActiveColoring(id, coloringName);
-      expect(result).toBeInstanceOf(Promise);
-      await result;
-      expect(dataStyleStore.meshPolygonsActiveColoring(id)).toBe(coloringName);
-      expect(viewerStore.status).toBe(Status.CONNECTED);
-    });
-
-    test("coloring vertex", async () => {
-      const dataStyleStore = useDataStyleStore();
-      const viewerStore = useViewerStore();
-      await dataStyleStore.setMeshPolygonsVertexAttributeName(id, default_vertex_attribute.name);
-      const coloringName = "vertex";
-      const result = dataStyleStore.setMeshPolygonsActiveColoring(id, coloringName);
-      expect(result).toBeInstanceOf(Promise);
-      await result;
-      expect(dataStyleStore.meshPolygonsActiveColoring(id)).toBe(coloringName);
-      expect(viewerStore.status).toBe(Status.CONNECTED);
-    });
-
-    test("coloring vertex restores the opacity", async () => {
-      const dataStyleStore = useDataStyleStore();
-      const viewerStore = useViewerStore();
-      const spy = vi.spyOn(viewerStore, "request");
-      await dataStyleStore.setMeshPolygonsActiveColoring(id, "vertex");
-      const schema = mesh_polygons_schemas.opacity;
-      const params = { id, opacity: dataStyleStore.meshPolygonsOpacity(id) };
-      expect(spy).toHaveBeenCalledWith(
-        { schema, params },
-        {
-          // oxlint-disable-next-line no-unsafe-assignment -- expect.any(Function) is untyped by design, this is a vitest matcher not a real callback.
-          response_function: expect.any(Function),
-        },
-      );
-      expect(viewerStore.status).toBe(Status.CONNECTED);
-    });
-
-    test("coloring polygon", async () => {
-      const dataStyleStore = useDataStyleStore();
-      const viewerStore = useViewerStore();
-      await dataStyleStore.setMeshPolygonsPolygonAttributeName(id, default_polygon_attribute.name);
-      const coloringName = "polygon";
-      const result = dataStyleStore.setMeshPolygonsActiveColoring(id, coloringName);
-      expect(result).toBeInstanceOf(Promise);
-      await result;
-      expect(dataStyleStore.meshPolygonsActiveColoring(id)).toBe(coloringName);
-      expect(viewerStore.status).toBe(Status.CONNECTED);
-    });
-
-    test("coloring textures without textures", async () => {
-      const dataStyleStore = useDataStyleStore();
-      const viewerStore = useViewerStore();
-      const spy = vi.spyOn(viewerStore, "request");
-      const coloringName = "textures";
-      const result = dataStyleStore.setMeshPolygonsActiveColoring(id, coloringName);
-      expect(result).toBeInstanceOf(Promise);
-      await result;
-      expect(spy).not.toHaveBeenCalledWith(
-        // oxlint-disable-next-line no-unsafe-assignment -- expect.objectContaining is untyped by design, this is a vitest matcher.
-        expect.objectContaining({ schema: viewer_schemas.opengeodeweb_viewer.mesh.apply_textures }),
-        // oxlint-disable-next-line no-unsafe-assignment -- expect.anything is untyped by design, this is a vitest matcher.
-        expect.anything(),
-      );
-      expect(dataStyleStore.meshPolygonsActiveColoring(id)).toBe(coloringName);
-      expect(viewerStore.status).toBe(Status.CONNECTED);
-    });
-  });
-
-  test("polygons apply default style", async () => {
-    const dataStyleStore = useDataStyleStore();
-    const viewerStore = useViewerStore();
-    const result = dataStyleStore.applyMeshPolygonsStyle(id);
-    expect(result).toBeInstanceOf(Promise);
-    await result;
-    expect(viewerStore.status).toBe(Status.CONNECTED);
   });
 
   describe("points vertex attribute", () => {
