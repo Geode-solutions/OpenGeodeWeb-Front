@@ -398,4 +398,13 @@ describe("basemap detail store", () => {
     const params: unknown = expect.objectContaining({ maps: ["satellite", "plan"], margin: false });
     expect(backRequest).toHaveBeenCalledWith(expect.objectContaining({ params }));
   });
+
+  test("hiding the basemap drops the detail", async () => {
+    const { basemap, detail } = await setupWithBase();
+    await vi.advanceTimersByTimeAsync(REST_DELAY);
+    await basemap.setMaps([]);
+    await vi.advanceTimersByTimeAsync(REST_DELAY);
+    expect(detail.detailId).toBeUndefined();
+    expect(deregisterObject).toHaveBeenCalledWith("detail-1");
+  });
 });

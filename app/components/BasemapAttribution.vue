@@ -2,11 +2,12 @@
 import { useBasemapStore } from "@ogw_front/stores/basemap";
 
 const basemapStore = useBasemapStore();
+// A hidden basemap stays built: its attribution goes with its maps
 </script>
 
 <template>
   <span
-    v-if="basemapStore.attribution"
+    v-if="basemapStore.attribution && basemapStore.maps.length > 0"
     data-testid="basemapAttribution"
     class="basemap-attribution text-caption text-medium-emphasis px-1"
   >

@@ -54,14 +54,15 @@ export const useBasemapDetailStore = defineStore("basemapDetail", () => {
   }
 
   // Eye, opacity and crop reach the detail as they reach the base, one request at a time while a
-  // Slider is dragged. A visible map the detail was built without would be missing from its sharp
-  // Patch: the detail goes, the next one has it
+  // Slider is dragged. Nothing visible, or a visible map the detail was built without (missing
+  // From its sharp patch): the detail goes, the next one has the maps
   const syncLayers = coalesced(async () => {
     const id = detailId.value;
     if (id === undefined) {
       return;
     }
-    if (basemapStore.maps.some((mapStyle) => !detailMaps.includes(mapStyle))) {
+    const { maps } = basemapStore;
+    if (maps.length === 0 || maps.some((mapStyle) => !detailMaps.includes(mapStyle))) {
       await clear();
       return;
     }

@@ -96,7 +96,8 @@ export const useBasemapStore = defineStore("basemap", () => {
     }
   });
 
-  // No map hides the basemap and keeps the last maps, to show them again
+  // No map hides the basemap and keeps the last maps, to show them again. Hidden, the built
+  // Basemap stays with every layer invisible: shown again, it only recomposes
   async function setMaps(newMaps: readonly MapStyle[]): Promise<void> {
     if (newMaps.length === 0) {
       hidden.value = true;
@@ -105,7 +106,7 @@ export const useBasemapStore = defineStore("basemap", () => {
       hidden.value = false;
     }
     const allBuilt = maps.value.every((mapStyle) => built.value.includes(mapStyle));
-    if (maps.value.length > 0 && basemapId.value !== undefined && allBuilt) {
+    if (basemapId.value !== undefined && allBuilt) {
       await recompose();
       return;
     }
@@ -139,7 +140,8 @@ export const useBasemapStore = defineStore("basemap", () => {
       return `${crs?.authority}:${crs?.code}|${georeferencedIds().join(",")}|${extentKey}`;
     },
     () => {
-      if (maps.value.length > 0) {
+      // A hidden basemap would be out of date once shown again: the rebuild removes it
+      if (maps.value.length > 0 || basemapId.value !== undefined) {
         void scheduleRebuild();
       }
     },

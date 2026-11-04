@@ -177,19 +177,32 @@ describe("basemap store", () => {
     expect(backRequest).toHaveBeenLastCalledWith(expect.objectContaining({ params }));
   });
 
-  test("none removes the basemap", async () => {
+  test("hiding keeps the basemap, showing it again builds nothing", async () => {
     const store = setup();
     await store.setMaps(["satellite"]);
     await store.setMaps([]);
+    const hiddenLayers: unknown = expect.objectContaining({
+      layers: [{ map: "satellite", visible: false, opacity: 1, crop: false }],
+    });
+    expect(viewerRequest).toHaveBeenLastCalledWith(
+      expect.objectContaining({ params: hiddenLayers }),
+    );
+    await store.setMaps(["satellite"]);
+    expect(backRequest).toHaveBeenCalledTimes(ONCE);
+    expect(deleteRequest).not.toHaveBeenCalled();
+  });
+
+  test("a hidden basemap goes once the data changes: it would be out of date", async () => {
+    const store = setup();
+    await store.setMaps(["satellite"]);
+    await store.setMaps([]);
+    items.value = georeferenced().slice(0, 1);
+    await nextTick();
+    await vi.advanceTimersByTimeAsync(REBUILD_DELAY);
     expect(deleteRequest).toHaveBeenCalledWith(
       expect.objectContaining({ params: { id: "basemap-1" } }),
     );
-    // The viewer lets the mesh go before the back deletes its files
-    expect(deregisterObject).toHaveBeenCalledBefore(deleteRequest);
-    expect(store.basemapId).toBeUndefined();
-    expect(store.attribution).toBeUndefined();
-    // The last maps are kept, to show them again
-    expect(store.shown).toStrictEqual(["satellite"]);
+    expect(backRequest).toHaveBeenCalledTimes(ONCE);
   });
 
   test("a newer build makes the running one obsolete", async () => {
@@ -237,7 +250,8 @@ describe("basemap store", () => {
     items.value = mockAs<DataItem[]>([{ id: "a", created_at: "1" }]);
     await nextTick();
     await vi.advanceTimersByTimeAsync(REBUILD_DELAY);
-    expect(deregisterObject).toHaveBeenCalledWith("basemap-1");
+    // The viewer lets the mesh go before the back deletes its files
+    expect(deregisterObject).toHaveBeenCalledBefore(deleteRequest);
     expect(store.basemapId).toBeUndefined();
     // No data in the project CRS: no map, so no Basemap category either
     expect(store.available).toBe(false);
