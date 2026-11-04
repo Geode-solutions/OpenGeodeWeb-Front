@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import {
   type AttributeInfo,
+  type AttributeRequestParams,
   attributeItemOptions,
   attributeRangesPerTarget,
+  attributeRequestParams,
   useAttributeRangeBounds,
   useSeriesTimeStepCommit,
 } from "@ogw_front/composables/attribute_selector";
@@ -81,24 +83,11 @@ const componentItems = computed<{ title: string; value: number }[]>(() => {
   return [];
 });
 
-function hasSelectedComponent(components: unknown): boolean {
-  return Array.isArray(components) && components.length > 0;
+function requestParams(): AttributeRequestParams | undefined {
+  return attributeRequestParams(schemas, id, componentIds);
 }
 
-function requestParams(): { id: string; component_ids?: string[] } | undefined {
-  const schemaProperties = schemas.names.properties as Record<string, unknown> | undefined;
-  if (schemaProperties?.component_ids === undefined) {
-    return { id };
-  }
-  if (!hasSelectedComponent(componentIds)) {
-    return undefined;
-  }
-  return { id, component_ids: componentIds };
-}
-
-function getRangeTargets(
-  name: string,
-): [string, { id: string; component_ids?: string[] } | undefined][] {
+function getRangeTargets(name: string): [string, AttributeRequestParams | undefined][] {
   if (groupTargetIds.value) {
     return [...attributesPerTarget]
       .filter(([, targetAttributes]) =>

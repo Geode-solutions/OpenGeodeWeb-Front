@@ -1,5 +1,5 @@
+import type { AttributeRangeInfo, AttributeSchemas } from "@ogw_front/utils/attribute_range";
 import type { AttributeRange } from "@ogw_front/composables/batch_style";
-import type { AttributeRangeInfo } from "@ogw_front/utils/attribute_range";
 import { getAttributeRange } from "@ogw_front/utils/attributes";
 
 interface AttributeInfo {
@@ -94,9 +94,32 @@ function useSeriesTimeStepCommit(
   };
 }
 
+interface AttributeRequestParams {
+  id: string;
+  component_ids?: string[];
+}
+
+// Params of the "names" request, or undefined when the schema needs components and none is selected
+function attributeRequestParams(
+  schemas: AttributeSchemas,
+  id: string,
+  componentIds: string[] | undefined,
+): AttributeRequestParams | undefined {
+  const { properties } = schemas.names;
+  if (typeof properties !== "object" || properties === null || !("component_ids" in properties)) {
+    return { id };
+  }
+  if (!Array.isArray(componentIds) || componentIds.length === 0) {
+    return undefined;
+  }
+  return { id, component_ids: componentIds };
+}
+
 export {
   type AttributeInfo,
+  type AttributeRequestParams,
   attributeItemOptions,
+  attributeRequestParams,
   attributeRangesPerTarget,
   useAttributeRangeBounds,
   useSeriesTimeStepCommit,
