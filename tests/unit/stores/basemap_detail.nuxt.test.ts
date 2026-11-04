@@ -151,7 +151,7 @@ describe("basemap detail store", () => {
   }
 
   async function setupWithBase(
-    options: { baseColumns?: number; slowDetail?: boolean; detailZoom?: number } = {},
+    options: { baseColumns?: number; slowDetail?: boolean; detailZooms?: number[] } = {},
   ): Promise<{
     basemap: ReturnType<typeof useBasemapStore>;
     detail: ReturnType<typeof useBasemapDetailStore>;
@@ -183,7 +183,7 @@ describe("basemap detail store", () => {
         const response = detailResponse(
           counters,
           request.params.bounds,
-          options.detailZoom ?? DETAIL_ZOOM,
+          options.detailZooms?.[counters.detail] ?? DETAIL_ZOOM,
         );
         if (slowDetail !== undefined) {
           await slowDetail.promise;
@@ -337,12 +337,35 @@ describe("basemap detail store", () => {
   });
 
   test("no finer zoom: the next rests of the same view build nothing", async () => {
-    const { detail } = await setupWithBase({ detailZoom: 14 });
+    const { detail } = await setupWithBase({ detailZooms: [14] });
     await vi.advanceTimersByTimeAsync(REST_DELAY);
     expect(detail.detailId).toBeUndefined();
     backRequest.mockClear();
     panCameraSlightly();
     await vi.advanceTimersByTimeAsync(REST_DELAY);
     expect(backRequest).not.toHaveBeenCalled();
+  });
+
+  test("a remembered step never hides a view that needs a finer map", async () => {
+    await setupWithBase({ detailZooms: [14] });
+    await vi.advanceTimersByTimeAsync(REST_DELAY);
+    backRequest.mockClear();
+    zoomCamera(0.4);
+    await vi.advanceTimersByTimeAsync(REST_DELAY);
+    const params: unknown = expect.objectContaining({ margin: false });
+    expect(backRequest).toHaveBeenCalledWith(expect.objectContaining({ params }));
+  });
+
+  test("a remembered step removes the detail still shown", async () => {
+    const { detail } = await setupWithBase({ detailZooms: [DETAIL_ZOOM, 14] });
+    await vi.advanceTimersByTimeAsync(REST_DELAY);
+    expect(detail.detailId).toBe("detail-1");
+    zoomCamera(0.4);
+    await vi.advanceTimersByTimeAsync(REST_DELAY);
+    expect(detail.detailId).toBeUndefined();
+    expect(deregisterObject).toHaveBeenCalledWith("detail-1");
+    expect(deleteRequest).toHaveBeenCalledWith(
+      expect.objectContaining({ params: { id: "detail-1" } }),
+    );
   });
 });

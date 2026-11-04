@@ -195,7 +195,9 @@ export const useBasemapDetailStore = defineStore("basemapDetail", () => {
     }
     if (isObsolete(refreshNumber, basemapId) || response.zoom <= grid.zoom) {
       if (!isObsolete(refreshNumber, basemapId)) {
-        // No finer zoom exists here: this view is a step too, not rebuilt at every rest
+        // No finer zoom exists here: a detail still shown is out of step and goes first, then
+        // This view is a step too, not rebuilt at every rest
+        await clear();
         detailGrid.value = { bounds: response.bounds, columns: response.columns };
       }
       await discard(response.id, false);
