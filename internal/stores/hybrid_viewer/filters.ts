@@ -75,8 +75,17 @@ async function setThreshold(ids: string[], attributes: ThresholdAttribute[]): Pr
     attributes,
   });
 }
-// oxlint-disable-next-line typescript/explicit-function-return-type, typescript/explicit-module-boundary-types
-function useHybridViewerFilters() {
+function useHybridViewerFilters(): {
+  setClippingPlanes: typeof setClippingPlanes;
+  setShrink: typeof setShrink;
+  setExplode: typeof setExplode;
+  setSlice: typeof setSlice;
+  setThreshold: typeof setThreshold;
+  getThresholds: (id: string) => Threshold[];
+  addThreshold: (id: string) => void;
+  removeThreshold: (id: string, index: number) => void;
+  removeThresholds: (id: string) => void;
+} {
   const thresholds = reactive<Record<string, Threshold[]>>({});
   let lastThresholdId = 0;
 
