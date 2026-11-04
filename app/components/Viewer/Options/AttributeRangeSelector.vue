@@ -11,10 +11,17 @@ const maximum = defineModel<number>("maximum");
 const minimumText = ref<string>("");
 const maximumText = ref<string>("");
 
-watch(minimum, (value) => (minimumText.value = value === undefined ? "" : String(value)), {
+function formatValue(value: number | undefined): string {
+  if (value === undefined) {
+    return "";
+  }
+  return String(value);
+}
+
+watch(minimum, (value) => (minimumText.value = formatValue(value)), {
   immediate: true,
 });
-watch(maximum, (value) => (maximumText.value = value === undefined ? "" : String(value)), {
+watch(maximum, (value) => (maximumText.value = formatValue(value)), {
   immediate: true,
 });
 
@@ -27,7 +34,7 @@ function parseValue(text: string): number | undefined {
 function commitMinimum(): void {
   const value = parseValue(minimumText.value);
   if (value === undefined) {
-    minimumText.value = minimum.value === undefined ? "" : String(minimum.value);
+    minimumText.value = formatValue(minimum.value);
     return;
   }
   minimum.value = value;
@@ -36,7 +43,7 @@ function commitMinimum(): void {
 function commitMaximum(): void {
   const value = parseValue(maximumText.value);
   if (value === undefined) {
-    maximumText.value = maximum.value === undefined ? "" : String(maximum.value);
+    maximumText.value = formatValue(maximum.value);
     return;
   }
   maximum.value = value;

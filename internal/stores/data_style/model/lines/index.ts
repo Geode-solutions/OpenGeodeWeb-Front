@@ -1,26 +1,15 @@
-import { isModelLinesEdgeAttributeValid, useModelLinesEdgeAttribute } from "./edge";
-import { isModelLinesVertexAttributeValid, useModelLinesVertexAttribute } from "./vertex";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import {
+  applyModelLinesConstantColoring,
+  applyModelLinesEdgeColoring,
+  applyModelLinesVertexColoring,
+} from "./apply_coloring";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelLinesColor } from "./color";
 import { useModelLinesCommonStyle } from "./common";
+import { useModelLinesEdgeAttribute } from "./edge";
 import { useModelLinesPointsStyle } from "./points";
+import { useModelLinesVertexAttribute } from "./vertex";
 import { useModelLinesVisibility } from "./visibility";
-
-interface ColorGroup {
-  color: RGBAColor | undefined;
-  lines_ids: string[];
-}
-
-interface AttributeGroup {
-  name: string;
-  item: number;
-  minimum: number;
-  maximum: number;
-  colorMap: string;
-  no_data_color?: RGBAColor;
-  lines_ids: string[];
-}
 
 async function setModelLinesDefaultStyle(_id: string): Promise<void> {
   // Placeholder
@@ -82,133 +71,20 @@ export function useModelLinesStyle(): ReturnType<typeof useModelLinesCommonStyle
 
     for (const [type, type_lines_ids] of Object.entries(activeColoringGroups)) {
       if (type === "constant") {
-        const colorGroups: Record<string, ColorGroup> = {};
-        for (const line_id of type_lines_ids) {
-          const color = modelColorStyle.modelLineColor(modelId, line_id);
-          const color_key = JSON.stringify(color);
-          colorGroups[color_key] ??= { color, lines_ids: [] };
-          colorGroups[color_key].lines_ids.push(line_id);
-        }
         coloringPromises.push(
-          ...Object.values(colorGroups).map(async ({ color, lines_ids: ids }) => {
-            const result = await modelColorStyle.setModelLinesColor(
-              modelId,
-              ids,
-              color,
-              "constant",
-            );
-            return result;
-          }),
+          ...applyModelLinesConstantColoring(modelId, type_lines_ids, modelColorStyle),
         );
       } else if (type === "random") {
         coloringPromises.push(
           modelColorStyle.setModelLinesColor(modelId, type_lines_ids, undefined, "random"),
         );
       } else if (type === "vertex") {
-        const vertexGroups: Record<string, AttributeGroup> = {};
-        for (const line_id of type_lines_ids) {
-          const name = modelLinesVertexAttribute.modelLinesVertexAttributeName(modelId, line_id);
-          const item = modelLinesVertexAttribute.modelLinesVertexAttributeItem(modelId, line_id);
-          const [minimum, maximum] = modelLinesVertexAttribute.modelLinesVertexAttributeRange(
-            modelId,
-            line_id,
-          );
-          const colorMap = modelLinesVertexAttribute.modelLinesVertexAttributeColorMap(
-            modelId,
-            line_id,
-          );
-          const no_data_color = modelLinesVertexAttribute.modelLinesVertexAttributeNoDataColor(
-            modelId,
-            line_id,
-          );
-          const attribute = {
-            name,
-            item,
-            minimum,
-            maximum,
-            colorMap,
-            no_data_color,
-          };
-          if (!isModelLinesVertexAttributeValid(attribute)) {
-            continue;
-          }
-          const key = [name, item, colorMap, minimum, maximum, JSON.stringify(no_data_color)].join(
-            "_",
-          );
-          vertexGroups[key] ??= { ...attribute, lines_ids: [] };
-          vertexGroups[key].lines_ids.push(line_id);
-        }
         coloringPromises.push(
-          ...Object.values(vertexGroups).map(
-            async ({ name, item, minimum, maximum, colorMap, no_data_color, lines_ids: ids }) => {
-              const result = await modelLinesVertexAttribute.setModelLinesVertexAttribute(
-                modelId,
-                ids,
-                {
-                  name,
-                  item,
-                  minimum,
-                  maximum,
-                  colorMap,
-                  no_data_color,
-                },
-              );
-              return result;
-            },
-          ),
+          ...applyModelLinesVertexColoring(modelId, type_lines_ids, modelLinesVertexAttribute),
         );
       } else if (type === "edge") {
-        const edgeGroups: Record<string, AttributeGroup> = {};
-        for (const line_id of type_lines_ids) {
-          const name = modelLinesEdgeAttribute.modelLinesEdgeAttributeName(modelId, line_id);
-          const item = modelLinesEdgeAttribute.modelLinesEdgeAttributeItem(modelId, line_id);
-          const [minimum, maximum] = modelLinesEdgeAttribute.modelLinesEdgeAttributeRange(
-            modelId,
-            line_id,
-          );
-          const colorMap = modelLinesEdgeAttribute.modelLinesEdgeAttributeColorMap(
-            modelId,
-            line_id,
-          );
-          const no_data_color = modelLinesEdgeAttribute.modelLinesEdgeAttributeNoDataColor(
-            modelId,
-            line_id,
-          );
-          const attribute = {
-            name,
-            item,
-            minimum,
-            maximum,
-            colorMap,
-            no_data_color,
-          };
-          if (!isModelLinesEdgeAttributeValid(attribute)) {
-            continue;
-          }
-          const key = [name, item, colorMap, minimum, maximum, JSON.stringify(no_data_color)].join(
-            "_",
-          );
-          edgeGroups[key] ??= { ...attribute, lines_ids: [] };
-          edgeGroups[key].lines_ids.push(line_id);
-        }
         coloringPromises.push(
-          ...Object.values(edgeGroups).map(
-            async ({ name, item, minimum, maximum, colorMap, no_data_color, lines_ids: ids }) => {
-              const result = await modelLinesEdgeAttribute.setModelLinesEdgeAttribute(
-                modelId,
-                ids,
-                {
-                  name,
-                  item,
-                  minimum,
-                  maximum,
-                  colorMap,
-                  no_data_color,
-                },
-              );
-              return result;
-            },
-          ),
+          ...applyModelLinesEdgeColoring(modelId, type_lines_ids, modelLinesEdgeAttribute),
         );
       }
     }

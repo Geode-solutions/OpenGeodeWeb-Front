@@ -19,8 +19,9 @@ const TIMEOUT = 5000;
 type SetFactor = (ids: string[], factor: number) => Promise<void>;
 
 vi.mock(import("@ogw_front/stores/data") as Promise<unknown>, () => ({
-  useDataStore: (): { refAllItems: () => Ref<{ id: string; name: string }[]> } => ({
-    refAllItems: (): Ref<{ id: string; name: string }[]> => ref([{ id: DATA_ID, name: "model" }]),
+  useDataStore: (): { refRegisteredItems: () => Ref<{ id: string; name: string }[]> } => ({
+    refRegisteredItems: (): Ref<{ id: string; name: string }[]> =>
+      ref([{ id: DATA_ID, name: "model" }]),
   }),
 }));
 vi.mock(import("@ogw_front/stores/hybrid_viewer") as Promise<unknown>, () => ({

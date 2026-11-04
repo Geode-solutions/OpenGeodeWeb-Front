@@ -1,23 +1,15 @@
-import type { Dexie, Table } from "dexie";
-import type {
-  ModelComponentStyle,
-  ModelComponentTypeStyle,
-  StyleValues,
-} from "@ogw_internal/stores/data_style/types.js";
+import {
+  type ComponentStyleUpdate,
+  useModelComponentStyleMutations,
+  useModelComponentsPerComponentStyleMutation,
+  useModelComponentsStyleMutation,
+} from "./common_mutations";
 import type { ParamsOf } from "@ogw_shared/utils/types.js";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
-import { database } from "@ogw_internal/database/database";
-import merge from "lodash/merge";
+import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { useDataStore } from "@ogw_front/stores/data";
-import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import type viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
-
-// The underlying dexie tables use compound array keys ([id_model, id_component] /
-// [id_model, type]) but the shared `database` proxy types every table as
-// Table<Record<string, unknown>, string>. Cast locally to the real key shape.
-type ComponentTable = Table<ModelComponentStyle, [string, string]>;
-type ComponentTypeTable = Table<ModelComponentTypeStyle, [string, string]>;
 
 type ModelComponentSchemas = (typeof viewer_schemas)["opengeodeweb_viewer"]["model"][
   | "corners"
@@ -30,11 +22,6 @@ type ModelColorMode = ParamsOf<ModelColorSchema>["color_mode"];
 
 function isModelColorMode(value: string): value is ModelColorMode {
   return value === "constant" || value === "random";
-}
-
-interface ComponentStyleUpdate {
-  id_component: string;
-  values: StyleValues;
 }
 
 interface UseModelCommonStyleReturn {
@@ -77,105 +64,9 @@ interface UseModelCommonStyleReturn {
 export function useModelCommonStyle(): UseModelCommonStyleReturn {
   const dataStore = useDataStore();
   const viewerStore = useViewerStore();
-  const dataStyleState = useDataStyleState();
-  const model_component_datastyle_db =
-    // oxlint-disable-next-line no-unsafe-type-assertion -- compound-key table cast; see comment above.
-    database.model_component_datastyle as unknown as ComponentTable;
-  const model_component_type_datastyle_db =
-    // oxlint-disable-next-line no-unsafe-type-assertion -- compound-key table cast; see comment above.
-    database.model_component_type_datastyle as unknown as ComponentTypeTable;
-
-  async function mutateComponentStyle(
-    id_model: string,
-    id_component: string,
-    values: StyleValues,
-  ): Promise<unknown> {
-    dataStyleState.updateComponentStyleCache(id_model, id_component, values);
-    const key: [string, string] = [id_model, id_component];
-    const entry: ModelComponentStyle = (await model_component_datastyle_db.get(key)) ?? {
-      id_model,
-      id_component,
-    };
-    merge(entry, values);
-    return model_component_datastyle_db.put(structuredClone(toRaw(entry)));
-  }
-
-  async function mutateModelComponentTypeStyle(
-    id_model: string,
-    type: string,
-    values: StyleValues,
-  ): Promise<void> {
-    dataStyleState.updateModelComponentTypeStyleCache(id_model, type, values);
-    // oxlint-disable-next-line no-unsafe-type-assertion -- the shared database proxy types every table as Dexie; see comment above.
-    await (database as unknown as Dexie).transaction(
-      "rw",
-      model_component_type_datastyle_db,
-      async () => {
-        const key: [string, string] = [id_model, type];
-        const entry: ModelComponentTypeStyle = (await model_component_type_datastyle_db.get(
-          key,
-        )) ?? {
-          id_model,
-          type,
-        };
-        merge(entry, values);
-        return model_component_type_datastyle_db.put(structuredClone(toRaw(entry)));
-      },
-    );
-  }
-
-  async function mutateComponentStyles(
-    id_model: string,
-    id_components: string[],
-    values: StyleValues,
-  ): Promise<void> {
-    dataStyleState.bulkUpdateComponentStylesCache(id_model, id_components, values);
-    // oxlint-disable-next-line no-unsafe-type-assertion -- the shared database proxy types every table as Dexie; see comment above.
-    await (database as unknown as Dexie).transaction(
-      "rw",
-      model_component_datastyle_db,
-      async () => {
-        const keys: [string, string][] = id_components.map((id_component) => [
-          id_model,
-          id_component,
-        ]);
-        const existing = await model_component_datastyle_db.bulkGet(keys);
-        const updates = id_components.map((id_component, index) => {
-          const style: ModelComponentStyle = existing[index] ?? { id_model, id_component };
-          merge(style, values);
-          return toRaw(style);
-        });
-
-        return model_component_datastyle_db.bulkPut(structuredClone(updates));
-      },
-    );
-  }
-
-  async function bulkMutateComponentStylesPerComponent(
-    id_model: string,
-    component_updates: ComponentStyleUpdate[],
-  ): Promise<void> {
-    dataStyleState.bulkUpdateComponentStyleCache(id_model, component_updates);
-    // oxlint-disable-next-line no-unsafe-type-assertion -- the shared database proxy types every table as Dexie; see comment above.
-    await (database as unknown as Dexie).transaction(
-      "rw",
-      model_component_datastyle_db,
-      async () => {
-        const keys: [string, string][] = component_updates.map((update) => [
-          id_model,
-          update.id_component,
-        ]);
-        const existing = await model_component_datastyle_db.bulkGet(keys);
-        const updates = component_updates.map(({ id_component, values }, index) => {
-          const style: ModelComponentStyle = existing[index] ?? { id_model, id_component };
-          merge(style, values);
-          return toRaw(style);
-        });
-        return model_component_datastyle_db.bulkPut(structuredClone(updates));
-      },
-    );
-  }
-
+  const { mutateComponentStyle, mutateModelComponentTypeStyle } = useModelComponentStyleMutations();
+  const { mutateComponentStyles } = useModelComponentsStyleMutation();
+  const { bulkMutateComponentStylesPerComponent } = useModelComponentsPerComponentStyleMutation();
   async function setModelTypeColor(
     id: string,
     component_ids: string[],

@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { MODEL_VERTEX_COLORING } from "@ogw_front/utils/model_component_coloring";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import ViewerOptionsSizeSlider from "@ogw_front/components/Viewer/Options/Sliders/Size.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
-import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
@@ -203,23 +203,7 @@ const vertexAttributeNoDataColor = computed<RGBAColor | undefined>({
   },
 });
 
-const capabilities = {
-  color: { available: true },
-  textures: { available: false },
-  vertex: { available: true },
-  edge: { available: false },
-  cell: { available: false },
-  polygon: { available: false },
-  polyhedron: { available: false },
-};
-
-const backSchemas = back_schemas.opengeodeweb_back;
-const attributeSchemas = {
-  vertex: {
-    names: backSchemas.model_component_vertex_attribute_names,
-    range: backSchemas.model_component_vertex_attribute_range,
-  },
-};
+const { capabilities, schemas: attributeSchemas } = MODEL_VERTEX_COLORING;
 </script>
 
 <template>

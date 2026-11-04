@@ -1,0 +1,131 @@
+import type { Bounds } from "@kitware/vtk.js/types";
+import type vtkActor from "@kitware/vtk.js/Rendering/Core/Actor";
+import type { vtkCamera } from "@kitware/vtk.js/Rendering/Core/Camera";
+
+function computeSceneBounds(actors: readonly vtkActor[]): Bounds {
+  let bounds: Bounds = [Infinity, -Infinity, Infinity, -Infinity, Infinity, -Infinity];
+  for (const actor of actors) {
+    const boundsOfActor = actor.getBounds();
+    bounds = [
+      Math.min(bounds[0], boundsOfActor[0]),
+      Math.max(bounds[1], boundsOfActor[1]),
+      Math.min(bounds[2], boundsOfActor[2]),
+      Math.max(bounds[3], boundsOfActor[3]),
+      Math.min(bounds[4], boundsOfActor[4]),
+      Math.max(bounds[5], boundsOfActor[5]),
+    ];
+  }
+  return bounds;
+}
+
+interface SceneBoundsInfo {
+  readonly center: readonly number[];
+  readonly cubicBounds: readonly number[];
+}
+
+function computeSceneBoundsInfo(actors: readonly vtkActor[]): SceneBoundsInfo {
+  if (actors.length === 0) {
+    return { center: [0, 0, 0], cubicBounds: [-1, 1, -1, 1, -1, 1] };
+  }
+  const [xmin, xmax, ymin, ymax, zmin, zmax] = computeSceneBounds(actors);
+  const center = [
+    Number(((xmin + xmax) / 2).toFixed(4)),
+    Number(((ymin + ymax) / 2).toFixed(4)),
+    Number(((zmin + zmax) / 2).toFixed(4)),
+  ];
+
+  const maxActorExtent = Math.max(
+    ...actors.map((actor: vtkActor) => {
+      const bounds = actor.getBounds();
+      return Math.max(bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4]);
+    }),
+  );
+  const halfExtent = maxActorExtent / 2;
+  const [centerX = 0, centerY = 0, centerZ = 0] = center;
+  const cubicBounds = [
+    centerX - halfExtent,
+    centerX + halfExtent,
+    centerY - halfExtent,
+    centerY + halfExtent,
+    centerZ - halfExtent,
+    centerZ + halfExtent,
+  ];
+  return { center, cubicBounds };
+}
+
+interface ActorEntry {
+  readonly actor: vtkActor;
+}
+
+interface MainCameraOptions {
+  readonly focal_point?: readonly number[];
+  readonly position?: readonly number[];
+  readonly view_up?: readonly number[];
+}
+
+function resolveActiveActors(
+  targetAllVisible: boolean,
+  allItems: readonly { readonly id: string }[],
+  selectedDatasetIds: readonly string[],
+  hybridDb: Record<string, ActorEntry | undefined>,
+): vtkActor[] {
+  let targetIds: readonly string[] = selectedDatasetIds;
+  if (targetAllVisible) {
+    targetIds = allItems.map((item: { id: string }) => item.id);
+  }
+  const targeted = targetIds
+    .map((id) => hybridDb[id]?.actor)
+    .filter((actor: vtkActor | undefined): actor is vtkActor => actor !== undefined);
+  if (targeted.length > 0) {
+    return targeted;
+  }
+  return Object.values(hybridDb)
+    .filter((entry: ActorEntry | undefined): entry is ActorEntry => entry !== undefined)
+    .map((entry: ActorEntry) => entry.actor);
+}
+
+function computeNormalizedViewDirection(
+  focalPoint: readonly number[],
+  position: readonly number[],
+): readonly number[] | undefined {
+  const dir = [
+    (position[0] ?? 0) - (focalPoint[0] ?? 0),
+    (position[1] ?? 0) - (focalPoint[1] ?? 0),
+    (position[2] ?? 0) - (focalPoint[2] ?? 0),
+  ];
+  const dirLen = Math.hypot(...dir);
+  if (dirLen === 0) {
+    return undefined;
+  }
+  return dir.map((component) => component / dirLen);
+}
+
+// Aligns the local clipping-plane preview camera onto the same viewing direction as the
+// Main viewer camera, re-centered on the clipped scene's bounds.
+function alignCameraToMainCamera(
+  camera: vtkCamera,
+  mainCam: MainCameraOptions,
+  center: readonly number[],
+): void {
+  if (!mainCam.focal_point || !mainCam.position) {
+    return;
+  }
+  const normDir = computeNormalizedViewDirection(mainCam.focal_point, mainCam.position);
+  if (!normDir) {
+    return;
+  }
+  const distance = camera.getDistance();
+  camera.setFocalPoint(center[0] ?? 0, center[1] ?? 0, center[2] ?? 0);
+  camera.setPosition(
+    (center[0] ?? 0) + (normDir[0] ?? 0) * distance,
+    (center[1] ?? 0) + (normDir[1] ?? 0) * distance,
+    (center[2] ?? 0) + (normDir[2] ?? 0) * distance,
+  );
+  if (mainCam.view_up) {
+    const [viewUpX = 0, viewUpY = 0, viewUpZ = 0] = mainCam.view_up;
+    camera.setViewUp(viewUpX, viewUpY, viewUpZ);
+  }
+}
+
+export { alignCameraToMainCamera, computeSceneBounds, computeSceneBoundsInfo, resolveActiveActors };
+export type { MainCameraOptions, SceneBoundsInfo };

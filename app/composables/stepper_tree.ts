@@ -21,7 +21,11 @@ function build_initial_state_unref(
   const initial_state_unref: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(initial_state)) {
     const unref_val: unknown = unref(value);
-    initial_state_unref[key] = isUnknownArray(unref_val) ? [...unref_val] : unref_val;
+    if (isUnknownArray(unref_val)) {
+      initial_state_unref[key] = [...unref_val];
+    } else {
+      initial_state_unref[key] = unref_val;
+    }
   }
   return initial_state_unref;
 }
@@ -65,7 +69,11 @@ export function useStepperTree(
     state.current_step_index = 0;
     state.navigating_back = false;
     for (const [key, initial_val] of Object.entries(initial_state_unref)) {
-      state[key] = isUnknownArray(initial_val) ? [...initial_val] : initial_val;
+      if (isUnknownArray(initial_val)) {
+        state[key] = [...initial_val];
+      } else {
+        state[key] = initial_val;
+      }
     }
   }
 

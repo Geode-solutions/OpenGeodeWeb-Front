@@ -37,9 +37,10 @@ function slerp(from: Vector3, target: Vector3, ratio: number, mid?: Vector3): Ve
     ]);
   }
   if (dotProduct < -SLERP_LINEAR_THRESHOLD && mid) {
-    return ratio < MID_ANIMATION_RATIO
-      ? slerp(normFrom, mid, ratio * 2)
-      : slerp(mid, normTarget, (ratio - MID_ANIMATION_RATIO) * 2);
+    if (ratio < MID_ANIMATION_RATIO) {
+      return slerp(normFrom, mid, ratio * 2);
+    }
+    return slerp(mid, normTarget, (ratio - MID_ANIMATION_RATIO) * 2);
   }
   const theta = Math.acos(dotProduct);
   const sinTheta = Math.sin(theta);
@@ -50,6 +51,17 @@ function slerp(from: Vector3, target: Vector3, ratio: number, mid?: Vector3): Ve
     normFrom[1] * weightFrom + normTarget[1] * weightTarget,
     normFrom[2] * weightFrom + normTarget[2] * weightTarget,
   ];
+}
+
+function getCameraOptions(camera: vtkCamera): CameraOptions {
+  return {
+    focal_point: [...(camera.getFocalPoint() ?? [0, 0, 0])] as Vector3,
+    view_up: [...(camera.getViewUp() ?? [0, 0, 0])] as Vector3,
+    position: [...(camera.getPosition() ?? [0, 0, 0])] as Vector3,
+    view_angle: camera.getViewAngle(),
+    clipping_range: [...(camera.getClippingRange() ?? [0, 0])] as [number, number],
+    distance: camera.getDistance(),
+  };
 }
 
 function computeAnimationDuration(startState: CameraOptions, targetState: CameraOptions): number {
@@ -145,4 +157,5 @@ export {
   SHORT_ANIMATION_DURATION,
   animateCamera,
   computeAnimationDuration,
+  getCameraOptions,
 };
