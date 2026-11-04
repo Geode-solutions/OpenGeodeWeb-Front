@@ -26,6 +26,7 @@ import Grid3DPointsOptions from "@ogw_front/components/Viewer/Grid/3D/PointsOpti
 // Solid components
 import SolidEdgesOptions from "@ogw_front/components/Viewer/Solid/EdgesOptions.vue";
 import SolidPointsOptions from "@ogw_front/components/Viewer/Solid/PointsOptions.vue";
+// oxlint-disable-next-line import/max-dependencies -- each menu component must be imported individually.
 import SolidPolygonsOptions from "@ogw_front/components/Viewer/Solid/PolygonsOptions.vue";
 import SolidPolyhedraOptions from "@ogw_front/components/Viewer/Solid/SpecificPolyhedraOptions.vue";
 
