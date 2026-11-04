@@ -1,45 +1,29 @@
 import {
   type MapBounds,
   type MapGrid,
-  type ViewCamera,
   covers,
-  mapResolution,
-  needsSharperMap,
-  screenPixelGroundSize,
   stillSharp,
-  visibleMapArea,
 } from "@ogw_front/utils/visible_map_area";
-import back_schemas, {
-  type BasemapBuildResponse,
-} from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
-import { useBackStore } from "@ogw_front/stores/back";
+import { ignoreError, useBasemapViewer } from "./basemap_helpers/viewer.js";
+import type { BasemapBuildResponse } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
+import type { BasemapGrid } from "./basemap_helpers/builds.js";
 import { useBasemapStore } from "@ogw_front/stores/basemap";
-import { useCrsStore } from "@ogw_front/stores/crs";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDebounceFn } from "@vueuse/core";
+import { useDetailView } from "./basemap_helpers/detail_view.js";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
-interface RenderWindowLike {
-  getApiSpecificRenderWindow: () => { getSize: () => [number, number] };
-}
-type BaseGrid = NonNullable<ReturnType<typeof useBasemapStore>["grid"]>;
-
 const REST_DELAY_MILLISECONDS = 250;
-const MAX_DETAIL_PIXELS = 4096;
 const DETAIL_NAME = "basemap detail";
-
-function ignoreError(): void {
-  // Already reported by the request feedback
-}
 
 // When the camera rests, the visible area of the basemap at the zoom of the screen
 // oxlint-disable-next-line max-lines-per-function, max-statements
 export const useBasemapDetailStore = defineStore("basemapDetail", () => {
-  const backStore = useBackStore();
   const dataStore = useDataStore();
-  const crsStore = useCrsStore();
   const basemapStore = useBasemapStore();
   const hybridViewerStore = useHybridViewerStore();
+  const { discardMap } = useBasemapViewer();
+  const { viewportSize, currentView, detailRequest } = useDetailView();
   const detailId = ref<string | undefined>(undefined);
   // The grid of the detail shown: a new detail is built only when the view leaves its step
   let detailGrid: MapGrid | undefined = undefined;
@@ -61,62 +45,8 @@ export const useBasemapDetailStore = defineStore("basemapDetail", () => {
     if (id === undefined) {
       return;
     }
-    await basemapStore.discard(id, true);
+    await discardMap(id, true);
     await hybridViewerStore.remoteRender();
-  }
-
-  function viewportSize(): [number, number] | undefined {
-    // The store holds the render window in a holder: the vtk.js typing of its API is partial
-    // oxlint-disable-next-line no-unsafe-type-assertion -- vtk.js render window API boundary
-    const renderWindow = hybridViewerStore.genericRenderWindow.value as unknown as
-      | RenderWindowLike
-      | undefined;
-    const size = renderWindow?.getApiSpecificRenderWindow().getSize();
-    if (size === undefined || size[0] === 0 || size[1] === 0) {
-      return undefined;
-    }
-    return size;
-  }
-
-  async function detailRequest(
-    visibleArea: MapBounds,
-    z: number,
-    size: readonly number[],
-  ): Promise<BasemapBuildResponse | undefined> {
-    const crs = crsStore.projectCrs;
-    if (crs === undefined) {
-      return undefined;
-    }
-    const response = await backStore.request({
-      schema: back_schemas.opengeodeweb_back.basemap.build,
-      params: {
-        maps: [...basemapStore.maps],
-        crs,
-        bounds: visibleArea,
-        z,
-        margin: false,
-        max_pixels: Math.min(MAX_DETAIL_PIXELS, Math.max(...size)),
-      },
-    });
-    return response;
-  }
-
-  // What the screen shows of the base, and the ground size of one of its pixels
-  function currentView(
-    grid: BaseGrid,
-    size: readonly number[],
-  ): { visibleArea: MapBounds | undefined; wanted: number; sharperNeeded: boolean } {
-    // oxlint-disable-next-line no-unsafe-type-assertion -- camera_options carries the vtk.js camera fields
-    const camera = hybridViewerStore.camera_options as unknown as ViewCamera;
-    const planeZ = grid.z * hybridViewerStore.zScale;
-    const visibleArea = visibleMapArea(
-      camera,
-      (size[0] ?? 1) / (size[1] ?? 1),
-      planeZ,
-      grid.bounds,
-    );
-    const wanted = screenPixelGroundSize(camera, size[1] ?? 1);
-    return { visibleArea, wanted, sharperNeeded: needsSharperMap(mapResolution(grid), wanted) };
   }
 
   function isObsolete(refreshNumber: number, basemapId: string): boolean {
@@ -154,7 +84,7 @@ export const useBasemapDetailStore = defineStore("basemapDetail", () => {
       await syncLayers();
     }
     if (previous !== undefined) {
-      void basemapStore.discard(previous, false);
+      void discardMap(previous, false);
     }
   }
 
@@ -164,23 +94,26 @@ export const useBasemapDetailStore = defineStore("basemapDetail", () => {
     // The synchronous part of clear() has run: the step is set before any newer refresh
     detailGrid = response;
     await clearing;
-    await basemapStore.discard(response.id, false);
+    await discardMap(response.id, false);
   }
 
   async function build(
-    grid: BaseGrid,
+    grid: BasemapGrid,
     basemapId: string,
     view: MapBounds,
     size: readonly number[],
   ): Promise<void> {
     lastRefresh += 1;
     const refreshNumber = lastRefresh;
-    const response = await detailRequest(view, grid.z, size);
+    const response = await detailRequest(
+      { maps: basemapStore.maps, visibleArea: view, z: grid.z },
+      size,
+    );
     if (response === undefined) {
       return;
     }
     if (isObsolete(refreshNumber, basemapId)) {
-      await basemapStore.discard(response.id, false);
+      await discardMap(response.id, false);
       return;
     }
     if (response.zoom <= grid.zoom) {
@@ -192,11 +125,11 @@ export const useBasemapDetailStore = defineStore("basemapDetail", () => {
       sentLayers = await basemapStore.applyBasemap(response, DETAIL_NAME, basemapId);
     } catch {
       // The request feedback already shows the error: the detail must not stay registered
-      await basemapStore.discard(response.id, true);
+      await discardMap(response.id, true);
       return;
     }
     if (isObsolete(refreshNumber, basemapId)) {
-      await basemapStore.discard(response.id, true);
+      await discardMap(response.id, true);
       return;
     }
     await replaceDetail(response, sentLayers);
