@@ -109,53 +109,53 @@ function builtMaps(request: BuildRequest): { map: string; sources: string[] }[] 
   return request.params.maps.map((map) => ({ map, sources: [] }));
 }
 
+function baseResponse(
+  counters: Counters,
+  baseColumns: number,
+  request: BuildRequest,
+): Record<string, unknown> {
+  counters.base += 1;
+  return {
+    id: `basemap-${counters.base}`,
+    columns: baseColumns,
+    rows: baseColumns,
+    zoom: 14,
+    bounds: BASE_BOUNDS,
+    attribution: "test",
+    maps: builtMaps(request),
+  };
+}
+
+// The back widens the requested area to whole tiles
+function detailResponse(
+  counters: Counters,
+  request: BuildRequest,
+  zoom: number,
+): Record<string, unknown> {
+  const { bounds } = request.params;
+  counters.detail += 1;
+  return {
+    id: `detail-${counters.detail}`,
+    columns: DETAIL_COLUMNS,
+    rows: DETAIL_COLUMNS,
+    zoom,
+    bounds: {
+      x_min: bounds.x_min - DETAIL_MARGIN,
+      y_min: bounds.y_min - DETAIL_MARGIN,
+      x_max: bounds.x_max + DETAIL_MARGIN,
+      y_max: bounds.y_max + DETAIL_MARGIN,
+    },
+    attribution: "test",
+    maps: builtMaps(request),
+  };
+}
+
 describe("basemap detail store", () => {
   let backRequest = vi.fn();
   let deleteRequest = vi.fn();
   let viewerRequest = vi.fn<(request: ViewerRequest) => Promise<unknown>>();
   let deregisterObject = vi.fn();
   let slowDetail: PromiseWithResolvers<unknown> | undefined = undefined;
-
-  function baseResponse(
-    counters: Counters,
-    baseColumns: number,
-    request: BuildRequest,
-  ): Record<string, unknown> {
-    counters.base += 1;
-    return {
-      id: `basemap-${counters.base}`,
-      columns: baseColumns,
-      rows: baseColumns,
-      zoom: 14,
-      bounds: BASE_BOUNDS,
-      attribution: "test",
-      maps: builtMaps(request),
-    };
-  }
-
-  // The back widens the requested area to whole tiles
-  function detailResponse(
-    counters: Counters,
-    request: BuildRequest,
-    zoom: number,
-  ): Record<string, unknown> {
-    const { bounds } = request.params;
-    counters.detail += 1;
-    return {
-      id: `detail-${counters.detail}`,
-      columns: DETAIL_COLUMNS,
-      rows: DETAIL_COLUMNS,
-      zoom,
-      bounds: {
-        x_min: bounds.x_min - DETAIL_MARGIN,
-        y_min: bounds.y_min - DETAIL_MARGIN,
-        x_max: bounds.x_max + DETAIL_MARGIN,
-        y_max: bounds.y_max + DETAIL_MARGIN,
-      },
-      attribution: "test",
-      maps: builtMaps(request),
-    };
-  }
 
   async function setupWithBase(
     options: { baseColumns?: number; slowDetail?: boolean; detailZooms?: number[] } = {},
