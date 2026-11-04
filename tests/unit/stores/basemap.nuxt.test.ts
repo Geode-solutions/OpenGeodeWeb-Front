@@ -40,7 +40,7 @@ function buildResponse(id: string): Record<string, unknown> {
     name: "basemap",
     columns: 2,
     rows: 3,
-    attribution: "Powered by Esri | test",
+    attribution: "© Test tiles",
     maps: [{ map: "satellite", sources: ["eox_s2cloudless_2016", "ign_orthophotos"] }],
   };
 }
@@ -133,7 +133,7 @@ describe("basemap store", () => {
       }),
     );
     expect(store.basemapId).toBe("basemap-1");
-    expect(store.attribution).toBe("Powered by Esri | test");
+    expect(store.attribution).toBe("© Test tiles");
   });
 
   test("the first build drapes the georeferenced data and renders", async () => {
@@ -368,7 +368,7 @@ describe("basemap store", () => {
     const store = setup();
     const both = [
       { map: "satellite", sources: ["ign_orthophotos"] },
-      { map: "routes", sources: ["ign_routes"] },
+      { map: "routes", sources: ["ign_roads"] },
     ];
     backRequest.mockResolvedValueOnce({ ...buildResponse("basemap-1"), maps: both });
     await store.setMaps(["satellite", "routes"]);
