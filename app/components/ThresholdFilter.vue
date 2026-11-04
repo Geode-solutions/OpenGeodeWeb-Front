@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import { type AttributeSource, fetchSources } from "@ogw_front/utils/threshold_sources";
-import { attributeArrayName, getAttributeRange } from "@ogw_front/utils/attributes";
+import type { Threshold, ThresholdAttribute } from "@ogw_internal/stores/hybrid_viewer/filters";
+import type { AttributeSource } from "@ogw_front/utils/threshold";
+import ThresholdCard from "@ogw_front/components/ThresholdCard.vue";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
-import ViewerOptionsAttributeRangeSelector from "@ogw_front/components/Viewer/Options/AttributeRangeSelector.vue";
-import { fetchAttributeRange } from "@ogw_front/utils/attribute_range";
-import { useBackStore } from "@ogw_front/stores/back";
+import { fetchSources } from "@ogw_front/utils/threshold_sources";
 import { useDataStore } from "@ogw_front/stores/data";
-import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useDebounceFn } from "@vueuse/core";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
@@ -18,26 +16,18 @@ interface Props {
 
 const { escapeFunction = undefined } = defineProps<Props>();
 
-interface AttributeInfo {
-  attribute_name: string;
-  nb_items: number;
-  time_steps?: number[];
-  [key: string]: unknown;
-}
-
 const show = defineModel<boolean>("show", { default: false });
-const backStore = useBackStore();
 const dataStore = useDataStore();
-const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const selectedDatasetId = ref<string>();
 const sources = ref<AttributeSource[]>([]);
-const selectedSourceIndex = ref<number>();
-const attributes = ref<AttributeInfo[]>([]);
-const attributeName = ref<string>();
-const attributeItem = ref<number>(0);
-const minimum = ref<number>();
-const maximum = ref<number>();
+const thresholds = computed<Threshold[]>(() => {
+  if (!selectedDatasetId.value) {
+    return [];
+  }
+  return hybridViewerStore.getThresholds(selectedDatasetId.value);
+});
+const cards = useTemplateRef("cards");
 
 const allItems = dataStore.refAllItems();
 const availableDatasets = computed<{ title: string; value: string }[]>(() =>
@@ -46,123 +36,74 @@ const availableDatasets = computed<{ title: string; value: string }[]>(() =>
     value: item.id,
   })),
 );
-const availableSources = computed<{ title: string; value: number }[]>(() =>
-  sources.value.map((source, index) => ({ title: source.title, value: index })),
-);
-const currentAttribute = computed<AttributeInfo | undefined>(() =>
-  attributes.value.find((attribute) => attribute.attribute_name === attributeName.value),
-);
-const currentTimeStep = computed<number | undefined>(() => {
-  const source = sources.value[selectedSourceIndex.value ?? -1];
-  if (!selectedDatasetId.value || !source || !currentAttribute.value?.time_steps?.length) {
-    return undefined;
-  }
-  const step =
-    dataStyleStore.attributeTimeStep(
-      selectedDatasetId.value,
-      source.timeStepKey,
-      attributeName.value,
-    ) ?? 0;
-  return Math.min(step, currentAttribute.value.time_steps.length - 1);
-});
-const itemOptions = computed<{ title: string; value: number }[]>(() =>
-  Array.from({ length: currentAttribute.value?.nb_items ?? 0 }, (_, index) => ({
-    title: `Item ${index + 1}`,
-    value: index,
-  })),
-);
 
-async function applyThreshold(): Promise<void> {
-  const source = sources.value[selectedSourceIndex.value ?? -1];
-  if (
-    !selectedDatasetId.value ||
-    !source ||
-    !attributeName.value ||
-    minimum.value === undefined ||
-    maximum.value === undefined ||
-    minimum.value > maximum.value
-  ) {
+async function applyThresholds(): Promise<void> {
+  if (!selectedDatasetId.value) {
     return;
   }
-  await hybridViewerStore.setThreshold([selectedDatasetId.value], {
-    name: attributeArrayName(attributeName.value, currentTimeStep.value),
-    location: source.location,
-    item: attributeItem.value,
-    minimum: minimum.value,
-    maximum: maximum.value,
-  });
+  await hybridViewerStore.setThreshold(
+    [selectedDatasetId.value],
+    thresholds.value
+      .map((threshold) => threshold.thresholdAttribute)
+      .filter((attribute): attribute is ThresholdAttribute => attribute !== undefined),
+  );
 }
 
-const debouncedApply = useDebounceFn(() => applyThreshold(), DEBOUNCE_DELAY);
+const debouncedApply = useDebounceFn(() => applyThresholds(), DEBOUNCE_DELAY);
 
-async function resetRange(): Promise<void> {
-  const source = sources.value[selectedSourceIndex.value ?? -1];
-  const name = attributeName.value;
-  if (!source || name === undefined) {
-    return;
-  }
-  const range = await fetchAttributeRange(source.schemas.range, source.params, name);
-  if (name !== attributeName.value) {
-    return;
-  }
-  const { min, max } = getAttributeRange(range, attributeItem.value);
-  minimum.value = min;
-  maximum.value = max;
-}
-
-async function removeThreshold(): Promise<void> {
-  attributeName.value = undefined;
+function addThreshold(): void {
   if (selectedDatasetId.value) {
-    await hybridViewerStore.setThreshold([selectedDatasetId.value]);
+    hybridViewerStore.addThreshold(selectedDatasetId.value);
+  }
+}
+
+function removeThreshold(index: number): void {
+  if (selectedDatasetId.value) {
+    hybridViewerStore.removeThreshold(selectedDatasetId.value, index);
+  }
+}
+
+async function clearThresholds(id: string): Promise<void> {
+  hybridViewerStore.removeThresholds(id);
+  await hybridViewerStore.setThreshold([id], []);
+}
+
+async function resetRanges(): Promise<void> {
+  await Promise.all((cards.value ?? []).map((card) => card?.resetRange()));
+}
+
+async function removeThresholds(): Promise<void> {
+  if (selectedDatasetId.value) {
+    await clearThresholds(selectedDatasetId.value);
+    hybridViewerStore.addThreshold(selectedDatasetId.value);
   }
 }
 
 watch(selectedDatasetId, async (id, previousId) => {
   if (previousId) {
-    await hybridViewerStore.setThreshold([previousId]);
+    await clearThresholds(previousId);
   }
-  selectedSourceIndex.value = undefined;
   if (id) {
     sources.value = await fetchSources(dataStore, id);
   } else {
     sources.value = [];
   }
-});
-
-watch(selectedSourceIndex, async (index) => {
-  attributeName.value = undefined;
-  attributes.value = [];
-  const source = sources.value[index ?? -1];
-  if (!source) {
-    return;
+  if (id && hybridViewerStore.getThresholds(id).length === 0) {
+    hybridViewerStore.addThreshold(id);
   }
-  const response = (await backStore.request({
-    schema: source.schemas.names,
-    params: source.params,
-  })) as { attributes: AttributeInfo[] };
-  attributes.value = response.attributes;
 });
 
-watch(attributeName, async () => {
-  attributeItem.value = 0;
-  await resetRange();
-});
-
-watch(attributeItem, async () => {
-  await resetRange();
-});
-
-watch(currentTimeStep, () => {
-  debouncedApply();
-});
-
-watch([minimum, maximum], () => {
-  debouncedApply();
-});
+watch(
+  thresholds,
+  () => {
+    debouncedApply();
+  },
+  { deep: true },
+);
 
 watch(show, (visible) => {
   if (visible) {
-    applyThreshold();
+    applyThresholds();
   }
 });
 </script>
@@ -188,50 +129,31 @@ watch(show, (visible) => {
         class="mb-3 text-caption"
       />
 
-      <v-select
-        v-if="selectedDatasetId"
-        v-model="selectedSourceIndex"
-        data-testid="thresholdAttributeTypeSelect"
-        :items="availableSources"
-        label="Select an attribute type"
-        variant="outlined"
-        density="compact"
-        hide-details
-        class="mb-3 text-caption"
-      />
+      <template v-if="selectedDatasetId">
+        <v-divider class="my-2" />
+        <v-row align="center" justify="space-between" no-gutters class="mb-2">
+          <v-col class="text-caption font-weight-bold">Thresholds ({{ thresholds.length }})</v-col>
+          <v-col cols="auto">
+            <v-btn
+              data-testid="addThresholdButton"
+              size="x-small"
+              variant="tonal"
+              color="primary"
+              icon="mdi-plus"
+              @click="addThreshold"
+            />
+          </v-col>
+        </v-row>
 
-      <v-select
-        v-if="selectedSourceIndex !== undefined"
-        v-model="attributeName"
-        data-testid="thresholdAttributeSelect"
-        :items="attributes.map((attribute) => attribute.attribute_name)"
-        label="Select an attribute"
-        variant="outlined"
-        density="compact"
-        hide-details
-        class="mb-3 text-caption"
-      />
-
-      <v-select
-        v-if="currentAttribute && currentAttribute.nb_items > 1"
-        v-model="attributeItem"
-        data-testid="thresholdItemSelect"
-        :items="itemOptions"
-        label="Select an item"
-        variant="outlined"
-        density="compact"
-        hide-details
-        class="mb-3 text-caption"
-      />
-
-      <template v-if="attributeName">
-        <v-divider class="my-3" />
-        <span class="text-caption font-weight-bold">Range</span>
-        <ViewerOptionsAttributeRangeSelector
-          v-model:minimum="minimum"
-          v-model:maximum="maximum"
-          class="mt-2"
-          @reset="resetRange"
+        <ThresholdCard
+          v-for="(threshold, idx) in thresholds"
+          :key="threshold.id"
+          ref="cards"
+          :threshold="threshold"
+          :dataset-id="selectedDatasetId"
+          :sources="sources"
+          :index="idx"
+          @remove="removeThreshold(idx)"
         />
       </template>
     </v-card-text>
@@ -244,9 +166,9 @@ watch(show, (visible) => {
           size="small"
           color="error"
           class="text-caption text-none"
-          @click="removeThreshold"
+          @click="removeThresholds"
         >
-          Remove Threshold
+          Remove all thresholds
         </v-btn>
         <v-btn
           data-testid="resetThresholdButton"
@@ -254,7 +176,7 @@ watch(show, (visible) => {
           size="small"
           color="secondary"
           class="text-caption text-none"
-          @click="resetRange"
+          @click="resetRanges"
         >
           Reset
         </v-btn>

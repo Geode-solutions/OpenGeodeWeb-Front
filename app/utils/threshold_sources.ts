@@ -3,17 +3,9 @@ import {
   MODEL_COMPONENT_ATTRIBUTE_SCHEMAS,
   MODEL_COMPONENT_KINDS,
 } from "@ogw_front/utils/attributes";
-import type { AttributeSchemas } from "@ogw_front/utils/attribute_range";
+import type { AttributeSource } from "@ogw_front/utils/threshold";
 import { attributeSchemas } from "@ogw_front/composables/attribute_coloring_style";
 import type { useDataStore } from "@ogw_front/stores/data";
-
-interface AttributeSource {
-  title: string;
-  schemas: AttributeSchemas;
-  timeStepKey: string;
-  params: { id: string; component_ids?: string[] };
-  location: "point" | "cell";
-}
 
 function attributeSource(
   kind: string,
@@ -57,4 +49,3 @@ async function fetchSources(
 }
 
 export { fetchSources };
-export type { AttributeSource };
