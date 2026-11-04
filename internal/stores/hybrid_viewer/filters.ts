@@ -60,29 +60,72 @@ interface ThresholdAttribute {
   minimum: number;
   maximum: number;
 }
-async function setThreshold(ids: string[], attribute?: ThresholdAttribute): Promise<void> {
+interface Threshold {
+  id: number;
+  sourceIndex: number | undefined;
+  attributeName: string | undefined;
+  item: number;
+  minimum: number | undefined;
+  maximum: number | undefined;
+  thresholdAttribute: ThresholdAttribute | undefined;
+}
+async function setThreshold(ids: string[], attributes: ThresholdAttribute[]): Promise<void> {
   await requestAndRender(viewer_schemas.opengeodeweb_viewer.viewer.threshold, {
     ids,
-    attribute,
+    attributes,
   });
 }
 function useHybridViewerFilters(): {
-  setClippingPlanes: (ids: string[], planes: ViewerClippingPlanesParams["planes"]) => Promise<void>;
-  setShrink: (ids: string[], shrink_factor: number) => Promise<void>;
-  setExplode: (ids: string[], explode_factor: number) => Promise<void>;
-  setSlice: (
-    ids: string[],
-    slices: { axis: SliceAxis; index: number }[],
-  ) => Promise<[number, number, number]>;
-  setThreshold: (ids: string[], attribute?: ThresholdAttribute) => Promise<void>;
+  setClippingPlanes: typeof setClippingPlanes;
+  setShrink: typeof setShrink;
+  setExplode: typeof setExplode;
+  setSlice: typeof setSlice;
+  setThreshold: typeof setThreshold;
+  getThresholds: (id: string) => Threshold[];
+  addThreshold: (id: string) => void;
+  removeThreshold: (id: string, index: number) => void;
+  removeThresholds: (id: string) => void;
 } {
+  const thresholds = reactive<Record<string, Threshold[]>>({});
+  let lastThresholdId = 0;
+
+  function getThresholds(id: string): Threshold[] {
+    return thresholds[id] ?? [];
+  }
+
+  function addThreshold(id: string): void {
+    lastThresholdId += 1;
+    thresholds[id] ??= [];
+    thresholds[id].push({
+      id: lastThresholdId,
+      sourceIndex: undefined,
+      attributeName: undefined,
+      item: 0,
+      minimum: undefined,
+      maximum: undefined,
+      thresholdAttribute: undefined,
+    });
+  }
+
+  function removeThreshold(id: string, index: number): void {
+    thresholds[id]?.splice(index, 1);
+  }
+
+  function removeThresholds(id: string): void {
+    thresholds[id] = [];
+  }
+
   return {
     setClippingPlanes,
     setShrink,
     setExplode,
     setSlice,
     setThreshold,
+    getThresholds,
+    addThreshold,
+    removeThreshold,
+    removeThresholds,
   };
 }
 export { useHybridViewerFilters };
-export type { ThresholdAttribute };
+export type { Threshold, ThresholdAttribute };
