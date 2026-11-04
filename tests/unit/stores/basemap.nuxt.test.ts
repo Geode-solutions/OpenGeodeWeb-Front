@@ -222,6 +222,30 @@ describe("basemap store", () => {
     );
   });
 
+  // On a project import, two rebuilds overlap: the superseded one must not take the maps back
+  test("a build superseded while applying keeps the maps of the newer one", async () => {
+    const store = setup();
+    const slowApply = Promise.withResolvers();
+    backRequest
+      .mockResolvedValueOnce(buildResponse("basemap-1"))
+      .mockResolvedValueOnce(buildResponse("basemap-2"));
+    // The first viewer request is the apply of basemap-1
+    viewerRequest.mockImplementationOnce(async () => {
+      await slowApply.promise;
+      return {};
+    });
+    const first = store.setMaps(["satellite"]);
+    await vi.advanceTimersByTimeAsync(0);
+    const second = store.rebuild();
+    await vi.advanceTimersByTimeAsync(0);
+    slowApply.resolve({});
+    await Promise.all([first, second]);
+    expect(store.basemapId).toBe("basemap-2");
+    expect(store.layersParams()).toStrictEqual([
+      { map: "satellite", visible: true, opacity: 1, crop: false },
+    ]);
+  });
+
   test("rebuilds once, 500 ms after the data changed", async () => {
     const store = setup();
     await store.setMaps(["satellite"]);

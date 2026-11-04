@@ -52,6 +52,8 @@ function useBasemapBuilds(context: BuildContext): BasemapBuilds {
   let lastBuild = 0;
   // Builds up to this number belong to a project the viewer and the back already cleared
   let lastBuildOfPreviousProject = 0;
+  // The maps of the basemap shown: a build that fails or is superseded gives them back
+  let shownMaps: MapStyle[] = [];
 
   // A build of a previous project: the viewer and the back already cleared it
   async function discardBuild(build: number, id: string, registered: boolean): Promise<void> {
@@ -64,6 +66,7 @@ function useBasemapBuilds(context: BuildContext): BasemapBuilds {
     basemapId.value = undefined;
     grid.value = undefined;
     built.value = [];
+    shownMaps = [];
     attribution.value = undefined;
   }
 
@@ -87,30 +90,38 @@ function useBasemapBuilds(context: BuildContext): BasemapBuilds {
       await discardBuild(build, response.id, false);
       return;
     }
-    const previous = { id: basemapId.value, built: built.value };
+    const previousId = basemapId.value;
     // The layers are computed from the maps just built
-    built.value = sortedMaps(response.maps.map(({ map }) => map));
+    const builtMaps = sortedMaps(response.maps.map(({ map }) => map));
+    built.value = builtMaps;
+    // Only while this build still owns the built maps: a newer build may have set its own
+    function giveBackMaps(): void {
+      if (built.value === builtMaps) {
+        built.value = shownMaps;
+      }
+    }
     let sentLayers = "";
     try {
       sentLayers = await applyBasemap(response, BASEMAP_NAME);
     } catch (error) {
-      built.value = previous.built;
+      giveBackMaps();
       // The new mesh must not stay registered without anyone tracking it
       await discardBuild(build, response.id, true);
       throw error;
     }
     if (build !== lastBuild) {
-      built.value = previous.built;
+      giveBackMaps();
       // Superseded while applying: the new basemap must not stay displayed
       await discardBuild(build, response.id, true);
       return;
     }
     basemapId.value = response.id;
+    shownMaps = builtMaps;
     const { bounds, zoom, columns } = response;
     grid.value = { bounds, zoom, columns, z: extent.z };
     attribution.value = response.attribution;
-    if (previous.id !== undefined) {
-      await discardBuild(build, previous.id, true);
+    if (previousId !== undefined) {
+      await discardBuild(build, previousId, true);
     }
     // The states changed while the basemap was built: the viewer still has the old ones
     if (JSON.stringify(layersParams()) !== sentLayers) {
