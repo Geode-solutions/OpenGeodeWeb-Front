@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { useBasemapDetailStore } from "@ogw_front/stores/basemap_detail";
 import { useBasemapStore } from "@ogw_front/stores/basemap";
 
 const basemapStore = useBasemapStore();
+// The sharper map of the visible area lives with the basemap view
+useBasemapDetailStore();
 </script>
 
 <template>

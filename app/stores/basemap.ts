@@ -122,6 +122,10 @@ export const useBasemapStore = defineStore("basemap", () => {
   // Cropped: only draped on the top surfaces, out of the flat map around
   const crop = ref<Record<MapStyle, boolean>>(everyMap(false));
   const basemapId = ref<string | undefined>(undefined);
+  // The grid of the basemap shown: the detail store compares its resolution with the screen
+  const grid = ref<{ bounds: Bounds; zoom: number; columns: number; z: number } | undefined>(
+    undefined,
+  );
   // The maps downloaded in the current basemap: the others need a build
   const built = ref<BuiltMap[]>([]);
   const attribution = ref<string | undefined>(undefined);
@@ -190,6 +194,7 @@ export const useBasemapStore = defineStore("basemap", () => {
   async function clear(): Promise<void> {
     const id = basemapId.value;
     basemapId.value = undefined;
+    grid.value = undefined;
     built.value = [];
     attribution.value = undefined;
     if (id === undefined) {
@@ -311,6 +316,12 @@ export const useBasemapStore = defineStore("basemap", () => {
       return;
     }
     basemapId.value = response.id;
+    grid.value = {
+      bounds: response.bounds,
+      zoom: response.zoom,
+      columns: response.columns,
+      z: extent.z,
+    };
     attribution.value = response.attribution;
     if (previous.id !== undefined) {
       await discard(build, previous.id, true);
@@ -355,6 +366,7 @@ export const useBasemapStore = defineStore("basemap", () => {
     lastBuild += 1;
     lastBuildOfPreviousProject = lastBuild;
     basemapId.value = undefined;
+    grid.value = undefined;
     built.value = [];
     attribution.value = undefined;
     loading.value = false;
@@ -438,6 +450,7 @@ export const useBasemapStore = defineStore("basemap", () => {
     opacities,
     crop,
     basemapId,
+    grid,
     attribution,
     loading,
     available,
@@ -446,6 +459,10 @@ export const useBasemapStore = defineStore("basemap", () => {
     setCrop,
     rebuild,
     reset,
+    layersParams,
+    georeferencedIds,
+    remove,
+    deleteData,
     exportStores,
     importStores,
   };
