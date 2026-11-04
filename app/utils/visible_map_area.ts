@@ -111,19 +111,28 @@ function needsSharperMap(baseResolution: number, wanted: number): boolean {
 }
 
 // A detail map stays while the view keeps within its area and its step of resolution
+// Whether the map area covers the whole visible area
+function covers(area: MapBounds, visible: MapBounds): boolean {
+  return (
+    visible.x_min >= area.x_min &&
+    visible.y_min >= area.y_min &&
+    visible.x_max <= area.x_max &&
+    visible.y_max <= area.y_max
+  );
+}
+
 function stillSharp(
   detail: { bounds: MapBounds; columns: number },
   visible: MapBounds,
   wanted: number,
 ): boolean {
   const resolution = (detail.bounds.x_max - detail.bounds.x_min) / (detail.columns * TILE_SIZE);
-  const inside =
-    visible.x_min >= detail.bounds.x_min &&
-    visible.y_min >= detail.bounds.y_min &&
-    visible.x_max <= detail.bounds.x_max &&
-    visible.y_max <= detail.bounds.y_max;
-  return inside && resolution <= wanted * DETAIL_RATIO && resolution >= wanted / DETAIL_RATIO;
+  return (
+    covers(detail.bounds, visible) &&
+    resolution <= wanted * DETAIL_RATIO &&
+    resolution >= wanted / DETAIL_RATIO
+  );
 }
 
 export type { MapBounds, ViewCamera };
-export { needsSharperMap, screenPixelGroundSize, stillSharp, visibleMapArea };
+export { covers, needsSharperMap, screenPixelGroundSize, stillSharp, visibleMapArea };

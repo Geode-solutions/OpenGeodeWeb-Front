@@ -13,7 +13,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed
 vi.setConfig({ testTimeout: 10_000 });
 
 const LAMBERT = { authority: "EPSG", code: "2154", name: "RGF93 v1 / Lambert-93" };
-const REST_DELAY = 400;
+const REST_DELAY = 250;
 const APPLY_ROUTE = viewer_schemas.opengeodeweb_viewer.mesh.apply_basemap.$id;
 const LAYERS_ROUTE = viewer_schemas.opengeodeweb_viewer.mesh.basemap_layers.$id;
 const DELETE_ROUTE = back_schemas.opengeodeweb_back.basemap.delete.$id;
@@ -253,6 +253,16 @@ describe("basemap detail store", () => {
     panCameraSlightly();
     await vi.advanceTimersByTimeAsync(REST_DELAY);
     expect(backRequest).not.toHaveBeenCalled();
+  });
+
+  // A sharp patch left in a wider view would show as a rectangle until the next detail
+  test("zooming out of the detail removes it at once, before the rest delay", async () => {
+    const { detail } = await setupWithBase();
+    await vi.advanceTimersByTimeAsync(REST_DELAY);
+    zoomCamera(4);
+    await flush();
+    expect(detail.detailId).toBeUndefined();
+    expect(deregisterObject).toHaveBeenCalledWith("detail-1");
   });
 
   test("zooming in one step further replaces the detail", async () => {

@@ -1,6 +1,7 @@
 import {
   type MapBounds,
   type ViewCamera,
+  covers,
   needsSharperMap,
   screenPixelGroundSize,
   stillSharp,
@@ -36,7 +37,7 @@ interface BaseGrid {
   z: number;
 }
 
-const REST_DELAY_MILLISECONDS = 400;
+const REST_DELAY_MILLISECONDS = 250;
 const MAX_DETAIL_PIXELS = 4096;
 const TILE_SIZE = 256;
 const DETAIL_NAME = "basemap detail";
@@ -171,14 +172,20 @@ export const useBasemapDetailStore = defineStore("basemapDetail", () => {
     const previous = detailId.value;
     detailId.value = response.id;
     detailGrid.value = { bounds: response.bounds, columns: response.columns };
+    // Out of the viewer before the render, deleted on the back after it: shown sooner
     if (previous !== undefined) {
-      await discard(previous, true);
+      await dataStore.deregisterObject(previous).catch(() => {
+        // Already reported by the request feedback
+      });
     }
     // The states changed while the detail was built: the viewer still has the old ones
     if (JSON.stringify(basemapStore.layersParams()) !== sentLayers) {
       await applyLayers(response.id);
     }
     await hybridViewerStore.remoteRender();
+    if (previous !== undefined) {
+      void discard(previous, false);
+    }
   }
 
   // No finer zoom exists here: the detail still shown goes, and this view is remembered as a step
@@ -258,9 +265,26 @@ export const useBasemapDetailStore = defineStore("basemapDetail", () => {
     void refreshQuietly();
   }, REST_DELAY_MILLISECONDS);
 
+  // A view leaving the detail would show it as a sharp patch in a blurred map: it goes at once,
+  // The base alone is shown until the next detail
+  function dropDetailOutOfView(): void {
+    const { grid } = basemapStore;
+    const size = viewportSize();
+    if (detailGrid.value === undefined || grid === undefined || size === undefined) {
+      return;
+    }
+    const { visibleArea } = currentView(grid, size);
+    if (visibleArea === undefined || !covers(detailGrid.value.bounds, visibleArea)) {
+      void clear();
+    }
+  }
+
   watch(
     () => hybridViewerStore.camera_options,
-    () => void scheduleRefresh(),
+    () => {
+      dropDetailOutOfView();
+      void scheduleRefresh();
+    },
     { deep: true },
   );
   watch(
