@@ -37,6 +37,11 @@ export function useHoverhighlight(): {
       currentType = type;
 
       if (!(await dataStore.isItemViewable(id))) {
+        // Nothing highlighted: forget the item so onHoverLeave sends no unhighlight
+        if (currentId === id) {
+          currentId = undefined;
+          currentType = undefined;
+        }
         return;
       }
 
