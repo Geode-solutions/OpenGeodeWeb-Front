@@ -1,0 +1,90 @@
+// Third party imports
+import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
+
+// Local imports
+import {
+  SLEEP_MS,
+  file_name,
+  geode_object,
+  model_corners_schemas,
+  sleep,
+} from "@ogw_tests/integration/stores/data_style/model/corners_helpers";
+import { beforeAllTimeout, setupIntegrationTests } from "@ogw_tests/integration/setup";
+import { Status } from "@ogw_front/utils/status";
+import { cleanupBackend } from "@ogw_server/utils/cleanup";
+import { useDataStore } from "@ogw_front/stores/data";
+import { useDataStyleStore } from "@ogw_front/stores/data_style";
+import { useViewerStore } from "@ogw_front/stores/viewer";
+
+let id = "";
+let projectFolderPath = "";
+
+describe("model corners", () => {
+  beforeAll(async () => {
+    ({ id, projectFolderPath } = await setupIntegrationTests(file_name, geode_object));
+  }, beforeAllTimeout);
+
+  afterAll(async () => {
+    await cleanupBackend(projectFolderPath);
+  });
+
+  describe("corners visibility", () => {
+    test("visibility false", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const corner_ids = await dataStore.getCornersGeodeIds(id);
+      const corner_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, corner_ids);
+      const visibility = false;
+      const spy = vi.spyOn(viewerStore, "request");
+      spy.mockClear();
+      const result = dataStyleStore.setModelCornersVisibility(id, corner_ids, visibility);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      await sleep(SLEEP_MS);
+      const schema = model_corners_schemas.visibility;
+      const params = { id, block_ids: corner_viewer_ids, visibility };
+      expect(spy).toHaveBeenCalledWith(
+        { schema, params },
+        {
+          // oxlint-disable-next-line no-unsafe-assignment -- expect.any(Function) is untyped by design, this is a vitest matcher not a real callback.
+          response_function: expect.any(Function),
+        },
+      );
+      for (const corner_id of corner_ids) {
+        expect(dataStyleStore.modelCornerVisibility(id, corner_id)).toBe(visibility);
+      }
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
+
+  describe("corner color", () => {
+    test("color red", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const dataStore = useDataStore();
+      const corner_ids = await dataStore.getCornersGeodeIds(id);
+      const corner_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, corner_ids);
+      const color = { red: 255, green: 0, blue: 0, alpha: 1 };
+      const spy = vi.spyOn(viewerStore, "request");
+      spy.mockClear();
+      const result = dataStyleStore.setModelCornersColor(id, corner_ids, color);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      await sleep(SLEEP_MS);
+      const schema = model_corners_schemas.color;
+      const params = { id, block_ids: corner_viewer_ids, color, color_mode: "constant" };
+      expect(spy).toHaveBeenCalledWith(
+        { schema, params },
+        {
+          // oxlint-disable-next-line no-unsafe-assignment -- expect.any(Function) is untyped by design, this is a vitest matcher not a real callback.
+          response_function: expect.any(Function),
+        },
+      );
+      for (const corner_id of corner_ids) {
+        expect(dataStyleStore.modelCornerColor(id, corner_id)).toStrictEqual(color);
+      }
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
+});

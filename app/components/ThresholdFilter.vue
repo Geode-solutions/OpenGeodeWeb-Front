@@ -1,15 +1,9 @@
 <script setup lang="ts">
-import {
-  MESH_ELEMENT_KINDS,
-  MODEL_COMPONENT_ATTRIBUTE_SCHEMAS,
-  MODEL_COMPONENT_KINDS,
-} from "@ogw_front/utils/attributes";
 import type { Threshold, ThresholdAttribute } from "@ogw_internal/stores/hybrid_viewer/filters";
 import type { AttributeSource } from "@ogw_front/utils/threshold";
-import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
 import ThresholdCard from "@ogw_front/components/ThresholdCard.vue";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
-import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
+import { fetchSources } from "@ogw_front/utils/threshold_sources";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDebounceFn } from "@vueuse/core";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -42,52 +36,6 @@ const availableDatasets = computed<{ title: string; value: string }[]>(() =>
     value: item.id,
   })),
 );
-
-function attributeSchema(kind: string, isModel: boolean, route: "names" | "range"): JsonRpcSchema {
-  const prefix = isModel ? "model_component_" : "";
-  return back_schemas.opengeodeweb_back[
-    `${prefix}${kind}_attribute_${route}` as keyof typeof back_schemas.opengeodeweb_back
-  ] as JsonRpcSchema;
-}
-
-function attributeSource(
-  kind: string,
-  title: string,
-  params: { id: string; component_ids?: string[] },
-  modelType?: string,
-): AttributeSource {
-  const isModel = modelType !== undefined;
-  const schema = attributeSchema(kind, isModel, "names");
-  return {
-    title: `${title}${kind} attribute`,
-    schemas: { names: schema, range: attributeSchema(kind, isModel, "range") },
-    timeStepKey:
-      modelType === undefined
-        ? schema.$id
-        : (MODEL_COMPONENT_ATTRIBUTE_SCHEMAS[modelType]?.[kind]?.$id ?? schema.$id),
-    params,
-    location: kind === "vertex" ? "point" : "cell",
-  };
-}
-
-async function fetchSources(id: string): Promise<AttributeSource[]> {
-  const item = await dataStore.item(id);
-  if (item.viewer_type !== "model") {
-    return ["vertex", MESH_ELEMENT_KINDS[item.geode_object_type]]
-      .filter((kind): kind is string => kind !== undefined)
-      .map((kind) => attributeSource(kind, "", { id }));
-  }
-  const modelSources = await Promise.all(
-    Object.entries(MODEL_COMPONENT_KINDS).map(async ([type, kinds]) => {
-      const component_ids = await dataStore.getMeshComponentGeodeIds(id, type);
-      if (component_ids.length === 0) {
-        return [];
-      }
-      return kinds.map((kind) => attributeSource(kind, `${type} `, { id, component_ids }, type));
-    }),
-  );
-  return modelSources.flat();
-}
 
 async function applyThresholds(): Promise<void> {
   if (!selectedDatasetId.value) {
@@ -136,7 +84,7 @@ watch(selectedDatasetId, async (id, previousId) => {
     await clearThresholds(previousId);
   }
   if (id) {
-    sources.value = await fetchSources(id);
+    sources.value = await fetchSources(dataStore, id);
   } else {
     sources.value = [];
   }
