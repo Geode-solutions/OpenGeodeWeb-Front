@@ -181,6 +181,14 @@ export const useBasemapDetailStore = defineStore("basemapDetail", () => {
     await hybridViewerStore.remoteRender();
   }
 
+  // No finer zoom exists here: the detail still shown goes, and this view is remembered as a step
+  async function rememberStep(response: DetailResponse): Promise<void> {
+    const clearing = clear();
+    // The synchronous part of clear() has run: the step is set before any newer refresh
+    detailGrid.value = { bounds: response.bounds, columns: response.columns };
+    await clearing;
+  }
+
   async function build(
     grid: BaseGrid,
     basemapId: string,
@@ -195,10 +203,7 @@ export const useBasemapDetailStore = defineStore("basemapDetail", () => {
     }
     if (isObsolete(refreshNumber, basemapId) || response.zoom <= grid.zoom) {
       if (!isObsolete(refreshNumber, basemapId)) {
-        // No finer zoom exists here: a detail still shown is out of step and goes first, then
-        // This view is a step too, not rebuilt at every rest
-        await clear();
-        detailGrid.value = { bounds: response.bounds, columns: response.columns };
+        await rememberStep(response);
       }
       await discard(response.id, false);
       return;
