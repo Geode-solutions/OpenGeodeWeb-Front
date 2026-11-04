@@ -122,6 +122,8 @@ export const useBasemapStore = defineStore("basemap", () => {
   // Cropped: only draped on the top surfaces, out of the flat map around
   const crop = ref<Record<MapStyle, boolean>>(everyMap(false));
   const basemapId = ref<string | undefined>(undefined);
+  // Counts the project resets: what depends on the basemap forgets it without any request
+  const resetCount = ref(0);
   // The grid of the basemap shown: the detail store compares its resolution with the screen
   const grid = ref<{ bounds: Bounds; zoom: number; columns: number; z: number } | undefined>(
     undefined,
@@ -365,6 +367,7 @@ export const useBasemapStore = defineStore("basemap", () => {
   function reset(): void {
     lastBuild += 1;
     lastBuildOfPreviousProject = lastBuild;
+    resetCount.value += 1;
     basemapId.value = undefined;
     grid.value = undefined;
     built.value = [];
@@ -450,6 +453,7 @@ export const useBasemapStore = defineStore("basemap", () => {
     opacities,
     crop,
     basemapId,
+    resetCount,
     grid,
     attribution,
     loading,

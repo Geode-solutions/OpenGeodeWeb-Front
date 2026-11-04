@@ -106,8 +106,10 @@ export const useBasemapDetailStore = defineStore("basemapDetail", () => {
     return response;
   }
 
-  async function showDetail(response: DetailResponse, basemapId: string): Promise<void> {
+  // Returns the layers sent: the states changed meanwhile are sent again once it is shown
+  async function showDetail(response: DetailResponse, basemapId: string): Promise<string> {
     await dataStore.registerObject(response.id, DETAIL_NAME);
+    const sentLayers = JSON.stringify(basemapStore.layersParams());
     await viewerStore.request({
       schema: viewer_schemas.opengeodeweb_viewer.mesh.apply_basemap,
       params: {
@@ -124,6 +126,7 @@ export const useBasemapDetailStore = defineStore("basemapDetail", () => {
       schema: viewer_schemas.opengeodeweb_viewer.mesh.basemap_drape,
       params: { id: response.id, data_ids: basemapStore.georeferencedIds() },
     });
+    return sentLayers;
   }
 
   // What the screen shows of the base, and the ground size of one of its pixels
@@ -157,12 +160,23 @@ export const useBasemapDetailStore = defineStore("basemapDetail", () => {
     });
   }
 
-  async function replaceDetail(response: DetailResponse): Promise<void> {
+  async function applyLayers(id: string): Promise<void> {
+    await viewerStore.request({
+      schema: viewer_schemas.opengeodeweb_viewer.mesh.basemap_layers,
+      params: { id, layers: basemapStore.layersParams() },
+    });
+  }
+
+  async function replaceDetail(response: DetailResponse, sentLayers: string): Promise<void> {
     const previous = detailId.value;
     detailId.value = response.id;
     detailGrid.value = { bounds: response.bounds, columns: response.columns };
     if (previous !== undefined) {
       await discard(previous, true);
+    }
+    // The states changed while the detail was built: the viewer still has the old ones
+    if (JSON.stringify(basemapStore.layersParams()) !== sentLayers) {
+      await applyLayers(response.id);
     }
     await hybridViewerStore.remoteRender();
   }
@@ -180,15 +194,26 @@ export const useBasemapDetailStore = defineStore("basemapDetail", () => {
       return;
     }
     if (isObsolete(refreshNumber, basemapId) || response.zoom <= grid.zoom) {
+      if (!isObsolete(refreshNumber, basemapId)) {
+        // No finer zoom exists here: this view is a step too, not rebuilt at every rest
+        detailGrid.value = { bounds: response.bounds, columns: response.columns };
+      }
       await discard(response.id, false);
       return;
     }
-    await showDetail(response, basemapId);
+    let sentLayers = "";
+    try {
+      sentLayers = await showDetail(response, basemapId);
+    } catch {
+      // The request feedback already shows the error: the detail must not stay registered
+      await discard(response.id, true);
+      return;
+    }
     if (isObsolete(refreshNumber, basemapId)) {
       await discard(response.id, true);
       return;
     }
-    await replaceDetail(response);
+    await replaceDetail(response, sentLayers);
   }
 
   async function refresh(): Promise<void> {
@@ -210,8 +235,17 @@ export const useBasemapDetailStore = defineStore("basemapDetail", () => {
     await build(grid, basemapId, visibleArea, size);
   }
 
+  async function refreshQuietly(): Promise<void> {
+    try {
+      await refresh();
+    } catch {
+      // Nothing more to do
+    }
+  }
+
   const scheduleRefresh = useDebounceFn(() => {
-    void refresh();
+    // Errors are already shown by the request feedback, never left unhandled
+    void refreshQuietly();
   }, REST_DELAY_MILLISECONDS);
 
   watch(
@@ -228,6 +262,15 @@ export const useBasemapDetailStore = defineStore("basemapDetail", () => {
       } else {
         void scheduleRefresh();
       }
+    },
+  );
+  // A new project: the viewer and the back are already cleared, nothing is requested
+  watch(
+    () => basemapStore.resetCount,
+    () => {
+      lastRefresh += 1;
+      detailId.value = undefined;
+      detailGrid.value = undefined;
     },
   );
   // A new base (data changed, maps rebuilt, project reset) drops the detail, then a new one
@@ -248,10 +291,7 @@ export const useBasemapDetailStore = defineStore("basemapDetail", () => {
       if (detailId.value === undefined) {
         return;
       }
-      await viewerStore.request({
-        schema: viewer_schemas.opengeodeweb_viewer.mesh.basemap_layers,
-        params: { id: detailId.value, layers: basemapStore.layersParams() },
-      });
+      await applyLayers(detailId.value);
       await hybridViewerStore.remoteRender();
     },
   );

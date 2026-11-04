@@ -8,11 +8,14 @@ import { useBasemapDetailStore } from "@ogw_front/stores/basemap_detail";
 import { useBasemapStore } from "@ogw_front/stores/basemap";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 vi.setConfig({ testTimeout: 10_000 });
 
 const LAMBERT = { authority: "EPSG", code: "2154", name: "RGF93 v1 / Lambert-93" };
 const REST_DELAY = 400;
+const APPLY_ROUTE = viewer_schemas.opengeodeweb_viewer.mesh.apply_basemap.$id;
+const LAYERS_ROUTE = viewer_schemas.opengeodeweb_viewer.mesh.basemap_layers.$id;
 const DELETE_ROUTE = back_schemas.opengeodeweb_back.basemap.delete.$id;
 // A base of 4000 m: 3.9 m per pixel with 4 columns of tiles
 const BASE_BOX = [-2000, 2000, -2000, 2000, 0, 0];
@@ -43,7 +46,8 @@ interface Counters {
   detail: number;
 }
 interface ViewerRequest {
-  params: { id: string };
+  schema: { $id: string };
+  params: { id: string; detail_of?: string; layers?: { opacity: number }[] };
 }
 interface BuildRequest {
   schema: { $id: string };
@@ -73,6 +77,34 @@ function panCameraSlightly(): void {
   Object.assign(camera, { position: [5, 5, 100], focal_point: [5, 5, 0] });
 }
 
+function isDetailApply(request: ViewerRequest): boolean {
+  return request.schema.$id === APPLY_ROUTE && request.params.detail_of !== undefined;
+}
+
+// The viewer refuses the detail only
+async function refuseDetail(request: ViewerRequest): Promise<unknown> {
+  await Promise.resolve();
+  if (isDetailApply(request)) {
+    throw new Error("apply failed");
+  }
+  return {};
+}
+
+function holdDetail(pending: Promise<unknown>): (request: ViewerRequest) => Promise<unknown> {
+  return async (request) => {
+    if (isDetailApply(request)) {
+      await pending;
+    }
+    return {};
+  };
+}
+
+function layersOf(requests: ViewerRequest[], id: string): ViewerRequest[] {
+  return requests.filter(
+    (request) => request.schema.$id === LAYERS_ROUTE && request.params.id === id,
+  );
+}
+
 describe("basemap detail store", () => {
   let backRequest = vi.fn();
   let deleteRequest = vi.fn();
@@ -95,14 +127,18 @@ describe("basemap detail store", () => {
   }
 
   // The back widens the requested area to whole tiles
-  function detailResponse(counters: Counters, bounds: Bounds): Record<string, unknown> {
+  function detailResponse(
+    counters: Counters,
+    bounds: Bounds,
+    zoom: number,
+  ): Record<string, unknown> {
     counters.detail += 1;
     return {
       id: `detail-${counters.detail}`,
       tiles_folder: "tiles",
       columns: DETAIL_COLUMNS,
       rows: DETAIL_COLUMNS,
-      zoom: DETAIL_ZOOM,
+      zoom,
       bounds: {
         x_min: bounds.x_min - DETAIL_MARGIN,
         y_min: bounds.y_min - DETAIL_MARGIN,
@@ -115,7 +151,7 @@ describe("basemap detail store", () => {
   }
 
   async function setupWithBase(
-    options: { baseColumns?: number; slowDetail?: boolean } = {},
+    options: { baseColumns?: number; slowDetail?: boolean; detailZoom?: number } = {},
   ): Promise<{
     basemap: ReturnType<typeof useBasemapStore>;
     detail: ReturnType<typeof useBasemapDetailStore>;
@@ -144,7 +180,11 @@ describe("basemap detail store", () => {
         if (request.params.margin !== false) {
           return baseResponse(counters, baseColumns);
         }
-        const response = detailResponse(counters, request.params.bounds);
+        const response = detailResponse(
+          counters,
+          request.params.bounds,
+          options.detailZoom ?? DETAIL_ZOOM,
+        );
         if (slowDetail !== undefined) {
           await slowDetail.promise;
         }
@@ -256,5 +296,53 @@ describe("basemap detail store", () => {
     await flush();
     const ids = viewerRequest.mock.calls.map(([request]) => request.params.id);
     expect(ids).toContain("detail-1");
+  });
+
+  test("a detail the viewer refuses is removed", async () => {
+    const { detail } = await setupWithBase();
+    viewerRequest.mockImplementation(refuseDetail);
+    await vi.advanceTimersByTimeAsync(REST_DELAY);
+    expect(deregisterObject).toHaveBeenCalledWith("detail-1");
+    expect(deleteRequest).toHaveBeenCalledWith(
+      expect.objectContaining({ params: { id: "detail-1" } }),
+    );
+    expect(detail.detailId).toBeUndefined();
+  });
+
+  test("map states changed while the detail is applied reach it", async () => {
+    const { basemap } = await setupWithBase();
+    const pending = Promise.withResolvers<unknown>();
+    viewerRequest.mockImplementation(holdDetail(pending.promise));
+    await vi.advanceTimersByTimeAsync(REST_DELAY);
+    await basemap.setOpacity("satellite", 0.5);
+    pending.resolve({});
+    await flush();
+    const sent = layersOf(
+      viewerRequest.mock.calls.map(([request]) => request),
+      "detail-1",
+    );
+    expect(sent.at(-1)?.params.layers?.[0]?.opacity).toBe(0.5);
+  });
+
+  test("a project reset forgets the detail without any request", async () => {
+    const { basemap, detail } = await setupWithBase();
+    await vi.advanceTimersByTimeAsync(REST_DELAY);
+    deregisterObject.mockClear();
+    deleteRequest.mockClear();
+    basemap.reset();
+    await flush();
+    expect(detail.detailId).toBeUndefined();
+    expect(deregisterObject).not.toHaveBeenCalled();
+    expect(deleteRequest).not.toHaveBeenCalled();
+  });
+
+  test("no finer zoom: the next rests of the same view build nothing", async () => {
+    const { detail } = await setupWithBase({ detailZoom: 14 });
+    await vi.advanceTimersByTimeAsync(REST_DELAY);
+    expect(detail.detailId).toBeUndefined();
+    backRequest.mockClear();
+    panCameraSlightly();
+    await vi.advanceTimersByTimeAsync(REST_DELAY);
+    expect(backRequest).not.toHaveBeenCalled();
   });
 });
