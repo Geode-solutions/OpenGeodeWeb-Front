@@ -18,6 +18,9 @@ import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
+// Local constants
+const HALF_OPACITY = 0.5;
+
 let id = "";
 let projectFolderPath = "";
 
@@ -72,6 +75,29 @@ describe("mesh polygons", () => {
         },
       );
       expect(dataStyleStore.meshPolygonsColor(id)).toStrictEqual(color);
+      expect(viewerStore.status).toBe(Status.CONNECTED);
+    });
+  });
+
+  describe("polygons opacity", () => {
+    test("opacity half", async () => {
+      const dataStyleStore = useDataStyleStore();
+      const viewerStore = useViewerStore();
+      const spy = vi.spyOn(viewerStore, "request");
+      const result = dataStyleStore.setMeshPolygonsOpacity(id, HALF_OPACITY);
+      expect(result).toBeInstanceOf(Promise);
+      await result;
+      const schema = mesh_polygons_schemas.opacity;
+      const params = { id, opacity: HALF_OPACITY };
+      expect(spy).toHaveBeenCalledWith(
+        { schema, params },
+        {
+          // oxlint-disable-next-line no-unsafe-assignment -- expect.any(Function) is untyped by design, this is a vitest matcher not a real callback.
+          response_function: expect.any(Function),
+        },
+      );
+      expect(dataStyleStore.meshPolygonsOpacity(id)).toBe(HALF_OPACITY);
+      expect(dataStyleStore.meshPolygonsColor(id)?.alpha).toBe(HALF_OPACITY);
       expect(viewerStore.status).toBe(Status.CONNECTED);
     });
   });

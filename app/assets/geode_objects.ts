@@ -13,6 +13,7 @@ import PointSet3D from "@ogw_front/assets/img/geode_objects/PointSet3D.svg";
 import PolygonalSurface2D from "@ogw_front/assets/img/geode_objects/PolygonalSurface2D.svg";
 import PolygonalSurface3D from "@ogw_front/assets/img/geode_objects/PolygonalSurface3D.svg";
 import PolyhedralSolid3D from "@ogw_front/assets/img/geode_objects/PolyhedralSolid3D.svg";
+// oxlint-disable-next-line import/max-dependencies -- one icon import per geode object.
 import RasterImage2D from "@ogw_front/assets/img/geode_objects/RasterImage2D.svg";
 import RasterImage3D from "@ogw_front/assets/img/geode_objects/RasterImage3D.svg";
 import RegularGrid2D from "@ogw_front/assets/img/geode_objects/RegularGrid2D.svg";

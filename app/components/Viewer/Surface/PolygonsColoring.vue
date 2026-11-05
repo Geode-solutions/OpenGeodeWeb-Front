@@ -6,6 +6,7 @@ import {
 } from "@ogw_front/composables/batch_style";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
+import { useBatchStyleModel } from "@ogw_front/composables/batch_style_model";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
@@ -33,30 +34,21 @@ const coloring_style_key = computed<string>({
     hybridViewerStore.remoteRender();
   },
 });
-const color = computed<RGBAColor | undefined>({
-  get: () => dataStyleStore.meshPolygonsColor(id) as RGBAColor | undefined,
-  set: async (newValue) => {
-    if (newValue === undefined) {
-      return;
-    }
-    await applyBatchStyle(id, (targetId: string) =>
-      dataStyleStore.setMeshPolygonsColor(targetId, newValue),
-    );
-    hybridViewerStore.remoteRender();
-  },
-});
-const textures = computed<Texture[] | undefined>({
-  get: () => dataStyleStore.meshPolygonsTextures(id) as Texture[] | undefined,
-  set: async (newValue) => {
-    if (newValue === undefined) {
-      return;
-    }
-    await applyBatchStyle(id, (targetId: string) =>
-      dataStyleStore.setMeshPolygonsTextures(targetId, newValue),
-    );
-    hybridViewerStore.remoteRender();
-  },
-});
+const color = useBatchStyleModel<RGBAColor>(
+  () => id,
+  (targetId) => dataStyleStore.meshPolygonsColor(targetId) as RGBAColor | undefined,
+  (targetId, value) => dataStyleStore.setMeshPolygonsColor(targetId, value),
+);
+const opacity = useBatchStyleModel<number>(
+  () => id,
+  (targetId) => dataStyleStore.meshPolygonsOpacity(targetId),
+  (targetId, value) => dataStyleStore.setMeshPolygonsOpacity(targetId, value),
+);
+const textures = useBatchStyleModel<Texture[]>(
+  () => id,
+  (targetId) => dataStyleStore.meshPolygonsTextures(targetId) as Texture[] | undefined,
+  (targetId, value) => dataStyleStore.setMeshPolygonsTextures(targetId, value),
+);
 const vertex_attribute_name = computed<string | undefined>({
   get: () => dataStyleStore.meshPolygonsVertexAttributeName(id),
   set: async (newValue) => {
@@ -212,6 +204,7 @@ async function setPolygonAttributeRangesPerData(ranges: RangesPerData): Promise<
     :id="id"
     v-model:coloring_style_key="coloring_style_key"
     v-model:color="color"
+    v-model:opacity="opacity"
     v-model:textures="textures"
     v-model:vertex_attribute_name="vertex_attribute_name"
     v-model:vertex_attribute_item="vertex_attribute_item"

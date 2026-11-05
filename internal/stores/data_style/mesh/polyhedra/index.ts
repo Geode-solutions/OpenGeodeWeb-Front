@@ -63,7 +63,7 @@ function handleMeshPolyhedraPolyhedronColoring(
   return polyhedronAttributeStyle.setMeshPolyhedraPolyhedronAttribute(id, polyhedron_attribute);
 }
 
-async function setMeshPolyhedraActiveColoring(
+async function applyMeshPolyhedraActiveColoring(
   id: string,
   type: string | undefined,
   deps: MeshPolyhedraActiveColoringDeps,
@@ -87,6 +87,22 @@ async function setMeshPolyhedraActiveColoring(
     return result;
   }
   throw new Error(`Unknown mesh polyhedra coloring type: ${type}`);
+}
+
+async function setMeshPolyhedraActiveColoring(
+  id: string,
+  type: string | undefined,
+  deps: MeshPolyhedraActiveColoringDeps,
+): Promise<unknown> {
+  const result = await applyMeshPolyhedraActiveColoring(id, type, deps);
+  if (type !== "constant") {
+    // Attribute and textures colorings keep the actor opacity: restore the stored one
+    await whenDefined(deps.colorStyle.meshPolyhedraOpacity(id), async (value) => {
+      const applied = await deps.colorStyle.setMeshPolyhedraOpacity(id, value);
+      return applied;
+    });
+  }
+  return result;
 }
 
 async function applyMeshPolyhedraStyle(

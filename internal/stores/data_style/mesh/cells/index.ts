@@ -52,7 +52,7 @@ function handleMeshCellsCellColoring(
   return cellAttributeStyle.setMeshCellsCellAttribute(id, cell_attribute);
 }
 
-async function setMeshCellsActiveColoring(
+async function applyMeshCellsActiveColoring(
   id: string,
   type: string | undefined,
   deps: MeshCellsActiveColoringDeps,
@@ -85,6 +85,22 @@ async function setMeshCellsActiveColoring(
     return result;
   }
   throw new Error(`Unknown mesh cells coloring type: ${type}`);
+}
+
+async function setMeshCellsActiveColoring(
+  id: string,
+  type: string | undefined,
+  deps: MeshCellsActiveColoringDeps,
+): Promise<unknown> {
+  const result = await applyMeshCellsActiveColoring(id, type, deps);
+  if (type !== "constant") {
+    // Attribute and textures colorings keep the actor opacity: restore the stored one
+    await whenDefined(deps.colorStyle.meshCellsOpacity(id), async (value) => {
+      const applied = await deps.colorStyle.setMeshCellsOpacity(id, value);
+      return applied;
+    });
+  }
+  return result;
 }
 
 async function applyMeshCellsStyle(
