@@ -22,27 +22,24 @@ function restoreCrs(snapshot: ProjectSnapshot): void {
   }
 }
 
-// Loads a project snapshot into the (already reset) viewer and stores.
-async function restoreProject(snapshot: ProjectSnapshot): Promise<void> {
-  const dataStyleStore = useDataStyleStore();
-  const viewerStore = useViewerStore();
+async function restoreData(snapshot: ProjectSnapshot): Promise<void> {
   const dataStore = useDataStore();
   const treeviewStore = useTreeviewStore();
   const hybridViewerStore = useHybridViewerStore();
-  const basemapStore = useBasemapStore();
-
-  treeviewStore.isImporting = true;
-
-  await importProjectToViewer(viewerStore.client);
 
   treeviewStore.importStores(snapshot.treeview);
   if (snapshot.data !== undefined) {
     await dataStore.importStores(snapshot.data);
   }
   await hybridViewerStore.initHybridViewer();
+  await importWorkflowFromSnapshot(snapshot.data?.items ?? []);
+}
 
-  const items = snapshot.data?.items ?? [];
-  await importWorkflowFromSnapshot(items);
+async function restoreViews(snapshot: ProjectSnapshot): Promise<void> {
+  const dataStyleStore = useDataStyleStore();
+  const hybridViewerStore = useHybridViewerStore();
+  const basemapStore = useBasemapStore();
+
   restoreCrs(snapshot);
   await basemapStore.importStores(snapshot.basemap);
   await hybridViewerStore.importStores(snapshot.hybridViewer);
@@ -50,6 +47,18 @@ async function restoreProject(snapshot: ProjectSnapshot): Promise<void> {
     await dataStyleStore.importStores(snapshot.dataStyle);
   }
   await dataStyleStore.applyAllStylesFromState();
+}
+
+// Loads a project snapshot into the (already reset) viewer and stores.
+async function restoreProject(snapshot: ProjectSnapshot): Promise<void> {
+  const viewerStore = useViewerStore();
+  const treeviewStore = useTreeviewStore();
+
+  treeviewStore.isImporting = true;
+
+  await importProjectToViewer(viewerStore.client);
+  await restoreData(snapshot);
+  await restoreViews(snapshot);
 
   treeviewStore.finalizeImportSelection();
   treeviewStore.isImporting = false;
