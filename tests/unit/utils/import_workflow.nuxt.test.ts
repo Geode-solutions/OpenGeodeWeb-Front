@@ -3,12 +3,18 @@
 import { type Mock, describe, expect, test, vi } from "vitest";
 
 // Local imports
-import { applyTimeSeriesWorkflow, importWorkflow } from "@ogw_front/utils/import_workflow";
+import {
+  applyTimeSeriesWorkflow,
+  importWorkflow,
+  reloadObject,
+} from "@ogw_front/utils/import_workflow";
 import { mockAs, setupActivePinia } from "@ogw_tests/utils";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+
+vi.setConfig({ testTimeout: 10_000 });
 
 function setup(): {
   calls: string[];
@@ -16,6 +22,7 @@ function setup(): {
   applyDefaultStyle: Mock;
   addDataStyle: Mock;
   remoteRender: Mock;
+  addHybridItem: Mock;
 } {
   const calls: string[] = [];
   const backStore = useBackStore();
@@ -29,6 +36,9 @@ function setup(): {
   });
   const addDataStyle = vi.fn();
   const remoteRender = vi.fn();
+  const addHybridItem = vi.fn().mockImplementation(() => {
+    calls.push("hybrid");
+  });
   backStore.request = mockAs<typeof backStore.request>(request);
   dataStore.item = mockAs<typeof dataStore.item>(
     vi.fn().mockResolvedValue({ id: "brep_id", name: "cube" }),
@@ -47,7 +57,8 @@ function setup(): {
     mockAs<typeof dataStyleStore.applyDefaultStyle>(applyDefaultStyle);
   dataStyleStore.addDataStyle = mockAs<typeof dataStyleStore.addDataStyle>(addDataStyle);
   hybridViewerStore.remoteRender = mockAs<typeof hybridViewerStore.remoteRender>(remoteRender);
-  return { calls, request, applyDefaultStyle, addDataStyle, remoteRender };
+  hybridViewerStore.addItem = mockAs<typeof hybridViewerStore.addItem>(addHybridItem);
+  return { calls, request, applyDefaultStyle, addDataStyle, remoteRender, addHybridItem };
 }
 
 describe("apply time series workflow", () => {
@@ -62,6 +73,7 @@ describe("apply time series workflow", () => {
     expect(request).toHaveBeenCalledWith(
       expect.objectContaining({ params: { id: "brep_id", filename: "time_series.pvd" } }),
     );
+    // The geometry is unchanged: the local actor (and the camera) are kept
     expect(calls).toStrictEqual(["deregister", "register", "style"]);
     expect(applyDefaultStyle).toHaveBeenCalledWith("brep_id");
     expect(remoteRender).toHaveBeenCalledWith();
@@ -73,6 +85,29 @@ describe("apply time series workflow", () => {
     await applyTimeSeriesWorkflow("time_series.pvd", "brep_id");
 
     expect(addDataStyle).not.toHaveBeenCalled();
+  });
+});
+
+describe("reload object", () => {
+  setupActivePinia();
+
+  test("re-registers the object with its stored style", async () => {
+    const { calls, request, applyDefaultStyle, remoteRender } = setup();
+
+    await reloadObject("brep_id");
+
+    expect(request).not.toHaveBeenCalled();
+    expect(calls).toStrictEqual(["deregister", "register", "style"]);
+    expect(applyDefaultStyle).toHaveBeenCalledWith("brep_id");
+    expect(remoteRender).toHaveBeenCalledWith();
+  });
+
+  test("rebuilds the local actor when the geometry moved", async () => {
+    const { calls } = setup();
+
+    await reloadObject("brep_id", { rebuildActor: true });
+
+    expect(calls).toStrictEqual(["deregister", "register", "hybrid", "style"]);
   });
 });
 

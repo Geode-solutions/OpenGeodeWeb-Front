@@ -6,7 +6,7 @@ import {
 import BlocksOptions from "./BlocksOptions.vue";
 import CornersOptions from "./CornersOptions.vue";
 import LinesOptions from "./LinesOptions.vue";
-import OptionsSection from "@ogw_front/components/Viewer/Options/OptionsSection.vue";
+import ModelCardTabs from "./ModelCardTabs.vue";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import SurfacesOptions from "./SurfacesOptions.vue";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
@@ -14,6 +14,7 @@ import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwi
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import { useModelTabs } from "@ogw_front/composables/model_tabs";
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
@@ -27,6 +28,11 @@ const { itemProps } = defineProps<Props>();
 
 const { modelId, componentId, componentType, collections, targetComponentIds } =
   useModelMenuContext(() => itemProps);
+
+const { tabs, activeTab } = useModelTabs({
+  componentType,
+  componentId,
+});
 function visibleComponents(targetId: string): string[] {
   return dataStyleStore.visibleMeshComponents(targetId).value || [];
 }
@@ -87,11 +93,13 @@ const modelComponentsActiveColoring = computed<string | undefined>({
 
 <template>
   <v-sheet class="model-style-card" color="transparent">
-    <OptionsSection title="Model Options">
-      <VisibilitySwitch data-testid="modelStyleVisibilitySwitch" v-model="modelVisibility" />
-    </OptionsSection>
+    <ModelCardTabs v-model="activeTab" :tabs="tabs" />
 
-    <OptionsSection v-if="!componentType && !componentId" title="Components Options" class="mt-4">
+    <div v-show="activeTab === 'model'">
+      <VisibilitySwitch data-testid="modelStyleVisibilitySwitch" v-model="modelVisibility" />
+    </div>
+
+    <div v-if="!componentType && !componentId" v-show="activeTab === 'components'">
       <ViewerOptionsColoringTypeSelector
         :id="modelId"
         v-model:coloring_style_key="modelComponentsActiveColoring"
@@ -99,7 +107,7 @@ const modelComponentsActiveColoring = computed<string | undefined>({
         :capabilities="{ color: { available: true } }"
         :allowRandom="true"
       />
-    </OptionsSection>
+    </div>
 
     <BlocksOptions
       v-if="componentType === 'Block'"
@@ -107,6 +115,7 @@ const modelComponentsActiveColoring = computed<string | undefined>({
       :blockId="componentId"
       :targetBlockIds="targetComponentIds"
       :collections="collections"
+      :activeTab="activeTab"
     />
     <SurfacesOptions
       v-else-if="componentType === 'Surface'"
@@ -114,6 +123,7 @@ const modelComponentsActiveColoring = computed<string | undefined>({
       :surfaceId="componentId"
       :targetSurfaceIds="targetComponentIds"
       :collections="collections"
+      :activeTab="activeTab"
     />
     <LinesOptions
       v-else-if="componentType === 'Line'"
@@ -121,6 +131,7 @@ const modelComponentsActiveColoring = computed<string | undefined>({
       :lineId="componentId"
       :targetLineIds="targetComponentIds"
       :collections="collections"
+      :activeTab="activeTab"
     />
     <CornersOptions
       v-else-if="componentType === 'Corner'"
@@ -128,6 +139,7 @@ const modelComponentsActiveColoring = computed<string | undefined>({
       :cornerId="componentId"
       :targetCornerIds="targetComponentIds"
       :collections="collections"
+      :activeTab="activeTab"
     />
   </v-sheet>
 </template>

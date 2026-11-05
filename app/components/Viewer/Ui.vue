@@ -4,6 +4,7 @@ import {
   useOverlappingPicker,
 } from "@ogw_front/composables/use_overlapping_picker";
 import OverlappingObjectsPicker from "@ogw_front/components/Viewer/OverlappingObjectsPicker.vue";
+import ProjectCrs from "@ogw_front/components/ProjectCrs.vue";
 import ToolActiveChip from "@ogw_front/components/Viewer/ToolActiveChip.vue";
 import type { TreeMenuPayload } from "@ogw_front/utils/treeview";
 import ViewerContextMenu from "@ogw_front/components/Viewer/ContextMenu/ContextMenu.vue";
@@ -105,6 +106,8 @@ defineExpose({ get_viewer_id });
     :container-width="containerWidth"
     :container-height="containerHeight"
   />
+
+  <ProjectCrs />
 
   <OverlappingObjectsPicker
     :display-intermediate="displayIntermediate"

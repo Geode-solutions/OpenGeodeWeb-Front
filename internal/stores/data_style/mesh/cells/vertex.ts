@@ -4,9 +4,18 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schem
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
+import {
+  type UseMeshCellsVertexAttributeStyleReturn,
+  type ValidAttributeInput,
+  isMeshCellsVertexAttributeValid,
+} from "./vertex_attribute";
+import {
+  useMeshCellsVertexAttributeConfig,
+  useMeshCellsVertexAttributeConfigValues,
+  useMeshCellsVertexAttributeConfigWriter,
+} from "./vertex_config";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { useAttributeTimeStepStyle } from "@ogw_internal/stores/data_style/time_step";
-import { useMeshCellsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
@@ -14,147 +23,24 @@ const attributeNamesSchema = back_schemas.opengeodeweb_back.vertex_attribute_nam
 const meshCellsVertexAttributeSchemas =
   viewer_schemas.opengeodeweb_viewer.mesh.cells.attribute.vertex;
 
-interface AttributeStoredConfig {
-  minimum: number | undefined;
-  maximum: number | undefined;
-  colorMap: string | undefined;
-  no_data_color: RGBAColor;
-}
-
-interface AttributeState {
-  name?: string;
-  item?: number;
-  storedConfigs?: Record<string, { lastItem: number } & Record<string, AttributeStoredConfig>>;
-}
-
-interface AttributeInput {
-  name: string | undefined;
-  item: number | undefined;
-  minimum: number | undefined;
-  maximum: number | undefined;
-  colorMap: string | undefined;
-  no_data_color?: RGBAColor;
-}
-
-interface ValidAttributeInput {
-  name: string;
-  item: number;
-  minimum: number;
-  maximum: number;
-  colorMap: string;
-  no_data_color?: RGBAColor;
-}
-
-function isMeshCellsVertexAttributeValid(input: AttributeInput): input is ValidAttributeInput {
-  return (
-    input.name !== undefined &&
-    input.item !== undefined &&
-    input.minimum !== undefined &&
-    input.maximum !== undefined &&
-    input.colorMap !== undefined
-  );
-}
-
-interface UseMeshCellsVertexAttributeStyleReturn {
-  meshCellsVertexAttributeName: (id: string) => string | undefined;
-  meshCellsVertexAttributeItem: (id: string) => number;
-  meshCellsVertexAttributeRange: (id: string) => [number | undefined, number | undefined];
-  meshCellsVertexAttributeTimeStep: (id: string) => number | undefined;
-  setMeshCellsVertexAttributeTimeStep: (id: string, timeStep: number) => Promise<unknown>;
-  meshCellsVertexAttributeColorMap: (id: string) => string | undefined;
-  meshCellsVertexAttributeStoredConfig: (
-    id: string,
-    name: string | undefined,
-    item: number | undefined,
-  ) => AttributeStoredConfig;
-  setMeshCellsVertexAttribute: (id: string, input: ValidAttributeInput) => Promise<unknown>;
-  setMeshCellsVertexAttributeName: (id: string, name: string) => Promise<unknown>;
-  setMeshCellsVertexAttributeItem: (id: string, item: number) => Promise<unknown>;
-  setMeshCellsVertexAttributeRange: (
-    id: string,
-    minimum: number,
-    maximum: number,
-  ) => Promise<unknown>;
-  setMeshCellsVertexAttributeColorMap: (
-    id: string,
-    colorMap: string | undefined,
-  ) => Promise<unknown>;
-  meshCellsVertexAttributeNoDataColor: (id: string) => RGBAColor;
-  setMeshCellsVertexAttributeNoDataColor: (
-    id: string,
-    no_data_color: RGBAColor,
-  ) => Promise<unknown>;
-}
-
 // oxlint-disable-next-line max-lines-per-function
 function useMeshCellsVertexAttributeStyle(): UseMeshCellsVertexAttributeStyleReturn {
   const { attributeTimeStep, setAttributeTimeStep, seriesArrayName } = useAttributeTimeStepStyle();
   const viewerStore = useViewerStore();
-  const meshCellsCommonStyle = useMeshCellsCommonStyle();
-  function meshCellsVertexAttribute(id: string): AttributeState {
-    // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.vertex shape is defined by the data style schema.
-    return meshCellsCommonStyle.meshCellsColoring(id).vertex as AttributeState;
-  }
-  function meshCellsVertexAttributeStoredConfig(
-    id: string,
-    name: string | undefined,
-    item: number | undefined,
-  ): AttributeStoredConfig {
-    const { storedConfigs } = meshCellsVertexAttribute(id);
-    const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
-    const itemConfig = item === undefined ? undefined : nameConfig?.[item];
-    if (itemConfig !== undefined) {
-      return itemConfig;
-    }
-    return {
-      minimum: undefined,
-      maximum: undefined,
-      colorMap: undefined,
-      no_data_color: DEFAULT_NO_DATA_COLOR,
-    };
-  }
-  async function mutateMeshCellsVertexStyle(
-    id: string,
-    values: Record<string, unknown>,
-  ): Promise<string> {
-    const result = await meshCellsCommonStyle.mutateMeshCellsStyle(id, {
-      coloring: {
-        vertex: values,
-      },
-    });
-    return result;
-  }
-  async function setMeshCellsVertexAttributeStoredConfig(
-    id: string,
-    name: string | undefined,
-    item: number | undefined,
-    config: Partial<AttributeStoredConfig>,
-  ): Promise<string> {
-    const result = await mutateMeshCellsVertexStyle(id, {
-      storedConfigs: {
-        [name ?? ""]: {
-          lastItem: item,
-          [item ?? 0]: config,
-        },
-      },
-    });
-    return result;
-  }
-  function meshCellsVertexAttributeName(id: string): string | undefined {
-    return meshCellsVertexAttribute(id).name;
-  }
-  function meshCellsVertexAttributeLastItem(id: string, name: string | undefined): number {
-    const { storedConfigs } = meshCellsVertexAttribute(id);
-    const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
-    if (nameConfig !== undefined) {
-      return nameConfig.lastItem;
-    }
-    return 0;
-  }
-  function meshCellsVertexAttributeItem(id: string): number {
-    const { item, name } = meshCellsVertexAttribute(id);
-    return item ?? meshCellsVertexAttributeLastItem(id, name);
-  }
+  const {
+    meshCellsVertexAttribute,
+    meshCellsVertexAttributeName,
+    meshCellsVertexAttributeLastItem,
+    meshCellsVertexAttributeItem,
+    meshCellsVertexAttributeStoredConfig,
+  } = useMeshCellsVertexAttributeConfig();
+  const {
+    meshCellsVertexAttributeRange,
+    meshCellsVertexAttributeColorMap,
+    meshCellsVertexAttributeNoDataColor,
+  } = useMeshCellsVertexAttributeConfigValues();
+  const { mutateMeshCellsVertexStyle, setMeshCellsVertexAttributeStoredConfig } =
+    useMeshCellsVertexAttributeConfigWriter();
   function meshCellsVertexAttributeTimeStep(id: string): number | undefined {
     return attributeTimeStep(id, attributeNamesSchema.$id, meshCellsVertexAttribute(id).name);
   }
@@ -227,12 +113,6 @@ function useMeshCellsVertexAttributeStyle(): UseMeshCellsVertexAttributeStyleRet
     });
     return applyVertexAttribute(id);
   }
-  function meshCellsVertexAttributeRange(id: string): [number | undefined, number | undefined] {
-    const name = meshCellsVertexAttributeName(id);
-    const item = meshCellsVertexAttributeItem(id);
-    const storedConfig = meshCellsVertexAttributeStoredConfig(id, name, item);
-    return [storedConfig.minimum, storedConfig.maximum];
-  }
   async function setMeshCellsVertexAttributeTimeStep(
     id: string,
     timeStep: number,
@@ -257,12 +137,6 @@ function useMeshCellsVertexAttributeStyle(): UseMeshCellsVertexAttributeStyleRet
     });
     return applyVertexAttribute(id);
   }
-  function meshCellsVertexAttributeColorMap(id: string): string | undefined {
-    const name = meshCellsVertexAttributeName(id);
-    const item = meshCellsVertexAttributeItem(id);
-    const storedConfig = meshCellsVertexAttributeStoredConfig(id, name, item);
-    return storedConfig.colorMap;
-  }
   async function setMeshCellsVertexAttributeColorMap(
     id: string,
     colorMap: string | undefined,
@@ -273,12 +147,6 @@ function useMeshCellsVertexAttributeStyle(): UseMeshCellsVertexAttributeStyleRet
       colorMap,
     });
     return applyVertexAttribute(id);
-  }
-  function meshCellsVertexAttributeNoDataColor(id: string): RGBAColor {
-    const name = meshCellsVertexAttributeName(id);
-    const item = meshCellsVertexAttributeItem(id);
-    const storedConfig = meshCellsVertexAttributeStoredConfig(id, name, item);
-    return storedConfig.no_data_color;
   }
   async function setMeshCellsVertexAttributeNoDataColor(
     id: string,
@@ -310,4 +178,5 @@ function useMeshCellsVertexAttributeStyle(): UseMeshCellsVertexAttributeStyleRet
     setMeshCellsVertexAttributeNoDataColor,
   };
 }
-export { isMeshCellsVertexAttributeValid, useMeshCellsVertexAttributeStyle };
+export { useMeshCellsVertexAttributeStyle };
+export { isMeshCellsVertexAttributeValid } from "./vertex_attribute";

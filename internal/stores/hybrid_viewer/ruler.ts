@@ -59,9 +59,10 @@ function useHybridViewerRuler(): {
     if (!ruler_point1.value) {
       return;
     }
-    const points = ruler_point2.value
-      ? [ruler_point1.value, ruler_point2.value]
-      : [ruler_point1.value];
+    const points = [ruler_point1.value];
+    if (ruler_point2.value) {
+      points.push(ruler_point2.value);
+    }
     const { remoteRender } = useHybridViewerCore();
     const viewerStore = useViewerStore();
     const schema = viewer_schemas.opengeodeweb_viewer.viewer.ruler;

@@ -67,6 +67,18 @@ const color = computed<RGBAColor | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
+const opacity = computed<number | undefined>({
+  get: () => dataStyleStore.meshPointsOpacity(id.value),
+  set: async (newValue) => {
+    if (newValue === undefined) {
+      return;
+    }
+    await applyBatchStyle(id.value, (targetId: string) =>
+      dataStyleStore.setMeshPointsOpacity(targetId, newValue),
+    );
+    hybridViewerStore.remoteRender();
+  },
+});
 const vertex_attribute_name = computed<string | undefined>({
   get: () => dataStyleStore.meshPointsVertexAttributeName(id.value),
   set: async (newValue) => {
@@ -165,6 +177,7 @@ async function setVertexAttributeRangesPerData(ranges: RangesPerData): Promise<v
           :id="id"
           v-model:coloring_style_key="coloring_style_key"
           v-model:color="color"
+          v-model:opacity="opacity"
           v-model:vertex_attribute_name="vertex_attribute_name"
           v-model:vertex_attribute_item="vertex_attribute_item"
           v-model:vertex_attribute_range="vertex_attribute_range"

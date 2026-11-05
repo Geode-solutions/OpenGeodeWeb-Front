@@ -56,6 +56,13 @@ function isErrorWithMessage(error: unknown): error is { message: string } {
   );
 }
 
+function describeError(error: unknown): string {
+  if (isErrorWithMessage(error)) {
+    return error.message;
+  }
+  return String(error);
+}
+
 async function killHttpMicroservice(microservice: Microservice): Promise<void> {
   consola.debug("killHttpMicroservice", {
     ...microservice,
@@ -70,7 +77,7 @@ async function killHttpMicroservice(microservice: Microservice): Promise<void> {
         method: microservice.method,
       });
     } catch (error) {
-      const message = isErrorWithMessage(error) ? error.message : String(error);
+      const message = describeError(error);
       consola.info(`Expected error during kill of ${microservice.name}:`, message);
     }
   }
@@ -180,7 +187,10 @@ function getMicroserviceByName(
   name: string,
 ): Microservice | undefined {
   const found = microservices.find((microservice) => microservice.name === name);
-  return found === undefined ? undefined : { ...found };
+  if (found === undefined) {
+    return undefined;
+  }
+  return { ...found };
 }
 
 export {

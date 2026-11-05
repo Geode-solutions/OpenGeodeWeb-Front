@@ -1,5 +1,6 @@
 // oxlint-disable eslint/max-lines
 // Third party imports
+import type { CRSList } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import type { Table } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
@@ -22,7 +23,11 @@ interface DataItem {
   created_at: string;
   is_viewable?: boolean;
   binary_light_viewable?: string;
+  crs?: CRSList;
 }
+
+// What the CRS features read of a data: light to copy on each change
+type CrsItem = Pick<DataItem, "id" | "name" | "crs" | "created_at">;
 
 interface ModelComponentInput {
   geode_id: string;
@@ -43,6 +48,9 @@ interface NewDataItem {
   geode_object_type: string;
   is_viewable?: boolean;
   binary_light_viewable?: string;
+  crs?: CRSList;
+  // Set on saved data: kept by the project snapshot
+  created_at?: string;
   mesh_components?: ModelComponentInput[];
   collection_components?: ModelComponentInput[];
   nb_vertices?: number;
@@ -127,6 +135,8 @@ export const useDataStore = defineStore("data", () => {
     refFormatedCollectionComponents,
   } = useDataCollections();
   const { getComponentRelations } = useDataRelations();
+  // Ids the viewer holds a pipeline for: an item is stored before it is registered, and non viewable items never are
+  const registeredIds = reactive(new Set<string>());
   async function item(id: string): Promise<DataItem> {
     const data_item = await data_db.get(id);
     if (!data_item) {
@@ -150,6 +160,17 @@ export const useDataStore = defineStore("data", () => {
       },
     );
   }
+  // The CRS features only need these fields: the geometry stays out of the copies made on each change
+  function refCrsItems(): Ref<CrsItem[]> {
+    return useObservable(
+      liveObservable(async () => {
+        const items = await data_db.toArray();
+        return items.map(({ id, name, crs, created_at }) => ({ id, name, crs, created_at }));
+      }),
+      { initialValue: [] as CrsItem[] },
+    );
+  }
+
   function refAllItems(): Ref<DataItem[]> {
     return useObservable(
       liveObservable(async () => {
@@ -160,6 +181,13 @@ export const useDataStore = defineStore("data", () => {
         initialValue: [] as DataItem[],
       },
     );
+  }
+  function isRegistered(id: string): boolean {
+    return registeredIds.has(id);
+  }
+  function refRegisteredItems(): ComputedRef<DataItem[]> {
+    const items = refAllItems();
+    return computed(() => items.value.filter((data_item) => isRegistered(data_item.id)));
   }
   async function meshComponentType(modelId: string, geode_id: string): Promise<string | undefined> {
     const component = await model_components_db
@@ -179,6 +207,7 @@ export const useDataStore = defineStore("data", () => {
       params,
       timeout: 0,
     });
+    registeredIds.add(id);
     return result;
   }
   async function deregisterObject(id: string): Promise<unknown> {
@@ -186,6 +215,7 @@ export const useDataStore = defineStore("data", () => {
     const params = {
       id,
     };
+    registeredIds.delete(id);
     const result = await viewerStore.request({
       schema,
       params,
@@ -207,6 +237,9 @@ export const useDataStore = defineStore("data", () => {
     };
     if (new_item.binary_light_viewable !== undefined && new_item.binary_light_viewable !== null) {
       itemData.binary_light_viewable = new_item.binary_light_viewable;
+    }
+    if (new_item.crs !== undefined) {
+      itemData.crs = new_item.crs;
     }
     const id = await data_db.put(itemData);
     return id;
@@ -346,6 +379,7 @@ export const useDataStore = defineStore("data", () => {
   }
 
   async function clear(): Promise<void> {
+    registeredIds.clear();
     await data_db.clear();
     await model_components_db.clear();
     await model_components_relation_db.clear();
@@ -363,6 +397,9 @@ export const useDataStore = defineStore("data", () => {
   }
   return {
     refAllItems,
+    refCrsItems,
+    refRegisteredItems,
+    isRegistered,
     item,
     allItems,
     refItem,
@@ -401,4 +438,4 @@ export const useDataStore = defineStore("data", () => {
   };
 });
 
-export type { DataItem, NewDataItem, ModelComponentInput, ModelComponentRelationRecord };
+export type { CrsItem, DataItem, NewDataItem, ModelComponentInput, ModelComponentRelationRecord };

@@ -1,132 +1,11 @@
-import type { CameraOptions, Vector3, vtkCamera, vtkOpenGLRenderWindow } from "./vtk_types";
-import {
-  LONG_ANIMATION_DURATION,
-  SHORT_ANIMATION_DURATION,
-  animateCamera,
-  computeAnimationDuration,
-} from "./camera_animation";
+import { EASE_EXPONENT, applyCameraOptions, getImageStyle, toBounds } from "./camera_helpers";
+import { animateCamera, computeAnimationDuration, getCameraOptions } from "./camera_animation";
 import { requireRenderWindow, useHybridViewerCore } from "./core";
-import { dot } from "@kitware/vtk.js/Common/Core/Math";
+import type { CameraOptions } from "./vtk_types";
+import { animateCameraOrientation } from "./camera_orientation";
 import { useHybridViewerScene } from "./scene";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
-
-const BUMP_MULTIPLIER = 0.2;
-const ALIGNMENT_THRESHOLD = 0.9;
-const EASE_EXPONENT = 1.1;
-
-interface OrientationConfig {
-  position: Vector3;
-  view_up: Vector3;
-}
-
-const ORIENTATIONS: Record<string, OrientationConfig> = {
-  zplus: {
-    position: [0, 0, 1],
-    view_up: [0, 1, 0],
-  },
-  zminus: {
-    position: [0, 0, -1],
-    view_up: [0, 1, 0],
-  },
-  yplus: {
-    position: [0, 1, 0],
-    view_up: [0, 0, 1],
-  },
-  yminus: {
-    position: [0, -1, 0],
-    view_up: [0, 0, 1],
-  },
-  xplus: {
-    position: [1, 0, 0],
-    view_up: [0, 0, 1],
-  },
-  xminus: {
-    position: [-1, 0, 0],
-    view_up: [0, 0, 1],
-  },
-};
-
-function getImageStyle(): CSSStyleDeclaration | undefined {
-  const { genericRenderWindow } = useHybridViewerCore();
-  if (!genericRenderWindow.value) {
-    return undefined;
-  }
-  // oxlint-disable-next-line no-unsafe-assignment -- vtk.js has no types for getApiSpecificRenderWindow(); narrowed below.
-  const apiSpecificRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
-  // oxlint-disable-next-line no-unsafe-type-assertion -- trusted vtk.js OpenGL render window API boundary.
-  const webGLRenderWindow = apiSpecificRenderWindow as unknown as vtkOpenGLRenderWindow;
-  const bgImage: unknown = webGLRenderWindow.getReferenceByName("bgImage");
-  return bgImage instanceof HTMLImageElement ? bgImage.style : undefined;
-}
-
-function getCameraOptions(camera: vtkCamera): CameraOptions {
-  return {
-    focal_point: [...(camera.getFocalPoint() ?? [0, 0, 0])] as Vector3,
-    view_up: [...(camera.getViewUp() ?? [0, 0, 0])] as Vector3,
-    position: [...(camera.getPosition() ?? [0, 0, 0])] as Vector3,
-    view_angle: camera.getViewAngle(),
-    clipping_range: [...(camera.getClippingRange() ?? [0, 0])] as [number, number],
-    distance: camera.getDistance(),
-  };
-}
-
-function applyCameraOptions(
-  camera: vtkCamera | undefined,
-  options: Partial<CameraOptions> | undefined,
-): void {
-  if (camera && options) {
-    camera.set({
-      focalPoint: options.focal_point,
-      viewUp: options.view_up,
-      position: options.position,
-      viewAngle: options.view_angle,
-      clippingRange: options.clipping_range,
-    });
-  }
-}
-
-const BOUNDS_LENGTH = 6;
-
-function isBounds(value: unknown): value is [number, number, number, number, number, number] {
-  return (
-    Array.isArray(value) &&
-    value.length === BOUNDS_LENGTH &&
-    value.every((item): item is number => typeof item === "number")
-  );
-}
-
-function toBounds(value: unknown): [number, number, number, number, number, number] {
-  if (!isBounds(value)) {
-    throw new Error("Expected a six-element numeric bounds array");
-  }
-  return value;
-}
-
-function centerCameraOnPosition(
-  camera: vtkCamera | undefined,
-  pickedPosition: Vector3 | undefined,
-): void {
-  if (!camera || !pickedPosition) {
-    return;
-  }
-  const position = camera.getPosition();
-  const directionOfProjection = camera.getDirectionOfProjection();
-  const distance = dot(
-    [
-      pickedPosition[0] - position[0],
-      pickedPosition[1] - position[1],
-      pickedPosition[2] - position[2],
-    ],
-    directionOfProjection,
-  );
-  camera.setFocalPoint(...pickedPosition);
-  camera.setPosition(
-    pickedPosition[0] - distance * directionOfProjection[0],
-    pickedPosition[1] - distance * directionOfProjection[1],
-    pickedPosition[2] - distance * directionOfProjection[2],
-  );
-}
 
 // Shared via createSharedComposable (rather than merged into the parent hybridViewer store) so sibling slices, e.g. viewport.ts and ruler.ts, can read camera_options/setCamera/syncRemoteCamera directly without importing the parent store and creating a cycle. A Pinia store would work too but its $id/$patch/... properties would leak into the composed store's spread and collapse its inferred type.
 const useHybridViewerCamera = createSharedComposable(() => {
@@ -241,50 +120,8 @@ const useHybridViewerCamera = createSharedComposable(() => {
     await performFocusCameraOnObject(id, block_ids);
   }
 
-  function performCameraOrientation(orientation: string): void {
-    const config = ORIENTATIONS[orientation.toLowerCase()];
-    if (!config) {
-      return;
-    }
-    const { genericRenderWindow, is_moving } = useHybridViewerCore();
-    const imageStyle = getImageStyle();
-    const renderer = requireRenderWindow(genericRenderWindow).getRenderer();
-    const camera = renderer.getActiveCamera();
-    const startState = getCameraOptions(camera);
-    applyCameraOptions(camera, {
-      ...config,
-      focal_point: [0, 0, 0],
-    });
-    renderer.resetCamera();
-    const targetState = getCameraOptions(camera);
-    applyCameraOptions(camera, startState);
-    const alignment = dot(camera.getDirectionOfProjection(), config.position);
-    const duration =
-      alignment > ALIGNMENT_THRESHOLD ? LONG_ANIMATION_DURATION : SHORT_ANIMATION_DURATION;
-    is_moving.value = true;
-    if (imageStyle) {
-      imageStyle.opacity = "0";
-    }
-    animateCamera({
-      camera,
-      startState,
-      targetState,
-      duration,
-      bumpMultiplier: BUMP_MULTIPLIER,
-      easeExponent: EASE_EXPONENT,
-      onUpdate: () => {
-        const renderWindow = requireRenderWindow(genericRenderWindow).getRenderWindow();
-        renderWindow.render();
-      },
-      onEnd: () => {
-        is_moving.value = false;
-        performSyncRemoteCamera();
-      },
-    });
-  }
-
   function setCameraOrientation(orientation: string): void {
-    performCameraOrientation(orientation);
+    animateCameraOrientation(orientation, performSyncRemoteCamera);
   }
 
   return {
@@ -319,9 +156,7 @@ export {
   EASE_EXPONENT,
   ORIENTATIONS,
   applyCameraOptions,
-  applySnapshot,
   centerCameraOnPosition,
-  getCameraOptions,
-  useHybridViewerCamera,
-};
+} from "./camera_helpers";
+export { applySnapshot, useHybridViewerCamera };
 export type { CameraSnapshot };
