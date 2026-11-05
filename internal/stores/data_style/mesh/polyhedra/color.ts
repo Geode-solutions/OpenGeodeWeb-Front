@@ -4,12 +4,13 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed
 
 // Local imports
 import { useMeshPolyhedraCommonStyle } from "./common";
+import { useMeshPolyhedraOpacityStyle } from "./opacity";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
 const schema = viewer_schemas.opengeodeweb_viewer.mesh.polyhedra.color;
 
-export function useMeshPolyhedraColorStyle(): {
+export function useMeshPolyhedraColorStyle(): ReturnType<typeof useMeshPolyhedraOpacityStyle> & {
   meshPolyhedraColor: (id: string) => RGBAColor | undefined;
   setMeshPolyhedraColor: (id: string, color: RGBAColor) => Promise<unknown>;
 } {
@@ -42,5 +43,6 @@ export function useMeshPolyhedraColorStyle(): {
   return {
     meshPolyhedraColor,
     setMeshPolyhedraColor,
+    ...useMeshPolyhedraOpacityStyle(),
   };
 }

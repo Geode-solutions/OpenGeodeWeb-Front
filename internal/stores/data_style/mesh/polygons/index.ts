@@ -62,7 +62,7 @@ function handleMeshPolygonsPolygonColoring(
   return polygonAttributeStyle.setMeshPolygonsPolygonAttribute(id, polygon_attribute);
 }
 
-async function setMeshPolygonsActiveColoring(
+async function applyMeshPolygonsActiveColoring(
   id: string,
   type: string | undefined,
   deps: MeshPolygonsActiveColoringDeps,
@@ -95,6 +95,22 @@ async function setMeshPolygonsActiveColoring(
     return result;
   }
   throw new Error(`Unknown mesh polygons coloring type: ${type}`);
+}
+
+async function setMeshPolygonsActiveColoring(
+  id: string,
+  type: string | undefined,
+  deps: MeshPolygonsActiveColoringDeps,
+): Promise<unknown> {
+  const result = await applyMeshPolygonsActiveColoring(id, type, deps);
+  if (type !== "constant") {
+    // Attribute and textures colorings keep the actor opacity: restore the stored one
+    await whenDefined(deps.colorStyle.meshPolygonsOpacity(id), async (value) => {
+      const applied = await deps.colorStyle.setMeshPolygonsOpacity(id, value);
+      return applied;
+    });
+  }
+  return result;
 }
 
 async function applyMeshPolygonsStyle(
