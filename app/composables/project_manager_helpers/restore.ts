@@ -2,6 +2,7 @@ import type { ProjectSnapshot } from "@ogw_front/composables/project_manager_hel
 import { importProjectToViewer } from "@ogw_front/composables/project_manager_helpers/viewer_session";
 import { importWorkflowFromSnapshot } from "@ogw_front/utils/import_workflow";
 import { oldestCrs } from "@ogw_front/utils/crs";
+import { useBasemapStore } from "@ogw_front/stores/basemap";
 import { useCrsStore } from "@ogw_front/stores/crs";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -28,6 +29,7 @@ async function restoreProject(snapshot: ProjectSnapshot): Promise<void> {
   const dataStore = useDataStore();
   const treeviewStore = useTreeviewStore();
   const hybridViewerStore = useHybridViewerStore();
+  const basemapStore = useBasemapStore();
 
   treeviewStore.isImporting = true;
 
@@ -42,6 +44,7 @@ async function restoreProject(snapshot: ProjectSnapshot): Promise<void> {
   const items = snapshot.data?.items ?? [];
   await importWorkflowFromSnapshot(items);
   restoreCrs(snapshot);
+  await basemapStore.importStores(snapshot.basemap);
   await hybridViewerStore.importStores(snapshot.hybridViewer);
   if (snapshot.dataStyle !== undefined) {
     await dataStyleStore.importStores(snapshot.dataStyle);

@@ -29,7 +29,18 @@ interface ModelComponentMenuPayload {
   targetComponentIds?: string[];
 }
 
-type TreeMenuPayload = DataMenuPayload | GeodeObjectTypeMenuPayload | ModelComponentMenuPayload;
+// The basemap category and its maps: not project data
+interface BasemapMenuPayload {
+  event: MouseEvent;
+  itemId: string;
+  context_type: "basemap";
+}
+
+type TreeMenuPayload =
+  | DataMenuPayload
+  | GeodeObjectTypeMenuPayload
+  | ModelComponentMenuPayload
+  | BasemapMenuPayload;
 
 export { compareSelections };
 export type {
