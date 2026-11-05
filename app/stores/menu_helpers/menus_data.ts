@@ -1,5 +1,6 @@
 import { modelComponentMenus, modelComponentTypeMenus, modelMenus } from "./model.js";
 import type { MenuItems } from "./types.js";
+import { basemapMenus } from "./basemap.js";
 import { edgedCurveMenus } from "./mesh/edged_curve.js";
 import { gridMenus } from "./mesh/grid.js";
 import { pointSetMenus } from "./mesh/point_set.js";
@@ -17,6 +18,7 @@ const menusData: Record<string, Record<string, MenuItems>> = {
   model: modelMenus,
   model_component_type: modelComponentTypeMenus,
   model_component: modelComponentMenus,
+  basemap: basemapMenus,
 };
 
 export { menusData };
