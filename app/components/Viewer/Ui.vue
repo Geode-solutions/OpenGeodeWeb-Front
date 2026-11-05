@@ -1,9 +1,9 @@
 <script setup lang="ts">
-// oxlint-disable max-dependencies
 import {
   type ViewerIdResult,
   useOverlappingPicker,
 } from "@ogw_front/composables/use_overlapping_picker";
+import BasemapAttribution from "@ogw_front/components/BasemapAttribution.vue";
 import OverlappingObjectsPicker from "@ogw_front/components/Viewer/OverlappingObjectsPicker.vue";
 import ProjectCrs from "@ogw_front/components/ProjectCrs.vue";
 import ToolActiveChip from "@ogw_front/components/Viewer/ToolActiveChip.vue";
@@ -11,6 +11,7 @@ import type { TreeMenuPayload } from "@ogw_front/utils/treeview";
 import ViewerContextMenu from "@ogw_front/components/Viewer/ContextMenu/ContextMenu.vue";
 import ViewerObjectTreeLayout from "@ogw_front/components/Viewer/ObjectTree/Layout.vue";
 import { getCurrentInstance } from "vue";
+import { useBasemapDetailStore } from "@ogw_front/stores/basemap_detail";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useMenuStore } from "@ogw_front/stores/menu";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -29,6 +30,8 @@ const emit = defineEmits<{
 const menuStore = useMenuStore();
 const viewerStore = useViewerStore();
 const hybridViewerStore = useHybridViewerStore();
+// The sharper map of the visible area follows the camera of this viewer
+useBasemapDetailStore();
 
 const hoverHighlightLabel = computed(
   () =>
@@ -109,6 +112,8 @@ defineExpose({ get_viewer_id });
   />
 
   <ProjectCrs />
+
+  <BasemapAttribution />
 
   <OverlappingObjectsPicker
     :display-intermediate="displayIntermediate"

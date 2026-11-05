@@ -1,5 +1,6 @@
 import { type MenuMetaData, useMenuStore } from "@ogw_front/stores/menu";
 import type { Ref, ShallowRef } from "vue";
+import { BASEMAP_GROUP_ID } from "@ogw_front/utils/basemap_tree";
 import type { TreeMenuPayload } from "@ogw_front/utils/treeview";
 import type { ViewerIdResult } from "@ogw_front/composables/use_overlapping_picker";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -23,6 +24,15 @@ async function treeMenuTarget(
   dataStore: ReturnType<typeof useDataStore>,
   payload: TreeMenuPayload,
 ): Promise<MenuTarget | undefined> {
+  if (payload.context_type === "basemap") {
+    return {
+      id: payload.itemId,
+      meta_data: {
+        viewer_type: "basemap",
+        geode_object_type: payload.itemId === BASEMAP_GROUP_ID ? "Basemap" : "Map",
+      },
+    };
+  }
   if (payload.context_type === "geode_object_type") {
     const [referenceId] = payload.targetIds;
     if (referenceId === undefined) {
