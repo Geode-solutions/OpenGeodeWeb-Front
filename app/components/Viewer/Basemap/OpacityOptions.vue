@@ -2,7 +2,6 @@
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
-import BasemapOpacity from "@ogw_front/assets/viewer_svgs/basemap_opacity.svg";
 import { mapStyleOf } from "@ogw_front/utils/basemap_tree";
 import { useBasemapStore } from "@ogw_front/stores/basemap";
 
@@ -32,7 +31,7 @@ const opacityPercent = computed({
     :index="itemProps.index"
     :itemProps="itemProps"
     :tooltip="tooltip"
-    :btnImage="BasemapOpacity"
+    btnIcon="mdi-circle-half-full"
   >
     <template #options>
       <div class="d-flex align-center ga-2 px-1">

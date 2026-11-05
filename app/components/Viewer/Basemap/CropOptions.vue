@@ -3,7 +3,6 @@ import { MAP_STYLES, mapStyleOf } from "@ogw_front/utils/basemap_tree";
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
-import BasemapAround from "@ogw_front/assets/viewer_svgs/basemap_around.svg";
 import { useBasemapStore } from "@ogw_front/stores/basemap";
 
 interface Props {
@@ -32,7 +31,7 @@ const indeterminate = computed(() => new Set(cropped.value).size > 1);
     :index="itemProps.index"
     :itemProps="itemProps"
     :tooltip="tooltip"
-    :btnImage="BasemapAround"
+    btnIcon="mdi-panorama-outline"
   >
     <template #options>
       <v-switch
