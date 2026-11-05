@@ -1,11 +1,12 @@
-import type { ComputedRef, Ref } from "vue";
-import { type Layer, ignoreError, useBasemapViewer } from "./viewer.js";
 import { type MapStyle, sortedMaps } from "@ogw_front/utils/basemap_tree";
 import back_schemas, {
   type BasemapBuildResponse,
   type CRSList,
 } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
+import { ignoreError, useBasemapViewer } from "./viewer.js";
+import type { BasemapLayers } from "./layers.js";
 import type { Extent } from "./extent.js";
+import type { Ref } from "vue";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useCrsStore } from "@ogw_front/stores/crs";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -13,17 +14,6 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 // The grid of the basemap shown, and the height it lies at
 interface BasemapGrid extends Pick<BasemapBuildResponse, "bounds" | "columns" | "zoom"> {
   z: number;
-}
-
-interface BuildContext {
-  maps: ComputedRef<MapStyle[]>;
-  hidden: Ref<boolean>;
-  // The maps downloaded in the current basemap: the others need a build
-  built: Ref<MapStyle[]>;
-  layersParams: () => Layer[];
-  applyLayers: (id: string) => Promise<void>;
-  applyBasemap: (response: BasemapBuildResponse, name: string) => Promise<string>;
-  dataBounds: () => Extent | undefined;
 }
 
 interface BasemapBuilds {
@@ -38,8 +28,11 @@ const BASEMAP_NAME = "basemap";
 
 // The basemap downloaded for the visible maps around the data, one build replacing the other
 // oxlint-disable max-lines-per-function, max-statements
-function useBasemapBuilds(context: BuildContext): BasemapBuilds {
-  const { maps, hidden, built, layersParams, applyLayers, applyBasemap, dataBounds } = context;
+function useBasemapBuilds(
+  layers: BasemapLayers,
+  dataBounds: () => Extent | undefined,
+): BasemapBuilds {
+  const { maps, hidden, built, layersParams, applyLayers, applyBasemap } = layers;
   const backStore = useBackStore();
   const crsStore = useCrsStore();
   const hybridViewerStore = useHybridViewerStore();
