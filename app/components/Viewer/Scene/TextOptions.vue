@@ -4,7 +4,6 @@ import ViewerContextMenuItem, {
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { SceneFontFamily } from "@ogw_internal/stores/data_style/types";
-import SceneText from "@ogw_front/assets/viewer_svgs/scene_text.svg";
 import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -47,7 +46,7 @@ const fontFamily = computed<SceneFontFamily>({
     :index="itemProps.index"
     :itemProps="itemProps"
     tooltip="Text"
-    :btnImage="SceneText"
+    btnIcon="mdi-format-text"
   >
     <template #options>
       <v-select

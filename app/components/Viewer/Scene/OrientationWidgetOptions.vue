@@ -2,7 +2,6 @@
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
-import SceneCompass from "@ogw_front/assets/viewer_svgs/scene_compass.svg";
 import type { SceneOrientationWidget } from "@ogw_internal/stores/data_style/types";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -31,7 +30,7 @@ const orientationWidget = computed<SceneOrientationWidget>({
     :index="itemProps.index"
     :itemProps="itemProps"
     tooltip="Orientation widget"
-    :btnImage="SceneCompass"
+    btnIcon="mdi-compass-outline"
   >
     <template #options>
       <v-btn-toggle
