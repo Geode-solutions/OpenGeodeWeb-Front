@@ -1,32 +1,33 @@
+import type { DataId } from "@ogw_front/types/identifiers";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 
 export function useMeshPolyhedraCommonStyle(): {
-  meshPolyhedraStyle: (id: string) => StyleValues;
-  meshPolyhedraColoring: (id: string) => StyleValues;
-  mutateMeshPolyhedraStyle: (id: string, values: StyleValues) => Promise<string>;
-  mutateMeshPolyhedraColoring: (id: string, values: StyleValues) => Promise<string>;
+  meshPolyhedraStyle: (meshId: DataId) => StyleValues;
+  meshPolyhedraColoring: (meshId: DataId) => StyleValues;
+  mutateMeshPolyhedraStyle: (meshId: DataId, values: StyleValues) => Promise<string>;
+  mutateMeshPolyhedraColoring: (meshId: DataId, values: StyleValues) => Promise<string>;
 } {
   const dataStyleState = useDataStyleState();
 
-  async function mutateMeshPolyhedraStyle(id: string, values: StyleValues): Promise<string> {
-    const result = await dataStyleState.mutateStyle(id, {
+  async function mutateMeshPolyhedraStyle(meshId: DataId, values: StyleValues): Promise<string> {
+    const result = await dataStyleState.mutateStyle(meshId, {
       polyhedra: values,
     });
     return result;
   }
 
-  function meshPolyhedraStyle(id: string): StyleValues {
-    return dataStyleState.getStyle(id).polyhedra ?? {};
+  function meshPolyhedraStyle(meshId: DataId): StyleValues {
+    return dataStyleState.getStyle(meshId).polyhedra ?? {};
   }
 
-  function meshPolyhedraColoring(id: string): StyleValues {
+  function meshPolyhedraColoring(meshId: DataId): StyleValues {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
-    return meshPolyhedraStyle(id).coloring as StyleValues;
+    return meshPolyhedraStyle(meshId).coloring as StyleValues;
   }
 
-  async function mutateMeshPolyhedraColoring(id: string, values: StyleValues): Promise<string> {
-    const result = await mutateMeshPolyhedraStyle(id, {
+  async function mutateMeshPolyhedraColoring(meshId: DataId, values: StyleValues): Promise<string> {
+    const result = await mutateMeshPolyhedraStyle(meshId, {
       coloring: values,
     });
     return result;

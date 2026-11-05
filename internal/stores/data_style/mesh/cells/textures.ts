@@ -4,6 +4,7 @@ import viewer_schemas, {
 } from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
+import type { DataId } from "@ogw_front/types/identifiers";
 import { useMeshCellsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -11,26 +12,26 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const schema = viewer_schemas.opengeodeweb_viewer.mesh.apply_textures;
 
 export function useMeshCellsTexturesStyle(): {
-  meshCellsTextures: (id: string) => MeshApplyTexturesParams["textures"] | undefined;
+  meshCellsTextures: (meshId: DataId) => MeshApplyTexturesParams["textures"] | undefined;
   setMeshCellsTextures: (
-    id: string,
+    meshId: DataId,
     textures: MeshApplyTexturesParams["textures"],
   ) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const meshCellsCommonStyle = useMeshCellsCommonStyle();
 
-  function meshCellsTextures(id: string): MeshApplyTexturesParams["textures"] | undefined {
+  function meshCellsTextures(meshId: DataId): MeshApplyTexturesParams["textures"] | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- textures shape is defined by the data style schema.
-    return meshCellsCommonStyle.meshCellsColoring(id).textures as
+    return meshCellsCommonStyle.meshCellsColoring(meshId).textures as
       | MeshApplyTexturesParams["textures"]
       | undefined;
   }
   async function setMeshCellsTextures(
-    id: string,
+    meshId: DataId,
     textures: MeshApplyTexturesParams["textures"],
   ): Promise<unknown> {
-    const params = { id, textures };
+    const params = { id: meshId, textures };
     const result = await viewerStore.request(
       {
         schema,
@@ -38,7 +39,7 @@ export function useMeshCellsTexturesStyle(): {
       },
       {
         response_function: async () => {
-          const mutateResult = await meshCellsCommonStyle.mutateMeshCellsStyle(id, {
+          const mutateResult = await meshCellsCommonStyle.mutateMeshCellsStyle(meshId, {
             coloring: { textures },
           });
           return mutateResult;

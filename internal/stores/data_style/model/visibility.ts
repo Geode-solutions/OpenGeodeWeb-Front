@@ -1,4 +1,5 @@
 import { type ComponentStyleFunctions, dispatchToComponentTypes } from "./visibility_dispatch";
+import type { DataId } from "@ogw_front/types/identifiers";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
@@ -10,20 +11,20 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed
 
 const model_schemas = viewer_schemas.opengeodeweb_viewer.model;
 interface UseModelVisibilityStyleReturn {
-  modelVisibility: (modelId: string) => boolean | undefined;
-  setModelVisibility: (modelId: string, visibility: boolean) => Promise<unknown>;
+  modelVisibility: (modelId: DataId) => boolean | undefined;
+  setModelVisibility: (modelId: DataId, visibility: boolean) => Promise<unknown>;
   setModelComponentsVisibility: (
-    modelId: string,
+    modelId: DataId,
     componentIds: string[],
     visibility: boolean,
   ) => Promise<unknown[]>;
   setModelComponentTypeVisibility: (
-    modelId: string,
+    modelId: DataId,
     componentType: string,
     visibility: boolean,
   ) => Promise<void>;
-  modelComponentVisibility: (modelId: string, componentId: string) => boolean;
-  modelComponentTypeVisibility: (modelId: string, componentType: string) => boolean;
+  modelComponentVisibility: (modelId: DataId, componentId: string) => boolean;
+  modelComponentTypeVisibility: (modelId: DataId, componentType: string) => boolean;
 }
 
 // oxlint-disable-next-line max-lines-per-function
@@ -35,10 +36,10 @@ function useModelVisibilityStyle(
   const hybridViewerStore = useHybridViewerStore();
   const viewerStore = useViewerStore();
   const modelCommonStyle = useModelCommonStyle();
-  function modelVisibility(modelId: string): boolean | undefined {
+  function modelVisibility(modelId: DataId): boolean | undefined {
     return dataStyleState.getStyle(modelId).visibility;
   }
-  async function setModelVisibility(modelId: string, visibility: boolean): Promise<unknown> {
+  async function setModelVisibility(modelId: DataId, visibility: boolean): Promise<unknown> {
     const schema = model_schemas.visibility;
     const params = {
       id: modelId,
@@ -65,7 +66,7 @@ function useModelVisibilityStyle(
     return result;
   }
   async function setModelComponentTypeVisibility(
-    modelId: string,
+    modelId: DataId,
     componentType: string,
     visibility: boolean,
   ): Promise<void> {
@@ -87,7 +88,7 @@ function useModelVisibilityStyle(
     );
   }
   async function setModelComponentsVisibility(
-    modelId: string,
+    modelId: DataId,
     componentIds: string[],
     visibility: boolean,
   ): Promise<unknown[]> {
@@ -113,11 +114,11 @@ function useModelVisibilityStyle(
     const results = await Promise.all(promises);
     return results;
   }
-  function modelComponentVisibility(modelId: string, componentId: string): boolean {
+  function modelComponentVisibility(modelId: DataId, componentId: string): boolean {
     const selection = useModelSelection(modelId, dataStyleState);
     return selection.value.includes(componentId);
   }
-  function modelComponentTypeVisibility(modelId: string, componentType: string): boolean {
+  function modelComponentTypeVisibility(modelId: DataId, componentType: string): boolean {
     const selection = useModelSelection(modelId, dataStyleState);
     return selection.value.includes(componentType);
   }

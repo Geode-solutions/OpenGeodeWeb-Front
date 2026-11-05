@@ -4,6 +4,7 @@ import {
   useModelComponentsPerComponentStyleMutation,
   useModelComponentsStyleMutation,
 } from "./common_mutations";
+import type { DataId } from "@ogw_front/types/identifiers";
 import type { ParamsOf } from "@ogw_shared/utils/types.js";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
@@ -45,7 +46,7 @@ interface UseModelCommonStyleReturn {
     component_updates: ComponentStyleUpdate[],
   ) => Promise<void>;
   setModelTypeColor: (
-    id: string,
+    modelId: DataId,
     component_ids: string[],
     color: RGBAColor | undefined,
     schema: ModelColorSchema,
@@ -53,7 +54,7 @@ interface UseModelCommonStyleReturn {
     collectionId?: string,
   ) => Promise<unknown>;
   setModelTypeVisibility: (
-    id: string,
+    modelId: DataId,
     component_ids: string[],
     visibility: boolean,
     schema: ModelVisibilitySchema,
@@ -68,7 +69,7 @@ export function useModelCommonStyle(): UseModelCommonStyleReturn {
   const { mutateComponentStyles } = useModelComponentsStyleMutation();
   const { bulkMutateComponentStylesPerComponent } = useModelComponentsPerComponentStyleMutation();
   async function setModelTypeColor(
-    id: string,
+    modelId: DataId,
     component_ids: string[],
     color: RGBAColor | undefined,
     schema: ModelColorSchema,
@@ -79,13 +80,13 @@ export function useModelCommonStyle(): UseModelCommonStyleReturn {
       return undefined;
     }
 
-    const viewer_ids = await dataStore.getMeshComponentsViewerIds(id, component_ids);
+    const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, component_ids);
     if (!viewer_ids?.length) {
       return undefined;
     }
 
     if (activeColoring === "constant") {
-      await mutateComponentStyles(id, component_ids, {
+      await mutateComponentStyles(modelId, component_ids, {
         coloring: {
           constant: color,
         },
@@ -95,7 +96,7 @@ export function useModelCommonStyle(): UseModelCommonStyleReturn {
       throw new Error(`Unknown model color mode: ${activeColoring}`);
     }
     const params = {
-      id,
+      id: modelId,
       block_ids: viewer_ids,
       color_mode: activeColoring,
       collection_id: collectionId,
@@ -107,7 +108,7 @@ export function useModelCommonStyle(): UseModelCommonStyleReturn {
       {
         response_function: async ({ colors }) => {
           if (activeColoring === "constant") {
-            await mutateComponentStyles(id, component_ids, {
+            await mutateComponentStyles(modelId, component_ids, {
               coloring: {
                 constant: color,
               },
@@ -120,7 +121,7 @@ export function useModelCommonStyle(): UseModelCommonStyleReturn {
           }
 
           await bulkMutateComponentStylesPerComponent(
-            id,
+            modelId,
             colors.map(({ geode_id, color: color_value }) => ({
               id_component: geode_id,
               values: {
@@ -136,7 +137,7 @@ export function useModelCommonStyle(): UseModelCommonStyleReturn {
   }
 
   async function setModelTypeVisibility(
-    id: string,
+    modelId: DataId,
     component_ids: string[],
     visibility: boolean,
     schema: ModelVisibilitySchema,
@@ -145,16 +146,16 @@ export function useModelCommonStyle(): UseModelCommonStyleReturn {
       return undefined;
     }
 
-    const viewer_ids = await dataStore.getMeshComponentsViewerIds(id, component_ids);
+    const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, component_ids);
     if (!viewer_ids?.length) {
       return undefined;
     }
-    const params = { id, block_ids: viewer_ids, visibility };
+    const params = { id: modelId, block_ids: viewer_ids, visibility };
     const result = await viewerStore.request(
       { schema, params },
       {
         response_function: async () => {
-          await mutateComponentStyles(id, component_ids, { visibility });
+          await mutateComponentStyles(modelId, component_ids, { visibility });
         },
       },
     );

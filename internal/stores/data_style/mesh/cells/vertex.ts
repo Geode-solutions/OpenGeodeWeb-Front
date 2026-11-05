@@ -1,4 +1,5 @@
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { DataId } from "@ogw_front/types/identifiers";
 // Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
@@ -41,11 +42,15 @@ function useMeshCellsVertexAttributeStyle(): UseMeshCellsVertexAttributeStyleRet
   } = useMeshCellsVertexAttributeConfigValues();
   const { mutateMeshCellsVertexStyle, setMeshCellsVertexAttributeStoredConfig } =
     useMeshCellsVertexAttributeConfigWriter();
-  function meshCellsVertexAttributeTimeStep(id: string): number | undefined {
-    return attributeTimeStep(id, attributeNamesSchema.$id, meshCellsVertexAttribute(id).name);
+  function meshCellsVertexAttributeTimeStep(meshId: DataId): number | undefined {
+    return attributeTimeStep(
+      meshId,
+      attributeNamesSchema.$id,
+      meshCellsVertexAttribute(meshId).name,
+    );
   }
   async function setMeshCellsVertexAttribute(
-    id: string,
+    meshId: DataId,
     {
       name,
       item,
@@ -55,11 +60,11 @@ function useMeshCellsVertexAttributeStyle(): UseMeshCellsVertexAttributeStyleRet
       no_data_color = DEFAULT_NO_DATA_COLOR,
     }: ValidAttributeInput,
   ): Promise<unknown> {
-    await mutateMeshCellsVertexStyle(id, {
+    await mutateMeshCellsVertexStyle(meshId, {
       name,
       item,
     });
-    await setMeshCellsVertexAttributeStoredConfig(id, name, item, {
+    await setMeshCellsVertexAttributeStoredConfig(meshId, name, item, {
       minimum,
       maximum,
       colorMap,
@@ -68,8 +73,8 @@ function useMeshCellsVertexAttributeStyle(): UseMeshCellsVertexAttributeStyleRet
     const points = [...getRGBPointsFromPreset(colorMap)];
     const schema = meshCellsVertexAttributeSchemas.attribute;
     const params = {
-      id,
-      name: seriesArrayName(id, attributeNamesSchema.$id, name),
+      id: meshId,
+      name: seriesArrayName(meshId, attributeNamesSchema.$id, name),
       item,
       points,
       minimum,
@@ -81,10 +86,10 @@ function useMeshCellsVertexAttributeStyle(): UseMeshCellsVertexAttributeStyleRet
       params,
     });
   }
-  async function applyVertexAttribute(id: string): Promise<unknown> {
-    const name = meshCellsVertexAttributeName(id);
-    const item = meshCellsVertexAttributeItem(id);
-    const storedConfig = meshCellsVertexAttributeStoredConfig(id, name, item);
+  async function applyVertexAttribute(meshId: DataId): Promise<unknown> {
+    const name = meshCellsVertexAttributeName(meshId);
+    const item = meshCellsVertexAttributeItem(meshId);
+    const storedConfig = meshCellsVertexAttributeStoredConfig(meshId, name, item);
     const attribute = {
       name,
       item,
@@ -94,72 +99,72 @@ function useMeshCellsVertexAttributeStyle(): UseMeshCellsVertexAttributeStyleRet
       no_data_color: storedConfig.no_data_color,
     };
     if (isMeshCellsVertexAttributeValid(attribute)) {
-      const result = await setMeshCellsVertexAttribute(id, attribute);
+      const result = await setMeshCellsVertexAttribute(meshId, attribute);
       return result;
     }
     return undefined;
   }
-  async function setMeshCellsVertexAttributeName(id: string, name: string): Promise<unknown> {
-    const item = meshCellsVertexAttributeLastItem(id, name);
-    await mutateMeshCellsVertexStyle(id, {
+  async function setMeshCellsVertexAttributeName(meshId: DataId, name: string): Promise<unknown> {
+    const item = meshCellsVertexAttributeLastItem(meshId, name);
+    await mutateMeshCellsVertexStyle(meshId, {
       name,
       item,
     });
-    return applyVertexAttribute(id);
+    return applyVertexAttribute(meshId);
   }
-  async function setMeshCellsVertexAttributeItem(id: string, item: number): Promise<unknown> {
-    await mutateMeshCellsVertexStyle(id, {
+  async function setMeshCellsVertexAttributeItem(meshId: DataId, item: number): Promise<unknown> {
+    await mutateMeshCellsVertexStyle(meshId, {
       item,
     });
-    return applyVertexAttribute(id);
+    return applyVertexAttribute(meshId);
   }
   async function setMeshCellsVertexAttributeTimeStep(
-    id: string,
+    meshId: DataId,
     timeStep: number,
   ): Promise<unknown> {
-    const name = meshCellsVertexAttributeName(id);
+    const name = meshCellsVertexAttributeName(meshId);
     if (name === undefined) {
       return undefined;
     }
-    await setAttributeTimeStep(id, attributeNamesSchema.$id, name, timeStep);
-    return applyVertexAttribute(id);
+    await setAttributeTimeStep(meshId, attributeNamesSchema.$id, name, timeStep);
+    return applyVertexAttribute(meshId);
   }
   async function setMeshCellsVertexAttributeRange(
-    id: string,
+    meshId: DataId,
     minimum: number,
     maximum: number,
   ): Promise<unknown> {
-    const name = meshCellsVertexAttributeName(id);
-    const item = meshCellsVertexAttributeItem(id);
-    await setMeshCellsVertexAttributeStoredConfig(id, name, item, {
+    const name = meshCellsVertexAttributeName(meshId);
+    const item = meshCellsVertexAttributeItem(meshId);
+    await setMeshCellsVertexAttributeStoredConfig(meshId, name, item, {
       minimum,
       maximum,
     });
-    return applyVertexAttribute(id);
+    return applyVertexAttribute(meshId);
   }
   async function setMeshCellsVertexAttributeColorMap(
-    id: string,
+    meshId: DataId,
     colorMap: string | undefined,
   ): Promise<unknown> {
-    const name = meshCellsVertexAttributeName(id);
-    const item = meshCellsVertexAttributeItem(id);
-    await setMeshCellsVertexAttributeStoredConfig(id, name, item, {
+    const name = meshCellsVertexAttributeName(meshId);
+    const item = meshCellsVertexAttributeItem(meshId);
+    await setMeshCellsVertexAttributeStoredConfig(meshId, name, item, {
       colorMap,
     });
-    return applyVertexAttribute(id);
+    return applyVertexAttribute(meshId);
   }
   async function setMeshCellsVertexAttributeNoDataColor(
-    id: string,
+    meshId: DataId,
     no_data_color: RGBAColor,
   ): Promise<unknown> {
-    const name = meshCellsVertexAttributeName(id);
-    const item = meshCellsVertexAttributeItem(id);
-    const storedConfig = meshCellsVertexAttributeStoredConfig(id, name, item);
-    await setMeshCellsVertexAttributeStoredConfig(id, name, item, {
+    const name = meshCellsVertexAttributeName(meshId);
+    const item = meshCellsVertexAttributeItem(meshId);
+    const storedConfig = meshCellsVertexAttributeStoredConfig(meshId, name, item);
+    await setMeshCellsVertexAttributeStoredConfig(meshId, name, item, {
       ...storedConfig,
       no_data_color,
     });
-    return applyVertexAttribute(id);
+    return applyVertexAttribute(meshId);
   }
   return {
     meshCellsVertexAttributeName,

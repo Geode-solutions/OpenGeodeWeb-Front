@@ -6,6 +6,7 @@ import {
   POINTS_COMPONENT_TYPES,
   useModelComponentPointsStyle,
 } from "@ogw_internal/stores/data_style/model/points/component";
+import type { DataId } from "@ogw_front/types/identifiers";
 import { useModelPointsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -13,8 +14,8 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const schema = viewer_schemas.opengeodeweb_viewer.model.points.size;
 
 export function useModelPointsSizeStyle(): {
-  modelPointsSize: (id: string) => number | undefined;
-  setModelPointsSize: (id: string, size: number) => Promise<unknown>;
+  modelPointsSize: (modelId: DataId) => number | undefined;
+  setModelPointsSize: (modelId: DataId, size: number) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const modelPointsCommonStyle = useModelPointsCommonStyle();
@@ -22,13 +23,13 @@ export function useModelPointsSizeStyle(): {
     useModelComponentPointsStyle(type),
   );
 
-  function modelPointsSize(id: string): number | undefined {
+  function modelPointsSize(modelId: DataId): number | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- points style values are dynamically typed at runtime.
-    return modelPointsCommonStyle.modelPointsStyle(id).size as number | undefined;
+    return modelPointsCommonStyle.modelPointsStyle(modelId).size as number | undefined;
   }
 
-  async function setModelPointsSize(id: string, size: number): Promise<unknown> {
-    const params = { id, size };
+  async function setModelPointsSize(modelId: DataId, size: number): Promise<unknown> {
+    const params = { id: modelId, size };
     const result = await viewerStore.request(
       {
         schema,
@@ -37,9 +38,9 @@ export function useModelPointsSizeStyle(): {
       {
         response_function: async () => {
           const [mutateResult] = await Promise.all([
-            modelPointsCommonStyle.mutateModelPointsStyle(id, { size }),
+            modelPointsCommonStyle.mutateModelPointsStyle(modelId, { size }),
             ...componentsPointsStyles.map(async (pointsStyle) => {
-              await pointsStyle.mutateStyledPoints(id, { size });
+              await pointsStyle.mutateStyledPoints(modelId, { size });
             }),
           ]);
           return mutateResult;

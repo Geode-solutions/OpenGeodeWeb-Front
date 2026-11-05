@@ -1,5 +1,6 @@
 import { isModelSurfacesPolygonAttributeValid, useModelSurfacesPolygonAttribute } from "./polygon";
 import { isModelSurfacesVertexAttributeValid, useModelSurfacesVertexAttribute } from "./vertex";
+import type { DataId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -11,17 +12,17 @@ const schema = viewer_schemas.opengeodeweb_viewer.model.surfaces.color;
 
 export function useModelSurfacesColor(): {
   setModelSurfacesColor: (
-    modelId: string,
+    modelId: DataId,
     surfaces_ids: string[],
     color: RGBAColor | undefined,
     activeColoring?: string,
     collectionId?: string,
   ) => Promise<unknown>;
-  modelSurfaceColoring: (id: string, surface_id?: string) => StyleValues;
-  modelSurfaceColor: (id: string, surface_id?: string) => RGBAColor | undefined;
-  modelSurfaceActiveColoring: (id: string, surface_id?: string) => unknown;
+  modelSurfaceColoring: (modelId: DataId, surface_id?: string) => StyleValues;
+  modelSurfaceColor: (modelId: DataId, surface_id?: string) => RGBAColor | undefined;
+  modelSurfaceActiveColoring: (modelId: DataId, surface_id?: string) => unknown;
   setModelSurfacesActiveColoring: (
-    modelId: string,
+    modelId: DataId,
     surfaces_ids: string[],
     activeColoring: string,
     collectionId?: string,
@@ -33,18 +34,18 @@ export function useModelSurfacesColor(): {
   const modelSurfacesVertexAttribute = useModelSurfacesVertexAttribute();
   const modelSurfacesPolygonAttribute = useModelSurfacesPolygonAttribute();
 
-  function modelSurfaceColoring(id: string, surface_id?: string): StyleValues {
+  function modelSurfaceColoring(modelId: DataId, surface_id?: string): StyleValues {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
-    return modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id).coloring as StyleValues;
+    return modelSurfacesCommonStyle.modelSurfaceStyle(modelId, surface_id).coloring as StyleValues;
   }
 
-  function modelSurfaceColor(id: string, surface_id?: string): RGBAColor | undefined {
+  function modelSurfaceColor(modelId: DataId, surface_id?: string): RGBAColor | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.constant shape is defined by the data style schema.
-    return modelSurfaceColoring(id, surface_id).constant as RGBAColor | undefined;
+    return modelSurfaceColoring(modelId, surface_id).constant as RGBAColor | undefined;
   }
 
   async function setModelSurfacesColor(
-    modelId: string,
+    modelId: DataId,
     surfaces_ids: string[],
     color: RGBAColor | undefined,
     activeColoring = "constant",
@@ -61,11 +62,11 @@ export function useModelSurfacesColor(): {
     return result;
   }
 
-  function modelSurfaceActiveColoring(id: string, surface_id?: string): unknown {
-    return modelSurfaceColoring(id, surface_id).active;
+  function modelSurfaceActiveColoring(modelId: DataId, surface_id?: string): unknown {
+    return modelSurfaceColoring(modelId, surface_id).active;
   }
 
-  async function applyVertexColoring(modelId: string, surfaces_ids: string[]): Promise<unknown> {
+  async function applyVertexColoring(modelId: DataId, surfaces_ids: string[]): Promise<unknown> {
     const name = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeName(
       modelId,
       surfaces_ids[0],
@@ -98,7 +99,7 @@ export function useModelSurfacesColor(): {
     return undefined;
   }
 
-  async function applyPolygonColoring(modelId: string, surfaces_ids: string[]): Promise<unknown> {
+  async function applyPolygonColoring(modelId: DataId, surfaces_ids: string[]): Promise<unknown> {
     const name = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeName(
       modelId,
       surfaces_ids[0],
@@ -132,7 +133,7 @@ export function useModelSurfacesColor(): {
   }
 
   async function setModelSurfacesActiveColoring(
-    modelId: string,
+    modelId: DataId,
     surfaces_ids: string[],
     activeColoring: string,
     collectionId?: string,

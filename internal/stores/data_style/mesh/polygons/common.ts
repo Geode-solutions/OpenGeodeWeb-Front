@@ -1,40 +1,44 @@
+import type { DataId } from "@ogw_front/types/identifiers";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 
 export function useMeshPolygonsCommonStyle(): {
-  meshPolygonsStyle: (id: string) => StyleValues;
-  meshPolygonsColoring: (id: string) => StyleValues;
-  mutateMeshPolygonsStyle: (id: string, values: StyleValues) => Promise<string>;
-  mutateMeshPolygonsColoring: (id: string, values: StyleValues) => Promise<string>;
-  mutateMeshPolygonsPolygonStyle: (id: string, values: StyleValues) => Promise<string>;
+  meshPolygonsStyle: (meshId: DataId) => StyleValues;
+  meshPolygonsColoring: (meshId: DataId) => StyleValues;
+  mutateMeshPolygonsStyle: (meshId: DataId, values: StyleValues) => Promise<string>;
+  mutateMeshPolygonsColoring: (meshId: DataId, values: StyleValues) => Promise<string>;
+  mutateMeshPolygonsPolygonStyle: (meshId: DataId, values: StyleValues) => Promise<string>;
 } {
   const dataStyleState = useDataStyleState();
 
-  async function mutateMeshPolygonsStyle(id: string, values: StyleValues): Promise<string> {
-    const result = await dataStyleState.mutateStyle(id, {
+  async function mutateMeshPolygonsStyle(meshId: DataId, values: StyleValues): Promise<string> {
+    const result = await dataStyleState.mutateStyle(meshId, {
       polygons: values,
     });
     return result;
   }
 
-  function meshPolygonsStyle(id: string): StyleValues {
-    return dataStyleState.getStyle(id).polygons ?? {};
+  function meshPolygonsStyle(meshId: DataId): StyleValues {
+    return dataStyleState.getStyle(meshId).polygons ?? {};
   }
 
-  function meshPolygonsColoring(id: string): StyleValues {
+  function meshPolygonsColoring(meshId: DataId): StyleValues {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
-    return meshPolygonsStyle(id).coloring as StyleValues;
+    return meshPolygonsStyle(meshId).coloring as StyleValues;
   }
 
-  async function mutateMeshPolygonsColoring(id: string, values: StyleValues): Promise<string> {
-    const result = await mutateMeshPolygonsStyle(id, {
+  async function mutateMeshPolygonsColoring(meshId: DataId, values: StyleValues): Promise<string> {
+    const result = await mutateMeshPolygonsStyle(meshId, {
       coloring: values,
     });
     return result;
   }
 
-  async function mutateMeshPolygonsPolygonStyle(id: string, values: StyleValues): Promise<string> {
-    const result = await mutateMeshPolygonsColoring(id, {
+  async function mutateMeshPolygonsPolygonStyle(
+    meshId: DataId,
+    values: StyleValues,
+  ): Promise<string> {
+    const result = await mutateMeshPolygonsColoring(meshId, {
       polygon: values,
     });
     return result;

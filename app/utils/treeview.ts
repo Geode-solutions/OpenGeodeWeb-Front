@@ -1,3 +1,5 @@
+import type { DataId } from "@ogw_front/types/identifiers";
+
 function compareSelections<Item>(
   current: readonly Item[],
   previous: readonly Item[],
@@ -24,7 +26,7 @@ interface ModelComponentMenuPayload {
   event: MouseEvent;
   itemId: string;
   context_type: "model_component" | "model_component_type";
-  modelId: string;
+  modelId: DataId;
   modelComponentType?: string;
   targetComponentIds?: string[];
 }

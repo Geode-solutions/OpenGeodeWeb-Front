@@ -1,4 +1,5 @@
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { DataId } from "@ogw_front/types/identifiers";
 // Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
@@ -41,11 +42,15 @@ function useMeshPolygonsVertexAttributeStyle(): UseMeshPolygonsVertexAttributeSt
   } = useMeshPolygonsVertexAttributeConfigValues();
   const { mutateMeshPolygonsVertexStyle, setMeshPolygonsVertexAttributeStoredConfig } =
     useMeshPolygonsVertexAttributeConfigWriter();
-  function meshPolygonsVertexAttributeTimeStep(id: string): number | undefined {
-    return attributeTimeStep(id, attributeNamesSchema.$id, meshPolygonsVertexAttribute(id).name);
+  function meshPolygonsVertexAttributeTimeStep(meshId: DataId): number | undefined {
+    return attributeTimeStep(
+      meshId,
+      attributeNamesSchema.$id,
+      meshPolygonsVertexAttribute(meshId).name,
+    );
   }
   async function setMeshPolygonsVertexAttribute(
-    id: string,
+    meshId: DataId,
     {
       name,
       item,
@@ -55,11 +60,11 @@ function useMeshPolygonsVertexAttributeStyle(): UseMeshPolygonsVertexAttributeSt
       no_data_color = DEFAULT_NO_DATA_COLOR,
     }: ValidAttributeInput,
   ): Promise<unknown> {
-    await mutateMeshPolygonsVertexStyle(id, {
+    await mutateMeshPolygonsVertexStyle(meshId, {
       name,
       item,
     });
-    await setMeshPolygonsVertexAttributeStoredConfig(id, name, item, {
+    await setMeshPolygonsVertexAttributeStoredConfig(meshId, name, item, {
       minimum,
       maximum,
       colorMap,
@@ -68,8 +73,8 @@ function useMeshPolygonsVertexAttributeStyle(): UseMeshPolygonsVertexAttributeSt
     const points = [...getRGBPointsFromPreset(colorMap)];
     const schema = meshPolygonsVertexAttributeSchemas.attribute;
     const params = {
-      id,
-      name: seriesArrayName(id, attributeNamesSchema.$id, name),
+      id: meshId,
+      name: seriesArrayName(meshId, attributeNamesSchema.$id, name),
       item,
       points,
       minimum,
@@ -81,10 +86,10 @@ function useMeshPolygonsVertexAttributeStyle(): UseMeshPolygonsVertexAttributeSt
       params,
     });
   }
-  async function applyVertexAttribute(id: string): Promise<unknown> {
-    const name = meshPolygonsVertexAttributeName(id);
-    const item = meshPolygonsVertexAttributeItem(id);
-    const storedConfig = meshPolygonsVertexAttributeStoredConfig(id, name, item);
+  async function applyVertexAttribute(meshId: DataId): Promise<unknown> {
+    const name = meshPolygonsVertexAttributeName(meshId);
+    const item = meshPolygonsVertexAttributeItem(meshId);
+    const storedConfig = meshPolygonsVertexAttributeStoredConfig(meshId, name, item);
     const attribute = {
       name,
       item,
@@ -94,72 +99,78 @@ function useMeshPolygonsVertexAttributeStyle(): UseMeshPolygonsVertexAttributeSt
       no_data_color: storedConfig.no_data_color,
     };
     if (isMeshPolygonsVertexAttributeValid(attribute)) {
-      const result = await setMeshPolygonsVertexAttribute(id, attribute);
+      const result = await setMeshPolygonsVertexAttribute(meshId, attribute);
       return result;
     }
     return undefined;
   }
-  async function setMeshPolygonsVertexAttributeName(id: string, name: string): Promise<unknown> {
-    const item = meshPolygonsVertexAttributeLastItem(id, name);
-    await mutateMeshPolygonsVertexStyle(id, {
+  async function setMeshPolygonsVertexAttributeName(
+    meshId: DataId,
+    name: string,
+  ): Promise<unknown> {
+    const item = meshPolygonsVertexAttributeLastItem(meshId, name);
+    await mutateMeshPolygonsVertexStyle(meshId, {
       name,
       item,
     });
-    return applyVertexAttribute(id);
+    return applyVertexAttribute(meshId);
   }
-  async function setMeshPolygonsVertexAttributeItem(id: string, item: number): Promise<unknown> {
-    await mutateMeshPolygonsVertexStyle(id, {
+  async function setMeshPolygonsVertexAttributeItem(
+    meshId: DataId,
+    item: number,
+  ): Promise<unknown> {
+    await mutateMeshPolygonsVertexStyle(meshId, {
       item,
     });
-    return applyVertexAttribute(id);
+    return applyVertexAttribute(meshId);
   }
   async function setMeshPolygonsVertexAttributeTimeStep(
-    id: string,
+    meshId: DataId,
     timeStep: number,
   ): Promise<unknown> {
-    const name = meshPolygonsVertexAttributeName(id);
+    const name = meshPolygonsVertexAttributeName(meshId);
     if (name === undefined) {
       return undefined;
     }
-    await setAttributeTimeStep(id, attributeNamesSchema.$id, name, timeStep);
-    return applyVertexAttribute(id);
+    await setAttributeTimeStep(meshId, attributeNamesSchema.$id, name, timeStep);
+    return applyVertexAttribute(meshId);
   }
   async function setMeshPolygonsVertexAttributeRange(
-    id: string,
+    meshId: DataId,
     minimum: number,
     maximum: number,
   ): Promise<unknown> {
-    const name = meshPolygonsVertexAttributeName(id);
-    const item = meshPolygonsVertexAttributeItem(id);
-    await setMeshPolygonsVertexAttributeStoredConfig(id, name, item, {
+    const name = meshPolygonsVertexAttributeName(meshId);
+    const item = meshPolygonsVertexAttributeItem(meshId);
+    await setMeshPolygonsVertexAttributeStoredConfig(meshId, name, item, {
       minimum,
       maximum,
     });
-    return applyVertexAttribute(id);
+    return applyVertexAttribute(meshId);
   }
   async function setMeshPolygonsVertexAttributeColorMap(
-    id: string,
+    meshId: DataId,
     colorMap: string | undefined,
   ): Promise<unknown> {
-    const name = meshPolygonsVertexAttributeName(id);
-    const item = meshPolygonsVertexAttributeItem(id);
-    await setMeshPolygonsVertexAttributeStoredConfig(id, name, item, {
+    const name = meshPolygonsVertexAttributeName(meshId);
+    const item = meshPolygonsVertexAttributeItem(meshId);
+    await setMeshPolygonsVertexAttributeStoredConfig(meshId, name, item, {
       colorMap,
     });
-    return applyVertexAttribute(id);
+    return applyVertexAttribute(meshId);
   }
   async function setMeshPolygonsVertexAttributeNoDataColor(
-    id: string,
+    meshId: DataId,
     no_data_color: RGBAColor,
   ): Promise<unknown> {
-    const name = meshPolygonsVertexAttributeName(id);
-    const item = meshPolygonsVertexAttributeItem(id);
-    const storedConfig = meshPolygonsVertexAttributeStoredConfig(id, name, item);
-    await setMeshPolygonsVertexAttributeStoredConfig(id, name, item, {
+    const name = meshPolygonsVertexAttributeName(meshId);
+    const item = meshPolygonsVertexAttributeItem(meshId);
+    const storedConfig = meshPolygonsVertexAttributeStoredConfig(meshId, name, item);
+    await setMeshPolygonsVertexAttributeStoredConfig(meshId, name, item, {
       ...storedConfig,
       no_data_color,
     });
-    return applyVertexAttribute(id);
+    return applyVertexAttribute(meshId);
   }
   return {
     meshPolygonsVertexAttributeName,

@@ -9,6 +9,7 @@ import {
   isMeshPolyhedraVertexAttributeValid,
   useMeshPolyhedraVertexAttributeStyle,
 } from "./vertex";
+import type { DataId } from "@ogw_front/types/identifiers";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { useMeshPolyhedraColorStyle } from "./color";
 import { useMeshPolyhedraCommonStyle } from "./common";
@@ -25,30 +26,31 @@ interface MeshPolyhedraActiveColoringDeps {
 }
 
 function handleMeshPolyhedraVertexColoring(
-  id: string,
+  meshId: DataId,
   vertexAttributeStyle: ReturnType<typeof useMeshPolyhedraVertexAttributeStyle>,
 ): Promise<unknown> | undefined {
-  const name = vertexAttributeStyle.meshPolyhedraVertexAttributeName(id);
-  const item = vertexAttributeStyle.meshPolyhedraVertexAttributeItem(id);
-  const [minimum, maximum] = vertexAttributeStyle.meshPolyhedraVertexAttributeRange(id);
-  const colorMap = vertexAttributeStyle.meshPolyhedraVertexAttributeColorMap(id);
-  const no_data_color = vertexAttributeStyle.meshPolyhedraVertexAttributeNoDataColor(id);
+  const name = vertexAttributeStyle.meshPolyhedraVertexAttributeName(meshId);
+  const item = vertexAttributeStyle.meshPolyhedraVertexAttributeItem(meshId);
+  const [minimum, maximum] = vertexAttributeStyle.meshPolyhedraVertexAttributeRange(meshId);
+  const colorMap = vertexAttributeStyle.meshPolyhedraVertexAttributeColorMap(meshId);
+  const no_data_color = vertexAttributeStyle.meshPolyhedraVertexAttributeNoDataColor(meshId);
   const vertex_attribute = { name, item, minimum, maximum, colorMap, no_data_color };
   if (!isMeshPolyhedraVertexAttributeValid(vertex_attribute)) {
     return undefined;
   }
-  return vertexAttributeStyle.setMeshPolyhedraVertexAttribute(id, vertex_attribute);
+  return vertexAttributeStyle.setMeshPolyhedraVertexAttribute(meshId, vertex_attribute);
 }
 
 function handleMeshPolyhedraPolyhedronColoring(
-  id: string,
+  meshId: DataId,
   polyhedronAttributeStyle: ReturnType<typeof useMeshPolyhedraPolyhedronAttributeStyle>,
 ): Promise<unknown> | undefined {
-  const name = polyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeName(id);
-  const item = polyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeItem(id);
-  const [minimum, maximum] = polyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeRange(id);
-  const colorMap = polyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeColorMap(id);
-  const no_data_color = polyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeNoDataColor(id);
+  const name = polyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeName(meshId);
+  const item = polyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeItem(meshId);
+  const [minimum, maximum] = polyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeRange(meshId);
+  const colorMap = polyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeColorMap(meshId);
+  const no_data_color =
+    polyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeNoDataColor(meshId);
   const polyhedron_attribute = {
     name,
     item,
@@ -60,45 +62,48 @@ function handleMeshPolyhedraPolyhedronColoring(
   if (!isMeshPolyhedraPolyhedronAttributeValid(polyhedron_attribute)) {
     return undefined;
   }
-  return polyhedronAttributeStyle.setMeshPolyhedraPolyhedronAttribute(id, polyhedron_attribute);
+  return polyhedronAttributeStyle.setMeshPolyhedraPolyhedronAttribute(meshId, polyhedron_attribute);
 }
 
 async function applyMeshPolyhedraActiveColoring(
-  id: string,
+  meshId: DataId,
   type: string | undefined,
   deps: MeshPolyhedraActiveColoringDeps,
 ): Promise<unknown> {
-  await deps.commonStyle.mutateMeshPolyhedraStyle(id, {
+  await deps.commonStyle.mutateMeshPolyhedraStyle(meshId, {
     coloring: { active: type },
   });
   if (type === "constant") {
-    const result = await whenDefined(deps.colorStyle.meshPolyhedraColor(id), async (value) => {
-      const applied = await deps.colorStyle.setMeshPolyhedraColor(id, value);
+    const result = await whenDefined(deps.colorStyle.meshPolyhedraColor(meshId), async (value) => {
+      const applied = await deps.colorStyle.setMeshPolyhedraColor(meshId, value);
       return applied;
     });
     return result;
   }
   if (type === "vertex") {
-    const result = await handleMeshPolyhedraVertexColoring(id, deps.vertexAttributeStyle);
+    const result = await handleMeshPolyhedraVertexColoring(meshId, deps.vertexAttributeStyle);
     return result;
   }
   if (type === "polyhedron") {
-    const result = await handleMeshPolyhedraPolyhedronColoring(id, deps.polyhedronAttributeStyle);
+    const result = await handleMeshPolyhedraPolyhedronColoring(
+      meshId,
+      deps.polyhedronAttributeStyle,
+    );
     return result;
   }
   throw new Error(`Unknown mesh polyhedra coloring type: ${type}`);
 }
 
 async function setMeshPolyhedraActiveColoring(
-  id: string,
+  meshId: DataId,
   type: string | undefined,
   deps: MeshPolyhedraActiveColoringDeps,
 ): Promise<unknown> {
-  const result = await applyMeshPolyhedraActiveColoring(id, type, deps);
+  const result = await applyMeshPolyhedraActiveColoring(meshId, type, deps);
   if (type !== "constant") {
     // Attribute and textures colorings keep the actor opacity: restore the stored one
-    await whenDefined(deps.colorStyle.meshPolyhedraOpacity(id), async (value) => {
-      const applied = await deps.colorStyle.setMeshPolyhedraOpacity(id, value);
+    await whenDefined(deps.colorStyle.meshPolyhedraOpacity(meshId), async (value) => {
+      const applied = await deps.colorStyle.setMeshPolyhedraOpacity(meshId, value);
       return applied;
     });
   }
@@ -106,26 +111,26 @@ async function setMeshPolyhedraActiveColoring(
 }
 
 async function applyMeshPolyhedraStyle(
-  id: string,
+  meshId: DataId,
   visibilityStyle: ReturnType<typeof useMeshPolyhedraVisibilityStyle>,
   activeColoringType: string | undefined,
   deps: MeshPolyhedraActiveColoringDeps,
 ): Promise<unknown[]> {
   const result = await Promise.all([
-    whenDefined(visibilityStyle.meshPolyhedraVisibility(id), async (value) => {
-      const applied = await visibilityStyle.setMeshPolyhedraVisibility(id, value);
+    whenDefined(visibilityStyle.meshPolyhedraVisibility(meshId), async (value) => {
+      const applied = await visibilityStyle.setMeshPolyhedraVisibility(meshId, value);
       return applied;
     }),
-    setMeshPolyhedraActiveColoring(id, activeColoringType, deps),
+    setMeshPolyhedraActiveColoring(meshId, activeColoringType, deps),
   ]);
   return result;
 }
 
 type UseMeshPolyhedraStyleReturn = ReturnType<typeof useMeshPolyhedraCommonStyle> & {
-  meshPolyhedraColoring: (id: string) => StyleValues;
-  meshPolyhedraActiveColoring: (id: string) => string | undefined;
-  setMeshPolyhedraActiveColoring: (id: string, type: string | undefined) => Promise<unknown>;
-  applyMeshPolyhedraStyle: (id: string) => Promise<unknown[]>;
+  meshPolyhedraColoring: (meshId: DataId) => StyleValues;
+  meshPolyhedraActiveColoring: (meshId: DataId) => string | undefined;
+  setMeshPolyhedraActiveColoring: (meshId: DataId, type: string | undefined) => Promise<unknown>;
+  applyMeshPolyhedraStyle: (meshId: DataId) => Promise<unknown[]>;
 } & ReturnType<typeof useMeshPolyhedraVisibilityStyle> &
   ReturnType<typeof useMeshPolyhedraColorStyle> &
   ReturnType<typeof useMeshPolyhedraVertexAttributeStyle> &
@@ -145,28 +150,28 @@ export function useMeshPolyhedraStyle(): UseMeshPolyhedraStyleReturn {
     polyhedronAttributeStyle: meshPolyhedraPolyhedronAttributeStyle,
   };
 
-  function meshPolyhedraColoring(id: string): StyleValues {
-    return meshPolyhedraCommonStyle.meshPolyhedraColoring(id);
+  function meshPolyhedraColoring(meshId: DataId): StyleValues {
+    return meshPolyhedraCommonStyle.meshPolyhedraColoring(meshId);
   }
 
-  function meshPolyhedraActiveColoring(id: string): string | undefined {
+  function meshPolyhedraActiveColoring(meshId: DataId): string | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.active is defined as string in the data style schema.
-    return meshPolyhedraColoring(id).active as string | undefined;
+    return meshPolyhedraColoring(meshId).active as string | undefined;
   }
 
   async function boundSetMeshPolyhedraActiveColoring(
-    id: string,
+    meshId: DataId,
     type: string | undefined,
   ): Promise<unknown> {
-    const result = await setMeshPolyhedraActiveColoring(id, type, activeColoringDeps);
+    const result = await setMeshPolyhedraActiveColoring(meshId, type, activeColoringDeps);
     return result;
   }
 
-  async function boundApplyMeshPolyhedraStyle(id: string): Promise<unknown[]> {
+  async function boundApplyMeshPolyhedraStyle(meshId: DataId): Promise<unknown[]> {
     const result = await applyMeshPolyhedraStyle(
-      id,
+      meshId,
       meshPolyhedraVisibility,
-      meshPolyhedraActiveColoring(id),
+      meshPolyhedraActiveColoring(meshId),
       activeColoringDeps,
     );
     return result;

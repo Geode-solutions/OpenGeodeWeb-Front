@@ -3,6 +3,7 @@ import {
   applyModelBlocksPolyhedronColoring,
   applyModelBlocksVertexColoring,
 } from "./apply_coloring";
+import type { DataId } from "@ogw_front/types/identifiers";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelBlocksColor } from "./color";
 import { useModelBlocksCommonStyle } from "./common";
@@ -17,8 +18,8 @@ async function setModelBlocksDefaultStyle(_id: string): Promise<void> {
 }
 
 type UseModelBlocksStyleReturn = {
-  applyModelBlocksStyle: (modelId: string) => Promise<void>;
-  setModelBlocksDefaultStyle: (id: string) => Promise<void>;
+  applyModelBlocksStyle: (modelId: DataId) => Promise<void>;
+  setModelBlocksDefaultStyle: (modelId: DataId) => Promise<void>;
 } & ReturnType<typeof useModelBlocksCommonStyle> &
   ReturnType<typeof useModelBlocksVisibility> &
   ReturnType<typeof useModelBlocksColor> &
@@ -39,7 +40,7 @@ export function useModelBlocksStyle(): UseModelBlocksStyleReturn {
   const modelBlocksEdgesStyle = useModelBlocksEdgesStyle();
 
   async function applyModelBlocksVisibilityStyle(
-    modelId: string,
+    modelId: DataId,
     blocks_ids: string[],
   ): Promise<unknown[]> {
     const visibilityGroups: Record<string, string[]> = {};
@@ -63,7 +64,7 @@ export function useModelBlocksStyle(): UseModelBlocksStyleReturn {
   }
 
   async function applyModelBlocksColoringStyle(
-    modelId: string,
+    modelId: DataId,
     blocks_ids: string[],
   ): Promise<unknown[]> {
     const activeColoringGroups: Record<string, string[]> = {};
@@ -103,7 +104,7 @@ export function useModelBlocksStyle(): UseModelBlocksStyleReturn {
     return result;
   }
 
-  async function applyModelBlocksStyle(modelId: string): Promise<void> {
+  async function applyModelBlocksStyle(modelId: DataId): Promise<void> {
     const blocks_ids = await dataStore.getBlocksGeodeIds(modelId);
     if (blocks_ids.length === 0) {
       return;

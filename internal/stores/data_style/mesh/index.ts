@@ -1,3 +1,4 @@
+import type { DataId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 // Local imports
@@ -12,11 +13,11 @@ import { whenDefined } from "@ogw_internal/stores/data_style/when_defined";
 
 // oxlint-disable-next-line max-lines-per-function
 export function useMeshStyle(): {
-  meshVisibility: (id: string) => boolean | undefined;
-  setMeshVisibility: (id: string, visibility: boolean) => Promise<unknown>;
-  meshColor: (id: string) => RGBAColor | undefined;
-  setMeshColor: (id: string, color: RGBAColor) => Promise<unknown>;
-  applyMeshStyle: (id: string) => Promise<unknown[]>;
+  meshVisibility: (meshId: DataId) => boolean | undefined;
+  setMeshVisibility: (meshId: DataId, visibility: boolean) => Promise<unknown>;
+  meshColor: (meshId: DataId) => RGBAColor | undefined;
+  setMeshColor: (meshId: DataId, color: RGBAColor) => Promise<unknown>;
+  applyMeshStyle: (meshId: DataId) => Promise<unknown[]>;
 } & ReturnType<typeof useMeshPointsStyle> &
   ReturnType<typeof useMeshEdgesStyle> &
   ReturnType<typeof useMeshCellsStyle> &
@@ -70,7 +71,7 @@ export function useMeshStyle(): {
   // The vertex series is shared by all the cards: re-render the other cards showing it
   function sharedVertexTimeStep(
     card: (typeof vertexCards)[number],
-  ): (id: string, timeStep: number) => Promise<unknown> {
+  ): (meshId: DataId, timeStep: number) => Promise<unknown> {
     return async (id, timeStep) => {
       const result = await card.setTimeStep(id, timeStep);
       const name = card.name(id);
@@ -93,41 +94,41 @@ export function useMeshStyle(): {
     };
   }
 
-  async function applyMeshStyle(id: string): Promise<unknown[]> {
-    const style = dataStyleState.getStyle(id);
+  async function applyMeshStyle(meshId: DataId): Promise<unknown[]> {
+    const style = dataStyleState.getStyle(meshId);
     const promise_array: unknown[] = [];
     for (const key of Object.keys(style)) {
       if (key === "visibility") {
         promise_array.push(
           whenDefined(style.visibility, async (visibility) => {
-            const applied = await setMeshVisibility(id, visibility);
+            const applied = await setMeshVisibility(meshId, visibility);
             return applied;
           }),
         );
       } else if (key === "color") {
         promise_array.push(
-          whenDefined(meshColor(id), async (color) => {
-            const applied = await setMeshColor(id, color);
+          whenDefined(meshColor(meshId), async (color) => {
+            const applied = await setMeshColor(meshId, color);
             return applied;
           }),
         );
       } else if (key === "points") {
-        promise_array.push(meshPointsStyle.applyMeshPointsStyle(id));
+        promise_array.push(meshPointsStyle.applyMeshPointsStyle(meshId));
       } else if (key === "edges") {
-        promise_array.push(meshEdgesStyle.applyMeshEdgesStyle(id));
+        promise_array.push(meshEdgesStyle.applyMeshEdgesStyle(meshId));
       } else if (key === "cells") {
-        promise_array.push(meshCellsStyle.applyMeshCellsStyle(id));
+        promise_array.push(meshCellsStyle.applyMeshCellsStyle(meshId));
       } else if (key === "polygons") {
-        promise_array.push(meshPolygonsStyle.applyMeshPolygonsStyle(id));
+        promise_array.push(meshPolygonsStyle.applyMeshPolygonsStyle(meshId));
       } else if (key === "polyhedra") {
-        promise_array.push(meshPolyhedraStyle.applyMeshPolyhedraStyle(id));
+        promise_array.push(meshPolyhedraStyle.applyMeshPolyhedraStyle(meshId));
       } else if (
         key === "corners" ||
         key === "lines" ||
         key === "surfaces" ||
         key === "blocks" ||
         key === "attributes" ||
-        key === "id"
+        key === "data_id"
       ) {
         // These keys are either handled elsewhere or not applicable to mesh objects
         continue;

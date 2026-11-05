@@ -1,4 +1,4 @@
-import type { DataIdentified, GeodeIdentified } from "@ogw_front/types/identifiers";
+import type { DataId, DataIdentified, GeodeIdentified } from "@ogw_front/types/identifiers";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import type { Table } from "dexie";
@@ -33,7 +33,7 @@ function groupComponentsByType(
 }
 
 interface TypeSelectionContext {
-  readonly modelId: string;
+  readonly modelId: DataId;
   readonly groupStyles: ReturnType<DataStyleState["getStyle"]>;
   readonly dataStyleState: DataStyleState;
 }
@@ -78,7 +78,7 @@ function computeTypeSelection(
 }
 
 function buildSelection(
-  modelId: string,
+  modelId: DataId,
   components: readonly ModelComponentRecord[],
   dataStyleState: DataStyleState,
 ): string[] {
@@ -100,7 +100,7 @@ function buildSelection(
 const selectionCache = new Map<string, ComputedRef<string[]>>();
 
 function useModelSelection(
-  modelId: string | undefined,
+  modelId: DataId | undefined,
   dataStyleState: DataStyleState,
 ): ComputedRef<string[]> {
   if (modelId === undefined || modelId === "") {

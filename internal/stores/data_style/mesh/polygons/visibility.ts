@@ -2,6 +2,7 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
+import type { DataId } from "@ogw_front/types/identifiers";
 import { useMeshPolygonsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -9,18 +10,18 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const schema = viewer_schemas.opengeodeweb_viewer.mesh.polygons.visibility;
 
 export function useMeshPolygonsVisibilityStyle(): {
-  meshPolygonsVisibility: (id: string) => boolean | undefined;
-  setMeshPolygonsVisibility: (id: string, visibility: boolean) => Promise<unknown>;
+  meshPolygonsVisibility: (meshId: DataId) => boolean | undefined;
+  setMeshPolygonsVisibility: (meshId: DataId, visibility: boolean) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle();
 
-  function meshPolygonsVisibility(id: string): boolean | undefined {
+  function meshPolygonsVisibility(meshId: DataId): boolean | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- visibility is defined as boolean in the data style schema.
-    return meshPolygonsCommonStyle.meshPolygonsStyle(id).visibility as boolean | undefined;
+    return meshPolygonsCommonStyle.meshPolygonsStyle(meshId).visibility as boolean | undefined;
   }
-  async function setMeshPolygonsVisibility(id: string, visibility: boolean): Promise<unknown> {
-    const params = { id, visibility };
+  async function setMeshPolygonsVisibility(meshId: DataId, visibility: boolean): Promise<unknown> {
+    const params = { id: meshId, visibility };
     const result = await viewerStore.request(
       {
         schema,
@@ -28,7 +29,7 @@ export function useMeshPolygonsVisibilityStyle(): {
       },
       {
         response_function: async () => {
-          const mutateResult = await meshPolygonsCommonStyle.mutateMeshPolygonsStyle(id, {
+          const mutateResult = await meshPolygonsCommonStyle.mutateMeshPolygonsStyle(meshId, {
             visibility,
           });
           return mutateResult;

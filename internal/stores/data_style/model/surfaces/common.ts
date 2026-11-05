@@ -1,60 +1,64 @@
+import type { DataId } from "@ogw_front/types/identifiers";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import merge from "lodash/merge";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 
 interface UseModelSurfacesCommonStyleReturn {
-  modelSurfacesStyle: (id: string) => StyleValues;
-  modelSurfaceStyle: (id: string, surface_id?: string) => StyleValues;
-  modelSurfaceColoring: (id: string, surface_id?: string) => StyleValues;
+  modelSurfacesStyle: (modelId: DataId) => StyleValues;
+  modelSurfaceStyle: (modelId: DataId, surface_id?: string) => StyleValues;
+  modelSurfaceColoring: (modelId: DataId, surface_id?: string) => StyleValues;
   mutateModelSurfacesColoring: (
-    id: string,
+    modelId: DataId,
     surfaces_ids: readonly string[],
     values: StyleValues,
   ) => Promise<void>;
-  mutateModelSurfacesTypeColoring: (id: string, values: StyleValues) => Promise<void>;
+  mutateModelSurfacesTypeColoring: (modelId: DataId, values: StyleValues) => Promise<void>;
 }
 
 export function useModelSurfacesCommonStyle(): UseModelSurfacesCommonStyleReturn {
   const dataStyleState = useDataStyleState();
   const modelCommonStyle = useModelCommonStyle();
 
-  function modelSurfacesStyle(id: string): StyleValues {
-    return dataStyleState.getStyle(id).surfaces ?? {};
+  function modelSurfacesStyle(modelId: DataId): StyleValues {
+    return dataStyleState.getStyle(modelId).surfaces ?? {};
   }
 
-  function modelComponentTypeSurfacesStyle(id: string): StyleValues {
-    const defaultStyle = modelSurfacesStyle(id);
-    const typeStyle = dataStyleState.getModelComponentTypeStyle(id, "Surface");
+  function modelComponentTypeSurfacesStyle(modelId: DataId): StyleValues {
+    const defaultStyle = modelSurfacesStyle(modelId);
+    const typeStyle = dataStyleState.getModelComponentTypeStyle(modelId, "Surface");
     return merge({}, defaultStyle, typeStyle);
   }
 
-  function modelSurfaceStyle(id: string, surface_id?: string): StyleValues {
+  function modelSurfaceStyle(modelId: DataId, surface_id?: string): StyleValues {
     if (surface_id === undefined) {
-      return modelComponentTypeSurfacesStyle(id);
+      return modelComponentTypeSurfacesStyle(modelId);
     }
-    const typeStyle = modelComponentTypeSurfacesStyle(id);
-    const individualStyle = dataStyleState.getComponentStyle(id, surface_id);
+    const typeStyle = modelComponentTypeSurfacesStyle(modelId);
+    const individualStyle = dataStyleState.getComponentStyle(modelId, surface_id);
     return merge({}, typeStyle, individualStyle);
   }
 
-  function modelSurfaceColoring(id: string, surface_id?: string): StyleValues {
+  function modelSurfaceColoring(modelId: DataId, surface_id?: string): StyleValues {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
-    return modelSurfaceStyle(id, surface_id).coloring as StyleValues;
+    return modelSurfaceStyle(modelId, surface_id).coloring as StyleValues;
   }
 
   async function mutateModelSurfacesColoring(
-    id: string,
+    modelId: DataId,
     surfaces_ids: readonly string[],
     values: StyleValues,
   ): Promise<void> {
-    await modelCommonStyle.mutateComponentStyles(id, [...surfaces_ids], {
+    await modelCommonStyle.mutateComponentStyles(modelId, [...surfaces_ids], {
       coloring: values,
     });
   }
 
-  async function mutateModelSurfacesTypeColoring(id: string, values: StyleValues): Promise<void> {
-    await modelCommonStyle.mutateModelComponentTypeStyle(id, "Surface", {
+  async function mutateModelSurfacesTypeColoring(
+    modelId: DataId,
+    values: StyleValues,
+  ): Promise<void> {
+    await modelCommonStyle.mutateModelComponentTypeStyle(modelId, "Surface", {
       coloring: values,
     });
   }

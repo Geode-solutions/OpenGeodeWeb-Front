@@ -1,3 +1,4 @@
+import type { DataId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 interface AttributeStoredConfig {
@@ -42,32 +43,32 @@ function isMeshPointsVertexAttributeValid(input: AttributeInput): input is Valid
 }
 
 interface UseMeshPointsVertexAttributeStyleReturn {
-  meshPointsVertexAttributeName: (id: string) => string | undefined;
-  meshPointsVertexAttributeItem: (id: string) => number;
-  meshPointsVertexAttributeRange: (id: string) => [number | undefined, number | undefined];
-  meshPointsVertexAttributeTimeStep: (id: string) => number | undefined;
-  setMeshPointsVertexAttributeTimeStep: (id: string, timeStep: number) => Promise<unknown>;
-  meshPointsVertexAttributeColorMap: (id: string) => string | undefined;
+  meshPointsVertexAttributeName: (meshId: DataId) => string | undefined;
+  meshPointsVertexAttributeItem: (meshId: DataId) => number;
+  meshPointsVertexAttributeRange: (meshId: DataId) => [number | undefined, number | undefined];
+  meshPointsVertexAttributeTimeStep: (meshId: DataId) => number | undefined;
+  setMeshPointsVertexAttributeTimeStep: (meshId: DataId, timeStep: number) => Promise<unknown>;
+  meshPointsVertexAttributeColorMap: (meshId: DataId) => string | undefined;
   meshPointsVertexAttributeStoredConfig: (
-    id: string,
+    meshId: DataId,
     name: string | undefined,
     item: number | undefined,
   ) => AttributeStoredConfig;
-  setMeshPointsVertexAttribute: (id: string, input: ValidAttributeInput) => Promise<unknown>;
-  setMeshPointsVertexAttributeName: (id: string, name: string) => Promise<unknown>;
-  setMeshPointsVertexAttributeItem: (id: string, item: number) => Promise<unknown>;
+  setMeshPointsVertexAttribute: (meshId: DataId, input: ValidAttributeInput) => Promise<unknown>;
+  setMeshPointsVertexAttributeName: (meshId: DataId, name: string) => Promise<unknown>;
+  setMeshPointsVertexAttributeItem: (meshId: DataId, item: number) => Promise<unknown>;
   setMeshPointsVertexAttributeRange: (
-    id: string,
+    meshId: DataId,
     minimum: number,
     maximum: number,
   ) => Promise<unknown>;
   setMeshPointsVertexAttributeColorMap: (
-    id: string,
+    meshId: DataId,
     colorMap: string | undefined,
   ) => Promise<unknown>;
-  meshPointsVertexAttributeNoDataColor: (id: string) => RGBAColor;
+  meshPointsVertexAttributeNoDataColor: (meshId: DataId) => RGBAColor;
   setMeshPointsVertexAttributeNoDataColor: (
-    id: string,
+    meshId: DataId,
     no_data_color: RGBAColor,
   ) => Promise<unknown>;
 }

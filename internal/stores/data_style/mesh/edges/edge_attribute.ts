@@ -1,3 +1,4 @@
+import type { DataId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 interface AttributeStoredConfig {
@@ -42,28 +43,34 @@ function isMeshEdgesEdgeAttributeValid(input: AttributeInput): input is ValidAtt
 }
 
 interface UseMeshEdgesEdgeAttributeStyleReturn {
-  meshEdgesEdgeAttributeName: (id: string) => string | undefined;
-  meshEdgesEdgeAttributeItem: (id: string) => number;
-  meshEdgesEdgeAttributeRange: (id: string) => [number | undefined, number | undefined];
-  meshEdgesEdgeAttributeTimeStep: (id: string) => number | undefined;
-  setMeshEdgesEdgeAttributeTimeStep: (id: string, timeStep: number) => Promise<unknown>;
-  meshEdgesEdgeAttributeColorMap: (id: string) => string | undefined;
+  meshEdgesEdgeAttributeName: (meshId: DataId) => string | undefined;
+  meshEdgesEdgeAttributeItem: (meshId: DataId) => number;
+  meshEdgesEdgeAttributeRange: (meshId: DataId) => [number | undefined, number | undefined];
+  meshEdgesEdgeAttributeTimeStep: (meshId: DataId) => number | undefined;
+  setMeshEdgesEdgeAttributeTimeStep: (meshId: DataId, timeStep: number) => Promise<unknown>;
+  meshEdgesEdgeAttributeColorMap: (meshId: DataId) => string | undefined;
   meshEdgesEdgeAttributeStoredConfig: (
-    id: string,
+    meshId: DataId,
     name: string | undefined,
     item: number | undefined,
   ) => AttributeStoredConfig;
-  setMeshEdgesEdgeAttribute: (id: string, input: ValidAttributeInput) => Promise<unknown>;
-  setMeshEdgesEdgeAttributeName: (id: string, name: string) => Promise<unknown>;
-  setMeshEdgesEdgeAttributeItem: (id: string, item: number) => Promise<unknown>;
+  setMeshEdgesEdgeAttribute: (meshId: DataId, input: ValidAttributeInput) => Promise<unknown>;
+  setMeshEdgesEdgeAttributeName: (meshId: DataId, name: string) => Promise<unknown>;
+  setMeshEdgesEdgeAttributeItem: (meshId: DataId, item: number) => Promise<unknown>;
   setMeshEdgesEdgeAttributeRange: (
-    id: string,
+    meshId: DataId,
     minimum: number,
     maximum: number,
   ) => Promise<unknown>;
-  setMeshEdgesEdgeAttributeColorMap: (id: string, colorMap: string | undefined) => Promise<unknown>;
-  meshEdgesEdgeAttributeNoDataColor: (id: string) => RGBAColor;
-  setMeshEdgesEdgeAttributeNoDataColor: (id: string, no_data_color: RGBAColor) => Promise<unknown>;
+  setMeshEdgesEdgeAttributeColorMap: (
+    meshId: DataId,
+    colorMap: string | undefined,
+  ) => Promise<unknown>;
+  meshEdgesEdgeAttributeNoDataColor: (meshId: DataId) => RGBAColor;
+  setMeshEdgesEdgeAttributeNoDataColor: (
+    meshId: DataId,
+    no_data_color: RGBAColor,
+  ) => Promise<unknown>;
 }
 export { isMeshEdgesEdgeAttributeValid };
 export type {

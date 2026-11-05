@@ -1,54 +1,59 @@
+import type { DataId } from "@ogw_front/types/identifiers";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import merge from "lodash/merge";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 
 export function useModelLinesCommonStyle(): {
-  modelLinesStyle: (id: string) => StyleValues;
-  modelLineStyle: (id: string, line_id?: string) => StyleValues;
-  modelLineColoring: (id: string, line_id?: string) => StyleValues;
-  mutateModelLinesColoring: (id: string, lines_ids: string[], values: StyleValues) => Promise<void>;
-  mutateModelLinesTypeColoring: (id: string, values: StyleValues) => Promise<void>;
+  modelLinesStyle: (modelId: DataId) => StyleValues;
+  modelLineStyle: (modelId: DataId, line_id?: string) => StyleValues;
+  modelLineColoring: (modelId: DataId, line_id?: string) => StyleValues;
+  mutateModelLinesColoring: (
+    modelId: DataId,
+    lines_ids: string[],
+    values: StyleValues,
+  ) => Promise<void>;
+  mutateModelLinesTypeColoring: (modelId: DataId, values: StyleValues) => Promise<void>;
 } {
   const dataStyleState = useDataStyleState();
   const modelCommonStyle = useModelCommonStyle();
 
-  function modelLinesStyle(id: string): StyleValues {
-    return dataStyleState.getStyle(id).lines ?? {};
+  function modelLinesStyle(modelId: DataId): StyleValues {
+    return dataStyleState.getStyle(modelId).lines ?? {};
   }
 
-  function modelComponentTypeLinesStyle(id: string): StyleValues {
-    const defaultStyle = modelLinesStyle(id);
-    const typeStyle = dataStyleState.getModelComponentTypeStyle(id, "Line");
+  function modelComponentTypeLinesStyle(modelId: DataId): StyleValues {
+    const defaultStyle = modelLinesStyle(modelId);
+    const typeStyle = dataStyleState.getModelComponentTypeStyle(modelId, "Line");
     return merge({}, defaultStyle, typeStyle);
   }
 
-  function modelLineStyle(id: string, line_id?: string): StyleValues {
+  function modelLineStyle(modelId: DataId, line_id?: string): StyleValues {
     if (line_id === undefined) {
-      return modelComponentTypeLinesStyle(id);
+      return modelComponentTypeLinesStyle(modelId);
     }
-    const typeStyle = modelComponentTypeLinesStyle(id);
-    const individualStyle = dataStyleState.getComponentStyle(id, line_id);
+    const typeStyle = modelComponentTypeLinesStyle(modelId);
+    const individualStyle = dataStyleState.getComponentStyle(modelId, line_id);
     return merge({}, typeStyle, individualStyle);
   }
 
-  function modelLineColoring(id: string, line_id?: string): StyleValues {
+  function modelLineColoring(modelId: DataId, line_id?: string): StyleValues {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
-    return modelLineStyle(id, line_id).coloring as StyleValues;
+    return modelLineStyle(modelId, line_id).coloring as StyleValues;
   }
 
   async function mutateModelLinesColoring(
-    id: string,
+    modelId: DataId,
     lines_ids: string[],
     values: StyleValues,
   ): Promise<void> {
-    await modelCommonStyle.mutateComponentStyles(id, lines_ids, {
+    await modelCommonStyle.mutateComponentStyles(modelId, lines_ids, {
       coloring: values,
     });
   }
 
-  async function mutateModelLinesTypeColoring(id: string, values: StyleValues): Promise<void> {
-    await modelCommonStyle.mutateModelComponentTypeStyle(id, "Line", {
+  async function mutateModelLinesTypeColoring(modelId: DataId, values: StyleValues): Promise<void> {
+    await modelCommonStyle.mutateModelComponentTypeStyle(modelId, "Line", {
       coloring: values,
     });
   }
