@@ -1,20 +1,19 @@
+import type { GeodeIdentified } from "@ogw_front/types/identifiers";
 import type { Table } from "dexie";
 import { database } from "@ogw_internal/database/database.js";
 import { liveObservable } from "@ogw_front/utils/live_observable";
 import { useObservable } from "@vueuse/rxjs";
 
-interface ModelComponentRecord {
+interface ModelComponentRecord extends GeodeIdentified {
   id: string;
-  geode_id: string;
   type: string;
   viewer_id: string | number;
   name: string;
   is_active: boolean;
 }
 
-interface FormattedComponent {
+interface FormattedComponent extends Readonly<GeodeIdentified> {
   readonly id: string;
-  readonly geode_id: string;
   readonly title: string;
   readonly category: string;
   readonly viewer_id: number;

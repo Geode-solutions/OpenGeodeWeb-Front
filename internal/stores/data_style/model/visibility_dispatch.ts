@@ -1,3 +1,4 @@
+import type { GeodeIdentified } from "@ogw_front/types/identifiers";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import { useDataStore } from "@ogw_front/stores/data";
 
@@ -5,8 +6,7 @@ import { useDataStore } from "@ogw_front/stores/data";
 // oxlint-disable-next-line no-explicit-any
 type ComponentStyleFunctions = Record<"Surface" | "Line" | "Block" | "Corner", any>;
 
-interface ModelComponent {
-  geode_id: string;
+interface ModelComponent extends GeodeIdentified {
   type: string;
 }
 

@@ -4,6 +4,7 @@ import { consola } from "consola";
 // oxlint-disable eslint/sort-imports, eslint/max-lines
 import { defineStore } from "pinia";
 
+import type { GeodeId, GeodeIdentified } from "@ogw_front/types/identifiers";
 import type { Table } from "dexie";
 import { ref, watch } from "vue";
 import { database } from "@ogw_internal/database/database";
@@ -19,10 +20,9 @@ interface OpenedView {
   geode_object_type?: string;
 }
 
-interface TreeviewChild {
+interface TreeviewChild extends GeodeIdentified {
   title: string;
   id: string;
-  geode_id: string;
   viewer_type: string;
   geode_object_type: string;
 }
@@ -169,7 +169,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     geodeObjectType: string,
     name: string,
     id: string,
-    geode_id: string,
+    geode_id: GeodeId,
     viewer_type: string,
   ): void {
     const child: TreeviewChild = {

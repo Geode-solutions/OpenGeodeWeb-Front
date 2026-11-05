@@ -6,6 +6,7 @@ import { useObservable } from "@vueuse/rxjs";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
+import type { GeodeId, GeodeIdentified } from "@ogw_front/types/identifiers";
 import { type ModelComponentRecord, useDataMesh } from "./data_helpers/mesh.js";
 import { database } from "@ogw_internal/database/database.js";
 import { liveObservable } from "@ogw_front/utils/live_observable";
@@ -13,9 +14,8 @@ import { useDataCollections } from "./data_helpers/collections.js";
 import { useDataRelations } from "./data_helpers/relations.js";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
-interface DataItem {
+interface DataItem extends GeodeIdentified {
   id: string;
-  geode_id: string;
   name: string;
   viewer_type: string;
   geode_object_type: string;
@@ -29,8 +29,7 @@ interface DataItem {
 // What the CRS features read of a data: light to copy on each change
 type CrsItem = Pick<DataItem, "id" | "name" | "crs" | "created_at">;
 
-interface ModelComponentInput {
-  geode_id: string;
+interface ModelComponentInput extends GeodeIdentified {
   type: string;
   viewer_id: string | number;
   name: string;
@@ -40,9 +39,8 @@ interface ModelComponentInput {
   items?: string[];
 }
 
-interface NewDataItem {
+interface NewDataItem extends GeodeIdentified {
   id: string;
-  geode_id: string;
   name?: string;
   viewer_type: string;
   geode_object_type: string;
@@ -189,7 +187,10 @@ export const useDataStore = defineStore("data", () => {
     const items = refAllItems();
     return computed(() => items.value.filter((data_item) => isRegistered(data_item.id)));
   }
-  async function meshComponentType(modelId: string, geode_id: string): Promise<string | undefined> {
+  async function meshComponentType(
+    modelId: string,
+    geode_id: GeodeId,
+  ): Promise<string | undefined> {
     const component = await model_components_db
       .where("[id+geode_id]")
       .equals([modelId, geode_id])
