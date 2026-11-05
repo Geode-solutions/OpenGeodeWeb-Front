@@ -47,9 +47,9 @@ function buildResponse(id: string): Record<string, unknown> {
 
 function georeferenced(): DataItem[] {
   return mockAs<DataItem[]>([
-    { id: "a", created_at: "1", crs: LAMBERT },
-    { id: "b", created_at: "2" },
-    { id: "c", created_at: "3", crs: LAMBERT },
+    { data_id: "a", created_at: "1", crs: LAMBERT },
+    { data_id: "b", created_at: "2" },
+    { data_id: "c", created_at: "3", crs: LAMBERT },
   ]);
 }
 
@@ -252,13 +252,13 @@ describe("basemap store", () => {
     expect(backRequest).toHaveBeenCalledTimes(ONCE);
     items.value = [
       ...georeferenced(),
-      mockAs<DataItem>({ id: "d", created_at: "4", crs: LAMBERT }),
+      mockAs<DataItem>({ data_id: "d", created_at: "4", crs: LAMBERT }),
     ];
     await nextTick();
     vi.advanceTimersByTime(HALF_DELAY);
     items.value = [
       ...georeferenced(),
-      mockAs<DataItem>({ id: "e", created_at: "5", crs: LAMBERT }),
+      mockAs<DataItem>({ data_id: "e", created_at: "5", crs: LAMBERT }),
     ];
     await nextTick();
     await vi.advanceTimersByTimeAsync(REBUILD_DELAY);
@@ -271,7 +271,7 @@ describe("basemap store", () => {
     const store = setup();
     await store.setMaps(["satellite"]);
     expect(store.available).toBe(true);
-    items.value = mockAs<DataItem[]>([{ id: "a", created_at: "1" }]);
+    items.value = mockAs<DataItem[]>([{ data_id: "a", created_at: "1" }]);
     await nextTick();
     await vi.advanceTimersByTimeAsync(REBUILD_DELAY);
     // The viewer lets the mesh go before the back deletes its files
@@ -505,8 +505,8 @@ describe("basemap store", () => {
   test("data in another crs than the project stays out of the basemap", async () => {
     const store = setup();
     items.value = mockAs<DataItem[]>([
-      { id: "a", created_at: "1", crs: LAMBERT },
-      { id: "c", created_at: "3", crs: { authority: "EPSG", code: "32631", name: "UTM" } },
+      { data_id: "a", created_at: "1", crs: LAMBERT },
+      { data_id: "c", created_at: "3", crs: { authority: "EPSG", code: "32631", name: "UTM" } },
     ]);
     await nextTick();
     await store.setMaps(["satellite"]);

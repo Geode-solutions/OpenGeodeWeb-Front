@@ -4,8 +4,6 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import type { StoreGeneric } from "pinia";
 
-import type { ModelComponentRecord } from "@ogw_front/stores/data_helpers/mesh.js";
-import type { ModelComponentRelationRecord } from "@ogw_front/stores/data.js";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -80,10 +78,9 @@ describe("project import", () => {
     // Flagging for review rather than silently changing behavior during the TS migration.
     vi.spyOn(stores.dataBase, "importStores").mockImplementation(
       async (
-        snapshot: {
-          readonly modelComponents: readonly ModelComponentRecord[];
-          readonly modelComponentsRelations: readonly ModelComponentRelationRecord[];
-        } & { items?: Record<string, unknown>[] },
+        snapshot: Parameters<typeof stores.dataBase.importStores>[0] & {
+          items?: Record<string, unknown>[];
+        },
       ) => {
         const { items } = snapshot;
         await Promise.all(
@@ -104,7 +101,7 @@ describe("project import", () => {
       data: {
         items: [
           {
-            id: "abc123",
+            data_id: "abc123",
             viewer_type: "mesh",
             geode_object_type: "PointSet2D",
             native_file: "native.ext",
@@ -135,10 +132,10 @@ describe("project import", () => {
 
     const item = await database.data?.get("abc123");
     expect(item).toBeDefined();
-    expect(item?.id).toBe("abc123");
+    expect(item?.data_id).toBe("abc123");
 
     const style = await database.data_style?.get("abc123");
     expect(style).toBeDefined();
-    expect(style?.id).toBe("abc123");
+    expect(style?.data_id).toBe("abc123");
   });
 });

@@ -30,14 +30,14 @@ const planes = ref<ClippingPlane[]>([{ id: newItemId(), origin: undefined, norma
 const allItems = dataStore.refRegisteredItems();
 const targetIds = computed<string[]>(() => {
   if (targetAllVisible.value) {
-    return allItems.value.map((item) => item.id);
+    return allItems.value.map((item) => item.data_id);
   }
   return selectedDatasetIds.value;
 });
 const availableDatasets = computed<{ title: string; value: string }[]>(() =>
   allItems.value.map((item) => ({
-    title: item.name || item.id,
-    value: item.id,
+    title: item.name || item.data_id,
+    value: item.data_id,
   })),
 );
 const widgetContainer = useTemplateRef("widgetContainer");
@@ -62,7 +62,7 @@ const {
 });
 
 function getUntargetedIds(): string[] {
-  return allItems.value.map((item) => item.id).filter((id) => !targetIds.value.includes(id));
+  return allItems.value.map((item) => item.data_id).filter((id) => !targetIds.value.includes(id));
 }
 
 const {
@@ -135,7 +135,7 @@ async function resetClippingPlanes(): Promise<void> {
 }
 
 async function removeClippingPlanes(): Promise<void> {
-  const allIds = allItems.value.map((item) => item.id);
+  const allIds = allItems.value.map((item) => item.data_id);
   await hybridViewerStore.setClippingPlanes(allIds, []);
   await removeSlices(allIds);
 }

@@ -1,3 +1,4 @@
+import { type LegacyDataId, fromLegacyDataId } from "@ogw_front/utils/legacy_data_id";
 import type {
   ModelComponentStyle,
   ModelComponentTypeStyle,
@@ -13,7 +14,8 @@ import { useMeshStyle } from "@ogw_internal/stores/data_style/mesh/index";
 import { useModelStyle } from "@ogw_internal/stores/data_style/model/index";
 
 interface DataStyleSnapshot {
-  readonly styles: Record<string, ObjectStyle>;
+  // Projects saved before data_id existed hold their styles with an `id`
+  readonly styles: Record<string, LegacyDataId<ObjectStyle> | ObjectStyle>;
   readonly componentStyles: Record<string, ModelComponentStyle>;
   readonly modelComponentTypeStyles: Record<string, ModelComponentTypeStyle>;
 }
@@ -55,7 +57,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   async function addDataStyle(id: string, geode_object: string): Promise<void> {
     const defaultStyle = getDefaultStyle(geode_object);
     await data_style_db.put(
-      structuredClone({ id, ...(isRecord(defaultStyle) ? defaultStyle : {}) }),
+      structuredClone({ data_id: id, ...(isRecord(defaultStyle) ? defaultStyle : {}) }),
     );
   }
 
@@ -111,8 +113,10 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
     const style_promises = Object.entries(stylesSnapshot).map(
       // oxlint-disable-next-line prefer-readonly-parameter-types -- same external ObjectStyle limitation as above.
-      async ([id, style]: readonly [string, ObjectStyle]) => {
-        const key = await data_style_db.put(structuredClone({ ...style, id }));
+      async ([id, style]: readonly [string, LegacyDataId<ObjectStyle> | ObjectStyle]) => {
+        const key = await data_style_db.put(
+          structuredClone({ ...fromLegacyDataId<ObjectStyle>(style), data_id: id }),
+        );
         return key;
       },
     );

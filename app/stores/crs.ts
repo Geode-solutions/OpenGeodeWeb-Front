@@ -46,7 +46,7 @@ export const useCrsStore = defineStore("crs", () => {
     const mismatched = new Map<string, CRSList | undefined>();
     for (const item of crsItems.value) {
       if (project !== undefined && !sameCrs(item.crs, project)) {
-        mismatched.set(item.id, item.crs);
+        mismatched.set(item.data_id, item.crs);
       }
     }
     return mismatched;

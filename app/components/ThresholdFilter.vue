@@ -32,8 +32,8 @@ const cards = useTemplateRef("cards");
 const allItems = dataStore.refAllItems();
 const availableDatasets = computed<{ title: string; value: string }[]>(() =>
   allItems.value.map((item) => ({
-    title: item.name || item.id,
-    value: item.id,
+    title: item.name || item.data_id,
+    value: item.data_id,
   })),
 );
 

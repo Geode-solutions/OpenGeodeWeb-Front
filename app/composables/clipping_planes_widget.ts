@@ -14,20 +14,17 @@ import {
   type vtkWidgetManager as WidgetManagerInstance,
   newInstance as vtkWidgetManager,
 } from "@kitware/vtk.js/Widgets/Core/WidgetManager";
+import type { DataIdentified } from "@ogw_front/types/identifiers";
 import type { vtkGenericRenderWindow as GenericRenderWindowInstance } from "@ogw_internal/stores/hybrid_viewer/vtk_types";
 import type { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import type { vtkCamera } from "@kitware/vtk.js/Rendering/Core/Camera";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 
-interface DataItemLike {
-  id: string;
-}
-
 interface ClippingPlanesWidgetParams {
   planes: Ref<ClippingPlane[]>;
   targetAllVisible: Ref<boolean>;
   selectedDatasetIds: Ref<string[]>;
-  allItems: Ref<DataItemLike[]>;
+  allItems: Ref<DataIdentified[]>;
   hybridViewerStore: ReturnType<typeof useHybridViewerStore>;
   debouncedApply: (...args: readonly unknown[]) => void;
 }

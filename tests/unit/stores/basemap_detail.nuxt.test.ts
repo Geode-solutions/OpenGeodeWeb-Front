@@ -201,7 +201,7 @@ describe("basemap detail store", () => {
     const viewerStore = useViewerStore();
     viewerStore.request = mockAs<typeof viewerStore.request>(viewerRequest);
     const dataStore = useDataStore();
-    const items = ref(mockAs<DataItem[]>([{ id: FIRST_DATA, created_at: "1", crs: LAMBERT }]));
+    const items = ref(mockAs<DataItem[]>([{ data_id: FIRST_DATA, created_at: "1", crs: LAMBERT }]));
     dataStore.refCrsItems = mockAs<typeof dataStore.refCrsItems>(() => items);
     dataStore.registerObject = mockAs<typeof dataStore.registerObject>(
       vi.fn().mockResolvedValue({}),

@@ -1,3 +1,5 @@
+import type { DataIdentified } from "@ogw_front/types/identifiers";
+
 const GRID_TYPES = new Set([
   "RegularGrid2D",
   "LightRegularGrid2D",
@@ -12,8 +14,11 @@ const SLICE_AXES = [
 ] as const satisfies readonly { title: string; value: SliceAxis; next: SliceAxis }[];
 const DEFAULT_SLICE_AXIS: SliceAxis = 2;
 
-function areAllGrids(items: { id: string; geode_object_type: string }[], ids: string[]): boolean {
-  const targetedItems = items.filter((item) => ids.includes(item.id));
+function areAllGrids(
+  items: (DataIdentified & { geode_object_type: string })[],
+  ids: string[],
+): boolean {
+  const targetedItems = items.filter((item) => ids.includes(item.data_id));
   return (
     targetedItems.length > 0 &&
     targetedItems.every((item) => GRID_TYPES.has(item.geode_object_type))

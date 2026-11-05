@@ -34,7 +34,7 @@ export function useDataRelations(): {
     const keys = relations
       .filter((relation) => relation.type === type)
       .map((relation) => [modelId, relation.child]);
-    const components = await model_components_db.where("[id+geode_id]").anyOf(keys).toArray();
+    const components = await model_components_db.where("[data_id+geode_id]").anyOf(keys).toArray();
     return components.map((component) => toFormattedComponent(component));
   }
 
@@ -43,7 +43,7 @@ export function useDataRelations(): {
     componentId: string,
   ): Promise<ComponentRelations> {
     const relations = await model_components_relation_db
-      .where("[id+parent+child]")
+      .where("[data_id+parent+child]")
       .between([modelId, componentId, Dexie.minKey], [modelId, componentId, Dexie.maxKey])
       .toArray();
     const [boundaries, internals] = await Promise.all([
