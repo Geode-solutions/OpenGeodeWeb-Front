@@ -1,3 +1,4 @@
+import type { GeodeId, GeodeIdentified } from "@ogw_front/types/identifiers";
 import { HOVER_DEBOUNCE_MS, HOVER_TIMEOUT_MS } from "./constants";
 import type { HoverComponentInfo, HoverData } from "./vtk_types";
 import viewer_schemas, {
@@ -17,7 +18,7 @@ async function lookupModelName(modelId: string): Promise<string | undefined> {
 
 async function lookupComponentInfo(
   modelId: string,
-  geodeId: string | undefined,
+  geodeId: GeodeId | undefined,
 ): Promise<HoverComponentInfo | undefined> {
   const modelComponentsTable = database.model_components;
   if (geodeId === undefined || !modelComponentsTable) {
@@ -26,7 +27,7 @@ async function lookupComponentInfo(
   const components = modelComponentsTable.where("[id+geode_id]");
   const query = components.equals([modelId, geodeId] as IndexableType);
   const component = (await query.first()) as
-    | { name?: string; geode_id?: string; type?: string }
+    | (Partial<GeodeIdentified> & { name?: string; type?: string })
     | undefined;
   if (!component) {
     return undefined;

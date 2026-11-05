@@ -1,12 +1,12 @@
+import type { GeodeIdentified } from "@ogw_front/types/identifiers";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import type { Table } from "dexie";
 import { database } from "@ogw_internal/database/database";
 import type { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 
-interface ModelComponentRecord {
+interface ModelComponentRecord extends GeodeIdentified {
   id: string;
-  geode_id: string;
   type: string;
 }
 

@@ -1,14 +1,14 @@
 import type { ComputedRef, Ref } from "vue";
+import type { GeodeIdentified } from "@ogw_front/types/identifiers";
 
 // Same shape as Vue's MaybeRefOrGetter<T>, kept as a local alias for readability at call sites.
 type ReadonlyMaybeRefOrGetter<Value> = Value | Ref<Value> | (() => Value);
 
 // This composable filters/sorts different flavors of "category with children" trees (treeview groups, model component/collection groups, ...); this shape captures just the fields it reads/writes, generically, across all of them.
-interface FilterableItem {
+interface FilterableItem extends Readonly<Partial<GeodeIdentified>> {
   readonly id: unknown;
   readonly title?: string;
-  // Present on geode objects (data and model components), absent on group nodes.
-  readonly geode_id?: string;
+  // Geode objects (data and model components) carry a geode_id, group nodes do not.
   readonly children?: readonly FilterableItem[];
 }
 
