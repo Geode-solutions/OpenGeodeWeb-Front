@@ -112,12 +112,28 @@ interface UseModelSurfacesVertexAttributeReturn {
   ) => Promise<unknown>;
 }
 
+type ModelSurfacesVertexAttributeGetters = Pick<
+  UseModelSurfacesVertexAttributeReturn,
+  | "modelSurfacesVertexAttributeStoredConfig"
+  | "modelSurfacesVertexAttributeName"
+  | "modelSurfacesVertexAttributeItem"
+  | "modelSurfacesVertexAttributeRange"
+  | "modelSurfacesVertexAttributeColorMap"
+  | "modelSurfacesVertexAttributeNoDataColor"
+  | "modelSurfacesVertexAttributeTimeStep"
+> & {
+  modelSurfacesVertexAttributeLastItem: (
+    modelId: string,
+    componentId: string | undefined,
+    name: string | undefined,
+  ) => number;
+};
+
 // oxlint-disable-next-line max-lines-per-function
-function useModelSurfacesVertexAttribute(): UseModelSurfacesVertexAttributeReturn {
-  const { attributeTimeStep, setAttributeTimeStep, seriesArrayName } = useAttributeTimeStepStyle();
-  const dataStore = useDataStore();
-  const modelSurfacesCommonStyle = useModelSurfacesCommonStyle();
-  const viewerStore = useViewerStore();
+function useModelSurfacesVertexAttributeGetters(
+  modelSurfacesCommonStyle: ReturnType<typeof useModelSurfacesCommonStyle>,
+): ModelSurfacesVertexAttributeGetters {
+  const { attributeTimeStep } = useAttributeTimeStepStyle();
   function modelSurfacesVertexAttribute(modelId: string, surfaceId?: string): AttributeState {
     return (
       // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.vertex shape is defined by the data style schema.
@@ -142,37 +158,6 @@ function useModelSurfacesVertexAttribute(): UseModelSurfacesVertexAttributeRetur
       colorMap: undefined,
       no_data_color: DEFAULT_NO_DATA_COLOR,
     };
-  }
-  async function mutateModelSurfacesVertexStyle(
-    modelId: string,
-    surfaceIds: string[],
-    values: Record<string, unknown>,
-  ): Promise<void> {
-    const tasks: Promise<void>[] = [
-      modelSurfacesCommonStyle.mutateModelSurfacesColoring(modelId, surfaceIds, {
-        vertex: values,
-      }),
-    ];
-    const totalSurfaceIds = await dataStore.getSurfacesGeodeIds(modelId);
-    if (surfaceIds.length === totalSurfaceIds.length) {
-      tasks.push(
-        modelSurfacesCommonStyle.mutateModelSurfacesTypeColoring(modelId, {
-          vertex: values,
-        }),
-      );
-    }
-    await Promise.all(tasks);
-  }
-  async function setModelSurfacesVertexAttributeStoredConfig(
-    modelId: string,
-    surfaceIds: string[],
-    name: string | undefined,
-    item: number | undefined,
-    config: Partial<AttributeStoredConfig>,
-  ): Promise<void> {
-    await mutateModelSurfacesVertexStyle(modelId, surfaceIds, {
-      storedConfigs: { [name ?? ""]: { lastItem: item, [item ?? 0]: config } },
-    });
   }
   function modelSurfacesVertexAttributeName(
     modelId: string,
@@ -233,6 +218,65 @@ function useModelSurfacesVertexAttribute(): UseModelSurfacesVertexAttributeRetur
       attributeSchema.$id,
       modelSurfacesVertexAttribute(modelId, surfaceId).name,
     );
+  }
+  return {
+    modelSurfacesVertexAttributeStoredConfig,
+    modelSurfacesVertexAttributeName,
+    modelSurfacesVertexAttributeLastItem,
+    modelSurfacesVertexAttributeItem,
+    modelSurfacesVertexAttributeRange,
+    modelSurfacesVertexAttributeColorMap,
+    modelSurfacesVertexAttributeNoDataColor,
+    modelSurfacesVertexAttributeTimeStep,
+  };
+}
+
+// oxlint-disable-next-line max-lines-per-function
+function useModelSurfacesVertexAttribute(): UseModelSurfacesVertexAttributeReturn {
+  const { setAttributeTimeStep, seriesArrayName } = useAttributeTimeStepStyle();
+  const dataStore = useDataStore();
+  const modelSurfacesCommonStyle = useModelSurfacesCommonStyle();
+  const {
+    modelSurfacesVertexAttributeStoredConfig,
+    modelSurfacesVertexAttributeName,
+    modelSurfacesVertexAttributeLastItem,
+    modelSurfacesVertexAttributeItem,
+    modelSurfacesVertexAttributeRange,
+    modelSurfacesVertexAttributeColorMap,
+    modelSurfacesVertexAttributeNoDataColor,
+    modelSurfacesVertexAttributeTimeStep,
+  } = useModelSurfacesVertexAttributeGetters(modelSurfacesCommonStyle);
+  const viewerStore = useViewerStore();
+  async function mutateModelSurfacesVertexStyle(
+    modelId: string,
+    surfaceIds: string[],
+    values: Record<string, unknown>,
+  ): Promise<void> {
+    const tasks: Promise<void>[] = [
+      modelSurfacesCommonStyle.mutateModelSurfacesColoring(modelId, surfaceIds, {
+        vertex: values,
+      }),
+    ];
+    const totalSurfaceIds = await dataStore.getSurfacesGeodeIds(modelId);
+    if (surfaceIds.length === totalSurfaceIds.length) {
+      tasks.push(
+        modelSurfacesCommonStyle.mutateModelSurfacesTypeColoring(modelId, {
+          vertex: values,
+        }),
+      );
+    }
+    await Promise.all(tasks);
+  }
+  async function setModelSurfacesVertexAttributeStoredConfig(
+    modelId: string,
+    surfaceIds: string[],
+    name: string | undefined,
+    item: number | undefined,
+    config: Partial<AttributeStoredConfig>,
+  ): Promise<void> {
+    await mutateModelSurfacesVertexStyle(modelId, surfaceIds, {
+      storedConfigs: { [name ?? ""]: { lastItem: item, [item ?? 0]: config } },
+    });
   }
   async function setModelSurfacesVertexAttribute(
     modelId: string,

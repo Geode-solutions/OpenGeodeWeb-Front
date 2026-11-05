@@ -43,6 +43,36 @@ interface NamedChildProcess extends child_process.ChildProcessByStdio<null, Read
   name?: string;
 }
 
+function truncateLine(lineOutput: string): string {
+  const halfBuffer = MAX_ERROR_BUFFER_BYTES / 2;
+  return byteLength(lineOutput) > halfBuffer
+    ? `${lineOutput.slice(0, halfBuffer)}…[truncated]`
+    : lineOutput;
+}
+
+function trimOutputBuffer(output: string): string {
+  let trimmed = output;
+  while (byteLength(trimmed) > MAX_ERROR_BUFFER_BYTES) {
+    const newline = trimmed.indexOf("\n");
+    if (newline === -1) {
+      return "";
+    }
+    trimmed = trimmed.slice(newline + 1);
+  }
+  return trimmed;
+}
+
+function createOutputRecorder(): { record: (lineOutput: string) => void; read: () => string } {
+  let recentOutput = "";
+  function record(lineOutput: string): void {
+    recentOutput = trimOutputBuffer(`${recentOutput} ${truncateLine(lineOutput)}\n`);
+  }
+  function read(): string {
+    return recentOutput;
+  }
+  return { record, read };
+}
+
 // oxlint-disable-next-line max-lines-per-function typescript/prefer-readonly-parameter-types eslint/require-await
 async function waitForReady(
   child: NamedChildProcess,
@@ -57,24 +87,8 @@ async function waitForReady(
     const readlineStderr = readline.createInterface({
       input: child.stderr,
     });
-    let recentOutput = "";
-    function recordOutput(lineOutput: string): void {
-      const safeLine =
-        byteLength(lineOutput) > MAX_ERROR_BUFFER_BYTES / 2
-          ? `${lineOutput.slice(0, MAX_ERROR_BUFFER_BYTES / 2)}…[truncated]`
-          : lineOutput;
-      recentOutput = `${recentOutput} ${safeLine}\n`;
-      while (byteLength(recentOutput) > MAX_ERROR_BUFFER_BYTES) {
-        const newline = recentOutput.indexOf("\n");
-        if (newline === -1) {
-          recentOutput = "";
-          break;
-        }
-        recentOutput = recentOutput.slice(newline + 1);
-      }
-    }
+    const recorder = createOutputRecorder();
     let onLine: ((line: string) => void) | undefined = undefined;
-    let onErrLine: ((line: string) => void) | undefined = undefined;
     let onError: ((err: Error) => void) | undefined = undefined;
     let onClose: ((code: number | null) => void) | undefined = undefined;
     let onAbort: (() => void) | undefined = undefined;
@@ -82,9 +96,7 @@ async function waitForReady(
     function cleanup(): void {
       if (onLine) {
         readlineStdout.removeListener("line", onLine);
-      }
-      if (onErrLine) {
-        readlineStderr.removeListener("line", onErrLine);
+        readlineStderr.removeListener("line", onLine);
       }
       if (onError) {
         child.removeListener("error", onError);
@@ -113,16 +125,8 @@ async function waitForReady(
 
     onLine = (lineOutput): void => {
       consola.info(`[${child.name}] ${lineOutput}`);
-      recordOutput(lineOutput);
+      recorder.record(lineOutput);
       if (lineOutput.includes(expectedResponse)) {
-        becomeReady();
-      }
-    };
-
-    onErrLine = (line): void => {
-      consola.info(`[${child.name}] ${line}`);
-      recordOutput(line);
-      if (line.includes(expectedResponse)) {
         becomeReady();
       }
     };
@@ -135,6 +139,7 @@ async function waitForReady(
     onClose = (code): void => {
       consola.info(`[${child.name}] exited with code ${code}`);
       cleanup();
+      const recentOutput = recorder.read();
       reject(
         new Error(
           `[${child.name}] exited with code ${code} before becoming ready.${recentOutput ? `\nRecent output:\n${recentOutput}` : ""}`,
@@ -147,7 +152,7 @@ async function waitForReady(
       reject(new Error(`[${child.name}] timed out waiting for "${expectedResponse}"`));
     };
     readlineStdout.on("line", onLine);
-    readlineStderr.on("line", onErrLine);
+    readlineStderr.on("line", onLine);
     child.once("error", onError);
     child.once("close", onClose);
     if (signal) {

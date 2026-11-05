@@ -8,6 +8,51 @@ interface DatabaseContainer {
 
 const databaseContainer: DatabaseContainer = { instance: undefined };
 
+interface CurrentSchema {
+  currentVersion: number;
+  currentStores: Record<string, string>;
+}
+
+function tableStoreDefinition(table: Table): string {
+  const keyPath = table.schema.primKey.src;
+  const indexes = table.schema.indexes.map((index) => index.src);
+  if (keyPath) {
+    return [keyPath, ...indexes].join(",");
+  }
+  return indexes.join(",");
+}
+
+async function readCurrentSchema(): Promise<CurrentSchema> {
+  const currentStores: Record<string, string> = { ...BaseDatabase.initialStores };
+  if (!(await Dexie.exists("Database"))) {
+    return { currentVersion: 1, currentStores };
+  }
+  const tempDb = new Dexie("Database");
+  await tempDb.open();
+  const currentVersion = tempDb.verno;
+  for (const table of tempDb.tables) {
+    currentStores[table.name] = tableStoreDefinition(table);
+  }
+  tempDb.close();
+  return { currentVersion, currentStores };
+}
+
+async function openExistingDatabase(
+  currentVersion: number,
+  currentStores: Record<string, string>,
+): Promise<Dexie> {
+  const existingDb = new Dexie("Database");
+  for (let version = 1; version <= currentVersion; version += 1) {
+    if (version === 1) {
+      existingDb.version(1).stores(BaseDatabase.initialStores);
+    } else {
+      existingDb.version(version).stores(currentStores);
+    }
+  }
+  await existingDb.open();
+  return existingDb;
+}
+
 class Database extends BaseDatabase {
   public constructor() {
     super("Database");
@@ -20,28 +65,7 @@ class Database extends BaseDatabase {
   }
 
   public static async addTables(newTables: Record<string, string>): Promise<void> {
-    let currentVersion = 1;
-    let currentStores: Record<string, string> = { ...BaseDatabase.initialStores };
-
-    if (await Dexie.exists("Database")) {
-      const tempDb = new Dexie("Database");
-      await tempDb.open();
-
-      currentVersion = tempDb.verno;
-      currentStores = { ...BaseDatabase.initialStores };
-
-      for (const table of tempDb.tables) {
-        const keyPath = table.schema.primKey.src;
-        const indexes = table.schema.indexes.map((index) => index.src);
-        let parts = indexes;
-        if (keyPath) {
-          parts = [keyPath, ...indexes];
-        }
-        currentStores[table.name] = parts.join(",");
-      }
-
-      tempDb.close();
-    }
+    const { currentVersion, currentStores } = await readCurrentSchema();
 
     const allExisting = Object.keys(newTables).every(
       (tableName) => currentStores[tableName] !== undefined,
@@ -51,16 +75,7 @@ class Database extends BaseDatabase {
     databaseContainer.instance?.close();
 
     if (allExisting) {
-      const existingDb = new Dexie("Database");
-      for (let version = 1; version <= currentVersion; version += 1) {
-        if (version === 1) {
-          existingDb.version(1).stores(BaseDatabase.initialStores);
-        } else {
-          existingDb.version(version).stores(currentStores);
-        }
-      }
-      await existingDb.open();
-      databaseContainer.instance = existingDb;
+      databaseContainer.instance = await openExistingDatabase(currentVersion, currentStores);
     } else {
       const newDb = new ExtendedDatabase(currentVersion, currentStores, newTables);
       await newDb.open();
