@@ -118,12 +118,28 @@ interface UseModelSurfacesPolygonAttributeReturn {
   ) => Promise<void>;
 }
 
+type ModelSurfacesPolygonAttributeGetters = Pick<
+  UseModelSurfacesPolygonAttributeReturn,
+  | "modelSurfacesPolygonAttributeStoredConfig"
+  | "modelSurfacesPolygonAttributeName"
+  | "modelSurfacesPolygonAttributeItem"
+  | "modelSurfacesPolygonAttributeRange"
+  | "modelSurfacesPolygonAttributeColorMap"
+  | "modelSurfacesPolygonAttributeNoDataColor"
+  | "modelSurfacesPolygonAttributeTimeStep"
+> & {
+  modelSurfacesPolygonAttributeLastItem: (
+    modelId: string,
+    componentId: string | undefined,
+    name: string | undefined,
+  ) => number;
+};
+
 // oxlint-disable-next-line max-lines-per-function
-function useModelSurfacesPolygonAttribute(): UseModelSurfacesPolygonAttributeReturn {
-  const { attributeTimeStep, setAttributeTimeStep, seriesArrayName } = useAttributeTimeStepStyle();
-  const dataStore = useDataStore();
-  const modelSurfacesCommonStyle = useModelSurfacesCommonStyle();
-  const viewerStore = useViewerStore();
+function useModelSurfacesPolygonAttributeGetters(
+  modelSurfacesCommonStyle: ReturnType<typeof useModelSurfacesCommonStyle>,
+): ModelSurfacesPolygonAttributeGetters {
+  const { attributeTimeStep } = useAttributeTimeStepStyle();
   function modelSurfacesPolygonAttribute(modelId: string, surfaceId?: string): AttributeState {
     return (
       // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.polygon shape is defined by the data style schema.
@@ -148,37 +164,6 @@ function useModelSurfacesPolygonAttribute(): UseModelSurfacesPolygonAttributeRet
       colorMap: undefined,
       no_data_color: DEFAULT_NO_DATA_COLOR,
     };
-  }
-  async function mutateModelSurfacesPolygonStyle(
-    modelId: string,
-    surfaceIds: string[],
-    values: Record<string, unknown>,
-  ): Promise<void> {
-    const tasks: Promise<void>[] = [
-      modelSurfacesCommonStyle.mutateModelSurfacesColoring(modelId, surfaceIds, {
-        polygon: values,
-      }),
-    ];
-    const totalSurfaceIds = await dataStore.getSurfacesGeodeIds(modelId);
-    if (surfaceIds.length === totalSurfaceIds.length) {
-      tasks.push(
-        modelSurfacesCommonStyle.mutateModelSurfacesTypeColoring(modelId, {
-          polygon: values,
-        }),
-      );
-    }
-    await Promise.all(tasks);
-  }
-  async function setModelSurfacesPolygonAttributeStoredConfig(
-    modelId: string,
-    surfaceIds: string[],
-    name: string | undefined,
-    item: number | undefined,
-    config: Partial<AttributeStoredConfig>,
-  ): Promise<void> {
-    await mutateModelSurfacesPolygonStyle(modelId, surfaceIds, {
-      storedConfigs: { [name ?? ""]: { lastItem: item, [item ?? 0]: config } },
-    });
   }
   function modelSurfacesPolygonAttributeName(
     modelId: string,
@@ -242,6 +227,65 @@ function useModelSurfacesPolygonAttribute(): UseModelSurfacesPolygonAttributeRet
       attributeSchema.$id,
       modelSurfacesPolygonAttribute(modelId, surfaceId).name,
     );
+  }
+  return {
+    modelSurfacesPolygonAttributeStoredConfig,
+    modelSurfacesPolygonAttributeName,
+    modelSurfacesPolygonAttributeLastItem,
+    modelSurfacesPolygonAttributeItem,
+    modelSurfacesPolygonAttributeRange,
+    modelSurfacesPolygonAttributeColorMap,
+    modelSurfacesPolygonAttributeNoDataColor,
+    modelSurfacesPolygonAttributeTimeStep,
+  };
+}
+
+// oxlint-disable-next-line max-lines-per-function
+function useModelSurfacesPolygonAttribute(): UseModelSurfacesPolygonAttributeReturn {
+  const { setAttributeTimeStep, seriesArrayName } = useAttributeTimeStepStyle();
+  const dataStore = useDataStore();
+  const modelSurfacesCommonStyle = useModelSurfacesCommonStyle();
+  const {
+    modelSurfacesPolygonAttributeStoredConfig,
+    modelSurfacesPolygonAttributeName,
+    modelSurfacesPolygonAttributeLastItem,
+    modelSurfacesPolygonAttributeItem,
+    modelSurfacesPolygonAttributeRange,
+    modelSurfacesPolygonAttributeColorMap,
+    modelSurfacesPolygonAttributeNoDataColor,
+    modelSurfacesPolygonAttributeTimeStep,
+  } = useModelSurfacesPolygonAttributeGetters(modelSurfacesCommonStyle);
+  const viewerStore = useViewerStore();
+  async function mutateModelSurfacesPolygonStyle(
+    modelId: string,
+    surfaceIds: string[],
+    values: Record<string, unknown>,
+  ): Promise<void> {
+    const tasks: Promise<void>[] = [
+      modelSurfacesCommonStyle.mutateModelSurfacesColoring(modelId, surfaceIds, {
+        polygon: values,
+      }),
+    ];
+    const totalSurfaceIds = await dataStore.getSurfacesGeodeIds(modelId);
+    if (surfaceIds.length === totalSurfaceIds.length) {
+      tasks.push(
+        modelSurfacesCommonStyle.mutateModelSurfacesTypeColoring(modelId, {
+          polygon: values,
+        }),
+      );
+    }
+    await Promise.all(tasks);
+  }
+  async function setModelSurfacesPolygonAttributeStoredConfig(
+    modelId: string,
+    surfaceIds: string[],
+    name: string | undefined,
+    item: number | undefined,
+    config: Partial<AttributeStoredConfig>,
+  ): Promise<void> {
+    await mutateModelSurfacesPolygonStyle(modelId, surfaceIds, {
+      storedConfigs: { [name ?? ""]: { lastItem: item, [item ?? 0]: config } },
+    });
   }
   async function setModelSurfacesPolygonAttribute(
     modelId: string,

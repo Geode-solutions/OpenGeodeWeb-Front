@@ -120,6 +120,37 @@ function showCommonGeodeObjects(
   return resolved.selectedGeodeObject;
 }
 
+function toResolvedEntries(loadable: readonly FileAllowedObjects[]): [string, string][] {
+  return loadable.flatMap((file): [string, string][] => {
+    if (file.selectedGeodeObject === undefined) {
+      return [];
+    }
+    return [[file.filename, file.selectedGeodeObject]];
+  });
+}
+
+// Tries to settle the pending files without the per file panel. Returns true when it did
+function resolveWithoutPanel(
+  pending: readonly FileAllowedObjects[],
+  allowedObjectsList: readonly AllowedObjectMap[],
+): boolean {
+  if (pending.length === 0) {
+    autoResolved.value = true;
+    emitGeodeObjectTypes(resolvedTypes.value);
+    return true;
+  }
+  const pendingAllowedObjects = pending.map(
+    (file) => allowedObjectsList[filenames.indexOf(file.filename)] ?? {},
+  );
+  // Pending files sharing a loadable type: one choice for all of them
+  const selected = showCommonGeodeObjects(pendingFilenames.value, pendingAllowedObjects);
+  if (Object.values(allowedGeodeObjects.value).some((object) => object.is_loadable > 0)) {
+    setGeodeObject(selected);
+    return true;
+  }
+  return false;
+}
+
 // Each file gets its own type. Returns true when the per file panel is needed, i.e. the files cannot be handled by a single choice
 function resolvePerFile(allowedObjectsList: readonly AllowedObjectMap[]): boolean {
   const files = resolveAllowedObjectsPerFile(filenames, allowedObjectsList);
@@ -130,33 +161,13 @@ function resolvePerFile(allowedObjectsList: readonly AllowedObjectMap[]): boolea
     return false;
   }
   const pending = loadable.filter((file) => file.selectedGeodeObject === undefined);
-  resolvedTypes.value = Object.fromEntries(
-    loadable.flatMap((file) => {
-      if (file.selectedGeodeObject === undefined) {
-        return [];
-      }
-      return [[file.filename, file.selectedGeodeObject]];
-    }),
-  );
+  resolvedTypes.value = Object.fromEntries(toResolvedEntries(loadable));
   pendingFilenames.value = pending.map((file) => file.filename);
   skippedFiles.value = files
     .filter((file) => file.candidates.length === 0)
     .map((file) => file.filename);
-  if (skippedFiles.value.length === 0) {
-    if (pending.length === 0) {
-      autoResolved.value = true;
-      emitGeodeObjectTypes(resolvedTypes.value);
-      return false;
-    }
-    const pendingAllowedObjects = pending.map(
-      (file) => allowedObjectsList[filenames.indexOf(file.filename)] ?? {},
-    );
-    // Pending files sharing a loadable type: one choice for all of them
-    const selected = showCommonGeodeObjects(pendingFilenames.value, pendingAllowedObjects);
-    if (Object.values(allowedGeodeObjects.value).some((object) => object.is_loadable > 0)) {
-      setGeodeObject(selected);
-      return false;
-    }
+  if (skippedFiles.value.length === 0 && resolveWithoutPanel(pending, allowedObjectsList)) {
+    return false;
   }
   pendingGroups.value = groupPendingFiles(pending);
   return true;

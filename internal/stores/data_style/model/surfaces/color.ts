@@ -65,6 +65,72 @@ export function useModelSurfacesColor(): {
     return modelSurfaceColoring(id, surface_id).active;
   }
 
+  async function applyVertexColoring(modelId: string, surfaces_ids: string[]): Promise<unknown> {
+    const name = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeName(
+      modelId,
+      surfaces_ids[0],
+    );
+    const item = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeItem(
+      modelId,
+      surfaces_ids[0],
+    );
+    const [minimum, maximum] = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeRange(
+      modelId,
+      surfaces_ids[0],
+    );
+    const colorMap = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeColorMap(
+      modelId,
+      surfaces_ids[0],
+    );
+    const no_data_color = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeNoDataColor(
+      modelId,
+      surfaces_ids[0],
+    );
+    const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
+    if (isModelSurfacesVertexAttributeValid(attribute)) {
+      const result = await modelSurfacesVertexAttribute.setModelSurfacesVertexAttribute(
+        modelId,
+        surfaces_ids,
+        attribute,
+      );
+      return result;
+    }
+    return undefined;
+  }
+
+  async function applyPolygonColoring(modelId: string, surfaces_ids: string[]): Promise<unknown> {
+    const name = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeName(
+      modelId,
+      surfaces_ids[0],
+    );
+    const item = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeItem(
+      modelId,
+      surfaces_ids[0],
+    );
+    const [minimum, maximum] = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeRange(
+      modelId,
+      surfaces_ids[0],
+    );
+    const colorMap = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeColorMap(
+      modelId,
+      surfaces_ids[0],
+    );
+    const no_data_color = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeNoDataColor(
+      modelId,
+      surfaces_ids[0],
+    );
+    const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
+    if (isModelSurfacesPolygonAttributeValid(attribute)) {
+      const result = await modelSurfacesPolygonAttribute.setModelSurfacesPolygonAttribute(
+        modelId,
+        surfaces_ids,
+        attribute,
+      );
+      return result;
+    }
+    return undefined;
+  }
+
   async function setModelSurfacesActiveColoring(
     modelId: string,
     surfaces_ids: string[],
@@ -86,63 +152,9 @@ export function useModelSurfacesColor(): {
     }
 
     if (activeColoring === "vertex") {
-      const name = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeName(
-        modelId,
-        surfaces_ids[0],
-      );
-      const item = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeItem(
-        modelId,
-        surfaces_ids[0],
-      );
-      const [minimum, maximum] = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeRange(
-        modelId,
-        surfaces_ids[0],
-      );
-      const colorMap = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeColorMap(
-        modelId,
-        surfaces_ids[0],
-      );
-      const no_data_color = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeNoDataColor(
-        modelId,
-        surfaces_ids[0],
-      );
-      const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
-      if (isModelSurfacesVertexAttributeValid(attribute)) {
-        return modelSurfacesVertexAttribute.setModelSurfacesVertexAttribute(
-          modelId,
-          surfaces_ids,
-          attribute,
-        );
-      }
+      return applyVertexColoring(modelId, surfaces_ids);
     } else if (activeColoring === "polygon") {
-      const name = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeName(
-        modelId,
-        surfaces_ids[0],
-      );
-      const item = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeItem(
-        modelId,
-        surfaces_ids[0],
-      );
-      const [minimum, maximum] = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeRange(
-        modelId,
-        surfaces_ids[0],
-      );
-      const colorMap = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeColorMap(
-        modelId,
-        surfaces_ids[0],
-      );
-      const no_data_color = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeNoDataColor(
-        modelId,
-        surfaces_ids[0],
-      );
-      const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
-      if (isModelSurfacesPolygonAttributeValid(attribute)) {
-        return modelSurfacesPolygonAttribute.setModelSurfacesPolygonAttribute(
-          modelId,
-          surfaces_ids,
-          attribute,
-        );
-      }
+      return applyPolygonColoring(modelId, surfaces_ids);
     }
     return undefined;
   }
