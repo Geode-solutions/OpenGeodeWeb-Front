@@ -68,6 +68,62 @@ export function useModelBlocksColor(): {
     return modelBlockColoring(id, block_id).active;
   }
 
+  async function applyVertexColoring(modelId: string, blocks_ids: string[]): Promise<void> {
+    const name = modelBlocksVertexAttribute.modelBlocksVertexAttributeName(modelId, blocks_ids[0]);
+    const item = modelBlocksVertexAttribute.modelBlocksVertexAttributeItem(modelId, blocks_ids[0]);
+    const [minimum, maximum] = modelBlocksVertexAttribute.modelBlocksVertexAttributeRange(
+      modelId,
+      blocks_ids[0],
+    );
+    const colorMap = modelBlocksVertexAttribute.modelBlocksVertexAttributeColorMap(
+      modelId,
+      blocks_ids[0],
+    );
+    const no_data_color = modelBlocksVertexAttribute.modelBlocksVertexAttributeNoDataColor(
+      modelId,
+      blocks_ids[0],
+    );
+    const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
+    if (isModelBlocksVertexAttributeValid(attribute)) {
+      await modelBlocksVertexAttribute.setModelBlocksVertexAttribute(
+        modelId,
+        blocks_ids,
+        attribute,
+      );
+    }
+  }
+
+  async function applyPolyhedronColoring(modelId: string, blocks_ids: string[]): Promise<void> {
+    const name = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeName(
+      modelId,
+      blocks_ids[0],
+    );
+    const item = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeItem(
+      modelId,
+      blocks_ids[0],
+    );
+    const [minimum, maximum] = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeRange(
+      modelId,
+      blocks_ids[0],
+    );
+    const colorMap = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeColorMap(
+      modelId,
+      blocks_ids[0],
+    );
+    const no_data_color = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeNoDataColor(
+      modelId,
+      blocks_ids[0],
+    );
+    const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
+    if (isModelBlocksPolyhedronAttributeValid(attribute)) {
+      await modelBlocksPolyhedronAttribute.setModelBlocksPolyhedronAttribute(
+        modelId,
+        blocks_ids,
+        attribute,
+      );
+    }
+  }
+
   async function setModelBlocksActiveColoring(
     modelId: string,
     blocks_ids: string[],
@@ -90,64 +146,9 @@ export function useModelBlocksColor(): {
     }
 
     if (activeColoring === "vertex") {
-      const name = modelBlocksVertexAttribute.modelBlocksVertexAttributeName(
-        modelId,
-        blocks_ids[0],
-      );
-      const item = modelBlocksVertexAttribute.modelBlocksVertexAttributeItem(
-        modelId,
-        blocks_ids[0],
-      );
-      const [minimum, maximum] = modelBlocksVertexAttribute.modelBlocksVertexAttributeRange(
-        modelId,
-        blocks_ids[0],
-      );
-      const colorMap = modelBlocksVertexAttribute.modelBlocksVertexAttributeColorMap(
-        modelId,
-        blocks_ids[0],
-      );
-      const no_data_color = modelBlocksVertexAttribute.modelBlocksVertexAttributeNoDataColor(
-        modelId,
-        blocks_ids[0],
-      );
-      const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
-      if (isModelBlocksVertexAttributeValid(attribute)) {
-        await modelBlocksVertexAttribute.setModelBlocksVertexAttribute(
-          modelId,
-          blocks_ids,
-          attribute,
-        );
-      }
+      await applyVertexColoring(modelId, blocks_ids);
     } else if (activeColoring === "polyhedron") {
-      const name = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeName(
-        modelId,
-        blocks_ids[0],
-      );
-      const item = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeItem(
-        modelId,
-        blocks_ids[0],
-      );
-      const [minimum, maximum] = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeRange(
-        modelId,
-        blocks_ids[0],
-      );
-      const colorMap = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeColorMap(
-        modelId,
-        blocks_ids[0],
-      );
-      const no_data_color =
-        modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeNoDataColor(
-          modelId,
-          blocks_ids[0],
-        );
-      const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
-      if (isModelBlocksPolyhedronAttributeValid(attribute)) {
-        await modelBlocksPolyhedronAttribute.setModelBlocksPolyhedronAttribute(
-          modelId,
-          blocks_ids,
-          attribute,
-        );
-      }
+      await applyPolyhedronColoring(modelId, blocks_ids);
     }
   }
 

@@ -111,12 +111,28 @@ interface UseModelLinesEdgeAttributeReturn {
   ) => Promise<unknown>;
 }
 
+type ModelLinesEdgeAttributeGetters = Pick<
+  UseModelLinesEdgeAttributeReturn,
+  | "modelLinesEdgeAttributeStoredConfig"
+  | "modelLinesEdgeAttributeName"
+  | "modelLinesEdgeAttributeItem"
+  | "modelLinesEdgeAttributeRange"
+  | "modelLinesEdgeAttributeColorMap"
+  | "modelLinesEdgeAttributeNoDataColor"
+  | "modelLinesEdgeAttributeTimeStep"
+> & {
+  modelLinesEdgeAttributeLastItem: (
+    modelId: string,
+    componentId: string | undefined,
+    name: string | undefined,
+  ) => number;
+};
+
 // oxlint-disable-next-line max-lines-per-function
-function useModelLinesEdgeAttribute(): UseModelLinesEdgeAttributeReturn {
-  const { attributeTimeStep, setAttributeTimeStep, seriesArrayName } = useAttributeTimeStepStyle();
-  const dataStore = useDataStore();
-  const modelLinesCommonStyle = useModelLinesCommonStyle();
-  const viewerStore = useViewerStore();
+function useModelLinesEdgeAttributeGetters(
+  modelLinesCommonStyle: ReturnType<typeof useModelLinesCommonStyle>,
+): ModelLinesEdgeAttributeGetters {
+  const { attributeTimeStep } = useAttributeTimeStepStyle();
   function modelLinesEdgeAttribute(modelId: string, lineId?: string): AttributeState {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.edge shape is defined by the data style schema.
     return modelLinesCommonStyle.modelLineColoring(modelId, lineId).edge as AttributeState;
@@ -139,45 +155,6 @@ function useModelLinesEdgeAttribute(): UseModelLinesEdgeAttributeReturn {
       colorMap: undefined,
       no_data_color: DEFAULT_NO_DATA_COLOR,
     };
-  }
-  async function mutateModelLinesEdgeStyle(
-    modelId: string,
-    lineIds: string[],
-    values: Record<string, unknown>,
-  ): Promise<void> {
-    const tasks: Promise<void>[] = [
-      modelLinesCommonStyle.mutateModelLinesColoring(modelId, lineIds, {
-        edge: values,
-      }),
-    ];
-    const totalLineIds = await dataStore.getLinesGeodeIds(modelId);
-    if (lineIds.length === totalLineIds.length) {
-      tasks.push(
-        modelLinesCommonStyle.mutateModelLinesTypeColoring(modelId, {
-          edge: values,
-        }),
-      );
-    }
-    await Promise.all(tasks);
-  }
-  async function setModelLinesEdgeAttributeStoredConfig(
-    modelId: string,
-    lineIds: string[],
-    name: string | undefined,
-    item: number | undefined,
-    config: Partial<AttributeStoredConfig>,
-  ): Promise<void> {
-    if (name === undefined || item === undefined) {
-      return;
-    }
-    await mutateModelLinesEdgeStyle(modelId, lineIds, {
-      storedConfigs: {
-        [name]: {
-          lastItem: item,
-          [item]: config,
-        },
-      },
-    });
   }
   function modelLinesEdgeAttributeName(modelId: string, lineId?: string): string | undefined {
     return modelLinesEdgeAttribute(modelId, lineId).name;
@@ -228,6 +205,73 @@ function useModelLinesEdgeAttribute(): UseModelLinesEdgeAttributeReturn {
       attributeSchema.$id,
       modelLinesEdgeAttribute(modelId, lineId).name,
     );
+  }
+  return {
+    modelLinesEdgeAttributeStoredConfig,
+    modelLinesEdgeAttributeName,
+    modelLinesEdgeAttributeLastItem,
+    modelLinesEdgeAttributeItem,
+    modelLinesEdgeAttributeRange,
+    modelLinesEdgeAttributeColorMap,
+    modelLinesEdgeAttributeNoDataColor,
+    modelLinesEdgeAttributeTimeStep,
+  };
+}
+
+// oxlint-disable-next-line max-lines-per-function
+function useModelLinesEdgeAttribute(): UseModelLinesEdgeAttributeReturn {
+  const { setAttributeTimeStep, seriesArrayName } = useAttributeTimeStepStyle();
+  const dataStore = useDataStore();
+  const modelLinesCommonStyle = useModelLinesCommonStyle();
+  const {
+    modelLinesEdgeAttributeStoredConfig,
+    modelLinesEdgeAttributeName,
+    modelLinesEdgeAttributeLastItem,
+    modelLinesEdgeAttributeItem,
+    modelLinesEdgeAttributeRange,
+    modelLinesEdgeAttributeColorMap,
+    modelLinesEdgeAttributeNoDataColor,
+    modelLinesEdgeAttributeTimeStep,
+  } = useModelLinesEdgeAttributeGetters(modelLinesCommonStyle);
+  const viewerStore = useViewerStore();
+  async function mutateModelLinesEdgeStyle(
+    modelId: string,
+    lineIds: string[],
+    values: Record<string, unknown>,
+  ): Promise<void> {
+    const tasks: Promise<void>[] = [
+      modelLinesCommonStyle.mutateModelLinesColoring(modelId, lineIds, {
+        edge: values,
+      }),
+    ];
+    const totalLineIds = await dataStore.getLinesGeodeIds(modelId);
+    if (lineIds.length === totalLineIds.length) {
+      tasks.push(
+        modelLinesCommonStyle.mutateModelLinesTypeColoring(modelId, {
+          edge: values,
+        }),
+      );
+    }
+    await Promise.all(tasks);
+  }
+  async function setModelLinesEdgeAttributeStoredConfig(
+    modelId: string,
+    lineIds: string[],
+    name: string | undefined,
+    item: number | undefined,
+    config: Partial<AttributeStoredConfig>,
+  ): Promise<void> {
+    if (name === undefined || item === undefined) {
+      return;
+    }
+    await mutateModelLinesEdgeStyle(modelId, lineIds, {
+      storedConfigs: {
+        [name]: {
+          lastItem: item,
+          [item]: config,
+        },
+      },
+    });
   }
   async function setModelLinesEdgeAttribute(
     modelId: string,

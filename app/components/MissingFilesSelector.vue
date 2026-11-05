@@ -94,29 +94,30 @@ function isCsvFile(filename: string): boolean {
   return filename.toLowerCase().endsWith(".csv") || filename.toLowerCase().endsWith(".csv.json");
 }
 
-async function missing_files(): Promise<void> {
-  toggle_loading();
+function reset_missing_state(): void {
   has_missing_files.value = false;
   mandatory_files.value = [];
   additional_files.value = [];
   missing_by_file.value = [];
-  const backStore = useBackStore();
+}
 
-  const promise_array = checked_filenames.value.map((filename): Promise<FilePlan> => {
-    if (isCsvFile(filename)) {
-      return Promise.resolve({
-        has_missing_files: false,
-        mandatory_files: [],
-        additional_files: [],
-      });
-    }
-    if (timeSeries) {
-      return backStore.request({ schema: time_series_schema, params: { filename } });
-    }
-    const params = { geode_object_type: geodeObjectTypes[filename] ?? "", filename };
-    return backStore.request({ schema, params });
-  });
-  const values = await Promise.all(promise_array);
+function request_file_plan(filename: string): Promise<FilePlan> {
+  if (isCsvFile(filename)) {
+    return Promise.resolve({
+      has_missing_files: false,
+      mandatory_files: [],
+      additional_files: [],
+    });
+  }
+  const backStore = useBackStore();
+  if (timeSeries) {
+    return backStore.request({ schema: time_series_schema, params: { filename } });
+  }
+  const params = { geode_object_type: geodeObjectTypes[filename] ?? "", filename };
+  return backStore.request({ schema, params });
+}
+
+function collect_file_plans(values: FilePlan[]): void {
   for (const [index, value] of values.entries()) {
     if (value.has_missing_files) {
       has_missing_files.value = true;
@@ -129,6 +130,9 @@ async function missing_files(): Promise<void> {
     mandatory_files.value = [...mandatory_files.value, ...value.mandatory_files];
     additional_files.value = [...additional_files.value, ...value.additional_files];
   }
+}
+
+function flag_unconfigured_csvs(): void {
   const unconfigured_csvs = files.filter((file) => isCsvFile(file.name) && !file.isConfigured);
   if (unconfigured_csvs.length > 0) {
     has_missing_files.value = true;
@@ -136,6 +140,15 @@ async function missing_files(): Promise<void> {
       accept.value = ".json";
     }
   }
+}
+
+async function missing_files(): Promise<void> {
+  toggle_loading();
+  reset_missing_state();
+
+  const values = await Promise.all(checked_filenames.value.map(request_file_plan));
+  collect_file_plans(values);
+  flag_unconfigured_csvs();
 
   if (!has_missing_files.value) {
     emit("update_values", { skipped_files: [] });

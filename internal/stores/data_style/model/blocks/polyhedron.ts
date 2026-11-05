@@ -114,12 +114,28 @@ interface UseModelBlocksPolyhedronAttributeReturn {
   ) => Promise<boolean>;
 }
 
+type ModelBlocksPolyhedronAttributeGetters = Pick<
+  UseModelBlocksPolyhedronAttributeReturn,
+  | "modelBlocksPolyhedronAttributeStoredConfig"
+  | "modelBlocksPolyhedronAttributeName"
+  | "modelBlocksPolyhedronAttributeItem"
+  | "modelBlocksPolyhedronAttributeRange"
+  | "modelBlocksPolyhedronAttributeColorMap"
+  | "modelBlocksPolyhedronAttributeNoDataColor"
+  | "modelBlocksPolyhedronAttributeTimeStep"
+> & {
+  modelBlocksPolyhedronAttributeLastItem: (
+    modelId: string,
+    componentId: string | undefined,
+    name: string | undefined,
+  ) => number;
+};
+
 // oxlint-disable-next-line max-lines-per-function
-function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeReturn {
-  const { attributeTimeStep, setAttributeTimeStep, seriesArrayName } = useAttributeTimeStepStyle();
-  const dataStore = useDataStore();
-  const modelBlocksCommonStyle = useModelBlocksCommonStyle();
-  const viewerStore = useViewerStore();
+function useModelBlocksPolyhedronAttributeGetters(
+  modelBlocksCommonStyle: ReturnType<typeof useModelBlocksCommonStyle>,
+): ModelBlocksPolyhedronAttributeGetters {
+  const { attributeTimeStep } = useAttributeTimeStepStyle();
   function modelBlocksPolyhedronAttribute(modelId: string, blockId?: string): AttributeState {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.polyhedron shape is defined by the data style schema.
     return modelBlocksCommonStyle.modelBlockColoring(modelId, blockId).polyhedron as AttributeState;
@@ -142,45 +158,6 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
       colorMap: undefined,
       no_data_color: DEFAULT_NO_DATA_COLOR,
     };
-  }
-  async function mutateModelBlocksPolyhedronStyle(
-    modelId: string,
-    blockIds: string[],
-    values: Record<string, unknown>,
-  ): Promise<void> {
-    const tasks: Promise<void>[] = [
-      modelBlocksCommonStyle.mutateModelBlocksColoring(modelId, blockIds, {
-        polyhedron: values,
-      }),
-    ];
-    const totalBlockIds = await dataStore.getBlocksGeodeIds(modelId);
-    if (blockIds.length === totalBlockIds.length) {
-      tasks.push(
-        modelBlocksCommonStyle.mutateModelBlocksTypeColoring(modelId, {
-          polyhedron: values,
-        }),
-      );
-    }
-    await Promise.all(tasks);
-  }
-  async function setModelBlocksPolyhedronAttributeStoredConfig(
-    modelId: string,
-    blockIds: string[],
-    name: string | undefined,
-    item: number | undefined,
-    config: Partial<AttributeStoredConfig>,
-  ): Promise<void> {
-    if (name === undefined || item === undefined) {
-      return;
-    }
-    await mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
-      storedConfigs: {
-        [name]: {
-          lastItem: item,
-          [item]: config,
-        },
-      },
-    });
   }
   function modelBlocksPolyhedronAttributeName(
     modelId: string,
@@ -241,6 +218,73 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
       modelBlockPolyhedronAttributeSchema.$id,
       modelBlocksPolyhedronAttribute(modelId, blockId).name,
     );
+  }
+  return {
+    modelBlocksPolyhedronAttributeStoredConfig,
+    modelBlocksPolyhedronAttributeName,
+    modelBlocksPolyhedronAttributeLastItem,
+    modelBlocksPolyhedronAttributeItem,
+    modelBlocksPolyhedronAttributeRange,
+    modelBlocksPolyhedronAttributeColorMap,
+    modelBlocksPolyhedronAttributeNoDataColor,
+    modelBlocksPolyhedronAttributeTimeStep,
+  };
+}
+
+// oxlint-disable-next-line max-lines-per-function
+function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeReturn {
+  const { setAttributeTimeStep, seriesArrayName } = useAttributeTimeStepStyle();
+  const dataStore = useDataStore();
+  const modelBlocksCommonStyle = useModelBlocksCommonStyle();
+  const {
+    modelBlocksPolyhedronAttributeStoredConfig,
+    modelBlocksPolyhedronAttributeName,
+    modelBlocksPolyhedronAttributeLastItem,
+    modelBlocksPolyhedronAttributeItem,
+    modelBlocksPolyhedronAttributeRange,
+    modelBlocksPolyhedronAttributeColorMap,
+    modelBlocksPolyhedronAttributeNoDataColor,
+    modelBlocksPolyhedronAttributeTimeStep,
+  } = useModelBlocksPolyhedronAttributeGetters(modelBlocksCommonStyle);
+  const viewerStore = useViewerStore();
+  async function mutateModelBlocksPolyhedronStyle(
+    modelId: string,
+    blockIds: string[],
+    values: Record<string, unknown>,
+  ): Promise<void> {
+    const tasks: Promise<void>[] = [
+      modelBlocksCommonStyle.mutateModelBlocksColoring(modelId, blockIds, {
+        polyhedron: values,
+      }),
+    ];
+    const totalBlockIds = await dataStore.getBlocksGeodeIds(modelId);
+    if (blockIds.length === totalBlockIds.length) {
+      tasks.push(
+        modelBlocksCommonStyle.mutateModelBlocksTypeColoring(modelId, {
+          polyhedron: values,
+        }),
+      );
+    }
+    await Promise.all(tasks);
+  }
+  async function setModelBlocksPolyhedronAttributeStoredConfig(
+    modelId: string,
+    blockIds: string[],
+    name: string | undefined,
+    item: number | undefined,
+    config: Partial<AttributeStoredConfig>,
+  ): Promise<void> {
+    if (name === undefined || item === undefined) {
+      return;
+    }
+    await mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
+      storedConfigs: {
+        [name]: {
+          lastItem: item,
+          [item]: config,
+        },
+      },
+    });
   }
   async function setModelBlocksPolyhedronAttribute(
     modelId: string,
