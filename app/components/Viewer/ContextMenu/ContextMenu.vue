@@ -198,10 +198,10 @@ function toggleShowName(): void {
         />
 
         <InfoCard
-  v-if="!isSceneMenu && meta_data.viewer_type !== 'basemap'"
-  v-model:show="showName"
-  :meta-data="meta_data"
-/>
+          v-if="!isSceneMenu && meta_data.viewer_type !== 'basemap'"
+          v-model:show="showName"
+          :meta-data="meta_data"
+        />
       </div>
     </div>
   </v-menu>
