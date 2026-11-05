@@ -27,10 +27,12 @@ interface Props {
   index: number;
   itemProps: ItemProps;
   tooltip: string;
-  btnImage: string;
+  // An image, or an mdi icon name
+  btnImage?: string;
+  btnIcon?: string;
 }
 
-const { index, itemProps, tooltip, btnImage } = defineProps<Props>();
+const { index, itemProps, tooltip, btnImage = "", btnIcon = "" } = defineProps<Props>();
 
 const buttonCoords = computed(() => {
   const angle = (index / itemProps.totalItems) * 2 * Math.PI;
@@ -155,7 +157,9 @@ export type { ItemProps };
           elevation="2"
           :style="computedItemStyles"
         >
+          <v-icon v-if="btnIcon" :icon="btnIcon" size="28" />
           <v-img
+            v-else
             :src="btnImage"
             height="28"
             width="28"
