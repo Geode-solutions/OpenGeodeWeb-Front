@@ -10,6 +10,20 @@ function parseComponent(val: string, max = RGB_MAX): number {
   return Number(val);
 }
 
+function clampChannel(value: number): number {
+  return Math.min(RGB_MAX, Math.max(0, Math.round(value)));
+}
+
+function parseAlpha(alphaText: string | undefined): number {
+  if (alphaText === undefined) {
+    return 1;
+  }
+  const rawAlpha = parseComponent(alphaText, 1);
+  const calculatedAlpha = rawAlpha > 1 ? rawAlpha / RGB_MAX : rawAlpha;
+  const roundedAlpha = Number(calculatedAlpha.toFixed(2));
+  return Math.min(1, Math.max(0, roundedAlpha));
+}
+
 function parseColorString(colorText: string): RGBAColor | undefined {
   if (colorText === "") {
     return undefined;
@@ -21,21 +35,10 @@ function parseColorString(colorText: string): RGBAColor | undefined {
   }
 
   const [redText = "", greenText = "", blueText = "", alphaText] = numbersMatch;
-  const rawRed = parseComponent(redText);
-  const rawGreen = parseComponent(greenText);
-  const rawBlue = parseComponent(blueText);
-
-  const red = Math.min(RGB_MAX, Math.max(0, Math.round(rawRed)));
-  const green = Math.min(RGB_MAX, Math.max(0, Math.round(rawGreen)));
-  const blue = Math.min(RGB_MAX, Math.max(0, Math.round(rawBlue)));
-
-  let alpha = 1;
-  if (alphaText !== undefined) {
-    const rawAlpha = parseComponent(alphaText, 1);
-    const calculatedAlpha = rawAlpha > 1 ? rawAlpha / RGB_MAX : rawAlpha;
-    const roundedAlpha = Number(calculatedAlpha.toFixed(2));
-    alpha = Math.min(1, Math.max(0, roundedAlpha));
-  }
+  const red = clampChannel(parseComponent(redText));
+  const green = clampChannel(parseComponent(greenText));
+  const blue = clampChannel(parseComponent(blueText));
+  const alpha = parseAlpha(alphaText);
 
   if (Number.isNaN(red) || Number.isNaN(green) || Number.isNaN(blue) || Number.isNaN(alpha)) {
     return undefined;

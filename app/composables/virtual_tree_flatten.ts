@@ -27,57 +27,80 @@ function matchesSearch(ctx: FlattenContext, item: TreeItem, id: unknown, search:
   );
 }
 
-function flattenTree(ctx: FlattenContext, nodes: readonly TreeItem[], depth = 0): DisplayItem[] {
+function createDisplayItem(ctx: FlattenContext, item: TreeItem, depth: number): DisplayItem {
+  const id = item[ctx.actualItemProps.value.value];
+  return {
+    raw: item,
+    id,
+    depth,
+    isOpen: ctx.openedSet.value.has(id),
+    isActive: ctx.activeSet.value.has(id),
+    isLeaf: true,
+  };
+}
+
+type FlattenChildren = (children: readonly TreeItem[]) => DisplayItem[];
+
+// A branch is kept when it matches or when one of its descendants does
+function flattenSearchedBranch(
+  entry: DisplayItem,
+  subtree: readonly DisplayItem[],
+  matches: boolean,
+): DisplayItem[] {
+  if (subtree.length === 0 && !matches) {
+    return [];
+  }
+  const branch = { ...entry, isLeaf: false };
+  if (!branch.isOpen) {
+    return [branch];
+  }
+  return [branch, ...subtree];
+}
+
+function flattenOpenBranch(
+  entry: DisplayItem,
+  children: readonly TreeItem[],
+  flattenChildren: FlattenChildren,
+): DisplayItem[] {
+  const branch = { ...entry, isLeaf: false };
+  if (!branch.isOpen) {
+    return [branch];
+  }
+  return [branch, ...flattenChildren(children)];
+}
+
+function flattenNode(
+  ctx: FlattenContext,
+  item: TreeItem,
+  depth: number,
+  flattenChildren: FlattenChildren,
+): DisplayItem[] {
   const { search } = ctx.props.value;
+  const entry = createDisplayItem(ctx, item, depth);
+  const children = ctx.getChildrenOf(item) ?? [];
+  const searching = search !== undefined && search !== "";
+
+  if (children.length === 0) {
+    if (searching && !matchesSearch(ctx, item, entry.id, search)) {
+      return [];
+    }
+    return [entry];
+  }
+  if (searching) {
+    const matches = matchesSearch(ctx, item, entry.id, search);
+    return flattenSearchedBranch(entry, flattenChildren(children), matches);
+  }
+  return flattenOpenBranch(entry, children, flattenChildren);
+}
+
+function flattenTree(ctx: FlattenContext, nodes: readonly TreeItem[], depth = 0): DisplayItem[] {
   const result: DisplayItem[] = [];
+  function flattenChildren(children: readonly TreeItem[]): DisplayItem[] {
+    return flattenTree(ctx, children, depth + 1);
+  }
 
   for (const item of nodes) {
-    const id = item[ctx.actualItemProps.value.value];
-    const children = ctx.getChildrenOf(item);
-    const hasChildren = Boolean(children && children.length > 0);
-
-    const isOpen = ctx.openedSet.value.has(id);
-    const isActive = ctx.activeSet.value.has(id);
-
-    if (search !== undefined && search !== "") {
-      const matches = matchesSearch(ctx, item, id, search);
-
-      if (hasChildren) {
-        const subtree = flattenTree(ctx, children ?? [], depth + 1);
-        if (subtree.length === 0 && !matches) {
-          continue;
-        }
-
-        result.push({
-          raw: item,
-          id,
-          depth,
-          isOpen,
-          isActive,
-          isLeaf: false,
-        });
-        if (isOpen) {
-          result.push(...subtree);
-        }
-        continue;
-      }
-      if (!matches) {
-        continue;
-      }
-    }
-
-    result.push({
-      raw: item,
-      id,
-      depth,
-      isOpen,
-      isActive,
-      isLeaf: !hasChildren,
-    });
-
-    if (isOpen && hasChildren) {
-      result.push(...flattenTree(ctx, children ?? [], depth + 1));
-    }
+    result.push(...flattenNode(ctx, item, depth, flattenChildren));
   }
   return result;
 }

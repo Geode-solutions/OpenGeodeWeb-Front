@@ -42,15 +42,29 @@ async function getModelComponentsMap(
     ),
   };
 }
-async function dispatchToComponentTypes(
-  modelId: string,
+const COMPONENT_TYPE_NAMES = ["Block", "Surface", "Line", "Corner"] as const;
+type ComponentTypeName = (typeof COMPONENT_TYPE_NAMES)[number];
+
+const DISPATCH_METHODS: Partial<Record<string, Record<ComponentTypeName, string>>> = {
+  Visibility: {
+    Block: "setModelBlocksVisibility",
+    Surface: "setModelSurfacesVisibility",
+    Line: "setModelLinesVisibility",
+    Corner: "setModelCornersVisibility",
+  },
+  Color: {
+    Block: "setModelBlocksColor",
+    Surface: "setModelSurfacesColor",
+    Line: "setModelLinesColor",
+    Corner: "setModelCornersColor",
+  },
+};
+
+function groupIdsByComponentType(
   componentIds: string[],
-  action: string,
-  { componentStyleFunctions }: { componentStyleFunctions: ComponentStyleFunctions },
-  ...args: unknown[]
-): Promise<unknown[]> {
-  const { componentsMap } = await getModelComponentsMap(modelId);
-  const idsByComponent: { Block: string[]; Surface: string[]; Line: string[]; Corner: string[] } = {
+  componentsMap: Record<string, ModelComponent>,
+): Record<ComponentTypeName, string[]> {
+  const idsByComponent: Record<ComponentTypeName, string[]> = {
     Block: [],
     Surface: [],
     Line: [],
@@ -62,98 +76,34 @@ async function dispatchToComponentTypes(
       (idsByComponent as Record<string, string[]>)[type]?.push(id);
     }
   }
-  const promises: Promise<unknown>[] = [];
-  if (action === "Visibility") {
-    if (idsByComponent.Block.length > 0) {
-      promises.push(
-        callComponentStyleFunction(
-          componentStyleFunctions.Block,
-          "setModelBlocksVisibility",
-          modelId,
-          idsByComponent.Block,
-          ...args,
-        ),
-      );
-    }
-    if (idsByComponent.Surface.length > 0) {
-      promises.push(
-        callComponentStyleFunction(
-          componentStyleFunctions.Surface,
-          "setModelSurfacesVisibility",
-          modelId,
-          idsByComponent.Surface,
-          ...args,
-        ),
-      );
-    }
-    if (idsByComponent.Line.length > 0) {
-      promises.push(
-        callComponentStyleFunction(
-          componentStyleFunctions.Line,
-          "setModelLinesVisibility",
-          modelId,
-          idsByComponent.Line,
-          ...args,
-        ),
-      );
-    }
-    if (idsByComponent.Corner.length > 0) {
-      promises.push(
-        callComponentStyleFunction(
-          componentStyleFunctions.Corner,
-          "setModelCornersVisibility",
-          modelId,
-          idsByComponent.Corner,
-          ...args,
-        ),
-      );
-    }
-  } else if (action === "Color") {
-    if (idsByComponent.Block.length > 0) {
-      promises.push(
-        callComponentStyleFunction(
-          componentStyleFunctions.Block,
-          "setModelBlocksColor",
-          modelId,
-          idsByComponent.Block,
-          ...args,
-        ),
-      );
-    }
-    if (idsByComponent.Surface.length > 0) {
-      promises.push(
-        callComponentStyleFunction(
-          componentStyleFunctions.Surface,
-          "setModelSurfacesColor",
-          modelId,
-          idsByComponent.Surface,
-          ...args,
-        ),
-      );
-    }
-    if (idsByComponent.Line.length > 0) {
-      promises.push(
-        callComponentStyleFunction(
-          componentStyleFunctions.Line,
-          "setModelLinesColor",
-          modelId,
-          idsByComponent.Line,
-          ...args,
-        ),
-      );
-    }
-    if (idsByComponent.Corner.length > 0) {
-      promises.push(
-        callComponentStyleFunction(
-          componentStyleFunctions.Corner,
-          "setModelCornersColor",
-          modelId,
-          idsByComponent.Corner,
-          ...args,
-        ),
-      );
-    }
+  return idsByComponent;
+}
+
+async function dispatchToComponentTypes(
+  modelId: string,
+  componentIds: string[],
+  action: string,
+  { componentStyleFunctions }: { componentStyleFunctions: ComponentStyleFunctions },
+  ...args: unknown[]
+): Promise<unknown[]> {
+  const { componentsMap } = await getModelComponentsMap(modelId);
+  const idsByComponent = groupIdsByComponentType(componentIds, componentsMap);
+  const methods = DISPATCH_METHODS[action];
+  if (methods === undefined) {
+    return [];
   }
+  const promises = COMPONENT_TYPE_NAMES.filter((type) => idsByComponent[type].length > 0).map(
+    async (type) => {
+      const result = await callComponentStyleFunction(
+        componentStyleFunctions[type],
+        methods[type],
+        modelId,
+        idsByComponent[type],
+        ...args,
+      );
+      return result;
+    },
+  );
   return Promise.all(promises);
 }
 export { getModelComponentsMap, dispatchToComponentTypes };
