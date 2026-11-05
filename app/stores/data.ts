@@ -187,7 +187,7 @@ export const useDataStore = defineStore("data", () => {
     return computed(() => items.value.filter((data_item) => isRegistered(data_item.data_id)));
   }
   async function meshComponentType(
-    modelId: string,
+    modelId: DataId,
     geode_id: GeodeId,
   ): Promise<string | undefined> {
     const component = await model_components_db
@@ -310,7 +310,7 @@ export const useDataStore = defineStore("data", () => {
     return lastKey;
   }
   async function getComponentByViewerId(
-    modelId: string,
+    modelId: DataId,
     viewer_id: string | number,
   ): Promise<ModelComponentRecord | undefined> {
     const component = await model_components_db
@@ -321,7 +321,7 @@ export const useDataStore = defineStore("data", () => {
     return component;
   }
   async function getComponentsByViewerIds(
-    modelId: string,
+    modelId: DataId,
     viewer_ids: number[],
   ): Promise<ModelComponentRecord[]> {
     const components = await model_components_db
@@ -331,7 +331,7 @@ export const useDataStore = defineStore("data", () => {
       .toArray();
     return components;
   }
-  async function deleteModelComponents(modelId: string): Promise<void> {
+  async function deleteModelComponents(modelId: DataId): Promise<void> {
     await model_components_db.where("data_id").equals(modelId).delete();
     await model_components_relation_db.where("data_id").equals(modelId).delete();
   }
@@ -345,14 +345,14 @@ export const useDataStore = defineStore("data", () => {
     await data_db.update(id, changes);
   }
 
-  async function getAllModelComponentsViewerIds(modelId: string): Promise<number[]> {
+  async function getAllModelComponentsViewerIds(modelId: DataId): Promise<number[]> {
     const components = await model_components_db.where("data_id").equals(modelId).toArray();
     return components.map((component: ModelComponentRecord) =>
       Math.trunc(Number(component.viewer_id)),
     );
   }
   async function getMeshComponentsViewerIds(
-    modelId: string,
+    modelId: DataId,
     meshComponentGeodeIds: readonly string[],
   ): Promise<number[]> {
     const components = await model_components_db

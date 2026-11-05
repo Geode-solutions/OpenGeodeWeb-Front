@@ -3,26 +3,27 @@ import type {
   AttributeStoredConfig,
 } from "@ogw_internal/stores/data_style/attribute_types";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { DataId } from "@ogw_front/types/identifiers";
 
 // Local imports
 import { useMeshEdgesCommonStyle } from "./common";
 
 interface UseMeshEdgesEdgeAttributeConfigReturn {
-  meshEdgesEdgeAttribute: (id: string) => AttributeState;
-  meshEdgesEdgeAttributeName: (id: string) => string | undefined;
-  meshEdgesEdgeAttributeLastItem: (id: string, name: string | undefined) => number;
-  meshEdgesEdgeAttributeItem: (id: string) => number;
+  meshEdgesEdgeAttribute: (meshId: DataId) => AttributeState;
+  meshEdgesEdgeAttributeName: (meshId: DataId) => string | undefined;
+  meshEdgesEdgeAttributeLastItem: (meshId: DataId, name: string | undefined) => number;
+  meshEdgesEdgeAttributeItem: (meshId: DataId) => number;
   meshEdgesEdgeAttributeStoredConfig: (
-    id: string,
+    meshId: DataId,
     name: string | undefined,
     item: number | undefined,
   ) => AttributeStoredConfig;
 }
 
 interface UseMeshEdgesEdgeAttributeConfigWriterReturn {
-  mutateMeshEdgesEdgeStyle: (id: string, values: Record<string, unknown>) => Promise<string>;
+  mutateMeshEdgesEdgeStyle: (meshId: DataId, values: Record<string, unknown>) => Promise<string>;
   setMeshEdgesEdgeAttributeStoredConfig: (
-    id: string,
+    meshId: DataId,
     name: string | undefined,
     item: number | undefined,
     config: Partial<AttributeStoredConfig>,
@@ -31,16 +32,16 @@ interface UseMeshEdgesEdgeAttributeConfigWriterReturn {
 
 function useMeshEdgesEdgeAttributeConfig(): UseMeshEdgesEdgeAttributeConfigReturn {
   const meshEdgesCommonStyle = useMeshEdgesCommonStyle();
-  function meshEdgesEdgeAttribute(id: string): AttributeState {
+  function meshEdgesEdgeAttribute(meshId: DataId): AttributeState {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.edge shape is defined by the data style schema.
-    return meshEdgesCommonStyle.meshEdgesColoring(id).edge as AttributeState;
+    return meshEdgesCommonStyle.meshEdgesColoring(meshId).edge as AttributeState;
   }
   function meshEdgesEdgeAttributeStoredConfig(
-    id: string,
+    meshId: DataId,
     name: string | undefined,
     item: number | undefined,
   ): AttributeStoredConfig {
-    const { storedConfigs } = meshEdgesEdgeAttribute(id);
+    const { storedConfigs } = meshEdgesEdgeAttribute(meshId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
     const itemConfig = item === undefined ? undefined : nameConfig?.[item];
     if (itemConfig !== undefined) {
@@ -53,20 +54,20 @@ function useMeshEdgesEdgeAttributeConfig(): UseMeshEdgesEdgeAttributeConfigRetur
       no_data_color: DEFAULT_NO_DATA_COLOR,
     };
   }
-  function meshEdgesEdgeAttributeName(id: string): string | undefined {
-    return meshEdgesEdgeAttribute(id).name;
+  function meshEdgesEdgeAttributeName(meshId: DataId): string | undefined {
+    return meshEdgesEdgeAttribute(meshId).name;
   }
-  function meshEdgesEdgeAttributeLastItem(id: string, name: string | undefined): number {
-    const { storedConfigs } = meshEdgesEdgeAttribute(id);
+  function meshEdgesEdgeAttributeLastItem(meshId: DataId, name: string | undefined): number {
+    const { storedConfigs } = meshEdgesEdgeAttribute(meshId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
     if (nameConfig !== undefined) {
       return nameConfig.lastItem;
     }
     return 0;
   }
-  function meshEdgesEdgeAttributeItem(id: string): number {
-    const { item, name } = meshEdgesEdgeAttribute(id);
-    return item ?? meshEdgesEdgeAttributeLastItem(id, name);
+  function meshEdgesEdgeAttributeItem(meshId: DataId): number {
+    const { item, name } = meshEdgesEdgeAttribute(meshId);
+    return item ?? meshEdgesEdgeAttributeLastItem(meshId, name);
   }
   return {
     meshEdgesEdgeAttribute,
@@ -78,9 +79,9 @@ function useMeshEdgesEdgeAttributeConfig(): UseMeshEdgesEdgeAttributeConfigRetur
 }
 
 interface UseMeshEdgesEdgeAttributeConfigValuesReturn {
-  meshEdgesEdgeAttributeRange: (id: string) => [number | undefined, number | undefined];
-  meshEdgesEdgeAttributeColorMap: (id: string) => string | undefined;
-  meshEdgesEdgeAttributeNoDataColor: (id: string) => RGBAColor;
+  meshEdgesEdgeAttributeRange: (meshId: DataId) => [number | undefined, number | undefined];
+  meshEdgesEdgeAttributeColorMap: (meshId: DataId) => string | undefined;
+  meshEdgesEdgeAttributeNoDataColor: (meshId: DataId) => RGBAColor;
 }
 
 function useMeshEdgesEdgeAttributeConfigValues(): UseMeshEdgesEdgeAttributeConfigValuesReturn {
@@ -89,22 +90,22 @@ function useMeshEdgesEdgeAttributeConfigValues(): UseMeshEdgesEdgeAttributeConfi
     meshEdgesEdgeAttributeItem,
     meshEdgesEdgeAttributeStoredConfig,
   } = useMeshEdgesEdgeAttributeConfig();
-  function meshEdgesEdgeAttributeRange(id: string): [number | undefined, number | undefined] {
-    const name = meshEdgesEdgeAttributeName(id);
-    const item = meshEdgesEdgeAttributeItem(id);
-    const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name, item);
+  function meshEdgesEdgeAttributeRange(meshId: DataId): [number | undefined, number | undefined] {
+    const name = meshEdgesEdgeAttributeName(meshId);
+    const item = meshEdgesEdgeAttributeItem(meshId);
+    const storedConfig = meshEdgesEdgeAttributeStoredConfig(meshId, name, item);
     return [storedConfig.minimum, storedConfig.maximum];
   }
-  function meshEdgesEdgeAttributeColorMap(id: string): string | undefined {
-    const name = meshEdgesEdgeAttributeName(id);
-    const item = meshEdgesEdgeAttributeItem(id);
-    const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name, item);
+  function meshEdgesEdgeAttributeColorMap(meshId: DataId): string | undefined {
+    const name = meshEdgesEdgeAttributeName(meshId);
+    const item = meshEdgesEdgeAttributeItem(meshId);
+    const storedConfig = meshEdgesEdgeAttributeStoredConfig(meshId, name, item);
     return storedConfig.colorMap;
   }
-  function meshEdgesEdgeAttributeNoDataColor(id: string): RGBAColor {
-    const name = meshEdgesEdgeAttributeName(id);
-    const item = meshEdgesEdgeAttributeItem(id);
-    const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name, item);
+  function meshEdgesEdgeAttributeNoDataColor(meshId: DataId): RGBAColor {
+    const name = meshEdgesEdgeAttributeName(meshId);
+    const item = meshEdgesEdgeAttributeItem(meshId);
+    const storedConfig = meshEdgesEdgeAttributeStoredConfig(meshId, name, item);
     return storedConfig.no_data_color;
   }
   return {
@@ -117,10 +118,10 @@ function useMeshEdgesEdgeAttributeConfigValues(): UseMeshEdgesEdgeAttributeConfi
 function useMeshEdgesEdgeAttributeConfigWriter(): UseMeshEdgesEdgeAttributeConfigWriterReturn {
   const meshEdgesCommonStyle = useMeshEdgesCommonStyle();
   async function mutateMeshEdgesEdgeStyle(
-    id: string,
+    meshId: DataId,
     values: Record<string, unknown>,
   ): Promise<string> {
-    const result = await meshEdgesCommonStyle.mutateMeshEdgesStyle(id, {
+    const result = await meshEdgesCommonStyle.mutateMeshEdgesStyle(meshId, {
       coloring: {
         edge: values,
       },
@@ -128,12 +129,12 @@ function useMeshEdgesEdgeAttributeConfigWriter(): UseMeshEdgesEdgeAttributeConfi
     return result;
   }
   async function setMeshEdgesEdgeAttributeStoredConfig(
-    id: string,
+    meshId: DataId,
     name: string | undefined,
     item: number | undefined,
     config: Partial<AttributeStoredConfig>,
   ): Promise<string> {
-    const result = await mutateMeshEdgesEdgeStyle(id, {
+    const result = await mutateMeshEdgesEdgeStyle(meshId, {
       storedConfigs: {
         [name ?? ""]: {
           lastItem: item,

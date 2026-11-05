@@ -10,6 +10,7 @@ import {
   POINTS_DEFAULT_VISIBILITY,
   type RGBAColor,
 } from "@ogw_front/utils/default_styles/constants";
+import type { DataId } from "@ogw_front/types/identifiers";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { groupBy } from "@ogw_internal/stores/data_style/model/component_style";
 import merge from "lodash/merge";
@@ -60,7 +61,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
   const schemas = modelSchemas[COMPONENT_TYPE_KEYS[type]].points;
 
   // Without an explicit points style, components follow the model points style
-  function pointsStyle(modelId: string, componentId?: string): PointsStyle {
+  function pointsStyle(modelId: DataId, componentId?: string): PointsStyle {
     // oxlint-disable-next-line no-unsafe-type-assertion -- points shape is defined by the data style schema.
     const modelPoints = (dataStyleState.getStyle(modelId).points ?? {}) as PointsStyle;
     // oxlint-disable-next-line no-unsafe-type-assertion -- points shape is defined by the data style schema.
@@ -85,41 +86,41 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
     );
   }
 
-  function vertexAttribute(modelId: string, componentId?: string): AttributeState {
+  function vertexAttribute(modelId: DataId, componentId?: string): AttributeState {
     return pointsStyle(modelId, componentId).coloring?.vertex ?? {};
   }
 
-  function pointsVisibility(modelId: string, componentId?: string): boolean {
+  function pointsVisibility(modelId: DataId, componentId?: string): boolean {
     return pointsStyle(modelId, componentId).visibility ?? POINTS_DEFAULT_VISIBILITY;
   }
 
-  function pointsSize(modelId: string, componentId?: string): number {
+  function pointsSize(modelId: DataId, componentId?: string): number {
     return pointsStyle(modelId, componentId).size ?? POINTS_DEFAULT_SIZE;
   }
 
-  function pointsColor(modelId: string, componentId?: string): RGBAColor {
+  function pointsColor(modelId: DataId, componentId?: string): RGBAColor {
     return pointsStyle(modelId, componentId).coloring?.constant ?? POINTS_DEFAULT_COLOR;
   }
 
-  function activeColoring(modelId: string, componentId?: string): string {
+  function activeColoring(modelId: DataId, componentId?: string): string {
     return pointsStyle(modelId, componentId).coloring?.active ?? "constant";
   }
 
-  function vertexAttributeName(modelId: string, componentId?: string): string | undefined {
+  function vertexAttributeName(modelId: DataId, componentId?: string): string | undefined {
     return vertexAttribute(modelId, componentId).name;
   }
 
-  function lastItem(modelId: string, componentId: string | undefined, name?: string): number {
+  function lastItem(modelId: DataId, componentId: string | undefined, name?: string): number {
     const { storedConfigs } = vertexAttribute(modelId, componentId);
     return name === undefined ? 0 : (storedConfigs?.[name]?.lastItem ?? 0);
   }
 
-  function vertexAttributeItem(modelId: string, componentId?: string): number {
+  function vertexAttributeItem(modelId: DataId, componentId?: string): number {
     const { name, item } = vertexAttribute(modelId, componentId);
     return item ?? lastItem(modelId, componentId, name);
   }
 
-  function storedConfig(modelId: string, componentId: string | undefined): AttributeStoredConfig {
+  function storedConfig(modelId: DataId, componentId: string | undefined): AttributeStoredConfig {
     const { name, storedConfigs } = vertexAttribute(modelId, componentId);
     const item = vertexAttributeItem(modelId, componentId);
     const config = name === undefined ? undefined : storedConfigs?.[name]?.[item];
@@ -134,24 +135,24 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
   }
 
   function vertexAttributeRange(
-    modelId: string,
+    modelId: DataId,
     componentId?: string,
   ): [number | undefined, number | undefined] {
     const { minimum, maximum } = storedConfig(modelId, componentId);
     return [minimum, maximum];
   }
 
-  function vertexAttributeColorMap(modelId: string, componentId?: string): string | undefined {
+  function vertexAttributeColorMap(modelId: DataId, componentId?: string): string | undefined {
     return storedConfig(modelId, componentId).colorMap;
   }
 
-  function vertexAttributeNoDataColor(modelId: string, componentId?: string): RGBAColor {
+  function vertexAttributeNoDataColor(modelId: DataId, componentId?: string): RGBAColor {
     return storedConfig(modelId, componentId).no_data_color;
   }
 
   // The type style is updated too when every component of the type is targeted
   async function mutatePoints(
-    modelId: string,
+    modelId: DataId,
     componentIds: string[],
     values: PointsStyle,
   ): Promise<void> {
@@ -166,7 +167,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
   }
 
   async function requestPoints(
-    modelId: string,
+    modelId: DataId,
     componentIds: string[],
     schema: PointsRequestSchema,
     values: Record<string, unknown> & { style: PointsStyle },
@@ -194,7 +195,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
   }
 
   async function setVisibility(
-    modelId: string,
+    modelId: DataId,
     componentIds: string[],
     visibility: boolean,
   ): Promise<unknown> {
@@ -205,7 +206,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
     return result;
   }
 
-  async function setSize(modelId: string, componentIds: string[], size: number): Promise<unknown> {
+  async function setSize(modelId: DataId, componentIds: string[], size: number): Promise<unknown> {
     const result = await requestPoints(modelId, componentIds, schemas.size, {
       size,
       style: { size },
@@ -214,7 +215,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
   }
 
   async function setColor(
-    modelId: string,
+    modelId: DataId,
     componentIds: string[],
     color: RGBAColor,
   ): Promise<unknown> {
@@ -225,7 +226,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
     return result;
   }
 
-  async function applyVertexAttribute(modelId: string, componentIds: string[]): Promise<unknown> {
+  async function applyVertexAttribute(modelId: DataId, componentIds: string[]): Promise<unknown> {
     const [referenceId] = componentIds;
     const name = vertexAttributeName(modelId, referenceId);
     const item = vertexAttributeItem(modelId, referenceId);
@@ -252,7 +253,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
   }
 
   async function mutateVertexAttribute(
-    modelId: string,
+    modelId: DataId,
     componentIds: string[],
     values: AttributeState,
   ): Promise<void> {
@@ -260,7 +261,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
   }
 
   async function mutateStoredConfig(
-    modelId: string,
+    modelId: DataId,
     componentIds: string[],
     config: Partial<AttributeStoredConfig>,
   ): Promise<void> {
@@ -273,7 +274,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
   }
 
   async function setActiveColoring(
-    modelId: string,
+    modelId: DataId,
     componentIds: string[],
     activeColoringType: string,
   ): Promise<unknown> {
@@ -287,7 +288,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
   }
 
   async function setVertexAttributeName(
-    modelId: string,
+    modelId: DataId,
     componentIds: string[],
     name: string,
   ): Promise<unknown> {
@@ -298,7 +299,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
   }
 
   async function setVertexAttributeItem(
-    modelId: string,
+    modelId: DataId,
     componentIds: string[],
     item: number,
   ): Promise<unknown> {
@@ -308,7 +309,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
   }
 
   async function setVertexAttributeRange(
-    modelId: string,
+    modelId: DataId,
     componentIds: string[],
     minimum: number,
     maximum: number,
@@ -319,7 +320,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
   }
 
   async function setVertexAttributeColorMap(
-    modelId: string,
+    modelId: DataId,
     componentIds: string[],
     colorMap: string | undefined,
   ): Promise<unknown> {
@@ -329,7 +330,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
   }
 
   async function setVertexAttributeNoDataColor(
-    modelId: string,
+    modelId: DataId,
     componentIds: string[],
     no_data_color: RGBAColor,
   ): Promise<unknown> {
@@ -338,7 +339,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
     return result;
   }
 
-  async function styledComponentIds(modelId: string): Promise<string[]> {
+  async function styledComponentIds(modelId: DataId): Promise<string[]> {
     const componentIds = await dataStore.getMeshComponentGeodeIds(modelId, type);
     if (dataStyleState.getModelComponentTypeStyle(modelId, type).points !== undefined) {
       return componentIds;
@@ -349,7 +350,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
   }
 
   // The model points routes override every component, so the explicit points styles follow
-  async function mutateStyledPoints(modelId: string, values: PointsStyle): Promise<void> {
+  async function mutateStyledPoints(modelId: DataId, values: PointsStyle): Promise<void> {
     const componentIds = await styledComponentIds(modelId);
     if (componentIds.length > 0) {
       await mutatePoints(modelId, componentIds, values);
@@ -357,7 +358,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
   }
 
   // Only components with an explicit points style are sent, the others follow the model points
-  async function applyPointsStyle(modelId: string): Promise<void> {
+  async function applyPointsStyle(modelId: DataId): Promise<void> {
     const componentIds = await styledComponentIds(modelId);
     function style(componentId?: string): PointsStyle {
       return pointsStyle(modelId, componentId);

@@ -1,3 +1,4 @@
+import type { DataId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
@@ -11,21 +12,21 @@ const schema = viewer_schemas.opengeodeweb_viewer.mesh.polygons.opacity;
 
 // The opacity is the constant color alpha, the viewer applies it whatever the coloring
 export function useMeshPolygonsOpacityStyle(): {
-  meshPolygonsOpacity: (id: string) => number | undefined;
-  setMeshPolygonsOpacity: (id: string, opacity: number) => Promise<unknown>;
+  meshPolygonsOpacity: (meshId: DataId) => number | undefined;
+  setMeshPolygonsOpacity: (meshId: DataId, opacity: number) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle();
 
-  function meshPolygonsConstantColor(id: string): RGBAColor | undefined {
+  function meshPolygonsConstantColor(meshId: DataId): RGBAColor | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.constant shape is defined by the data style schema.
-    return meshPolygonsCommonStyle.meshPolygonsColoring(id).constant as RGBAColor | undefined;
+    return meshPolygonsCommonStyle.meshPolygonsColoring(meshId).constant as RGBAColor | undefined;
   }
-  function meshPolygonsOpacity(id: string): number | undefined {
-    return meshPolygonsConstantColor(id)?.alpha;
+  function meshPolygonsOpacity(meshId: DataId): number | undefined {
+    return meshPolygonsConstantColor(meshId)?.alpha;
   }
-  async function setMeshPolygonsOpacity(id: string, opacity: number): Promise<unknown> {
-    const params = { id, opacity };
+  async function setMeshPolygonsOpacity(meshId: DataId, opacity: number): Promise<unknown> {
+    const params = { id: meshId, opacity };
     const result = await viewerStore.request(
       {
         schema,
@@ -33,11 +34,11 @@ export function useMeshPolygonsOpacityStyle(): {
       },
       {
         response_function: async () => {
-          const color = meshPolygonsConstantColor(id);
+          const color = meshPolygonsConstantColor(meshId);
           if (color === undefined) {
             return undefined;
           }
-          const mutateResult = await meshPolygonsCommonStyle.mutateMeshPolygonsColoring(id, {
+          const mutateResult = await meshPolygonsCommonStyle.mutateMeshPolygonsColoring(meshId, {
             constant: { ...color, alpha: opacity },
           });
           return mutateResult;

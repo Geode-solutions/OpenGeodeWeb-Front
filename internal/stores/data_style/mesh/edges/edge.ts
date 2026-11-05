@@ -1,4 +1,5 @@
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { DataId } from "@ogw_front/types/identifiers";
 import type { ValidAttributeInput } from "@ogw_internal/stores/data_style/attribute_types";
 // Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
@@ -40,11 +41,11 @@ function useMeshEdgesEdgeAttributeStyle(): UseMeshEdgesEdgeAttributeStyleReturn 
   } = useMeshEdgesEdgeAttributeConfigValues();
   const { mutateMeshEdgesEdgeStyle, setMeshEdgesEdgeAttributeStoredConfig } =
     useMeshEdgesEdgeAttributeConfigWriter();
-  function meshEdgesEdgeAttributeTimeStep(id: string): number | undefined {
-    return attributeTimeStep(id, attributeNamesSchema.$id, meshEdgesEdgeAttribute(id).name);
+  function meshEdgesEdgeAttributeTimeStep(meshId: DataId): number | undefined {
+    return attributeTimeStep(meshId, attributeNamesSchema.$id, meshEdgesEdgeAttribute(meshId).name);
   }
   async function setMeshEdgesEdgeAttribute(
-    id: string,
+    meshId: DataId,
     {
       name,
       item,
@@ -54,11 +55,11 @@ function useMeshEdgesEdgeAttributeStyle(): UseMeshEdgesEdgeAttributeStyleReturn 
       no_data_color = DEFAULT_NO_DATA_COLOR,
     }: ValidAttributeInput,
   ): Promise<unknown> {
-    await mutateMeshEdgesEdgeStyle(id, {
+    await mutateMeshEdgesEdgeStyle(meshId, {
       name,
       item,
     });
-    await setMeshEdgesEdgeAttributeStoredConfig(id, name, item, {
+    await setMeshEdgesEdgeAttributeStoredConfig(meshId, name, item, {
       minimum,
       maximum,
       colorMap,
@@ -67,8 +68,8 @@ function useMeshEdgesEdgeAttributeStyle(): UseMeshEdgesEdgeAttributeStyleReturn 
     const points = [...getRGBPointsFromPreset(colorMap)];
     const schema = meshEdgesEdgeAttributeSchemas.attribute;
     const params = {
-      id,
-      name: seriesArrayName(id, attributeNamesSchema.$id, name),
+      id: meshId,
+      name: seriesArrayName(meshId, attributeNamesSchema.$id, name),
       item,
       points,
       minimum,
@@ -80,10 +81,10 @@ function useMeshEdgesEdgeAttributeStyle(): UseMeshEdgesEdgeAttributeStyleReturn 
       params,
     });
   }
-  async function applyEdgeAttribute(id: string): Promise<unknown> {
-    const name = meshEdgesEdgeAttributeName(id);
-    const item = meshEdgesEdgeAttributeItem(id);
-    const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name, item);
+  async function applyEdgeAttribute(meshId: DataId): Promise<unknown> {
+    const name = meshEdgesEdgeAttributeName(meshId);
+    const item = meshEdgesEdgeAttributeItem(meshId);
+    const storedConfig = meshEdgesEdgeAttributeStoredConfig(meshId, name, item);
     const attribute = {
       name,
       item,
@@ -93,69 +94,72 @@ function useMeshEdgesEdgeAttributeStyle(): UseMeshEdgesEdgeAttributeStyleReturn 
       no_data_color: storedConfig.no_data_color,
     };
     if (isMeshEdgesEdgeAttributeValid(attribute)) {
-      const result = await setMeshEdgesEdgeAttribute(id, attribute);
+      const result = await setMeshEdgesEdgeAttribute(meshId, attribute);
       return result;
     }
     return undefined;
   }
-  async function setMeshEdgesEdgeAttributeName(id: string, name: string): Promise<unknown> {
-    const item = meshEdgesEdgeAttributeLastItem(id, name);
-    await mutateMeshEdgesEdgeStyle(id, {
+  async function setMeshEdgesEdgeAttributeName(meshId: DataId, name: string): Promise<unknown> {
+    const item = meshEdgesEdgeAttributeLastItem(meshId, name);
+    await mutateMeshEdgesEdgeStyle(meshId, {
       name,
       item,
     });
-    return applyEdgeAttribute(id);
+    return applyEdgeAttribute(meshId);
   }
-  async function setMeshEdgesEdgeAttributeItem(id: string, item: number): Promise<unknown> {
-    await mutateMeshEdgesEdgeStyle(id, {
+  async function setMeshEdgesEdgeAttributeItem(meshId: DataId, item: number): Promise<unknown> {
+    await mutateMeshEdgesEdgeStyle(meshId, {
       item,
     });
-    return applyEdgeAttribute(id);
+    return applyEdgeAttribute(meshId);
   }
-  async function setMeshEdgesEdgeAttributeTimeStep(id: string, timeStep: number): Promise<unknown> {
-    const name = meshEdgesEdgeAttributeName(id);
+  async function setMeshEdgesEdgeAttributeTimeStep(
+    meshId: DataId,
+    timeStep: number,
+  ): Promise<unknown> {
+    const name = meshEdgesEdgeAttributeName(meshId);
     if (name === undefined) {
       return undefined;
     }
-    await setAttributeTimeStep(id, attributeNamesSchema.$id, name, timeStep);
-    return applyEdgeAttribute(id);
+    await setAttributeTimeStep(meshId, attributeNamesSchema.$id, name, timeStep);
+    return applyEdgeAttribute(meshId);
   }
   async function setMeshEdgesEdgeAttributeRange(
-    id: string,
+    meshId: DataId,
     minimum: number,
     maximum: number,
   ): Promise<unknown> {
-    const name = meshEdgesEdgeAttributeName(id);
-    const item = meshEdgesEdgeAttributeItem(id);
-    await setMeshEdgesEdgeAttributeStoredConfig(id, name, item, {
+    const name = meshEdgesEdgeAttributeName(meshId);
+    const item = meshEdgesEdgeAttributeItem(meshId);
+    await setMeshEdgesEdgeAttributeStoredConfig(meshId, name, item, {
       minimum,
       maximum,
     });
-    return applyEdgeAttribute(id);
+    return applyEdgeAttribute(meshId);
   }
   async function setMeshEdgesEdgeAttributeColorMap(
-    id: string,
+    meshId: DataId,
     colorMap: string | undefined,
   ): Promise<unknown> {
-    const name = meshEdgesEdgeAttributeName(id);
-    const item = meshEdgesEdgeAttributeItem(id);
-    await setMeshEdgesEdgeAttributeStoredConfig(id, name, item, {
+    const name = meshEdgesEdgeAttributeName(meshId);
+    const item = meshEdgesEdgeAttributeItem(meshId);
+    await setMeshEdgesEdgeAttributeStoredConfig(meshId, name, item, {
       colorMap,
     });
-    return applyEdgeAttribute(id);
+    return applyEdgeAttribute(meshId);
   }
   async function setMeshEdgesEdgeAttributeNoDataColor(
-    id: string,
+    meshId: DataId,
     no_data_color: RGBAColor,
   ): Promise<unknown> {
-    const name = meshEdgesEdgeAttributeName(id);
-    const item = meshEdgesEdgeAttributeItem(id);
-    const storedConfig = meshEdgesEdgeAttributeStoredConfig(id, name, item);
-    await setMeshEdgesEdgeAttributeStoredConfig(id, name, item, {
+    const name = meshEdgesEdgeAttributeName(meshId);
+    const item = meshEdgesEdgeAttributeItem(meshId);
+    const storedConfig = meshEdgesEdgeAttributeStoredConfig(meshId, name, item);
+    await setMeshEdgesEdgeAttributeStoredConfig(meshId, name, item, {
       ...storedConfig,
       no_data_color,
     });
-    return applyEdgeAttribute(id);
+    return applyEdgeAttribute(meshId);
   }
   return {
     meshEdgesEdgeAttributeName,

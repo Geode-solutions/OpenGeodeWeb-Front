@@ -1,4 +1,4 @@
-import type { GeodeId, GeodeIdentified } from "@ogw_front/types/identifiers";
+import type { DataId, GeodeId, GeodeIdentified } from "@ogw_front/types/identifiers";
 import { HOVER_DEBOUNCE_MS, HOVER_TIMEOUT_MS } from "./constants";
 import type { HoverComponentInfo, HoverData } from "./vtk_types";
 import viewer_schemas, {
@@ -11,13 +11,13 @@ import { useHybridViewerCore } from "./core";
 import { useHybridViewerScene } from "./scene";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
-async function lookupModelName(modelId: string): Promise<string | undefined> {
+async function lookupModelName(modelId: DataId): Promise<string | undefined> {
   const modelRecord = (await database.data?.get(modelId)) as { name?: string } | undefined;
   return modelRecord?.name;
 }
 
 async function lookupComponentInfo(
-  modelId: string,
+  modelId: DataId,
   geodeId: GeodeId | undefined,
 ): Promise<HoverComponentInfo | undefined> {
   const modelComponentsTable = database.model_components;

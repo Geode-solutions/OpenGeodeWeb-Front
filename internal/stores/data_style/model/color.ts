@@ -1,3 +1,4 @@
+import type { DataId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // oxlint-disable eslint/max-lines
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
@@ -11,30 +12,30 @@ import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/commo
 type ComponentStyleFunctions = Record<"Surface" | "Line" | "Block" | "Corner", any>;
 
 interface AttributeAccessors {
-  getName: (modelId: string, componentId: string) => string | undefined;
-  setName: (modelId: string, componentIds: string[], name: string) => unknown;
-  getRange: (modelId: string, componentId: string) => [number | undefined, number | undefined];
-  setRange: (modelId: string, componentIds: string[], minimum: number, maximum: number) => unknown;
-  getColorMap: (modelId: string, componentId: string) => string | undefined;
-  setColorMap: (modelId: string, componentIds: string[], colorMap: string) => unknown;
+  getName: (modelId: DataId, componentId: string) => string | undefined;
+  setName: (modelId: DataId, componentIds: string[], name: string) => unknown;
+  getRange: (modelId: DataId, componentId: string) => [number | undefined, number | undefined];
+  setRange: (modelId: DataId, componentIds: string[], minimum: number, maximum: number) => unknown;
+  getColorMap: (modelId: DataId, componentId: string) => string | undefined;
+  setColorMap: (modelId: DataId, componentIds: string[], colorMap: string) => unknown;
 }
 
 // The signatures below describe just the per-attribute-kind methods this module reads off each dynamically-typed composable (see the `any` in ComponentStyleFunctions above). `attributeFn` narrows one such method to its known signature so every downstream read/call is a real, checked type instead of `any`.
-type AttributeNameFn = (modelId: string, componentId: string) => string | undefined;
-type SetAttributeNameFn = (modelId: string, componentIds: string[], name: string) => unknown;
+type AttributeNameFn = (modelId: DataId, componentId: string) => string | undefined;
+type SetAttributeNameFn = (modelId: DataId, componentIds: string[], name: string) => unknown;
 type AttributeRangeFn = (
-  modelId: string,
+  modelId: DataId,
   componentId: string,
 ) => [number | undefined, number | undefined];
 type SetAttributeRangeFn = (
-  modelId: string,
+  modelId: DataId,
   componentIds: string[],
   minimum: number,
   maximum: number,
 ) => unknown;
-type AttributeColorMapFn = (modelId: string, componentId: string) => string | undefined;
+type AttributeColorMapFn = (modelId: DataId, componentId: string) => string | undefined;
 type SetAttributeColorMapFn = (
-  modelId: string,
+  modelId: DataId,
   componentIds: string[],
   colorMap: string,
 ) => unknown;
@@ -48,7 +49,7 @@ function attributeFn<Signature>(method: unknown): Signature {
 
 // Re-applies the attribute name, range and color map of `firstId` to every id in `componentIds`
 async function applyAttributeAccessors(
-  modelId: string,
+  modelId: DataId,
   componentIds: string[],
   firstId: string,
   accessors: AttributeAccessors,
@@ -71,26 +72,26 @@ async function applyAttributeAccessors(
 
 // oxlint-disable-next-line max-lines-per-function
 function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
-  getModelColor: (modelId: string) => RGBAColor | undefined;
-  getModelActiveColoring: (modelId: string) => unknown;
-  getModelComponentColor: (modelId: string, componentId: string) => unknown;
-  getModelComponentEffectiveColor: (modelId: string, componentId: string, type: string) => unknown;
-  getModelComponentActiveColoring: (modelId: string, componentId: string) => unknown;
-  modelComponentTypeColor: (modelId: string, type: string) => unknown;
-  getModelComponentTypeActiveColoring: (modelId: string, type: string) => unknown;
-  setModelComponentTypeColor: (modelId: string, type: string, color: RGBAColor) => Promise<void>;
+  getModelColor: (modelId: DataId) => RGBAColor | undefined;
+  getModelActiveColoring: (modelId: DataId) => unknown;
+  getModelComponentColor: (modelId: DataId, componentId: string) => unknown;
+  getModelComponentEffectiveColor: (modelId: DataId, componentId: string, type: string) => unknown;
+  getModelComponentActiveColoring: (modelId: DataId, componentId: string) => unknown;
+  modelComponentTypeColor: (modelId: DataId, type: string) => unknown;
+  getModelComponentTypeActiveColoring: (modelId: DataId, type: string) => unknown;
+  setModelComponentTypeColor: (modelId: DataId, type: string, color: RGBAColor) => Promise<void>;
   setModelComponentTypeActiveColoring: (
-    modelId: string,
+    modelId: DataId,
     type: string,
     activeColoring: string,
   ) => Promise<void>;
   setModelComponentActiveColoring: (
-    modelId: string,
+    modelId: DataId,
     componentId: string,
     activeColoring: string,
   ) => Promise<void>;
   setModelComponentsColor: (
-    modelId: string,
+    modelId: DataId,
     componentIds: string[],
     color: RGBAColor | undefined,
     activeColoring?: string,
@@ -185,12 +186,12 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
       },
     },
   };
-  function getModelComponentColor(modelId: string, componentId: string): unknown {
+  function getModelComponentColor(modelId: DataId, componentId: string): unknown {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
     const coloring = dataStyleState.getComponentStyle(modelId, componentId).coloring as StyleValues;
     return coloring.constant;
   }
-  function modelComponentTypeColor(modelId: string, type: string): unknown {
+  function modelComponentTypeColor(modelId: DataId, type: string): unknown {
     const groupStyle = dataStyleState.getModelComponentTypeStyle(modelId, type);
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
     const groupColoring = groupStyle.coloring as StyleValues;
@@ -201,7 +202,7 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
     return groupColoring.constant ?? typeColoring.constant;
   }
   function getModelComponentEffectiveColor(
-    modelId: string,
+    modelId: DataId,
     componentId: string,
     type: string,
   ): unknown {
@@ -211,12 +212,12 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
     }
     return modelComponentTypeColor(modelId, type);
   }
-  function getModelComponentActiveColoring(modelId: string, componentId: string): unknown {
+  function getModelComponentActiveColoring(modelId: DataId, componentId: string): unknown {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
     const coloring = dataStyleState.getComponentStyle(modelId, componentId).coloring as StyleValues;
     return coloring.active;
   }
-  function getModelComponentTypeActiveColoring(modelId: string, type: string): unknown {
+  function getModelComponentTypeActiveColoring(modelId: DataId, type: string): unknown {
     const groupStyle = dataStyleState.getModelComponentTypeStyle(modelId, type);
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
     const groupColoring = groupStyle.coloring as StyleValues;
@@ -227,7 +228,7 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
     return groupColoring.active ?? typeColoring.active;
   }
   async function setModelComponentsColor(
-    modelId: string,
+    modelId: DataId,
     componentIds: string[],
     color: RGBAColor | undefined,
     activeColoring = "constant",
@@ -250,7 +251,7 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
     );
   }
   async function setModelComponentTypeColor(
-    modelId: string,
+    modelId: DataId,
     type: string,
     color: RGBAColor,
   ): Promise<void> {
@@ -267,7 +268,7 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
     await setModelComponentsColor(modelId, idsForType, color);
   }
   async function setModelComponentTypeActiveColoring(
-    modelId: string,
+    modelId: DataId,
     type: string,
     activeColoring: string,
   ): Promise<void> {
@@ -300,7 +301,7 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
     await applyAttributeAccessors(modelId, idsForType, firstId, attributeFunctions);
   }
   async function setModelComponentActiveColoring(
-    modelId: string,
+    modelId: DataId,
     componentId: string,
     activeColoring: string,
   ): Promise<void> {
@@ -323,13 +324,13 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
     }
     await applyAttributeAccessors(modelId, [componentId], componentId, attributeFunctions);
   }
-  function getModelColor(modelId: string): RGBAColor | undefined {
+  function getModelColor(modelId: DataId): RGBAColor | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
     return (dataStyleState.getStyle(modelId).coloring as StyleValues).constant as
       | RGBAColor
       | undefined;
   }
-  function getModelActiveColoring(modelId: string): unknown {
+  function getModelActiveColoring(modelId: DataId): unknown {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
     return (dataStyleState.getStyle(modelId).coloring as StyleValues).active;
   }

@@ -1,4 +1,5 @@
 import { type FormattedComponent, type ModelComponentRecord, useDataMesh } from "./mesh.js";
+import type { DataId } from "@ogw_front/types/identifiers";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import type { ModelComponentRelationRecord } from "./relations.js";
 import type { ReadonlyTreeGroup } from "@ogw_front/types/tree";
@@ -28,7 +29,7 @@ export function useDataCollections(): {
   );
   const { getAllMeshComponents } = useDataMesh();
 
-  async function hasCollectionComponents(modelId: string): Promise<boolean> {
+  async function hasCollectionComponents(modelId: DataId): Promise<boolean> {
     const count = await model_components_db
       .where("data_id")
       .equals(modelId)
@@ -37,7 +38,7 @@ export function useDataCollections(): {
     return count > 0;
   }
 
-  async function getAllCollectionComponents(modelId: string): Promise<FormattedComponent[]> {
+  async function getAllCollectionComponents(modelId: DataId): Promise<FormattedComponent[]> {
     const items = await model_components_db.where("data_id").equals(modelId).toArray();
     return items
       .filter((component: ModelComponentRecord) => !MESH_COMPONENT_TYPES.includes(component.type))
@@ -52,7 +53,7 @@ export function useDataCollections(): {
   }
 
   async function fetchAllCollectionComponents(
-    modelId: string,
+    modelId: DataId,
   ): Promise<Record<string, CollectionComponent[]>> {
     const components = await getAllCollectionComponents(modelId);
     const relations = await model_components_relation_db.where("data_id").equals(modelId).toArray();
@@ -81,7 +82,7 @@ export function useDataCollections(): {
   }
 
   async function formatedCollectionComponents(
-    modelId: string,
+    modelId: DataId,
   ): Promise<CollectionComponentGroup[]> {
     const byType = await fetchAllCollectionComponents(modelId);
     const collectionTypes = Object.keys(byType);
@@ -96,7 +97,7 @@ export function useDataCollections(): {
   }
 
   function refFormatedCollectionComponents(
-    modelId: string,
+    modelId: DataId,
   ): Ref<CollectionComponentGroup[] | undefined> {
     return useObservable(
       liveObservable(async () => {

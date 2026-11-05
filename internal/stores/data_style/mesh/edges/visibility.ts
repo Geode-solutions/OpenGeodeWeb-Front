@@ -1,6 +1,7 @@
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
+import type { DataId } from "@ogw_front/types/identifiers";
 import { useMeshEdgesCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -8,18 +9,18 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const schema = viewer_schemas.opengeodeweb_viewer.mesh.edges.visibility;
 
 export function useMeshEdgesVisibilityStyle(): {
-  meshEdgesVisibility: (id: string) => boolean | undefined;
-  setMeshEdgesVisibility: (id: string, visibility: boolean) => Promise<unknown>;
+  meshEdgesVisibility: (meshId: DataId) => boolean | undefined;
+  setMeshEdgesVisibility: (meshId: DataId, visibility: boolean) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const meshEdgesCommonStyle = useMeshEdgesCommonStyle();
 
-  function meshEdgesVisibility(id: string): boolean | undefined {
+  function meshEdgesVisibility(meshId: DataId): boolean | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- visibility is defined as boolean in the data style schema.
-    return meshEdgesCommonStyle.meshEdgesStyle(id).visibility as boolean | undefined;
+    return meshEdgesCommonStyle.meshEdgesStyle(meshId).visibility as boolean | undefined;
   }
-  async function setMeshEdgesVisibility(id: string, visibility: boolean): Promise<unknown> {
-    const params = { id, visibility };
+  async function setMeshEdgesVisibility(meshId: DataId, visibility: boolean): Promise<unknown> {
+    const params = { id: meshId, visibility };
     const result = await viewerStore.request(
       {
         schema,
@@ -27,7 +28,9 @@ export function useMeshEdgesVisibilityStyle(): {
       },
       {
         response_function: async () => {
-          const mutateResult = await meshEdgesCommonStyle.mutateMeshEdgesStyle(id, { visibility });
+          const mutateResult = await meshEdgesCommonStyle.mutateMeshEdgesStyle(meshId, {
+            visibility,
+          });
           return mutateResult;
         },
       },

@@ -1,3 +1,4 @@
+import type { DataId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
@@ -12,10 +13,10 @@ import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 const meshSchemas = viewer_schemas.opengeodeweb_viewer.mesh;
 
 interface MeshBaseStyle {
-  meshVisibility: (id: string) => boolean | undefined;
-  setMeshVisibility: (id: string, visibility: boolean) => Promise<unknown>;
-  meshColor: (id: string) => RGBAColor | undefined;
-  setMeshColor: (id: string, color: RGBAColor) => Promise<unknown>;
+  meshVisibility: (meshId: DataId) => boolean | undefined;
+  setMeshVisibility: (meshId: DataId, visibility: boolean) => Promise<unknown>;
+  meshColor: (meshId: DataId) => RGBAColor | undefined;
+  setMeshColor: (meshId: DataId, color: RGBAColor) => Promise<unknown>;
 }
 
 export function useMeshBaseStyle(): MeshBaseStyle {
@@ -23,12 +24,12 @@ export function useMeshBaseStyle(): MeshBaseStyle {
   const viewerStore = useViewerStore();
   const dataStyleState = useDataStyleState();
 
-  function meshVisibility(id: string): boolean | undefined {
-    return dataStyleState.getStyle(id).visibility;
+  function meshVisibility(meshId: DataId): boolean | undefined {
+    return dataStyleState.getStyle(meshId).visibility;
   }
-  async function setMeshVisibility(id: string, visibility: boolean): Promise<unknown> {
+  async function setMeshVisibility(meshId: DataId, visibility: boolean): Promise<unknown> {
     const schema = meshSchemas.visibility;
-    const params = { id, visibility };
+    const params = { id: meshId, visibility };
     const result = await viewerStore.request(
       {
         schema,
@@ -37,9 +38,9 @@ export function useMeshBaseStyle(): MeshBaseStyle {
       {
         response_function: async () => {
           if (visibility !== undefined) {
-            hybridViewerStore.setVisibility(id, visibility);
+            hybridViewerStore.setVisibility(meshId, visibility);
           }
-          const mutatedId = await dataStyleState.mutateStyle(id, { visibility });
+          const mutatedId = await dataStyleState.mutateStyle(meshId, { visibility });
           return mutatedId;
         },
       },
@@ -47,14 +48,14 @@ export function useMeshBaseStyle(): MeshBaseStyle {
     return result;
   }
 
-  function meshColor(id: string): RGBAColor | undefined {
+  function meshColor(meshId: DataId): RGBAColor | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- color shape is defined by the data style schema.
-    return dataStyleState.getStyle(id).color as RGBAColor | undefined;
+    return dataStyleState.getStyle(meshId).color as RGBAColor | undefined;
   }
 
-  async function setMeshColor(id: string, color: RGBAColor): Promise<unknown> {
+  async function setMeshColor(meshId: DataId, color: RGBAColor): Promise<unknown> {
     const schema = meshSchemas.color;
-    const params = { id, color };
+    const params = { id: meshId, color };
     const result = await viewerStore.request(
       {
         schema,
@@ -62,7 +63,7 @@ export function useMeshBaseStyle(): MeshBaseStyle {
       },
       {
         response_function: async () => {
-          const mutatedId = await dataStyleState.mutateStyle(id, { color });
+          const mutatedId = await dataStyleState.mutateStyle(meshId, { color });
           return mutatedId;
         },
       },

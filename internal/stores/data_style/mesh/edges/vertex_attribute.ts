@@ -3,6 +3,7 @@ import type {
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
+import type { DataId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 function isMeshEdgesVertexAttributeValid(input: AttributeInput): input is ValidAttributeInput {
@@ -16,32 +17,32 @@ function isMeshEdgesVertexAttributeValid(input: AttributeInput): input is ValidA
 }
 
 interface UseMeshEdgesVertexAttributeStyleReturn {
-  meshEdgesVertexAttributeName: (id: string) => string | undefined;
-  meshEdgesVertexAttributeItem: (id: string) => number;
-  meshEdgesVertexAttributeRange: (id: string) => [number | undefined, number | undefined];
-  meshEdgesVertexAttributeTimeStep: (id: string) => number | undefined;
-  setMeshEdgesVertexAttributeTimeStep: (id: string, timeStep: number) => Promise<unknown>;
-  meshEdgesVertexAttributeColorMap: (id: string) => string | undefined;
+  meshEdgesVertexAttributeName: (meshId: DataId) => string | undefined;
+  meshEdgesVertexAttributeItem: (meshId: DataId) => number;
+  meshEdgesVertexAttributeRange: (meshId: DataId) => [number | undefined, number | undefined];
+  meshEdgesVertexAttributeTimeStep: (meshId: DataId) => number | undefined;
+  setMeshEdgesVertexAttributeTimeStep: (meshId: DataId, timeStep: number) => Promise<unknown>;
+  meshEdgesVertexAttributeColorMap: (meshId: DataId) => string | undefined;
   meshEdgesVertexAttributeStoredConfig: (
-    id: string,
+    meshId: DataId,
     name: string | undefined,
     item: number | undefined,
   ) => AttributeStoredConfig;
-  setMeshEdgesVertexAttribute: (id: string, input: ValidAttributeInput) => Promise<unknown>;
-  setMeshEdgesVertexAttributeName: (id: string, name: string) => Promise<unknown>;
-  setMeshEdgesVertexAttributeItem: (id: string, item: number) => Promise<unknown>;
+  setMeshEdgesVertexAttribute: (meshId: DataId, input: ValidAttributeInput) => Promise<unknown>;
+  setMeshEdgesVertexAttributeName: (meshId: DataId, name: string) => Promise<unknown>;
+  setMeshEdgesVertexAttributeItem: (meshId: DataId, item: number) => Promise<unknown>;
   setMeshEdgesVertexAttributeRange: (
-    id: string,
+    meshId: DataId,
     minimum: number,
     maximum: number,
   ) => Promise<unknown>;
   setMeshEdgesVertexAttributeColorMap: (
-    id: string,
+    meshId: DataId,
     colorMap: string | undefined,
   ) => Promise<unknown>;
-  meshEdgesVertexAttributeNoDataColor: (id: string) => RGBAColor;
+  meshEdgesVertexAttributeNoDataColor: (meshId: DataId) => RGBAColor;
   setMeshEdgesVertexAttributeNoDataColor: (
-    id: string,
+    meshId: DataId,
     no_data_color: RGBAColor,
   ) => Promise<unknown>;
 }

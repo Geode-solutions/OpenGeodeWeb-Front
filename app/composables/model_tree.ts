@@ -6,6 +6,7 @@ import type {
   FormattedComponent,
   FormattedComponentGroup,
 } from "@ogw_front/stores/data_helpers/mesh";
+import type { DataId } from "@ogw_front/types/identifiers";
 import { compareSelections } from "@ogw_front/utils/treeview";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -14,7 +15,7 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 type ModelTreeCategory = FormattedComponentGroup | CollectionComponentGroup;
 type ModelTreeCache = Record<string, (FormattedComponent | CollectionComponent)[]>;
 
-function useModelVisibility(modelId: string): {
+function useModelVisibility(modelId: DataId): {
   selection: typeof selection;
   updateVisibility: typeof updateVisibility;
 } {
@@ -38,7 +39,7 @@ function useModelVisibility(modelId: string): {
   return { selection, updateVisibility };
 }
 
-export function useModelTree(modelId: string): {
+export function useModelTree(modelId: DataId): {
   isLoading: ComputedRef<boolean>;
   localCategories: Ref<ModelTreeCategory[]>;
   cache: Ref<ModelTreeCache | undefined>;

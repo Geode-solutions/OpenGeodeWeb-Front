@@ -7,6 +7,7 @@ import {
   isModelSurfacesVertexAttributeValid,
   type useModelSurfacesVertexAttribute,
 } from "./vertex";
+import type { DataId } from "@ogw_front/types/identifiers";
 import type { useModelSurfacesColor } from "./color";
 
 type ColorStyle = ReturnType<typeof useModelSurfacesColor>;
@@ -14,7 +15,7 @@ type VertexAttributeStyle = ReturnType<typeof useModelSurfacesVertexAttribute>;
 type PolygonAttributeStyle = ReturnType<typeof useModelSurfacesPolygonAttribute>;
 
 function applyModelSurfacesConstantColoring(
-  modelId: string,
+  modelId: DataId,
   type_surfaces_ids: string[],
   modelColorStyle: ColorStyle,
 ): Promise<unknown>[] {
@@ -32,7 +33,7 @@ function applyModelSurfacesConstantColoring(
 }
 
 function groupModelSurfacesVertexAttributes(
-  modelId: string,
+  modelId: DataId,
   type_surfaces_ids: string[],
   modelSurfacesVertexAttribute: VertexAttributeStyle,
 ): Record<string, AttributeGroup> {
@@ -77,7 +78,7 @@ function groupModelSurfacesVertexAttributes(
 }
 
 function applyModelSurfacesVertexColoring(
-  modelId: string,
+  modelId: DataId,
   type_surfaces_ids: string[],
   modelSurfacesVertexAttribute: VertexAttributeStyle,
 ): Promise<unknown>[] {
@@ -106,7 +107,7 @@ function applyModelSurfacesVertexColoring(
 }
 
 function groupModelSurfacesPolygonAttributes(
-  modelId: string,
+  modelId: DataId,
   type_surfaces_ids: string[],
   modelSurfacesPolygonAttribute: PolygonAttributeStyle,
 ): Record<string, AttributeGroup> {
@@ -151,7 +152,7 @@ function groupModelSurfacesPolygonAttributes(
 }
 
 function applyModelSurfacesPolygonColoring(
-  modelId: string,
+  modelId: DataId,
   type_surfaces_ids: string[],
   modelSurfacesPolygonAttribute: PolygonAttributeStyle,
 ): Promise<unknown>[] {

@@ -1,5 +1,6 @@
 import { isModelLinesEdgeAttributeValid, useModelLinesEdgeAttribute } from "./edge";
 import { isModelLinesVertexAttributeValid, useModelLinesVertexAttribute } from "./vertex";
+import type { DataId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -11,17 +12,17 @@ const schema = viewer_schemas.opengeodeweb_viewer.model.lines.color;
 
 export function useModelLinesColor(): {
   setModelLinesColor: (
-    modelId: string,
+    modelId: DataId,
     lines_ids: string[],
     color: RGBAColor | undefined,
     activeColoring?: string,
     collectionId?: string,
   ) => Promise<unknown>;
-  modelLineColoring: (id: string, line_id?: string) => StyleValues;
-  modelLineColor: (id: string, line_id?: string) => RGBAColor | undefined;
-  modelLineActiveColoring: (id: string, line_id?: string) => unknown;
+  modelLineColoring: (modelId: DataId, line_id?: string) => StyleValues;
+  modelLineColor: (modelId: DataId, line_id?: string) => RGBAColor | undefined;
+  modelLineActiveColoring: (modelId: DataId, line_id?: string) => unknown;
   setModelLinesActiveColoring: (
-    modelId: string,
+    modelId: DataId,
     lines_ids: string[],
     activeColoring: string,
     collectionId?: string,
@@ -33,18 +34,18 @@ export function useModelLinesColor(): {
   const modelLinesVertexAttribute = useModelLinesVertexAttribute();
   const modelLinesEdgeAttribute = useModelLinesEdgeAttribute();
 
-  function modelLineColoring(id: string, line_id?: string): StyleValues {
+  function modelLineColoring(modelId: DataId, line_id?: string): StyleValues {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
-    return modelLinesCommonStyle.modelLineStyle(id, line_id).coloring as StyleValues;
+    return modelLinesCommonStyle.modelLineStyle(modelId, line_id).coloring as StyleValues;
   }
 
-  function modelLineColor(id: string, line_id?: string): RGBAColor | undefined {
+  function modelLineColor(modelId: DataId, line_id?: string): RGBAColor | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.constant shape is defined by the data style schema.
-    return modelLineColoring(id, line_id).constant as RGBAColor | undefined;
+    return modelLineColoring(modelId, line_id).constant as RGBAColor | undefined;
   }
 
   async function setModelLinesColor(
-    modelId: string,
+    modelId: DataId,
     lines_ids: string[],
     color: RGBAColor | undefined,
     activeColoring = "constant",
@@ -61,11 +62,11 @@ export function useModelLinesColor(): {
     return result;
   }
 
-  function modelLineActiveColoring(id: string, line_id?: string): unknown {
-    return modelLineColoring(id, line_id).active;
+  function modelLineActiveColoring(modelId: DataId, line_id?: string): unknown {
+    return modelLineColoring(modelId, line_id).active;
   }
 
-  async function applyVertexColoring(modelId: string, lines_ids: string[]): Promise<unknown> {
+  async function applyVertexColoring(modelId: DataId, lines_ids: string[]): Promise<unknown> {
     const name = modelLinesVertexAttribute.modelLinesVertexAttributeName(modelId, lines_ids[0]);
     const item = modelLinesVertexAttribute.modelLinesVertexAttributeItem(modelId, lines_ids[0]);
     const [minimum, maximum] = modelLinesVertexAttribute.modelLinesVertexAttributeRange(
@@ -92,7 +93,7 @@ export function useModelLinesColor(): {
     return undefined;
   }
 
-  async function applyEdgeColoring(modelId: string, lines_ids: string[]): Promise<unknown> {
+  async function applyEdgeColoring(modelId: DataId, lines_ids: string[]): Promise<unknown> {
     const name = modelLinesEdgeAttribute.modelLinesEdgeAttributeName(modelId, lines_ids[0]);
     const item = modelLinesEdgeAttribute.modelLinesEdgeAttributeItem(modelId, lines_ids[0]);
     const [minimum, maximum] = modelLinesEdgeAttribute.modelLinesEdgeAttributeRange(
@@ -117,7 +118,7 @@ export function useModelLinesColor(): {
   }
 
   async function setModelLinesActiveColoring(
-    modelId: string,
+    modelId: DataId,
     lines_ids: string[],
     activeColoring: string,
     collectionId?: string,

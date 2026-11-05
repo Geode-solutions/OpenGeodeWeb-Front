@@ -6,14 +6,15 @@ import type {
   StyleValues,
 } from "./types";
 import { type SharedState, getSharedState } from "./state_shared";
+import type { DataId } from "@ogw_front/types/identifiers";
 import { getDefaultSceneStyle } from "@ogw_front/utils/default_styles";
 import { getTable } from "@ogw_internal/database/database";
 import merge from "lodash/merge";
 
 interface DataStyleStateApi extends SharedState {
   getStyle: (objectId: string) => ObjectStyle;
-  getComponentStyle: (modelId: string, componentId: string) => ModelComponentStyle;
-  getModelComponentTypeStyle: (modelId: string, componentType: string) => ModelComponentTypeStyle;
+  getComponentStyle: (modelId: DataId, componentId: string) => ModelComponentStyle;
+  getModelComponentTypeStyle: (modelId: DataId, componentType: string) => ModelComponentTypeStyle;
   mutateStyle: (objectId: string, styleValues: StyleValues) => Promise<string>;
   objectVisibility: ComputedRef<(objectId: string) => boolean | undefined>;
   selectedObjects: ComputedRef<string[]>;
@@ -67,13 +68,13 @@ export function useDataStyleState(): DataStyleStateApi {
     return savedId;
   }
 
-  function getComponentStyle(modelId: string, componentId: string): ModelComponentStyle {
+  function getComponentStyle(modelId: DataId, componentId: string): ModelComponentStyle {
     const cacheKey = `${modelId}_${componentId}`;
     return merge({ coloring: {} }, componentStyles.value[cacheKey]);
   }
 
   function getModelComponentTypeStyle(
-    modelId: string,
+    modelId: DataId,
     componentType: string,
   ): ModelComponentTypeStyle {
     const cacheKey = `${modelId}_${componentType}`;

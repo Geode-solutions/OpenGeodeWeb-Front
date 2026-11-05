@@ -3,6 +3,7 @@ import type {
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
+import type { DataId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 function isMeshCellsVertexAttributeValid(input: AttributeInput): input is ValidAttributeInput {
@@ -16,32 +17,32 @@ function isMeshCellsVertexAttributeValid(input: AttributeInput): input is ValidA
 }
 
 interface UseMeshCellsVertexAttributeStyleReturn {
-  meshCellsVertexAttributeName: (id: string) => string | undefined;
-  meshCellsVertexAttributeItem: (id: string) => number;
-  meshCellsVertexAttributeRange: (id: string) => [number | undefined, number | undefined];
-  meshCellsVertexAttributeTimeStep: (id: string) => number | undefined;
-  setMeshCellsVertexAttributeTimeStep: (id: string, timeStep: number) => Promise<unknown>;
-  meshCellsVertexAttributeColorMap: (id: string) => string | undefined;
+  meshCellsVertexAttributeName: (meshId: DataId) => string | undefined;
+  meshCellsVertexAttributeItem: (meshId: DataId) => number;
+  meshCellsVertexAttributeRange: (meshId: DataId) => [number | undefined, number | undefined];
+  meshCellsVertexAttributeTimeStep: (meshId: DataId) => number | undefined;
+  setMeshCellsVertexAttributeTimeStep: (meshId: DataId, timeStep: number) => Promise<unknown>;
+  meshCellsVertexAttributeColorMap: (meshId: DataId) => string | undefined;
   meshCellsVertexAttributeStoredConfig: (
-    id: string,
+    meshId: DataId,
     name: string | undefined,
     item: number | undefined,
   ) => AttributeStoredConfig;
-  setMeshCellsVertexAttribute: (id: string, input: ValidAttributeInput) => Promise<unknown>;
-  setMeshCellsVertexAttributeName: (id: string, name: string) => Promise<unknown>;
-  setMeshCellsVertexAttributeItem: (id: string, item: number) => Promise<unknown>;
+  setMeshCellsVertexAttribute: (meshId: DataId, input: ValidAttributeInput) => Promise<unknown>;
+  setMeshCellsVertexAttributeName: (meshId: DataId, name: string) => Promise<unknown>;
+  setMeshCellsVertexAttributeItem: (meshId: DataId, item: number) => Promise<unknown>;
   setMeshCellsVertexAttributeRange: (
-    id: string,
+    meshId: DataId,
     minimum: number,
     maximum: number,
   ) => Promise<unknown>;
   setMeshCellsVertexAttributeColorMap: (
-    id: string,
+    meshId: DataId,
     colorMap: string | undefined,
   ) => Promise<unknown>;
-  meshCellsVertexAttributeNoDataColor: (id: string) => RGBAColor;
+  meshCellsVertexAttributeNoDataColor: (meshId: DataId) => RGBAColor;
   setMeshCellsVertexAttributeNoDataColor: (
-    id: string,
+    meshId: DataId,
     no_data_color: RGBAColor,
   ) => Promise<unknown>;
 }

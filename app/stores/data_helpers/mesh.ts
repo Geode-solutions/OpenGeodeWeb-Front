@@ -1,4 +1,4 @@
-import type { DataIdentified, GeodeIdentified } from "@ogw_front/types/identifiers";
+import type { DataId, DataIdentified, GeodeIdentified } from "@ogw_front/types/identifiers";
 import type { ReadonlyTreeGroup } from "@ogw_front/types/tree";
 import type { Table } from "dexie";
 import { database } from "@ogw_internal/database/database.js";
@@ -52,7 +52,7 @@ function useDataMesh(): {
     string
   >;
 
-  async function formatedMeshComponents(modelId: string): Promise<FormattedComponentGroup[]> {
+  async function formatedMeshComponents(modelId: DataId): Promise<FormattedComponentGroup[]> {
     const items = await model_components_db.where("data_id").equals(modelId).toArray();
     const componentTitles: Record<string, string> = {
       Corner: "Corners",
@@ -80,7 +80,7 @@ function useDataMesh(): {
       }));
   }
 
-  function refFormatedMeshComponents(modelId: string): Ref<FormattedComponentGroup[] | undefined> {
+  function refFormatedMeshComponents(modelId: DataId): Ref<FormattedComponentGroup[] | undefined> {
     return useObservable(
       liveObservable(async () => {
         const components = await formatedMeshComponents(modelId);
@@ -93,7 +93,7 @@ function useDataMesh(): {
   }
 
   async function getMeshComponentsByType(
-    modelId: string,
+    modelId: DataId,
     type: string,
   ): Promise<FormattedComponent[]> {
     const components = await model_components_db
@@ -103,13 +103,13 @@ function useDataMesh(): {
     return components.map((item: ModelComponentRecord) => toFormattedComponent(item));
   }
 
-  async function getAllMeshComponents(modelId: string): Promise<FormattedComponent[]> {
+  async function getAllMeshComponents(modelId: DataId): Promise<FormattedComponent[]> {
     const items = await model_components_db.where("data_id").equals(modelId).toArray();
     return items.map((item: ModelComponentRecord) => toFormattedComponent(item));
   }
 
   async function fetchAllMeshComponents(
-    modelId: string,
+    modelId: DataId,
   ): Promise<Record<string, FormattedComponent[]>> {
     const components = await getAllMeshComponents(modelId);
     const byType: Record<string, FormattedComponent[]> = {};
@@ -120,7 +120,7 @@ function useDataMesh(): {
     return byType;
   }
 
-  async function getMeshComponentGeodeIds(modelId: string, type: string): Promise<string[]> {
+  async function getMeshComponentGeodeIds(modelId: DataId, type: string): Promise<string[]> {
     const components = await model_components_db
       .where("[data_id+type]")
       .equals([modelId, type])
@@ -128,22 +128,22 @@ function useDataMesh(): {
     return components.map((component: ModelComponentRecord) => component.geode_id);
   }
 
-  async function getCornersGeodeIds(modelId: string): Promise<string[]> {
+  async function getCornersGeodeIds(modelId: DataId): Promise<string[]> {
     const geodeIds = await getMeshComponentGeodeIds(modelId, "Corner");
     return geodeIds;
   }
 
-  async function getLinesGeodeIds(modelId: string): Promise<string[]> {
+  async function getLinesGeodeIds(modelId: DataId): Promise<string[]> {
     const geodeIds = await getMeshComponentGeodeIds(modelId, "Line");
     return geodeIds;
   }
 
-  async function getSurfacesGeodeIds(modelId: string): Promise<string[]> {
+  async function getSurfacesGeodeIds(modelId: DataId): Promise<string[]> {
     const geodeIds = await getMeshComponentGeodeIds(modelId, "Surface");
     return geodeIds;
   }
 
-  async function getBlocksGeodeIds(modelId: string): Promise<string[]> {
+  async function getBlocksGeodeIds(modelId: DataId): Promise<string[]> {
     const geodeIds = await getMeshComponentGeodeIds(modelId, "Block");
     return geodeIds;
   }

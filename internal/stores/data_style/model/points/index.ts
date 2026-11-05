@@ -1,11 +1,12 @@
 // Local imports
+import type { DataId } from "@ogw_front/types/identifiers";
 import { useModelPointsCommonStyle } from "./common";
 import { useModelPointsSizeStyle } from "./size";
 import { useModelPointsVisibilityStyle } from "./visibility";
 import { whenDefined } from "@ogw_internal/stores/data_style/when_defined";
 
 export function useModelPointsStyle(): {
-  applyModelPointsStyle: (id: string) => Promise<unknown[]>;
+  applyModelPointsStyle: (modelId: DataId) => Promise<unknown[]>;
 } & ReturnType<typeof useModelPointsCommonStyle> &
   ReturnType<typeof useModelPointsVisibilityStyle> &
   ReturnType<typeof useModelPointsSizeStyle> {
@@ -13,14 +14,17 @@ export function useModelPointsStyle(): {
   const modelPointsVisibilityStyle = useModelPointsVisibilityStyle();
   const modelPointsSizeStyle = useModelPointsSizeStyle();
 
-  async function applyModelPointsStyle(id: string): Promise<unknown[]> {
-    const style = modelPointsCommonStyle.modelPointsStyle(id);
+  async function applyModelPointsStyle(modelId: DataId): Promise<unknown[]> {
+    const style = modelPointsCommonStyle.modelPointsStyle(modelId);
     const result = await Promise.all([
       whenDefined(
         // oxlint-disable-next-line no-unsafe-type-assertion -- points style values are dynamically typed at runtime.
         style.visibility as boolean | undefined,
         async (visibility) => {
-          const applied = await modelPointsVisibilityStyle.setModelPointsVisibility(id, visibility);
+          const applied = await modelPointsVisibilityStyle.setModelPointsVisibility(
+            modelId,
+            visibility,
+          );
           return applied;
         },
       ),
@@ -28,7 +32,7 @@ export function useModelPointsStyle(): {
         // oxlint-disable-next-line no-unsafe-type-assertion -- points style values are dynamically typed at runtime.
         style.size as number | undefined,
         async (size) => {
-          const applied = await modelPointsSizeStyle.setModelPointsSize(id, size);
+          const applied = await modelPointsSizeStyle.setModelPointsSize(modelId, size);
           return applied;
         },
       ),

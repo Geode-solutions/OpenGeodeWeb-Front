@@ -3,6 +3,7 @@ import type {
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
+import type { DataId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 function isMeshPolyhedraPolyhedronAttributeValid(
@@ -18,32 +19,40 @@ function isMeshPolyhedraPolyhedronAttributeValid(
 }
 
 interface UseMeshPolyhedraPolyhedronAttributeStyleReturn {
-  meshPolyhedraPolyhedronAttributeName: (id: string) => string | undefined;
-  meshPolyhedraPolyhedronAttributeItem: (id: string) => number;
-  meshPolyhedraPolyhedronAttributeRange: (id: string) => [number | undefined, number | undefined];
-  meshPolyhedraPolyhedronAttributeTimeStep: (id: string) => number | undefined;
-  setMeshPolyhedraPolyhedronAttributeTimeStep: (id: string, timeStep: number) => Promise<unknown>;
-  meshPolyhedraPolyhedronAttributeColorMap: (id: string) => string | undefined;
+  meshPolyhedraPolyhedronAttributeName: (meshId: DataId) => string | undefined;
+  meshPolyhedraPolyhedronAttributeItem: (meshId: DataId) => number;
+  meshPolyhedraPolyhedronAttributeRange: (
+    meshId: DataId,
+  ) => [number | undefined, number | undefined];
+  meshPolyhedraPolyhedronAttributeTimeStep: (meshId: DataId) => number | undefined;
+  setMeshPolyhedraPolyhedronAttributeTimeStep: (
+    meshId: DataId,
+    timeStep: number,
+  ) => Promise<unknown>;
+  meshPolyhedraPolyhedronAttributeColorMap: (meshId: DataId) => string | undefined;
   meshPolyhedraPolyhedronAttributeStoredConfig: (
-    id: string,
+    meshId: DataId,
     name: string | undefined,
     item: number | undefined,
   ) => AttributeStoredConfig;
-  setMeshPolyhedraPolyhedronAttribute: (id: string, input: ValidAttributeInput) => Promise<unknown>;
-  setMeshPolyhedraPolyhedronAttributeName: (id: string, name: string) => Promise<unknown>;
-  setMeshPolyhedraPolyhedronAttributeItem: (id: string, item: number) => Promise<unknown>;
+  setMeshPolyhedraPolyhedronAttribute: (
+    meshId: DataId,
+    input: ValidAttributeInput,
+  ) => Promise<unknown>;
+  setMeshPolyhedraPolyhedronAttributeName: (meshId: DataId, name: string) => Promise<unknown>;
+  setMeshPolyhedraPolyhedronAttributeItem: (meshId: DataId, item: number) => Promise<unknown>;
   setMeshPolyhedraPolyhedronAttributeRange: (
-    id: string,
+    meshId: DataId,
     minimum: number,
     maximum: number,
   ) => Promise<unknown>;
   setMeshPolyhedraPolyhedronAttributeColorMap: (
-    id: string,
+    meshId: DataId,
     colorMap: string | undefined,
   ) => Promise<unknown>;
-  meshPolyhedraPolyhedronAttributeNoDataColor: (id: string) => RGBAColor;
+  meshPolyhedraPolyhedronAttributeNoDataColor: (meshId: DataId) => RGBAColor;
   setMeshPolyhedraPolyhedronAttributeNoDataColor: (
-    id: string,
+    meshId: DataId,
     no_data_color: RGBAColor,
   ) => Promise<unknown>;
 }

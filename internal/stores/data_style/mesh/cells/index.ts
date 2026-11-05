@@ -3,6 +3,7 @@
 // Local imports
 import { isMeshCellsCellAttributeValid, useMeshCellsCellAttributeStyle } from "./cell";
 import { isMeshCellsVertexAttributeValid, useMeshCellsVertexAttributeStyle } from "./vertex";
+import type { DataId } from "@ogw_front/types/identifiers";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { useMeshCellsColorStyle } from "./color";
 import { useMeshCellsCommonStyle } from "./common";
@@ -21,82 +22,82 @@ interface MeshCellsActiveColoringDeps {
 }
 
 function handleMeshCellsVertexColoring(
-  id: string,
+  meshId: DataId,
   vertexAttributeStyle: ReturnType<typeof useMeshCellsVertexAttributeStyle>,
 ): Promise<unknown> | undefined {
-  const name = vertexAttributeStyle.meshCellsVertexAttributeName(id);
-  const item = vertexAttributeStyle.meshCellsVertexAttributeItem(id);
-  const [minimum, maximum] = vertexAttributeStyle.meshCellsVertexAttributeRange(id);
-  const colorMap = vertexAttributeStyle.meshCellsVertexAttributeColorMap(id);
-  const no_data_color = vertexAttributeStyle.meshCellsVertexAttributeNoDataColor(id);
+  const name = vertexAttributeStyle.meshCellsVertexAttributeName(meshId);
+  const item = vertexAttributeStyle.meshCellsVertexAttributeItem(meshId);
+  const [minimum, maximum] = vertexAttributeStyle.meshCellsVertexAttributeRange(meshId);
+  const colorMap = vertexAttributeStyle.meshCellsVertexAttributeColorMap(meshId);
+  const no_data_color = vertexAttributeStyle.meshCellsVertexAttributeNoDataColor(meshId);
   const vertex_attribute = { name, item, minimum, maximum, colorMap, no_data_color };
   if (!isMeshCellsVertexAttributeValid(vertex_attribute)) {
     return undefined;
   }
-  return vertexAttributeStyle.setMeshCellsVertexAttribute(id, vertex_attribute);
+  return vertexAttributeStyle.setMeshCellsVertexAttribute(meshId, vertex_attribute);
 }
 
 function handleMeshCellsCellColoring(
-  id: string,
+  meshId: DataId,
   cellAttributeStyle: ReturnType<typeof useMeshCellsCellAttributeStyle>,
 ): Promise<unknown> | undefined {
-  const name = cellAttributeStyle.meshCellsCellAttributeName(id);
-  const item = cellAttributeStyle.meshCellsCellAttributeItem(id);
-  const [minimum, maximum] = cellAttributeStyle.meshCellsCellAttributeRange(id);
-  const colorMap = cellAttributeStyle.meshCellsCellAttributeColorMap(id);
-  const no_data_color = cellAttributeStyle.meshCellsCellAttributeNoDataColor(id);
+  const name = cellAttributeStyle.meshCellsCellAttributeName(meshId);
+  const item = cellAttributeStyle.meshCellsCellAttributeItem(meshId);
+  const [minimum, maximum] = cellAttributeStyle.meshCellsCellAttributeRange(meshId);
+  const colorMap = cellAttributeStyle.meshCellsCellAttributeColorMap(meshId);
+  const no_data_color = cellAttributeStyle.meshCellsCellAttributeNoDataColor(meshId);
   const cell_attribute = { name, item, minimum, maximum, colorMap, no_data_color };
   if (!isMeshCellsCellAttributeValid(cell_attribute)) {
     return undefined;
   }
-  return cellAttributeStyle.setMeshCellsCellAttribute(id, cell_attribute);
+  return cellAttributeStyle.setMeshCellsCellAttribute(meshId, cell_attribute);
 }
 
 async function applyMeshCellsActiveColoring(
-  id: string,
+  meshId: DataId,
   type: string | undefined,
   deps: MeshCellsActiveColoringDeps,
 ): Promise<unknown> {
-  await deps.commonStyle.mutateMeshCellsStyle(id, {
+  await deps.commonStyle.mutateMeshCellsStyle(meshId, {
     coloring: { active: type },
   });
   if (type === "constant") {
-    const result = await whenDefined(deps.colorStyle.meshCellsColor(id), async (value) => {
-      const applied = await deps.colorStyle.setMeshCellsColor(id, value);
+    const result = await whenDefined(deps.colorStyle.meshCellsColor(meshId), async (value) => {
+      const applied = await deps.colorStyle.setMeshCellsColor(meshId, value);
       return applied;
     });
     return result;
   }
   if (type === "textures") {
-    const textures = deps.texturesStyle.meshCellsTextures(id);
+    const textures = deps.texturesStyle.meshCellsTextures(meshId);
     // The viewer requires at least one texture: nothing to apply until one is picked.
     if (textures === undefined || textures.length === 0) {
       return undefined;
     }
-    const result = await deps.texturesStyle.setMeshCellsTextures(id, textures);
+    const result = await deps.texturesStyle.setMeshCellsTextures(meshId, textures);
     return result;
   }
   if (type === "vertex") {
-    const result = await handleMeshCellsVertexColoring(id, deps.vertexAttributeStyle);
+    const result = await handleMeshCellsVertexColoring(meshId, deps.vertexAttributeStyle);
     return result;
   }
   if (type === "cell") {
-    const result = await handleMeshCellsCellColoring(id, deps.cellAttributeStyle);
+    const result = await handleMeshCellsCellColoring(meshId, deps.cellAttributeStyle);
     return result;
   }
   throw new Error(`Unknown mesh cells coloring type: ${type}`);
 }
 
 async function setMeshCellsActiveColoring(
-  id: string,
+  meshId: DataId,
   type: string | undefined,
   deps: MeshCellsActiveColoringDeps,
 ): Promise<unknown> {
-  const result = await applyMeshCellsActiveColoring(id, type, deps);
+  const result = await applyMeshCellsActiveColoring(meshId, type, deps);
   if (type !== "constant") {
     // Attribute and textures colorings keep the actor opacity: restore the stored one
-    await whenDefined(deps.colorStyle.meshCellsOpacity(id), async (value) => {
-      const applied = await deps.colorStyle.setMeshCellsOpacity(id, value);
+    await whenDefined(deps.colorStyle.meshCellsOpacity(meshId), async (value) => {
+      const applied = await deps.colorStyle.setMeshCellsOpacity(meshId, value);
       return applied;
     });
   }
@@ -104,26 +105,26 @@ async function setMeshCellsActiveColoring(
 }
 
 async function applyMeshCellsStyle(
-  id: string,
+  meshId: DataId,
   visibilityStyle: ReturnType<typeof useMeshCellsVisibilityStyle>,
   activeColoringType: string | undefined,
   deps: MeshCellsActiveColoringDeps,
 ): Promise<unknown[]> {
   const result = await Promise.all([
-    whenDefined(visibilityStyle.meshCellsVisibility(id), async (value) => {
-      const applied = await visibilityStyle.setMeshCellsVisibility(id, value);
+    whenDefined(visibilityStyle.meshCellsVisibility(meshId), async (value) => {
+      const applied = await visibilityStyle.setMeshCellsVisibility(meshId, value);
       return applied;
     }),
-    setMeshCellsActiveColoring(id, activeColoringType, deps),
+    setMeshCellsActiveColoring(meshId, activeColoringType, deps),
   ]);
   return result;
 }
 
 type UseMeshCellsStyleReturn = ReturnType<typeof useMeshCellsCommonStyle> & {
-  meshCellsColoring: (id: string) => StyleValues;
-  meshCellsActiveColoring: (id: string) => string | undefined;
-  setMeshCellsActiveColoring: (id: string, type: string | undefined) => Promise<unknown>;
-  applyMeshCellsStyle: (id: string) => Promise<unknown[]>;
+  meshCellsColoring: (meshId: DataId) => StyleValues;
+  meshCellsActiveColoring: (meshId: DataId) => string | undefined;
+  setMeshCellsActiveColoring: (meshId: DataId, type: string | undefined) => Promise<unknown>;
+  applyMeshCellsStyle: (meshId: DataId) => Promise<unknown[]>;
 } & ReturnType<typeof useMeshCellsVisibilityStyle> &
   ReturnType<typeof useMeshCellsColorStyle> &
   ReturnType<typeof useMeshCellsTexturesStyle> &
@@ -146,28 +147,28 @@ export function useMeshCellsStyle(): UseMeshCellsStyleReturn {
     cellAttributeStyle: meshCellsCellAttributeStyle,
   };
 
-  function meshCellsColoring(id: string): StyleValues {
-    return meshCellsCommonStyle.meshCellsColoring(id);
+  function meshCellsColoring(meshId: DataId): StyleValues {
+    return meshCellsCommonStyle.meshCellsColoring(meshId);
   }
 
-  function meshCellsActiveColoring(id: string): string | undefined {
+  function meshCellsActiveColoring(meshId: DataId): string | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.active is defined as string in the data style schema.
-    return meshCellsColoring(id).active as string | undefined;
+    return meshCellsColoring(meshId).active as string | undefined;
   }
 
   async function boundSetMeshCellsActiveColoring(
-    id: string,
+    meshId: DataId,
     type: string | undefined,
   ): Promise<unknown> {
-    const result = await setMeshCellsActiveColoring(id, type, activeColoringDeps);
+    const result = await setMeshCellsActiveColoring(meshId, type, activeColoringDeps);
     return result;
   }
 
-  async function boundApplyMeshCellsStyle(id: string): Promise<unknown[]> {
+  async function boundApplyMeshCellsStyle(meshId: DataId): Promise<unknown[]> {
     const result = await applyMeshCellsStyle(
-      id,
+      meshId,
       meshCellsVisibility,
-      meshCellsActiveColoring(id),
+      meshCellsActiveColoring(meshId),
       activeColoringDeps,
     );
     return result;

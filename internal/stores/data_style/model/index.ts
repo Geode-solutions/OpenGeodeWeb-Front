@@ -1,4 +1,5 @@
 import type { ComputedRef } from "vue";
+import type { DataId } from "@ogw_front/types/identifiers";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useModelBlocksStyle } from "./blocks";
@@ -19,9 +20,9 @@ type UseModelStyleReturn = ReturnType<typeof useModelColorStyle> &
   ReturnType<typeof useModelLinesStyle> &
   ReturnType<typeof useModelPointsStyle> &
   ReturnType<typeof useModelSurfacesStyle> & {
-    visibleMeshComponents: (modelId: string) => ComputedRef<string[]>;
-    applyModelStyle: (modelId: string) => Promise<unknown[]>;
-    setModelMeshComponentsDefaultStyle: (modelId: string) => Promise<unknown[]>;
+    visibleMeshComponents: (modelId: DataId) => ComputedRef<string[]>;
+    applyModelStyle: (modelId: DataId) => Promise<unknown[]>;
+    setModelMeshComponentsDefaultStyle: (modelId: DataId) => Promise<unknown[]>;
   };
 
 // oxlint-disable-next-line max-lines-per-function, max-statements
@@ -45,11 +46,11 @@ function useModelStyle(): UseModelStyleReturn {
   const modelColorStyle = useModelColorStyle(componentStyleFunctions);
   const modelVisibilityStyle = useModelVisibilityStyle(componentStyleFunctions);
 
-  function visibleMeshComponents(modelId: string): ComputedRef<string[]> {
+  function visibleMeshComponents(modelId: DataId): ComputedRef<string[]> {
     return useModelSelection(modelId, dataStyleState);
   }
 
-  async function applyModelStyle(modelId: string): Promise<unknown[]> {
+  async function applyModelStyle(modelId: DataId): Promise<unknown[]> {
     const style = dataStyleState.getStyle(modelId);
 
     const results = await Promise.all([
@@ -72,7 +73,7 @@ function useModelStyle(): UseModelStyleReturn {
     return results;
   }
 
-  async function setModelMeshComponentsDefaultStyle(modelId: string): Promise<unknown[]> {
+  async function setModelMeshComponentsDefaultStyle(modelId: DataId): Promise<unknown[]> {
     await dataStore.item(modelId);
     const results = await Promise.all([
       modelBlocksStyle.setModelBlocksDefaultStyle(modelId),

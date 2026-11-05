@@ -10,6 +10,7 @@ import {
   EDGES_DEFAULT_WIDTH,
   type RGBAColor,
 } from "@ogw_front/utils/default_styles/constants";
+import type { DataId } from "@ogw_front/types/identifiers";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { groupBy } from "@ogw_internal/stores/data_style/model/component_style";
 import merge from "lodash/merge";
@@ -59,7 +60,7 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
   const schemas = modelSchemas[COMPONENT_TYPE_KEYS[type]].edges;
 
   // Without an explicit edges style, components follow the model edges style
-  function edgesStyle(modelId: string, componentId?: string): EdgesStyle {
+  function edgesStyle(modelId: DataId, componentId?: string): EdgesStyle {
     // oxlint-disable-next-line no-unsafe-type-assertion -- edges shape is defined by the data style schema.
     const modelEdges = (dataStyleState.getStyle(modelId).edges ?? {}) as EdgesStyle;
     // oxlint-disable-next-line no-unsafe-type-assertion -- edges shape is defined by the data style schema.
@@ -82,41 +83,41 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
     );
   }
 
-  function vertexAttribute(modelId: string, componentId?: string): AttributeState {
+  function vertexAttribute(modelId: DataId, componentId?: string): AttributeState {
     return edgesStyle(modelId, componentId).coloring?.vertex ?? {};
   }
 
-  function edgesVisibility(modelId: string, componentId?: string): boolean {
+  function edgesVisibility(modelId: DataId, componentId?: string): boolean {
     return edgesStyle(modelId, componentId).visibility ?? EDGES_DEFAULT_VISIBILITY;
   }
 
-  function edgesWidth(modelId: string, componentId?: string): number {
+  function edgesWidth(modelId: DataId, componentId?: string): number {
     return edgesStyle(modelId, componentId).width ?? EDGES_DEFAULT_WIDTH;
   }
 
-  function edgesColor(modelId: string, componentId?: string): RGBAColor {
+  function edgesColor(modelId: DataId, componentId?: string): RGBAColor {
     return edgesStyle(modelId, componentId).coloring?.constant ?? EDGES_DEFAULT_COLOR;
   }
 
-  function activeColoring(modelId: string, componentId?: string): string {
+  function activeColoring(modelId: DataId, componentId?: string): string {
     return edgesStyle(modelId, componentId).coloring?.active ?? "constant";
   }
 
-  function vertexAttributeName(modelId: string, componentId?: string): string | undefined {
+  function vertexAttributeName(modelId: DataId, componentId?: string): string | undefined {
     return vertexAttribute(modelId, componentId).name;
   }
 
-  function lastItem(modelId: string, componentId: string | undefined, name?: string): number {
+  function lastItem(modelId: DataId, componentId: string | undefined, name?: string): number {
     const { storedConfigs } = vertexAttribute(modelId, componentId);
     return name === undefined ? 0 : (storedConfigs?.[name]?.lastItem ?? 0);
   }
 
-  function vertexAttributeItem(modelId: string, componentId?: string): number {
+  function vertexAttributeItem(modelId: DataId, componentId?: string): number {
     const { name, item } = vertexAttribute(modelId, componentId);
     return item ?? lastItem(modelId, componentId, name);
   }
 
-  function storedConfig(modelId: string, componentId: string | undefined): AttributeStoredConfig {
+  function storedConfig(modelId: DataId, componentId: string | undefined): AttributeStoredConfig {
     const { name, storedConfigs } = vertexAttribute(modelId, componentId);
     const item = vertexAttributeItem(modelId, componentId);
     const config = name === undefined ? undefined : storedConfigs?.[name]?.[item];
@@ -131,24 +132,24 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
   }
 
   function vertexAttributeRange(
-    modelId: string,
+    modelId: DataId,
     componentId?: string,
   ): [number | undefined, number | undefined] {
     const { minimum, maximum } = storedConfig(modelId, componentId);
     return [minimum, maximum];
   }
 
-  function vertexAttributeColorMap(modelId: string, componentId?: string): string | undefined {
+  function vertexAttributeColorMap(modelId: DataId, componentId?: string): string | undefined {
     return storedConfig(modelId, componentId).colorMap;
   }
 
-  function vertexAttributeNoDataColor(modelId: string, componentId?: string): RGBAColor {
+  function vertexAttributeNoDataColor(modelId: DataId, componentId?: string): RGBAColor {
     return storedConfig(modelId, componentId).no_data_color;
   }
 
   // The type style is updated too when every component of the type is targeted
   async function mutateEdges(
-    modelId: string,
+    modelId: DataId,
     componentIds: string[],
     values: EdgesStyle,
   ): Promise<void> {
@@ -163,7 +164,7 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
   }
 
   async function requestEdges(
-    modelId: string,
+    modelId: DataId,
     componentIds: string[],
     schema: EdgesRequestSchema,
     values: Record<string, unknown> & { style: EdgesStyle },
@@ -191,7 +192,7 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
   }
 
   async function setVisibility(
-    modelId: string,
+    modelId: DataId,
     componentIds: string[],
     visibility: boolean,
   ): Promise<unknown> {
@@ -203,7 +204,7 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
   }
 
   async function setWidth(
-    modelId: string,
+    modelId: DataId,
     componentIds: string[],
     width: number,
   ): Promise<unknown> {
@@ -215,7 +216,7 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
   }
 
   async function setColor(
-    modelId: string,
+    modelId: DataId,
     componentIds: string[],
     color: RGBAColor,
   ): Promise<unknown> {
@@ -226,7 +227,7 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
     return result;
   }
 
-  async function applyVertexAttribute(modelId: string, componentIds: string[]): Promise<unknown> {
+  async function applyVertexAttribute(modelId: DataId, componentIds: string[]): Promise<unknown> {
     const [referenceId] = componentIds;
     const name = vertexAttributeName(modelId, referenceId);
     const item = vertexAttributeItem(modelId, referenceId);
@@ -253,7 +254,7 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
   }
 
   async function mutateVertexAttribute(
-    modelId: string,
+    modelId: DataId,
     componentIds: string[],
     values: AttributeState,
   ): Promise<void> {
@@ -261,7 +262,7 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
   }
 
   async function mutateStoredConfig(
-    modelId: string,
+    modelId: DataId,
     componentIds: string[],
     config: Partial<AttributeStoredConfig>,
   ): Promise<void> {
@@ -274,7 +275,7 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
   }
 
   async function setActiveColoring(
-    modelId: string,
+    modelId: DataId,
     componentIds: string[],
     activeColoringType: string,
   ): Promise<unknown> {
@@ -288,7 +289,7 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
   }
 
   async function setVertexAttributeName(
-    modelId: string,
+    modelId: DataId,
     componentIds: string[],
     name: string,
   ): Promise<unknown> {
@@ -299,7 +300,7 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
   }
 
   async function setVertexAttributeItem(
-    modelId: string,
+    modelId: DataId,
     componentIds: string[],
     item: number,
   ): Promise<unknown> {
@@ -309,7 +310,7 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
   }
 
   async function setVertexAttributeRange(
-    modelId: string,
+    modelId: DataId,
     componentIds: string[],
     minimum: number,
     maximum: number,
@@ -320,7 +321,7 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
   }
 
   async function setVertexAttributeColorMap(
-    modelId: string,
+    modelId: DataId,
     componentIds: string[],
     colorMap: string | undefined,
   ): Promise<unknown> {
@@ -330,7 +331,7 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
   }
 
   async function setVertexAttributeNoDataColor(
-    modelId: string,
+    modelId: DataId,
     componentIds: string[],
     no_data_color: RGBAColor,
   ): Promise<unknown> {
@@ -339,7 +340,7 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
     return result;
   }
 
-  async function styledComponentIds(modelId: string): Promise<string[]> {
+  async function styledComponentIds(modelId: DataId): Promise<string[]> {
     const componentIds = await dataStore.getMeshComponentGeodeIds(modelId, type);
     if (dataStyleState.getModelComponentTypeStyle(modelId, type).edges !== undefined) {
       return componentIds;
@@ -350,7 +351,7 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
   }
 
   // The model edges routes override every component, so the explicit edges styles follow
-  async function mutateStyledEdges(modelId: string, values: EdgesStyle): Promise<void> {
+  async function mutateStyledEdges(modelId: DataId, values: EdgesStyle): Promise<void> {
     const componentIds = await styledComponentIds(modelId);
     if (componentIds.length > 0) {
       await mutateEdges(modelId, componentIds, values);
@@ -358,7 +359,7 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
   }
 
   // Only components with an explicit edges style are sent, the others follow the model edges
-  async function applyEdgesStyle(modelId: string): Promise<void> {
+  async function applyEdgesStyle(modelId: DataId): Promise<void> {
     const componentIds = await styledComponentIds(modelId);
     function style(componentId?: string): EdgesStyle {
       return edgesStyle(modelId, componentId);
