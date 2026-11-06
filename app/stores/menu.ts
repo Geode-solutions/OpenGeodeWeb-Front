@@ -1,8 +1,8 @@
-import type { DataIdentified, GeodeObjectTyped } from "@ogw_front/types/identifiers";
+import type { DataIdentified, GeodeObjectTyped, ViewerTyped } from "@ogw_front/types/identifiers";
 import { type MenuItems, menusData } from "./menu_helpers/menus_data.js";
 
-interface MenuMetaData extends Partial<DataIdentified>, Partial<GeodeObjectTyped> {
-  viewer_type?: string;
+interface MenuMetaData
+  extends Partial<DataIdentified>, Partial<GeodeObjectTyped>, Partial<ViewerTyped> {
   targetIds?: string[];
   [key: string]: unknown;
 }
