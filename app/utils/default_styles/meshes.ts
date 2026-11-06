@@ -16,9 +16,7 @@ interface PointSetStyle {
   points: MeshPointsStyle;
 }
 
-interface EdgedCurveStyle {
-  visibility: boolean;
-  points: MeshPointsStyle;
+interface EdgedCurveStyle extends PointSetStyle {
   edges: MeshEdgesStyle;
 }
 
