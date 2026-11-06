@@ -2,6 +2,7 @@ import type {
   ModelComponentStyle,
   ModelComponentTypeStyle,
   ObjectStyle,
+  SceneStyle,
 } from "@ogw_internal/stores/data_style/types";
 import type { Table } from "dexie";
 import { database } from "@ogw_internal/database/database.js";
@@ -11,11 +12,13 @@ import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useMeshStyle } from "@ogw_internal/stores/data_style/mesh/index";
 import { useModelStyle } from "@ogw_internal/stores/data_style/model/index";
+import { useSceneStyle } from "@ogw_internal/stores/data_style/scene";
 
 interface DataStyleSnapshot {
   readonly styles: Record<string, ObjectStyle>;
   readonly componentStyles: Record<string, ModelComponentStyle>;
   readonly modelComponentTypeStyles: Record<string, ModelComponentTypeStyle>;
+  readonly sceneStyle?: SceneStyle;
 }
 
 // The database's table map is dynamically assembled at runtime (see internal/database/database.ts), so its exported type is a loose `{}`; cast it to the shape it actually has at runtime rather than widening every call site.
@@ -38,6 +41,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   const dataStyleState = useDataStyleState();
   const meshStyleStore = useMeshStyle();
   const modelStyleStore = useModelStyle();
+  const sceneStyleStore = useSceneStyle();
   const attributeTimeStepStyle = useAttributeTimeStepStyle();
   const dataStore = useDataStore();
   // oxlint-disable-next-line no-unsafe-type-assertion -- the database Proxy is typed as `{}` at its export site; this cast documents its real runtime shape.
@@ -98,6 +102,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
       styles: dataStyleState.styles.value,
       componentStyles: dataStyleState.componentStyles.value,
       modelComponentTypeStyles: dataStyleState.modelComponentTypeStyles.value,
+      sceneStyle: dataStyleState.sceneStyle.value,
     };
   }
 
@@ -135,6 +140,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
       ...model_component_type_style_promises,
     ]);
     await dataStyleState.loadFromDatabase();
+    await sceneStyleStore.importSceneStyle(snapshot.sceneStyle);
   }
 
   async function applyAllStylesFromState(): Promise<void> {
@@ -152,6 +158,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
       }
     });
     await Promise.all(promises);
+    await sceneStyleStore.applySceneStyle();
   }
 
   return {
@@ -165,6 +172,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     ...attributeTimeStepStyle,
     ...meshStyleStore,
     ...modelStyleStore,
+    ...sceneStyleStore,
   };
 });
 

@@ -18,6 +18,9 @@ interface OpenMenuOptions {
   readonly meta_data: MenuMetaData | undefined;
 }
 
+const MENU_RADIUS = 80;
+// Same gap between neighbour items as a 4-item object menu (3 items, no center button)
+const SCENE_MENU_RADIUS = 65;
 export const useMenuStore = defineStore("menu", () => {
   const menus = shallowRef(menusData);
   const display_menu = ref(false);
@@ -30,6 +33,9 @@ export const useMenuStore = defineStore("menu", () => {
   const containerLeft = ref(0);
   const active_item_index = ref<number | undefined>(undefined);
   const current_meta_data = ref<MenuMetaData>({});
+  const menuRadius = computed(() =>
+    current_meta_data.value.viewer_type === "scene" ? SCENE_MENU_RADIUS : MENU_RADIUS,
+  );
 
   function getMenuItems(
     objectType: string | undefined,
@@ -117,6 +123,7 @@ export const useMenuStore = defineStore("menu", () => {
     containerTop,
     containerLeft,
     active_item_index,
+    menuRadius,
     getMenuItems,
     closeMenu,
     openMenu,

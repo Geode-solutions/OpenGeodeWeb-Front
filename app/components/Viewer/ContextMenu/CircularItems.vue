@@ -11,7 +11,6 @@ interface Props {
 
 const { menuItems, id, metaData, menuItemCount } = defineProps<Props>();
 
-const RADIUS = 80;
 const Z_INDEX_ACTIVE_ITEM = 10;
 const Z_INDEX_BASE_ITEM = 1;
 const FULL_ANGLE = 360;
@@ -25,7 +24,7 @@ const menuStore = useMenuStore();
 function getItemStyle(index: number): Record<string, string> {
   const angle = (index / menuItemCount) * 2 * Math.PI;
   return {
-    transform: `translate(${Math.cos(angle) * RADIUS}px, ${Math.sin(angle) * RADIUS}px)`,
+    transform: `translate(${Math.cos(angle) * menuStore.menuRadius}px, ${Math.sin(angle) * menuStore.menuRadius}px)`,
     transition: "opacity 0.2s ease, transform 0.2s ease",
     position: "absolute",
     zIndex: menuStore.active_item_index === index ? Z_INDEX_ACTIVE_ITEM : Z_INDEX_BASE_ITEM,

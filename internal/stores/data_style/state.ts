@@ -2,9 +2,11 @@ import type {
   ModelComponentStyle,
   ModelComponentTypeStyle,
   ObjectStyle,
+  SceneStyle,
   StyleValues,
 } from "./types";
 import { type SharedState, getSharedState } from "./state_shared";
+import { getDefaultSceneStyle } from "@ogw_front/utils/default_styles";
 import { getTable } from "@ogw_internal/database/database";
 import merge from "lodash/merge";
 
@@ -83,9 +85,11 @@ export function useDataStyleState(): DataStyleStateApi {
       dataStyleTable.clear(),
       modelComponentDataStyleTable.clear(),
       modelComponentTypeDataStyleTable.clear(),
+      getTable<SceneStyle>("scene_style").clear(),
     ]);
     modelComponentTypeStyles.value = {};
     componentStyles.value = {};
+    state.sceneStyle.value = getDefaultSceneStyle();
   }
 
   return {

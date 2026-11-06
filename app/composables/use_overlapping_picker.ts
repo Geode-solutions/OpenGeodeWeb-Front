@@ -22,6 +22,8 @@ interface ProposedItem {
 interface ViewerIdResult {
   id: string | undefined;
   viewer_id: number | undefined;
+  // True when objects were under the cursor but the user closed the picker without choosing
+  dismissed?: boolean;
 }
 
 interface GetViewerIdParams {
@@ -161,7 +163,7 @@ export function useOverlappingPicker(): UseOverlappingPickerReturn {
         if (chosenResult) {
           resolve({ id: chosenResult.id, viewer_id: chosenResult.viewer_id });
         } else {
-          resolve({ id: undefined, viewer_id: undefined });
+          resolve({ id: undefined, viewer_id: undefined, dismissed: true });
         }
       };
     });

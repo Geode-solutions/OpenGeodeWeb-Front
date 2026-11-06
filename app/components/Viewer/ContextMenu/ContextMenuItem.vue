@@ -8,7 +8,6 @@ import { useTreeviewStore } from "@ogw_front/stores/treeview";
 const CARD_WIDTH = 300;
 const CARD_HEIGHT = 500;
 const MARGIN = 60;
-const RADIUS = 80;
 const OFFSET = 40;
 
 const menuStore = useMenuStore();
@@ -36,8 +35,8 @@ const { index, itemProps, tooltip, btnImage = "", btnIcon = "" } = defineProps<P
 
 const buttonCoords = computed(() => {
   const angle = (index / itemProps.totalItems) * 2 * Math.PI;
-  const deltaX = Math.cos(angle) * RADIUS;
-  const deltaY = Math.sin(angle) * RADIUS;
+  const deltaX = Math.cos(angle) * menuStore.menuRadius;
+  const deltaY = Math.sin(angle) * menuStore.menuRadius;
   const size = 40;
   return {
     x: menuStore.containerLeft + menuStore.menuX + deltaX - size / 2,
@@ -110,7 +109,7 @@ const optionsStyle = computed<Record<string, string>>(() => {
     return {};
   }
   const angle = (index / itemProps.totalItems) * 2 * Math.PI;
-  const radius = RADIUS;
+  const radius = menuStore.menuRadius;
   const absoluteButtonY = menuStore.menuY + Math.sin(angle) * radius;
   const height = optionsHeight.value;
   const margin = MARGIN;
@@ -127,7 +126,7 @@ const optionsStyle = computed<Record<string, string>>(() => {
 const optionsClass = computed<string>(() => {
   const loc = itemProps.tooltip_location;
   const margin = MARGIN;
-  const radius = RADIUS;
+  const radius = menuStore.menuRadius;
   if (loc === "right") {
     return menuStore.menuX + radius + margin + CARD_WIDTH > menuStore.containerWidth
       ? "options-left"

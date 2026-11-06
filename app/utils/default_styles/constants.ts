@@ -53,6 +53,12 @@ const DEFAULT_MODEL_COMPONENT_TYPE_COLORS: Record<string, RGBAColor> = {
 
 const DEFAULT_NO_DATA_COLOR: RGBAColor = { red: 128, green: 128, blue: 128, alpha: 1 };
 
+// Scene
+const SCENE_DEFAULT_BACKGROUND_COLOR: RGBAColor = { red: 180, green: 180, blue: 180, alpha: 1 };
+const SCENE_DEFAULT_TEXT_COLOR: RGBAColor = { red: 0, green: 0, blue: 0, alpha: 1 };
+const SCENE_DEFAULT_FONT_FAMILY = "arial";
+const SCENE_DEFAULT_ORIENTATION_WIDGET = "axes";
+
 export type { RGBAColor, AttributeConfig };
 export {
   POINTS_DEFAULT_VISIBILITY,
@@ -85,4 +91,8 @@ export {
   MESH_DEFAULT_ACTIVE_COLORING,
   MODEL_DEFAULT_ACTIVE_COLORING,
   DEFAULT_NO_DATA_COLOR,
+  SCENE_DEFAULT_BACKGROUND_COLOR,
+  SCENE_DEFAULT_TEXT_COLOR,
+  SCENE_DEFAULT_FONT_FAMILY,
+  SCENE_DEFAULT_ORIENTATION_WIDGET,
 };
