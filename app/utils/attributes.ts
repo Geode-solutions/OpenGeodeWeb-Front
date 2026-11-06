@@ -8,7 +8,7 @@ interface AttributeRangeSource {
   max_value?: number;
 }
 
-interface AttributeRange {
+interface AttributeMinMax {
   min: number;
   max: number;
 }
@@ -16,7 +16,7 @@ interface AttributeRange {
 function getAttributeRange(
   currentAttribute: AttributeRangeSource | undefined | null,
   compIndex = 0,
-): AttributeRange {
+): AttributeMinMax {
   if (!currentAttribute) {
     return { min: 0, max: 1 };
   }

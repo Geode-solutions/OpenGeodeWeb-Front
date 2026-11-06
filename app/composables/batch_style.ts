@@ -8,11 +8,11 @@ import {
   toValue,
 } from "vue";
 import type { DataId } from "@ogw_front/types/identifiers";
+import type { ValidAttributeRange } from "@ogw_front/types/attribute";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
-type AttributeRange = [number, number];
-type RangesPerData = ReadonlyMap<string, AttributeRange>;
+type RangesPerData = ReadonlyMap<string, ValidAttributeRange>;
 
 const BATCH_GROUP_KEY: InjectionKey<ComputedRef<string[]>> = Symbol("batch_group");
 
@@ -101,4 +101,4 @@ function useBatchStyle(): { applyBatchStyle: typeof applyBatchStyle } {
 }
 
 export { BATCH_GROUP_KEY, applyRangesPerData, provideBatchGroup, useBatchGroup, useBatchStyle };
-export type { AttributeRange, RangesPerData };
+export type { RangesPerData };

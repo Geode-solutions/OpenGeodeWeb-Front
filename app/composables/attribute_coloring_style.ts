@@ -1,6 +1,7 @@
 import { type AttributeInfo, getAttributeRange } from "@ogw_front/utils/attributes";
 import { type AttributeSchemas, fetchAttributeRange } from "@ogw_front/utils/attribute_range";
 import type { JsonRpcSchema } from "@ogw_shared/utils/types";
+import type { ValidAttributeRange } from "@ogw_front/types/attribute";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -20,7 +21,7 @@ interface AttributeNamesResponse {
 
 interface AttributeColoringStyle {
   currentColormap: ComputedRef<string>;
-  currentRange: WritableComputedRef<readonly [number, number]>;
+  currentRange: WritableComputedRef<Readonly<ValidAttributeRange>>;
   applyGlobalColormap: (colorMap: string) => Promise<void>;
   resetGlobalRange: () => Promise<void>;
   currentTimeSteps: Ref<number[]>;
@@ -88,8 +89,8 @@ function useAttributeColoringStyle(colorings: Ref<AttributeColoring[]>): Attribu
     await writeAll("ColorMap", colorMap);
   }
 
-  const currentRange = computed<readonly [number, number]>({
-    get(): readonly [number, number] {
+  const currentRange = computed<Readonly<ValidAttributeRange>>({
+    get(): Readonly<ValidAttributeRange> {
       const [coloring] = colorings.value;
       if (!coloring) {
         return [0, 1];
@@ -99,7 +100,7 @@ function useAttributeColoringStyle(colorings: Ref<AttributeColoring[]>): Attribu
       return [minimum, maximum];
     },
     // Vue's WritableComputedOptions setter is strictly `(v: T) => void`: the async write is delegated.
-    set: (range: readonly [number, number]): void => {
+    set: (range: Readonly<ValidAttributeRange>): void => {
       /* oxlint-disable-next-line promise/prefer-await-to-then -- setter cannot be async; see comment above. */
       writeAll("Range", range[0], range[1]).catch(() => undefined);
     },

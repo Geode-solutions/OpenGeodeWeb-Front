@@ -1,6 +1,6 @@
 import type { AttributeRangeInfo, AttributeSchemas } from "@ogw_front/utils/attribute_range";
-import type { AttributeRange } from "@ogw_front/composables/batch_style";
 import type { DataId } from "@ogw_front/types/identifiers";
+import type { ValidAttributeRange } from "@ogw_front/types/attribute";
 import { getAttributeRange } from "@ogw_front/utils/attributes";
 
 // The minimum and maximum of an attribute range: each one is clamped by the other
@@ -51,8 +51,8 @@ function attributeItemOptions(itemCount: number): { title: string; value: number
 function attributeRangesPerTarget(
   rangesPerTarget: ReadonlyMap<string, AttributeRangeInfo>,
   item: number,
-): Map<string, AttributeRange> {
-  const ranges = new Map<string, AttributeRange>();
+): Map<string, ValidAttributeRange> {
+  const ranges = new Map<string, ValidAttributeRange>();
   for (const [targetId, range] of rangesPerTarget) {
     const { min, max } = getAttributeRange(range, item);
     ranges.set(targetId, [min, max]);
