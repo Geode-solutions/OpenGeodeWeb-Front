@@ -1,6 +1,7 @@
 import { type FormattedComponent, type ModelComponentRecord, useDataMesh } from "./mesh.js";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import type { ModelComponentRelationRecord } from "./relations.js";
+import type { ReadonlyTreeGroup } from "@ogw_front/types/tree";
 import type { Ref } from "vue";
 import { getTable } from "@ogw_internal/database/database.js";
 import { liveObservable } from "@ogw_front/utils/live_observable";
@@ -11,11 +12,7 @@ interface CollectionComponent extends FormattedComponent {
   readonly children: readonly FormattedComponent[];
 }
 
-interface CollectionComponentGroup {
-  id: string;
-  title: string;
-  readonly children: readonly CollectionComponent[];
-}
+type CollectionComponentGroup = ReadonlyTreeGroup<CollectionComponent>;
 
 // oxlint-disable-next-line eslint/max-lines-per-function
 export function useDataCollections(): {
