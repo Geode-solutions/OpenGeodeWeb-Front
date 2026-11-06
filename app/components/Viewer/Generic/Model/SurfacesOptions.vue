@@ -1,5 +1,6 @@
 <script setup lang="ts">
 // oxlint-disable eslint/max-lines
+import type { AttributeName } from "@ogw_front/types/attribute";
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { SurfaceId } from "@ogw_front/types/identifiers";
@@ -122,7 +123,7 @@ const surfaceActiveColoring = computed<string | undefined>({
 });
 
 // Group Attributes
-const surfacesVertexAttributeName = computed<string | undefined>({
+const surfacesVertexAttributeName = computed<AttributeName | undefined>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeName(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -198,7 +199,7 @@ const surfacesVertexAttributeNoDataColor = computed<RGBAColor>({
   },
 });
 
-const surfacesPolygonAttributeName = computed<string | undefined>({
+const surfacesPolygonAttributeName = computed<AttributeName | undefined>({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeName(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -277,7 +278,7 @@ const surfacesPolygonAttributeNoDataColor = computed<RGBAColor>({
 });
 
 // Individual Attributes
-const vertexAttributeName = computed<string | undefined>({
+const vertexAttributeName = computed<AttributeName | undefined>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeName(modelId, surfaceId),
   set: async (newValue) => {
     if (surfaceId === undefined || newValue === undefined) {
@@ -349,7 +350,7 @@ const vertexAttributeNoDataColor = computed<RGBAColor>({
   },
 });
 
-const polygonAttributeName = computed<string | undefined>({
+const polygonAttributeName = computed<AttributeName | undefined>({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeName(modelId, surfaceId),
   set: async (newValue) => {
     if (surfaceId === undefined || newValue === undefined) {

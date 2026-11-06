@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AttributeName } from "@ogw_front/types/attribute";
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import { MODEL_LINE_COLORING } from "@ogw_front/utils/model_component_coloring";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
@@ -78,7 +79,7 @@ const linesActiveColoring = computed<string | undefined>({
 });
 
 // Group Attributes
-const linesVertexAttributeName = computed<string | undefined>({
+const linesVertexAttributeName = computed<AttributeName | undefined>({
   get: () => dataStyleStore.modelLinesVertexAttributeName(modelId, referenceLineId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -141,7 +142,7 @@ const linesVertexAttributeNoDataColor = computed<RGBAColor>({
   },
 });
 
-const linesEdgeAttributeName = computed<string | undefined>({
+const linesEdgeAttributeName = computed<AttributeName | undefined>({
   get: () => dataStyleStore.modelLinesEdgeAttributeName(modelId, referenceLineId.value),
   set: async (newValue) => {
     if (newValue === undefined) {

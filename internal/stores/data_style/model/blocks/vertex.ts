@@ -7,6 +7,7 @@ import type {
 } from "@ogw_internal/stores/data_style/attribute_types";
 import type { BlockId, ModelId } from "@ogw_front/types/identifiers";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { AttributeName } from "@ogw_front/types/attribute";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
@@ -26,7 +27,10 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const attributeSchema = viewer_schemas.opengeodeweb_viewer.model.blocks.attribute.vertex.attribute;
 
 interface UseModelBlocksVertexAttributeReturn {
-  modelBlocksVertexAttributeName: (modelId: ModelId, blockId?: BlockId) => string | undefined;
+  modelBlocksVertexAttributeName: (
+    modelId: ModelId,
+    blockId?: BlockId,
+  ) => AttributeName | undefined;
   modelBlocksVertexAttributeItem: (modelId: ModelId, blockId?: BlockId) => number;
   modelBlocksVertexAttributeRange: (
     modelId: ModelId,
@@ -42,7 +46,7 @@ interface UseModelBlocksVertexAttributeReturn {
   modelBlocksVertexAttributeStoredConfig: (
     modelId: ModelId,
     blockId: BlockId | undefined,
-    name: string | undefined,
+    name: AttributeName | undefined,
     item: number | undefined,
   ) => AttributeStoredConfig;
   setModelBlocksVertexAttribute: (
@@ -53,7 +57,7 @@ interface UseModelBlocksVertexAttributeReturn {
   setModelBlocksVertexAttributeName: (
     modelId: ModelId,
     blockIds: BlockId[],
-    name: string,
+    name: AttributeName,
   ) => Promise<unknown>;
   setModelBlocksVertexAttributeItem: (
     modelId: ModelId,
@@ -92,7 +96,7 @@ type ModelBlocksVertexAttributeGetters = Pick<
   modelBlocksVertexAttributeLastItem: (
     modelId: ModelId,
     componentId: string | undefined,
-    name: string | undefined,
+    name: AttributeName | undefined,
   ) => number;
 };
 
@@ -108,7 +112,7 @@ function useModelBlocksVertexAttributeGetters(
   function modelBlocksVertexAttributeStoredConfig(
     modelId: ModelId,
     blockId: BlockId | undefined,
-    name: string | undefined,
+    name: AttributeName | undefined,
     item: number | undefined,
   ): AttributeStoredConfig {
     const { storedConfigs } = modelBlocksVertexAttribute(modelId, blockId);
@@ -119,13 +123,16 @@ function useModelBlocksVertexAttributeGetters(
     }
     return defaultAttributeStoredConfig();
   }
-  function modelBlocksVertexAttributeName(modelId: ModelId, blockId?: BlockId): string | undefined {
+  function modelBlocksVertexAttributeName(
+    modelId: ModelId,
+    blockId?: BlockId,
+  ): AttributeName | undefined {
     return modelBlocksVertexAttribute(modelId, blockId).name;
   }
   function modelBlocksVertexAttributeLastItem(
     modelId: ModelId,
     blockId: BlockId | undefined,
-    name: string | undefined,
+    name: AttributeName | undefined,
   ): number {
     const { storedConfigs } = modelBlocksVertexAttribute(modelId, blockId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
@@ -227,7 +234,7 @@ function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
   async function setModelBlocksVertexAttributeStoredConfig(
     modelId: ModelId,
     blockIds: BlockId[],
-    name: string | undefined,
+    name: AttributeName | undefined,
     item: number | undefined,
     config: Partial<AttributeStoredConfig>,
   ): Promise<void> {
@@ -303,7 +310,7 @@ function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
   async function setModelBlocksVertexAttributeName(
     modelId: ModelId,
     blockIds: BlockId[],
-    name: string,
+    name: AttributeName,
   ): Promise<unknown> {
     const item = modelBlocksVertexAttributeLastItem(modelId, blockIds[0], name);
     await mutateModelBlocksVertexStyle(modelId, blockIds, {

@@ -5,6 +5,7 @@ import {
   applyRangesPerData,
   useBatchStyle,
 } from "@ogw_front/composables/batch_style";
+import type { AttributeName } from "@ogw_front/types/attribute";
 import type { Opacity } from "@ogw_front/types/style";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
@@ -41,7 +42,7 @@ const opacity = useBatchStyleModel<Opacity>(
   (meshId) => dataStyleStore.meshPolyhedraOpacity(meshId),
   (meshId, value) => dataStyleStore.setMeshPolyhedraOpacity(meshId, value),
 );
-const vertex_attribute_name = computed<string | undefined>({
+const vertex_attribute_name = computed<AttributeName | undefined>({
   get: () => dataStyleStore.meshPolyhedraVertexAttributeName(dataId),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -108,7 +109,7 @@ const vertex_attribute_no_data_color = computed<RGBAColor>({
     hybridViewerStore.remoteRender();
   },
 });
-const polyhedron_attribute_name = computed<string | undefined>({
+const polyhedron_attribute_name = computed<AttributeName | undefined>({
   get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeName(dataId),
   set: async (newValue) => {
     if (newValue === undefined) {

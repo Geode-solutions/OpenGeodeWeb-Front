@@ -1,3 +1,4 @@
+import type { AttributeName } from "@ogw_front/types/attribute";
 import type { ModelId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // oxlint-disable eslint/max-lines
@@ -13,7 +14,7 @@ type ComponentStyleFunctions = Record<"Surface" | "Line" | "Block" | "Corner", a
 
 interface AttributeAccessors {
   getName: (modelId: ModelId, componentId: string) => string | undefined;
-  setName: (modelId: ModelId, componentIds: string[], name: string) => unknown;
+  setName: (modelId: ModelId, componentIds: string[], name: AttributeName) => unknown;
   getRange: (modelId: ModelId, componentId: string) => [number | undefined, number | undefined];
   setRange: (modelId: ModelId, componentIds: string[], minimum: number, maximum: number) => unknown;
   getColorMap: (modelId: ModelId, componentId: string) => string | undefined;
@@ -22,7 +23,11 @@ interface AttributeAccessors {
 
 // The signatures below describe just the per-attribute-kind methods this module reads off each dynamically-typed composable (see the `any` in ComponentStyleFunctions above). `attributeFn` narrows one such method to its known signature so every downstream read/call is a real, checked type instead of `any`.
 type AttributeNameFn = (modelId: ModelId, componentId: string) => string | undefined;
-type SetAttributeNameFn = (modelId: ModelId, componentIds: string[], name: string) => unknown;
+type SetAttributeNameFn = (
+  modelId: ModelId,
+  componentIds: string[],
+  name: AttributeName,
+) => unknown;
 type AttributeRangeFn = (
   modelId: ModelId,
   componentId: string,

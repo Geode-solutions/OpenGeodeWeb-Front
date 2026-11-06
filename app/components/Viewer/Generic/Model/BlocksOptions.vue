@@ -1,5 +1,6 @@
 <script setup lang="ts">
 // oxlint-disable eslint/max-lines
+import type { AttributeName } from "@ogw_front/types/attribute";
 import type { BlockId } from "@ogw_front/types/identifiers";
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
@@ -118,7 +119,7 @@ const blockActiveColoring = computed<string | undefined>({
 });
 
 // Group Attributes
-const blocksVertexAttributeName = computed<string | undefined>({
+const blocksVertexAttributeName = computed<AttributeName | undefined>({
   get: () => dataStyleStore.modelBlocksVertexAttributeName(modelId, referenceBlockId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -185,7 +186,7 @@ const blocksVertexAttributeNoDataColor = computed<RGBAColor>({
   },
 });
 
-const blocksPolyhedronAttributeName = computed<string | undefined>({
+const blocksPolyhedronAttributeName = computed<AttributeName | undefined>({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, referenceBlockId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -282,7 +283,7 @@ const blocksPolyhedronAttributeNoDataColor = computed<RGBAColor>({
 });
 
 // Individual Attributes
-const vertexAttributeName = computed<string | undefined>({
+const vertexAttributeName = computed<AttributeName | undefined>({
   get: () => dataStyleStore.modelBlocksVertexAttributeName(modelId, blockId),
   set: async (newValue) => {
     if (blockId === undefined || newValue === undefined) {
@@ -349,7 +350,7 @@ const vertexAttributeNoDataColor = computed<RGBAColor>({
   },
 });
 
-const polyhedronAttributeName = computed<string | undefined>({
+const polyhedronAttributeName = computed<AttributeName | undefined>({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, blockId),
   set: async (newValue) => {
     if (blockId === undefined || newValue === undefined) {

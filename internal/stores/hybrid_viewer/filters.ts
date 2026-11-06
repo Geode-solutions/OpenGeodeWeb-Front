@@ -2,6 +2,7 @@ import type { JsonRpcSchema, ParamsOf, ResponseOf } from "@ogw_shared/utils/type
 import viewer_schemas, {
   type ViewerClippingPlanesParams,
 } from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
+import type { AttributeName } from "@ogw_front/types/attribute";
 import type { DataId } from "@ogw_front/types/identifiers";
 import type { SliceAxis } from "@ogw_front/utils/slice";
 import { useHybridViewerCore } from "./core";
@@ -64,7 +65,7 @@ interface ThresholdAttribute {
 interface Threshold {
   id: number;
   sourceIndex: number | undefined;
-  attributeName: string | undefined;
+  attributeName: AttributeName | undefined;
   item: number;
   minimum: number | undefined;
   maximum: number | undefined;

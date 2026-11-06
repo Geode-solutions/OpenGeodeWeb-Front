@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Visibility, Width } from "@ogw_front/types/style";
+import type { AttributeName } from "@ogw_front/types/attribute";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import ViewerOptionsWidthSlider from "@ogw_front/components/Viewer/Options/Sliders/Width.vue";
@@ -127,7 +128,7 @@ const color = computed<RGBAColor | undefined>({
   },
 });
 
-const vertexAttributeName = computed<string | undefined>({
+const vertexAttributeName = computed<AttributeName | undefined>({
   get: () => edgesStyle.value?.vertexAttributeName(modelId, referenceComponentId),
   set: async (newValue) => {
     if (newValue === undefined) {

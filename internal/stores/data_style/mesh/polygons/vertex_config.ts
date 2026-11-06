@@ -2,6 +2,7 @@ import type {
   AttributeState,
   AttributeStoredConfig,
 } from "@ogw_internal/stores/data_style/attribute_types";
+import type { AttributeName } from "@ogw_front/types/attribute";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
@@ -11,12 +12,12 @@ import { useMeshPolygonsCommonStyle } from "./common";
 
 interface UseMeshPolygonsVertexAttributeConfigReturn {
   meshPolygonsVertexAttribute: (meshId: MeshId) => AttributeState;
-  meshPolygonsVertexAttributeName: (meshId: MeshId) => string | undefined;
-  meshPolygonsVertexAttributeLastItem: (meshId: MeshId, name: string | undefined) => number;
+  meshPolygonsVertexAttributeName: (meshId: MeshId) => AttributeName | undefined;
+  meshPolygonsVertexAttributeLastItem: (meshId: MeshId, name: AttributeName | undefined) => number;
   meshPolygonsVertexAttributeItem: (meshId: MeshId) => number;
   meshPolygonsVertexAttributeStoredConfig: (
     meshId: MeshId,
-    name: string | undefined,
+    name: AttributeName | undefined,
     item: number | undefined,
   ) => AttributeStoredConfig;
 }
@@ -28,7 +29,7 @@ interface UseMeshPolygonsVertexAttributeConfigWriterReturn {
   ) => Promise<string>;
   setMeshPolygonsVertexAttributeStoredConfig: (
     meshId: MeshId,
-    name: string | undefined,
+    name: AttributeName | undefined,
     item: number | undefined,
     config: Partial<AttributeStoredConfig>,
   ) => Promise<string>;
@@ -42,7 +43,7 @@ function useMeshPolygonsVertexAttributeConfig(): UseMeshPolygonsVertexAttributeC
   }
   function meshPolygonsVertexAttributeStoredConfig(
     meshId: MeshId,
-    name: string | undefined,
+    name: AttributeName | undefined,
     item: number | undefined,
   ): AttributeStoredConfig {
     const { storedConfigs } = meshPolygonsVertexAttribute(meshId);
@@ -53,10 +54,13 @@ function useMeshPolygonsVertexAttributeConfig(): UseMeshPolygonsVertexAttributeC
     }
     return defaultAttributeStoredConfig();
   }
-  function meshPolygonsVertexAttributeName(meshId: MeshId): string | undefined {
+  function meshPolygonsVertexAttributeName(meshId: MeshId): AttributeName | undefined {
     return meshPolygonsVertexAttribute(meshId).name;
   }
-  function meshPolygonsVertexAttributeLastItem(meshId: MeshId, name: string | undefined): number {
+  function meshPolygonsVertexAttributeLastItem(
+    meshId: MeshId,
+    name: AttributeName | undefined,
+  ): number {
     const { storedConfigs } = meshPolygonsVertexAttribute(meshId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
     if (nameConfig !== undefined) {
@@ -131,7 +135,7 @@ function useMeshPolygonsVertexAttributeConfigWriter(): UseMeshPolygonsVertexAttr
   }
   async function setMeshPolygonsVertexAttributeStoredConfig(
     meshId: MeshId,
-    name: string | undefined,
+    name: AttributeName | undefined,
     item: number | undefined,
     config: Partial<AttributeStoredConfig>,
   ): Promise<string> {

@@ -7,6 +7,7 @@ import type {
 } from "@ogw_internal/stores/data_style/attribute_types";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { ModelId, SurfaceId } from "@ogw_front/types/identifiers";
+import type { AttributeName } from "@ogw_front/types/attribute";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
@@ -27,7 +28,10 @@ const attributeSchema =
   viewer_schemas.opengeodeweb_viewer.model.surfaces.attribute.vertex.attribute;
 
 interface UseModelSurfacesVertexAttributeReturn {
-  modelSurfacesVertexAttributeName: (modelId: ModelId, surfaceId?: SurfaceId) => string | undefined;
+  modelSurfacesVertexAttributeName: (
+    modelId: ModelId,
+    surfaceId?: SurfaceId,
+  ) => AttributeName | undefined;
   modelSurfacesVertexAttributeItem: (modelId: ModelId, surfaceId?: SurfaceId) => number;
   modelSurfacesVertexAttributeRange: (
     modelId: ModelId,
@@ -49,7 +53,7 @@ interface UseModelSurfacesVertexAttributeReturn {
   modelSurfacesVertexAttributeStoredConfig: (
     modelId: ModelId,
     surfaceId: SurfaceId | undefined,
-    name: string | undefined,
+    name: AttributeName | undefined,
     item: number | undefined,
   ) => AttributeStoredConfig;
   setModelSurfacesVertexAttribute: (
@@ -60,7 +64,7 @@ interface UseModelSurfacesVertexAttributeReturn {
   setModelSurfacesVertexAttributeName: (
     modelId: ModelId,
     surfaceIds: SurfaceId[],
-    name: string,
+    name: AttributeName,
   ) => Promise<unknown>;
   setModelSurfacesVertexAttributeItem: (
     modelId: ModelId,
@@ -99,7 +103,7 @@ type ModelSurfacesVertexAttributeGetters = Pick<
   modelSurfacesVertexAttributeLastItem: (
     modelId: ModelId,
     componentId: string | undefined,
-    name: string | undefined,
+    name: AttributeName | undefined,
   ) => number;
 };
 
@@ -117,7 +121,7 @@ function useModelSurfacesVertexAttributeGetters(
   function modelSurfacesVertexAttributeStoredConfig(
     modelId: ModelId,
     surfaceId: SurfaceId | undefined,
-    name: string | undefined,
+    name: AttributeName | undefined,
     item: number | undefined,
   ): AttributeStoredConfig {
     const { storedConfigs } = modelSurfacesVertexAttribute(modelId, surfaceId);
@@ -131,13 +135,13 @@ function useModelSurfacesVertexAttributeGetters(
   function modelSurfacesVertexAttributeName(
     modelId: ModelId,
     surfaceId?: SurfaceId,
-  ): string | undefined {
+  ): AttributeName | undefined {
     return modelSurfacesVertexAttribute(modelId, surfaceId).name;
   }
   function modelSurfacesVertexAttributeLastItem(
     modelId: ModelId,
     surfaceId: SurfaceId | undefined,
-    name: string | undefined,
+    name: AttributeName | undefined,
   ): number {
     const { storedConfigs } = modelSurfacesVertexAttribute(modelId, surfaceId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
@@ -242,7 +246,7 @@ function useModelSurfacesVertexAttribute(): UseModelSurfacesVertexAttributeRetur
   async function setModelSurfacesVertexAttributeStoredConfig(
     modelId: ModelId,
     surfaceIds: SurfaceId[],
-    name: string | undefined,
+    name: AttributeName | undefined,
     item: number | undefined,
     config: Partial<AttributeStoredConfig>,
   ): Promise<void> {
@@ -313,7 +317,7 @@ function useModelSurfacesVertexAttribute(): UseModelSurfacesVertexAttributeRetur
   async function setModelSurfacesVertexAttributeName(
     modelId: ModelId,
     surfaceIds: SurfaceId[],
-    name: string,
+    name: AttributeName,
   ): Promise<unknown> {
     const item = modelSurfacesVertexAttributeLastItem(modelId, surfaceIds[0], name);
     await mutateModelSurfacesVertexStyle(modelId, surfaceIds, { name, item });

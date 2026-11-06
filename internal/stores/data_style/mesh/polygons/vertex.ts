@@ -1,4 +1,5 @@
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { AttributeName } from "@ogw_front/types/attribute";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { ValidAttributeInput } from "@ogw_internal/stores/data_style/attribute_types";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
@@ -104,7 +105,7 @@ function useMeshPolygonsVertexAttributeStyle(): UseMeshPolygonsVertexAttributeSt
   }
   async function setMeshPolygonsVertexAttributeName(
     meshId: MeshId,
-    name: string,
+    name: AttributeName,
   ): Promise<unknown> {
     const item = meshPolygonsVertexAttributeLastItem(meshId, name);
     await mutateMeshPolygonsVertexStyle(meshId, {

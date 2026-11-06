@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AttributeName } from "@ogw_front/types/attribute";
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import { MODEL_VERTEX_COLORING } from "@ogw_front/utils/model_component_coloring";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
@@ -81,7 +82,7 @@ const cornersActiveColoring = computed<string | undefined>({
 });
 
 // Group Attributes
-const cornersVertexAttributeName = computed<string | undefined>({
+const cornersVertexAttributeName = computed<AttributeName | undefined>({
   get: () => dataStyleStore.modelCornersVertexAttributeName(modelId, referenceCornerId.value),
   set: async (newValue) => {
     if (newValue === undefined) {

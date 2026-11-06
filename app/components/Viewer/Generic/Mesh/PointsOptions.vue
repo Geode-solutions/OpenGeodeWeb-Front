@@ -8,6 +8,7 @@ import {
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import type { AttributeName } from "@ogw_front/types/attribute";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
@@ -81,7 +82,7 @@ const opacity = computed<Opacity | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_name = computed<string | undefined>({
+const vertex_attribute_name = computed<AttributeName | undefined>({
   get: () => dataStyleStore.meshPointsVertexAttributeName(dataId.value),
   set: async (newValue) => {
     if (newValue === undefined) {

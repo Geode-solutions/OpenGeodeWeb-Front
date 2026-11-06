@@ -5,6 +5,7 @@ import {
   applyRangesPerData,
   useBatchStyle,
 } from "@ogw_front/composables/batch_style";
+import type { AttributeName } from "@ogw_front/types/attribute";
 import type { Opacity } from "@ogw_front/types/style";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { Texture } from "@ogw_front/types/texture";
@@ -48,7 +49,7 @@ const textures = useBatchStyleModel<Texture[]>(
   (meshId, value) => dataStyleStore.setMeshCellsTextures(meshId, value),
 );
 
-const vertex_attribute_name = computed<string | undefined>({
+const vertex_attribute_name = computed<AttributeName | undefined>({
   get: () => dataStyleStore.meshCellsVertexAttributeName(dataId),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -113,7 +114,7 @@ const vertex_attribute_no_data_color = computed<RGBAColor>({
     hybridViewerStore.remoteRender();
   },
 });
-const cell_attribute_name = computed<string | undefined>({
+const cell_attribute_name = computed<AttributeName | undefined>({
   get: () => dataStyleStore.meshCellsCellAttributeName(dataId),
   set: async (newValue) => {
     if (newValue === undefined) {

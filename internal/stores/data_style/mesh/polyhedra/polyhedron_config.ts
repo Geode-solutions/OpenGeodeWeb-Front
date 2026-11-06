@@ -2,6 +2,7 @@ import type {
   AttributeState,
   AttributeStoredConfig,
 } from "@ogw_internal/stores/data_style/attribute_types";
+import type { AttributeName } from "@ogw_front/types/attribute";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
@@ -11,12 +12,15 @@ import { useMeshPolyhedraCommonStyle } from "./common";
 
 interface UseMeshPolyhedraPolyhedronAttributeConfigReturn {
   meshPolyhedraPolyhedronAttribute: (meshId: MeshId) => AttributeState;
-  meshPolyhedraPolyhedronAttributeName: (meshId: MeshId) => string | undefined;
-  meshPolyhedraPolyhedronAttributeLastItem: (meshId: MeshId, name: string | undefined) => number;
+  meshPolyhedraPolyhedronAttributeName: (meshId: MeshId) => AttributeName | undefined;
+  meshPolyhedraPolyhedronAttributeLastItem: (
+    meshId: MeshId,
+    name: AttributeName | undefined,
+  ) => number;
   meshPolyhedraPolyhedronAttributeItem: (meshId: MeshId) => number;
   meshPolyhedraPolyhedronAttributeStoredConfig: (
     meshId: MeshId,
-    name: string | undefined,
+    name: AttributeName | undefined,
     item: number | undefined,
   ) => AttributeStoredConfig;
 }
@@ -28,7 +32,7 @@ interface UseMeshPolyhedraPolyhedronAttributeConfigWriterReturn {
   ) => Promise<string>;
   setMeshPolyhedraPolyhedronAttributeStoredConfig: (
     meshId: MeshId,
-    name: string | undefined,
+    name: AttributeName | undefined,
     item: number | undefined,
     config: Partial<AttributeStoredConfig>,
   ) => Promise<string>;
@@ -42,7 +46,7 @@ function useMeshPolyhedraPolyhedronAttributeConfig(): UseMeshPolyhedraPolyhedron
   }
   function meshPolyhedraPolyhedronAttributeStoredConfig(
     meshId: MeshId,
-    name: string | undefined,
+    name: AttributeName | undefined,
     item: number | undefined,
   ): AttributeStoredConfig {
     const { storedConfigs } = meshPolyhedraPolyhedronAttribute(meshId);
@@ -53,12 +57,12 @@ function useMeshPolyhedraPolyhedronAttributeConfig(): UseMeshPolyhedraPolyhedron
     }
     return defaultAttributeStoredConfig();
   }
-  function meshPolyhedraPolyhedronAttributeName(meshId: MeshId): string | undefined {
+  function meshPolyhedraPolyhedronAttributeName(meshId: MeshId): AttributeName | undefined {
     return meshPolyhedraPolyhedronAttribute(meshId).name;
   }
   function meshPolyhedraPolyhedronAttributeLastItem(
     meshId: MeshId,
-    name: string | undefined,
+    name: AttributeName | undefined,
   ): number {
     const { storedConfigs } = meshPolyhedraPolyhedronAttribute(meshId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
@@ -136,7 +140,7 @@ function useMeshPolyhedraPolyhedronAttributeConfigWriter(): UseMeshPolyhedraPoly
   }
   async function setMeshPolyhedraPolyhedronAttributeStoredConfig(
     meshId: MeshId,
-    name: string | undefined,
+    name: AttributeName | undefined,
     item: number | undefined,
     config: Partial<AttributeStoredConfig>,
   ): Promise<string> {

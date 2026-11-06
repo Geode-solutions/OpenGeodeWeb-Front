@@ -2,11 +2,12 @@ import type {
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
+import type { AttributeName } from "@ogw_front/types/attribute";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 interface UseMeshPolyhedraVertexAttributeStyleReturn {
-  meshPolyhedraVertexAttributeName: (meshId: MeshId) => string | undefined;
+  meshPolyhedraVertexAttributeName: (meshId: MeshId) => AttributeName | undefined;
   meshPolyhedraVertexAttributeItem: (meshId: MeshId) => number;
   meshPolyhedraVertexAttributeRange: (meshId: MeshId) => [number | undefined, number | undefined];
   meshPolyhedraVertexAttributeTimeStep: (meshId: MeshId) => number | undefined;
@@ -14,11 +15,11 @@ interface UseMeshPolyhedraVertexAttributeStyleReturn {
   meshPolyhedraVertexAttributeColorMap: (meshId: MeshId) => string | undefined;
   meshPolyhedraVertexAttributeStoredConfig: (
     meshId: MeshId,
-    name: string | undefined,
+    name: AttributeName | undefined,
     item: number | undefined,
   ) => AttributeStoredConfig;
   setMeshPolyhedraVertexAttribute: (meshId: MeshId, input: ValidAttributeInput) => Promise<unknown>;
-  setMeshPolyhedraVertexAttributeName: (meshId: MeshId, name: string) => Promise<unknown>;
+  setMeshPolyhedraVertexAttributeName: (meshId: MeshId, name: AttributeName) => Promise<unknown>;
   setMeshPolyhedraVertexAttributeItem: (meshId: MeshId, item: number) => Promise<unknown>;
   setMeshPolyhedraVertexAttributeRange: (
     meshId: MeshId,

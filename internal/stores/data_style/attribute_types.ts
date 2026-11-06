@@ -1,3 +1,4 @@
+import type { AttributeName } from "@ogw_front/types/attribute";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 // The same fields while the user has not chosen them yet
@@ -5,7 +6,7 @@ type Undefinable<Fields> = { [Field in keyof Fields]: Fields[Field] | undefined 
 
 // The attribute of a data, and the item of it, that colors the data
 interface AttributeSelection {
-  name: string;
+  name: AttributeName;
   item: number;
 }
 

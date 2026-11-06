@@ -10,6 +10,7 @@ import {
   type RGBAColor,
 } from "@ogw_front/utils/default_styles/constants";
 import type { Size, Visibility } from "@ogw_front/types/style";
+import type { AttributeName } from "@ogw_front/types/attribute";
 import type { ModelId } from "@ogw_front/types/identifiers";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
@@ -107,11 +108,15 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
     return pointsStyle(modelId, componentId).coloring?.active ?? "constant";
   }
 
-  function vertexAttributeName(modelId: ModelId, componentId?: string): string | undefined {
+  function vertexAttributeName(modelId: ModelId, componentId?: string): AttributeName | undefined {
     return vertexAttribute(modelId, componentId).name;
   }
 
-  function lastItem(modelId: ModelId, componentId: string | undefined, name?: string): number {
+  function lastItem(
+    modelId: ModelId,
+    componentId: string | undefined,
+    name?: AttributeName,
+  ): number {
     const { storedConfigs } = vertexAttribute(modelId, componentId);
     return name === undefined ? 0 : (storedConfigs?.[name]?.lastItem ?? 0);
   }
@@ -285,7 +290,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
   async function setVertexAttributeName(
     modelId: ModelId,
     componentIds: string[],
-    name: string,
+    name: AttributeName,
   ): Promise<unknown> {
     const item = lastItem(modelId, componentIds[0], name);
     await mutateVertexAttribute(modelId, componentIds, { name, item });

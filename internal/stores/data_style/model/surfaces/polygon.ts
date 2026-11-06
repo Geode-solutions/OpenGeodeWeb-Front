@@ -7,6 +7,7 @@ import type {
 } from "@ogw_internal/stores/data_style/attribute_types";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { ModelId, SurfaceId } from "@ogw_front/types/identifiers";
+import type { AttributeName } from "@ogw_front/types/attribute";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
@@ -30,7 +31,7 @@ interface UseModelSurfacesPolygonAttributeReturn {
   modelSurfacesPolygonAttributeName: (
     modelId: ModelId,
     surfaceId?: SurfaceId,
-  ) => string | undefined;
+  ) => AttributeName | undefined;
   modelSurfacesPolygonAttributeItem: (modelId: ModelId, surfaceId?: SurfaceId) => number;
   modelSurfacesPolygonAttributeRange: (
     modelId: ModelId,
@@ -52,7 +53,7 @@ interface UseModelSurfacesPolygonAttributeReturn {
   modelSurfacesPolygonAttributeStoredConfig: (
     modelId: ModelId,
     surfaceId: SurfaceId | undefined,
-    name: string | undefined,
+    name: AttributeName | undefined,
     item: number | undefined,
   ) => AttributeStoredConfig;
   setModelSurfacesPolygonAttribute: (
@@ -63,7 +64,7 @@ interface UseModelSurfacesPolygonAttributeReturn {
   setModelSurfacesPolygonAttributeName: (
     modelId: ModelId,
     surfaceIds: SurfaceId[],
-    name: string,
+    name: AttributeName,
   ) => Promise<void>;
   setModelSurfacesPolygonAttributeItem: (
     modelId: ModelId,
@@ -102,7 +103,7 @@ type ModelSurfacesPolygonAttributeGetters = Pick<
   modelSurfacesPolygonAttributeLastItem: (
     modelId: ModelId,
     componentId: string | undefined,
-    name: string | undefined,
+    name: AttributeName | undefined,
   ) => number;
 };
 
@@ -120,7 +121,7 @@ function useModelSurfacesPolygonAttributeGetters(
   function modelSurfacesPolygonAttributeStoredConfig(
     modelId: ModelId,
     surfaceId: SurfaceId | undefined,
-    name: string | undefined,
+    name: AttributeName | undefined,
     item: number | undefined,
   ): AttributeStoredConfig {
     const { storedConfigs } = modelSurfacesPolygonAttribute(modelId, surfaceId);
@@ -134,13 +135,13 @@ function useModelSurfacesPolygonAttributeGetters(
   function modelSurfacesPolygonAttributeName(
     modelId: ModelId,
     surfaceId?: SurfaceId,
-  ): string | undefined {
+  ): AttributeName | undefined {
     return modelSurfacesPolygonAttribute(modelId, surfaceId).name;
   }
   function modelSurfacesPolygonAttributeLastItem(
     modelId: ModelId,
     surfaceId: SurfaceId | undefined,
-    name: string | undefined,
+    name: AttributeName | undefined,
   ): number {
     const { storedConfigs } = modelSurfacesPolygonAttribute(modelId, surfaceId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
@@ -245,7 +246,7 @@ function useModelSurfacesPolygonAttribute(): UseModelSurfacesPolygonAttributeRet
   async function setModelSurfacesPolygonAttributeStoredConfig(
     modelId: ModelId,
     surfaceIds: SurfaceId[],
-    name: string | undefined,
+    name: AttributeName | undefined,
     item: number | undefined,
     config: Partial<AttributeStoredConfig>,
   ): Promise<void> {
@@ -314,7 +315,7 @@ function useModelSurfacesPolygonAttribute(): UseModelSurfacesPolygonAttributeRet
   async function setModelSurfacesPolygonAttributeName(
     modelId: ModelId,
     surfaceIds: SurfaceId[],
-    name: string,
+    name: AttributeName,
   ): Promise<void> {
     const item = modelSurfacesPolygonAttributeLastItem(modelId, surfaceIds[0], name);
     await mutateModelSurfacesPolygonStyle(modelId, surfaceIds, { name, item });

@@ -1,3 +1,4 @@
+import type { AttributeName } from "@ogw_front/types/attribute";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 interface AttributeRangeSource {
@@ -92,7 +93,7 @@ function intersectBy<TItem>(
 
 // An attribute of a data: its name, its number of items and the time steps it is defined at
 interface NamedAttribute {
-  attribute_name: string;
+  attribute_name: AttributeName;
   nb_items: number;
   time_steps?: readonly number[];
 }
