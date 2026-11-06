@@ -1,4 +1,4 @@
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { ModelIdentified } from "@ogw_front/types/identifiers";
 import type { Vector3 } from "@kitware/vtk.js/types";
 import type vtkActor from "@kitware/vtk.js/Rendering/Core/Actor";
 import type vtkPolyData from "@kitware/vtk.js/Common/DataModel/PolyData";
@@ -27,8 +27,7 @@ interface HoverComponentInfo {
   type: string;
 }
 
-interface HoverData {
-  modelId: DataId;
+interface HoverData extends ModelIdentified {
   modelName: string | undefined;
   blockName: string | undefined;
   pickedId: unknown;
