@@ -1,4 +1,4 @@
-import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
+import type { CornerId, ModelId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { ValidAttributeInput } from "@ogw_internal/stores/data_style/attribute_types";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
@@ -10,11 +10,11 @@ import { useModelCornersVisibility } from "./visibility";
 
 interface ColorGroup {
   color: RGBAColor | undefined;
-  corners_ids: ModelComponentId[];
+  corners_ids: CornerId[];
 }
 
 interface AttributeGroup extends ValidAttributeInput {
-  corners_ids: ModelComponentId[];
+  corners_ids: CornerId[];
 }
 
 async function setModelCornersDefaultStyle(_id: string): Promise<void> {
@@ -38,7 +38,7 @@ export function useModelCornersStyle(): ModelCornersStyleApi {
 
   async function applyModelCornersVisibilityStyle(
     modelId: ModelId,
-    corners_ids: ModelComponentId[],
+    corners_ids: CornerId[],
   ): Promise<unknown[]> {
     const visibilityGroups: Record<string, string[]> = {};
     for (const corner_id of corners_ids) {
@@ -62,7 +62,7 @@ export function useModelCornersStyle(): ModelCornersStyleApi {
 
   function groupCornersByActiveColoring(
     modelId: ModelId,
-    corners_ids: ModelComponentId[],
+    corners_ids: CornerId[],
   ): Record<string, string[]> {
     const activeColoringGroups: Record<string, string[]> = {};
     for (const corner_id of corners_ids) {
@@ -73,10 +73,7 @@ export function useModelCornersStyle(): ModelCornersStyleApi {
     return activeColoringGroups;
   }
 
-  function applyConstantColoring(
-    modelId: ModelId,
-    corners_ids: ModelComponentId[],
-  ): Promise<unknown>[] {
+  function applyConstantColoring(modelId: ModelId, corners_ids: CornerId[]): Promise<unknown>[] {
     const colorGroups: Record<string, ColorGroup> = {};
     for (const corner_id of corners_ids) {
       const color = modelColorStyle.modelCornerColor(modelId, corner_id);
@@ -92,7 +89,7 @@ export function useModelCornersStyle(): ModelCornersStyleApi {
 
   function groupCornersByVertexAttribute(
     modelId: ModelId,
-    corners_ids: ModelComponentId[],
+    corners_ids: CornerId[],
   ): Record<string, AttributeGroup> {
     const vertexGroups: Record<string, AttributeGroup> = {};
     for (const corner_id of corners_ids) {
@@ -128,10 +125,7 @@ export function useModelCornersStyle(): ModelCornersStyleApi {
     return vertexGroups;
   }
 
-  function applyVertexColoring(
-    modelId: ModelId,
-    corners_ids: ModelComponentId[],
-  ): Promise<unknown>[] {
+  function applyVertexColoring(modelId: ModelId, corners_ids: CornerId[]): Promise<unknown>[] {
     const vertexGroups = groupCornersByVertexAttribute(modelId, corners_ids);
     return Object.values(vertexGroups).map(
       async ({ name, item, minimum, maximum, colorMap, no_data_color, corners_ids: ids }) => {
@@ -154,7 +148,7 @@ export function useModelCornersStyle(): ModelCornersStyleApi {
 
   async function applyModelCornersColoringStyle(
     modelId: ModelId,
-    corners_ids: ModelComponentId[],
+    corners_ids: CornerId[],
   ): Promise<unknown[]> {
     const activeColoringGroups = groupCornersByActiveColoring(modelId, corners_ids);
 

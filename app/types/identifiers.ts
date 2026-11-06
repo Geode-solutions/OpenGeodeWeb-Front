@@ -13,6 +13,9 @@ type MeshId = DataId;
 // The data of a model, the data a model style or a model component applies to
 type ModelId = DataId;
 
+// A corner of a model, by its id in the model
+type CornerId = ModelComponentId;
+
 // Type of an OpenGeode object, as named by OpenGeode (BRep, TriangulatedSurface3D, ...)
 type GeodeObjectType = string;
 
@@ -41,6 +44,7 @@ interface ModelIdentified {
 }
 
 export type {
+  CornerId,
   DataId,
   DataIdentified,
   GeodeId,
