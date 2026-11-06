@@ -5,8 +5,8 @@ import type {
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
+import type { CornerId, ModelId } from "@ogw_front/types/identifiers";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
-import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
@@ -25,59 +25,49 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 // Local constants
 const attributeSchema = viewer_schemas.opengeodeweb_viewer.model.corners.attribute.vertex.attribute;
 
-type IdsFn<Value> = (
-  modelId: ModelId,
-  cornerIds: ModelComponentId[],
-  value: Value,
-) => Promise<void>;
+type IdsFn<Value> = (modelId: ModelId, cornerIds: CornerId[], value: Value) => Promise<void>;
 
 interface ModelCornersVertexAttributeApi {
-  modelCornersVertexAttributeName: (
-    modelId: ModelId,
-    cornerId?: ModelComponentId,
-  ) => string | undefined;
-  modelCornersVertexAttributeItem: (modelId: ModelId, cornerId?: ModelComponentId) => number;
+  modelCornersVertexAttributeName: (modelId: ModelId, cornerId?: CornerId) => string | undefined;
+  modelCornersVertexAttributeItem: (modelId: ModelId, cornerId?: CornerId) => number;
   modelCornersVertexAttributeRange: (
     modelId: ModelId,
-    cornerId?: ModelComponentId,
+    cornerId?: CornerId,
   ) => [number | undefined, number | undefined];
   modelCornersVertexAttributeTimeStep: (
     modelId: ModelId,
-    cornerId?: ModelComponentId,
+    cornerId?: CornerId,
   ) => number | undefined;
   setModelCornersVertexAttributeTimeStep: (
     modelId: ModelId,
-    cornerIds: ModelComponentId[],
+    cornerIds: CornerId[],
     timeStep: number,
   ) => Promise<void>;
   modelCornersVertexAttributeColorMap: (
     modelId: ModelId,
-    cornerId?: ModelComponentId,
+    cornerId?: CornerId,
   ) => string | undefined;
   modelCornersVertexAttributeStoredConfig: (
     modelId: ModelId,
-    cornerId: ModelComponentId | undefined,
+    cornerId: CornerId | undefined,
     name: string | undefined,
     item: number | undefined,
   ) => AttributeStoredConfig;
   setModelCornersVertexAttribute: (
     modelId: ModelId,
-    cornerIds: ModelComponentId[],
+    cornerIds: CornerId[],
     attribute: ValidAttributeInput,
   ) => Promise<unknown>;
   setModelCornersVertexAttributeName: IdsFn<string>;
   setModelCornersVertexAttributeItem: IdsFn<number>;
   setModelCornersVertexAttributeRange: (
     modelId: ModelId,
-    cornerIds: ModelComponentId[],
+    cornerIds: CornerId[],
     minimum: number,
     maximum: number,
   ) => Promise<void>;
   setModelCornersVertexAttributeColorMap: IdsFn<string | undefined>;
-  modelCornersVertexAttributeNoDataColor: (
-    modelId: ModelId,
-    cornerId?: ModelComponentId,
-  ) => RGBAColor;
+  modelCornersVertexAttributeNoDataColor: (modelId: ModelId, cornerId?: CornerId) => RGBAColor;
   setModelCornersVertexAttributeNoDataColor: IdsFn<RGBAColor>;
 }
 
@@ -103,16 +93,13 @@ function useModelCornersVertexAttributeGetters(
   modelCornersCommonStyle: ReturnType<typeof useModelCornersCommonStyle>,
 ): ModelCornersVertexAttributeGetters {
   const { attributeTimeStep } = useAttributeTimeStepStyle();
-  function modelCornersVertexAttribute(
-    modelId: ModelId,
-    cornerId?: ModelComponentId,
-  ): AttributeState {
+  function modelCornersVertexAttribute(modelId: ModelId, cornerId?: CornerId): AttributeState {
     // oxlint-disable-next-line no-unsafe-type-assertion -- vertex is a StyleValues sub-object stored under a StyleValues index signature.
     return modelCornersCommonStyle.modelCornerColoring(modelId, cornerId).vertex as AttributeState;
   }
   function modelCornersVertexAttributeStoredConfig(
     modelId: ModelId,
-    cornerId: ModelComponentId | undefined,
+    cornerId: CornerId | undefined,
     name: string | undefined,
     item: number | undefined,
   ): AttributeStoredConfig {
@@ -127,13 +114,13 @@ function useModelCornersVertexAttributeGetters(
   }
   function modelCornersVertexAttributeName(
     modelId: ModelId,
-    cornerId?: ModelComponentId,
+    cornerId?: CornerId,
   ): string | undefined {
     return modelCornersVertexAttribute(modelId, cornerId).name;
   }
   function modelCornersVertexAttributeLastItem(
     modelId: ModelId,
-    cornerId: ModelComponentId | undefined,
+    cornerId: CornerId | undefined,
     name: string | undefined,
   ): number {
     if (name === undefined) {
@@ -142,7 +129,7 @@ function useModelCornersVertexAttributeGetters(
     const { storedConfigs } = modelCornersVertexAttribute(modelId, cornerId);
     return storedConfigs?.[name]?.lastItem ?? 0;
   }
-  function modelCornersVertexAttributeItem(modelId: ModelId, cornerId?: ModelComponentId): number {
+  function modelCornersVertexAttributeItem(modelId: ModelId, cornerId?: CornerId): number {
     const vertexAttribute = modelCornersVertexAttribute(modelId, cornerId);
     return (
       vertexAttribute.item ??
@@ -151,7 +138,7 @@ function useModelCornersVertexAttributeGetters(
   }
   function modelCornersVertexAttributeRange(
     modelId: ModelId,
-    cornerId?: ModelComponentId,
+    cornerId?: CornerId,
   ): [number | undefined, number | undefined] {
     const name = modelCornersVertexAttributeName(modelId, cornerId);
     const item = modelCornersVertexAttributeItem(modelId, cornerId);
@@ -165,7 +152,7 @@ function useModelCornersVertexAttributeGetters(
   }
   function modelCornersVertexAttributeColorMap(
     modelId: ModelId,
-    cornerId?: ModelComponentId,
+    cornerId?: CornerId,
   ): string | undefined {
     const name = modelCornersVertexAttributeName(modelId, cornerId);
     const item = modelCornersVertexAttributeItem(modelId, cornerId);
@@ -173,7 +160,7 @@ function useModelCornersVertexAttributeGetters(
   }
   function modelCornersVertexAttributeNoDataColor(
     modelId: ModelId,
-    cornerId?: ModelComponentId,
+    cornerId?: CornerId,
   ): RGBAColor {
     const name = modelCornersVertexAttributeName(modelId, cornerId);
     const item = modelCornersVertexAttributeItem(modelId, cornerId);
@@ -181,7 +168,7 @@ function useModelCornersVertexAttributeGetters(
   }
   function modelCornersVertexAttributeTimeStep(
     modelId: ModelId,
-    cornerId?: ModelComponentId,
+    cornerId?: CornerId,
   ): number | undefined {
     return attributeTimeStep(
       modelId,
@@ -219,7 +206,7 @@ function useModelCornersVertexAttribute(): ModelCornersVertexAttributeApi {
   const viewerStore = useViewerStore();
   async function mutateModelCornersVertexStyle(
     modelId: ModelId,
-    cornerIds: ModelComponentId[],
+    cornerIds: CornerId[],
     values: Record<string, unknown>,
   ): Promise<void> {
     const tasks: Promise<void>[] = [
@@ -239,7 +226,7 @@ function useModelCornersVertexAttribute(): ModelCornersVertexAttributeApi {
   }
   async function setModelCornersVertexAttributeStoredConfig(
     modelId: ModelId,
-    cornerIds: ModelComponentId[],
+    cornerIds: CornerId[],
     name: string | undefined,
     item: number | undefined,
     config: Partial<AttributeStoredConfig>,
@@ -253,7 +240,7 @@ function useModelCornersVertexAttribute(): ModelCornersVertexAttributeApi {
   }
   async function setModelCornersVertexAttribute(
     modelId: ModelId,
-    cornerIds: ModelComponentId[],
+    cornerIds: CornerId[],
     {
       name,
       item,
@@ -288,10 +275,7 @@ function useModelCornersVertexAttribute(): ModelCornersVertexAttributeApi {
     });
     return result;
   }
-  async function applyVertexAttribute(
-    modelId: ModelId,
-    cornerIds: ModelComponentId[],
-  ): Promise<void> {
+  async function applyVertexAttribute(modelId: ModelId, cornerIds: CornerId[]): Promise<void> {
     const name = modelCornersVertexAttributeName(modelId, cornerIds[0]);
     const item = modelCornersVertexAttributeItem(modelId, cornerIds[0]);
     const storedConfig = modelCornersVertexAttributeStoredConfig(modelId, cornerIds[0], name, item);
@@ -309,7 +293,7 @@ function useModelCornersVertexAttribute(): ModelCornersVertexAttributeApi {
   }
   async function setModelCornersVertexAttributeName(
     modelId: ModelId,
-    cornerIds: ModelComponentId[],
+    cornerIds: CornerId[],
     name: string,
   ): Promise<void> {
     const item = modelCornersVertexAttributeLastItem(modelId, cornerIds[0], name);
@@ -318,7 +302,7 @@ function useModelCornersVertexAttribute(): ModelCornersVertexAttributeApi {
   }
   async function setModelCornersVertexAttributeItem(
     modelId: ModelId,
-    cornerIds: ModelComponentId[],
+    cornerIds: CornerId[],
     item: number,
   ): Promise<void> {
     await mutateModelCornersVertexStyle(modelId, cornerIds, { item });
@@ -326,7 +310,7 @@ function useModelCornersVertexAttribute(): ModelCornersVertexAttributeApi {
   }
   async function setModelCornersVertexAttributeTimeStep(
     modelId: ModelId,
-    cornerIds: ModelComponentId[],
+    cornerIds: CornerId[],
     timeStep: number,
   ): Promise<void> {
     const name = modelCornersVertexAttributeName(modelId, cornerIds[0]);
@@ -361,7 +345,7 @@ function useModelCornersVertexAttribute(): ModelCornersVertexAttributeApi {
   }
   async function setModelCornersVertexAttributeRange(
     modelId: ModelId,
-    cornerIds: ModelComponentId[],
+    cornerIds: CornerId[],
     minimum: number,
     maximum: number,
   ): Promise<void> {
@@ -375,7 +359,7 @@ function useModelCornersVertexAttribute(): ModelCornersVertexAttributeApi {
   }
   async function setModelCornersVertexAttributeColorMap(
     modelId: ModelId,
-    cornerIds: ModelComponentId[],
+    cornerIds: CornerId[],
     colorMap: string | undefined,
   ): Promise<void> {
     const name = modelCornersVertexAttributeName(modelId, cornerIds[0]);
@@ -385,7 +369,7 @@ function useModelCornersVertexAttribute(): ModelCornersVertexAttributeApi {
   }
   async function setModelCornersVertexAttributeNoDataColor(
     modelId: ModelId,
-    cornerIds: ModelComponentId[],
+    cornerIds: CornerId[],
     no_data_color: RGBAColor,
   ): Promise<void> {
     const name = modelCornersVertexAttributeName(modelId, cornerIds[0]);
