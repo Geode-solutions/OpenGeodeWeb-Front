@@ -72,21 +72,21 @@ export function useMeshStyle(): {
   function sharedVertexTimeStep(
     card: (typeof vertexCards)[number],
   ): (meshId: DataId, timeStep: number) => Promise<unknown> {
-    return async (id, timeStep) => {
-      const result = await card.setTimeStep(id, timeStep);
-      const name = card.name(id);
-      const style = dataStyleState.getStyle(id);
+    return async (meshId, timeStep) => {
+      const result = await card.setTimeStep(meshId, timeStep);
+      const name = card.name(meshId);
+      const style = dataStyleState.getStyle(meshId);
       const others = vertexCards.filter(
         (other) =>
           other !== card &&
           style[other.key] !== undefined &&
-          other.active(id) === "vertex" &&
-          other.name(id) === name,
+          other.active(meshId) === "vertex" &&
+          other.name(meshId) === name,
       );
       if (name !== undefined) {
         await Promise.all(
           others.map(async (other) => {
-            await other.setActive(id, "vertex");
+            await other.setActive(meshId, "vertex");
           }),
         );
       }
