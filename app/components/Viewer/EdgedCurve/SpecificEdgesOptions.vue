@@ -20,21 +20,21 @@ interface Props {
 
 const { itemProps } = defineProps<Props>();
 
-const id = toRef(() => itemProps.id);
+const dataId = toRef(() => itemProps.id);
 
 const visibility = computed<boolean>({
-  get: () => dataStyleStore.meshEdgesVisibility(id.value),
+  get: () => dataStyleStore.meshEdgesVisibility(dataId.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId: string) =>
+    await applyBatchStyle(dataId.value, (targetId: string) =>
       dataStyleStore.setMeshEdgesVisibility(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const width = computed<number>({
-  get: () => dataStyleStore.meshEdgesWidth(id.value),
+  get: () => dataStyleStore.meshEdgesWidth(dataId.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId: string) =>
+    await applyBatchStyle(dataId.value, (targetId: string) =>
       dataStyleStore.setMeshEdgesWidth(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -55,7 +55,7 @@ const width = computed<number>({
       <template v-if="visibility">
         <v-divider class="my-2" />
         <ViewerOptionsWidthSlider data-testid="meshEdgesWidthSlider" v-model="width" />
-        <ViewerEdgedCurveSpecificEdgesColoring :data-id="id" />
+        <ViewerEdgedCurveSpecificEdgesColoring :data-id="dataId" />
       </template>
     </template>
   </ViewerContextMenuItem>

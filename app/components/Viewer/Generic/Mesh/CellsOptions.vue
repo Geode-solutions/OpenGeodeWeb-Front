@@ -20,12 +20,12 @@ interface Props {
 
 const { itemProps, btnImage, tooltip = "Cells options" } = defineProps<Props>();
 
-const id = toRef(() => itemProps.id);
+const dataId = toRef(() => itemProps.id);
 
 const visibility = computed<boolean>({
-  get: () => dataStyleStore.meshCellsVisibility(id.value),
+  get: () => dataStyleStore.meshCellsVisibility(dataId.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId: string) =>
+    await applyBatchStyle(dataId.value, (targetId: string) =>
       dataStyleStore.setMeshCellsVisibility(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -45,7 +45,7 @@ const visibility = computed<boolean>({
       <ViewerOptionsVisibilitySwitch data-testid="meshCellsVisibilitySwitch" v-model="visibility" />
       <template v-if="visibility">
         <v-divider />
-        <ViewerGenericMeshCellsColoring :data-id="id" />
+        <ViewerGenericMeshCellsColoring :data-id="dataId" />
       </template>
     </template>
   </ViewerContextMenuItem>

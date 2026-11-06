@@ -20,12 +20,12 @@ interface Props {
 
 const { itemProps, tooltip = "Polygons options" } = defineProps<Props>();
 
-const id = toRef(() => itemProps.id);
+const dataId = toRef(() => itemProps.id);
 
 const visibility = computed<boolean>({
-  get: () => dataStyleStore.meshPolygonsVisibility(id.value),
+  get: () => dataStyleStore.meshPolygonsVisibility(dataId.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId: string) =>
+    await applyBatchStyle(dataId.value, (targetId: string) =>
       dataStyleStore.setMeshPolygonsVisibility(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -47,7 +47,7 @@ const visibility = computed<boolean>({
         v-model="visibility"
       />
       <template v-if="visibility">
-        <ViewerSurfacePolygonsColoring :data-id="id" />
+        <ViewerSurfacePolygonsColoring :data-id="dataId" />
       </template>
     </template>
   </ViewerContextMenuItem>

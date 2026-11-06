@@ -20,12 +20,12 @@ interface Props {
 
 const { itemProps, btnImage, tooltip = "Polyhedra options" } = defineProps<Props>();
 
-const id = toRef(() => itemProps.id);
+const dataId = toRef(() => itemProps.id);
 
 const visibility = computed<boolean>({
-  get: () => dataStyleStore.meshPolyhedraVisibility(id.value),
+  get: () => dataStyleStore.meshPolyhedraVisibility(dataId.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId: string) =>
+    await applyBatchStyle(dataId.value, (targetId: string) =>
       dataStyleStore.setMeshPolyhedraVisibility(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -48,7 +48,7 @@ const visibility = computed<boolean>({
       />
       <template v-if="visibility">
         <v-divider />
-        <ViewerGenericMeshPolyhedraColoring :data-id="id" />
+        <ViewerGenericMeshPolyhedraColoring :data-id="dataId" />
       </template>
     </template>
   </ViewerContextMenuItem>
