@@ -14,17 +14,6 @@ import {
   modelSurfacesDefaultStyle,
 } from "./model_components";
 
-interface ModelWithBlocksStyle {
-  visibility: boolean;
-  coloring: { active: string; constant: RGBAColor };
-  corners: ModelCornersStyle;
-  lines: ModelLinesStyle;
-  surfaces: ModelSurfacesStyle;
-  blocks: ModelBlocksStyle;
-  points: ModelPointsStyle;
-  edges: ModelEdgesStyle;
-}
-
 interface ModelWithoutBlocksStyle {
   visibility: boolean;
   coloring: { active: string; constant: RGBAColor };
@@ -33,6 +22,10 @@ interface ModelWithoutBlocksStyle {
   surfaces: ModelSurfacesStyle;
   points: ModelPointsStyle;
   edges: ModelEdgesStyle;
+}
+
+interface ModelWithBlocksStyle extends ModelWithoutBlocksStyle {
+  blocks: ModelBlocksStyle;
 }
 
 function brepDefaultStyle(): ModelWithBlocksStyle {
