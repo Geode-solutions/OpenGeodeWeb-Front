@@ -6,7 +6,7 @@ import type {
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { DataId, ModelComponentId } from "@ogw_front/types/identifiers";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
@@ -26,55 +26,61 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const attributeSchema = viewer_schemas.opengeodeweb_viewer.model.lines.attribute.edge.attribute;
 
 interface UseModelLinesEdgeAttributeReturn {
-  modelLinesEdgeAttributeName: (modelId: DataId, lineId?: string) => string | undefined;
-  modelLinesEdgeAttributeItem: (modelId: DataId, lineId?: string) => number;
+  modelLinesEdgeAttributeName: (modelId: DataId, lineId?: ModelComponentId) => string | undefined;
+  modelLinesEdgeAttributeItem: (modelId: DataId, lineId?: ModelComponentId) => number;
   modelLinesEdgeAttributeRange: (
     modelId: DataId,
-    lineId?: string,
+    lineId?: ModelComponentId,
   ) => [number | undefined, number | undefined];
-  modelLinesEdgeAttributeTimeStep: (modelId: DataId, lineId?: string) => number | undefined;
+  modelLinesEdgeAttributeTimeStep: (
+    modelId: DataId,
+    lineId?: ModelComponentId,
+  ) => number | undefined;
   setModelLinesEdgeAttributeTimeStep: (
     modelId: DataId,
-    lineIds: string[],
+    lineIds: ModelComponentId[],
     timeStep: number,
   ) => Promise<void>;
-  modelLinesEdgeAttributeColorMap: (modelId: DataId, lineId?: string) => string | undefined;
+  modelLinesEdgeAttributeColorMap: (
+    modelId: DataId,
+    lineId?: ModelComponentId,
+  ) => string | undefined;
   modelLinesEdgeAttributeStoredConfig: (
     modelId: DataId,
-    lineId: string | undefined,
+    lineId: ModelComponentId | undefined,
     name: string | undefined,
     item: number | undefined,
   ) => AttributeStoredConfig;
   setModelLinesEdgeAttribute: (
     modelId: DataId,
-    lineIds: string[],
+    lineIds: ModelComponentId[],
     input: ValidAttributeInput,
   ) => Promise<unknown>;
   setModelLinesEdgeAttributeName: (
     modelId: DataId,
-    lineIds: string[],
+    lineIds: ModelComponentId[],
     name: string,
   ) => Promise<unknown>;
   setModelLinesEdgeAttributeItem: (
     modelId: DataId,
-    lineIds: string[],
+    lineIds: ModelComponentId[],
     item: number,
   ) => Promise<unknown>;
   setModelLinesEdgeAttributeRange: (
     modelId: DataId,
-    lineIds: string[],
+    lineIds: ModelComponentId[],
     minimum: number,
     maximum: number,
   ) => Promise<unknown>;
   setModelLinesEdgeAttributeColorMap: (
     modelId: DataId,
-    lineIds: string[],
+    lineIds: ModelComponentId[],
     colorMap: string | undefined,
   ) => Promise<unknown>;
-  modelLinesEdgeAttributeNoDataColor: (modelId: DataId, lineId?: string) => RGBAColor;
+  modelLinesEdgeAttributeNoDataColor: (modelId: DataId, lineId?: ModelComponentId) => RGBAColor;
   setModelLinesEdgeAttributeNoDataColor: (
     modelId: DataId,
-    lineIds: string[],
+    lineIds: ModelComponentId[],
     no_data_color: RGBAColor,
   ) => Promise<unknown>;
 }
@@ -101,13 +107,13 @@ function useModelLinesEdgeAttributeGetters(
   modelLinesCommonStyle: ReturnType<typeof useModelLinesCommonStyle>,
 ): ModelLinesEdgeAttributeGetters {
   const { attributeTimeStep } = useAttributeTimeStepStyle();
-  function modelLinesEdgeAttribute(modelId: DataId, lineId?: string): AttributeState {
+  function modelLinesEdgeAttribute(modelId: DataId, lineId?: ModelComponentId): AttributeState {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.edge shape is defined by the data style schema.
     return modelLinesCommonStyle.modelLineColoring(modelId, lineId).edge as AttributeState;
   }
   function modelLinesEdgeAttributeStoredConfig(
     modelId: DataId,
-    lineId: string | undefined,
+    lineId: ModelComponentId | undefined,
     name: string | undefined,
     item: number | undefined,
   ): AttributeStoredConfig {
@@ -119,12 +125,15 @@ function useModelLinesEdgeAttributeGetters(
     }
     return defaultAttributeStoredConfig();
   }
-  function modelLinesEdgeAttributeName(modelId: DataId, lineId?: string): string | undefined {
+  function modelLinesEdgeAttributeName(
+    modelId: DataId,
+    lineId?: ModelComponentId,
+  ): string | undefined {
     return modelLinesEdgeAttribute(modelId, lineId).name;
   }
   function modelLinesEdgeAttributeLastItem(
     modelId: DataId,
-    lineId: string | undefined,
+    lineId: ModelComponentId | undefined,
     name: string | undefined,
   ): number {
     const { storedConfigs } = modelLinesEdgeAttribute(modelId, lineId);
@@ -134,7 +143,7 @@ function useModelLinesEdgeAttributeGetters(
     }
     return 0;
   }
-  function modelLinesEdgeAttributeItem(modelId: DataId, lineId?: string): number {
+  function modelLinesEdgeAttributeItem(modelId: DataId, lineId?: ModelComponentId): number {
     const edgeAttribute = modelLinesEdgeAttribute(modelId, lineId);
     return (
       edgeAttribute.item ?? modelLinesEdgeAttributeLastItem(modelId, lineId, edgeAttribute.name)
@@ -142,7 +151,7 @@ function useModelLinesEdgeAttributeGetters(
   }
   function modelLinesEdgeAttributeRange(
     modelId: DataId,
-    lineId?: string,
+    lineId?: ModelComponentId,
   ): [number | undefined, number | undefined] {
     const name = modelLinesEdgeAttributeName(modelId, lineId);
     const item = modelLinesEdgeAttributeItem(modelId, lineId);
@@ -150,19 +159,28 @@ function useModelLinesEdgeAttributeGetters(
     const { minimum, maximum } = storedConfig;
     return [minimum, maximum];
   }
-  function modelLinesEdgeAttributeColorMap(modelId: DataId, lineId?: string): string | undefined {
+  function modelLinesEdgeAttributeColorMap(
+    modelId: DataId,
+    lineId?: ModelComponentId,
+  ): string | undefined {
     const name = modelLinesEdgeAttributeName(modelId, lineId);
     const item = modelLinesEdgeAttributeItem(modelId, lineId);
     const storedConfig = modelLinesEdgeAttributeStoredConfig(modelId, lineId, name, item);
     return storedConfig.colorMap;
   }
-  function modelLinesEdgeAttributeNoDataColor(modelId: DataId, lineId?: string): RGBAColor {
+  function modelLinesEdgeAttributeNoDataColor(
+    modelId: DataId,
+    lineId?: ModelComponentId,
+  ): RGBAColor {
     const name = modelLinesEdgeAttributeName(modelId, lineId);
     const item = modelLinesEdgeAttributeItem(modelId, lineId);
     const storedConfig = modelLinesEdgeAttributeStoredConfig(modelId, lineId, name, item);
     return storedConfig.no_data_color;
   }
-  function modelLinesEdgeAttributeTimeStep(modelId: DataId, lineId?: string): number | undefined {
+  function modelLinesEdgeAttributeTimeStep(
+    modelId: DataId,
+    lineId?: ModelComponentId,
+  ): number | undefined {
     return attributeTimeStep(
       modelId,
       attributeSchema.$id,
@@ -199,7 +217,7 @@ function useModelLinesEdgeAttribute(): UseModelLinesEdgeAttributeReturn {
   const viewerStore = useViewerStore();
   async function mutateModelLinesEdgeStyle(
     modelId: DataId,
-    lineIds: string[],
+    lineIds: ModelComponentId[],
     values: Record<string, unknown>,
   ): Promise<void> {
     const tasks: Promise<void>[] = [
@@ -219,7 +237,7 @@ function useModelLinesEdgeAttribute(): UseModelLinesEdgeAttributeReturn {
   }
   async function setModelLinesEdgeAttributeStoredConfig(
     modelId: DataId,
-    lineIds: string[],
+    lineIds: ModelComponentId[],
     name: string | undefined,
     item: number | undefined,
     config: Partial<AttributeStoredConfig>,
@@ -238,7 +256,7 @@ function useModelLinesEdgeAttribute(): UseModelLinesEdgeAttributeReturn {
   }
   async function setModelLinesEdgeAttribute(
     modelId: DataId,
-    lineIds: string[],
+    lineIds: ModelComponentId[],
     {
       name,
       item,
@@ -275,7 +293,7 @@ function useModelLinesEdgeAttribute(): UseModelLinesEdgeAttributeReturn {
       params,
     });
   }
-  async function applyEdgeAttribute(modelId: DataId, lineIds: string[]): Promise<void> {
+  async function applyEdgeAttribute(modelId: DataId, lineIds: ModelComponentId[]): Promise<void> {
     const name = modelLinesEdgeAttributeName(modelId, lineIds[0]);
     const item = modelLinesEdgeAttributeItem(modelId, lineIds[0]);
     const storedConfig = modelLinesEdgeAttributeStoredConfig(modelId, lineIds[0], name, item);
@@ -293,7 +311,7 @@ function useModelLinesEdgeAttribute(): UseModelLinesEdgeAttributeReturn {
   }
   async function setModelLinesEdgeAttributeName(
     modelId: DataId,
-    lineIds: string[],
+    lineIds: ModelComponentId[],
     name: string,
   ): Promise<unknown> {
     const item = modelLinesEdgeAttributeLastItem(modelId, lineIds[0], name);
@@ -305,7 +323,7 @@ function useModelLinesEdgeAttribute(): UseModelLinesEdgeAttributeReturn {
   }
   async function setModelLinesEdgeAttributeItem(
     modelId: DataId,
-    lineIds: string[],
+    lineIds: ModelComponentId[],
     item: number,
   ): Promise<unknown> {
     await mutateModelLinesEdgeStyle(modelId, lineIds, {
@@ -315,7 +333,7 @@ function useModelLinesEdgeAttribute(): UseModelLinesEdgeAttributeReturn {
   }
   async function setModelLinesEdgeAttributeTimeStep(
     modelId: DataId,
-    lineIds: string[],
+    lineIds: ModelComponentId[],
     timeStep: number,
   ): Promise<void> {
     const name = modelLinesEdgeAttributeName(modelId, lineIds[0]);
@@ -350,7 +368,7 @@ function useModelLinesEdgeAttribute(): UseModelLinesEdgeAttributeReturn {
   }
   async function setModelLinesEdgeAttributeRange(
     modelId: DataId,
-    lineIds: string[],
+    lineIds: ModelComponentId[],
     minimum: number,
     maximum: number,
   ): Promise<unknown> {
@@ -364,7 +382,7 @@ function useModelLinesEdgeAttribute(): UseModelLinesEdgeAttributeReturn {
   }
   async function setModelLinesEdgeAttributeColorMap(
     modelId: DataId,
-    lineIds: string[],
+    lineIds: ModelComponentId[],
     colorMap: string | undefined,
   ): Promise<unknown> {
     const name = modelLinesEdgeAttributeName(modelId, lineIds[0]);
@@ -376,7 +394,7 @@ function useModelLinesEdgeAttribute(): UseModelLinesEdgeAttributeReturn {
   }
   async function setModelLinesEdgeAttributeNoDataColor(
     modelId: DataId,
-    lineIds: string[],
+    lineIds: ModelComponentId[],
     no_data_color: RGBAColor,
   ): Promise<unknown> {
     const name = modelLinesEdgeAttributeName(modelId, lineIds[0]);

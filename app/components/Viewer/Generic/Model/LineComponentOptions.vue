@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { MODEL_LINE_COLORING } from "@ogw_front/utils/model_component_coloring";
+import type { ModelComponentId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
@@ -8,7 +9,7 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 interface Props {
   modelId: string;
-  lineId?: string;
+  lineId?: ModelComponentId;
   activeTab?: string;
 }
 

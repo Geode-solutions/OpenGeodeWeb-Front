@@ -1,4 +1,4 @@
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { DataId, ModelComponentId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
@@ -14,17 +14,17 @@ const schema = viewer_schemas.opengeodeweb_viewer.model.surfaces.color;
 export function useModelSurfacesColor(): {
   setModelSurfacesColor: (
     modelId: DataId,
-    surfaces_ids: string[],
+    surfaces_ids: ModelComponentId[],
     color: RGBAColor | undefined,
     activeColoring?: string,
     collectionId?: string,
   ) => Promise<unknown>;
-  modelSurfaceColoring: (modelId: DataId, surface_id?: string) => StyleValues;
-  modelSurfaceColor: (modelId: DataId, surface_id?: string) => RGBAColor | undefined;
-  modelSurfaceActiveColoring: (modelId: DataId, surface_id?: string) => unknown;
+  modelSurfaceColoring: (modelId: DataId, surface_id?: ModelComponentId) => StyleValues;
+  modelSurfaceColor: (modelId: DataId, surface_id?: ModelComponentId) => RGBAColor | undefined;
+  modelSurfaceActiveColoring: (modelId: DataId, surface_id?: ModelComponentId) => unknown;
   setModelSurfacesActiveColoring: (
     modelId: DataId,
-    surfaces_ids: string[],
+    surfaces_ids: ModelComponentId[],
     activeColoring: string,
     collectionId?: string,
   ) => Promise<unknown>;
@@ -35,19 +35,22 @@ export function useModelSurfacesColor(): {
   const modelSurfacesVertexAttribute = useModelSurfacesVertexAttribute();
   const modelSurfacesPolygonAttribute = useModelSurfacesPolygonAttribute();
 
-  function modelSurfaceColoring(modelId: DataId, surface_id?: string): StyleValues {
+  function modelSurfaceColoring(modelId: DataId, surface_id?: ModelComponentId): StyleValues {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
     return modelSurfacesCommonStyle.modelSurfaceStyle(modelId, surface_id).coloring as StyleValues;
   }
 
-  function modelSurfaceColor(modelId: DataId, surface_id?: string): RGBAColor | undefined {
+  function modelSurfaceColor(
+    modelId: DataId,
+    surface_id?: ModelComponentId,
+  ): RGBAColor | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.constant shape is defined by the data style schema.
     return modelSurfaceColoring(modelId, surface_id).constant as RGBAColor | undefined;
   }
 
   async function setModelSurfacesColor(
     modelId: DataId,
-    surfaces_ids: string[],
+    surfaces_ids: ModelComponentId[],
     color: RGBAColor | undefined,
     activeColoring = "constant",
     collectionId?: string,
@@ -63,11 +66,14 @@ export function useModelSurfacesColor(): {
     return result;
   }
 
-  function modelSurfaceActiveColoring(modelId: DataId, surface_id?: string): unknown {
+  function modelSurfaceActiveColoring(modelId: DataId, surface_id?: ModelComponentId): unknown {
     return modelSurfaceColoring(modelId, surface_id).active;
   }
 
-  async function applyVertexColoring(modelId: DataId, surfaces_ids: string[]): Promise<unknown> {
+  async function applyVertexColoring(
+    modelId: DataId,
+    surfaces_ids: ModelComponentId[],
+  ): Promise<unknown> {
     const name = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeName(
       modelId,
       surfaces_ids[0],
@@ -100,7 +106,10 @@ export function useModelSurfacesColor(): {
     return undefined;
   }
 
-  async function applyPolygonColoring(modelId: DataId, surfaces_ids: string[]): Promise<unknown> {
+  async function applyPolygonColoring(
+    modelId: DataId,
+    surfaces_ids: ModelComponentId[],
+  ): Promise<unknown> {
     const name = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeName(
       modelId,
       surfaces_ids[0],
@@ -135,7 +144,7 @@ export function useModelSurfacesColor(): {
 
   async function setModelSurfacesActiveColoring(
     modelId: DataId,
-    surfaces_ids: string[],
+    surfaces_ids: ModelComponentId[],
     activeColoring: string,
     collectionId?: string,
   ): Promise<unknown> {

@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
+import type { ModelComponentId } from "@ogw_front/types/identifiers";
 import ViewerGenericModelLineComponentOptions from "@ogw_front/components/Viewer/Generic/Model/LineComponentOptions.vue";
 import ViewerGenericModelLinesTypeOptions from "@ogw_front/components/Viewer/Generic/Model/LinesTypeOptions.vue";
 
 interface Props {
   modelId: string;
-  lineId?: string;
+  lineId?: ModelComponentId;
   targetLineIds: string[];
   collections?: CollectionComponent[];
   activeTab?: string;
