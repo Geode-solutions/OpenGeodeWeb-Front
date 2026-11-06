@@ -1,4 +1,5 @@
 import type { MeshId } from "@ogw_front/types/identifiers";
+import type { Opacity } from "@ogw_front/types/style";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
@@ -12,8 +13,8 @@ const schema = viewer_schemas.opengeodeweb_viewer.mesh.edges.opacity;
 
 // The opacity is the constant color alpha, the viewer applies it whatever the coloring
 export function useMeshEdgesOpacityStyle(): {
-  meshEdgesOpacity: (meshId: MeshId) => number | undefined;
-  setMeshEdgesOpacity: (meshId: MeshId, opacity: number) => Promise<unknown>;
+  meshEdgesOpacity: (meshId: MeshId) => Opacity | undefined;
+  setMeshEdgesOpacity: (meshId: MeshId, opacity: Opacity) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const meshEdgesCommonStyle = useMeshEdgesCommonStyle();
@@ -22,10 +23,10 @@ export function useMeshEdgesOpacityStyle(): {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.constant shape is defined by the data style schema.
     return meshEdgesCommonStyle.meshEdgesColoring(meshId).constant as RGBAColor | undefined;
   }
-  function meshEdgesOpacity(meshId: MeshId): number | undefined {
+  function meshEdgesOpacity(meshId: MeshId): Opacity | undefined {
     return meshEdgesConstantColor(meshId)?.alpha;
   }
-  async function setMeshEdgesOpacity(meshId: MeshId, opacity: number): Promise<unknown> {
+  async function setMeshEdgesOpacity(meshId: MeshId, opacity: Opacity): Promise<unknown> {
     const params = { id: meshId, opacity };
     const result = await viewerStore.request(
       {

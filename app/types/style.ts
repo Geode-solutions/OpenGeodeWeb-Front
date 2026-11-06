@@ -7,4 +7,7 @@ type Width = number;
 // How big the points of a data are drawn in the viewer
 type Size = number;
 
-export type { Size, Visibility, Width };
+// How opaque something is drawn in the viewer
+type Opacity = number;
+
+export type { Opacity, Size, Visibility, Width };

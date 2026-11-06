@@ -5,6 +5,7 @@ import {
   applyRangesPerData,
   useBatchStyle,
 } from "@ogw_front/composables/batch_style";
+import type { Opacity } from "@ogw_front/types/style";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { Texture } from "@ogw_front/types/texture";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
@@ -36,7 +37,7 @@ const color = useBatchStyleModel<RGBAColor>(
   (meshId) => dataStyleStore.meshPolygonsColor(meshId) as RGBAColor | undefined,
   (meshId, value) => dataStyleStore.setMeshPolygonsColor(meshId, value),
 );
-const opacity = useBatchStyleModel<number>(
+const opacity = useBatchStyleModel<Opacity>(
   () => dataId,
   (meshId) => dataStyleStore.meshPolygonsOpacity(meshId),
   (meshId, value) => dataStyleStore.setMeshPolygonsOpacity(meshId, value),

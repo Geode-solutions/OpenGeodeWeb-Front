@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import type { Opacity, Size, Visibility } from "@ogw_front/types/style";
 import {
   type RangesPerData,
   applyRangesPerData,
   useBatchStyle,
 } from "@ogw_front/composables/batch_style";
-import type { Size, Visibility } from "@ogw_front/types/style";
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
@@ -69,7 +69,7 @@ const color = computed<RGBAColor | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
-const opacity = computed<number | undefined>({
+const opacity = computed<Opacity | undefined>({
   get: () => dataStyleStore.meshPointsOpacity(dataId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
