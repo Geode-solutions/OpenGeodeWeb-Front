@@ -1,10 +1,8 @@
+import type { TreeGroup, TreeNode } from "@ogw_front/types/tree";
+
 type MapStyle = "satellite" | "plan" | "routes";
 
-interface BasemapTreeGroup {
-  id: string;
-  title: string;
-  children: { id: string; title: string }[];
-}
+type BasemapTreeGroup = TreeGroup<TreeNode>;
 
 // Tree order and stacking order: from the bottom up, the routes stay readable on top
 const MAP_STYLES: readonly MapStyle[] = ["satellite", "plan", "routes"];
