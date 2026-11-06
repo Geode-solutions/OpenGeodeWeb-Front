@@ -27,7 +27,7 @@ interface PendingGroup {
 
 const emit = defineEmits<{
   // Filename -> geode object type, files that cannot be loaded are left out
-  update_values: [value: { geode_object_types: Record<string, string> }];
+  update_values: [value: { geode_object_types: Record<string, GeodeObjectType> }];
   increment_step: [];
 }>();
 
@@ -61,7 +61,7 @@ async function fetchAllowedObjectsList(): Promise<AllowedObjectMap[]> {
   return responses.map((response) => response.allowed_objects);
 }
 
-function emitGeodeObjectTypes(geode_object_types: Record<string, string>): void {
+function emitGeodeObjectTypes(geode_object_types: Record<string, GeodeObjectType>): void {
   emit("update_values", { geode_object_types });
   emit("increment_step");
 }

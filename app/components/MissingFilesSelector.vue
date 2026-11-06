@@ -5,6 +5,7 @@ import { matchExpectedFiles, uploadPath } from "@ogw_front/utils/upload_path";
 import DragAndDrop from "@ogw_front/components/DragAndDrop.vue";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
 import FileUploader from "@ogw_front/components/FileUploader.vue";
+import type { GeodeObjectType } from "@ogw_front/types/identifiers";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
@@ -35,7 +36,7 @@ const emit = defineEmits<Emits>();
 interface Props {
   multiple: boolean;
   // Filename -> geode object type, each file is checked with its own type (unused for time series)
-  geodeObjectTypes?: Record<string, string>;
+  geodeObjectTypes?: Record<string, GeodeObjectType>;
   filenames: string[];
   files?: UploadFile[];
   timeSeries?: boolean;
