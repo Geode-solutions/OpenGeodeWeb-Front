@@ -2,6 +2,7 @@
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import type { MeshId } from "@ogw_front/types/identifiers";
 import ViewerGenericMeshCellsColoring from "@ogw_front/components/Viewer/Generic/Mesh/CellsColoring.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
@@ -25,8 +26,8 @@ const dataId = toRef(() => itemProps.id);
 const visibility = computed<boolean>({
   get: () => dataStyleStore.meshCellsVisibility(dataId.value),
   set: async (newValue) => {
-    await applyBatchStyle(dataId.value, (targetId: string) =>
-      dataStyleStore.setMeshCellsVisibility(targetId, newValue),
+    await applyBatchStyle(dataId.value, (meshId: MeshId) =>
+      dataStyleStore.setMeshCellsVisibility(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
