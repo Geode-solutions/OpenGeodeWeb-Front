@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 
+import type { DataIdentified } from "@ogw_front/types/identifiers";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStore } from "@ogw_front/stores/data";
 
 const schema = schemas.opengeodeweb_back.time_series_allowed_objects;
 
-interface Target {
-  id: string;
+interface Target extends DataIdentified {
   name: string;
   geode_object_type: string;
 }
@@ -33,12 +33,12 @@ async function get_targets(): Promise<void> {
   ]);
   targets.value = items
     .filter((item) => allowed_objects.includes(item.geode_object_type))
-    .map(({ data_id, name, geode_object_type }) => ({ id: data_id, name, geode_object_type }));
+    .map(({ data_id, name, geode_object_type }) => ({ data_id, name, geode_object_type }));
   loading.value = false;
 }
 
 function select(target: Target): void {
-  emit("update_values", { target_id: target.id, geode_object_type: target.geode_object_type });
+  emit("update_values", { target_id: target.data_id, geode_object_type: target.geode_object_type });
   emit("increment_step");
 }
 
@@ -59,7 +59,7 @@ await get_targets();
   <v-list v-else bg-color="transparent">
     <v-list-item
       v-for="target in targets"
-      :key="target.id"
+      :key="target.data_id"
       data-testid="timeSeriesTarget"
       :title="target.name"
       :subtitle="target.geode_object_type"
