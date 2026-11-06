@@ -70,7 +70,9 @@ const {
 });
 
 function getUntargetedIds(): string[] {
-  return allItems.value.map((item) => item.data_id).filter((id) => !targetIds.value.includes(id));
+  return allItems.value
+    .map((item) => item.data_id)
+    .filter((dataId) => !targetIds.value.includes(dataId));
 }
 
 const {
