@@ -1,5 +1,6 @@
 import { isModelCornersVertexAttributeValid, useModelCornersVertexAttribute } from "./vertex";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { ValidAttributeInput } from "@ogw_internal/stores/data_style/attribute_types";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelCornersColor } from "./color";
 import { useModelCornersCommonStyle } from "./common";
@@ -10,13 +11,7 @@ interface ColorGroup {
   corners_ids: string[];
 }
 
-interface AttributeGroup {
-  name: string;
-  item: number;
-  minimum: number;
-  maximum: number;
-  colorMap: string;
-  no_data_color?: RGBAColor;
+interface AttributeGroup extends ValidAttributeInput {
   corners_ids: string[];
 }
 

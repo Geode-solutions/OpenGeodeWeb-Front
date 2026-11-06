@@ -1,17 +1,12 @@
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { ValidAttributeInput } from "@ogw_internal/stores/data_style/attribute_types";
 
 interface ColorGroup {
   color: RGBAColor | undefined;
   surfaces_ids: string[];
 }
 
-interface AttributeGroup {
-  name: string;
-  item: number;
-  minimum: number;
-  maximum: number;
-  colorMap: string;
-  no_data_color?: RGBAColor;
+interface AttributeGroup extends ValidAttributeInput {
   surfaces_ids: string[];
 }
 
