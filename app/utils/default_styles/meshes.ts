@@ -28,10 +28,7 @@ interface Grid3dStyle extends Grid2dStyle {
   polyhedra: MeshPolyhedraStyle;
 }
 
-interface SurfaceStyle {
-  visibility: boolean;
-  points: MeshPointsStyle;
-  edges: MeshEdgesStyle;
+interface SurfaceStyle extends EdgedCurveStyle {
   polygons: MeshPolygonsStyle;
 }
 
