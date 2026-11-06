@@ -2,7 +2,7 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { MeshId } from "@ogw_front/types/identifiers";
 import { useMeshPolyhedraCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -10,17 +10,17 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const schema = viewer_schemas.opengeodeweb_viewer.mesh.polyhedra.visibility;
 
 export function useMeshPolyhedraVisibilityStyle(): {
-  meshPolyhedraVisibility: (meshId: DataId) => boolean | undefined;
-  setMeshPolyhedraVisibility: (meshId: DataId, visibility: boolean) => Promise<unknown>;
+  meshPolyhedraVisibility: (meshId: MeshId) => boolean | undefined;
+  setMeshPolyhedraVisibility: (meshId: MeshId, visibility: boolean) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const meshPolyhedraCommonStyle = useMeshPolyhedraCommonStyle();
 
-  function meshPolyhedraVisibility(meshId: DataId): boolean | undefined {
+  function meshPolyhedraVisibility(meshId: MeshId): boolean | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- visibility is defined as boolean in the data style schema.
     return meshPolyhedraCommonStyle.meshPolyhedraStyle(meshId).visibility as boolean | undefined;
   }
-  async function setMeshPolyhedraVisibility(meshId: DataId, visibility: boolean): Promise<unknown> {
+  async function setMeshPolyhedraVisibility(meshId: MeshId, visibility: boolean): Promise<unknown> {
     const params = { id: meshId, visibility };
     const result = await viewerStore.request(
       {

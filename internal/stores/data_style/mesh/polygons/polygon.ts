@@ -1,5 +1,5 @@
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { MeshId } from "@ogw_front/types/identifiers";
 import type { ValidAttributeInput } from "@ogw_internal/stores/data_style/attribute_types";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
@@ -40,7 +40,7 @@ function useMeshPolygonsPolygonAttributeStyle(): UseMeshPolygonsPolygonAttribute
   } = useMeshPolygonsPolygonAttributeConfigValues();
   const { mutateMeshPolygonsPolygonStyle, setMeshPolygonsPolygonAttributeStoredConfig } =
     useMeshPolygonsPolygonAttributeConfigWriter();
-  function meshPolygonsPolygonAttributeTimeStep(meshId: DataId): number | undefined {
+  function meshPolygonsPolygonAttributeTimeStep(meshId: MeshId): number | undefined {
     return attributeTimeStep(
       meshId,
       attributeNamesSchema.$id,
@@ -48,7 +48,7 @@ function useMeshPolygonsPolygonAttributeStyle(): UseMeshPolygonsPolygonAttribute
     );
   }
   async function setMeshPolygonsPolygonAttribute(
-    meshId: DataId,
+    meshId: MeshId,
     {
       name,
       item,
@@ -84,7 +84,7 @@ function useMeshPolygonsPolygonAttributeStyle(): UseMeshPolygonsPolygonAttribute
       params,
     });
   }
-  async function applyPolygonAttribute(meshId: DataId): Promise<unknown> {
+  async function applyPolygonAttribute(meshId: MeshId): Promise<unknown> {
     const name = meshPolygonsPolygonAttributeName(meshId);
     const item = meshPolygonsPolygonAttributeItem(meshId);
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(meshId, name, item);
@@ -103,7 +103,7 @@ function useMeshPolygonsPolygonAttributeStyle(): UseMeshPolygonsPolygonAttribute
     return undefined;
   }
   async function setMeshPolygonsPolygonAttributeName(
-    meshId: DataId,
+    meshId: MeshId,
     name: string,
   ): Promise<unknown> {
     const item = meshPolygonsPolygonAttributeLastItem(meshId, name);
@@ -114,7 +114,7 @@ function useMeshPolygonsPolygonAttributeStyle(): UseMeshPolygonsPolygonAttribute
     return applyPolygonAttribute(meshId);
   }
   async function setMeshPolygonsPolygonAttributeItem(
-    meshId: DataId,
+    meshId: MeshId,
     item: number,
   ): Promise<unknown> {
     await mutateMeshPolygonsPolygonStyle(meshId, {
@@ -123,7 +123,7 @@ function useMeshPolygonsPolygonAttributeStyle(): UseMeshPolygonsPolygonAttribute
     return applyPolygonAttribute(meshId);
   }
   async function setMeshPolygonsPolygonAttributeTimeStep(
-    meshId: DataId,
+    meshId: MeshId,
     timeStep: number,
   ): Promise<unknown> {
     const name = meshPolygonsPolygonAttributeName(meshId);
@@ -134,7 +134,7 @@ function useMeshPolygonsPolygonAttributeStyle(): UseMeshPolygonsPolygonAttribute
     return applyPolygonAttribute(meshId);
   }
   async function setMeshPolygonsPolygonAttributeRange(
-    meshId: DataId,
+    meshId: MeshId,
     minimum: number,
     maximum: number,
   ): Promise<unknown> {
@@ -147,7 +147,7 @@ function useMeshPolygonsPolygonAttributeStyle(): UseMeshPolygonsPolygonAttribute
     return applyPolygonAttribute(meshId);
   }
   async function setMeshPolygonsPolygonAttributeColorMap(
-    meshId: DataId,
+    meshId: MeshId,
     colorMap: string | undefined,
   ): Promise<unknown> {
     const name = meshPolygonsPolygonAttributeName(meshId);
@@ -158,7 +158,7 @@ function useMeshPolygonsPolygonAttributeStyle(): UseMeshPolygonsPolygonAttribute
     return applyPolygonAttribute(meshId);
   }
   async function setMeshPolygonsPolygonAttributeNoDataColor(
-    meshId: DataId,
+    meshId: MeshId,
     no_data_color: RGBAColor,
   ): Promise<unknown> {
     const name = meshPolygonsPolygonAttributeName(meshId);

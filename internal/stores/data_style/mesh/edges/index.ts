@@ -1,7 +1,7 @@
 // Third party imports
 
 // Local imports
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { MeshId } from "@ogw_front/types/identifiers";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import { useMeshEdgesColorStyle } from "./color";
@@ -22,7 +22,7 @@ interface MeshEdgesActiveColoringDeps {
 }
 
 function handleMeshEdgesVertexColoring(
-  meshId: DataId,
+  meshId: MeshId,
   vertexAttributeStyle: ReturnType<typeof useMeshEdgesVertexAttributeStyle>,
 ): Promise<unknown> | undefined {
   const name = vertexAttributeStyle.meshEdgesVertexAttributeName(meshId);
@@ -38,7 +38,7 @@ function handleMeshEdgesVertexColoring(
 }
 
 function handleMeshEdgesEdgeColoring(
-  meshId: DataId,
+  meshId: MeshId,
   edgeAttributeStyle: ReturnType<typeof useMeshEdgesEdgeAttributeStyle>,
 ): Promise<unknown> | undefined {
   const name = edgeAttributeStyle.meshEdgesEdgeAttributeName(meshId);
@@ -54,7 +54,7 @@ function handleMeshEdgesEdgeColoring(
 }
 
 async function applyMeshEdgesActiveColoring(
-  meshId: DataId,
+  meshId: MeshId,
   type: string | undefined,
   deps: MeshEdgesActiveColoringDeps,
 ): Promise<unknown> {
@@ -80,7 +80,7 @@ async function applyMeshEdgesActiveColoring(
 }
 
 async function setMeshEdgesActiveColoring(
-  meshId: DataId,
+  meshId: MeshId,
   type: string | undefined,
   deps: MeshEdgesActiveColoringDeps,
 ): Promise<unknown> {
@@ -96,7 +96,7 @@ async function setMeshEdgesActiveColoring(
 }
 
 async function applyMeshEdgesStyle(
-  meshId: DataId,
+  meshId: MeshId,
   visibilityStyle: ReturnType<typeof useMeshEdgesVisibilityStyle>,
   widthStyle: ReturnType<typeof useMeshEdgesWidthStyle>,
   activeColoringType: string | undefined,
@@ -117,10 +117,10 @@ async function applyMeshEdgesStyle(
 }
 
 type UseMeshEdgesStyleReturn = ReturnType<typeof useMeshEdgesCommonStyle> & {
-  meshEdgesColoring: (meshId: DataId) => StyleValues;
-  meshEdgesActiveColoring: (meshId: DataId) => string | undefined;
-  setMeshEdgesActiveColoring: (meshId: DataId, type: string | undefined) => Promise<unknown>;
-  applyMeshEdgesStyle: (meshId: DataId) => Promise<unknown[]>;
+  meshEdgesColoring: (meshId: MeshId) => StyleValues;
+  meshEdgesActiveColoring: (meshId: MeshId) => string | undefined;
+  setMeshEdgesActiveColoring: (meshId: MeshId, type: string | undefined) => Promise<unknown>;
+  applyMeshEdgesStyle: (meshId: MeshId) => Promise<unknown[]>;
 } & ReturnType<typeof useMeshEdgesVisibilityStyle> &
   ReturnType<typeof useMeshEdgesColorStyle> &
   ReturnType<typeof useMeshEdgesWidthStyle> &
@@ -142,24 +142,24 @@ export function useMeshEdgesStyle(): UseMeshEdgesStyleReturn {
     edgeAttributeStyle: meshEdgesEdgeAttributeStyle,
   };
 
-  function meshEdgesColoring(meshId: DataId): StyleValues {
+  function meshEdgesColoring(meshId: MeshId): StyleValues {
     return meshEdgesCommonStyle.meshEdgesColoring(meshId);
   }
 
-  function meshEdgesActiveColoring(meshId: DataId): string | undefined {
+  function meshEdgesActiveColoring(meshId: MeshId): string | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.active is defined as string in the data style schema.
     return meshEdgesColoring(meshId).active as string | undefined;
   }
 
   async function boundSetMeshEdgesActiveColoring(
-    meshId: DataId,
+    meshId: MeshId,
     type: string | undefined,
   ): Promise<unknown> {
     const result = await setMeshEdgesActiveColoring(meshId, type, activeColoringDeps);
     return result;
   }
 
-  async function boundApplyMeshEdgesStyle(meshId: DataId): Promise<unknown[]> {
+  async function boundApplyMeshEdgesStyle(meshId: MeshId): Promise<unknown[]> {
     const result = await applyMeshEdgesStyle(
       meshId,
       meshEdgesVisibility,

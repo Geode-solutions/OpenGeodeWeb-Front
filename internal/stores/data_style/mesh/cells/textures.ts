@@ -4,7 +4,7 @@ import viewer_schemas, {
 } from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { MeshId } from "@ogw_front/types/identifiers";
 import { useMeshCellsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -12,23 +12,23 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const schema = viewer_schemas.opengeodeweb_viewer.mesh.apply_textures;
 
 export function useMeshCellsTexturesStyle(): {
-  meshCellsTextures: (meshId: DataId) => MeshApplyTexturesParams["textures"] | undefined;
+  meshCellsTextures: (meshId: MeshId) => MeshApplyTexturesParams["textures"] | undefined;
   setMeshCellsTextures: (
-    meshId: DataId,
+    meshId: MeshId,
     textures: MeshApplyTexturesParams["textures"],
   ) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const meshCellsCommonStyle = useMeshCellsCommonStyle();
 
-  function meshCellsTextures(meshId: DataId): MeshApplyTexturesParams["textures"] | undefined {
+  function meshCellsTextures(meshId: MeshId): MeshApplyTexturesParams["textures"] | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- textures shape is defined by the data style schema.
     return meshCellsCommonStyle.meshCellsColoring(meshId).textures as
       | MeshApplyTexturesParams["textures"]
       | undefined;
   }
   async function setMeshCellsTextures(
-    meshId: DataId,
+    meshId: MeshId,
     textures: MeshApplyTexturesParams["textures"],
   ): Promise<unknown> {
     const params = { id: meshId, textures };

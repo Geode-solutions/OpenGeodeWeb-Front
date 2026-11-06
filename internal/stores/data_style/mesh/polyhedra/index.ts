@@ -1,7 +1,7 @@
 // Third party imports
 
 // Local imports
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { MeshId } from "@ogw_front/types/identifiers";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import { useMeshPolyhedraColorStyle } from "./color";
@@ -21,7 +21,7 @@ interface MeshPolyhedraActiveColoringDeps {
 }
 
 function handleMeshPolyhedraVertexColoring(
-  meshId: DataId,
+  meshId: MeshId,
   vertexAttributeStyle: ReturnType<typeof useMeshPolyhedraVertexAttributeStyle>,
 ): Promise<unknown> | undefined {
   const name = vertexAttributeStyle.meshPolyhedraVertexAttributeName(meshId);
@@ -37,7 +37,7 @@ function handleMeshPolyhedraVertexColoring(
 }
 
 function handleMeshPolyhedraPolyhedronColoring(
-  meshId: DataId,
+  meshId: MeshId,
   polyhedronAttributeStyle: ReturnType<typeof useMeshPolyhedraPolyhedronAttributeStyle>,
 ): Promise<unknown> | undefined {
   const name = polyhedronAttributeStyle.meshPolyhedraPolyhedronAttributeName(meshId);
@@ -61,7 +61,7 @@ function handleMeshPolyhedraPolyhedronColoring(
 }
 
 async function applyMeshPolyhedraActiveColoring(
-  meshId: DataId,
+  meshId: MeshId,
   type: string | undefined,
   deps: MeshPolyhedraActiveColoringDeps,
 ): Promise<unknown> {
@@ -90,7 +90,7 @@ async function applyMeshPolyhedraActiveColoring(
 }
 
 async function setMeshPolyhedraActiveColoring(
-  meshId: DataId,
+  meshId: MeshId,
   type: string | undefined,
   deps: MeshPolyhedraActiveColoringDeps,
 ): Promise<unknown> {
@@ -106,7 +106,7 @@ async function setMeshPolyhedraActiveColoring(
 }
 
 async function applyMeshPolyhedraStyle(
-  meshId: DataId,
+  meshId: MeshId,
   visibilityStyle: ReturnType<typeof useMeshPolyhedraVisibilityStyle>,
   activeColoringType: string | undefined,
   deps: MeshPolyhedraActiveColoringDeps,
@@ -122,10 +122,10 @@ async function applyMeshPolyhedraStyle(
 }
 
 type UseMeshPolyhedraStyleReturn = ReturnType<typeof useMeshPolyhedraCommonStyle> & {
-  meshPolyhedraColoring: (meshId: DataId) => StyleValues;
-  meshPolyhedraActiveColoring: (meshId: DataId) => string | undefined;
-  setMeshPolyhedraActiveColoring: (meshId: DataId, type: string | undefined) => Promise<unknown>;
-  applyMeshPolyhedraStyle: (meshId: DataId) => Promise<unknown[]>;
+  meshPolyhedraColoring: (meshId: MeshId) => StyleValues;
+  meshPolyhedraActiveColoring: (meshId: MeshId) => string | undefined;
+  setMeshPolyhedraActiveColoring: (meshId: MeshId, type: string | undefined) => Promise<unknown>;
+  applyMeshPolyhedraStyle: (meshId: MeshId) => Promise<unknown[]>;
 } & ReturnType<typeof useMeshPolyhedraVisibilityStyle> &
   ReturnType<typeof useMeshPolyhedraColorStyle> &
   ReturnType<typeof useMeshPolyhedraVertexAttributeStyle> &
@@ -145,24 +145,24 @@ export function useMeshPolyhedraStyle(): UseMeshPolyhedraStyleReturn {
     polyhedronAttributeStyle: meshPolyhedraPolyhedronAttributeStyle,
   };
 
-  function meshPolyhedraColoring(meshId: DataId): StyleValues {
+  function meshPolyhedraColoring(meshId: MeshId): StyleValues {
     return meshPolyhedraCommonStyle.meshPolyhedraColoring(meshId);
   }
 
-  function meshPolyhedraActiveColoring(meshId: DataId): string | undefined {
+  function meshPolyhedraActiveColoring(meshId: MeshId): string | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.active is defined as string in the data style schema.
     return meshPolyhedraColoring(meshId).active as string | undefined;
   }
 
   async function boundSetMeshPolyhedraActiveColoring(
-    meshId: DataId,
+    meshId: MeshId,
     type: string | undefined,
   ): Promise<unknown> {
     const result = await setMeshPolyhedraActiveColoring(meshId, type, activeColoringDeps);
     return result;
   }
 
-  async function boundApplyMeshPolyhedraStyle(meshId: DataId): Promise<unknown[]> {
+  async function boundApplyMeshPolyhedraStyle(meshId: MeshId): Promise<unknown[]> {
     const result = await applyMeshPolyhedraStyle(
       meshId,
       meshPolyhedraVisibility,

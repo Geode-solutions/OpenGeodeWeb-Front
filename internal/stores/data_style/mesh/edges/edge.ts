@@ -1,5 +1,5 @@
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { MeshId } from "@ogw_front/types/identifiers";
 import type { ValidAttributeInput } from "@ogw_internal/stores/data_style/attribute_types";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
@@ -39,11 +39,11 @@ function useMeshEdgesEdgeAttributeStyle(): UseMeshEdgesEdgeAttributeStyleReturn 
   } = useMeshEdgesEdgeAttributeConfigValues();
   const { mutateMeshEdgesEdgeStyle, setMeshEdgesEdgeAttributeStoredConfig } =
     useMeshEdgesEdgeAttributeConfigWriter();
-  function meshEdgesEdgeAttributeTimeStep(meshId: DataId): number | undefined {
+  function meshEdgesEdgeAttributeTimeStep(meshId: MeshId): number | undefined {
     return attributeTimeStep(meshId, attributeNamesSchema.$id, meshEdgesEdgeAttribute(meshId).name);
   }
   async function setMeshEdgesEdgeAttribute(
-    meshId: DataId,
+    meshId: MeshId,
     {
       name,
       item,
@@ -79,7 +79,7 @@ function useMeshEdgesEdgeAttributeStyle(): UseMeshEdgesEdgeAttributeStyleReturn 
       params,
     });
   }
-  async function applyEdgeAttribute(meshId: DataId): Promise<unknown> {
+  async function applyEdgeAttribute(meshId: MeshId): Promise<unknown> {
     const name = meshEdgesEdgeAttributeName(meshId);
     const item = meshEdgesEdgeAttributeItem(meshId);
     const storedConfig = meshEdgesEdgeAttributeStoredConfig(meshId, name, item);
@@ -97,7 +97,7 @@ function useMeshEdgesEdgeAttributeStyle(): UseMeshEdgesEdgeAttributeStyleReturn 
     }
     return undefined;
   }
-  async function setMeshEdgesEdgeAttributeName(meshId: DataId, name: string): Promise<unknown> {
+  async function setMeshEdgesEdgeAttributeName(meshId: MeshId, name: string): Promise<unknown> {
     const item = meshEdgesEdgeAttributeLastItem(meshId, name);
     await mutateMeshEdgesEdgeStyle(meshId, {
       name,
@@ -105,14 +105,14 @@ function useMeshEdgesEdgeAttributeStyle(): UseMeshEdgesEdgeAttributeStyleReturn 
     });
     return applyEdgeAttribute(meshId);
   }
-  async function setMeshEdgesEdgeAttributeItem(meshId: DataId, item: number): Promise<unknown> {
+  async function setMeshEdgesEdgeAttributeItem(meshId: MeshId, item: number): Promise<unknown> {
     await mutateMeshEdgesEdgeStyle(meshId, {
       item,
     });
     return applyEdgeAttribute(meshId);
   }
   async function setMeshEdgesEdgeAttributeTimeStep(
-    meshId: DataId,
+    meshId: MeshId,
     timeStep: number,
   ): Promise<unknown> {
     const name = meshEdgesEdgeAttributeName(meshId);
@@ -123,7 +123,7 @@ function useMeshEdgesEdgeAttributeStyle(): UseMeshEdgesEdgeAttributeStyleReturn 
     return applyEdgeAttribute(meshId);
   }
   async function setMeshEdgesEdgeAttributeRange(
-    meshId: DataId,
+    meshId: MeshId,
     minimum: number,
     maximum: number,
   ): Promise<unknown> {
@@ -136,7 +136,7 @@ function useMeshEdgesEdgeAttributeStyle(): UseMeshEdgesEdgeAttributeStyleReturn 
     return applyEdgeAttribute(meshId);
   }
   async function setMeshEdgesEdgeAttributeColorMap(
-    meshId: DataId,
+    meshId: MeshId,
     colorMap: string | undefined,
   ): Promise<unknown> {
     const name = meshEdgesEdgeAttributeName(meshId);
@@ -147,7 +147,7 @@ function useMeshEdgesEdgeAttributeStyle(): UseMeshEdgesEdgeAttributeStyleReturn 
     return applyEdgeAttribute(meshId);
   }
   async function setMeshEdgesEdgeAttributeNoDataColor(
-    meshId: DataId,
+    meshId: MeshId,
     no_data_color: RGBAColor,
   ): Promise<unknown> {
     const name = meshEdgesEdgeAttributeName(meshId);

@@ -2,36 +2,36 @@ import type {
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 interface UseMeshCellsCellAttributeStyleReturn {
-  meshCellsCellAttributeName: (meshId: DataId) => string | undefined;
-  meshCellsCellAttributeItem: (meshId: DataId) => number;
-  meshCellsCellAttributeRange: (meshId: DataId) => [number | undefined, number | undefined];
-  meshCellsCellAttributeTimeStep: (meshId: DataId) => number | undefined;
-  setMeshCellsCellAttributeTimeStep: (meshId: DataId, timeStep: number) => Promise<unknown>;
-  meshCellsCellAttributeColorMap: (meshId: DataId) => string | undefined;
+  meshCellsCellAttributeName: (meshId: MeshId) => string | undefined;
+  meshCellsCellAttributeItem: (meshId: MeshId) => number;
+  meshCellsCellAttributeRange: (meshId: MeshId) => [number | undefined, number | undefined];
+  meshCellsCellAttributeTimeStep: (meshId: MeshId) => number | undefined;
+  setMeshCellsCellAttributeTimeStep: (meshId: MeshId, timeStep: number) => Promise<unknown>;
+  meshCellsCellAttributeColorMap: (meshId: MeshId) => string | undefined;
   meshCellsCellAttributeStoredConfig: (
-    meshId: DataId,
+    meshId: MeshId,
     name: string | undefined,
     item: number | undefined,
   ) => AttributeStoredConfig;
-  setMeshCellsCellAttribute: (meshId: DataId, input: ValidAttributeInput) => Promise<unknown>;
-  setMeshCellsCellAttributeName: (meshId: DataId, name: string) => Promise<unknown>;
-  setMeshCellsCellAttributeItem: (meshId: DataId, item: number) => Promise<unknown>;
+  setMeshCellsCellAttribute: (meshId: MeshId, input: ValidAttributeInput) => Promise<unknown>;
+  setMeshCellsCellAttributeName: (meshId: MeshId, name: string) => Promise<unknown>;
+  setMeshCellsCellAttributeItem: (meshId: MeshId, item: number) => Promise<unknown>;
   setMeshCellsCellAttributeRange: (
-    meshId: DataId,
+    meshId: MeshId,
     minimum: number,
     maximum: number,
   ) => Promise<unknown>;
   setMeshCellsCellAttributeColorMap: (
-    meshId: DataId,
+    meshId: MeshId,
     colorMap: string | undefined,
   ) => Promise<unknown>;
-  meshCellsCellAttributeNoDataColor: (meshId: DataId) => RGBAColor;
+  meshCellsCellAttributeNoDataColor: (meshId: MeshId) => RGBAColor;
   setMeshCellsCellAttributeNoDataColor: (
-    meshId: DataId,
+    meshId: MeshId,
     no_data_color: RGBAColor,
   ) => Promise<unknown>;
 }

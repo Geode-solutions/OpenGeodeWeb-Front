@@ -1,4 +1,4 @@
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 // Local imports
@@ -13,11 +13,11 @@ import { whenDefined } from "@ogw_internal/stores/data_style/when_defined";
 
 // oxlint-disable-next-line max-lines-per-function
 export function useMeshStyle(): {
-  meshVisibility: (meshId: DataId) => boolean | undefined;
-  setMeshVisibility: (meshId: DataId, visibility: boolean) => Promise<unknown>;
-  meshColor: (meshId: DataId) => RGBAColor | undefined;
-  setMeshColor: (meshId: DataId, color: RGBAColor) => Promise<unknown>;
-  applyMeshStyle: (meshId: DataId) => Promise<unknown[]>;
+  meshVisibility: (meshId: MeshId) => boolean | undefined;
+  setMeshVisibility: (meshId: MeshId, visibility: boolean) => Promise<unknown>;
+  meshColor: (meshId: MeshId) => RGBAColor | undefined;
+  setMeshColor: (meshId: MeshId, color: RGBAColor) => Promise<unknown>;
+  applyMeshStyle: (meshId: MeshId) => Promise<unknown[]>;
 } & ReturnType<typeof useMeshPointsStyle> &
   ReturnType<typeof useMeshEdgesStyle> &
   ReturnType<typeof useMeshCellsStyle> &
@@ -71,7 +71,7 @@ export function useMeshStyle(): {
   // The vertex series is shared by all the cards: re-render the other cards showing it
   function sharedVertexTimeStep(
     card: (typeof vertexCards)[number],
-  ): (meshId: DataId, timeStep: number) => Promise<unknown> {
+  ): (meshId: MeshId, timeStep: number) => Promise<unknown> {
     return async (meshId, timeStep) => {
       const result = await card.setTimeStep(meshId, timeStep);
       const name = card.name(meshId);
@@ -94,7 +94,7 @@ export function useMeshStyle(): {
     };
   }
 
-  async function applyMeshStyle(meshId: DataId): Promise<unknown[]> {
+  async function applyMeshStyle(meshId: MeshId): Promise<unknown[]> {
     const style = dataStyleState.getStyle(meshId);
     const promise_array: unknown[] = [];
     for (const key of Object.keys(style)) {

@@ -2,7 +2,7 @@ import type {
   AttributeState,
   AttributeStoredConfig,
 } from "@ogw_internal/stores/data_style/attribute_types";
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 
@@ -10,12 +10,12 @@ import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/at
 import { useMeshPolygonsCommonStyle } from "./common";
 
 interface UseMeshPolygonsVertexAttributeConfigReturn {
-  meshPolygonsVertexAttribute: (meshId: DataId) => AttributeState;
-  meshPolygonsVertexAttributeName: (meshId: DataId) => string | undefined;
-  meshPolygonsVertexAttributeLastItem: (meshId: DataId, name: string | undefined) => number;
-  meshPolygonsVertexAttributeItem: (meshId: DataId) => number;
+  meshPolygonsVertexAttribute: (meshId: MeshId) => AttributeState;
+  meshPolygonsVertexAttributeName: (meshId: MeshId) => string | undefined;
+  meshPolygonsVertexAttributeLastItem: (meshId: MeshId, name: string | undefined) => number;
+  meshPolygonsVertexAttributeItem: (meshId: MeshId) => number;
   meshPolygonsVertexAttributeStoredConfig: (
-    meshId: DataId,
+    meshId: MeshId,
     name: string | undefined,
     item: number | undefined,
   ) => AttributeStoredConfig;
@@ -23,11 +23,11 @@ interface UseMeshPolygonsVertexAttributeConfigReturn {
 
 interface UseMeshPolygonsVertexAttributeConfigWriterReturn {
   mutateMeshPolygonsVertexStyle: (
-    meshId: DataId,
+    meshId: MeshId,
     values: Record<string, unknown>,
   ) => Promise<string>;
   setMeshPolygonsVertexAttributeStoredConfig: (
-    meshId: DataId,
+    meshId: MeshId,
     name: string | undefined,
     item: number | undefined,
     config: Partial<AttributeStoredConfig>,
@@ -36,12 +36,12 @@ interface UseMeshPolygonsVertexAttributeConfigWriterReturn {
 
 function useMeshPolygonsVertexAttributeConfig(): UseMeshPolygonsVertexAttributeConfigReturn {
   const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle();
-  function meshPolygonsVertexAttribute(meshId: DataId): AttributeState {
+  function meshPolygonsVertexAttribute(meshId: MeshId): AttributeState {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.vertex shape is defined by the data style schema.
     return meshPolygonsCommonStyle.meshPolygonsColoring(meshId).vertex as AttributeState;
   }
   function meshPolygonsVertexAttributeStoredConfig(
-    meshId: DataId,
+    meshId: MeshId,
     name: string | undefined,
     item: number | undefined,
   ): AttributeStoredConfig {
@@ -53,10 +53,10 @@ function useMeshPolygonsVertexAttributeConfig(): UseMeshPolygonsVertexAttributeC
     }
     return defaultAttributeStoredConfig();
   }
-  function meshPolygonsVertexAttributeName(meshId: DataId): string | undefined {
+  function meshPolygonsVertexAttributeName(meshId: MeshId): string | undefined {
     return meshPolygonsVertexAttribute(meshId).name;
   }
-  function meshPolygonsVertexAttributeLastItem(meshId: DataId, name: string | undefined): number {
+  function meshPolygonsVertexAttributeLastItem(meshId: MeshId, name: string | undefined): number {
     const { storedConfigs } = meshPolygonsVertexAttribute(meshId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
     if (nameConfig !== undefined) {
@@ -64,7 +64,7 @@ function useMeshPolygonsVertexAttributeConfig(): UseMeshPolygonsVertexAttributeC
     }
     return 0;
   }
-  function meshPolygonsVertexAttributeItem(meshId: DataId): number {
+  function meshPolygonsVertexAttributeItem(meshId: MeshId): number {
     const { item, name } = meshPolygonsVertexAttribute(meshId);
     return item ?? meshPolygonsVertexAttributeLastItem(meshId, name);
   }
@@ -78,9 +78,9 @@ function useMeshPolygonsVertexAttributeConfig(): UseMeshPolygonsVertexAttributeC
 }
 
 interface UseMeshPolygonsVertexAttributeConfigValuesReturn {
-  meshPolygonsVertexAttributeRange: (meshId: DataId) => [number | undefined, number | undefined];
-  meshPolygonsVertexAttributeColorMap: (meshId: DataId) => string | undefined;
-  meshPolygonsVertexAttributeNoDataColor: (meshId: DataId) => RGBAColor;
+  meshPolygonsVertexAttributeRange: (meshId: MeshId) => [number | undefined, number | undefined];
+  meshPolygonsVertexAttributeColorMap: (meshId: MeshId) => string | undefined;
+  meshPolygonsVertexAttributeNoDataColor: (meshId: MeshId) => RGBAColor;
 }
 
 function useMeshPolygonsVertexAttributeConfigValues(): UseMeshPolygonsVertexAttributeConfigValuesReturn {
@@ -90,20 +90,20 @@ function useMeshPolygonsVertexAttributeConfigValues(): UseMeshPolygonsVertexAttr
     meshPolygonsVertexAttributeStoredConfig,
   } = useMeshPolygonsVertexAttributeConfig();
   function meshPolygonsVertexAttributeRange(
-    meshId: DataId,
+    meshId: MeshId,
   ): [number | undefined, number | undefined] {
     const name = meshPolygonsVertexAttributeName(meshId);
     const item = meshPolygonsVertexAttributeItem(meshId);
     const storedConfig = meshPolygonsVertexAttributeStoredConfig(meshId, name, item);
     return [storedConfig.minimum, storedConfig.maximum];
   }
-  function meshPolygonsVertexAttributeColorMap(meshId: DataId): string | undefined {
+  function meshPolygonsVertexAttributeColorMap(meshId: MeshId): string | undefined {
     const name = meshPolygonsVertexAttributeName(meshId);
     const item = meshPolygonsVertexAttributeItem(meshId);
     const storedConfig = meshPolygonsVertexAttributeStoredConfig(meshId, name, item);
     return storedConfig.colorMap;
   }
-  function meshPolygonsVertexAttributeNoDataColor(meshId: DataId): RGBAColor {
+  function meshPolygonsVertexAttributeNoDataColor(meshId: MeshId): RGBAColor {
     const name = meshPolygonsVertexAttributeName(meshId);
     const item = meshPolygonsVertexAttributeItem(meshId);
     const storedConfig = meshPolygonsVertexAttributeStoredConfig(meshId, name, item);
@@ -119,7 +119,7 @@ function useMeshPolygonsVertexAttributeConfigValues(): UseMeshPolygonsVertexAttr
 function useMeshPolygonsVertexAttributeConfigWriter(): UseMeshPolygonsVertexAttributeConfigWriterReturn {
   const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle();
   async function mutateMeshPolygonsVertexStyle(
-    meshId: DataId,
+    meshId: MeshId,
     values: Record<string, unknown>,
   ): Promise<string> {
     const result = await meshPolygonsCommonStyle.mutateMeshPolygonsStyle(meshId, {
@@ -130,7 +130,7 @@ function useMeshPolygonsVertexAttributeConfigWriter(): UseMeshPolygonsVertexAttr
     return result;
   }
   async function setMeshPolygonsVertexAttributeStoredConfig(
-    meshId: DataId,
+    meshId: MeshId,
     name: string | undefined,
     item: number | undefined,
     config: Partial<AttributeStoredConfig>,

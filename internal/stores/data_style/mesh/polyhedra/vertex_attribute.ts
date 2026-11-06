@@ -2,36 +2,36 @@ import type {
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 interface UseMeshPolyhedraVertexAttributeStyleReturn {
-  meshPolyhedraVertexAttributeName: (meshId: DataId) => string | undefined;
-  meshPolyhedraVertexAttributeItem: (meshId: DataId) => number;
-  meshPolyhedraVertexAttributeRange: (meshId: DataId) => [number | undefined, number | undefined];
-  meshPolyhedraVertexAttributeTimeStep: (meshId: DataId) => number | undefined;
-  setMeshPolyhedraVertexAttributeTimeStep: (meshId: DataId, timeStep: number) => Promise<unknown>;
-  meshPolyhedraVertexAttributeColorMap: (meshId: DataId) => string | undefined;
+  meshPolyhedraVertexAttributeName: (meshId: MeshId) => string | undefined;
+  meshPolyhedraVertexAttributeItem: (meshId: MeshId) => number;
+  meshPolyhedraVertexAttributeRange: (meshId: MeshId) => [number | undefined, number | undefined];
+  meshPolyhedraVertexAttributeTimeStep: (meshId: MeshId) => number | undefined;
+  setMeshPolyhedraVertexAttributeTimeStep: (meshId: MeshId, timeStep: number) => Promise<unknown>;
+  meshPolyhedraVertexAttributeColorMap: (meshId: MeshId) => string | undefined;
   meshPolyhedraVertexAttributeStoredConfig: (
-    meshId: DataId,
+    meshId: MeshId,
     name: string | undefined,
     item: number | undefined,
   ) => AttributeStoredConfig;
-  setMeshPolyhedraVertexAttribute: (meshId: DataId, input: ValidAttributeInput) => Promise<unknown>;
-  setMeshPolyhedraVertexAttributeName: (meshId: DataId, name: string) => Promise<unknown>;
-  setMeshPolyhedraVertexAttributeItem: (meshId: DataId, item: number) => Promise<unknown>;
+  setMeshPolyhedraVertexAttribute: (meshId: MeshId, input: ValidAttributeInput) => Promise<unknown>;
+  setMeshPolyhedraVertexAttributeName: (meshId: MeshId, name: string) => Promise<unknown>;
+  setMeshPolyhedraVertexAttributeItem: (meshId: MeshId, item: number) => Promise<unknown>;
   setMeshPolyhedraVertexAttributeRange: (
-    meshId: DataId,
+    meshId: MeshId,
     minimum: number,
     maximum: number,
   ) => Promise<unknown>;
   setMeshPolyhedraVertexAttributeColorMap: (
-    meshId: DataId,
+    meshId: MeshId,
     colorMap: string | undefined,
   ) => Promise<unknown>;
-  meshPolyhedraVertexAttributeNoDataColor: (meshId: DataId) => RGBAColor;
+  meshPolyhedraVertexAttributeNoDataColor: (meshId: MeshId) => RGBAColor;
   setMeshPolyhedraVertexAttributeNoDataColor: (
-    meshId: DataId,
+    meshId: MeshId,
     no_data_color: RGBAColor,
   ) => Promise<unknown>;
 }

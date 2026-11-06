@@ -7,6 +7,9 @@ type DataId = string;
 // Id of a component of a model (a corner, a line, a surface or a block): its geode_id
 type ModelComponentId = GeodeId;
 
+// The data of a mesh, the data a mesh style applies to
+type MeshId = DataId;
+
 // The data of a model, the data a model style or a model component applies to
 type ModelId = DataId;
 
@@ -44,6 +47,7 @@ export type {
   GeodeIdentified,
   GeodeObjectType,
   GeodeObjectTyped,
+  MeshId,
   ModelComponentId,
   ModelId,
   ModelIdentified,
