@@ -1,36 +1,10 @@
+import type {
+  AttributeInput,
+  AttributeStoredConfig,
+  ValidAttributeInput,
+} from "@ogw_internal/stores/data_style/attribute_types";
 import type { DataId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
-
-interface AttributeStoredConfig {
-  minimum: number | undefined;
-  maximum: number | undefined;
-  colorMap: string | undefined;
-  no_data_color: RGBAColor;
-}
-
-interface AttributeState {
-  name?: string;
-  item?: number;
-  storedConfigs?: Record<string, { lastItem: number } & Record<string, AttributeStoredConfig>>;
-}
-
-interface AttributeInput {
-  name: string | undefined;
-  item: number | undefined;
-  minimum: number | undefined;
-  maximum: number | undefined;
-  colorMap: string | undefined;
-  no_data_color?: RGBAColor;
-}
-
-interface ValidAttributeInput {
-  name: string;
-  item: number;
-  minimum: number;
-  maximum: number;
-  colorMap: string;
-  no_data_color?: RGBAColor;
-}
 
 function isMeshCellsVertexAttributeValid(input: AttributeInput): input is ValidAttributeInput {
   return (
@@ -73,9 +47,4 @@ interface UseMeshCellsVertexAttributeStyleReturn {
   ) => Promise<unknown>;
 }
 export { isMeshCellsVertexAttributeValid };
-export type {
-  AttributeStoredConfig,
-  AttributeState,
-  ValidAttributeInput,
-  UseMeshCellsVertexAttributeStyleReturn,
-};
+export type { UseMeshCellsVertexAttributeStyleReturn };

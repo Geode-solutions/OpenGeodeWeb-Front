@@ -1,9 +1,8 @@
 // oxlint-disable eslint/max-lines
-import {
-  type AttributeState,
-  type AttributeStoredConfig,
-  groupBy,
-} from "@ogw_internal/stores/data_style/model/component_style";
+import type {
+  AttributeState,
+  AttributeStoredConfig,
+} from "@ogw_internal/stores/data_style/attribute_types";
 import {
   DEFAULT_NO_DATA_COLOR,
   POINTS_DEFAULT_COLOR,
@@ -13,6 +12,7 @@ import {
 } from "@ogw_front/utils/default_styles/constants";
 import type { DataId } from "@ogw_front/types/identifiers";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
+import { groupBy } from "@ogw_internal/stores/data_style/model/component_style";
 import merge from "lodash/merge";
 import { useAttributeTimeStepStyle } from "@ogw_internal/stores/data_style/time_step";
 import { useDataStore } from "@ogw_front/stores/data";
