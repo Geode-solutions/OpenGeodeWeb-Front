@@ -47,4 +47,16 @@ describe("hover highlight", () => {
 
     expect(request).not.toHaveBeenCalled();
   });
+
+  test("sends nothing when left before the viewable check resolves", async () => {
+    const { promise, resolve } = Promise.withResolvers<boolean>();
+    isItemViewable.mockReturnValue(promise);
+    const { onHoverEnter, onHoverLeave } = useHoverhighlight();
+    onHoverEnter(VIEWABLE_ID, [], "model", true);
+    onHoverLeave(VIEWABLE_ID);
+    resolve(true);
+    await flushPromises();
+
+    expect(request).not.toHaveBeenCalled();
+  });
 });
