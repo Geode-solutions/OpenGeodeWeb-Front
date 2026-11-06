@@ -4,6 +4,8 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schem
 import { consola } from "consola";
 
 // Local imports
+import type { DataId, GeodeObjectType, GeodeObjectTyped } from "@ogw_front/types/identifiers";
+import { type LegacyDataId, fromLegacyDataId } from "@ogw_front/utils/legacy_data_id";
 import { type NewDataItem, useDataStore } from "@ogw_front/stores/data";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -11,14 +13,13 @@ import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
-interface FileToImport {
+interface FileToImport extends Readonly<GeodeObjectTyped> {
   readonly filename: string;
-  readonly geode_object_type: string;
 }
 
 // NewDataItem has mutable array fields (mesh_components, collection_components), so it can't
 // Satisfy prefer-readonly-parameter-types deeply; left unfixed (same pattern as app/plugins/auto_store_register.ts).
-async function importItem(item: NewDataItem): Promise<string> {
+async function importDataItem(item: NewDataItem): Promise<string> {
   const dataStore = useDataStore();
   const dataStyleStore = useDataStyleStore();
   const hybridViewerStore = useHybridViewerStore();
@@ -32,7 +33,7 @@ async function importItem(item: NewDataItem): Promise<string> {
     if (!(await dataStore.isItemViewable(item))) {
       return undefined;
     }
-    return dataStore.registerObject(item.id, item.name ?? item.id);
+    return dataStore.registerObject(item.data_id, item.name ?? item.data_id);
   });
   let addDataComponentsTask: Promise<string | undefined> = Promise.resolve(undefined);
   let addDataRelationsTask: Promise<string | undefined> = Promise.resolve(undefined);
@@ -42,22 +43,22 @@ async function importItem(item: NewDataItem): Promise<string> {
   }
   treeviewStore.addItem(
     item.geode_object_type,
-    item.name ?? item.id,
-    item.id,
+    item.name ?? item.data_id,
+    item.data_id,
     item.geode_id,
     item.viewer_type,
   );
-  const addDataStyleTask = dataStyleStore.addDataStyle(item.id, item.geode_object_type);
+  const addDataStyleTask = dataStyleStore.addDataStyle(item.data_id, item.geode_object_type);
   const addViewerTask = addDataTask.then(async () => {
     if (!(await dataStore.isItemViewable(item))) {
       return undefined;
     }
-    return hybridViewerStore.addItem(item.id);
+    return hybridViewerStore.addItem(item.data_id);
   });
   const applyStyleTask = Promise.all([registerTask, addDataComponentsTask, addDataStyleTask]).then(
     async () => {
       if (await dataStore.isItemViewable(item)) {
-        return dataStyleStore.applyDefaultStyle(item.id);
+        return dataStyleStore.applyDefaultStyle(item.data_id);
       }
       return undefined;
     },
@@ -70,9 +71,14 @@ async function importItem(item: NewDataItem): Promise<string> {
     addViewerTask,
     applyStyleTask,
   ]);
-  return item.id;
+  return item.data_id;
 }
-async function importFile(filename: string, geode_object_type: string): Promise<string> {
+// Every item comes through here: from the back-end, which still names its data id `id`, or from a project
+async function importItem(imported: LegacyDataId<NewDataItem> | NewDataItem): Promise<string> {
+  const dataId = await importDataItem(fromLegacyDataId(imported));
+  return dataId;
+}
+async function importFile(filename: string, geode_object_type: GeodeObjectType): Promise<string> {
   const backStore = useBackStore();
   const schema = back_schemas.opengeodeweb_back.save_viewable_file;
   const params = {
@@ -83,8 +89,8 @@ async function importFile(filename: string, geode_object_type: string): Promise<
     schema,
     params,
   });
-  // oxlint-disable-next-line no-unsafe-type-assertion -- this is the trusted API boundary; the back-end response shape matches NewDataItem.
-  return importItem(response as NewDataItem);
+  // oxlint-disable-next-line no-unsafe-type-assertion -- this is the trusted API boundary; the back-end response shape matches NewDataItem, except for its legacy id.
+  return importItem(response as LegacyDataId<NewDataItem>);
 }
 
 async function importWorkflow(files: readonly FileToImport[]): Promise<string[]> {
@@ -107,8 +113,8 @@ async function importWorkflow(files: readonly FileToImport[]): Promise<string[]>
     // A failing file does not prevent the other files from being imported
     const chunk_results = await Promise.allSettled(
       chunk.map(async ({ filename, geode_object_type }) => {
-        const id = await importFile(filename, geode_object_type);
-        return id;
+        const dataId = await importFile(filename, geode_object_type);
+        return dataId;
       }),
     );
     for (const result of chunk_results) {
@@ -133,11 +139,13 @@ async function importWorkflow(files: readonly FileToImport[]): Promise<string[]>
 }
 
 // NewDataItem has mutable array fields (mesh_components, collection_components), so a readonly array of it can't satisfy prefer-readonly-parameter-types deeply; left unfixed (same pattern as app/plugins/auto_store_register.ts).
-async function importWorkflowFromSnapshot(items: readonly NewDataItem[]): Promise<string[]> {
+async function importWorkflowFromSnapshot(
+  items: readonly (LegacyDataId<NewDataItem> | NewDataItem)[],
+): Promise<string[]> {
   consola.debug("[importWorkflowFromSnapshot] start", { count: items?.length });
   const hybridViewerStore = useHybridViewerStore();
   const chunk_size = 5;
-  const chunks: NewDataItem[][] = [];
+  const chunks: (LegacyDataId<NewDataItem> | NewDataItem)[][] = [];
   for (let i = 0; i < items.length; i += chunk_size) {
     chunks.push(items.slice(i, i + chunk_size));
   }
@@ -149,8 +157,8 @@ async function importWorkflowFromSnapshot(items: readonly NewDataItem[]): Promis
     const chunk = chunks[chunkIndex] ?? [];
     const chunk_ids = await Promise.all(
       chunk.map(async (item) => {
-        const id = await importItem(item);
-        return id;
+        const dataId = await importItem(item);
+        return dataId;
       }),
     );
     ids.push(...chunk_ids);
@@ -166,32 +174,32 @@ async function importWorkflowFromSnapshot(items: readonly NewDataItem[]): Promis
 
 // Reloads the viewer object under the same id with its stored style, after the back rewrote its files.
 async function reloadObject(
-  id: string,
+  dataId: DataId,
   { rebuildActor = false }: { rebuildActor?: boolean } = {},
 ): Promise<void> {
   const dataStore = useDataStore();
   const dataStyleStore = useDataStyleStore();
   const hybridViewerStore = useHybridViewerStore();
-  const item = await dataStore.item(id);
-  await dataStore.deregisterObject(id);
-  await dataStore.registerObject(id, item.name ?? id);
+  const item = await dataStore.item(dataId);
+  await dataStore.deregisterObject(dataId);
+  await dataStore.registerObject(dataId, item.name ?? dataId);
   // Only when the geometry moved: the local actor is rebuilt from the stored light viewable
   if (rebuildActor) {
-    await hybridViewerStore.addItem(id);
+    await hybridViewerStore.addItem(dataId);
   }
-  await dataStyleStore.applyDefaultStyle(id);
+  await dataStyleStore.applyDefaultStyle(dataId);
   await hybridViewerStore.remoteRender();
 }
 
 // The time series only adds attributes to the model, so the viewer object is reloaded.
-async function applyTimeSeriesWorkflow(filename: string, id: string): Promise<string> {
+async function applyTimeSeriesWorkflow(filename: string, dataId: DataId): Promise<string> {
   const backStore = useBackStore();
   await backStore.request({
     schema: back_schemas.opengeodeweb_back.apply_time_series,
-    params: { id, filename },
+    params: { id: dataId, filename },
   });
-  await reloadObject(id);
-  return id;
+  await reloadObject(dataId);
+  return dataId;
 }
 
 export {

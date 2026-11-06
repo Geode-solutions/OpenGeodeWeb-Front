@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
+import type { CornerId } from "@ogw_front/types/identifiers";
 import ViewerGenericModelCornerComponentOptions from "@ogw_front/components/Viewer/Generic/Model/CornerComponentOptions.vue";
 import ViewerGenericModelCornersTypeOptions from "@ogw_front/components/Viewer/Generic/Model/CornersTypeOptions.vue";
 
 interface Props {
   modelId: string;
-  cornerId?: string;
+  cornerId?: CornerId;
   targetCornerIds: string[];
   collections?: CollectionComponent[];
   activeTab?: string;

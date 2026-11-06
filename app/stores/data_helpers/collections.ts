@@ -1,27 +1,19 @@
 import { type FormattedComponent, type ModelComponentRecord, useDataMesh } from "./mesh.js";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
+import type { ModelComponentRelationRecord } from "./relations.js";
+import type { ModelId } from "@ogw_front/types/identifiers";
+import type { ReadonlyTreeGroup } from "@ogw_front/types/tree";
 import type { Ref } from "vue";
 import { getTable } from "@ogw_internal/database/database.js";
 import { liveObservable } from "@ogw_front/utils/live_observable";
 import { pluralize } from "@ogw_front/utils/string";
 import { useObservable } from "@vueuse/rxjs";
 
-interface ModelComponentRelationRecord {
-  id: string;
-  parent: string;
-  child: string;
-  type: string;
-}
-
 interface CollectionComponent extends FormattedComponent {
   readonly children: readonly FormattedComponent[];
 }
 
-interface CollectionComponentGroup {
-  id: string;
-  title: string;
-  readonly children: readonly CollectionComponent[];
-}
+type CollectionComponentGroup = ReadonlyTreeGroup<CollectionComponent>;
 
 // oxlint-disable-next-line eslint/max-lines-per-function
 export function useDataCollections(): {
@@ -37,17 +29,17 @@ export function useDataCollections(): {
   );
   const { getAllMeshComponents } = useDataMesh();
 
-  async function hasCollectionComponents(modelId: string): Promise<boolean> {
+  async function hasCollectionComponents(modelId: ModelId): Promise<boolean> {
     const count = await model_components_db
-      .where("id")
+      .where("data_id")
       .equals(modelId)
       .and((component: ModelComponentRecord) => !MESH_COMPONENT_TYPES.includes(component.type))
       .count();
     return count > 0;
   }
 
-  async function getAllCollectionComponents(modelId: string): Promise<FormattedComponent[]> {
-    const items = await model_components_db.where("id").equals(modelId).toArray();
+  async function getAllCollectionComponents(modelId: ModelId): Promise<FormattedComponent[]> {
+    const items = await model_components_db.where("data_id").equals(modelId).toArray();
     return items
       .filter((component: ModelComponentRecord) => !MESH_COMPONENT_TYPES.includes(component.type))
       .map((component: ModelComponentRecord) => ({
@@ -61,10 +53,10 @@ export function useDataCollections(): {
   }
 
   async function fetchAllCollectionComponents(
-    modelId: string,
+    modelId: ModelId,
   ): Promise<Record<string, CollectionComponent[]>> {
     const components = await getAllCollectionComponents(modelId);
-    const relations = await model_components_relation_db.where("id").equals(modelId).toArray();
+    const relations = await model_components_relation_db.where("data_id").equals(modelId).toArray();
     const allMeshComponents = await getAllMeshComponents(modelId);
     const meshComponentsById: Record<string, FormattedComponent> = {};
     for (const meshComponent of allMeshComponents) {
@@ -90,7 +82,7 @@ export function useDataCollections(): {
   }
 
   async function formatedCollectionComponents(
-    modelId: string,
+    modelId: ModelId,
   ): Promise<CollectionComponentGroup[]> {
     const byType = await fetchAllCollectionComponents(modelId);
     const collectionTypes = Object.keys(byType);
@@ -105,7 +97,7 @@ export function useDataCollections(): {
   }
 
   function refFormatedCollectionComponents(
-    modelId: string,
+    modelId: ModelId,
   ): Ref<CollectionComponentGroup[] | undefined> {
     return useObservable(
       liveObservable(async () => {
@@ -127,4 +119,4 @@ export function useDataCollections(): {
   };
 }
 
-export type { CollectionComponent, CollectionComponentGroup, ModelComponentRelationRecord };
+export type { CollectionComponent, CollectionComponentGroup };

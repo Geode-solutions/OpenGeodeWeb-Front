@@ -1,17 +1,16 @@
 import type { AttributeGroup, ColorGroup } from "./coloring_groups";
-import {
-  isModelBlocksPolyhedronAttributeValid,
-  type useModelBlocksPolyhedronAttribute,
-} from "./polyhedron";
-import { isModelBlocksVertexAttributeValid, type useModelBlocksVertexAttribute } from "./vertex";
+import type { ModelId } from "@ogw_front/types/identifiers";
+import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import type { useModelBlocksColor } from "./color";
+import type { useModelBlocksPolyhedronAttribute } from "./polyhedron";
+import type { useModelBlocksVertexAttribute } from "./vertex";
 
 type ColorStyle = ReturnType<typeof useModelBlocksColor>;
 type VertexAttributeStyle = ReturnType<typeof useModelBlocksVertexAttribute>;
 type PolyhedronAttributeStyle = ReturnType<typeof useModelBlocksPolyhedronAttribute>;
 
 function applyModelBlocksConstantColoring(
-  modelId: string,
+  modelId: ModelId,
   type_blocks_ids: string[],
   modelColorStyle: ColorStyle,
 ): Promise<unknown>[] {
@@ -29,7 +28,7 @@ function applyModelBlocksConstantColoring(
 }
 
 function groupModelBlocksVertexAttributes(
-  modelId: string,
+  modelId: ModelId,
   type_blocks_ids: string[],
   modelBlocksVertexAttribute: VertexAttributeStyle,
 ): Record<string, AttributeGroup> {
@@ -57,7 +56,7 @@ function groupModelBlocksVertexAttributes(
       colorMap,
       no_data_color,
     };
-    if (!isModelBlocksVertexAttributeValid(attribute)) {
+    if (!isAttributeValid(attribute)) {
       continue;
     }
     const key = [name, item, colorMap, minimum, maximum, JSON.stringify(no_data_color)].join("_");
@@ -68,7 +67,7 @@ function groupModelBlocksVertexAttributes(
 }
 
 function applyModelBlocksVertexColoring(
-  modelId: string,
+  modelId: ModelId,
   type_blocks_ids: string[],
   modelBlocksVertexAttribute: VertexAttributeStyle,
 ): Promise<unknown>[] {
@@ -93,7 +92,7 @@ function applyModelBlocksVertexColoring(
 }
 
 function groupModelBlocksPolyhedronAttributes(
-  modelId: string,
+  modelId: ModelId,
   type_blocks_ids: string[],
   modelBlocksPolyhedronAttribute: PolyhedronAttributeStyle,
 ): Record<string, AttributeGroup> {
@@ -127,7 +126,7 @@ function groupModelBlocksPolyhedronAttributes(
       colorMap,
       no_data_color,
     };
-    if (!isModelBlocksPolyhedronAttributeValid(attribute)) {
+    if (!isAttributeValid(attribute)) {
       continue;
     }
     const key = [name, item, colorMap, minimum, maximum, JSON.stringify(no_data_color)].join("_");
@@ -138,7 +137,7 @@ function groupModelBlocksPolyhedronAttributes(
 }
 
 function applyModelBlocksPolyhedronColoring(
-  modelId: string,
+  modelId: ModelId,
   type_blocks_ids: string[],
   modelBlocksPolyhedronAttribute: PolyhedronAttributeStyle,
 ): Promise<unknown>[] {

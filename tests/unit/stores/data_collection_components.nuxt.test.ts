@@ -21,7 +21,7 @@ describe("useDataStore - collections", () => {
 
     // 1. Add model item
     await dataStore.addItem({
-      id: modelId,
+      data_id: modelId,
       geode_id: "00000000-0000-0000-0000-000000000001",
       name: "Test Model",
       viewer_type: "model",
@@ -30,7 +30,7 @@ describe("useDataStore - collections", () => {
 
     // 2. Add mesh components and collection components (including a custom type like "MyCustomCollection")
     await dataStore.addComponents({
-      id: modelId,
+      data_id: modelId,
       geode_id: "00000000-0000-0000-0000-000000000001",
       viewer_type: "model",
       geode_object_type: "BRep",
@@ -66,7 +66,7 @@ describe("useDataStore - collections", () => {
 
     // Add component relations
     await dataStore.addComponentRelations({
-      id: modelId,
+      data_id: modelId,
       geode_id: "00000000-0000-0000-0000-000000000001",
       viewer_type: "model",
       geode_object_type: "BRep",

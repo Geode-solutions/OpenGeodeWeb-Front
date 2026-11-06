@@ -1,5 +1,6 @@
 <script setup lang="ts">
 // oxlint-disable max-dependencies
+import type { GeodeObjectTyped, ViewerTyped } from "@ogw_front/types/identifiers";
 import {
   type MapStyle,
   basemapGroup,
@@ -33,12 +34,10 @@ interface Emits {
 
 const emit = defineEmits<Emits>();
 
-interface TreeGroupItem {
+interface TreeGroupItem extends Partial<GeodeObjectTyped>, Partial<ViewerTyped> {
   raw?: TreeGroupItem;
   id: string;
   title?: string;
-  viewer_type?: string;
-  geode_object_type?: string;
   children?: TreeGroupItem[];
 }
 

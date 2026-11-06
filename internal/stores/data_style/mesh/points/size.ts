@@ -2,6 +2,8 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
+import type { MeshId } from "@ogw_front/types/identifiers";
+import type { Size } from "@ogw_front/types/style";
 import { useMeshPointsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -9,18 +11,18 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const schema = viewer_schemas.opengeodeweb_viewer.mesh.points.size;
 
 export function useMeshPointsSizeStyle(): {
-  meshPointsSize: (id: string) => number | undefined;
-  setMeshPointsSize: (id: string, size: number) => Promise<unknown>;
+  meshPointsSize: (meshId: MeshId) => Size | undefined;
+  setMeshPointsSize: (meshId: MeshId, size: Size) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const meshPointsCommonStyle = useMeshPointsCommonStyle();
 
-  function meshPointsSize(id: string): number | undefined {
+  function meshPointsSize(meshId: MeshId): Size | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- size is defined as number in the data style schema.
-    return meshPointsCommonStyle.meshPointsStyle(id).size as number | undefined;
+    return meshPointsCommonStyle.meshPointsStyle(meshId).size as Size | undefined;
   }
-  async function setMeshPointsSize(id: string, size: number): Promise<unknown> {
-    const params = { id, size };
+  async function setMeshPointsSize(meshId: MeshId, size: Size): Promise<unknown> {
+    const params = { id: meshId, size };
     const result = await viewerStore.request(
       {
         schema,
@@ -28,7 +30,7 @@ export function useMeshPointsSizeStyle(): {
       },
       {
         response_function: async () => {
-          const mutateResult = await meshPointsCommonStyle.mutateMeshPointsStyle(id, { size });
+          const mutateResult = await meshPointsCommonStyle.mutateMeshPointsStyle(meshId, { size });
           return mutateResult;
         },
       },

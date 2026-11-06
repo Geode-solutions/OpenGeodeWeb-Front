@@ -1,7 +1,12 @@
+import type {
+  AttributeColorMap,
+  AttributeTimeStep,
+  ValidAttributeRange,
+} from "@ogw_front/types/attribute";
+import { type AttributeInfo, getAttributeRange } from "@ogw_front/utils/attributes";
 import { type AttributeSchemas, fetchAttributeRange } from "@ogw_front/utils/attribute_range";
 import type { JsonRpcSchema } from "@ogw_shared/utils/types";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
-import { getAttributeRange } from "@ogw_front/utils/attributes";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
@@ -15,16 +20,16 @@ interface AttributeColoring {
 }
 
 interface AttributeNamesResponse {
-  attributes: { attribute_name: string; time_steps?: number[] }[];
+  attributes: Pick<AttributeInfo, "attribute_name" | "time_steps">[];
 }
 
 interface AttributeColoringStyle {
-  currentColormap: ComputedRef<string>;
-  currentRange: WritableComputedRef<readonly [number, number]>;
-  applyGlobalColormap: (colorMap: string) => Promise<void>;
+  currentColormap: ComputedRef<AttributeColorMap>;
+  currentRange: WritableComputedRef<Readonly<ValidAttributeRange>>;
+  applyGlobalColormap: (colorMap: AttributeColorMap) => Promise<void>;
   resetGlobalRange: () => Promise<void>;
   currentTimeSteps: Ref<number[]>;
-  currentTimeStep: WritableComputedRef<number>;
+  currentTimeStep: WritableComputedRef<AttributeTimeStep>;
   loadTimeSteps: () => Promise<void>;
 }
 
@@ -76,7 +81,7 @@ function useAttributeColoringStyle(colorings: Ref<AttributeColoring[]>): Attribu
     await hybridViewerStore.remoteRender();
   }
 
-  const currentColormap = computed((): string => {
+  const currentColormap = computed((): AttributeColorMap => {
     const [coloring] = colorings.value;
     if (!coloring) {
       return "batlow";
@@ -84,12 +89,12 @@ function useAttributeColoringStyle(colorings: Ref<AttributeColoring[]>): Attribu
     return String(coloring.read("ColorMap"));
   });
 
-  async function applyGlobalColormap(colorMap: string): Promise<void> {
+  async function applyGlobalColormap(colorMap: AttributeColorMap): Promise<void> {
     await writeAll("ColorMap", colorMap);
   }
 
-  const currentRange = computed<readonly [number, number]>({
-    get(): readonly [number, number] {
+  const currentRange = computed<Readonly<ValidAttributeRange>>({
+    get(): Readonly<ValidAttributeRange> {
       const [coloring] = colorings.value;
       if (!coloring) {
         return [0, 1];
@@ -99,7 +104,7 @@ function useAttributeColoringStyle(colorings: Ref<AttributeColoring[]>): Attribu
       return [minimum, maximum];
     },
     // Vue's WritableComputedOptions setter is strictly `(v: T) => void`: the async write is delegated.
-    set: (range: readonly [number, number]): void => {
+    set: (range: Readonly<ValidAttributeRange>): void => {
       /* oxlint-disable-next-line promise/prefer-await-to-then -- setter cannot be async; see comment above. */
       writeAll("Range", range[0], range[1]).catch(() => undefined);
     },
@@ -152,7 +157,7 @@ function useAttributeColoringStyle(colorings: Ref<AttributeColoring[]>): Attribu
     }
   }
 
-  const currentTimeStep = computed<number>({
+  const currentTimeStep = computed<AttributeTimeStep>({
     get(): number {
       const coloring = temporalColoring.value;
       if (!coloring) {

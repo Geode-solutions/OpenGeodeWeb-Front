@@ -1,3 +1,5 @@
+import type { BlockId, ModelId } from "@ogw_front/types/identifiers";
+import type { Visibility } from "@ogw_front/types/style";
 import { useModelBlocksCommonStyle } from "./common";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
@@ -6,23 +8,23 @@ const schema = viewer_schemas.opengeodeweb_viewer.model.blocks.visibility;
 
 export function useModelBlocksVisibility(): {
   setModelBlocksVisibility: (
-    modelId: string,
-    blocks_ids: string[],
-    visibility: boolean,
+    modelId: ModelId,
+    blocks_ids: BlockId[],
+    visibility: Visibility,
   ) => Promise<unknown>;
-  modelBlockVisibility: (id: string, block_id?: string) => unknown;
+  modelBlockVisibility: (modelId: ModelId, block_id?: BlockId) => unknown;
 } {
   const modelCommonStyle = useModelCommonStyle();
   const modelBlocksCommonStyle = useModelBlocksCommonStyle();
 
-  function modelBlockVisibility(id: string, block_id?: string): unknown {
-    return modelBlocksCommonStyle.modelBlockStyle(id, block_id).visibility;
+  function modelBlockVisibility(modelId: ModelId, block_id?: BlockId): unknown {
+    return modelBlocksCommonStyle.modelBlockStyle(modelId, block_id).visibility;
   }
 
   async function setModelBlocksVisibility(
-    modelId: string,
-    blocks_ids: string[],
-    visibility: boolean,
+    modelId: ModelId,
+    blocks_ids: BlockId[],
+    visibility: Visibility,
   ): Promise<unknown> {
     const result = await modelCommonStyle.setModelTypeVisibility(
       modelId,

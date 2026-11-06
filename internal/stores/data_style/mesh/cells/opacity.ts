@@ -1,3 +1,5 @@
+import type { MeshId } from "@ogw_front/types/identifiers";
+import type { Opacity } from "@ogw_front/types/style";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
@@ -11,21 +13,21 @@ const schema = viewer_schemas.opengeodeweb_viewer.mesh.cells.opacity;
 
 // The opacity is the constant color alpha, the viewer applies it whatever the coloring
 export function useMeshCellsOpacityStyle(): {
-  meshCellsOpacity: (id: string) => number | undefined;
-  setMeshCellsOpacity: (id: string, opacity: number) => Promise<unknown>;
+  meshCellsOpacity: (meshId: MeshId) => Opacity | undefined;
+  setMeshCellsOpacity: (meshId: MeshId, opacity: Opacity) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const meshCellsCommonStyle = useMeshCellsCommonStyle();
 
-  function meshCellsConstantColor(id: string): RGBAColor | undefined {
+  function meshCellsConstantColor(meshId: MeshId): RGBAColor | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.constant shape is defined by the data style schema.
-    return meshCellsCommonStyle.meshCellsColoring(id).constant as RGBAColor | undefined;
+    return meshCellsCommonStyle.meshCellsColoring(meshId).constant as RGBAColor | undefined;
   }
-  function meshCellsOpacity(id: string): number | undefined {
-    return meshCellsConstantColor(id)?.alpha;
+  function meshCellsOpacity(meshId: MeshId): Opacity | undefined {
+    return meshCellsConstantColor(meshId)?.alpha;
   }
-  async function setMeshCellsOpacity(id: string, opacity: number): Promise<unknown> {
-    const params = { id, opacity };
+  async function setMeshCellsOpacity(meshId: MeshId, opacity: Opacity): Promise<unknown> {
+    const params = { id: meshId, opacity };
     const result = await viewerStore.request(
       {
         schema,
@@ -33,11 +35,11 @@ export function useMeshCellsOpacityStyle(): {
       },
       {
         response_function: async () => {
-          const color = meshCellsConstantColor(id);
+          const color = meshCellsConstantColor(meshId);
           if (color === undefined) {
             return undefined;
           }
-          const mutateResult = await meshCellsCommonStyle.mutateMeshCellsColoring(id, {
+          const mutateResult = await meshCellsCommonStyle.mutateMeshCellsColoring(meshId, {
             constant: { ...color, alpha: opacity },
           });
           return mutateResult;

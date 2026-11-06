@@ -2,6 +2,7 @@
 import { formatCrs, formatCrsCode } from "@ogw_front/utils/crs";
 import ComponentRelations from "@ogw_front/components/Viewer/ObjectTree/Base/ComponentRelations.vue";
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
+import type { GeodeIdentified } from "@ogw_front/types/identifiers";
 import { middleTruncate } from "@ogw_front/utils/string";
 import { useClipboard } from "@vueuse/core";
 import { useCrsStore } from "@ogw_front/stores/crs";
@@ -33,9 +34,8 @@ const labelContainer = useTemplateRef("label-container");
 const { width: containerWidth } = useElementSize(labelContainer);
 
 // The item prop can be either a DisplayItem wrapper (with a `.raw` domain object) or the domain object itself when this component is used outside CommonTreeView's slot machinery; the domain object always carries an id/title at runtime.
-interface LabeledItem {
+interface LabeledItem extends Partial<GeodeIdentified> {
   id: string;
-  geode_id?: string;
   title?: string;
   is_active?: boolean;
   category?: string;

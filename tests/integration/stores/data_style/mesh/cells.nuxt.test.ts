@@ -9,7 +9,7 @@ import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants
 import { Status } from "@ogw_front/utils/status";
 import { cleanupBackend } from "@ogw_server/utils/cleanup";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
-import { isMeshCellsVertexAttributeValid } from "@ogw_internal/stores/data_style/mesh/cells/vertex";
+import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -95,7 +95,7 @@ describe("mesh cells", () => {
   describe("cells vertex attribute", () => {
     test("coloring vertex attribute - guard on missing parameters", () => {
       expect(
-        isMeshCellsVertexAttributeValid({
+        isAttributeValid({
           name: "points",
           item: 0,
           minimum: undefined,

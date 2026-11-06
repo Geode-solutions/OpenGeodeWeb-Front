@@ -1,18 +1,15 @@
 <script setup lang="ts">
+import type { DataId } from "@ogw_front/types/identifiers";
+import type { Texture } from "@ogw_front/types/texture";
 import ViewerOptionsTextureItem from "@ogw_front/components/Viewer/Options/TextureItem.vue";
-
-interface Texture {
-  id: string;
-  texture_name: string;
-}
 
 const textures = defineModel<Texture[]>();
 
 interface Props {
-  id: string;
+  dataId: DataId;
 }
 
-const { id } = defineProps<Props>();
+const { dataId } = defineProps<Props>();
 
 const internal_textures = ref<Texture[]>([]);
 
@@ -51,7 +48,7 @@ function update_value_event($event: { key: keyof Texture; value: string }, index
       />
     </v-col>
     <ViewerOptionsTextureItem
-      :id="id"
+      :data-id="dataId"
       :texture-name="texture.texture_name"
       :texture-id="texture.id"
       @update_value="update_value_event($event, index)"

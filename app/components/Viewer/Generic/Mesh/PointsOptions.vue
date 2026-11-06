@@ -1,4 +1,12 @@
 <script setup lang="ts">
+import type {
+  AttributeColorMap,
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+  AttributeTimeStep,
+} from "@ogw_front/types/attribute";
+import type { Opacity, Size, Visibility } from "@ogw_front/types/style";
 import {
   type RangesPerData,
   applyRangesPerData,
@@ -7,6 +15,7 @@ import {
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import ViewerOptionsSizeSlider from "@ogw_front/components/Viewer/Options/Sliders/Size.vue";
@@ -26,128 +35,128 @@ interface Props {
 
 const { itemProps, btnImage, tooltip = "Points options" } = defineProps<Props>();
 
-const id = toRef(() => itemProps.id);
+const dataId = toRef(() => itemProps.id);
 
-const visibility = computed<boolean>({
-  get: () => dataStyleStore.meshPointsVisibility(id.value),
+const visibility = computed<Visibility>({
+  get: () => dataStyleStore.meshPointsVisibility(dataId.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshPointsVisibility(targetId, newValue),
+    await applyBatchStyle(dataId.value, (meshId: MeshId) =>
+      dataStyleStore.setMeshPointsVisibility(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
 });
-const size = computed<number>({
-  get: () => dataStyleStore.meshPointsSize(id.value),
+const size = computed<Size>({
+  get: () => dataStyleStore.meshPointsSize(dataId.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshPointsSize(targetId, newValue),
+    await applyBatchStyle(dataId.value, (meshId: MeshId) =>
+      dataStyleStore.setMeshPointsSize(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const coloring_style_key = computed<string>({
-  get: () => dataStyleStore.meshPointsActiveColoring(id.value),
+  get: () => dataStyleStore.meshPointsActiveColoring(dataId.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshPointsActiveColoring(targetId, newValue),
+    await applyBatchStyle(dataId.value, (meshId: MeshId) =>
+      dataStyleStore.setMeshPointsActiveColoring(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const color = computed<RGBAColor | undefined>({
-  get: () => dataStyleStore.meshPointsColor(id.value) as RGBAColor | undefined,
+  get: () => dataStyleStore.meshPointsColor(dataId.value) as RGBAColor | undefined,
   set: async (newValue) => {
     if (newValue === undefined) {
       return;
     }
-    await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshPointsColor(targetId, newValue),
+    await applyBatchStyle(dataId.value, (meshId: MeshId) =>
+      dataStyleStore.setMeshPointsColor(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
 });
-const opacity = computed<number | undefined>({
-  get: () => dataStyleStore.meshPointsOpacity(id.value),
+const opacity = computed<Opacity | undefined>({
+  get: () => dataStyleStore.meshPointsOpacity(dataId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
       return;
     }
-    await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshPointsOpacity(targetId, newValue),
+    await applyBatchStyle(dataId.value, (meshId: MeshId) =>
+      dataStyleStore.setMeshPointsOpacity(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_name = computed<string | undefined>({
-  get: () => dataStyleStore.meshPointsVertexAttributeName(id.value),
+const vertex_attribute_name = computed<AttributeName | undefined>({
+  get: () => dataStyleStore.meshPointsVertexAttributeName(dataId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
       return;
     }
-    await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPointsVertexAttributeName(targetId, newValue)),
+    await applyBatchStyle(dataId.value, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPointsVertexAttributeName(meshId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
 });
 
-const vertex_attribute_time_step = computed<number | undefined>({
-  get: () => dataStyleStore.meshPointsVertexAttributeTimeStep(id.value),
+const vertex_attribute_time_step = computed<AttributeTimeStep | undefined>({
+  get: () => dataStyleStore.meshPointsVertexAttributeTimeStep(dataId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
       return;
     }
-    await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPointsVertexAttributeTimeStep(targetId, newValue)),
+    await applyBatchStyle(dataId.value, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPointsVertexAttributeTimeStep(meshId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_item = computed<string | undefined>({
-  get: () => dataStyleStore.meshPointsVertexAttributeItem(id.value),
+const vertex_attribute_item = computed<AttributeItem>({
+  get: () => dataStyleStore.meshPointsVertexAttributeItem(dataId.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPointsVertexAttributeItem(targetId, newValue)),
+    await applyBatchStyle(dataId.value, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPointsVertexAttributeItem(meshId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_range = computed<[number, number] | undefined>({
-  get: () => dataStyleStore.meshPointsVertexAttributeRange(id.value),
+const vertex_attribute_range = computed<AttributeRange>({
+  get: () => dataStyleStore.meshPointsVertexAttributeRange(dataId.value),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
     if (minimum === undefined || maximum === undefined) {
       return;
     }
-    await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPointsVertexAttributeRange(targetId, minimum, maximum)),
+    await applyBatchStyle(dataId.value, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPointsVertexAttributeRange(meshId, minimum, maximum)),
     );
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_color_map = computed<Map<string, RGBAColor>>({
-  get: () => dataStyleStore.meshPointsVertexAttributeColorMap(id.value),
+const vertex_attribute_color_map = computed<AttributeColorMap | undefined>({
+  get: () => dataStyleStore.meshPointsVertexAttributeColorMap(dataId.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPointsVertexAttributeColorMap(targetId, newValue)),
+    await applyBatchStyle(dataId.value, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPointsVertexAttributeColorMap(meshId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_no_data_color = computed<RGBAColor>({
-  get: () => dataStyleStore.meshPointsVertexAttributeNoDataColor(id.value),
+  get: () => dataStyleStore.meshPointsVertexAttributeNoDataColor(dataId.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshPointsVertexAttributeNoDataColor(targetId, newValue),
+    await applyBatchStyle(dataId.value, (meshId: MeshId) =>
+      dataStyleStore.setMeshPointsVertexAttributeNoDataColor(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
 });
 
 async function setVertexAttributeRangesPerData(ranges: RangesPerData): Promise<void> {
-  await applyRangesPerData(ranges, (targetId, minimum, maximum) =>
-    dataStyleStore.setMeshPointsVertexAttributeRange(targetId, minimum, maximum),
+  await applyRangesPerData(ranges, (meshId, minimum, maximum) =>
+    dataStyleStore.setMeshPointsVertexAttributeRange(meshId, minimum, maximum),
   );
   hybridViewerStore.remoteRender();
 }
@@ -174,7 +183,7 @@ async function setVertexAttributeRangesPerData(ranges: RangesPerData): Promise<v
         <v-divider class="my-2" />
         <ViewerOptionsSizeSlider data-testid="meshPointsSizeSlider" v-model="size" />
         <ViewerOptionsColoringTypeSelector
-          :id="id"
+          :data-id="dataId"
           v-model:coloring_style_key="coloring_style_key"
           v-model:color="color"
           v-model:opacity="opacity"

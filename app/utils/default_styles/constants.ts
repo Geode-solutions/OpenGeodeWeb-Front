@@ -10,6 +10,13 @@ interface AttributeConfig {
   storedConfigs: Record<string, unknown>;
 }
 
+// How a component of a data is colored: by a constant color or by the attribute of its vertices
+interface ComponentColoring {
+  active: string;
+  constant: RGBAColor;
+  vertex: AttributeConfig;
+}
+
 // Mesh
 const MESH_DEFAULT_ACTIVE_COLORING = "constant";
 const POINTS_DEFAULT_VISIBILITY = true;
@@ -59,7 +66,7 @@ const SCENE_DEFAULT_TEXT_COLOR: RGBAColor = { red: 0, green: 0, blue: 0, alpha: 
 const SCENE_DEFAULT_FONT_FAMILY = "arial";
 const SCENE_DEFAULT_ORIENTATION_WIDGET = "axes";
 
-export type { RGBAColor, AttributeConfig };
+export type { RGBAColor, AttributeConfig, ComponentColoring };
 export {
   POINTS_DEFAULT_VISIBILITY,
   POINTS_DEFAULT_SIZE,

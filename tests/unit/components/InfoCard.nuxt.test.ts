@@ -24,7 +24,7 @@ describe("info card crs", () => {
     crsStore.enableCrsEdit();
     const wrapper = await mountSuspended(InfoCard, {
       global: { plugins: [vuetify, pinia] },
-      props: { show: true, metaData: { id: "data-1", name: "cube", crs: LAMBERT } },
+      props: { show: true, metaData: { data_id: "data-1", name: "cube", crs: LAMBERT } },
     });
     // The card is narrow: the code alone, the full name is in the tooltip
     expect(wrapper.get('[data-testid="infoCrsValue"]').text()).toBe("EPSG:2154");
@@ -38,7 +38,7 @@ describe("info card crs", () => {
   test("hides the edit button when the host app cannot edit", async () => {
     const wrapper = await mountSuspended(InfoCard, {
       global: { plugins: [vuetify, pinia] },
-      props: { show: true, metaData: { id: "data-2", name: "cube" } },
+      props: { show: true, metaData: { data_id: "data-2", name: "cube" } },
     });
     expect(wrapper.get('[data-testid="infoCrsValue"]').text()).toBe("None");
     expect(wrapper.find('[data-testid="infoEditCrsBtn"]').exists()).toBe(false);
@@ -47,7 +47,7 @@ describe("info card crs", () => {
   test("has no crs row for a model component", async () => {
     const wrapper = await mountSuspended(InfoCard, {
       global: { plugins: [vuetify, pinia] },
-      props: { show: true, metaData: { id: "comp-1", modelId: "model-1", name: "Block" } },
+      props: { show: true, metaData: { modelId: "model-1", name: "Block" } },
     });
     expect(wrapper.find('[data-testid="infoCrsValue"]').exists()).toBe(false);
   });
@@ -55,11 +55,11 @@ describe("info card crs", () => {
   test("shows the crs stored after an edit, not the one captured when the menu opened", async () => {
     const dataStore = useDataStore();
     dataStore.refItem = mockAs<typeof dataStore.refItem>(
-      vi.fn<() => unknown>().mockReturnValue(ref({ id: "data-3", crs: UTM })),
+      vi.fn<() => unknown>().mockReturnValue(ref({ data_id: "data-3", crs: UTM })),
     );
     const wrapper = await mountSuspended(InfoCard, {
       global: { plugins: [vuetify, pinia] },
-      props: { show: true, metaData: { id: "data-3", name: "cube", crs: LAMBERT } },
+      props: { show: true, metaData: { data_id: "data-3", name: "cube", crs: LAMBERT } },
     });
     expect(wrapper.get('[data-testid="infoCrsValue"]').text()).toBe("EPSG:32631");
   });

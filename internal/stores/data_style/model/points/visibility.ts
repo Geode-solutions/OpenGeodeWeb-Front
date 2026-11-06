@@ -6,6 +6,8 @@ import {
   POINTS_COMPONENT_TYPES,
   useModelComponentPointsStyle,
 } from "@ogw_internal/stores/data_style/model/points/component";
+import type { ModelId } from "@ogw_front/types/identifiers";
+import type { Visibility } from "@ogw_front/types/style";
 import { useModelPointsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -13,8 +15,8 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const schema = viewer_schemas.opengeodeweb_viewer.model.points.visibility;
 
 export function useModelPointsVisibilityStyle(): {
-  modelPointsVisibility: (id: string) => boolean | undefined;
-  setModelPointsVisibility: (id: string, visibility: boolean) => Promise<unknown>;
+  modelPointsVisibility: (modelId: ModelId) => Visibility | undefined;
+  setModelPointsVisibility: (modelId: ModelId, visibility: Visibility) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const modelPointsCommonStyle = useModelPointsCommonStyle();
@@ -22,21 +24,24 @@ export function useModelPointsVisibilityStyle(): {
     useModelComponentPointsStyle(type),
   );
 
-  function modelPointsVisibility(id: string): boolean | undefined {
+  function modelPointsVisibility(modelId: ModelId): Visibility | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- points style values are dynamically typed at runtime.
-    return modelPointsCommonStyle.modelPointsStyle(id).visibility as boolean | undefined;
+    return modelPointsCommonStyle.modelPointsStyle(modelId).visibility as Visibility | undefined;
   }
 
-  async function setModelPointsVisibility(id: string, visibility: boolean): Promise<unknown> {
-    const params = { id, visibility };
+  async function setModelPointsVisibility(
+    modelId: ModelId,
+    visibility: Visibility,
+  ): Promise<unknown> {
+    const params = { id: modelId, visibility };
     const result = await viewerStore.request(
       { schema, params },
       {
         response_function: async () => {
           const [mutateResult] = await Promise.all([
-            modelPointsCommonStyle.mutateModelPointsStyle(id, { visibility }),
+            modelPointsCommonStyle.mutateModelPointsStyle(modelId, { visibility }),
             ...componentsPointsStyles.map(async (pointsStyle) => {
-              await pointsStyle.mutateStyledPoints(id, { visibility });
+              await pointsStyle.mutateStyledPoints(modelId, { visibility });
             }),
           ]);
           return mutateResult;

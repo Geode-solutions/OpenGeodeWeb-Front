@@ -61,7 +61,7 @@ describe("item label tooltip", () => {
     const LAMBERT = { authority: "EPSG", code: "2154", name: "RGF93 v1 / Lambert-93" };
     const dataStore = useDataStore();
     dataStore.refItem = mockAs<typeof dataStore.refItem>(
-      vi.fn<() => unknown>().mockReturnValue(ref({ id: DATA_ID, crs: LAMBERT })),
+      vi.fn<() => unknown>().mockReturnValue(ref({ data_id: DATA_ID, crs: LAMBERT })),
     );
     const crsStore = useCrsStore();
     crsStore.enableCrsEdit();
@@ -80,7 +80,7 @@ describe("item label tooltip", () => {
 
   test("does not read the stored item while the tooltip is closed", async () => {
     const dataStore = useDataStore();
-    const refItem = vi.fn<() => unknown>().mockReturnValue(ref({ id: DATA_ID }));
+    const refItem = vi.fn<() => unknown>().mockReturnValue(ref({ data_id: DATA_ID }));
     dataStore.refItem = mockAs<typeof dataStore.refItem>(refItem);
     await mountSuspended(ItemLabel, {
       global: { plugins: [vuetify, pinia], stubs: { VTooltip: VTooltipStub } },
@@ -105,8 +105,8 @@ describe("item label tooltip", () => {
     const LAMBERT = { authority: "EPSG", code: "2154", name: "RGF93 v1 / Lambert-93" };
     const OTHER_ID = "b".repeat(DATA_ID_LENGTH);
     const items: Record<string, unknown> = {
-      [DATA_ID]: { id: DATA_ID },
-      [OTHER_ID]: { id: OTHER_ID, crs: LAMBERT },
+      [DATA_ID]: { data_id: DATA_ID },
+      [OTHER_ID]: { data_id: OTHER_ID, crs: LAMBERT },
     };
     const dataStore = useDataStore();
     dataStore.refItem = mockAs<typeof dataStore.refItem>(
@@ -136,9 +136,9 @@ describe("item label crs mismatch", () => {
     const dataStore = useDataStore();
     dataStore.refCrsItems = mockAs<typeof dataStore.refCrsItems>(() =>
       ref([
-        { id: "a", created_at: "1", crs: LAMBERT },
-        { id: "b", created_at: "2", crs: UTM },
-        { id: "local", created_at: "3" },
+        { data_id: "a", created_at: "1", crs: LAMBERT },
+        { data_id: "b", created_at: "2", crs: UTM },
+        { data_id: "local", created_at: "3" },
       ]),
     );
     useCrsStore();

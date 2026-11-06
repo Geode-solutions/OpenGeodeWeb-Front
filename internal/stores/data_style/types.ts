@@ -1,10 +1,11 @@
+import type { DataIdentified } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { Visibility } from "@ogw_front/types/style";
 
 type StyleValues = Record<string, unknown>;
 
-interface ObjectStyle {
-  id: string;
-  visibility?: boolean;
+interface ObjectStyle extends DataIdentified {
+  visibility?: Visibility;
   color?: unknown;
   points?: StyleValues;
   edges?: StyleValues;

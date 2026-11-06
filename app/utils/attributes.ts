@@ -1,3 +1,4 @@
+import type { AttributeName, AttributeTimeStep } from "@ogw_front/types/attribute";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 interface AttributeRangeSource {
@@ -7,7 +8,7 @@ interface AttributeRangeSource {
   max_value?: number;
 }
 
-interface AttributeRange {
+interface AttributeMinMax {
   min: number;
   max: number;
 }
@@ -15,7 +16,7 @@ interface AttributeRange {
 function getAttributeRange(
   currentAttribute: AttributeRangeSource | undefined | null,
   compIndex = 0,
-): AttributeRange {
+): AttributeMinMax {
   if (!currentAttribute) {
     return { min: 0, max: 1 };
   }
@@ -90,10 +91,17 @@ function intersectBy<TItem>(
   );
 }
 
+// An attribute of a data: its name, its number of items and the time steps it is defined at
 interface NamedAttribute {
-  attribute_name: string;
+  attribute_name: AttributeName;
   nb_items: number;
   time_steps?: readonly number[];
+}
+
+// What the back-end answers for an attribute, which may carry more fields than these
+interface AttributeInfo extends NamedAttribute {
+  time_steps?: number[];
+  [key: string]: unknown;
 }
 
 function sameTimeSteps(left: NamedAttribute, right: NamedAttribute): boolean {
@@ -124,10 +132,11 @@ function intersectAttributes<TAttribute extends NamedAttribute>(
 }
 
 // OpenGeode-IO writes each step of a time series as the "<name>@<step>" VTK array
-function attributeArrayName(name: string, timeStep: number | undefined): string {
+function attributeArrayName(name: string, timeStep: AttributeTimeStep | undefined): string {
   return timeStep === undefined ? name : `${name}@${timeStep}`;
 }
 
+export type { AttributeInfo, NamedAttribute };
 export {
   MESH_ELEMENT_KINDS,
   MODEL_COMPONENT_ATTRIBUTE_SCHEMAS,

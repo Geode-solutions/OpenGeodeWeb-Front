@@ -22,7 +22,7 @@ function useGeoreferenced(): Georeferenced {
   function georeferencedIds(): string[] {
     return crsStore.crsItems
       .filter((item) => sameCrs(item.crs, crsStore.projectCrs))
-      .map((item) => item.id);
+      .map((item) => item.data_id);
   }
 
   const available = computed(

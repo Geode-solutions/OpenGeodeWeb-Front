@@ -1,4 +1,8 @@
-import { MODEL_DEFAULT_ACTIVE_COLORING, MODEL_DEFAULT_COLOR, type RGBAColor } from "./constants";
+import {
+  type ComponentColoring,
+  MODEL_DEFAULT_ACTIVE_COLORING,
+  MODEL_DEFAULT_COLOR,
+} from "./constants";
 import {
   type ModelBlocksStyle,
   type ModelCornersStyle,
@@ -13,26 +17,20 @@ import {
   modelPointsDefaultStyle,
   modelSurfacesDefaultStyle,
 } from "./model_components";
+import type { Visibility } from "@ogw_front/types/style";
 
-interface ModelWithBlocksStyle {
-  visibility: boolean;
-  coloring: { active: string; constant: RGBAColor };
+interface ModelWithoutBlocksStyle {
+  visibility: Visibility;
+  coloring: Pick<ComponentColoring, "active" | "constant">;
   corners: ModelCornersStyle;
   lines: ModelLinesStyle;
   surfaces: ModelSurfacesStyle;
-  blocks: ModelBlocksStyle;
   points: ModelPointsStyle;
   edges: ModelEdgesStyle;
 }
 
-interface ModelWithoutBlocksStyle {
-  visibility: boolean;
-  coloring: { active: string; constant: RGBAColor };
-  corners: ModelCornersStyle;
-  lines: ModelLinesStyle;
-  surfaces: ModelSurfacesStyle;
-  points: ModelPointsStyle;
-  edges: ModelEdgesStyle;
+interface ModelWithBlocksStyle extends ModelWithoutBlocksStyle {
+  blocks: ModelBlocksStyle;
 }
 
 function brepDefaultStyle(): ModelWithBlocksStyle {

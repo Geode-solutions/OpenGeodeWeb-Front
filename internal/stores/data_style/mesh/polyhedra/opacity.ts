@@ -1,3 +1,5 @@
+import type { MeshId } from "@ogw_front/types/identifiers";
+import type { Opacity } from "@ogw_front/types/style";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
@@ -11,21 +13,21 @@ const schema = viewer_schemas.opengeodeweb_viewer.mesh.polyhedra.opacity;
 
 // The opacity is the constant color alpha, the viewer applies it whatever the coloring
 export function useMeshPolyhedraOpacityStyle(): {
-  meshPolyhedraOpacity: (id: string) => number | undefined;
-  setMeshPolyhedraOpacity: (id: string, opacity: number) => Promise<unknown>;
+  meshPolyhedraOpacity: (meshId: MeshId) => Opacity | undefined;
+  setMeshPolyhedraOpacity: (meshId: MeshId, opacity: Opacity) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const meshPolyhedraCommonStyle = useMeshPolyhedraCommonStyle();
 
-  function meshPolyhedraConstantColor(id: string): RGBAColor | undefined {
+  function meshPolyhedraConstantColor(meshId: MeshId): RGBAColor | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.constant shape is defined by the data style schema.
-    return meshPolyhedraCommonStyle.meshPolyhedraColoring(id).constant as RGBAColor | undefined;
+    return meshPolyhedraCommonStyle.meshPolyhedraColoring(meshId).constant as RGBAColor | undefined;
   }
-  function meshPolyhedraOpacity(id: string): number | undefined {
-    return meshPolyhedraConstantColor(id)?.alpha;
+  function meshPolyhedraOpacity(meshId: MeshId): Opacity | undefined {
+    return meshPolyhedraConstantColor(meshId)?.alpha;
   }
-  async function setMeshPolyhedraOpacity(id: string, opacity: number): Promise<unknown> {
-    const params = { id, opacity };
+  async function setMeshPolyhedraOpacity(meshId: MeshId, opacity: Opacity): Promise<unknown> {
+    const params = { id: meshId, opacity };
     const result = await viewerStore.request(
       {
         schema,
@@ -33,11 +35,11 @@ export function useMeshPolyhedraOpacityStyle(): {
       },
       {
         response_function: async () => {
-          const color = meshPolyhedraConstantColor(id);
+          const color = meshPolyhedraConstantColor(meshId);
           if (color === undefined) {
             return undefined;
           }
-          const mutateResult = await meshPolyhedraCommonStyle.mutateMeshPolyhedraColoring(id, {
+          const mutateResult = await meshPolyhedraCommonStyle.mutateMeshPolyhedraColoring(meshId, {
             constant: { ...color, alpha: opacity },
           });
           return mutateResult;

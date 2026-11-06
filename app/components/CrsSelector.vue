@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import type { CRSList } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
+import type { GeodeObjectType } from "@ogw_front/types/identifiers";
 import { useCrsStore } from "@ogw_front/stores/crs";
 
 interface Props {
-  geodeObjectType: string;
+  geodeObjectType: GeodeObjectType;
   // Narrow containers: one "AUTHORITY:CODE" column and a truncated name
   compact?: boolean;
 }

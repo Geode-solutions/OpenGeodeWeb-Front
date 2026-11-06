@@ -1,80 +1,50 @@
+import type {
+  AttributeColorMap,
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+  AttributeRangeMaximum,
+  AttributeRangeMinimum,
+  AttributeTimeStep,
+} from "@ogw_front/types/attribute";
+import type {
+  AttributeStoredConfig,
+  ValidAttributeInput,
+} from "@ogw_internal/stores/data_style/attribute_types";
+import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
-interface AttributeStoredConfig {
-  minimum: number | undefined;
-  maximum: number | undefined;
-  colorMap: string | undefined;
-  no_data_color: RGBAColor;
-}
-
-interface AttributeState {
-  name?: string;
-  item?: number;
-  storedConfigs?: Record<string, { lastItem: number } & Record<string, AttributeStoredConfig>>;
-}
-
-interface AttributeInput {
-  name: string | undefined;
-  item: number | undefined;
-  minimum: number | undefined;
-  maximum: number | undefined;
-  colorMap: string | undefined;
-  no_data_color?: RGBAColor;
-}
-
-interface ValidAttributeInput {
-  name: string;
-  item: number;
-  minimum: number;
-  maximum: number;
-  colorMap: string;
-  no_data_color?: RGBAColor;
-}
-
-function isMeshPointsVertexAttributeValid(input: AttributeInput): input is ValidAttributeInput {
-  return (
-    input.name !== undefined &&
-    input.item !== undefined &&
-    input.minimum !== undefined &&
-    input.maximum !== undefined &&
-    input.colorMap !== undefined
-  );
-}
-
 interface UseMeshPointsVertexAttributeStyleReturn {
-  meshPointsVertexAttributeName: (id: string) => string | undefined;
-  meshPointsVertexAttributeItem: (id: string) => number;
-  meshPointsVertexAttributeRange: (id: string) => [number | undefined, number | undefined];
-  meshPointsVertexAttributeTimeStep: (id: string) => number | undefined;
-  setMeshPointsVertexAttributeTimeStep: (id: string, timeStep: number) => Promise<unknown>;
-  meshPointsVertexAttributeColorMap: (id: string) => string | undefined;
+  meshPointsVertexAttributeName: (meshId: MeshId) => AttributeName | undefined;
+  meshPointsVertexAttributeItem: (meshId: MeshId) => AttributeItem;
+  meshPointsVertexAttributeRange: (meshId: MeshId) => AttributeRange;
+  meshPointsVertexAttributeTimeStep: (meshId: MeshId) => AttributeTimeStep | undefined;
+  setMeshPointsVertexAttributeTimeStep: (
+    meshId: MeshId,
+    timeStep: AttributeTimeStep,
+  ) => Promise<unknown>;
+  meshPointsVertexAttributeColorMap: (meshId: MeshId) => AttributeColorMap | undefined;
   meshPointsVertexAttributeStoredConfig: (
-    id: string,
-    name: string | undefined,
-    item: number | undefined,
+    meshId: MeshId,
+    name: AttributeName | undefined,
+    item: AttributeItem | undefined,
   ) => AttributeStoredConfig;
-  setMeshPointsVertexAttribute: (id: string, input: ValidAttributeInput) => Promise<unknown>;
-  setMeshPointsVertexAttributeName: (id: string, name: string) => Promise<unknown>;
-  setMeshPointsVertexAttributeItem: (id: string, item: number) => Promise<unknown>;
+  setMeshPointsVertexAttribute: (meshId: MeshId, input: ValidAttributeInput) => Promise<unknown>;
+  setMeshPointsVertexAttributeName: (meshId: MeshId, name: AttributeName) => Promise<unknown>;
+  setMeshPointsVertexAttributeItem: (meshId: MeshId, item: AttributeItem) => Promise<unknown>;
   setMeshPointsVertexAttributeRange: (
-    id: string,
-    minimum: number,
-    maximum: number,
+    meshId: MeshId,
+    minimum: AttributeRangeMinimum,
+    maximum: AttributeRangeMaximum,
   ) => Promise<unknown>;
   setMeshPointsVertexAttributeColorMap: (
-    id: string,
-    colorMap: string | undefined,
+    meshId: MeshId,
+    colorMap: AttributeColorMap | undefined,
   ) => Promise<unknown>;
-  meshPointsVertexAttributeNoDataColor: (id: string) => RGBAColor;
+  meshPointsVertexAttributeNoDataColor: (meshId: MeshId) => RGBAColor;
   setMeshPointsVertexAttributeNoDataColor: (
-    id: string,
+    meshId: MeshId,
     no_data_color: RGBAColor,
   ) => Promise<unknown>;
 }
-export { isMeshPointsVertexAttributeValid };
-export type {
-  AttributeStoredConfig,
-  AttributeState,
-  ValidAttributeInput,
-  UseMeshPointsVertexAttributeStyleReturn,
-};
+export type { UseMeshPointsVertexAttributeStyleReturn };

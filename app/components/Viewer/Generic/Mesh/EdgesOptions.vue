@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import type { Size, Visibility } from "@ogw_front/types/style";
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import type { MeshId } from "@ogw_front/types/identifiers";
 import ViewerGenericMeshEdgesColoring from "@ogw_front/components/Viewer/Generic/Mesh/EdgesColoring.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import ViewerOptionsWidthSlider from "@ogw_front/components/Viewer/Options/Sliders/Width.vue";
@@ -27,22 +29,22 @@ interface Props {
 
 const { itemProps, btnImage, tooltip = "Edges options", capabilities = {} } = defineProps<Props>();
 
-const id = toRef(() => itemProps.id);
+const dataId = toRef(() => itemProps.id);
 
-const visibility = computed<boolean>({
-  get: () => dataStyleStore.meshEdgesVisibility(id.value),
+const visibility = computed<Visibility>({
+  get: () => dataStyleStore.meshEdgesVisibility(dataId.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshEdgesVisibility(targetId, newValue),
+    await applyBatchStyle(dataId.value, (meshId: MeshId) =>
+      dataStyleStore.setMeshEdgesVisibility(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
 });
-const size = computed<number>({
-  get: () => dataStyleStore.meshEdgesWidth(id.value),
+const size = computed<Size>({
+  get: () => dataStyleStore.meshEdgesWidth(dataId.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshEdgesWidth(targetId, newValue),
+    await applyBatchStyle(dataId.value, (meshId: MeshId) =>
+      dataStyleStore.setMeshEdgesWidth(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
@@ -69,7 +71,7 @@ const size = computed<number>({
       <template v-if="visibility">
         <v-divider class="my-2" />
         <ViewerOptionsWidthSlider data-testid="meshEdgesWidthSlider" v-model="size" />
-        <ViewerGenericMeshEdgesColoring :id="id" :capabilities="capabilities" />
+        <ViewerGenericMeshEdgesColoring :data-id="dataId" :capabilities="capabilities" />
       </template>
     </template>
   </ViewerContextMenuItem>

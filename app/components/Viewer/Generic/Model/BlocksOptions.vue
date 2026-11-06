@@ -1,8 +1,16 @@
 <script setup lang="ts">
 // oxlint-disable eslint/max-lines
+import type {
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+  AttributeTimeStep,
+} from "@ogw_front/types/attribute";
+import type { BlockId } from "@ogw_front/types/identifiers";
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
+import type { Visibility } from "@ogw_front/types/style";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -10,7 +18,7 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 interface Props {
   modelId: string;
-  blockId?: string;
+  blockId?: BlockId;
   targetBlockIds: string[];
   collections?: CollectionComponent[];
   activeTab?: string;
@@ -34,7 +42,7 @@ const referenceBlockId = computed<string | undefined>(() =>
 const blockComponentIds = computed<string[]>(() => (blockId !== undefined && [blockId]) || []);
 
 // Visibility
-const blocksVisibility = computed<boolean>({
+const blocksVisibility = computed<Visibility>({
   get: () => {
     if (collections) {
       return targetBlockIds.every((id) => dataStyleStore.modelBlockVisibility(modelId, id));
@@ -47,7 +55,7 @@ const blocksVisibility = computed<boolean>({
   },
 });
 
-const blockVisibility = computed<boolean | undefined>({
+const blockVisibility = computed<Visibility | undefined>({
   get: () => dataStyleStore.modelBlockVisibility(modelId, blockId) as boolean | undefined,
   set: async (newValue) => {
     if (newValue === undefined || blockId === undefined) {
@@ -116,7 +124,7 @@ const blockActiveColoring = computed<string | undefined>({
 });
 
 // Group Attributes
-const blocksVertexAttributeName = computed<string | undefined>({
+const blocksVertexAttributeName = computed<AttributeName | undefined>({
   get: () => dataStyleStore.modelBlocksVertexAttributeName(modelId, referenceBlockId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -127,7 +135,7 @@ const blocksVertexAttributeName = computed<string | undefined>({
   },
 });
 
-const blocksVertexAttributeTimeStep = computed<number | undefined>({
+const blocksVertexAttributeTimeStep = computed<AttributeTimeStep | undefined>({
   get: () => dataStyleStore.modelBlocksVertexAttributeTimeStep(modelId, referenceBlockId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -138,7 +146,7 @@ const blocksVertexAttributeTimeStep = computed<number | undefined>({
   },
 });
 
-const blocksVertexAttributeItem = computed<string | undefined>({
+const blocksVertexAttributeItem = computed<AttributeItem>({
   get: () => dataStyleStore.modelBlocksVertexAttributeItem(modelId, referenceBlockId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksVertexAttributeItem(modelId, targetBlockIds, newValue);
@@ -146,7 +154,7 @@ const blocksVertexAttributeItem = computed<string | undefined>({
   },
 });
 
-const blocksVertexAttributeRange = computed<[number, number] | undefined>({
+const blocksVertexAttributeRange = computed<AttributeRange>({
   get: () => dataStyleStore.modelBlocksVertexAttributeRange(modelId, referenceBlockId.value),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -183,7 +191,7 @@ const blocksVertexAttributeNoDataColor = computed<RGBAColor>({
   },
 });
 
-const blocksPolyhedronAttributeName = computed<string | undefined>({
+const blocksPolyhedronAttributeName = computed<AttributeName | undefined>({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, referenceBlockId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -200,7 +208,7 @@ const blocksPolyhedronAttributeName = computed<string | undefined>({
   },
 });
 
-const blocksPolyhedronAttributeTimeStep = computed<number | undefined>({
+const blocksPolyhedronAttributeTimeStep = computed<AttributeTimeStep | undefined>({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeTimeStep(modelId, referenceBlockId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -217,7 +225,7 @@ const blocksPolyhedronAttributeTimeStep = computed<number | undefined>({
   },
 });
 
-const blocksPolyhedronAttributeItem = computed<string | undefined>({
+const blocksPolyhedronAttributeItem = computed<AttributeItem>({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeItem(modelId, referenceBlockId.value),
   set: async (newValue) => {
     const applied = await dataStyleStore.setModelBlocksPolyhedronAttributeItem(
@@ -231,7 +239,7 @@ const blocksPolyhedronAttributeItem = computed<string | undefined>({
   },
 });
 
-const blocksPolyhedronAttributeRange = computed<[number, number] | undefined>({
+const blocksPolyhedronAttributeRange = computed<AttributeRange>({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeRange(modelId, referenceBlockId.value),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -280,7 +288,7 @@ const blocksPolyhedronAttributeNoDataColor = computed<RGBAColor>({
 });
 
 // Individual Attributes
-const vertexAttributeName = computed<string | undefined>({
+const vertexAttributeName = computed<AttributeName | undefined>({
   get: () => dataStyleStore.modelBlocksVertexAttributeName(modelId, blockId),
   set: async (newValue) => {
     if (blockId === undefined || newValue === undefined) {
@@ -291,7 +299,7 @@ const vertexAttributeName = computed<string | undefined>({
   },
 });
 
-const vertexAttributeTimeStep = computed<number | undefined>({
+const vertexAttributeTimeStep = computed<AttributeTimeStep | undefined>({
   get: () => dataStyleStore.modelBlocksVertexAttributeTimeStep(modelId, blockId),
   set: async (newValue) => {
     if (blockId === undefined || newValue === undefined) {
@@ -302,7 +310,7 @@ const vertexAttributeTimeStep = computed<number | undefined>({
   },
 });
 
-const vertexAttributeItem = computed<string | undefined>({
+const vertexAttributeItem = computed<AttributeItem>({
   get: () => dataStyleStore.modelBlocksVertexAttributeItem(modelId, blockId),
   set: async (newValue) => {
     if (blockId === undefined) {
@@ -313,7 +321,7 @@ const vertexAttributeItem = computed<string | undefined>({
   },
 });
 
-const vertexAttributeRange = computed<[number, number] | undefined>({
+const vertexAttributeRange = computed<AttributeRange>({
   get: () => dataStyleStore.modelBlocksVertexAttributeRange(modelId, blockId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -347,7 +355,7 @@ const vertexAttributeNoDataColor = computed<RGBAColor>({
   },
 });
 
-const polyhedronAttributeName = computed<string | undefined>({
+const polyhedronAttributeName = computed<AttributeName | undefined>({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeName(modelId, blockId),
   set: async (newValue) => {
     if (blockId === undefined || newValue === undefined) {
@@ -364,7 +372,7 @@ const polyhedronAttributeName = computed<string | undefined>({
   },
 });
 
-const polyhedronAttributeTimeStep = computed<number | undefined>({
+const polyhedronAttributeTimeStep = computed<AttributeTimeStep | undefined>({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeTimeStep(modelId, blockId),
   set: async (newValue) => {
     if (blockId === undefined || newValue === undefined) {
@@ -381,7 +389,7 @@ const polyhedronAttributeTimeStep = computed<number | undefined>({
   },
 });
 
-const polyhedronAttributeItem = computed<string | undefined>({
+const polyhedronAttributeItem = computed<AttributeItem>({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeItem(modelId, blockId),
   set: async (newValue) => {
     if (blockId === undefined) {
@@ -398,7 +406,7 @@ const polyhedronAttributeItem = computed<string | undefined>({
   },
 });
 
-const polyhedronAttributeRange = computed<[number, number] | undefined>({
+const polyhedronAttributeRange = computed<AttributeRange>({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeRange(modelId, blockId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -478,7 +486,7 @@ const attributeSchemas = {
   <div v-show="!activeTab || activeTab === 'type'" data-testid="modelComponentTypeOptions">
     <VisibilitySwitch data-testid="modelBlocksVisibilitySwitch" v-model="blocksVisibility" />
     <ViewerOptionsColoringTypeSelector
-      :id="modelId"
+      :data-id="modelId"
       :componentIds="targetBlockIds"
       v-model:coloring_style_key="blocksActiveColoring"
       v-model:color="blocksColor"
@@ -507,7 +515,7 @@ const attributeSchemas = {
   >
     <VisibilitySwitch v-model="blockVisibility" />
     <ViewerOptionsColoringTypeSelector
-      :id="modelId"
+      :data-id="modelId"
       :componentIds="blockComponentIds"
       v-model:coloring_style_key="blockActiveColoring"
       v-model:color="blockColor"

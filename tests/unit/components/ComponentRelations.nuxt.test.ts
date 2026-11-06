@@ -28,7 +28,7 @@ describe("component relations", () => {
     const dataStore = useDataStore();
     await dataStore.clear();
     const model = {
-      id: MODEL_ID,
+      data_id: MODEL_ID,
       geode_id: MODEL_ID,
       viewer_type: "model",
       geode_object_type: "Section",

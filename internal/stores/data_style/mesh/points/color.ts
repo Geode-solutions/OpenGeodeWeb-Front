@@ -1,3 +1,4 @@
+import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
@@ -11,18 +12,18 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const schema = viewer_schemas.opengeodeweb_viewer.mesh.points.color;
 
 export function useMeshPointsColorStyle(): ReturnType<typeof useMeshPointsOpacityStyle> & {
-  meshPointsColor: (id: string) => RGBAColor | undefined;
-  setMeshPointsColor: (id: string, color: RGBAColor) => Promise<unknown>;
+  meshPointsColor: (meshId: MeshId) => RGBAColor | undefined;
+  setMeshPointsColor: (meshId: MeshId, color: RGBAColor) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const meshPointsCommonStyle = useMeshPointsCommonStyle();
 
-  function meshPointsColor(id: string): RGBAColor | undefined {
+  function meshPointsColor(meshId: MeshId): RGBAColor | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.constant shape is defined by the data style schema.
-    return meshPointsCommonStyle.meshPointsColoring(id).constant as RGBAColor | undefined;
+    return meshPointsCommonStyle.meshPointsColoring(meshId).constant as RGBAColor | undefined;
   }
-  async function setMeshPointsColor(id: string, color: RGBAColor): Promise<unknown> {
-    const params = { id, color };
+  async function setMeshPointsColor(meshId: MeshId, color: RGBAColor): Promise<unknown> {
+    const params = { id: meshId, color };
     const result = await viewerStore.request(
       {
         schema,
@@ -30,7 +31,7 @@ export function useMeshPointsColorStyle(): ReturnType<typeof useMeshPointsOpacit
       },
       {
         response_function: async () => {
-          const mutateResult = await meshPointsCommonStyle.mutateMeshPointsColoring(id, {
+          const mutateResult = await meshPointsCommonStyle.mutateMeshPointsColoring(meshId, {
             constant: color,
           });
           return mutateResult;

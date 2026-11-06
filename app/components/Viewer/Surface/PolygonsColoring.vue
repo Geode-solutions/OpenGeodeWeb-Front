@@ -1,199 +1,201 @@
 <script setup lang="ts">
+import type {
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+  AttributeTimeStep,
+} from "@ogw_front/types/attribute";
+import type { DataId, MeshId } from "@ogw_front/types/identifiers";
 import {
   type RangesPerData,
   applyRangesPerData,
   useBatchStyle,
 } from "@ogw_front/composables/batch_style";
+import type { Opacity } from "@ogw_front/types/style";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { Texture } from "@ogw_front/types/texture";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import { useBatchStyleModel } from "@ogw_front/composables/batch_style_model";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-
-interface Texture {
-  id: string;
-  texture_name: string;
-}
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const { applyBatchStyle } = useBatchStyle();
 
 interface Props {
-  id: string;
+  dataId: DataId;
 }
 
-const { id } = defineProps<Props>();
+const { dataId } = defineProps<Props>();
 
 const coloring_style_key = computed<string>({
-  get: () => dataStyleStore.meshPolygonsActiveColoring(id),
+  get: () => dataStyleStore.meshPolygonsActiveColoring(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(id, (targetId: string) =>
-      dataStyleStore.setMeshPolygonsActiveColoring(targetId, newValue),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      dataStyleStore.setMeshPolygonsActiveColoring(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const color = useBatchStyleModel<RGBAColor>(
-  () => id,
-  (targetId) => dataStyleStore.meshPolygonsColor(targetId) as RGBAColor | undefined,
-  (targetId, value) => dataStyleStore.setMeshPolygonsColor(targetId, value),
+  () => dataId,
+  (meshId) => dataStyleStore.meshPolygonsColor(meshId) as RGBAColor | undefined,
+  (meshId, value) => dataStyleStore.setMeshPolygonsColor(meshId, value),
 );
-const opacity = useBatchStyleModel<number>(
-  () => id,
-  (targetId) => dataStyleStore.meshPolygonsOpacity(targetId),
-  (targetId, value) => dataStyleStore.setMeshPolygonsOpacity(targetId, value),
+const opacity = useBatchStyleModel<Opacity>(
+  () => dataId,
+  (meshId) => dataStyleStore.meshPolygonsOpacity(meshId),
+  (meshId, value) => dataStyleStore.setMeshPolygonsOpacity(meshId, value),
 );
 const textures = useBatchStyleModel<Texture[]>(
-  () => id,
-  (targetId) => dataStyleStore.meshPolygonsTextures(targetId) as Texture[] | undefined,
-  (targetId, value) => dataStyleStore.setMeshPolygonsTextures(targetId, value),
+  () => dataId,
+  (meshId) => dataStyleStore.meshPolygonsTextures(meshId) as Texture[] | undefined,
+  (meshId, value) => dataStyleStore.setMeshPolygonsTextures(meshId, value),
 );
-const vertex_attribute_name = computed<string | undefined>({
-  get: () => dataStyleStore.meshPolygonsVertexAttributeName(id),
+const vertex_attribute_name = computed<AttributeName | undefined>({
+  get: () => dataStyleStore.meshPolygonsVertexAttributeName(dataId),
   set: async (newValue) => {
     if (newValue === undefined) {
       return;
     }
-    await applyBatchStyle(id, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolygonsVertexAttributeName(targetId, newValue)),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPolygonsVertexAttributeName(meshId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
 });
 
-const vertex_attribute_time_step = computed<number | undefined>({
-  get: () => dataStyleStore.meshPolygonsVertexAttributeTimeStep(id),
+const vertex_attribute_time_step = computed<AttributeTimeStep | undefined>({
+  get: () => dataStyleStore.meshPolygonsVertexAttributeTimeStep(dataId),
   set: async (newValue) => {
     if (newValue === undefined) {
       return;
     }
-    await applyBatchStyle(id, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolygonsVertexAttributeTimeStep(targetId, newValue)),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPolygonsVertexAttributeTimeStep(meshId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_item = computed<string | undefined>({
-  get: () => dataStyleStore.meshPolygonsVertexAttributeItem(id),
+const vertex_attribute_item = computed<AttributeItem>({
+  get: () => dataStyleStore.meshPolygonsVertexAttributeItem(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(id, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolygonsVertexAttributeItem(targetId, newValue)),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPolygonsVertexAttributeItem(meshId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_range = computed<[number, number] | undefined>({
-  get: () => dataStyleStore.meshPolygonsVertexAttributeRange(id),
+const vertex_attribute_range = computed<AttributeRange>({
+  get: () => dataStyleStore.meshPolygonsVertexAttributeRange(dataId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
     if (minimum === undefined || maximum === undefined) {
       return;
     }
-    await applyBatchStyle(id, (targetId: string) =>
-      Promise.resolve(
-        dataStyleStore.setMeshPolygonsVertexAttributeRange(targetId, minimum, maximum),
-      ),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPolygonsVertexAttributeRange(meshId, minimum, maximum)),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_color_map = computed<Map<string, RGBAColor> | undefined>({
-  get: () => dataStyleStore.meshPolygonsVertexAttributeColorMap(id),
+  get: () => dataStyleStore.meshPolygonsVertexAttributeColorMap(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(id, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolygonsVertexAttributeColorMap(targetId, newValue)),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPolygonsVertexAttributeColorMap(meshId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_no_data_color = computed<RGBAColor>({
-  get: () => dataStyleStore.meshPolygonsVertexAttributeNoDataColor(id),
+  get: () => dataStyleStore.meshPolygonsVertexAttributeNoDataColor(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(id, (targetId: string) =>
-      dataStyleStore.setMeshPolygonsVertexAttributeNoDataColor(targetId, newValue),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      dataStyleStore.setMeshPolygonsVertexAttributeNoDataColor(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
 });
-const polygon_attribute_name = computed<string | undefined>({
-  get: () => dataStyleStore.meshPolygonsPolygonAttributeName(id),
+const polygon_attribute_name = computed<AttributeName | undefined>({
+  get: () => dataStyleStore.meshPolygonsPolygonAttributeName(dataId),
   set: async (newValue) => {
     if (newValue === undefined) {
       return;
     }
-    await applyBatchStyle(id, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolygonsPolygonAttributeName(targetId, newValue)),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPolygonsPolygonAttributeName(meshId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
 });
 
-const polygon_attribute_time_step = computed<number | undefined>({
-  get: () => dataStyleStore.meshPolygonsPolygonAttributeTimeStep(id),
+const polygon_attribute_time_step = computed<AttributeTimeStep | undefined>({
+  get: () => dataStyleStore.meshPolygonsPolygonAttributeTimeStep(dataId),
   set: async (newValue) => {
     if (newValue === undefined) {
       return;
     }
-    await applyBatchStyle(id, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolygonsPolygonAttributeTimeStep(targetId, newValue)),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPolygonsPolygonAttributeTimeStep(meshId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
 });
-const polygon_attribute_item = computed<string | undefined>({
-  get: () => dataStyleStore.meshPolygonsPolygonAttributeItem(id),
+const polygon_attribute_item = computed<AttributeItem>({
+  get: () => dataStyleStore.meshPolygonsPolygonAttributeItem(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(id, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolygonsPolygonAttributeItem(targetId, newValue)),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPolygonsPolygonAttributeItem(meshId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
 });
-const polygon_attribute_range = computed<[number, number] | undefined>({
-  get: () => dataStyleStore.meshPolygonsPolygonAttributeRange(id),
+const polygon_attribute_range = computed<AttributeRange>({
+  get: () => dataStyleStore.meshPolygonsPolygonAttributeRange(dataId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
     if (minimum === undefined || maximum === undefined) {
       return;
     }
-    await applyBatchStyle(id, (targetId: string) =>
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
       Promise.resolve(
-        dataStyleStore.setMeshPolygonsPolygonAttributeRange(targetId, minimum, maximum),
+        dataStyleStore.setMeshPolygonsPolygonAttributeRange(meshId, minimum, maximum),
       ),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const polygon_attribute_color_map = computed<Map<string, RGBAColor> | undefined>({
-  get: () => dataStyleStore.meshPolygonsPolygonAttributeColorMap(id),
+  get: () => dataStyleStore.meshPolygonsPolygonAttributeColorMap(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(id, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolygonsPolygonAttributeColorMap(targetId, newValue)),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPolygonsPolygonAttributeColorMap(meshId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const polygon_attribute_no_data_color = computed<RGBAColor>({
-  get: () => dataStyleStore.meshPolygonsPolygonAttributeNoDataColor(id),
+  get: () => dataStyleStore.meshPolygonsPolygonAttributeNoDataColor(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(id, (targetId: string) =>
-      dataStyleStore.setMeshPolygonsPolygonAttributeNoDataColor(targetId, newValue),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      dataStyleStore.setMeshPolygonsPolygonAttributeNoDataColor(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
 });
 
 async function setVertexAttributeRangesPerData(ranges: RangesPerData): Promise<void> {
-  await applyRangesPerData(ranges, (targetId, minimum, maximum) =>
-    dataStyleStore.setMeshPolygonsVertexAttributeRange(targetId, minimum, maximum),
+  await applyRangesPerData(ranges, (meshId, minimum, maximum) =>
+    dataStyleStore.setMeshPolygonsVertexAttributeRange(meshId, minimum, maximum),
   );
   hybridViewerStore.remoteRender();
 }
 
 async function setPolygonAttributeRangesPerData(ranges: RangesPerData): Promise<void> {
-  await applyRangesPerData(ranges, (targetId, minimum, maximum) =>
-    dataStyleStore.setMeshPolygonsPolygonAttributeRange(targetId, minimum, maximum),
+  await applyRangesPerData(ranges, (meshId, minimum, maximum) =>
+    dataStyleStore.setMeshPolygonsPolygonAttributeRange(meshId, minimum, maximum),
   );
   hybridViewerStore.remoteRender();
 }
@@ -201,7 +203,7 @@ async function setPolygonAttributeRangesPerData(ranges: RangesPerData): Promise<
 
 <template>
   <ViewerOptionsColoringTypeSelector
-    :id="id"
+    :data-id="dataId"
     v-model:coloring_style_key="coloring_style_key"
     v-model:color="color"
     v-model:opacity="opacity"

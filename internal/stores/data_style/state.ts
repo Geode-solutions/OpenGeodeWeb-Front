@@ -6,14 +6,15 @@ import type {
   StyleValues,
 } from "./types";
 import { type SharedState, getSharedState } from "./state_shared";
+import type { ModelId } from "@ogw_front/types/identifiers";
 import { getDefaultSceneStyle } from "@ogw_front/utils/default_styles";
 import { getTable } from "@ogw_internal/database/database";
 import merge from "lodash/merge";
 
 interface DataStyleStateApi extends SharedState {
   getStyle: (objectId: string) => ObjectStyle;
-  getComponentStyle: (modelId: string, componentId: string) => ModelComponentStyle;
-  getModelComponentTypeStyle: (modelId: string, componentType: string) => ModelComponentTypeStyle;
+  getComponentStyle: (modelId: ModelId, componentId: string) => ModelComponentStyle;
+  getModelComponentTypeStyle: (modelId: ModelId, componentType: string) => ModelComponentTypeStyle;
   mutateStyle: (objectId: string, styleValues: StyleValues) => Promise<string>;
   objectVisibility: ComputedRef<(objectId: string) => boolean | undefined>;
   selectedObjects: ComputedRef<string[]>;
@@ -52,7 +53,7 @@ export function useDataStyleState(): DataStyleStateApi {
   function getStyle(objectId: string): ObjectStyle {
     const style = styles.value[objectId];
     if (style === undefined) {
-      return { id: objectId };
+      return { data_id: objectId };
     }
     return { ...toRaw(style) };
   }
@@ -62,18 +63,18 @@ export function useDataStyleState(): DataStyleStateApi {
     const currentStyle = getStyle(objectId);
     merge(currentStyle, styleValues);
     const savedId = await dataStyleTable.put(
-      structuredClone({ ...toRaw(currentStyle), id: objectId }),
+      structuredClone({ ...toRaw(currentStyle), data_id: objectId }),
     );
     return savedId;
   }
 
-  function getComponentStyle(modelId: string, componentId: string): ModelComponentStyle {
+  function getComponentStyle(modelId: ModelId, componentId: string): ModelComponentStyle {
     const cacheKey = `${modelId}_${componentId}`;
     return merge({ coloring: {} }, componentStyles.value[cacheKey]);
   }
 
   function getModelComponentTypeStyle(
-    modelId: string,
+    modelId: ModelId,
     componentType: string,
   ): ModelComponentTypeStyle {
     const cacheKey = `${modelId}_${componentType}`;

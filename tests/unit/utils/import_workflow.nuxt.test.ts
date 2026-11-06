@@ -132,7 +132,7 @@ describe("import workflow", () => {
       ]),
     ).rejects.toThrow("1 file(s) could not be imported");
     expect(dataStore.addItem).toHaveBeenCalledWith(
-      expect.objectContaining({ id: "model.og_brep" }),
+      expect.objectContaining({ data_id: "model.og_brep" }),
     );
     expect(remoteRender).toHaveBeenCalledWith();
   });

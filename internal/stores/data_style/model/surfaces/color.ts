@@ -1,28 +1,30 @@
-import { isModelSurfacesPolygonAttributeValid, useModelSurfacesPolygonAttribute } from "./polygon";
-import { isModelSurfacesVertexAttributeValid, useModelSurfacesVertexAttribute } from "./vertex";
+import type { ModelId, SurfaceId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
+import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 import { useModelSurfacesCommonStyle } from "./common";
+import { useModelSurfacesPolygonAttribute } from "./polygon";
+import { useModelSurfacesVertexAttribute } from "./vertex";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 const schema = viewer_schemas.opengeodeweb_viewer.model.surfaces.color;
 
 export function useModelSurfacesColor(): {
   setModelSurfacesColor: (
-    modelId: string,
-    surfaces_ids: string[],
+    modelId: ModelId,
+    surfaces_ids: SurfaceId[],
     color: RGBAColor | undefined,
     activeColoring?: string,
     collectionId?: string,
   ) => Promise<unknown>;
-  modelSurfaceColoring: (id: string, surface_id?: string) => StyleValues;
-  modelSurfaceColor: (id: string, surface_id?: string) => RGBAColor | undefined;
-  modelSurfaceActiveColoring: (id: string, surface_id?: string) => unknown;
+  modelSurfaceColoring: (modelId: ModelId, surface_id?: SurfaceId) => StyleValues;
+  modelSurfaceColor: (modelId: ModelId, surface_id?: SurfaceId) => RGBAColor | undefined;
+  modelSurfaceActiveColoring: (modelId: ModelId, surface_id?: SurfaceId) => unknown;
   setModelSurfacesActiveColoring: (
-    modelId: string,
-    surfaces_ids: string[],
+    modelId: ModelId,
+    surfaces_ids: SurfaceId[],
     activeColoring: string,
     collectionId?: string,
   ) => Promise<unknown>;
@@ -33,19 +35,19 @@ export function useModelSurfacesColor(): {
   const modelSurfacesVertexAttribute = useModelSurfacesVertexAttribute();
   const modelSurfacesPolygonAttribute = useModelSurfacesPolygonAttribute();
 
-  function modelSurfaceColoring(id: string, surface_id?: string): StyleValues {
+  function modelSurfaceColoring(modelId: ModelId, surface_id?: SurfaceId): StyleValues {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
-    return modelSurfacesCommonStyle.modelSurfaceStyle(id, surface_id).coloring as StyleValues;
+    return modelSurfacesCommonStyle.modelSurfaceStyle(modelId, surface_id).coloring as StyleValues;
   }
 
-  function modelSurfaceColor(id: string, surface_id?: string): RGBAColor | undefined {
+  function modelSurfaceColor(modelId: ModelId, surface_id?: SurfaceId): RGBAColor | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.constant shape is defined by the data style schema.
-    return modelSurfaceColoring(id, surface_id).constant as RGBAColor | undefined;
+    return modelSurfaceColoring(modelId, surface_id).constant as RGBAColor | undefined;
   }
 
   async function setModelSurfacesColor(
-    modelId: string,
-    surfaces_ids: string[],
+    modelId: ModelId,
+    surfaces_ids: SurfaceId[],
     color: RGBAColor | undefined,
     activeColoring = "constant",
     collectionId?: string,
@@ -61,11 +63,14 @@ export function useModelSurfacesColor(): {
     return result;
   }
 
-  function modelSurfaceActiveColoring(id: string, surface_id?: string): unknown {
-    return modelSurfaceColoring(id, surface_id).active;
+  function modelSurfaceActiveColoring(modelId: ModelId, surface_id?: SurfaceId): unknown {
+    return modelSurfaceColoring(modelId, surface_id).active;
   }
 
-  async function applyVertexColoring(modelId: string, surfaces_ids: string[]): Promise<unknown> {
+  async function applyVertexColoring(
+    modelId: ModelId,
+    surfaces_ids: SurfaceId[],
+  ): Promise<unknown> {
     const name = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeName(
       modelId,
       surfaces_ids[0],
@@ -87,7 +92,7 @@ export function useModelSurfacesColor(): {
       surfaces_ids[0],
     );
     const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
-    if (isModelSurfacesVertexAttributeValid(attribute)) {
+    if (isAttributeValid(attribute)) {
       const result = await modelSurfacesVertexAttribute.setModelSurfacesVertexAttribute(
         modelId,
         surfaces_ids,
@@ -98,7 +103,10 @@ export function useModelSurfacesColor(): {
     return undefined;
   }
 
-  async function applyPolygonColoring(modelId: string, surfaces_ids: string[]): Promise<unknown> {
+  async function applyPolygonColoring(
+    modelId: ModelId,
+    surfaces_ids: SurfaceId[],
+  ): Promise<unknown> {
     const name = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeName(
       modelId,
       surfaces_ids[0],
@@ -120,7 +128,7 @@ export function useModelSurfacesColor(): {
       surfaces_ids[0],
     );
     const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
-    if (isModelSurfacesPolygonAttributeValid(attribute)) {
+    if (isAttributeValid(attribute)) {
       const result = await modelSurfacesPolygonAttribute.setModelSurfacesPolygonAttribute(
         modelId,
         surfaces_ids,
@@ -132,8 +140,8 @@ export function useModelSurfacesColor(): {
   }
 
   async function setModelSurfacesActiveColoring(
-    modelId: string,
-    surfaces_ids: string[],
+    modelId: ModelId,
+    surfaces_ids: SurfaceId[],
     activeColoring: string,
     collectionId?: string,
   ): Promise<unknown> {

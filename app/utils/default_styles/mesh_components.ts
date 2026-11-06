@@ -2,6 +2,7 @@ import {
   type AttributeConfig,
   CELLS_DEFAULT_COLOR,
   CELLS_DEFAULT_VISIBILITY,
+  type ComponentColoring,
   EDGES_DEFAULT_COLOR,
   EDGES_DEFAULT_VISIBILITY,
   EDGES_DEFAULT_WIDTH,
@@ -15,66 +16,61 @@ import {
   POLYHEDRA_DEFAULT_VISIBILITY,
   type RGBAColor,
 } from "./constants";
+import type { Size, Visibility, Width } from "@ogw_front/types/style";
 import type { MeshApplyTexturesParams } from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 function emptyAttributeConfig(): AttributeConfig {
   return { name: undefined, storedConfigs: {} };
 }
 
-interface MeshComponentColoring {
-  active: string;
-  constant: RGBAColor;
-  vertex: AttributeConfig;
-}
-
-interface MeshEdgesColoring extends MeshComponentColoring {
+interface MeshEdgesColoring extends ComponentColoring {
   edge: AttributeConfig;
 }
 
-interface MeshCellsColoring extends MeshComponentColoring {
+interface MeshCellsColoring extends ComponentColoring {
   cell: AttributeConfig;
   textures: MeshApplyTexturesParams["textures"];
 }
 
-interface MeshPolygonsColoring extends MeshComponentColoring {
+interface MeshPolygonsColoring extends ComponentColoring {
   textures: MeshApplyTexturesParams["textures"];
   polygon: AttributeConfig;
 }
 
-interface MeshPolyhedraColoring extends MeshComponentColoring {
+interface MeshPolyhedraColoring extends ComponentColoring {
   polyhedron: AttributeConfig;
 }
 
 interface MeshPointsStyle {
-  visibility: boolean;
-  coloring: MeshComponentColoring;
-  size: number;
+  visibility: Visibility;
+  coloring: ComponentColoring;
+  size: Size;
 }
 
 interface MeshEdgesStyle {
-  visibility: boolean;
+  visibility: Visibility;
   coloring: MeshEdgesColoring;
-  width: number;
+  width: Width;
 }
 
 interface MeshCellsStyle {
-  visibility: boolean;
+  visibility: Visibility;
   coloring: MeshCellsColoring;
 }
 
 interface MeshPolygonsStyle {
-  visibility: boolean;
+  visibility: Visibility;
   coloring: MeshPolygonsColoring;
 }
 
 interface MeshPolyhedraStyle {
-  visibility: boolean;
+  visibility: Visibility;
   coloring: MeshPolyhedraColoring;
 }
 
 function meshPointsDefaultStyle(
-  visibility: boolean = POINTS_DEFAULT_VISIBILITY,
-  size: number = POINTS_DEFAULT_SIZE,
+  visibility: Visibility = POINTS_DEFAULT_VISIBILITY,
+  size: Size = POINTS_DEFAULT_SIZE,
   constant: RGBAColor = POINTS_DEFAULT_COLOR,
 ): MeshPointsStyle {
   return {
@@ -89,8 +85,8 @@ function meshPointsDefaultStyle(
 }
 
 function meshEdgesDefaultStyle(
-  visibility: boolean = EDGES_DEFAULT_VISIBILITY,
-  width: number = EDGES_DEFAULT_WIDTH,
+  visibility: Visibility = EDGES_DEFAULT_VISIBILITY,
+  width: Width = EDGES_DEFAULT_WIDTH,
   constant: RGBAColor = EDGES_DEFAULT_COLOR,
 ): MeshEdgesStyle {
   return {
@@ -106,7 +102,7 @@ function meshEdgesDefaultStyle(
 }
 
 function meshCellsDefaultStyle(
-  visibility: boolean = CELLS_DEFAULT_VISIBILITY,
+  visibility: Visibility = CELLS_DEFAULT_VISIBILITY,
   constant: RGBAColor = CELLS_DEFAULT_COLOR,
 ): MeshCellsStyle {
   return {
@@ -122,7 +118,7 @@ function meshCellsDefaultStyle(
 }
 
 function meshPolygonsDefaultStyle(
-  visibility: boolean = POLYGONS_DEFAULT_VISIBILITY,
+  visibility: Visibility = POLYGONS_DEFAULT_VISIBILITY,
   constant: RGBAColor = POLYGONS_DEFAULT_COLOR,
 ): MeshPolygonsStyle {
   return {
@@ -138,7 +134,7 @@ function meshPolygonsDefaultStyle(
 }
 
 function meshPolyhedraDefaultStyle(
-  visibility: boolean = POLYHEDRA_DEFAULT_VISIBILITY,
+  visibility: Visibility = POLYHEDRA_DEFAULT_VISIBILITY,
   constant: RGBAColor = POLYHEDRA_DEFAULT_COLOR,
 ): MeshPolyhedraStyle {
   return {

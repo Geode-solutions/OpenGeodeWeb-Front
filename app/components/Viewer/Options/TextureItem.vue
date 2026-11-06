@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { DataId } from "@ogw_front/types/identifiers";
 import FileUploader from "@ogw_front/components/FileUploader.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { intersectBy } from "@ogw_front/utils/attributes";
@@ -16,12 +17,12 @@ interface Emits {
 const emit = defineEmits<Emits>();
 
 interface Props {
-  id: string;
+  dataId: DataId;
   textureId: string;
   textureName: string;
 }
 
-const { id, textureId: propTextureId, textureName: propTextureName } = defineProps<Props>();
+const { dataId, textureId: propTextureId, textureName: propTextureName } = defineProps<Props>();
 
 const textureName = ref<string>(propTextureName);
 const textureId = ref<string>(propTextureId);
@@ -43,11 +44,11 @@ watch(
 const textureCoordinates = ref<string[]>([]);
 const backStore = useBackStore();
 
-const groupTargetIds = useBatchGroup(() => id);
+const groupTargetIds = useBatchGroup(() => dataId);
 
 async function getTextureCoordinates(): Promise<void> {
   const schema = back_schemas.opengeodeweb_back.texture_coordinates;
-  const targetIds = groupTargetIds.value ?? [id];
+  const targetIds = groupTargetIds.value ?? [dataId];
   const responses = await requestForTargets<{ texture_coordinates: string[] }>(schema, targetIds, {
     texture_coordinates: [],
   });

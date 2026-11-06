@@ -1,80 +1,50 @@
+import type {
+  AttributeColorMap,
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+  AttributeRangeMaximum,
+  AttributeRangeMinimum,
+  AttributeTimeStep,
+} from "@ogw_front/types/attribute";
+import type {
+  AttributeStoredConfig,
+  ValidAttributeInput,
+} from "@ogw_internal/stores/data_style/attribute_types";
+import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
-interface AttributeStoredConfig {
-  minimum: number | undefined;
-  maximum: number | undefined;
-  colorMap: string | undefined;
-  no_data_color: RGBAColor;
-}
-
-interface AttributeState {
-  name?: string;
-  item?: number;
-  storedConfigs?: Record<string, { lastItem: number } & Record<string, AttributeStoredConfig>>;
-}
-
-interface AttributeInput {
-  name: string | undefined;
-  item: number | undefined;
-  minimum: number | undefined;
-  maximum: number | undefined;
-  colorMap: string | undefined;
-  no_data_color?: RGBAColor;
-}
-
-interface ValidAttributeInput {
-  name: string;
-  item: number;
-  minimum: number;
-  maximum: number;
-  colorMap: string;
-  no_data_color?: RGBAColor;
-}
-
-function isMeshPolygonsVertexAttributeValid(input: AttributeInput): input is ValidAttributeInput {
-  return (
-    input.name !== undefined &&
-    input.item !== undefined &&
-    input.minimum !== undefined &&
-    input.maximum !== undefined &&
-    input.colorMap !== undefined
-  );
-}
-
 interface UseMeshPolygonsVertexAttributeStyleReturn {
-  meshPolygonsVertexAttributeName: (id: string) => string | undefined;
-  meshPolygonsVertexAttributeItem: (id: string) => number;
-  meshPolygonsVertexAttributeRange: (id: string) => [number | undefined, number | undefined];
-  meshPolygonsVertexAttributeTimeStep: (id: string) => number | undefined;
-  setMeshPolygonsVertexAttributeTimeStep: (id: string, timeStep: number) => Promise<unknown>;
-  meshPolygonsVertexAttributeColorMap: (id: string) => string | undefined;
+  meshPolygonsVertexAttributeName: (meshId: MeshId) => AttributeName | undefined;
+  meshPolygonsVertexAttributeItem: (meshId: MeshId) => AttributeItem;
+  meshPolygonsVertexAttributeRange: (meshId: MeshId) => AttributeRange;
+  meshPolygonsVertexAttributeTimeStep: (meshId: MeshId) => AttributeTimeStep | undefined;
+  setMeshPolygonsVertexAttributeTimeStep: (
+    meshId: MeshId,
+    timeStep: AttributeTimeStep,
+  ) => Promise<unknown>;
+  meshPolygonsVertexAttributeColorMap: (meshId: MeshId) => AttributeColorMap | undefined;
   meshPolygonsVertexAttributeStoredConfig: (
-    id: string,
-    name: string | undefined,
-    item: number | undefined,
+    meshId: MeshId,
+    name: AttributeName | undefined,
+    item: AttributeItem | undefined,
   ) => AttributeStoredConfig;
-  setMeshPolygonsVertexAttribute: (id: string, input: ValidAttributeInput) => Promise<unknown>;
-  setMeshPolygonsVertexAttributeName: (id: string, name: string) => Promise<unknown>;
-  setMeshPolygonsVertexAttributeItem: (id: string, item: number) => Promise<unknown>;
+  setMeshPolygonsVertexAttribute: (meshId: MeshId, input: ValidAttributeInput) => Promise<unknown>;
+  setMeshPolygonsVertexAttributeName: (meshId: MeshId, name: AttributeName) => Promise<unknown>;
+  setMeshPolygonsVertexAttributeItem: (meshId: MeshId, item: AttributeItem) => Promise<unknown>;
   setMeshPolygonsVertexAttributeRange: (
-    id: string,
-    minimum: number,
-    maximum: number,
+    meshId: MeshId,
+    minimum: AttributeRangeMinimum,
+    maximum: AttributeRangeMaximum,
   ) => Promise<unknown>;
   setMeshPolygonsVertexAttributeColorMap: (
-    id: string,
-    colorMap: string | undefined,
+    meshId: MeshId,
+    colorMap: AttributeColorMap | undefined,
   ) => Promise<unknown>;
-  meshPolygonsVertexAttributeNoDataColor: (id: string) => RGBAColor;
+  meshPolygonsVertexAttributeNoDataColor: (meshId: MeshId) => RGBAColor;
   setMeshPolygonsVertexAttributeNoDataColor: (
-    id: string,
+    meshId: MeshId,
     no_data_color: RGBAColor,
   ) => Promise<unknown>;
 }
-export { isMeshPolygonsVertexAttributeValid };
-export type {
-  AttributeStoredConfig,
-  AttributeState,
-  ValidAttributeInput,
-  UseMeshPolygonsVertexAttributeStyleReturn,
-};
+export type { UseMeshPolygonsVertexAttributeStyleReturn };

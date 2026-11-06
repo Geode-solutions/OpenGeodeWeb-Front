@@ -2,6 +2,8 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
+import type { MeshId } from "@ogw_front/types/identifiers";
+import type { Visibility } from "@ogw_front/types/style";
 import { useMeshPointsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -9,18 +11,18 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const schema = viewer_schemas.opengeodeweb_viewer.mesh.points.visibility;
 
 export function useMeshPointsVisibilityStyle(): {
-  meshPointsVisibility: (id: string) => boolean | undefined;
-  setMeshPointsVisibility: (id: string, visibility: boolean) => Promise<unknown>;
+  meshPointsVisibility: (meshId: MeshId) => Visibility | undefined;
+  setMeshPointsVisibility: (meshId: MeshId, visibility: Visibility) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const meshPointsCommonStyle = useMeshPointsCommonStyle();
 
-  function meshPointsVisibility(id: string): boolean | undefined {
+  function meshPointsVisibility(meshId: MeshId): Visibility | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- visibility is defined as boolean in the data style schema.
-    return meshPointsCommonStyle.meshPointsStyle(id).visibility as boolean | undefined;
+    return meshPointsCommonStyle.meshPointsStyle(meshId).visibility as Visibility | undefined;
   }
-  async function setMeshPointsVisibility(id: string, visibility: boolean): Promise<unknown> {
-    const params = { id, visibility };
+  async function setMeshPointsVisibility(meshId: MeshId, visibility: Visibility): Promise<unknown> {
+    const params = { id: meshId, visibility };
     const result = await viewerStore.request(
       {
         schema,

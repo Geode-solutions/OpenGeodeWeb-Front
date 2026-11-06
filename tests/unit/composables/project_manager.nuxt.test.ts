@@ -39,7 +39,7 @@ const snapshotMock = {
   data: {
     items: [
       {
-        id: "abc123",
+        data_id: "abc123",
         geode_id: "11111111-1111-1111-1111-111111111111",
         viewer_type: "mesh",
         geode_object_type: "PointSet2D",
@@ -370,7 +370,7 @@ describe("projectManager composable (compact)", () => {
     Reflect.deleteProperty(snapshotMock, "crs");
     data.items = mockAs<typeof savedItems>([
       { ...savedItems[0], crs: utm, created_at: "2026-01-02T00:00:00.000Z" },
-      { ...savedItems[0], id: "older", crs: lambert, created_at: "2026-01-01T00:00:00.000Z" },
+      { ...savedItems[0], data_id: "older", crs: lambert, created_at: "2026-01-01T00:00:00.000Z" },
     ]);
     try {
       await importProject(file);

@@ -1,3 +1,5 @@
+import type { CornerId, ModelId } from "@ogw_front/types/identifiers";
+import type { Visibility } from "@ogw_front/types/style";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 import { useModelCornersCommonStyle } from "./common";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
@@ -6,25 +8,25 @@ const schema = viewer_schemas.opengeodeweb_viewer.model.corners.visibility;
 
 interface ModelCornersVisibilityApi {
   setModelCornersVisibility: (
-    modelId: string,
-    corners_ids: string[],
-    visibility: boolean,
+    modelId: ModelId,
+    corners_ids: CornerId[],
+    visibility: Visibility,
   ) => Promise<unknown>;
-  modelCornerVisibility: (id: string, corner_id?: string) => unknown;
+  modelCornerVisibility: (modelId: ModelId, corner_id?: CornerId) => unknown;
 }
 
 export function useModelCornersVisibility(): ModelCornersVisibilityApi {
   const modelCommonStyle = useModelCommonStyle();
   const modelCornersCommonStyle = useModelCornersCommonStyle();
 
-  function modelCornerVisibility(id: string, corner_id?: string): unknown {
-    return modelCornersCommonStyle.modelCornerStyle(id, corner_id).visibility;
+  function modelCornerVisibility(modelId: ModelId, corner_id?: CornerId): unknown {
+    return modelCornersCommonStyle.modelCornerStyle(modelId, corner_id).visibility;
   }
 
   async function setModelCornersVisibility(
-    modelId: string,
-    corners_ids: string[],
-    visibility: boolean,
+    modelId: ModelId,
+    corners_ids: CornerId[],
+    visibility: Visibility,
   ): Promise<unknown> {
     const result = await modelCommonStyle.setModelTypeVisibility(
       modelId,

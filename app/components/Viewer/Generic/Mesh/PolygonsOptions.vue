@@ -2,8 +2,10 @@
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import type { MeshId } from "@ogw_front/types/identifiers";
 import ViewerGenericMeshPolygonsColoring from "@ogw_front/components/Viewer/Generic/Mesh/PolygonsColoring.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
+import type { Visibility } from "@ogw_front/types/style";
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -31,13 +33,13 @@ const {
   capabilities = {},
 } = defineProps<Props>();
 
-const id = toRef(() => itemProps.id);
+const dataId = toRef(() => itemProps.id);
 
-const visibility = computed<boolean>({
-  get: () => dataStyleStore.meshPolygonsVisibility(id.value),
+const visibility = computed<Visibility>({
+  get: () => dataStyleStore.meshPolygonsVisibility(dataId.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshPolygonsVisibility(targetId, newValue),
+    await applyBatchStyle(dataId.value, (meshId: MeshId) =>
+      dataStyleStore.setMeshPolygonsVisibility(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
@@ -59,7 +61,7 @@ const visibility = computed<boolean>({
       />
       <template v-if="visibility">
         <v-divider />
-        <ViewerGenericMeshPolygonsColoring :id="id" :capabilities="capabilities" />
+        <ViewerGenericMeshPolygonsColoring :data-id="dataId" :capabilities="capabilities" />
       </template>
     </template>
   </ViewerContextMenuItem>

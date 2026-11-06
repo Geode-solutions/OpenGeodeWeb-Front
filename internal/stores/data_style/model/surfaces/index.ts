@@ -1,3 +1,4 @@
+import type { ModelId, SurfaceId } from "@ogw_front/types/identifiers";
 import {
   applyModelSurfacesConstantColoring,
   applyModelSurfacesPolygonColoring,
@@ -23,8 +24,8 @@ type UseModelSurfacesStyleReturn = ReturnType<typeof useModelSurfacesCommonStyle
   ReturnType<typeof useModelSurfacesEdgesStyle> &
   ReturnType<typeof useModelSurfacesVertexAttribute> &
   ReturnType<typeof useModelSurfacesPolygonAttribute> & {
-    applyModelSurfacesStyle: (modelId: string) => Promise<void>;
-    setModelSurfacesDefaultStyle: (id: string) => Promise<void>;
+    applyModelSurfacesStyle: (modelId: ModelId) => Promise<void>;
+    setModelSurfacesDefaultStyle: (modelId: ModelId) => Promise<void>;
   };
 
 // oxlint-disable-next-line max-lines-per-function
@@ -39,8 +40,8 @@ export function useModelSurfacesStyle(): UseModelSurfacesStyleReturn {
   const modelSurfacesEdgesStyle = useModelSurfacesEdgesStyle();
 
   async function applyModelSurfacesVisibilityStyle(
-    modelId: string,
-    surfaces_ids: string[],
+    modelId: ModelId,
+    surfaces_ids: SurfaceId[],
   ): Promise<void> {
     const visibilityGroups: Record<string, string[]> = {};
     for (const surfaces_id of surfaces_ids) {
@@ -62,8 +63,8 @@ export function useModelSurfacesStyle(): UseModelSurfacesStyleReturn {
   }
 
   async function applyModelSurfacesColoringStyle(
-    modelId: string,
-    surfaces_ids: string[],
+    modelId: ModelId,
+    surfaces_ids: SurfaceId[],
   ): Promise<unknown[]> {
     const activeColoringGroups: Record<string, string[]> = {};
     for (const surfaces_id of surfaces_ids) {
@@ -107,7 +108,7 @@ export function useModelSurfacesStyle(): UseModelSurfacesStyleReturn {
     return results;
   }
 
-  async function applyModelSurfacesStyle(modelId: string): Promise<void> {
+  async function applyModelSurfacesStyle(modelId: ModelId): Promise<void> {
     const surfaces_ids = await dataStore.getSurfacesGeodeIds(modelId);
     if (surfaces_ids.length === 0) {
       return;

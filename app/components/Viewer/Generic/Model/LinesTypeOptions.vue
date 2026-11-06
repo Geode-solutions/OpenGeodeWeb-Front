@@ -1,8 +1,15 @@
 <script setup lang="ts">
+import type {
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+  AttributeTimeStep,
+} from "@ogw_front/types/attribute";
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import { MODEL_LINE_COLORING } from "@ogw_front/utils/model_component_coloring";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
+import type { Visibility } from "@ogw_front/types/style";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -29,7 +36,7 @@ const referenceLineId = computed<string | undefined>(() =>
 );
 
 // Visibility
-const linesVisibility = computed<boolean>({
+const linesVisibility = computed<Visibility>({
   get: () => {
     if (collections) {
       return targetLineIds.every((id) => dataStyleStore.modelLineVisibility(modelId, id));
@@ -77,7 +84,7 @@ const linesActiveColoring = computed<string | undefined>({
 });
 
 // Group Attributes
-const linesVertexAttributeName = computed<string | undefined>({
+const linesVertexAttributeName = computed<AttributeName | undefined>({
   get: () => dataStyleStore.modelLinesVertexAttributeName(modelId, referenceLineId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -88,7 +95,7 @@ const linesVertexAttributeName = computed<string | undefined>({
   },
 });
 
-const linesVertexAttributeTimeStep = computed<number | undefined>({
+const linesVertexAttributeTimeStep = computed<AttributeTimeStep | undefined>({
   get: () => dataStyleStore.modelLinesVertexAttributeTimeStep(modelId, referenceLineId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -99,7 +106,7 @@ const linesVertexAttributeTimeStep = computed<number | undefined>({
   },
 });
 
-const linesVertexAttributeItem = computed<string | undefined>({
+const linesVertexAttributeItem = computed<AttributeItem>({
   get: () => dataStyleStore.modelLinesVertexAttributeItem(modelId, referenceLineId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesVertexAttributeItem(modelId, targetLineIds, newValue);
@@ -107,7 +114,7 @@ const linesVertexAttributeItem = computed<string | undefined>({
   },
 });
 
-const linesVertexAttributeRange = computed<[number, number] | undefined>({
+const linesVertexAttributeRange = computed<AttributeRange>({
   get: () => dataStyleStore.modelLinesVertexAttributeRange(modelId, referenceLineId.value),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -140,7 +147,7 @@ const linesVertexAttributeNoDataColor = computed<RGBAColor>({
   },
 });
 
-const linesEdgeAttributeName = computed<string | undefined>({
+const linesEdgeAttributeName = computed<AttributeName | undefined>({
   get: () => dataStyleStore.modelLinesEdgeAttributeName(modelId, referenceLineId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -151,7 +158,7 @@ const linesEdgeAttributeName = computed<string | undefined>({
   },
 });
 
-const linesEdgeAttributeTimeStep = computed<number | undefined>({
+const linesEdgeAttributeTimeStep = computed<AttributeTimeStep | undefined>({
   get: () => dataStyleStore.modelLinesEdgeAttributeTimeStep(modelId, referenceLineId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -162,7 +169,7 @@ const linesEdgeAttributeTimeStep = computed<number | undefined>({
   },
 });
 
-const linesEdgeAttributeItem = computed<string | undefined>({
+const linesEdgeAttributeItem = computed<AttributeItem>({
   get: () => dataStyleStore.modelLinesEdgeAttributeItem(modelId, referenceLineId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesEdgeAttributeItem(modelId, targetLineIds, newValue);
@@ -170,7 +177,7 @@ const linesEdgeAttributeItem = computed<string | undefined>({
   },
 });
 
-const linesEdgeAttributeRange = computed<[number, number] | undefined>({
+const linesEdgeAttributeRange = computed<AttributeRange>({
   get: () => dataStyleStore.modelLinesEdgeAttributeRange(modelId, referenceLineId.value),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -205,7 +212,7 @@ const { capabilities, schemas: attributeSchemas } = MODEL_LINE_COLORING;
   <div v-show="!activeTab || activeTab === 'type'" data-testid="modelComponentTypeOptions">
     <VisibilitySwitch data-testid="modelLinesVisibilitySwitch" v-model="linesVisibility" />
     <ViewerOptionsColoringTypeSelector
-      :id="modelId"
+      :data-id="modelId"
       :componentIds="targetLineIds"
       v-model:coloring_style_key="linesActiveColoring"
       v-model:color="linesColor"

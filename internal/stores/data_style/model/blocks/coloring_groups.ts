@@ -1,18 +1,14 @@
+import type { BlockId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { ValidAttributeInput } from "@ogw_internal/stores/data_style/attribute_types";
 
 interface ColorGroup {
   color: RGBAColor | undefined;
-  blocks_ids: string[];
+  blocks_ids: BlockId[];
 }
 
-interface AttributeGroup {
-  name: string;
-  item: number;
-  minimum: number;
-  maximum: number;
-  colorMap: string;
-  no_data_color?: RGBAColor;
-  blocks_ids: string[];
+interface AttributeGroup extends ValidAttributeInput {
+  blocks_ids: BlockId[];
 }
 
 export type { AttributeGroup, ColorGroup };

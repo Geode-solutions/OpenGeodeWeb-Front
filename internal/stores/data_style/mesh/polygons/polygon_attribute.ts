@@ -1,80 +1,50 @@
+import type {
+  AttributeColorMap,
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+  AttributeRangeMaximum,
+  AttributeRangeMinimum,
+  AttributeTimeStep,
+} from "@ogw_front/types/attribute";
+import type {
+  AttributeStoredConfig,
+  ValidAttributeInput,
+} from "@ogw_internal/stores/data_style/attribute_types";
+import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
-interface AttributeStoredConfig {
-  minimum: number | undefined;
-  maximum: number | undefined;
-  colorMap: string | undefined;
-  no_data_color: RGBAColor;
-}
-
-interface AttributeState {
-  name?: string;
-  item?: number;
-  storedConfigs?: Record<string, { lastItem: number } & Record<string, AttributeStoredConfig>>;
-}
-
-interface AttributeInput {
-  name: string | undefined;
-  item: number | undefined;
-  minimum: number | undefined;
-  maximum: number | undefined;
-  colorMap: string | undefined;
-  no_data_color?: RGBAColor;
-}
-
-interface ValidAttributeInput {
-  name: string;
-  item: number;
-  minimum: number;
-  maximum: number;
-  colorMap: string;
-  no_data_color?: RGBAColor;
-}
-
-function isMeshPolygonsPolygonAttributeValid(input: AttributeInput): input is ValidAttributeInput {
-  return (
-    input.name !== undefined &&
-    input.item !== undefined &&
-    input.minimum !== undefined &&
-    input.maximum !== undefined &&
-    input.colorMap !== undefined
-  );
-}
-
 interface UseMeshPolygonsPolygonAttributeStyleReturn {
-  meshPolygonsPolygonAttributeName: (id: string) => string | undefined;
-  meshPolygonsPolygonAttributeItem: (id: string) => number;
-  meshPolygonsPolygonAttributeRange: (id: string) => [number | undefined, number | undefined];
-  meshPolygonsPolygonAttributeTimeStep: (id: string) => number | undefined;
-  setMeshPolygonsPolygonAttributeTimeStep: (id: string, timeStep: number) => Promise<unknown>;
-  meshPolygonsPolygonAttributeColorMap: (id: string) => string | undefined;
+  meshPolygonsPolygonAttributeName: (meshId: MeshId) => AttributeName | undefined;
+  meshPolygonsPolygonAttributeItem: (meshId: MeshId) => AttributeItem;
+  meshPolygonsPolygonAttributeRange: (meshId: MeshId) => AttributeRange;
+  meshPolygonsPolygonAttributeTimeStep: (meshId: MeshId) => AttributeTimeStep | undefined;
+  setMeshPolygonsPolygonAttributeTimeStep: (
+    meshId: MeshId,
+    timeStep: AttributeTimeStep,
+  ) => Promise<unknown>;
+  meshPolygonsPolygonAttributeColorMap: (meshId: MeshId) => AttributeColorMap | undefined;
   meshPolygonsPolygonAttributeStoredConfig: (
-    id: string,
-    name: string | undefined,
-    item: number | undefined,
+    meshId: MeshId,
+    name: AttributeName | undefined,
+    item: AttributeItem | undefined,
   ) => AttributeStoredConfig;
-  setMeshPolygonsPolygonAttribute: (id: string, input: ValidAttributeInput) => Promise<unknown>;
-  setMeshPolygonsPolygonAttributeName: (id: string, name: string) => Promise<unknown>;
-  setMeshPolygonsPolygonAttributeItem: (id: string, item: number) => Promise<unknown>;
+  setMeshPolygonsPolygonAttribute: (meshId: MeshId, input: ValidAttributeInput) => Promise<unknown>;
+  setMeshPolygonsPolygonAttributeName: (meshId: MeshId, name: AttributeName) => Promise<unknown>;
+  setMeshPolygonsPolygonAttributeItem: (meshId: MeshId, item: AttributeItem) => Promise<unknown>;
   setMeshPolygonsPolygonAttributeRange: (
-    id: string,
-    minimum: number,
-    maximum: number,
+    meshId: MeshId,
+    minimum: AttributeRangeMinimum,
+    maximum: AttributeRangeMaximum,
   ) => Promise<unknown>;
   setMeshPolygonsPolygonAttributeColorMap: (
-    id: string,
-    colorMap: string | undefined,
+    meshId: MeshId,
+    colorMap: AttributeColorMap | undefined,
   ) => Promise<unknown>;
-  meshPolygonsPolygonAttributeNoDataColor: (id: string) => RGBAColor;
+  meshPolygonsPolygonAttributeNoDataColor: (meshId: MeshId) => RGBAColor;
   setMeshPolygonsPolygonAttributeNoDataColor: (
-    id: string,
+    meshId: MeshId,
     no_data_color: RGBAColor,
   ) => Promise<unknown>;
 }
-export { isMeshPolygonsPolygonAttributeValid };
-export type {
-  AttributeStoredConfig,
-  AttributeState,
-  ValidAttributeInput,
-  UseMeshPolygonsPolygonAttributeStyleReturn,
-};
+export type { UseMeshPolygonsPolygonAttributeStyleReturn };

@@ -1,6 +1,6 @@
+import type { FetchErrorLike, Microservice } from "./api_fetch.js";
 import type { JsonRpcSchema, RequestHandlers } from "@ogw_shared/utils/types.js";
 import { CHUNK_SIZE_BYTES } from "@ogw_shared/utils/file.js";
-import type { Microservice } from "./api_fetch.js";
 import { consola } from "consola";
 import { fetchRaw } from "@ogw_shared/utils/fetch_raw.js";
 import { uploadPath } from "@ogw_front/utils/upload_path";
@@ -15,12 +15,6 @@ interface UploadFileParams {
 }
 
 // Loosely-typed shapes for the dynamic error/response values reported by fetchRaw.
-interface FetchErrorLike {
-  code?: number;
-  message?: string;
-  stack?: string;
-}
-
 interface FetchErrorResponseLike {
   status?: number;
   name?: string;

@@ -1,3 +1,4 @@
+import type { DataId, GeodeObjectType } from "@ogw_front/types/identifiers";
 import back_schemas, {
   type CRSList,
 } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
@@ -46,13 +47,13 @@ export const useCrsStore = defineStore("crs", () => {
     const mismatched = new Map<string, CRSList | undefined>();
     for (const item of crsItems.value) {
       if (project !== undefined && !sameCrs(item.crs, project)) {
-        mismatched.set(item.id, item.crs);
+        mismatched.set(item.data_id, item.crs);
       }
     }
     return mismatched;
   });
 
-  async function fetchGeographicList(geodeObjectType: string): Promise<CRSList[]> {
+  async function fetchGeographicList(geodeObjectType: GeodeObjectType): Promise<CRSList[]> {
     try {
       const response = await backStore.request({
         schema: back_schemas.opengeodeweb_back.crs.geographic_list,
@@ -69,7 +70,7 @@ export const useCrsStore = defineStore("crs", () => {
     return [];
   }
 
-  async function geographicList(geodeObjectType: string): Promise<CRSList[]> {
+  async function geographicList(geodeObjectType: GeodeObjectType): Promise<CRSList[]> {
     // The promise is cached, so dialogs opened together share a single request.
     // The back still checks each CRS against the list of the data dimension
     geographicListPromise ??= fetchGeographicList(geodeObjectType);
@@ -81,8 +82,8 @@ export const useCrsStore = defineStore("crs", () => {
     crsEditEnabled.value = true;
   }
 
-  function requestCrsEdit(id: string): void {
-    crsEditRequest.value = id;
+  function requestCrsEdit(dataId: DataId): void {
+    crsEditRequest.value = dataId;
   }
 
   function clearCrsEditRequest(): void {
