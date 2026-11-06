@@ -7,15 +7,11 @@ import {
 } from "@ogw_front/utils/coloring_styles";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { RangesPerData } from "@ogw_front/composables/batch_style";
+import type { Texture } from "@ogw_front/types/texture";
 import ViewerOptionsAttributeSelector from "@ogw_front/components/Viewer/Options/AttributeSelector.vue";
 import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
 import ViewerOptionsOpacitySlider from "@ogw_front/components/Viewer/Options/Sliders/Opacity.vue";
 import ViewerOptionsTexturesSelector from "@ogw_front/components/Viewer/Options/TexturesSelector.vue";
-
-interface Texture {
-  id: string;
-  texture_name: string;
-}
 
 interface CapabilityConfig {
   available?: boolean;
