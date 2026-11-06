@@ -60,7 +60,7 @@ async function applyFactor(): Promise<void> {
     return;
   }
   const targetIds = targetAllVisible.value ? allIds : selectedDatasetIds.value;
-  const untargetedIds = allIds.filter((id) => !targetIds.includes(id));
+  const untargetedIds = allIds.filter((dataId) => !targetIds.includes(dataId));
 
   if (targetIds.length > 0) {
     await setFactor(targetIds, Number(factor.value));
