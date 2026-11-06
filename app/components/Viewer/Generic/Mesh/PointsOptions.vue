@@ -4,6 +4,7 @@ import {
   applyRangesPerData,
   useBatchStyle,
 } from "@ogw_front/composables/batch_style";
+import type { Size, Visibility } from "@ogw_front/types/style";
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
@@ -12,7 +13,6 @@ import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import ViewerOptionsSizeSlider from "@ogw_front/components/Viewer/Options/Sliders/Size.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
-import type { Visibility } from "@ogw_front/types/style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
@@ -39,7 +39,7 @@ const visibility = computed<Visibility>({
     hybridViewerStore.remoteRender();
   },
 });
-const size = computed<number>({
+const size = computed<Size>({
   get: () => dataStyleStore.meshPointsSize(dataId.value),
   set: async (newValue) => {
     await applyBatchStyle(dataId.value, (meshId: MeshId) =>

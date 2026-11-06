@@ -1,6 +1,6 @@
 // Local imports
+import type { Size, Visibility } from "@ogw_front/types/style";
 import type { ModelId } from "@ogw_front/types/identifiers";
-import type { Visibility } from "@ogw_front/types/style";
 import { useModelPointsCommonStyle } from "./common";
 import { useModelPointsSizeStyle } from "./size";
 import { useModelPointsVisibilityStyle } from "./visibility";
@@ -31,7 +31,7 @@ export function useModelPointsStyle(): {
       ),
       whenDefined(
         // oxlint-disable-next-line no-unsafe-type-assertion -- points style values are dynamically typed at runtime.
-        style.size as number | undefined,
+        style.size as Size | undefined,
         async (size) => {
           const applied = await modelPointsSizeStyle.setModelPointsSize(modelId, size);
           return applied;

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Size, Visibility } from "@ogw_front/types/style";
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
@@ -6,7 +7,6 @@ import type { MeshId } from "@ogw_front/types/identifiers";
 import ViewerGenericMeshEdgesColoring from "@ogw_front/components/Viewer/Generic/Mesh/EdgesColoring.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import ViewerOptionsWidthSlider from "@ogw_front/components/Viewer/Options/Sliders/Width.vue";
-import type { Visibility } from "@ogw_front/types/style";
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -40,7 +40,7 @@ const visibility = computed<Visibility>({
     hybridViewerStore.remoteRender();
   },
 });
-const size = computed<number>({
+const size = computed<Size>({
   get: () => dataStyleStore.meshEdgesWidth(dataId.value),
   set: async (newValue) => {
     await applyBatchStyle(dataId.value, (meshId: MeshId) =>

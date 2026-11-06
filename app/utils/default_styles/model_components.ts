@@ -19,7 +19,7 @@ import {
   SURFACES_DEFAULT_COLOR,
   SURFACES_DEFAULT_VISIBILITY,
 } from "./constants";
-import type { Visibility, Width } from "@ogw_front/types/style";
+import type { Size, Visibility, Width } from "@ogw_front/types/style";
 
 function emptyAttributeConfig(): AttributeConfig {
   return { name: undefined, storedConfigs: {} };
@@ -59,7 +59,7 @@ interface ModelBlocksStyle {
 
 interface ModelPointsStyle {
   visibility: Visibility;
-  size: number;
+  size: Size;
 }
 
 interface ModelEdgesStyle {
@@ -128,7 +128,7 @@ function modelBlocksDefaultStyle(
 
 function modelPointsDefaultStyle(
   visibility: Visibility = POINTS_DEFAULT_VISIBILITY,
-  size: number = POINTS_DEFAULT_SIZE,
+  size: Size = POINTS_DEFAULT_SIZE,
 ): ModelPointsStyle {
   return { visibility, size };
 }

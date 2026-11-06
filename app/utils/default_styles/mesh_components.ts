@@ -16,7 +16,7 @@ import {
   POLYHEDRA_DEFAULT_VISIBILITY,
   type RGBAColor,
 } from "./constants";
-import type { Visibility, Width } from "@ogw_front/types/style";
+import type { Size, Visibility, Width } from "@ogw_front/types/style";
 import type { MeshApplyTexturesParams } from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 function emptyAttributeConfig(): AttributeConfig {
@@ -44,7 +44,7 @@ interface MeshPolyhedraColoring extends ComponentColoring {
 interface MeshPointsStyle {
   visibility: Visibility;
   coloring: ComponentColoring;
-  size: number;
+  size: Size;
 }
 
 interface MeshEdgesStyle {
@@ -70,7 +70,7 @@ interface MeshPolyhedraStyle {
 
 function meshPointsDefaultStyle(
   visibility: Visibility = POINTS_DEFAULT_VISIBILITY,
-  size: number = POINTS_DEFAULT_SIZE,
+  size: Size = POINTS_DEFAULT_SIZE,
   constant: RGBAColor = POINTS_DEFAULT_COLOR,
 ): MeshPointsStyle {
   return {
