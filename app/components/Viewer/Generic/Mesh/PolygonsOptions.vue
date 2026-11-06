@@ -2,6 +2,7 @@
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import type { MeshId } from "@ogw_front/types/identifiers";
 import ViewerGenericMeshPolygonsColoring from "@ogw_front/components/Viewer/Generic/Mesh/PolygonsColoring.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
@@ -36,8 +37,8 @@ const dataId = toRef(() => itemProps.id);
 const visibility = computed<boolean>({
   get: () => dataStyleStore.meshPolygonsVisibility(dataId.value),
   set: async (newValue) => {
-    await applyBatchStyle(dataId.value, (targetId: string) =>
-      dataStyleStore.setMeshPolygonsVisibility(targetId, newValue),
+    await applyBatchStyle(dataId.value, (meshId: MeshId) =>
+      dataStyleStore.setMeshPolygonsVisibility(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
   },

@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import type { DataId, MeshId } from "@ogw_front/types/identifiers";
 import {
   type RangesPerData,
   applyRangesPerData,
   useBatchStyle,
 } from "@ogw_front/composables/batch_style";
-import type { DataId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import { useBatchStyleModel } from "@ogw_front/composables/batch_style_model";
@@ -24,21 +24,21 @@ const { dataId } = defineProps<Props>();
 const coloring_style_key = computed<string>({
   get: () => dataStyleStore.meshPolyhedraActiveColoring(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(dataId, (targetId: string) =>
-      dataStyleStore.setMeshPolyhedraActiveColoring(targetId, newValue),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      dataStyleStore.setMeshPolyhedraActiveColoring(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const color = useBatchStyleModel<RGBAColor>(
   () => dataId,
-  (targetId) => dataStyleStore.meshPolyhedraColor(targetId) as RGBAColor | undefined,
-  (targetId, value) => dataStyleStore.setMeshPolyhedraColor(targetId, value),
+  (meshId) => dataStyleStore.meshPolyhedraColor(meshId) as RGBAColor | undefined,
+  (meshId, value) => dataStyleStore.setMeshPolyhedraColor(meshId, value),
 );
 const opacity = useBatchStyleModel<number>(
   () => dataId,
-  (targetId) => dataStyleStore.meshPolyhedraOpacity(targetId),
-  (targetId, value) => dataStyleStore.setMeshPolyhedraOpacity(targetId, value),
+  (meshId) => dataStyleStore.meshPolyhedraOpacity(meshId),
+  (meshId, value) => dataStyleStore.setMeshPolyhedraOpacity(meshId, value),
 );
 const vertex_attribute_name = computed<string | undefined>({
   get: () => dataStyleStore.meshPolyhedraVertexAttributeName(dataId),
@@ -46,8 +46,8 @@ const vertex_attribute_name = computed<string | undefined>({
     if (newValue === undefined) {
       return;
     }
-    await applyBatchStyle(dataId, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolyhedraVertexAttributeName(targetId, newValue)),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPolyhedraVertexAttributeName(meshId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -59,8 +59,8 @@ const vertex_attribute_time_step = computed<number | undefined>({
     if (newValue === undefined) {
       return;
     }
-    await applyBatchStyle(dataId, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolyhedraVertexAttributeTimeStep(targetId, newValue)),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPolyhedraVertexAttributeTimeStep(meshId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -68,8 +68,8 @@ const vertex_attribute_time_step = computed<number | undefined>({
 const vertex_attribute_item = computed<string | undefined>({
   get: () => dataStyleStore.meshPolyhedraVertexAttributeItem(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(dataId, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolyhedraVertexAttributeItem(targetId, newValue)),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPolyhedraVertexAttributeItem(meshId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -81,9 +81,9 @@ const vertex_attribute_range = computed<[number, number] | undefined>({
     if (minimum === undefined || maximum === undefined) {
       return;
     }
-    await applyBatchStyle(dataId, (targetId: string) =>
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
       Promise.resolve(
-        dataStyleStore.setMeshPolyhedraVertexAttributeRange(targetId, minimum, maximum),
+        dataStyleStore.setMeshPolyhedraVertexAttributeRange(meshId, minimum, maximum),
       ),
     );
     hybridViewerStore.remoteRender();
@@ -92,8 +92,8 @@ const vertex_attribute_range = computed<[number, number] | undefined>({
 const vertex_attribute_color_map = computed<Map<string, RGBAColor> | undefined>({
   get: () => dataStyleStore.meshPolyhedraVertexAttributeColorMap(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(dataId, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolyhedraVertexAttributeColorMap(targetId, newValue)),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPolyhedraVertexAttributeColorMap(meshId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -101,8 +101,8 @@ const vertex_attribute_color_map = computed<Map<string, RGBAColor> | undefined>(
 const vertex_attribute_no_data_color = computed<RGBAColor>({
   get: () => dataStyleStore.meshPolyhedraVertexAttributeNoDataColor(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(dataId, (targetId: string) =>
-      dataStyleStore.setMeshPolyhedraVertexAttributeNoDataColor(targetId, newValue),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      dataStyleStore.setMeshPolyhedraVertexAttributeNoDataColor(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
@@ -113,8 +113,8 @@ const polyhedron_attribute_name = computed<string | undefined>({
     if (newValue === undefined) {
       return;
     }
-    await applyBatchStyle(dataId, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(targetId, newValue)),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPolyhedraPolyhedronAttributeName(meshId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -126,10 +126,8 @@ const polyhedron_attribute_time_step = computed<number | undefined>({
     if (newValue === undefined) {
       return;
     }
-    await applyBatchStyle(dataId, (targetId: string) =>
-      Promise.resolve(
-        dataStyleStore.setMeshPolyhedraPolyhedronAttributeTimeStep(targetId, newValue),
-      ),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPolyhedraPolyhedronAttributeTimeStep(meshId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -137,8 +135,8 @@ const polyhedron_attribute_time_step = computed<number | undefined>({
 const polyhedron_attribute_item = computed<string | undefined>({
   get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeItem(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(dataId, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolyhedraPolyhedronAttributeItem(targetId, newValue)),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPolyhedraPolyhedronAttributeItem(meshId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -150,9 +148,9 @@ const polyhedron_attribute_range = computed<[number, number] | undefined>({
     if (minimum === undefined || maximum === undefined) {
       return;
     }
-    await applyBatchStyle(dataId, (targetId: string) =>
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
       Promise.resolve(
-        dataStyleStore.setMeshPolyhedraPolyhedronAttributeRange(targetId, minimum, maximum),
+        dataStyleStore.setMeshPolyhedraPolyhedronAttributeRange(meshId, minimum, maximum),
       ),
     );
     hybridViewerStore.remoteRender();
@@ -161,10 +159,8 @@ const polyhedron_attribute_range = computed<[number, number] | undefined>({
 const polyhedron_attribute_color_map = computed<Map<string, RGBAColor> | undefined>({
   get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeColorMap(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(dataId, (targetId: string) =>
-      Promise.resolve(
-        dataStyleStore.setMeshPolyhedraPolyhedronAttributeColorMap(targetId, newValue),
-      ),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPolyhedraPolyhedronAttributeColorMap(meshId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -172,23 +168,23 @@ const polyhedron_attribute_color_map = computed<Map<string, RGBAColor> | undefin
 const polyhedron_attribute_no_data_color = computed<RGBAColor>({
   get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeNoDataColor(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(dataId, (targetId: string) =>
-      dataStyleStore.setMeshPolyhedraPolyhedronAttributeNoDataColor(targetId, newValue),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      dataStyleStore.setMeshPolyhedraPolyhedronAttributeNoDataColor(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
 });
 
 async function setVertexAttributeRangesPerData(ranges: RangesPerData): Promise<void> {
-  await applyRangesPerData(ranges, (targetId, minimum, maximum) =>
-    dataStyleStore.setMeshPolyhedraVertexAttributeRange(targetId, minimum, maximum),
+  await applyRangesPerData(ranges, (meshId, minimum, maximum) =>
+    dataStyleStore.setMeshPolyhedraVertexAttributeRange(meshId, minimum, maximum),
   );
   hybridViewerStore.remoteRender();
 }
 
 async function setPolyhedronAttributeRangesPerData(ranges: RangesPerData): Promise<void> {
-  await applyRangesPerData(ranges, (targetId, minimum, maximum) =>
-    dataStyleStore.setMeshPolyhedraPolyhedronAttributeRange(targetId, minimum, maximum),
+  await applyRangesPerData(ranges, (meshId, minimum, maximum) =>
+    dataStyleStore.setMeshPolyhedraPolyhedronAttributeRange(meshId, minimum, maximum),
   );
   hybridViewerStore.remoteRender();
 }

@@ -2,6 +2,7 @@
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import type { MeshId } from "@ogw_front/types/identifiers";
 import ViewerGenericMeshEdgesColoring from "@ogw_front/components/Viewer/Generic/Mesh/EdgesColoring.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import ViewerOptionsWidthSlider from "@ogw_front/components/Viewer/Options/Sliders/Width.vue";
@@ -32,8 +33,8 @@ const dataId = toRef(() => itemProps.id);
 const visibility = computed<boolean>({
   get: () => dataStyleStore.meshEdgesVisibility(dataId.value),
   set: async (newValue) => {
-    await applyBatchStyle(dataId.value, (targetId: string) =>
-      dataStyleStore.setMeshEdgesVisibility(targetId, newValue),
+    await applyBatchStyle(dataId.value, (meshId: MeshId) =>
+      dataStyleStore.setMeshEdgesVisibility(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
@@ -41,8 +42,8 @@ const visibility = computed<boolean>({
 const size = computed<number>({
   get: () => dataStyleStore.meshEdgesWidth(dataId.value),
   set: async (newValue) => {
-    await applyBatchStyle(dataId.value, (targetId: string) =>
-      dataStyleStore.setMeshEdgesWidth(targetId, newValue),
+    await applyBatchStyle(dataId.value, (meshId: MeshId) =>
+      dataStyleStore.setMeshEdgesWidth(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
   },

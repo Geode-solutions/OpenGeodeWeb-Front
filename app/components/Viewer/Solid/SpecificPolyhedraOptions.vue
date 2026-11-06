@@ -2,6 +2,7 @@
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import type { MeshId } from "@ogw_front/types/identifiers";
 import SolidPolyhedra from "@ogw_front/assets/viewer_svgs/solid_polyhedra.svg";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import ViewerSolidSpecificPolyhedraColoring from "@ogw_front/components/Viewer/Solid/SpecificPolyhedraColoring.vue";
@@ -25,8 +26,8 @@ const dataId = toRef(() => itemProps.id);
 const visibility = computed<boolean>({
   get: () => dataStyleStore.meshPolyhedraVisibility(dataId.value),
   set: async (newValue) => {
-    await applyBatchStyle(dataId.value, (targetId: string) =>
-      dataStyleStore.setMeshPolyhedraVisibility(targetId, newValue),
+    await applyBatchStyle(dataId.value, (meshId: MeshId) =>
+      dataStyleStore.setMeshPolyhedraVisibility(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
   },

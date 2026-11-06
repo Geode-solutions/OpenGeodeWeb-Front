@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import type { DataId, MeshId } from "@ogw_front/types/identifiers";
 import {
   type RangesPerData,
   applyRangesPerData,
   useBatchStyle,
 } from "@ogw_front/composables/batch_style";
-import type { DataId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { Texture } from "@ogw_front/types/texture";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
@@ -26,26 +26,26 @@ const { dataId, capabilities } = defineProps<Props>();
 const coloring_style_key = computed<string>({
   get: () => dataStyleStore.meshPolygonsActiveColoring(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(dataId, (targetId: string) =>
-      dataStyleStore.setMeshPolygonsActiveColoring(targetId, newValue),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      dataStyleStore.setMeshPolygonsActiveColoring(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const color = useBatchStyleModel<RGBAColor>(
   () => dataId,
-  (targetId) => dataStyleStore.meshPolygonsColor(targetId) as RGBAColor | undefined,
-  (targetId, value) => dataStyleStore.setMeshPolygonsColor(targetId, value),
+  (meshId) => dataStyleStore.meshPolygonsColor(meshId) as RGBAColor | undefined,
+  (meshId, value) => dataStyleStore.setMeshPolygonsColor(meshId, value),
 );
 const opacity = useBatchStyleModel<number>(
   () => dataId,
-  (targetId) => dataStyleStore.meshPolygonsOpacity(targetId),
-  (targetId, value) => dataStyleStore.setMeshPolygonsOpacity(targetId, value),
+  (meshId) => dataStyleStore.meshPolygonsOpacity(meshId),
+  (meshId, value) => dataStyleStore.setMeshPolygonsOpacity(meshId, value),
 );
 const textures = useBatchStyleModel<Texture[]>(
   () => dataId,
-  (targetId) => dataStyleStore.meshPolygonsTextures(targetId) as Texture[] | undefined,
-  (targetId, value) => dataStyleStore.setMeshPolygonsTextures(targetId, value),
+  (meshId) => dataStyleStore.meshPolygonsTextures(meshId) as Texture[] | undefined,
+  (meshId, value) => dataStyleStore.setMeshPolygonsTextures(meshId, value),
 );
 
 const vertex_attribute_name = computed<string | undefined>({
@@ -54,8 +54,8 @@ const vertex_attribute_name = computed<string | undefined>({
     if (newValue === undefined) {
       return;
     }
-    await applyBatchStyle(dataId, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolygonsVertexAttributeName(targetId, newValue)),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPolygonsVertexAttributeName(meshId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -67,8 +67,8 @@ const vertex_attribute_time_step = computed<number | undefined>({
     if (newValue === undefined) {
       return;
     }
-    await applyBatchStyle(dataId, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolygonsVertexAttributeTimeStep(targetId, newValue)),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPolygonsVertexAttributeTimeStep(meshId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -76,8 +76,8 @@ const vertex_attribute_time_step = computed<number | undefined>({
 const vertex_attribute_item = computed<string | undefined>({
   get: () => dataStyleStore.meshPolygonsVertexAttributeItem(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(dataId, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolygonsVertexAttributeItem(targetId, newValue)),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPolygonsVertexAttributeItem(meshId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -89,10 +89,8 @@ const vertex_attribute_range = computed<[number, number] | undefined>({
     if (minimum === undefined || maximum === undefined) {
       return;
     }
-    await applyBatchStyle(dataId, (targetId: string) =>
-      Promise.resolve(
-        dataStyleStore.setMeshPolygonsVertexAttributeRange(targetId, minimum, maximum),
-      ),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPolygonsVertexAttributeRange(meshId, minimum, maximum)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -100,8 +98,8 @@ const vertex_attribute_range = computed<[number, number] | undefined>({
 const vertex_attribute_color_map = computed<Map<string, RGBAColor>>({
   get: () => dataStyleStore.meshPolygonsVertexAttributeColorMap(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(dataId, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolygonsVertexAttributeColorMap(targetId, newValue)),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPolygonsVertexAttributeColorMap(meshId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -109,8 +107,8 @@ const vertex_attribute_color_map = computed<Map<string, RGBAColor>>({
 const vertex_attribute_no_data_color = computed<RGBAColor>({
   get: () => dataStyleStore.meshPolygonsVertexAttributeNoDataColor(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(dataId, (targetId: string) =>
-      dataStyleStore.setMeshPolygonsVertexAttributeNoDataColor(targetId, newValue),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      dataStyleStore.setMeshPolygonsVertexAttributeNoDataColor(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
@@ -121,8 +119,8 @@ const polygon_attribute_name = computed<string | undefined>({
     if (newValue === undefined) {
       return;
     }
-    await applyBatchStyle(dataId, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolygonsPolygonAttributeName(targetId, newValue)),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPolygonsPolygonAttributeName(meshId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -134,8 +132,8 @@ const polygon_attribute_time_step = computed<number | undefined>({
     if (newValue === undefined) {
       return;
     }
-    await applyBatchStyle(dataId, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolygonsPolygonAttributeTimeStep(targetId, newValue)),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPolygonsPolygonAttributeTimeStep(meshId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -143,8 +141,8 @@ const polygon_attribute_time_step = computed<number | undefined>({
 const polygon_attribute_item = computed<string | undefined>({
   get: () => dataStyleStore.meshPolygonsPolygonAttributeItem(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(dataId, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolygonsPolygonAttributeItem(targetId, newValue)),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPolygonsPolygonAttributeItem(meshId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -156,9 +154,9 @@ const polygon_attribute_range = computed<[number, number] | undefined>({
     if (minimum === undefined || maximum === undefined) {
       return;
     }
-    await applyBatchStyle(dataId, (targetId: string) =>
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
       Promise.resolve(
-        dataStyleStore.setMeshPolygonsPolygonAttributeRange(targetId, minimum, maximum),
+        dataStyleStore.setMeshPolygonsPolygonAttributeRange(meshId, minimum, maximum),
       ),
     );
     hybridViewerStore.remoteRender();
@@ -167,8 +165,8 @@ const polygon_attribute_range = computed<[number, number] | undefined>({
 const polygon_attribute_color_map = computed<Map<string, RGBAColor>>({
   get: () => dataStyleStore.meshPolygonsPolygonAttributeColorMap(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(dataId, (targetId: string) =>
-      Promise.resolve(dataStyleStore.setMeshPolygonsPolygonAttributeColorMap(targetId, newValue)),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      Promise.resolve(dataStyleStore.setMeshPolygonsPolygonAttributeColorMap(meshId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
@@ -176,23 +174,23 @@ const polygon_attribute_color_map = computed<Map<string, RGBAColor>>({
 const polygon_attribute_no_data_color = computed<RGBAColor>({
   get: () => dataStyleStore.meshPolygonsPolygonAttributeNoDataColor(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(dataId, (targetId: string) =>
-      dataStyleStore.setMeshPolygonsPolygonAttributeNoDataColor(targetId, newValue),
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
+      dataStyleStore.setMeshPolygonsPolygonAttributeNoDataColor(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
 });
 
 async function setVertexAttributeRangesPerData(ranges: RangesPerData): Promise<void> {
-  await applyRangesPerData(ranges, (targetId, minimum, maximum) =>
-    dataStyleStore.setMeshPolygonsVertexAttributeRange(targetId, minimum, maximum),
+  await applyRangesPerData(ranges, (meshId, minimum, maximum) =>
+    dataStyleStore.setMeshPolygonsVertexAttributeRange(meshId, minimum, maximum),
   );
   hybridViewerStore.remoteRender();
 }
 
 async function setPolygonAttributeRangesPerData(ranges: RangesPerData): Promise<void> {
-  await applyRangesPerData(ranges, (targetId, minimum, maximum) =>
-    dataStyleStore.setMeshPolygonsPolygonAttributeRange(targetId, minimum, maximum),
+  await applyRangesPerData(ranges, (meshId, minimum, maximum) =>
+    dataStyleStore.setMeshPolygonsPolygonAttributeRange(meshId, minimum, maximum),
   );
   hybridViewerStore.remoteRender();
 }
