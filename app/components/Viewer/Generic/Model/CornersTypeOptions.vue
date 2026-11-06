@@ -3,6 +3,7 @@ import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collect
 import { MODEL_VERTEX_COLORING } from "@ogw_front/utils/model_component_coloring";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
+import type { Visibility } from "@ogw_front/types/style";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -29,7 +30,7 @@ const referenceCornerId = computed<string | undefined>(() =>
 );
 
 // Visibility
-const cornersVisibility = computed<boolean>({
+const cornersVisibility = computed<Visibility>({
   get: () => {
     if (collections) {
       return targetCornerIds.every((id) => dataStyleStore.modelCornerVisibility(modelId, id));

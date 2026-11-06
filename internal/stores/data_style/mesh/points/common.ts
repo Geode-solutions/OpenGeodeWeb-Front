@@ -1,5 +1,6 @@
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
+import type { Visibility } from "@ogw_front/types/style";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 
 export function useMeshPointsCommonStyle(): {
@@ -7,7 +8,7 @@ export function useMeshPointsCommonStyle(): {
   meshPointsColoring: (meshId: MeshId) => StyleValues;
   mutateMeshPointsColoring: (meshId: MeshId, values: StyleValues) => Promise<string>;
   mutateMeshPointsStyle: (meshId: MeshId, values: StyleValues) => Promise<string>;
-  mutateMeshPointsVisibility: (response: { id: string; visibility: boolean }) => Promise<string>;
+  mutateMeshPointsVisibility: (response: { id: string; visibility: Visibility }) => Promise<string>;
 } {
   const dataStyleState = useDataStyleState();
 
@@ -20,7 +21,7 @@ export function useMeshPointsCommonStyle(): {
 
   async function mutateMeshPointsVisibility(response: {
     id: string;
-    visibility: boolean;
+    visibility: Visibility;
   }): Promise<string> {
     const result = await mutateMeshPointsStyle(response.id, { visibility: response.visibility });
     return result;

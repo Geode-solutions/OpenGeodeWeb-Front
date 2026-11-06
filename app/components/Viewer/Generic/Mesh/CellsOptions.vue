@@ -5,6 +5,7 @@ import ViewerContextMenuItem, {
 import type { MeshId } from "@ogw_front/types/identifiers";
 import ViewerGenericMeshCellsColoring from "@ogw_front/components/Viewer/Generic/Mesh/CellsColoring.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
+import type { Visibility } from "@ogw_front/types/style";
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -23,7 +24,7 @@ const { itemProps, btnImage, tooltip = "Cells options" } = defineProps<Props>();
 
 const dataId = toRef(() => itemProps.id);
 
-const visibility = computed<boolean>({
+const visibility = computed<Visibility>({
   get: () => dataStyleStore.meshCellsVisibility(dataId.value),
   set: async (newValue) => {
     await applyBatchStyle(dataId.value, (meshId: MeshId) =>

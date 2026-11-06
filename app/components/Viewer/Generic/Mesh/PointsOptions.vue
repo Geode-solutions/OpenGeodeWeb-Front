@@ -12,6 +12,7 @@ import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import ViewerOptionsSizeSlider from "@ogw_front/components/Viewer/Options/Sliders/Size.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
+import type { Visibility } from "@ogw_front/types/style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
@@ -29,7 +30,7 @@ const { itemProps, btnImage, tooltip = "Points options" } = defineProps<Props>()
 
 const dataId = toRef(() => itemProps.id);
 
-const visibility = computed<boolean>({
+const visibility = computed<Visibility>({
   get: () => dataStyleStore.meshPointsVisibility(dataId.value),
   set: async (newValue) => {
     await applyBatchStyle(dataId.value, (meshId: MeshId) =>

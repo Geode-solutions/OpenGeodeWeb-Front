@@ -2,6 +2,7 @@
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import ViewerOptionsWidthSlider from "@ogw_front/components/Viewer/Options/Sliders/Width.vue";
+import type { Visibility } from "@ogw_front/types/style";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -86,7 +87,7 @@ async function applyEdgesStyle(
   hybridViewerStore.remoteRender();
 }
 
-const visibility = computed<boolean | undefined>({
+const visibility = computed<Visibility | undefined>({
   get: () => edgesStyle.value?.visibility(modelId, referenceComponentId),
   set: async (newValue) => {
     if (newValue === undefined) {

@@ -5,6 +5,7 @@ import {
 } from "@ogw_front/composables/model_menu_context";
 import ModelCardTabs from "./ModelCardTabs.vue";
 import ViewerGenericModelComponentPointsOptions from "@ogw_front/components/Viewer/Generic/Model/ComponentPointsOptions.vue";
+import type { Visibility } from "@ogw_front/types/style";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -39,7 +40,7 @@ const { applyBatchStyle } = useBatchStyle();
 const { modelId, componentId, componentType, collections, targetComponentIds } =
   useModelMenuContext(() => itemProps);
 
-const modelPointsVisibility = computed<boolean>({
+const modelPointsVisibility = computed<Visibility>({
   get: () => dataStyleStore.modelPointsVisibility(modelId.value),
   set: async (newValue) => {
     await applyBatchStyle(modelId.value, (targetId: string) =>

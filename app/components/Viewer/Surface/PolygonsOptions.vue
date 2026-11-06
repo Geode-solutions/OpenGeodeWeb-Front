@@ -6,6 +6,7 @@ import type { MeshId } from "@ogw_front/types/identifiers";
 import PolygonalSurfacePolygons from "@ogw_front/assets/viewer_svgs/surface_triangles.svg";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import ViewerSurfacePolygonsColoring from "@ogw_front/components/Viewer/Surface/PolygonsColoring.vue";
+import type { Visibility } from "@ogw_front/types/style";
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -23,7 +24,7 @@ const { itemProps, tooltip = "Polygons options" } = defineProps<Props>();
 
 const dataId = toRef(() => itemProps.id);
 
-const visibility = computed<boolean>({
+const visibility = computed<Visibility>({
   get: () => dataStyleStore.meshPolygonsVisibility(dataId.value),
   set: async (newValue) => {
     await applyBatchStyle(dataId.value, (meshId: MeshId) =>

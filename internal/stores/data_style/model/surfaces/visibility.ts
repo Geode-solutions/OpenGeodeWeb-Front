@@ -1,4 +1,5 @@
 import type { ModelId, SurfaceId } from "@ogw_front/types/identifiers";
+import type { Visibility } from "@ogw_front/types/style";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 import { useModelSurfacesCommonStyle } from "./common";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
@@ -9,7 +10,7 @@ export function useModelSurfacesVisibility(): {
   setModelSurfacesVisibility: (
     modelId: ModelId,
     surfaces_ids: readonly SurfaceId[],
-    visibility: boolean,
+    visibility: Visibility,
   ) => Promise<unknown>;
   modelSurfaceVisibility: (modelId: ModelId, surface_id?: SurfaceId) => unknown;
 } {
@@ -23,7 +24,7 @@ export function useModelSurfacesVisibility(): {
   async function setModelSurfacesVisibility(
     modelId: ModelId,
     surfaces_ids: readonly SurfaceId[],
-    visibility: boolean,
+    visibility: Visibility,
   ): Promise<unknown> {
     const result = await modelCommonStyle.setModelTypeVisibility(
       modelId,

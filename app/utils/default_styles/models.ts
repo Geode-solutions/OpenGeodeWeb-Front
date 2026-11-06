@@ -17,9 +17,10 @@ import {
   modelPointsDefaultStyle,
   modelSurfacesDefaultStyle,
 } from "./model_components";
+import type { Visibility } from "@ogw_front/types/style";
 
 interface ModelWithoutBlocksStyle {
-  visibility: boolean;
+  visibility: Visibility;
   coloring: Pick<ComponentColoring, "active" | "constant">;
   corners: ModelCornersStyle;
   lines: ModelLinesStyle;

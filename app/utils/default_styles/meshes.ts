@@ -10,9 +10,10 @@ import {
   meshPolygonsDefaultStyle,
   meshPolyhedraDefaultStyle,
 } from "./mesh_components";
+import type { Visibility } from "@ogw_front/types/style";
 
 interface PointSetStyle {
-  visibility: boolean;
+  visibility: Visibility;
   points: MeshPointsStyle;
 }
 

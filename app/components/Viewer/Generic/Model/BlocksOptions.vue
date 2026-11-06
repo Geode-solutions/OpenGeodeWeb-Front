@@ -4,6 +4,7 @@ import type { BlockId } from "@ogw_front/types/identifiers";
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
+import type { Visibility } from "@ogw_front/types/style";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -35,7 +36,7 @@ const referenceBlockId = computed<string | undefined>(() =>
 const blockComponentIds = computed<string[]>(() => (blockId !== undefined && [blockId]) || []);
 
 // Visibility
-const blocksVisibility = computed<boolean>({
+const blocksVisibility = computed<Visibility>({
   get: () => {
     if (collections) {
       return targetBlockIds.every((id) => dataStyleStore.modelBlockVisibility(modelId, id));
@@ -48,7 +49,7 @@ const blocksVisibility = computed<boolean>({
   },
 });
 
-const blockVisibility = computed<boolean | undefined>({
+const blockVisibility = computed<Visibility | undefined>({
   get: () => dataStyleStore.modelBlockVisibility(modelId, blockId) as boolean | undefined,
   set: async (newValue) => {
     if (newValue === undefined || blockId === undefined) {

@@ -1,5 +1,6 @@
 // Local imports
 import type { ModelId } from "@ogw_front/types/identifiers";
+import type { Visibility } from "@ogw_front/types/style";
 import { useModelPointsCommonStyle } from "./common";
 import { useModelPointsSizeStyle } from "./size";
 import { useModelPointsVisibilityStyle } from "./visibility";
@@ -19,7 +20,7 @@ export function useModelPointsStyle(): {
     const result = await Promise.all([
       whenDefined(
         // oxlint-disable-next-line no-unsafe-type-assertion -- points style values are dynamically typed at runtime.
-        style.visibility as boolean | undefined,
+        style.visibility as Visibility | undefined,
         async (visibility) => {
           const applied = await modelPointsVisibilityStyle.setModelPointsVisibility(
             modelId,

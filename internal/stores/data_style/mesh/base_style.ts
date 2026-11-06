@@ -1,5 +1,6 @@
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { Visibility } from "@ogw_front/types/style";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
@@ -13,8 +14,8 @@ import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 const meshSchemas = viewer_schemas.opengeodeweb_viewer.mesh;
 
 interface MeshBaseStyle {
-  meshVisibility: (meshId: MeshId) => boolean | undefined;
-  setMeshVisibility: (meshId: MeshId, visibility: boolean) => Promise<unknown>;
+  meshVisibility: (meshId: MeshId) => Visibility | undefined;
+  setMeshVisibility: (meshId: MeshId, visibility: Visibility) => Promise<unknown>;
   meshColor: (meshId: MeshId) => RGBAColor | undefined;
   setMeshColor: (meshId: MeshId, color: RGBAColor) => Promise<unknown>;
 }
@@ -24,10 +25,10 @@ export function useMeshBaseStyle(): MeshBaseStyle {
   const viewerStore = useViewerStore();
   const dataStyleState = useDataStyleState();
 
-  function meshVisibility(meshId: MeshId): boolean | undefined {
+  function meshVisibility(meshId: MeshId): Visibility | undefined {
     return dataStyleState.getStyle(meshId).visibility;
   }
-  async function setMeshVisibility(meshId: MeshId, visibility: boolean): Promise<unknown> {
+  async function setMeshVisibility(meshId: MeshId, visibility: Visibility): Promise<unknown> {
     const schema = meshSchemas.visibility;
     const params = { id: meshId, visibility };
     const result = await viewerStore.request(

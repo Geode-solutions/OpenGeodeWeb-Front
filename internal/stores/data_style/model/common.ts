@@ -8,6 +8,7 @@ import type { ModelId } from "@ogw_front/types/identifiers";
 import type { ParamsOf } from "@ogw_shared/utils/types.js";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
+import type { Visibility } from "@ogw_front/types/style";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import type viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
@@ -56,7 +57,7 @@ interface UseModelCommonStyleReturn {
   setModelTypeVisibility: (
     modelId: ModelId,
     component_ids: string[],
-    visibility: boolean,
+    visibility: Visibility,
     schema: ModelVisibilitySchema,
   ) => Promise<unknown>;
 }
@@ -139,7 +140,7 @@ export function useModelCommonStyle(): UseModelCommonStyleReturn {
   async function setModelTypeVisibility(
     modelId: ModelId,
     component_ids: string[],
-    visibility: boolean,
+    visibility: Visibility,
     schema: ModelVisibilitySchema,
   ): Promise<unknown> {
     if (!component_ids?.length) {

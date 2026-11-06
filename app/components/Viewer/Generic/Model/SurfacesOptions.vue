@@ -4,6 +4,7 @@ import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collect
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { SurfaceId } from "@ogw_front/types/identifiers";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
+import type { Visibility } from "@ogw_front/types/style";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -37,7 +38,7 @@ const surfaceComponentIds = computed<string[]>(
 );
 
 // Visibility
-const surfacesVisibility = computed<boolean>({
+const surfacesVisibility = computed<Visibility>({
   get: () => {
     if (collections) {
       return targetSurfaceIds.every((id) => dataStyleStore.modelSurfaceVisibility(modelId, id));
@@ -50,7 +51,7 @@ const surfacesVisibility = computed<boolean>({
   },
 });
 
-const surfaceVisibility = computed<boolean>({
+const surfaceVisibility = computed<Visibility>({
   get: () => dataStyleStore.modelSurfaceVisibility(modelId, surfaceId) as boolean | undefined,
   set: async (newValue) => {
     if (surfaceId === undefined) {

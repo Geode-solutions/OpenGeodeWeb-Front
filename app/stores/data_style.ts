@@ -7,6 +7,7 @@ import type {
   SceneStyle,
 } from "@ogw_internal/stores/data_style/types";
 import type { Table } from "dexie";
+import type { Visibility } from "@ogw_front/types/style";
 import { database } from "@ogw_internal/database/database.js";
 import { getDefaultStyle } from "@ogw_front/utils/default_styles";
 import { useAttributeTimeStepStyle } from "@ogw_internal/stores/data_style/time_step";
@@ -66,7 +67,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     );
   }
 
-  async function setVisibility(dataId: DataId, visibility: boolean): Promise<unknown> {
+  async function setVisibility(dataId: DataId, visibility: Visibility): Promise<unknown> {
     const item = await dataStore.item(dataId);
     if (!(await dataStore.isItemViewable(item))) {
       return dataStyleState.mutateStyle(dataId, { visibility });

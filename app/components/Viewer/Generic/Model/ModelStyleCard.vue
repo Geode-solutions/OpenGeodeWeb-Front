@@ -10,6 +10,7 @@ import ModelCardTabs from "./ModelCardTabs.vue";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import SurfacesOptions from "./SurfacesOptions.vue";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
+import type { Visibility } from "@ogw_front/types/style";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -37,7 +38,7 @@ function visibleComponents(targetId: string): string[] {
   return dataStyleStore.visibleMeshComponents(targetId).value || [];
 }
 
-const modelVisibility = computed<boolean | undefined>({
+const modelVisibility = computed<Visibility | undefined>({
   get: () => dataStyleStore.modelVisibility(modelId.value),
   set: async (newValue) => {
     if (newValue === undefined) {

@@ -10,6 +10,7 @@ import {
   type RGBAColor,
 } from "@ogw_front/utils/default_styles/constants";
 import type { ModelId } from "@ogw_front/types/identifiers";
+import type { Visibility } from "@ogw_front/types/style";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { groupBy } from "@ogw_internal/stores/data_style/model/component_style";
@@ -40,7 +41,7 @@ type EdgesRequestSchema =
   | EdgesSchemas["attribute"]["vertex"]["attribute"];
 
 interface EdgesStyle {
-  visibility?: boolean;
+  visibility?: Visibility;
   width?: number;
   coloring?: {
     active?: string;
@@ -87,7 +88,7 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
     return edgesStyle(modelId, componentId).coloring?.vertex ?? {};
   }
 
-  function edgesVisibility(modelId: ModelId, componentId?: string): boolean {
+  function edgesVisibility(modelId: ModelId, componentId?: string): Visibility {
     return edgesStyle(modelId, componentId).visibility ?? EDGES_DEFAULT_VISIBILITY;
   }
 
@@ -188,7 +189,7 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
   async function setVisibility(
     modelId: ModelId,
     componentIds: string[],
-    visibility: boolean,
+    visibility: Visibility,
   ): Promise<unknown> {
     const result = await requestEdges(modelId, componentIds, schemas.visibility, {
       visibility,

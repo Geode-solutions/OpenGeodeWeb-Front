@@ -3,6 +3,7 @@ import type { LineId } from "@ogw_front/types/identifiers";
 import { MODEL_LINE_COLORING } from "@ogw_front/utils/model_component_coloring";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
+import type { Visibility } from "@ogw_front/types/style";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -20,7 +21,7 @@ const hybridViewerStore = useHybridViewerStore();
 
 const lineComponentIds = computed<string[]>(() => (lineId !== undefined && [lineId]) || []);
 
-const lineVisibility = computed<boolean | undefined>({
+const lineVisibility = computed<Visibility | undefined>({
   get: () => dataStyleStore.modelLineVisibility(modelId, lineId) as boolean | undefined,
   set: async (newValue) => {
     if (newValue === undefined || lineId === undefined) {

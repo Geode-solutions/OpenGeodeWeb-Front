@@ -1,5 +1,6 @@
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { Visibility } from "@ogw_front/types/style";
 
 // Local imports
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
@@ -13,8 +14,8 @@ import { whenDefined } from "@ogw_internal/stores/data_style/when_defined";
 
 // oxlint-disable-next-line max-lines-per-function
 export function useMeshStyle(): {
-  meshVisibility: (meshId: MeshId) => boolean | undefined;
-  setMeshVisibility: (meshId: MeshId, visibility: boolean) => Promise<unknown>;
+  meshVisibility: (meshId: MeshId) => Visibility | undefined;
+  setMeshVisibility: (meshId: MeshId, visibility: Visibility) => Promise<unknown>;
   meshColor: (meshId: MeshId) => RGBAColor | undefined;
   setMeshColor: (meshId: MeshId, color: RGBAColor) => Promise<unknown>;
   applyMeshStyle: (meshId: MeshId) => Promise<unknown[]>;

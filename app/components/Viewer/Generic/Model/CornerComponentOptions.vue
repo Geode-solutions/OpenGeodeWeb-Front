@@ -3,6 +3,7 @@ import type { CornerId } from "@ogw_front/types/identifiers";
 import { MODEL_VERTEX_COLORING } from "@ogw_front/utils/model_component_coloring";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
+import type { Visibility } from "@ogw_front/types/style";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -20,7 +21,7 @@ const hybridViewerStore = useHybridViewerStore();
 
 const cornerComponentIds = computed<string[]>(() => (cornerId !== undefined && [cornerId]) || []);
 
-const cornerVisibility = computed<boolean | undefined>({
+const cornerVisibility = computed<Visibility | undefined>({
   get: () => dataStyleStore.modelCornerVisibility(modelId, cornerId) as boolean | undefined,
   set: async (newValue) => {
     if (newValue === undefined || cornerId === undefined) {

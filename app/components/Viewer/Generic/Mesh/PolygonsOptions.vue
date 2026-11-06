@@ -5,6 +5,7 @@ import ViewerContextMenuItem, {
 import type { MeshId } from "@ogw_front/types/identifiers";
 import ViewerGenericMeshPolygonsColoring from "@ogw_front/components/Viewer/Generic/Mesh/PolygonsColoring.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
+import type { Visibility } from "@ogw_front/types/style";
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -34,7 +35,7 @@ const {
 
 const dataId = toRef(() => itemProps.id);
 
-const visibility = computed<boolean>({
+const visibility = computed<Visibility>({
   get: () => dataStyleStore.meshPolygonsVisibility(dataId.value),
   set: async (newValue) => {
     await applyBatchStyle(dataId.value, (meshId: MeshId) =>

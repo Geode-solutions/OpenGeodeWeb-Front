@@ -1,4 +1,5 @@
 import type { LineId, ModelId } from "@ogw_front/types/identifiers";
+import type { Visibility } from "@ogw_front/types/style";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 import { useModelLinesCommonStyle } from "./common";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
@@ -9,7 +10,7 @@ export function useModelLinesVisibility(): {
   setModelLinesVisibility: (
     modelId: ModelId,
     lines_ids: LineId[],
-    visibility: boolean,
+    visibility: Visibility,
   ) => Promise<unknown>;
   modelLineVisibility: (modelId: ModelId, line_id?: LineId) => unknown;
 } {
@@ -23,7 +24,7 @@ export function useModelLinesVisibility(): {
   async function setModelLinesVisibility(
     modelId: ModelId,
     lines_ids: LineId[],
-    visibility: boolean,
+    visibility: Visibility,
   ): Promise<unknown> {
     const result = await modelCommonStyle.setModelTypeVisibility(
       modelId,

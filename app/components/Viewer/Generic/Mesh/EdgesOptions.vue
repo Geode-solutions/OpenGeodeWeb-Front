@@ -6,6 +6,7 @@ import type { MeshId } from "@ogw_front/types/identifiers";
 import ViewerGenericMeshEdgesColoring from "@ogw_front/components/Viewer/Generic/Mesh/EdgesColoring.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import ViewerOptionsWidthSlider from "@ogw_front/components/Viewer/Options/Sliders/Width.vue";
+import type { Visibility } from "@ogw_front/types/style";
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -30,7 +31,7 @@ const { itemProps, btnImage, tooltip = "Edges options", capabilities = {} } = de
 
 const dataId = toRef(() => itemProps.id);
 
-const visibility = computed<boolean>({
+const visibility = computed<Visibility>({
   get: () => dataStyleStore.meshEdgesVisibility(dataId.value),
   set: async (newValue) => {
     await applyBatchStyle(dataId.value, (meshId: MeshId) =>

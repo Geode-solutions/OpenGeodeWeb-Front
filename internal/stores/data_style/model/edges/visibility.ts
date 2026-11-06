@@ -6,6 +6,7 @@ import {
   useModelComponentEdgesStyle,
 } from "@ogw_internal/stores/data_style/model/edges/component";
 import type { ModelId } from "@ogw_front/types/identifiers";
+import type { Visibility } from "@ogw_front/types/style";
 import { useModelEdgesCommonStyle } from "./common";
 import { useModelEdgesWidthStyle } from "./width";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -15,8 +16,8 @@ import { whenDefined } from "@ogw_internal/stores/data_style/when_defined";
 const schema = viewer_schemas.opengeodeweb_viewer.model.edges.visibility;
 
 interface ModelEdgesVisibilityStyleApi {
-  modelEdgesVisibility: (modelId: ModelId) => boolean | undefined;
-  setModelEdgesVisibility: (modelId: ModelId, visibility: boolean) => Promise<unknown>;
+  modelEdgesVisibility: (modelId: ModelId) => Visibility | undefined;
+  setModelEdgesVisibility: (modelId: ModelId, visibility: Visibility) => Promise<unknown>;
   applyModelEdgesStyle: (modelId: ModelId) => Promise<unknown[]>;
 }
 
@@ -28,7 +29,7 @@ export function useModelEdgesVisibilityStyle(): ModelEdgesVisibilityStyleApi {
     useModelComponentEdgesStyle(type),
   );
 
-  function modelEdgesVisibility(modelId: ModelId): boolean | undefined {
+  function modelEdgesVisibility(modelId: ModelId): Visibility | undefined {
     const { visibility } = modelEdgesCommonStyle.modelEdgesStyle(modelId);
     if (typeof visibility === "boolean") {
       return visibility;
@@ -36,7 +37,10 @@ export function useModelEdgesVisibilityStyle(): ModelEdgesVisibilityStyleApi {
     return undefined;
   }
 
-  async function setModelEdgesVisibility(modelId: ModelId, visibility: boolean): Promise<unknown> {
+  async function setModelEdgesVisibility(
+    modelId: ModelId,
+    visibility: Visibility,
+  ): Promise<unknown> {
     const params = { id: modelId, visibility };
     const result = await viewerStore.request(
       { schema, params },

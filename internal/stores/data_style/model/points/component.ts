@@ -10,6 +10,7 @@ import {
   type RGBAColor,
 } from "@ogw_front/utils/default_styles/constants";
 import type { ModelId } from "@ogw_front/types/identifiers";
+import type { Visibility } from "@ogw_front/types/style";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { groupBy } from "@ogw_internal/stores/data_style/model/component_style";
@@ -41,7 +42,7 @@ type PointsRequestSchema =
   | PointsSchemas["attribute"]["vertex"]["attribute"];
 
 interface PointsStyle {
-  visibility?: boolean;
+  visibility?: Visibility;
   size?: number;
   coloring?: {
     active?: string;
@@ -90,7 +91,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
     return pointsStyle(modelId, componentId).coloring?.vertex ?? {};
   }
 
-  function pointsVisibility(modelId: ModelId, componentId?: string): boolean {
+  function pointsVisibility(modelId: ModelId, componentId?: string): Visibility {
     return pointsStyle(modelId, componentId).visibility ?? POINTS_DEFAULT_VISIBILITY;
   }
 
@@ -191,7 +192,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
   async function setVisibility(
     modelId: ModelId,
     componentIds: string[],
-    visibility: boolean,
+    visibility: Visibility,
   ): Promise<unknown> {
     const result = await requestPoints(modelId, componentIds, schemas.visibility, {
       visibility,

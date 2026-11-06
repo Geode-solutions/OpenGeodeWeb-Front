@@ -6,6 +6,7 @@ import {
 import ModelCardTabs from "./ModelCardTabs.vue";
 import ViewerGenericModelComponentEdgesOptions from "@ogw_front/components/Viewer/Generic/Model/ComponentEdgesOptions.vue";
 import ViewerOptionsWidthSlider from "@ogw_front/components/Viewer/Options/Sliders/Width.vue";
+import type { Visibility } from "@ogw_front/types/style";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -39,7 +40,7 @@ const { applyBatchStyle } = useBatchStyle();
 const { modelId, componentId, componentType, collections, targetComponentIds } =
   useModelMenuContext(() => itemProps);
 
-const modelEdgesVisibility = computed<boolean | undefined>({
+const modelEdgesVisibility = computed<Visibility | undefined>({
   get: () => dataStyleStore.modelEdgesVisibility(modelId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
