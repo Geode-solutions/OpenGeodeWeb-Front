@@ -19,6 +19,9 @@ type CornerId = ModelComponentId;
 // A line of a model, by its id in the model
 type LineId = ModelComponentId;
 
+// A surface of a model, by its id in the model
+type SurfaceId = ModelComponentId;
+
 // Type of an OpenGeode object, as named by OpenGeode (BRep, TriangulatedSurface3D, ...)
 type GeodeObjectType = string;
 
@@ -59,6 +62,7 @@ export type {
   ModelComponentId,
   ModelId,
   ModelIdentified,
+  SurfaceId,
   ViewerType,
   ViewerTyped,
 };
