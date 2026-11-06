@@ -52,7 +52,7 @@ export function useDataStyleState(): DataStyleStateApi {
   function getStyle(objectId: string): ObjectStyle {
     const style = styles.value[objectId];
     if (style === undefined) {
-      return { id: objectId };
+      return { data_id: objectId };
     }
     return { ...toRaw(style) };
   }
@@ -62,7 +62,7 @@ export function useDataStyleState(): DataStyleStateApi {
     const currentStyle = getStyle(objectId);
     merge(currentStyle, styleValues);
     const savedId = await dataStyleTable.put(
-      structuredClone({ ...toRaw(currentStyle), id: objectId }),
+      structuredClone({ ...toRaw(currentStyle), data_id: objectId }),
     );
     return savedId;
   }

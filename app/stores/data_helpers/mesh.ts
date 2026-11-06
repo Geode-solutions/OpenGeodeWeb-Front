@@ -1,11 +1,10 @@
-import type { GeodeIdentified } from "@ogw_front/types/identifiers";
+import type { DataIdentified, GeodeIdentified } from "@ogw_front/types/identifiers";
 import type { Table } from "dexie";
 import { database } from "@ogw_internal/database/database.js";
 import { liveObservable } from "@ogw_front/utils/live_observable";
 import { useObservable } from "@vueuse/rxjs";
 
-interface ModelComponentRecord extends GeodeIdentified {
-  id: string;
+interface ModelComponentRecord extends DataIdentified, GeodeIdentified {
   type: string;
   viewer_id: string | number;
   name: string;
@@ -57,7 +56,7 @@ function useDataMesh(): {
   >;
 
   async function formatedMeshComponents(modelId: string): Promise<FormattedComponentGroup[]> {
-    const items = await model_components_db.where("id").equals(modelId).toArray();
+    const items = await model_components_db.where("data_id").equals(modelId).toArray();
     const componentTitles: Record<string, string> = {
       Corner: "Corners",
       Line: "Lines",
@@ -101,14 +100,14 @@ function useDataMesh(): {
     type: string,
   ): Promise<FormattedComponent[]> {
     const components = await model_components_db
-      .where("[id+type]")
+      .where("[data_id+type]")
       .equals([modelId, type])
       .toArray();
     return components.map((item: ModelComponentRecord) => toFormattedComponent(item));
   }
 
   async function getAllMeshComponents(modelId: string): Promise<FormattedComponent[]> {
-    const items = await model_components_db.where("id").equals(modelId).toArray();
+    const items = await model_components_db.where("data_id").equals(modelId).toArray();
     return items.map((item: ModelComponentRecord) => toFormattedComponent(item));
   }
 
@@ -126,7 +125,7 @@ function useDataMesh(): {
 
   async function getMeshComponentGeodeIds(modelId: string, type: string): Promise<string[]> {
     const components = await model_components_db
-      .where("[id+type]")
+      .where("[data_id+type]")
       .equals([modelId, type])
       .toArray();
     return components.map((component: ModelComponentRecord) => component.geode_id);

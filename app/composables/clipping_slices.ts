@@ -4,6 +4,7 @@ import {
   type SliceAxis,
   areAllGrids,
 } from "@ogw_front/utils/slice";
+import type { DataIdentified } from "@ogw_front/types/identifiers";
 import type { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 interface Slice {
@@ -31,7 +32,7 @@ interface SliceSyncParams {
 }
 
 interface ClippingSlicesParams {
-  allItems: ComputedRef<{ id: string; geode_object_type: string }[]>;
+  allItems: ComputedRef<(DataIdentified & { geode_object_type: string })[]>;
   targetIds: ComputedRef<string[]>;
   getUntargetedIds: () => string[];
   newItemId: () => number;

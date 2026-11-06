@@ -92,21 +92,21 @@ describe("project crs", () => {
   test("follows when every georeferenced data is in one crs", async () => {
     const data = mockItems([]);
     const crsStore = useCrsStore();
-    data.value = mockAs<DataItem[]>([{ id: "a", created_at: "1", crs: LAMBERT }]);
+    data.value = mockAs<DataItem[]>([{ data_id: "a", created_at: "1", crs: LAMBERT }]);
     await nextTick();
     expect(crsStore.projectCrs).toStrictEqual(LAMBERT);
     // One data converted alone: mixed, the project keeps its crs
     data.value = mockAs<DataItem[]>([
-      { id: "a", created_at: "1", crs: UTM },
-      { id: "b", created_at: "2", crs: LAMBERT },
-      { id: "local", created_at: "3" },
+      { data_id: "a", created_at: "1", crs: UTM },
+      { data_id: "b", created_at: "2", crs: LAMBERT },
+      { data_id: "local", created_at: "3" },
     ]);
     await nextTick();
     expect(crsStore.projectCrs).toStrictEqual(LAMBERT);
     data.value = mockAs<DataItem[]>([
-      { id: "a", created_at: "1", crs: UTM },
-      { id: "b", created_at: "2", crs: UTM },
-      { id: "local", created_at: "3" },
+      { data_id: "a", created_at: "1", crs: UTM },
+      { data_id: "b", created_at: "2", crs: UTM },
+      { data_id: "local", created_at: "3" },
     ]);
     await nextTick();
     expect(crsStore.projectCrs).toStrictEqual(UTM);
@@ -115,8 +115,8 @@ describe("project crs", () => {
   test("an imported project crs is kept while the data are mixed", async () => {
     mockItems(
       mockAs<DataItem[]>([
-        { id: "a", created_at: "1", crs: LAMBERT },
-        { id: "b", created_at: "2", crs: UTM },
+        { data_id: "a", created_at: "1", crs: LAMBERT },
+        { data_id: "b", created_at: "2", crs: UTM },
       ]),
     );
     const crsStore = useCrsStore();
@@ -128,9 +128,9 @@ describe("project crs", () => {
   test("lists the data in another crs than the project", () => {
     mockItems(
       mockAs<DataItem[]>([
-        { id: "a", created_at: "1", crs: LAMBERT },
-        { id: "b", created_at: "2", crs: UTM },
-        { id: "local", created_at: "3" },
+        { data_id: "a", created_at: "1", crs: LAMBERT },
+        { data_id: "b", created_at: "2", crs: UTM },
+        { data_id: "local", created_at: "3" },
       ]),
     );
     const crsStore = useCrsStore();
@@ -142,7 +142,7 @@ describe("project crs", () => {
   });
 
   test("is exported and imported with the project", () => {
-    mockItems(mockAs<DataItem[]>([{ id: "a", created_at: "1", crs: LAMBERT }]));
+    mockItems(mockAs<DataItem[]>([{ data_id: "a", created_at: "1", crs: LAMBERT }]));
     const crsStore = useCrsStore();
     crsStore.setProjectCrs(UTM);
     expect(crsStore.exportStores()).toStrictEqual({ projectCrs: UTM });
@@ -155,8 +155,8 @@ describe("project crs", () => {
   test("a project saved without it takes the crs of its oldest georeferenced data", () => {
     mockItems(
       mockAs<DataItem[]>([
-        { id: "b", created_at: "2", crs: UTM },
-        { id: "a", created_at: "1", crs: LAMBERT },
+        { data_id: "b", created_at: "2", crs: UTM },
+        { data_id: "a", created_at: "1", crs: LAMBERT },
       ]),
     );
     const crsStore = useCrsStore();

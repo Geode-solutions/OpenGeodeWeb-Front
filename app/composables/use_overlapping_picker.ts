@@ -106,7 +106,7 @@ export function useOverlappingPicker(): UseOverlappingPickerReturn {
   }
 
   async function getViewableIds(): Promise<string[]> {
-    const activeIds = new Set(dataItems.value.map((i: DataItem) => i.id));
+    const activeIds = new Set(dataItems.value.map((i: DataItem) => i.data_id));
     const visibleStyleIds = Object.keys(dataStyleStore.styles).filter(
       (styleId) => activeIds.has(styleId) && dataStyleStore.objectVisibility(styleId) === true,
     );

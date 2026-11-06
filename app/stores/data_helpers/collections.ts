@@ -39,7 +39,7 @@ export function useDataCollections(): {
 
   async function hasCollectionComponents(modelId: string): Promise<boolean> {
     const count = await model_components_db
-      .where("id")
+      .where("data_id")
       .equals(modelId)
       .and((component: ModelComponentRecord) => !MESH_COMPONENT_TYPES.includes(component.type))
       .count();
@@ -47,7 +47,7 @@ export function useDataCollections(): {
   }
 
   async function getAllCollectionComponents(modelId: string): Promise<FormattedComponent[]> {
-    const items = await model_components_db.where("id").equals(modelId).toArray();
+    const items = await model_components_db.where("data_id").equals(modelId).toArray();
     return items
       .filter((component: ModelComponentRecord) => !MESH_COMPONENT_TYPES.includes(component.type))
       .map((component: ModelComponentRecord) => ({
@@ -64,7 +64,7 @@ export function useDataCollections(): {
     modelId: string,
   ): Promise<Record<string, CollectionComponent[]>> {
     const components = await getAllCollectionComponents(modelId);
-    const relations = await model_components_relation_db.where("id").equals(modelId).toArray();
+    const relations = await model_components_relation_db.where("data_id").equals(modelId).toArray();
     const allMeshComponents = await getAllMeshComponents(modelId);
     const meshComponentsById: Record<string, FormattedComponent> = {};
     for (const meshComponent of allMeshComponents) {

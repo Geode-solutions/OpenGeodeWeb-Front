@@ -24,7 +24,7 @@ async function lookupComponentInfo(
   if (geodeId === undefined || !modelComponentsTable) {
     return undefined;
   }
-  const components = modelComponentsTable.where("[id+geode_id]");
+  const components = modelComponentsTable.where("[data_id+geode_id]");
   const query = components.equals([modelId, geodeId] as IndexableType);
   const component = (await query.first()) as
     | (Partial<GeodeIdentified> & { name?: string; type?: string })

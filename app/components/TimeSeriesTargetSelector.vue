@@ -33,7 +33,7 @@ async function get_targets(): Promise<void> {
   ]);
   targets.value = items
     .filter((item) => allowed_objects.includes(item.geode_object_type))
-    .map(({ id, name, geode_object_type }) => ({ id, name, geode_object_type }));
+    .map(({ data_id, name, geode_object_type }) => ({ id: data_id, name, geode_object_type }));
   loading.value = false;
 }
 

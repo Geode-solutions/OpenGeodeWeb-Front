@@ -64,7 +64,7 @@ function getSharedState(): SharedState {
     const objectStyles = await dataStyleTable.toArray();
     const stylesByObjectId: Record<string, ObjectStyle> = {};
     for (const objectStyle of objectStyles) {
-      stylesByObjectId[objectStyle.id] = objectStyle;
+      stylesByObjectId[objectStyle.data_id] = objectStyle;
     }
     return stylesByObjectId;
   });
@@ -176,7 +176,7 @@ function getSharedState(): SharedState {
   }
 
   function updateStyleCache(objectId: string, styleValues: StyleValues): void {
-    styles.value[objectId] ??= { id: objectId };
+    styles.value[objectId] ??= { data_id: objectId };
     merge(styles.value[objectId], styleValues);
   }
 

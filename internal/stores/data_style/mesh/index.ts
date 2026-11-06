@@ -127,7 +127,7 @@ export function useMeshStyle(): {
         key === "surfaces" ||
         key === "blocks" ||
         key === "attributes" ||
-        key === "id"
+        key === "data_id"
       ) {
         // These keys are either handled elsewhere or not applicable to mesh objects
         continue;

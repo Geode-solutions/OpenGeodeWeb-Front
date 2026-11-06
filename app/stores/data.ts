@@ -6,7 +6,13 @@ import { useObservable } from "@vueuse/rxjs";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
-import type { GeodeId, GeodeIdentified } from "@ogw_front/types/identifiers";
+import type {
+  DataId,
+  DataIdentified,
+  GeodeId,
+  GeodeIdentified,
+} from "@ogw_front/types/identifiers";
+import { type LegacyDataId, fromLegacyDataId } from "@ogw_front/utils/legacy_data_id";
 import { type ModelComponentRecord, useDataMesh } from "./data_helpers/mesh.js";
 import { database } from "@ogw_internal/database/database.js";
 import { liveObservable } from "@ogw_front/utils/live_observable";
@@ -14,8 +20,7 @@ import { useDataCollections } from "./data_helpers/collections.js";
 import { useDataRelations } from "./data_helpers/relations.js";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
-interface DataItem extends GeodeIdentified {
-  id: string;
+interface DataItem extends DataIdentified, GeodeIdentified {
   name: string;
   viewer_type: string;
   geode_object_type: string;
@@ -27,7 +32,7 @@ interface DataItem extends GeodeIdentified {
 }
 
 // What the CRS features read of a data: light to copy on each change
-type CrsItem = Pick<DataItem, "id" | "name" | "crs" | "created_at">;
+type CrsItem = Pick<DataItem, "data_id" | "name" | "crs" | "created_at">;
 
 interface ModelComponentInput extends GeodeIdentified {
   type: string;
@@ -39,8 +44,7 @@ interface ModelComponentInput extends GeodeIdentified {
   items?: string[];
 }
 
-interface NewDataItem extends GeodeIdentified {
-  id: string;
+interface NewDataItem extends DataIdentified, GeodeIdentified {
   name?: string;
   viewer_type: string;
   geode_object_type: string;
@@ -54,8 +58,7 @@ interface NewDataItem extends GeodeIdentified {
   nb_vertices?: number;
 }
 
-interface ModelComponentRelationRecord {
-  id: string;
+interface ModelComponentRelationRecord extends DataIdentified {
   parent: string;
   child: string;
   type: string;
@@ -65,7 +68,7 @@ interface ViewableItemLike {
   is_viewable?: boolean;
   binary_light_viewable?: string;
   geode_object_type?: string;
-  id?: string;
+  data_id?: DataId;
   title?: string;
 }
 
@@ -86,7 +89,7 @@ function checkItemViewable(item: ViewableItemLike | undefined | null): boolean {
   }
   if (
     item.geode_object_type === "HorizonStack3D" ||
-    item.id === "HorizonStack3D" ||
+    item.data_id === "HorizonStack3D" ||
     item.title === "HorizonStack3D"
   ) {
     return false;
@@ -163,7 +166,12 @@ export const useDataStore = defineStore("data", () => {
     return useObservable(
       liveObservable(async () => {
         const items = await data_db.toArray();
-        return items.map(({ id, name, crs, created_at }) => ({ id, name, crs, created_at }));
+        return items.map(({ data_id, name, crs, created_at }) => ({
+          data_id,
+          name,
+          crs,
+          created_at,
+        }));
       }),
       { initialValue: [] as CrsItem[] },
     );
@@ -185,14 +193,14 @@ export const useDataStore = defineStore("data", () => {
   }
   function refRegisteredItems(): ComputedRef<DataItem[]> {
     const items = refAllItems();
-    return computed(() => items.value.filter((data_item) => isRegistered(data_item.id)));
+    return computed(() => items.value.filter((data_item) => isRegistered(data_item.data_id)));
   }
   async function meshComponentType(
     modelId: string,
     geode_id: GeodeId,
   ): Promise<string | undefined> {
     const component = await model_components_db
-      .where("[id+geode_id]")
+      .where("[data_id+geode_id]")
       .equals([modelId, geode_id])
       .first();
     return component?.type;
@@ -227,9 +235,9 @@ export const useDataStore = defineStore("data", () => {
   // Satisfy prefer-readonly-parameter-types deeply; same pattern as app/utils/import_workflow.ts.
   async function addItem(new_item: NewDataItem): Promise<string> {
     const itemData: DataItem = {
-      id: new_item.id,
+      data_id: new_item.data_id,
       geode_id: new_item.geode_id,
-      name: new_item.name ?? new_item.id,
+      name: new_item.name ?? new_item.data_id,
       viewer_type: new_item.viewer_type,
       geode_object_type: new_item.geode_object_type,
       visible: true,
@@ -254,7 +262,7 @@ export const useDataStore = defineStore("data", () => {
     function addModelComponents(components: readonly ModelComponentInput[]): void {
       for (const component of components) {
         allComponents.push({
-          id: new_item.id,
+          data_id: new_item.data_id,
           geode_id: component.geode_id,
           type: component.type,
           viewer_id: component.viewer_id,
@@ -283,7 +291,7 @@ export const useDataStore = defineStore("data", () => {
     ): void {
       for (const child of components) {
         relations.push({
-          id: new_item.id,
+          data_id: new_item.data_id,
           parent,
           child,
           type,
@@ -317,7 +325,7 @@ export const useDataStore = defineStore("data", () => {
     const component = await model_components_db
       .where("viewer_id")
       .equals(Number(viewer_id))
-      .and((model_component: ModelComponentRecord) => model_component.id === modelId)
+      .and((model_component: ModelComponentRecord) => model_component.data_id === modelId)
       .first();
     return component;
   }
@@ -328,13 +336,13 @@ export const useDataStore = defineStore("data", () => {
     const components = await model_components_db
       .where("viewer_id")
       .anyOf(viewer_ids)
-      .and((model_component: ModelComponentRecord) => model_component.id === modelId)
+      .and((model_component: ModelComponentRecord) => model_component.data_id === modelId)
       .toArray();
     return components;
   }
   async function deleteModelComponents(modelId: string): Promise<void> {
-    await model_components_db.where("id").equals(modelId).delete();
-    await model_components_relation_db.where("id").equals(modelId).delete();
+    await model_components_db.where("data_id").equals(modelId).delete();
+    await model_components_relation_db.where("data_id").equals(modelId).delete();
   }
 
   async function deleteItem(id: string): Promise<void> {
@@ -347,7 +355,7 @@ export const useDataStore = defineStore("data", () => {
   }
 
   async function getAllModelComponentsViewerIds(modelId: string): Promise<number[]> {
-    const components = await model_components_db.where("id").equals(modelId).toArray();
+    const components = await model_components_db.where("data_id").equals(modelId).toArray();
     return components.map((component: ModelComponentRecord) =>
       Math.trunc(Number(component.viewer_id)),
     );
@@ -357,7 +365,7 @@ export const useDataStore = defineStore("data", () => {
     meshComponentGeodeIds: readonly string[],
   ): Promise<number[]> {
     const components = await model_components_db
-      .where("[id+geode_id]")
+      .where("[data_id+geode_id]")
       .anyOf(meshComponentGeodeIds.map((geode_id) => [modelId, geode_id]))
       .toArray();
     return components.map((component: ModelComponentRecord) =>
@@ -389,12 +397,26 @@ export const useDataStore = defineStore("data", () => {
   // Dexie's bulkPut expects mutable arrays, so this snapshot parameter can't deeply satisfy
   // The prefer-readonly-parameter-types rule; same pattern as app/utils/import_workflow.ts.
   async function importStores(snapshot: {
-    readonly modelComponents: readonly ModelComponentRecord[];
-    readonly modelComponentsRelations: readonly ModelComponentRelationRecord[];
+    readonly modelComponents: readonly (
+      | LegacyDataId<ModelComponentRecord>
+      | ModelComponentRecord
+    )[];
+    readonly modelComponentsRelations: readonly (
+      | LegacyDataId<ModelComponentRelationRecord>
+      | ModelComponentRelationRecord
+    )[];
   }): Promise<void> {
     await clear();
-    await model_components_db.bulkPut(snapshot.modelComponents);
-    await model_components_relation_db.bulkPut(snapshot.modelComponentsRelations);
+    await model_components_db.bulkPut(
+      snapshot.modelComponents.map((component) =>
+        fromLegacyDataId<ModelComponentRecord>(component),
+      ),
+    );
+    await model_components_relation_db.bulkPut(
+      snapshot.modelComponentsRelations.map((relation) =>
+        fromLegacyDataId<ModelComponentRelationRecord>(relation),
+      ),
+    );
   }
   return {
     refAllItems,

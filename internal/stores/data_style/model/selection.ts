@@ -1,12 +1,11 @@
-import type { GeodeIdentified } from "@ogw_front/types/identifiers";
+import type { DataIdentified, GeodeIdentified } from "@ogw_front/types/identifiers";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import type { Table } from "dexie";
 import { database } from "@ogw_internal/database/database";
 import type { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 
-interface ModelComponentRecord extends GeodeIdentified {
-  id: string;
+interface ModelComponentRecord extends DataIdentified, GeodeIdentified {
   type: string;
 }
 
@@ -118,7 +117,7 @@ function useModelSelection(
 
   void (async (): Promise<void> => {
     try {
-      allComponents.value = await model_components_db.where("id").equals(modelId).toArray();
+      allComponents.value = await model_components_db.where("data_id").equals(modelId).toArray();
     } catch {
       allComponents.value = [];
     }
