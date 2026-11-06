@@ -138,10 +138,10 @@ export const useDataStore = defineStore("data", () => {
   const { getComponentRelations } = useDataRelations();
   // Ids the viewer holds a pipeline for: an item is stored before it is registered, and non viewable items never are
   const registeredIds = reactive(new Set<string>());
-  async function item(id: string): Promise<DataItem> {
-    const data_item = await data_db.get(id);
+  async function item(dataId: DataId): Promise<DataItem> {
+    const data_item = await data_db.get(dataId);
     if (!data_item) {
-      throw new Error(`Item not found: ${id}`);
+      throw new Error(`Item not found: ${dataId}`);
     }
     return data_item;
   }
@@ -149,10 +149,10 @@ export const useDataStore = defineStore("data", () => {
     const items = await data_db.toArray();
     return items;
   }
-  function refItem(id: string): Ref<DataItem | undefined> {
+  function refItem(dataId: DataId): Ref<DataItem | undefined> {
     return useObservable(
       liveObservable(async () => {
-        const data_item = await data_db.get(id);
+        const data_item = await data_db.get(dataId);
         return data_item;
       }),
       {
@@ -188,8 +188,8 @@ export const useDataStore = defineStore("data", () => {
       },
     );
   }
-  function isRegistered(id: string): boolean {
-    return registeredIds.has(id);
+  function isRegistered(dataId: DataId): boolean {
+    return registeredIds.has(dataId);
   }
   function refRegisteredItems(): ComputedRef<DataItem[]> {
     const items = refAllItems();
@@ -205,10 +205,10 @@ export const useDataStore = defineStore("data", () => {
       .first();
     return component?.type;
   }
-  async function registerObject(id: string, name: string): Promise<unknown> {
+  async function registerObject(dataId: DataId, name: string): Promise<unknown> {
     const schema = viewer_generic_schemas.register;
     const params = {
-      id,
+      id: dataId,
       name,
     };
     const result = await viewerStore.request({
@@ -216,15 +216,15 @@ export const useDataStore = defineStore("data", () => {
       params,
       timeout: 0,
     });
-    registeredIds.add(id);
+    registeredIds.add(dataId);
     return result;
   }
-  async function deregisterObject(id: string): Promise<unknown> {
+  async function deregisterObject(dataId: DataId): Promise<unknown> {
     const schema = viewer_generic_schemas.deregister;
     const params = {
-      id,
+      id: dataId,
     };
-    registeredIds.delete(id);
+    registeredIds.delete(dataId);
     const result = await viewerStore.request({
       schema,
       params,
@@ -250,8 +250,8 @@ export const useDataStore = defineStore("data", () => {
     if (new_item.crs !== undefined) {
       itemData.crs = new_item.crs;
     }
-    const id = await data_db.put(itemData);
-    return id;
+    const dataId = await data_db.put(itemData);
+    return dataId;
   }
   // NewDataItem has mutable array fields (mesh_components, collection_components), so it can't
   // Satisfy prefer-readonly-parameter-types deeply; same pattern as app/utils/import_workflow.ts.
@@ -345,13 +345,13 @@ export const useDataStore = defineStore("data", () => {
     await model_components_relation_db.where("data_id").equals(modelId).delete();
   }
 
-  async function deleteItem(id: string): Promise<void> {
-    await data_db.delete(id);
-    await deleteModelComponents(id);
+  async function deleteItem(dataId: DataId): Promise<void> {
+    await data_db.delete(dataId);
+    await deleteModelComponents(dataId);
   }
 
-  async function updateItem(id: string, changes: Partial<DataItem>): Promise<void> {
-    await data_db.update(id, changes);
+  async function updateItem(dataId: DataId, changes: Partial<DataItem>): Promise<void> {
+    await data_db.update(dataId, changes);
   }
 
   async function getAllModelComponentsViewerIds(modelId: DataId): Promise<number[]> {
