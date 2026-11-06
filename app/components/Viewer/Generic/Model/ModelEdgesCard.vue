@@ -3,10 +3,10 @@ import {
   type ModelMenuItemProps,
   useModelMenuContext,
 } from "@ogw_front/composables/model_menu_context";
+import type { Visibility, Width } from "@ogw_front/types/style";
 import ModelCardTabs from "./ModelCardTabs.vue";
 import ViewerGenericModelComponentEdgesOptions from "@ogw_front/components/Viewer/Generic/Model/ComponentEdgesOptions.vue";
 import ViewerOptionsWidthSlider from "@ogw_front/components/Viewer/Options/Sliders/Width.vue";
-import type { Visibility } from "@ogw_front/types/style";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -53,7 +53,7 @@ const modelEdgesVisibility = computed<Visibility | undefined>({
   },
 });
 
-const modelEdgesWidth = computed<number | undefined>({
+const modelEdgesWidth = computed<Width | undefined>({
   get: () => dataStyleStore.modelEdgesWidth(modelId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
