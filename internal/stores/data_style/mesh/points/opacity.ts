@@ -1,4 +1,4 @@
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
@@ -12,20 +12,20 @@ const schema = viewer_schemas.opengeodeweb_viewer.mesh.points.opacity;
 
 // The opacity is the constant color alpha, the viewer applies it whatever the coloring
 export function useMeshPointsOpacityStyle(): {
-  meshPointsOpacity: (meshId: DataId) => number | undefined;
-  setMeshPointsOpacity: (meshId: DataId, opacity: number) => Promise<unknown>;
+  meshPointsOpacity: (meshId: MeshId) => number | undefined;
+  setMeshPointsOpacity: (meshId: MeshId, opacity: number) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const meshPointsCommonStyle = useMeshPointsCommonStyle();
 
-  function meshPointsConstantColor(meshId: DataId): RGBAColor | undefined {
+  function meshPointsConstantColor(meshId: MeshId): RGBAColor | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.constant shape is defined by the data style schema.
     return meshPointsCommonStyle.meshPointsColoring(meshId).constant as RGBAColor | undefined;
   }
-  function meshPointsOpacity(meshId: DataId): number | undefined {
+  function meshPointsOpacity(meshId: MeshId): number | undefined {
     return meshPointsConstantColor(meshId)?.alpha;
   }
-  async function setMeshPointsOpacity(meshId: DataId, opacity: number): Promise<unknown> {
+  async function setMeshPointsOpacity(meshId: MeshId, opacity: number): Promise<unknown> {
     const params = { id: meshId, opacity };
     const result = await viewerStore.request(
       {

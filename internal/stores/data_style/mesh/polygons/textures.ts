@@ -4,7 +4,7 @@ import viewer_schemas, {
 } from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { MeshId } from "@ogw_front/types/identifiers";
 import { useMeshPolygonsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -12,23 +12,23 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const schema = viewer_schemas.opengeodeweb_viewer.mesh.apply_textures;
 
 export function useMeshPolygonsTexturesStyle(): {
-  meshPolygonsTextures: (meshId: DataId) => MeshApplyTexturesParams["textures"] | undefined;
+  meshPolygonsTextures: (meshId: MeshId) => MeshApplyTexturesParams["textures"] | undefined;
   setMeshPolygonsTextures: (
-    meshId: DataId,
+    meshId: MeshId,
     textures: MeshApplyTexturesParams["textures"],
   ) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle();
 
-  function meshPolygonsTextures(meshId: DataId): MeshApplyTexturesParams["textures"] | undefined {
+  function meshPolygonsTextures(meshId: MeshId): MeshApplyTexturesParams["textures"] | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- textures shape is defined by the data style schema.
     return meshPolygonsCommonStyle.meshPolygonsColoring(meshId).textures as
       | MeshApplyTexturesParams["textures"]
       | undefined;
   }
   async function setMeshPolygonsTextures(
-    meshId: DataId,
+    meshId: MeshId,
     textures: MeshApplyTexturesParams["textures"],
   ): Promise<unknown> {
     const params = { id: meshId, textures };

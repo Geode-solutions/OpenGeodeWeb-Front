@@ -1,5 +1,5 @@
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { MeshId } from "@ogw_front/types/identifiers";
 import type { ValidAttributeInput } from "@ogw_internal/stores/data_style/attribute_types";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
@@ -39,11 +39,11 @@ function useMeshCellsCellAttributeStyle(): UseMeshCellsCellAttributeStyleReturn 
   } = useMeshCellsCellAttributeConfigValues();
   const { mutateMeshCellsCellStyle, setMeshCellsCellAttributeStoredConfig } =
     useMeshCellsCellAttributeConfigWriter();
-  function meshCellsCellAttributeTimeStep(meshId: DataId): number | undefined {
+  function meshCellsCellAttributeTimeStep(meshId: MeshId): number | undefined {
     return attributeTimeStep(meshId, attributeNamesSchema.$id, meshCellsCellAttribute(meshId).name);
   }
   async function setMeshCellsCellAttribute(
-    meshId: DataId,
+    meshId: MeshId,
     {
       name,
       item,
@@ -79,7 +79,7 @@ function useMeshCellsCellAttributeStyle(): UseMeshCellsCellAttributeStyleReturn 
       params,
     });
   }
-  async function applyCellAttribute(meshId: DataId): Promise<unknown> {
+  async function applyCellAttribute(meshId: MeshId): Promise<unknown> {
     const name = meshCellsCellAttributeName(meshId);
     const item = meshCellsCellAttributeItem(meshId);
     const storedConfig = meshCellsCellAttributeStoredConfig(meshId, name, item);
@@ -97,7 +97,7 @@ function useMeshCellsCellAttributeStyle(): UseMeshCellsCellAttributeStyleReturn 
     }
     return undefined;
   }
-  async function setMeshCellsCellAttributeName(meshId: DataId, name: string): Promise<unknown> {
+  async function setMeshCellsCellAttributeName(meshId: MeshId, name: string): Promise<unknown> {
     const item = meshCellsCellAttributeLastItem(meshId, name);
     await mutateMeshCellsCellStyle(meshId, {
       name,
@@ -105,14 +105,14 @@ function useMeshCellsCellAttributeStyle(): UseMeshCellsCellAttributeStyleReturn 
     });
     return applyCellAttribute(meshId);
   }
-  async function setMeshCellsCellAttributeItem(meshId: DataId, item: number): Promise<unknown> {
+  async function setMeshCellsCellAttributeItem(meshId: MeshId, item: number): Promise<unknown> {
     await mutateMeshCellsCellStyle(meshId, {
       item,
     });
     return applyCellAttribute(meshId);
   }
   async function setMeshCellsCellAttributeTimeStep(
-    meshId: DataId,
+    meshId: MeshId,
     timeStep: number,
   ): Promise<unknown> {
     const name = meshCellsCellAttributeName(meshId);
@@ -123,7 +123,7 @@ function useMeshCellsCellAttributeStyle(): UseMeshCellsCellAttributeStyleReturn 
     return applyCellAttribute(meshId);
   }
   async function setMeshCellsCellAttributeRange(
-    meshId: DataId,
+    meshId: MeshId,
     minimum: number,
     maximum: number,
   ): Promise<unknown> {
@@ -136,7 +136,7 @@ function useMeshCellsCellAttributeStyle(): UseMeshCellsCellAttributeStyleReturn 
     return applyCellAttribute(meshId);
   }
   async function setMeshCellsCellAttributeColorMap(
-    meshId: DataId,
+    meshId: MeshId,
     colorMap: string | undefined,
   ): Promise<unknown> {
     const name = meshCellsCellAttributeName(meshId);
@@ -147,7 +147,7 @@ function useMeshCellsCellAttributeStyle(): UseMeshCellsCellAttributeStyleReturn 
     return applyCellAttribute(meshId);
   }
   async function setMeshCellsCellAttributeNoDataColor(
-    meshId: DataId,
+    meshId: MeshId,
     no_data_color: RGBAColor,
   ): Promise<unknown> {
     const name = meshCellsCellAttributeName(meshId);

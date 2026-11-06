@@ -1,4 +1,4 @@
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
@@ -12,20 +12,20 @@ const schema = viewer_schemas.opengeodeweb_viewer.mesh.polygons.opacity;
 
 // The opacity is the constant color alpha, the viewer applies it whatever the coloring
 export function useMeshPolygonsOpacityStyle(): {
-  meshPolygonsOpacity: (meshId: DataId) => number | undefined;
-  setMeshPolygonsOpacity: (meshId: DataId, opacity: number) => Promise<unknown>;
+  meshPolygonsOpacity: (meshId: MeshId) => number | undefined;
+  setMeshPolygonsOpacity: (meshId: MeshId, opacity: number) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle();
 
-  function meshPolygonsConstantColor(meshId: DataId): RGBAColor | undefined {
+  function meshPolygonsConstantColor(meshId: MeshId): RGBAColor | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.constant shape is defined by the data style schema.
     return meshPolygonsCommonStyle.meshPolygonsColoring(meshId).constant as RGBAColor | undefined;
   }
-  function meshPolygonsOpacity(meshId: DataId): number | undefined {
+  function meshPolygonsOpacity(meshId: MeshId): number | undefined {
     return meshPolygonsConstantColor(meshId)?.alpha;
   }
-  async function setMeshPolygonsOpacity(meshId: DataId, opacity: number): Promise<unknown> {
+  async function setMeshPolygonsOpacity(meshId: MeshId, opacity: number): Promise<unknown> {
     const params = { id: meshId, opacity };
     const result = await viewerStore.request(
       {

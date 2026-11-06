@@ -2,7 +2,7 @@ import type {
   AttributeState,
   AttributeStoredConfig,
 } from "@ogw_internal/stores/data_style/attribute_types";
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 
@@ -10,12 +10,12 @@ import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/at
 import { useMeshPolygonsCommonStyle } from "./common";
 
 interface UseMeshPolygonsPolygonAttributeConfigReturn {
-  meshPolygonsPolygonAttribute: (meshId: DataId) => AttributeState;
-  meshPolygonsPolygonAttributeName: (meshId: DataId) => string | undefined;
-  meshPolygonsPolygonAttributeLastItem: (meshId: DataId, name: string | undefined) => number;
-  meshPolygonsPolygonAttributeItem: (meshId: DataId) => number;
+  meshPolygonsPolygonAttribute: (meshId: MeshId) => AttributeState;
+  meshPolygonsPolygonAttributeName: (meshId: MeshId) => string | undefined;
+  meshPolygonsPolygonAttributeLastItem: (meshId: MeshId, name: string | undefined) => number;
+  meshPolygonsPolygonAttributeItem: (meshId: MeshId) => number;
   meshPolygonsPolygonAttributeStoredConfig: (
-    meshId: DataId,
+    meshId: MeshId,
     name: string | undefined,
     item: number | undefined,
   ) => AttributeStoredConfig;
@@ -23,11 +23,11 @@ interface UseMeshPolygonsPolygonAttributeConfigReturn {
 
 interface UseMeshPolygonsPolygonAttributeConfigWriterReturn {
   mutateMeshPolygonsPolygonStyle: (
-    meshId: DataId,
+    meshId: MeshId,
     values: Record<string, unknown>,
   ) => Promise<string>;
   setMeshPolygonsPolygonAttributeStoredConfig: (
-    meshId: DataId,
+    meshId: MeshId,
     name: string | undefined,
     item: number | undefined,
     config: Partial<AttributeStoredConfig>,
@@ -36,12 +36,12 @@ interface UseMeshPolygonsPolygonAttributeConfigWriterReturn {
 
 function useMeshPolygonsPolygonAttributeConfig(): UseMeshPolygonsPolygonAttributeConfigReturn {
   const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle();
-  function meshPolygonsPolygonAttribute(meshId: DataId): AttributeState {
+  function meshPolygonsPolygonAttribute(meshId: MeshId): AttributeState {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.polygon shape is defined by the data style schema.
     return meshPolygonsCommonStyle.meshPolygonsColoring(meshId).polygon as AttributeState;
   }
   function meshPolygonsPolygonAttributeStoredConfig(
-    meshId: DataId,
+    meshId: MeshId,
     name: string | undefined,
     item: number | undefined,
   ): AttributeStoredConfig {
@@ -53,10 +53,10 @@ function useMeshPolygonsPolygonAttributeConfig(): UseMeshPolygonsPolygonAttribut
     }
     return defaultAttributeStoredConfig();
   }
-  function meshPolygonsPolygonAttributeName(meshId: DataId): string | undefined {
+  function meshPolygonsPolygonAttributeName(meshId: MeshId): string | undefined {
     return meshPolygonsPolygonAttribute(meshId).name;
   }
-  function meshPolygonsPolygonAttributeLastItem(meshId: DataId, name: string | undefined): number {
+  function meshPolygonsPolygonAttributeLastItem(meshId: MeshId, name: string | undefined): number {
     const { storedConfigs } = meshPolygonsPolygonAttribute(meshId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
     if (nameConfig !== undefined) {
@@ -64,7 +64,7 @@ function useMeshPolygonsPolygonAttributeConfig(): UseMeshPolygonsPolygonAttribut
     }
     return 0;
   }
-  function meshPolygonsPolygonAttributeItem(meshId: DataId): number {
+  function meshPolygonsPolygonAttributeItem(meshId: MeshId): number {
     const { item, name } = meshPolygonsPolygonAttribute(meshId);
     return item ?? meshPolygonsPolygonAttributeLastItem(meshId, name);
   }
@@ -78,9 +78,9 @@ function useMeshPolygonsPolygonAttributeConfig(): UseMeshPolygonsPolygonAttribut
 }
 
 interface UseMeshPolygonsPolygonAttributeConfigValuesReturn {
-  meshPolygonsPolygonAttributeRange: (meshId: DataId) => [number | undefined, number | undefined];
-  meshPolygonsPolygonAttributeColorMap: (meshId: DataId) => string | undefined;
-  meshPolygonsPolygonAttributeNoDataColor: (meshId: DataId) => RGBAColor;
+  meshPolygonsPolygonAttributeRange: (meshId: MeshId) => [number | undefined, number | undefined];
+  meshPolygonsPolygonAttributeColorMap: (meshId: MeshId) => string | undefined;
+  meshPolygonsPolygonAttributeNoDataColor: (meshId: MeshId) => RGBAColor;
 }
 
 function useMeshPolygonsPolygonAttributeConfigValues(): UseMeshPolygonsPolygonAttributeConfigValuesReturn {
@@ -90,20 +90,20 @@ function useMeshPolygonsPolygonAttributeConfigValues(): UseMeshPolygonsPolygonAt
     meshPolygonsPolygonAttributeStoredConfig,
   } = useMeshPolygonsPolygonAttributeConfig();
   function meshPolygonsPolygonAttributeRange(
-    meshId: DataId,
+    meshId: MeshId,
   ): [number | undefined, number | undefined] {
     const name = meshPolygonsPolygonAttributeName(meshId);
     const item = meshPolygonsPolygonAttributeItem(meshId);
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(meshId, name, item);
     return [storedConfig.minimum, storedConfig.maximum];
   }
-  function meshPolygonsPolygonAttributeColorMap(meshId: DataId): string | undefined {
+  function meshPolygonsPolygonAttributeColorMap(meshId: MeshId): string | undefined {
     const name = meshPolygonsPolygonAttributeName(meshId);
     const item = meshPolygonsPolygonAttributeItem(meshId);
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(meshId, name, item);
     return storedConfig.colorMap;
   }
-  function meshPolygonsPolygonAttributeNoDataColor(meshId: DataId): RGBAColor {
+  function meshPolygonsPolygonAttributeNoDataColor(meshId: MeshId): RGBAColor {
     const name = meshPolygonsPolygonAttributeName(meshId);
     const item = meshPolygonsPolygonAttributeItem(meshId);
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(meshId, name, item);
@@ -119,14 +119,14 @@ function useMeshPolygonsPolygonAttributeConfigValues(): UseMeshPolygonsPolygonAt
 function useMeshPolygonsPolygonAttributeConfigWriter(): UseMeshPolygonsPolygonAttributeConfigWriterReturn {
   const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle();
   async function mutateMeshPolygonsPolygonStyle(
-    meshId: DataId,
+    meshId: MeshId,
     values: Record<string, unknown>,
   ): Promise<string> {
     const result = await meshPolygonsCommonStyle.mutateMeshPolygonsPolygonStyle(meshId, values);
     return result;
   }
   async function setMeshPolygonsPolygonAttributeStoredConfig(
-    meshId: DataId,
+    meshId: MeshId,
     name: string | undefined,
     item: number | undefined,
     config: Partial<AttributeStoredConfig>,

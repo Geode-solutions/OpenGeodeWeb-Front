@@ -1,5 +1,5 @@
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { MeshId } from "@ogw_front/types/identifiers";
 import type { ValidAttributeInput } from "@ogw_internal/stores/data_style/attribute_types";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
@@ -40,7 +40,7 @@ function useMeshPointsVertexAttributeStyle(): UseMeshPointsVertexAttributeStyleR
   } = useMeshPointsVertexAttributeConfigValues();
   const { mutateMeshPointsVertexStyle, setMeshPointsVertexAttributeStoredConfig } =
     useMeshPointsVertexAttributeConfigWriter();
-  function meshPointsVertexAttributeTimeStep(meshId: DataId): number | undefined {
+  function meshPointsVertexAttributeTimeStep(meshId: MeshId): number | undefined {
     return attributeTimeStep(
       meshId,
       attributeNamesSchema.$id,
@@ -48,7 +48,7 @@ function useMeshPointsVertexAttributeStyle(): UseMeshPointsVertexAttributeStyleR
     );
   }
   async function setMeshPointsVertexAttribute(
-    meshId: DataId,
+    meshId: MeshId,
     {
       name,
       item,
@@ -84,7 +84,7 @@ function useMeshPointsVertexAttributeStyle(): UseMeshPointsVertexAttributeStyleR
       params,
     });
   }
-  async function applyVertexAttribute(meshId: DataId): Promise<unknown> {
+  async function applyVertexAttribute(meshId: MeshId): Promise<unknown> {
     const name = meshPointsVertexAttributeName(meshId);
     const item = meshPointsVertexAttributeItem(meshId);
     const storedConfig = meshPointsVertexAttributeStoredConfig(meshId, name, item);
@@ -102,7 +102,7 @@ function useMeshPointsVertexAttributeStyle(): UseMeshPointsVertexAttributeStyleR
     }
     return undefined;
   }
-  async function setMeshPointsVertexAttributeName(meshId: DataId, name: string): Promise<unknown> {
+  async function setMeshPointsVertexAttributeName(meshId: MeshId, name: string): Promise<unknown> {
     const item = meshPointsVertexAttributeLastItem(meshId, name);
     await mutateMeshPointsVertexStyle(meshId, {
       name,
@@ -110,14 +110,14 @@ function useMeshPointsVertexAttributeStyle(): UseMeshPointsVertexAttributeStyleR
     });
     return applyVertexAttribute(meshId);
   }
-  async function setMeshPointsVertexAttributeItem(meshId: DataId, item: number): Promise<unknown> {
+  async function setMeshPointsVertexAttributeItem(meshId: MeshId, item: number): Promise<unknown> {
     await mutateMeshPointsVertexStyle(meshId, {
       item,
     });
     return applyVertexAttribute(meshId);
   }
   async function setMeshPointsVertexAttributeTimeStep(
-    meshId: DataId,
+    meshId: MeshId,
     timeStep: number,
   ): Promise<unknown> {
     const name = meshPointsVertexAttributeName(meshId);
@@ -128,7 +128,7 @@ function useMeshPointsVertexAttributeStyle(): UseMeshPointsVertexAttributeStyleR
     return applyVertexAttribute(meshId);
   }
   async function setMeshPointsVertexAttributeRange(
-    meshId: DataId,
+    meshId: MeshId,
     minimum: number,
     maximum: number,
   ): Promise<unknown> {
@@ -141,7 +141,7 @@ function useMeshPointsVertexAttributeStyle(): UseMeshPointsVertexAttributeStyleR
     return applyVertexAttribute(meshId);
   }
   async function setMeshPointsVertexAttributeColorMap(
-    meshId: DataId,
+    meshId: MeshId,
     colorMap: string | undefined,
   ): Promise<unknown> {
     const name = meshPointsVertexAttributeName(meshId);
@@ -152,7 +152,7 @@ function useMeshPointsVertexAttributeStyle(): UseMeshPointsVertexAttributeStyleR
     return applyVertexAttribute(meshId);
   }
   async function setMeshPointsVertexAttributeNoDataColor(
-    meshId: DataId,
+    meshId: MeshId,
     no_data_color: RGBAColor,
   ): Promise<unknown> {
     const name = meshPointsVertexAttributeName(meshId);
