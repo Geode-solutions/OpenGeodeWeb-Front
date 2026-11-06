@@ -1,6 +1,6 @@
 import type { AttributeRangeInfo, AttributeSchemas } from "@ogw_front/utils/attribute_range";
+import type { AttributeTimeStep, ValidAttributeRange } from "@ogw_front/types/attribute";
 import type { DataId } from "@ogw_front/types/identifiers";
-import type { ValidAttributeRange } from "@ogw_front/types/attribute";
 import { getAttributeRange } from "@ogw_front/utils/attributes";
 
 // The minimum and maximum of an attribute range: each one is clamped by the other
@@ -64,7 +64,7 @@ function attributeRangesPerTarget(
 function useSeriesTimeStepCommit(
   timeSteps: ComputedRef<number[]>,
   seriesName: () => string | undefined,
-  attributeTimeStep: Readonly<Ref<number | undefined>>,
+  attributeTimeStep: Readonly<Ref<AttributeTimeStep | undefined>>,
   resetTimeStep: () => void,
 ): () => void {
   let committedSeries: string | undefined = undefined;

@@ -1,4 +1,4 @@
-import type { AttributeName } from "@ogw_front/types/attribute";
+import type { AttributeName, AttributeTimeStep } from "@ogw_front/types/attribute";
 import type { DataId } from "@ogw_front/types/identifiers";
 import { attributeArrayName } from "@ogw_front/utils/attributes";
 import { useDataStyleState } from "./state";
@@ -8,12 +8,12 @@ interface UseAttributeTimeStepStyleReturn {
     dataId: DataId,
     key: string,
     name: AttributeName | undefined,
-  ) => number | undefined;
+  ) => AttributeTimeStep | undefined;
   setAttributeTimeStep: (
     dataId: DataId,
     key: string,
     name: AttributeName,
-    timeStep: number,
+    timeStep: AttributeTimeStep,
   ) => Promise<unknown>;
   seriesArrayName: (dataId: DataId, key: string, name: AttributeName) => string;
 }
@@ -51,7 +51,7 @@ function useAttributeTimeStepStyle(): UseAttributeTimeStepStyleReturn {
     dataId: DataId,
     key: string,
     name: AttributeName | undefined,
-  ): number | undefined {
+  ): AttributeTimeStep | undefined {
     if (name === undefined) {
       return undefined;
     }
@@ -62,7 +62,7 @@ function useAttributeTimeStepStyle(): UseAttributeTimeStepStyleReturn {
     dataId: DataId,
     key: string,
     name: AttributeName,
-    timeStep: number,
+    timeStep: AttributeTimeStep,
   ): Promise<unknown> {
     const result = await dataStyleState.mutateStyle(dataId, {
       timeSteps: { [key]: { [name]: timeStep } },

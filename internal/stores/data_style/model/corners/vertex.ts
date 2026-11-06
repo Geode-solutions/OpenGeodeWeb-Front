@@ -4,6 +4,7 @@ import type {
   AttributeItem,
   AttributeName,
   AttributeRange,
+  AttributeTimeStep,
 } from "@ogw_front/types/attribute";
 import type {
   AttributeInput,
@@ -43,11 +44,11 @@ interface ModelCornersVertexAttributeApi {
   modelCornersVertexAttributeTimeStep: (
     modelId: ModelId,
     cornerId?: CornerId,
-  ) => number | undefined;
+  ) => AttributeTimeStep | undefined;
   setModelCornersVertexAttributeTimeStep: (
     modelId: ModelId,
     cornerIds: CornerId[],
-    timeStep: number,
+    timeStep: AttributeTimeStep,
   ) => Promise<void>;
   modelCornersVertexAttributeColorMap: (
     modelId: ModelId,
@@ -172,7 +173,7 @@ function useModelCornersVertexAttributeGetters(
   function modelCornersVertexAttributeTimeStep(
     modelId: ModelId,
     cornerId?: CornerId,
-  ): number | undefined {
+  ): AttributeTimeStep | undefined {
     return attributeTimeStep(
       modelId,
       attributeSchema.$id,
@@ -314,7 +315,7 @@ function useModelCornersVertexAttribute(): ModelCornersVertexAttributeApi {
   async function setModelCornersVertexAttributeTimeStep(
     modelId: ModelId,
     cornerIds: CornerId[],
-    timeStep: number,
+    timeStep: AttributeTimeStep,
   ): Promise<void> {
     const name = modelCornersVertexAttributeName(modelId, cornerIds[0]);
     if (name === undefined) {

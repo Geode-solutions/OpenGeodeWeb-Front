@@ -1,4 +1,9 @@
-import type { AttributeColorMap, AttributeItem, AttributeName } from "@ogw_front/types/attribute";
+import type {
+  AttributeColorMap,
+  AttributeItem,
+  AttributeName,
+  AttributeTimeStep,
+} from "@ogw_front/types/attribute";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { ValidAttributeInput } from "@ogw_internal/stores/data_style/attribute_types";
@@ -40,7 +45,7 @@ function useMeshCellsCellAttributeStyle(): UseMeshCellsCellAttributeStyleReturn 
   } = useMeshCellsCellAttributeConfigValues();
   const { mutateMeshCellsCellStyle, setMeshCellsCellAttributeStoredConfig } =
     useMeshCellsCellAttributeConfigWriter();
-  function meshCellsCellAttributeTimeStep(meshId: MeshId): number | undefined {
+  function meshCellsCellAttributeTimeStep(meshId: MeshId): AttributeTimeStep | undefined {
     return attributeTimeStep(meshId, attributeNamesSchema.$id, meshCellsCellAttribute(meshId).name);
   }
   async function setMeshCellsCellAttribute(
@@ -120,7 +125,7 @@ function useMeshCellsCellAttributeStyle(): UseMeshCellsCellAttributeStyleReturn 
   }
   async function setMeshCellsCellAttributeTimeStep(
     meshId: MeshId,
-    timeStep: number,
+    timeStep: AttributeTimeStep,
   ): Promise<unknown> {
     const name = meshCellsCellAttributeName(meshId);
     if (name === undefined) {

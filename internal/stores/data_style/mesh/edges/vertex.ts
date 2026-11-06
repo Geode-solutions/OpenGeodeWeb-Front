@@ -1,4 +1,9 @@
-import type { AttributeColorMap, AttributeItem, AttributeName } from "@ogw_front/types/attribute";
+import type {
+  AttributeColorMap,
+  AttributeItem,
+  AttributeName,
+  AttributeTimeStep,
+} from "@ogw_front/types/attribute";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { ValidAttributeInput } from "@ogw_internal/stores/data_style/attribute_types";
@@ -41,7 +46,7 @@ function useMeshEdgesVertexAttributeStyle(): UseMeshEdgesVertexAttributeStyleRet
   } = useMeshEdgesVertexAttributeConfigValues();
   const { mutateMeshEdgesVertexStyle, setMeshEdgesVertexAttributeStoredConfig } =
     useMeshEdgesVertexAttributeConfigWriter();
-  function meshEdgesVertexAttributeTimeStep(meshId: MeshId): number | undefined {
+  function meshEdgesVertexAttributeTimeStep(meshId: MeshId): AttributeTimeStep | undefined {
     return attributeTimeStep(
       meshId,
       attributeNamesSchema.$id,
@@ -125,7 +130,7 @@ function useMeshEdgesVertexAttributeStyle(): UseMeshEdgesVertexAttributeStyleRet
   }
   async function setMeshEdgesVertexAttributeTimeStep(
     meshId: MeshId,
-    timeStep: number,
+    timeStep: AttributeTimeStep,
   ): Promise<unknown> {
     const name = meshEdgesVertexAttributeName(meshId);
     if (name === undefined) {

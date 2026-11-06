@@ -4,6 +4,7 @@ import type {
   AttributeItem,
   AttributeName,
   AttributeRange,
+  AttributeTimeStep,
 } from "@ogw_front/types/attribute";
 import type {
   AttributeInput,
@@ -42,11 +43,11 @@ interface UseModelSurfacesPolygonAttributeReturn {
   modelSurfacesPolygonAttributeTimeStep: (
     modelId: ModelId,
     surfaceId?: SurfaceId,
-  ) => number | undefined;
+  ) => AttributeTimeStep | undefined;
   setModelSurfacesPolygonAttributeTimeStep: (
     modelId: ModelId,
     surfaceIds: SurfaceId[],
-    timeStep: number,
+    timeStep: AttributeTimeStep,
   ) => Promise<void>;
   modelSurfacesPolygonAttributeColorMap: (
     modelId: ModelId,
@@ -193,7 +194,7 @@ function useModelSurfacesPolygonAttributeGetters(
   function modelSurfacesPolygonAttributeTimeStep(
     modelId: ModelId,
     surfaceId?: SurfaceId,
-  ): number | undefined {
+  ): AttributeTimeStep | undefined {
     return attributeTimeStep(
       modelId,
       attributeSchema.$id,
@@ -337,7 +338,7 @@ function useModelSurfacesPolygonAttribute(): UseModelSurfacesPolygonAttributeRet
   async function setModelSurfacesPolygonAttributeTimeStep(
     modelId: ModelId,
     surfaceIds: SurfaceId[],
-    timeStep: number,
+    timeStep: AttributeTimeStep,
   ): Promise<void> {
     const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
     if (name === undefined) {

@@ -4,6 +4,7 @@ import type {
   AttributeItem,
   AttributeName,
   AttributeRange,
+  AttributeTimeStep,
 } from "@ogw_front/types/attribute";
 import type {
   AttributeInput,
@@ -42,11 +43,11 @@ interface UseModelSurfacesVertexAttributeReturn {
   modelSurfacesVertexAttributeTimeStep: (
     modelId: ModelId,
     surfaceId?: SurfaceId,
-  ) => number | undefined;
+  ) => AttributeTimeStep | undefined;
   setModelSurfacesVertexAttributeTimeStep: (
     modelId: ModelId,
     surfaceIds: SurfaceId[],
-    timeStep: number,
+    timeStep: AttributeTimeStep,
   ) => Promise<void>;
   modelSurfacesVertexAttributeColorMap: (
     modelId: ModelId,
@@ -193,7 +194,7 @@ function useModelSurfacesVertexAttributeGetters(
   function modelSurfacesVertexAttributeTimeStep(
     modelId: ModelId,
     surfaceId?: SurfaceId,
-  ): number | undefined {
+  ): AttributeTimeStep | undefined {
     return attributeTimeStep(
       modelId,
       attributeSchema.$id,
@@ -341,7 +342,7 @@ function useModelSurfacesVertexAttribute(): UseModelSurfacesVertexAttributeRetur
   async function setModelSurfacesVertexAttributeTimeStep(
     modelId: ModelId,
     surfaceIds: SurfaceId[],
-    timeStep: number,
+    timeStep: AttributeTimeStep,
   ): Promise<void> {
     const name = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
     if (name === undefined) {

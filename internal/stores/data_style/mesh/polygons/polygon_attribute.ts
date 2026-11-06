@@ -3,6 +3,7 @@ import type {
   AttributeItem,
   AttributeName,
   AttributeRange,
+  AttributeTimeStep,
 } from "@ogw_front/types/attribute";
 import type {
   AttributeStoredConfig,
@@ -15,8 +16,11 @@ interface UseMeshPolygonsPolygonAttributeStyleReturn {
   meshPolygonsPolygonAttributeName: (meshId: MeshId) => AttributeName | undefined;
   meshPolygonsPolygonAttributeItem: (meshId: MeshId) => AttributeItem;
   meshPolygonsPolygonAttributeRange: (meshId: MeshId) => AttributeRange;
-  meshPolygonsPolygonAttributeTimeStep: (meshId: MeshId) => number | undefined;
-  setMeshPolygonsPolygonAttributeTimeStep: (meshId: MeshId, timeStep: number) => Promise<unknown>;
+  meshPolygonsPolygonAttributeTimeStep: (meshId: MeshId) => AttributeTimeStep | undefined;
+  setMeshPolygonsPolygonAttributeTimeStep: (
+    meshId: MeshId,
+    timeStep: AttributeTimeStep,
+  ) => Promise<unknown>;
   meshPolygonsPolygonAttributeColorMap: (meshId: MeshId) => AttributeColorMap | undefined;
   meshPolygonsPolygonAttributeStoredConfig: (
     meshId: MeshId,

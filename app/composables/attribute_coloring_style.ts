@@ -1,4 +1,8 @@
-import type { AttributeColorMap, ValidAttributeRange } from "@ogw_front/types/attribute";
+import type {
+  AttributeColorMap,
+  AttributeTimeStep,
+  ValidAttributeRange,
+} from "@ogw_front/types/attribute";
 import { type AttributeInfo, getAttributeRange } from "@ogw_front/utils/attributes";
 import { type AttributeSchemas, fetchAttributeRange } from "@ogw_front/utils/attribute_range";
 import type { JsonRpcSchema } from "@ogw_shared/utils/types";
@@ -25,7 +29,7 @@ interface AttributeColoringStyle {
   applyGlobalColormap: (colorMap: AttributeColorMap) => Promise<void>;
   resetGlobalRange: () => Promise<void>;
   currentTimeSteps: Ref<number[]>;
-  currentTimeStep: WritableComputedRef<number>;
+  currentTimeStep: WritableComputedRef<AttributeTimeStep>;
   loadTimeSteps: () => Promise<void>;
 }
 
@@ -153,7 +157,7 @@ function useAttributeColoringStyle(colorings: Ref<AttributeColoring[]>): Attribu
     }
   }
 
-  const currentTimeStep = computed<number>({
+  const currentTimeStep = computed<AttributeTimeStep>({
     get(): number {
       const coloring = temporalColoring.value;
       if (!coloring) {

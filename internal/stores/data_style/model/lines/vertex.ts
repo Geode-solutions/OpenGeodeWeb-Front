@@ -4,6 +4,7 @@ import type {
   AttributeItem,
   AttributeName,
   AttributeRange,
+  AttributeTimeStep,
 } from "@ogw_front/types/attribute";
 import type {
   AttributeInput,
@@ -35,11 +36,14 @@ interface UseModelLinesVertexAttributeReturn {
   modelLinesVertexAttributeName: (modelId: ModelId, lineId?: LineId) => AttributeName | undefined;
   modelLinesVertexAttributeItem: (modelId: ModelId, lineId?: LineId) => AttributeItem;
   modelLinesVertexAttributeRange: (modelId: ModelId, lineId?: LineId) => AttributeRange;
-  modelLinesVertexAttributeTimeStep: (modelId: ModelId, lineId?: LineId) => number | undefined;
+  modelLinesVertexAttributeTimeStep: (
+    modelId: ModelId,
+    lineId?: LineId,
+  ) => AttributeTimeStep | undefined;
   setModelLinesVertexAttributeTimeStep: (
     modelId: ModelId,
     lineIds: LineId[],
-    timeStep: number,
+    timeStep: AttributeTimeStep,
   ) => Promise<void>;
   modelLinesVertexAttributeColorMap: (
     modelId: ModelId,
@@ -175,7 +179,7 @@ function useModelLinesVertexAttributeGetters(
   function modelLinesVertexAttributeTimeStep(
     modelId: ModelId,
     lineId?: LineId,
-  ): number | undefined {
+  ): AttributeTimeStep | undefined {
     return attributeTimeStep(
       modelId,
       attributeSchema.$id,
@@ -329,7 +333,7 @@ function useModelLinesVertexAttribute(): UseModelLinesVertexAttributeReturn {
   async function setModelLinesVertexAttributeTimeStep(
     modelId: ModelId,
     lineIds: LineId[],
-    timeStep: number,
+    timeStep: AttributeTimeStep,
   ): Promise<void> {
     const name = modelLinesVertexAttributeName(modelId, lineIds[0]);
     if (name === undefined) {

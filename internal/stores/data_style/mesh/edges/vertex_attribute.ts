@@ -3,6 +3,7 @@ import type {
   AttributeItem,
   AttributeName,
   AttributeRange,
+  AttributeTimeStep,
 } from "@ogw_front/types/attribute";
 import type {
   AttributeStoredConfig,
@@ -15,8 +16,11 @@ interface UseMeshEdgesVertexAttributeStyleReturn {
   meshEdgesVertexAttributeName: (meshId: MeshId) => AttributeName | undefined;
   meshEdgesVertexAttributeItem: (meshId: MeshId) => AttributeItem;
   meshEdgesVertexAttributeRange: (meshId: MeshId) => AttributeRange;
-  meshEdgesVertexAttributeTimeStep: (meshId: MeshId) => number | undefined;
-  setMeshEdgesVertexAttributeTimeStep: (meshId: MeshId, timeStep: number) => Promise<unknown>;
+  meshEdgesVertexAttributeTimeStep: (meshId: MeshId) => AttributeTimeStep | undefined;
+  setMeshEdgesVertexAttributeTimeStep: (
+    meshId: MeshId,
+    timeStep: AttributeTimeStep,
+  ) => Promise<unknown>;
   meshEdgesVertexAttributeColorMap: (meshId: MeshId) => AttributeColorMap | undefined;
   meshEdgesVertexAttributeStoredConfig: (
     meshId: MeshId,

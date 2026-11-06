@@ -1,4 +1,9 @@
-import type { AttributeColorMap, AttributeItem, AttributeName } from "@ogw_front/types/attribute";
+import type {
+  AttributeColorMap,
+  AttributeItem,
+  AttributeName,
+  AttributeTimeStep,
+} from "@ogw_front/types/attribute";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { ValidAttributeInput } from "@ogw_internal/stores/data_style/attribute_types";
@@ -41,7 +46,7 @@ function useMeshPolygonsVertexAttributeStyle(): UseMeshPolygonsVertexAttributeSt
   } = useMeshPolygonsVertexAttributeConfigValues();
   const { mutateMeshPolygonsVertexStyle, setMeshPolygonsVertexAttributeStoredConfig } =
     useMeshPolygonsVertexAttributeConfigWriter();
-  function meshPolygonsVertexAttributeTimeStep(meshId: MeshId): number | undefined {
+  function meshPolygonsVertexAttributeTimeStep(meshId: MeshId): AttributeTimeStep | undefined {
     return attributeTimeStep(
       meshId,
       attributeNamesSchema.$id,
@@ -125,7 +130,7 @@ function useMeshPolygonsVertexAttributeStyle(): UseMeshPolygonsVertexAttributeSt
   }
   async function setMeshPolygonsVertexAttributeTimeStep(
     meshId: MeshId,
-    timeStep: number,
+    timeStep: AttributeTimeStep,
   ): Promise<unknown> {
     const name = meshPolygonsVertexAttributeName(meshId);
     if (name === undefined) {

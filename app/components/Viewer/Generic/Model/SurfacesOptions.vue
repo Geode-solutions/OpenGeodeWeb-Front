@@ -1,6 +1,11 @@
 <script setup lang="ts">
 // oxlint-disable eslint/max-lines
-import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
+import type {
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+  AttributeTimeStep,
+} from "@ogw_front/types/attribute";
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { SurfaceId } from "@ogw_front/types/identifiers";
@@ -134,7 +139,7 @@ const surfacesVertexAttributeName = computed<AttributeName | undefined>({
   },
 });
 
-const surfacesVertexAttributeTimeStep = computed<number | undefined>({
+const surfacesVertexAttributeTimeStep = computed<AttributeTimeStep | undefined>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeTimeStep(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -210,7 +215,7 @@ const surfacesPolygonAttributeName = computed<AttributeName | undefined>({
   },
 });
 
-const surfacesPolygonAttributeTimeStep = computed<number | undefined>({
+const surfacesPolygonAttributeTimeStep = computed<AttributeTimeStep | undefined>({
   get: () =>
     dataStyleStore.modelSurfacesPolygonAttributeTimeStep(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
@@ -289,7 +294,7 @@ const vertexAttributeName = computed<AttributeName | undefined>({
   },
 });
 
-const vertexAttributeTimeStep = computed<number | undefined>({
+const vertexAttributeTimeStep = computed<AttributeTimeStep | undefined>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeTimeStep(modelId, surfaceId),
   set: async (newValue) => {
     if (surfaceId === undefined || newValue === undefined) {
@@ -361,7 +366,7 @@ const polygonAttributeName = computed<AttributeName | undefined>({
   },
 });
 
-const polygonAttributeTimeStep = computed<number | undefined>({
+const polygonAttributeTimeStep = computed<AttributeTimeStep | undefined>({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeTimeStep(modelId, surfaceId),
   set: async (newValue) => {
     if (surfaceId === undefined || newValue === undefined) {

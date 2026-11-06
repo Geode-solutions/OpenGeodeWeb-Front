@@ -1,3 +1,4 @@
+import type { AttributeTimeStep } from "@ogw_front/types/attribute";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { Visibility } from "@ogw_front/types/style";
@@ -72,7 +73,7 @@ export function useMeshStyle(): {
   // The vertex series is shared by all the cards: re-render the other cards showing it
   function sharedVertexTimeStep(
     card: (typeof vertexCards)[number],
-  ): (meshId: MeshId, timeStep: number) => Promise<unknown> {
+  ): (meshId: MeshId, timeStep: AttributeTimeStep) => Promise<unknown> {
     return async (meshId, timeStep) => {
       const result = await card.setTimeStep(meshId, timeStep);
       const name = card.name(meshId);

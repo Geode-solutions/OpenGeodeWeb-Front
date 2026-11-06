@@ -3,6 +3,7 @@ import type {
   AttributeItem,
   AttributeName,
   AttributeRange,
+  AttributeTimeStep,
 } from "@ogw_front/types/attribute";
 import type {
   AttributeStoredConfig,
@@ -15,8 +16,11 @@ interface UseMeshCellsCellAttributeStyleReturn {
   meshCellsCellAttributeName: (meshId: MeshId) => AttributeName | undefined;
   meshCellsCellAttributeItem: (meshId: MeshId) => AttributeItem;
   meshCellsCellAttributeRange: (meshId: MeshId) => AttributeRange;
-  meshCellsCellAttributeTimeStep: (meshId: MeshId) => number | undefined;
-  setMeshCellsCellAttributeTimeStep: (meshId: MeshId, timeStep: number) => Promise<unknown>;
+  meshCellsCellAttributeTimeStep: (meshId: MeshId) => AttributeTimeStep | undefined;
+  setMeshCellsCellAttributeTimeStep: (
+    meshId: MeshId,
+    timeStep: AttributeTimeStep,
+  ) => Promise<unknown>;
   meshCellsCellAttributeColorMap: (meshId: MeshId) => AttributeColorMap | undefined;
   meshCellsCellAttributeStoredConfig: (
     meshId: MeshId,

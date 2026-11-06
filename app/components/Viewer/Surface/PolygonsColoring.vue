@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
+import type {
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+  AttributeTimeStep,
+} from "@ogw_front/types/attribute";
 import type { DataId, MeshId } from "@ogw_front/types/identifiers";
 import {
   type RangesPerData,
@@ -61,7 +66,7 @@ const vertex_attribute_name = computed<AttributeName | undefined>({
   },
 });
 
-const vertex_attribute_time_step = computed<number | undefined>({
+const vertex_attribute_time_step = computed<AttributeTimeStep | undefined>({
   get: () => dataStyleStore.meshPolygonsVertexAttributeTimeStep(dataId),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -126,7 +131,7 @@ const polygon_attribute_name = computed<AttributeName | undefined>({
   },
 });
 
-const polygon_attribute_time_step = computed<number | undefined>({
+const polygon_attribute_time_step = computed<AttributeTimeStep | undefined>({
   get: () => dataStyleStore.meshPolygonsPolygonAttributeTimeStep(dataId),
   set: async (newValue) => {
     if (newValue === undefined) {

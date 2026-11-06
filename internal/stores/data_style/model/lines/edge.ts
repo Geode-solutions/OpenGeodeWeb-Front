@@ -4,6 +4,7 @@ import type {
   AttributeItem,
   AttributeName,
   AttributeRange,
+  AttributeTimeStep,
 } from "@ogw_front/types/attribute";
 import type {
   AttributeInput,
@@ -35,11 +36,14 @@ interface UseModelLinesEdgeAttributeReturn {
   modelLinesEdgeAttributeName: (modelId: ModelId, lineId?: LineId) => AttributeName | undefined;
   modelLinesEdgeAttributeItem: (modelId: ModelId, lineId?: LineId) => AttributeItem;
   modelLinesEdgeAttributeRange: (modelId: ModelId, lineId?: LineId) => AttributeRange;
-  modelLinesEdgeAttributeTimeStep: (modelId: ModelId, lineId?: LineId) => number | undefined;
+  modelLinesEdgeAttributeTimeStep: (
+    modelId: ModelId,
+    lineId?: LineId,
+  ) => AttributeTimeStep | undefined;
   setModelLinesEdgeAttributeTimeStep: (
     modelId: ModelId,
     lineIds: LineId[],
-    timeStep: number,
+    timeStep: AttributeTimeStep,
   ) => Promise<void>;
   modelLinesEdgeAttributeColorMap: (
     modelId: ModelId,
@@ -171,7 +175,10 @@ function useModelLinesEdgeAttributeGetters(
     const storedConfig = modelLinesEdgeAttributeStoredConfig(modelId, lineId, name, item);
     return storedConfig.no_data_color;
   }
-  function modelLinesEdgeAttributeTimeStep(modelId: ModelId, lineId?: LineId): number | undefined {
+  function modelLinesEdgeAttributeTimeStep(
+    modelId: ModelId,
+    lineId?: LineId,
+  ): AttributeTimeStep | undefined {
     return attributeTimeStep(
       modelId,
       attributeSchema.$id,
@@ -325,7 +332,7 @@ function useModelLinesEdgeAttribute(): UseModelLinesEdgeAttributeReturn {
   async function setModelLinesEdgeAttributeTimeStep(
     modelId: ModelId,
     lineIds: LineId[],
-    timeStep: number,
+    timeStep: AttributeTimeStep,
   ): Promise<void> {
     const name = modelLinesEdgeAttributeName(modelId, lineIds[0]);
     if (name === undefined) {

@@ -1,4 +1,4 @@
-import type { AttributeName } from "@ogw_front/types/attribute";
+import type { AttributeName, AttributeTimeStep } from "@ogw_front/types/attribute";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 interface AttributeRangeSource {
@@ -132,7 +132,7 @@ function intersectAttributes<TAttribute extends NamedAttribute>(
 }
 
 // OpenGeode-IO writes each step of a time series as the "<name>@<step>" VTK array
-function attributeArrayName(name: string, timeStep: number | undefined): string {
+function attributeArrayName(name: string, timeStep: AttributeTimeStep | undefined): string {
   return timeStep === undefined ? name : `${name}@${timeStep}`;
 }
 

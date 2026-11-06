@@ -4,6 +4,7 @@ import type {
   AttributeItem,
   AttributeName,
   AttributeRange,
+  AttributeTimeStep,
 } from "@ogw_front/types/attribute";
 import type {
   AttributeInput,
@@ -42,11 +43,11 @@ interface UseModelBlocksPolyhedronAttributeReturn {
   modelBlocksPolyhedronAttributeTimeStep: (
     modelId: ModelId,
     blockId?: BlockId,
-  ) => number | undefined;
+  ) => AttributeTimeStep | undefined;
   setModelBlocksPolyhedronAttributeTimeStep: (
     modelId: ModelId,
     blockIds: BlockId[],
-    timeStep: number,
+    timeStep: AttributeTimeStep,
   ) => Promise<boolean>;
   modelBlocksPolyhedronAttributeColorMap: (
     modelId: ModelId,
@@ -188,7 +189,7 @@ function useModelBlocksPolyhedronAttributeGetters(
   function modelBlocksPolyhedronAttributeTimeStep(
     modelId: ModelId,
     blockId?: BlockId,
-  ): number | undefined {
+  ): AttributeTimeStep | undefined {
     return attributeTimeStep(
       modelId,
       modelBlockPolyhedronAttributeSchema.$id,
@@ -350,7 +351,7 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
   async function setModelBlocksPolyhedronAttributeTimeStep(
     modelId: ModelId,
     blockIds: BlockId[],
-    timeStep: number,
+    timeStep: AttributeTimeStep,
   ): Promise<boolean> {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
     if (name === undefined) {

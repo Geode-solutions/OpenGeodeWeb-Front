@@ -7,6 +7,9 @@ type AttributeItem = number;
 // The name of the color map that colors a data by an attribute
 type AttributeColorMap = string;
 
+// Which time step of its series an attribute is read at, an index into the time steps of the attribute
+type AttributeTimeStep = number;
+
 // The range an attribute coloring covers, a bound being undefined until one is stored for it
 type AttributeRange = [minimum: number | undefined, maximum: number | undefined];
 
@@ -18,5 +21,6 @@ export type {
   AttributeItem,
   AttributeName,
   AttributeRange,
+  AttributeTimeStep,
   ValidAttributeRange,
 };

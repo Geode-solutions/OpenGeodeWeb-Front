@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
+import type {
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+  AttributeTimeStep,
+} from "@ogw_front/types/attribute";
 import type { LineId } from "@ogw_front/types/identifiers";
 import { MODEL_LINE_COLORING } from "@ogw_front/utils/model_component_coloring";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
@@ -67,7 +72,7 @@ const vertexAttributeName = computed<AttributeName | undefined>({
   },
 });
 
-const vertexAttributeTimeStep = computed<number | undefined>({
+const vertexAttributeTimeStep = computed<AttributeTimeStep | undefined>({
   get: () => dataStyleStore.modelLinesVertexAttributeTimeStep(modelId, lineId),
   set: async (newValue) => {
     if (lineId === undefined || newValue === undefined) {
@@ -134,7 +139,7 @@ const edgeAttributeName = computed<AttributeName | undefined>({
   },
 });
 
-const edgeAttributeTimeStep = computed<number | undefined>({
+const edgeAttributeTimeStep = computed<AttributeTimeStep | undefined>({
   get: () => dataStyleStore.modelLinesEdgeAttributeTimeStep(modelId, lineId),
   set: async (newValue) => {
     if (lineId === undefined || newValue === undefined) {

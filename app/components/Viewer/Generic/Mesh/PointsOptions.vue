@@ -4,6 +4,7 @@ import type {
   AttributeItem,
   AttributeName,
   AttributeRange,
+  AttributeTimeStep,
 } from "@ogw_front/types/attribute";
 import type { Opacity, Size, Visibility } from "@ogw_front/types/style";
 import {
@@ -100,7 +101,7 @@ const vertex_attribute_name = computed<AttributeName | undefined>({
   },
 });
 
-const vertex_attribute_time_step = computed<number | undefined>({
+const vertex_attribute_time_step = computed<AttributeTimeStep | undefined>({
   get: () => dataStyleStore.meshPointsVertexAttributeTimeStep(dataId.value),
   set: async (newValue) => {
     if (newValue === undefined) {

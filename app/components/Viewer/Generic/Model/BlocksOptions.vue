@@ -1,6 +1,11 @@
 <script setup lang="ts">
 // oxlint-disable eslint/max-lines
-import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
+import type {
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+  AttributeTimeStep,
+} from "@ogw_front/types/attribute";
 import type { BlockId } from "@ogw_front/types/identifiers";
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
@@ -130,7 +135,7 @@ const blocksVertexAttributeName = computed<AttributeName | undefined>({
   },
 });
 
-const blocksVertexAttributeTimeStep = computed<number | undefined>({
+const blocksVertexAttributeTimeStep = computed<AttributeTimeStep | undefined>({
   get: () => dataStyleStore.modelBlocksVertexAttributeTimeStep(modelId, referenceBlockId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -203,7 +208,7 @@ const blocksPolyhedronAttributeName = computed<AttributeName | undefined>({
   },
 });
 
-const blocksPolyhedronAttributeTimeStep = computed<number | undefined>({
+const blocksPolyhedronAttributeTimeStep = computed<AttributeTimeStep | undefined>({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeTimeStep(modelId, referenceBlockId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -294,7 +299,7 @@ const vertexAttributeName = computed<AttributeName | undefined>({
   },
 });
 
-const vertexAttributeTimeStep = computed<number | undefined>({
+const vertexAttributeTimeStep = computed<AttributeTimeStep | undefined>({
   get: () => dataStyleStore.modelBlocksVertexAttributeTimeStep(modelId, blockId),
   set: async (newValue) => {
     if (blockId === undefined || newValue === undefined) {
@@ -367,7 +372,7 @@ const polyhedronAttributeName = computed<AttributeName | undefined>({
   },
 });
 
-const polyhedronAttributeTimeStep = computed<number | undefined>({
+const polyhedronAttributeTimeStep = computed<AttributeTimeStep | undefined>({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeTimeStep(modelId, blockId),
   set: async (newValue) => {
     if (blockId === undefined || newValue === undefined) {

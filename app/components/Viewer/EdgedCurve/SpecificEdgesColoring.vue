@@ -4,6 +4,7 @@ import type {
   AttributeItem,
   AttributeName,
   AttributeRange,
+  AttributeTimeStep,
 } from "@ogw_front/types/attribute";
 import type { DataId, MeshId } from "@ogw_front/types/identifiers";
 import {
@@ -60,7 +61,7 @@ const vertex_attribute_name = computed<AttributeName | undefined>({
   },
 });
 
-const vertex_attribute_time_step = computed<number | undefined>({
+const vertex_attribute_time_step = computed<AttributeTimeStep | undefined>({
   get: () => dataStyleStore.meshEdgesVertexAttributeTimeStep(dataId),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -125,7 +126,7 @@ const edge_attribute_name = computed<AttributeName | undefined>({
   },
 });
 
-const edge_attribute_time_step = computed<number | undefined>({
+const edge_attribute_time_step = computed<AttributeTimeStep | undefined>({
   get: () => dataStyleStore.meshEdgesEdgeAttributeTimeStep(dataId),
   set: async (newValue) => {
     if (newValue === undefined) {
