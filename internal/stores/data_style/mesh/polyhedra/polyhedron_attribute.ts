@@ -3,6 +3,8 @@ import type {
   AttributeItem,
   AttributeName,
   AttributeRange,
+  AttributeRangeMaximum,
+  AttributeRangeMinimum,
   AttributeTimeStep,
 } from "@ogw_front/types/attribute";
 import type {
@@ -41,8 +43,8 @@ interface UseMeshPolyhedraPolyhedronAttributeStyleReturn {
   ) => Promise<unknown>;
   setMeshPolyhedraPolyhedronAttributeRange: (
     meshId: MeshId,
-    minimum: number,
-    maximum: number,
+    minimum: AttributeRangeMinimum,
+    maximum: AttributeRangeMaximum,
   ) => Promise<unknown>;
   setMeshPolyhedraPolyhedronAttributeColorMap: (
     meshId: MeshId,

@@ -3,6 +3,8 @@ import type {
   AttributeItem,
   AttributeName,
   AttributeRange,
+  AttributeRangeMaximum,
+  AttributeRangeMinimum,
   AttributeTimeStep,
 } from "@ogw_front/types/attribute";
 import type {
@@ -32,8 +34,8 @@ interface UseMeshCellsVertexAttributeStyleReturn {
   setMeshCellsVertexAttributeItem: (meshId: MeshId, item: AttributeItem) => Promise<unknown>;
   setMeshCellsVertexAttributeRange: (
     meshId: MeshId,
-    minimum: number,
-    maximum: number,
+    minimum: AttributeRangeMinimum,
+    maximum: AttributeRangeMaximum,
   ) => Promise<unknown>;
   setMeshCellsVertexAttributeColorMap: (
     meshId: MeshId,

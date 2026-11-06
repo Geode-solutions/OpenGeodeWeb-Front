@@ -4,6 +4,8 @@ import type {
   AttributeItem,
   AttributeName,
   AttributeRange,
+  AttributeRangeMaximum,
+  AttributeRangeMinimum,
   AttributeTimeStep,
 } from "@ogw_front/types/attribute";
 import type {
@@ -77,8 +79,8 @@ interface UseModelBlocksPolyhedronAttributeReturn {
   setModelBlocksPolyhedronAttributeRange: (
     modelId: ModelId,
     blockIds: BlockId[],
-    minimum: number,
-    maximum: number,
+    minimum: AttributeRangeMinimum,
+    maximum: AttributeRangeMaximum,
   ) => Promise<boolean>;
   setModelBlocksPolyhedronAttributeColorMap: (
     modelId: ModelId,
@@ -388,8 +390,8 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
   async function setModelBlocksPolyhedronAttributeRange(
     modelId: ModelId,
     blockIds: BlockId[],
-    minimum: number,
-    maximum: number,
+    minimum: AttributeRangeMinimum,
+    maximum: AttributeRangeMaximum,
   ): Promise<boolean> {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockIds[0]);

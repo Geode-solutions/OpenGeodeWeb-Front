@@ -4,6 +4,8 @@ import type {
   AttributeItem,
   AttributeName,
   AttributeRange,
+  AttributeRangeMaximum,
+  AttributeRangeMinimum,
 } from "@ogw_front/types/attribute";
 import type {
   AttributeState,
@@ -317,8 +319,8 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
   async function setVertexAttributeRange(
     modelId: ModelId,
     componentIds: string[],
-    minimum: number,
-    maximum: number,
+    minimum: AttributeRangeMinimum,
+    maximum: AttributeRangeMaximum,
   ): Promise<unknown> {
     await mutateStoredConfig(modelId, componentIds, { minimum, maximum });
     const result = await applyVertexAttribute(modelId, componentIds);

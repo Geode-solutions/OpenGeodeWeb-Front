@@ -3,6 +3,8 @@ import type {
   AttributeItem,
   AttributeName,
   AttributeRange,
+  AttributeRangeMaximum,
+  AttributeRangeMinimum,
   AttributeTimeStep,
 } from "@ogw_front/types/attribute";
 import type {
@@ -32,8 +34,8 @@ interface UseMeshEdgesEdgeAttributeStyleReturn {
   setMeshEdgesEdgeAttributeItem: (meshId: MeshId, item: AttributeItem) => Promise<unknown>;
   setMeshEdgesEdgeAttributeRange: (
     meshId: MeshId,
-    minimum: number,
-    maximum: number,
+    minimum: AttributeRangeMinimum,
+    maximum: AttributeRangeMaximum,
   ) => Promise<unknown>;
   setMeshEdgesEdgeAttributeColorMap: (
     meshId: MeshId,

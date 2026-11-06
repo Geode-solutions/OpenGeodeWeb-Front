@@ -4,6 +4,8 @@ import type {
   AttributeItem,
   AttributeName,
   AttributeRange,
+  AttributeRangeMaximum,
+  AttributeRangeMinimum,
   AttributeTimeStep,
 } from "@ogw_front/types/attribute";
 import type {
@@ -77,8 +79,8 @@ interface UseModelSurfacesPolygonAttributeReturn {
   setModelSurfacesPolygonAttributeRange: (
     modelId: ModelId,
     surfaceIds: SurfaceId[],
-    minimum: number,
-    maximum: number,
+    minimum: AttributeRangeMinimum,
+    maximum: AttributeRangeMaximum,
   ) => Promise<void>;
   setModelSurfacesPolygonAttributeColorMap: (
     modelId: ModelId,
@@ -373,8 +375,8 @@ function useModelSurfacesPolygonAttribute(): UseModelSurfacesPolygonAttributeRet
   async function setModelSurfacesPolygonAttributeRange(
     modelId: ModelId,
     surfaceIds: SurfaceId[],
-    minimum: number,
-    maximum: number,
+    minimum: AttributeRangeMinimum,
+    maximum: AttributeRangeMaximum,
   ): Promise<void> {
     const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
     const item = modelSurfacesPolygonAttributeItem(modelId, surfaceIds[0]);

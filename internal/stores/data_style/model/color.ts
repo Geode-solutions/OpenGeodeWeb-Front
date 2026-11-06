@@ -1,4 +1,10 @@
-import type { AttributeColorMap, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
+import type {
+  AttributeColorMap,
+  AttributeName,
+  AttributeRange,
+  AttributeRangeMaximum,
+  AttributeRangeMinimum,
+} from "@ogw_front/types/attribute";
 import type { ModelId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // oxlint-disable eslint/max-lines
@@ -16,7 +22,12 @@ interface AttributeAccessors {
   getName: (modelId: ModelId, componentId: string) => string | undefined;
   setName: (modelId: ModelId, componentIds: string[], name: AttributeName) => unknown;
   getRange: (modelId: ModelId, componentId: string) => AttributeRange;
-  setRange: (modelId: ModelId, componentIds: string[], minimum: number, maximum: number) => unknown;
+  setRange: (
+    modelId: ModelId,
+    componentIds: string[],
+    minimum: AttributeRangeMinimum,
+    maximum: AttributeRangeMaximum,
+  ) => unknown;
   getColorMap: (modelId: ModelId, componentId: string) => AttributeColorMap | undefined;
   setColorMap: (modelId: ModelId, componentIds: string[], colorMap: AttributeColorMap) => unknown;
 }
@@ -32,8 +43,8 @@ type AttributeRangeFn = (modelId: ModelId, componentId: string) => AttributeRang
 type SetAttributeRangeFn = (
   modelId: ModelId,
   componentIds: string[],
-  minimum: number,
-  maximum: number,
+  minimum: AttributeRangeMinimum,
+  maximum: AttributeRangeMaximum,
 ) => unknown;
 type AttributeColorMapFn = (modelId: ModelId, componentId: string) => string | undefined;
 type SetAttributeColorMapFn = (

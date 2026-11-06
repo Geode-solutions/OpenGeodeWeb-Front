@@ -4,6 +4,8 @@ import type {
   AttributeItem,
   AttributeName,
   AttributeRange,
+  AttributeRangeMaximum,
+  AttributeRangeMinimum,
   AttributeTimeStep,
 } from "@ogw_front/types/attribute";
 import type {
@@ -70,8 +72,8 @@ interface ModelCornersVertexAttributeApi {
   setModelCornersVertexAttributeRange: (
     modelId: ModelId,
     cornerIds: CornerId[],
-    minimum: number,
-    maximum: number,
+    minimum: AttributeRangeMinimum,
+    maximum: AttributeRangeMaximum,
   ) => Promise<void>;
   setModelCornersVertexAttributeColorMap: IdsFn<string | undefined>;
   modelCornersVertexAttributeNoDataColor: (modelId: ModelId, cornerId?: CornerId) => RGBAColor;
@@ -350,8 +352,8 @@ function useModelCornersVertexAttribute(): ModelCornersVertexAttributeApi {
   async function setModelCornersVertexAttributeRange(
     modelId: ModelId,
     cornerIds: CornerId[],
-    minimum: number,
-    maximum: number,
+    minimum: AttributeRangeMinimum,
+    maximum: AttributeRangeMaximum,
   ): Promise<void> {
     const name = modelCornersVertexAttributeName(modelId, cornerIds[0]);
     const item = modelCornersVertexAttributeItem(modelId, cornerIds[0]);

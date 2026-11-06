@@ -1,3 +1,8 @@
+import type {
+  AttributeRangeMaximum,
+  AttributeRangeMinimum,
+  ValidAttributeRange,
+} from "@ogw_front/types/attribute";
 import {
   type ComputedRef,
   type InjectionKey,
@@ -8,7 +13,6 @@ import {
   toValue,
 } from "vue";
 import type { DataId } from "@ogw_front/types/identifiers";
-import type { ValidAttributeRange } from "@ogw_front/types/attribute";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
@@ -35,7 +39,11 @@ function useBatchGroup(dataId: MaybeRefOrGetter<DataId>): ComputedRef<string[] |
 
 async function applyRangesPerData(
   ranges: RangesPerData,
-  setRange: (dataId: DataId, minimum: number, maximum: number) => unknown,
+  setRange: (
+    dataId: DataId,
+    minimum: AttributeRangeMinimum,
+    maximum: AttributeRangeMaximum,
+  ) => unknown,
 ): Promise<void> {
   await Promise.all(
     [...ranges].map(async ([targetId, [minimum, maximum]]) => {

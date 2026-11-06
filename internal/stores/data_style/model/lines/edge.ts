@@ -4,6 +4,8 @@ import type {
   AttributeItem,
   AttributeName,
   AttributeRange,
+  AttributeRangeMaximum,
+  AttributeRangeMinimum,
   AttributeTimeStep,
 } from "@ogw_front/types/attribute";
 import type {
@@ -73,8 +75,8 @@ interface UseModelLinesEdgeAttributeReturn {
   setModelLinesEdgeAttributeRange: (
     modelId: ModelId,
     lineIds: LineId[],
-    minimum: number,
-    maximum: number,
+    minimum: AttributeRangeMinimum,
+    maximum: AttributeRangeMaximum,
   ) => Promise<unknown>;
   setModelLinesEdgeAttributeColorMap: (
     modelId: ModelId,
@@ -367,8 +369,8 @@ function useModelLinesEdgeAttribute(): UseModelLinesEdgeAttributeReturn {
   async function setModelLinesEdgeAttributeRange(
     modelId: ModelId,
     lineIds: LineId[],
-    minimum: number,
-    maximum: number,
+    minimum: AttributeRangeMinimum,
+    maximum: AttributeRangeMaximum,
   ): Promise<unknown> {
     const name = modelLinesEdgeAttributeName(modelId, lineIds[0]);
     const item = modelLinesEdgeAttributeItem(modelId, lineIds[0]);

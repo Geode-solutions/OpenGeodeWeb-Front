@@ -1,4 +1,10 @@
-import type { AttributeColorMap, AttributeItem, AttributeName } from "@ogw_front/types/attribute";
+import type {
+  AttributeColorMap,
+  AttributeItem,
+  AttributeName,
+  AttributeRangeMaximum,
+  AttributeRangeMinimum,
+} from "@ogw_front/types/attribute";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 // The same fields while the user has not chosen them yet
@@ -11,8 +17,8 @@ interface AttributeSelection {
 }
 
 interface AttributeBounds {
-  minimum: number;
-  maximum: number;
+  minimum: AttributeRangeMinimum;
+  maximum: AttributeRangeMaximum;
 }
 
 interface AttributeColorMapped {

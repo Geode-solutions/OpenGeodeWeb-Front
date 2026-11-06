@@ -4,6 +4,8 @@ import type {
   AttributeItem,
   AttributeName,
   AttributeRange,
+  AttributeRangeMaximum,
+  AttributeRangeMinimum,
   AttributeTimeStep,
 } from "@ogw_front/types/attribute";
 import type {
@@ -76,8 +78,8 @@ interface UseModelBlocksVertexAttributeReturn {
   setModelBlocksVertexAttributeRange: (
     modelId: ModelId,
     blockIds: BlockId[],
-    minimum: number,
-    maximum: number,
+    minimum: AttributeRangeMinimum,
+    maximum: AttributeRangeMaximum,
   ) => Promise<unknown>;
   setModelBlocksVertexAttributeColorMap: (
     modelId: ModelId,
@@ -373,8 +375,8 @@ function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
   async function setModelBlocksVertexAttributeRange(
     modelId: ModelId,
     blockIds: BlockId[],
-    minimum: number,
-    maximum: number,
+    minimum: AttributeRangeMinimum,
+    maximum: AttributeRangeMaximum,
   ): Promise<unknown> {
     const name = modelBlocksVertexAttributeName(modelId, blockIds[0]);
     const item = modelBlocksVertexAttributeItem(modelId, blockIds[0]);
