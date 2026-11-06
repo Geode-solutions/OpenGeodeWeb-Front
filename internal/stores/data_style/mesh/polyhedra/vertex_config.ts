@@ -1,8 +1,8 @@
+import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
 import type {
   AttributeState,
   AttributeStoredConfig,
 } from "@ogw_internal/stores/data_style/attribute_types";
-import type { AttributeName } from "@ogw_front/types/attribute";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
@@ -14,11 +14,11 @@ interface UseMeshPolyhedraVertexAttributeConfigReturn {
   meshPolyhedraVertexAttribute: (meshId: MeshId) => AttributeState;
   meshPolyhedraVertexAttributeName: (meshId: MeshId) => AttributeName | undefined;
   meshPolyhedraVertexAttributeLastItem: (meshId: MeshId, name: AttributeName | undefined) => number;
-  meshPolyhedraVertexAttributeItem: (meshId: MeshId) => number;
+  meshPolyhedraVertexAttributeItem: (meshId: MeshId) => AttributeItem;
   meshPolyhedraVertexAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: number | undefined,
+    item: AttributeItem | undefined,
   ) => AttributeStoredConfig;
 }
 
@@ -30,7 +30,7 @@ interface UseMeshPolyhedraVertexAttributeConfigWriterReturn {
   setMeshPolyhedraVertexAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: number | undefined,
+    item: AttributeItem | undefined,
     config: Partial<AttributeStoredConfig>,
   ) => Promise<string>;
 }
@@ -44,7 +44,7 @@ function useMeshPolyhedraVertexAttributeConfig(): UseMeshPolyhedraVertexAttribut
   function meshPolyhedraVertexAttributeStoredConfig(
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: number | undefined,
+    item: AttributeItem | undefined,
   ): AttributeStoredConfig {
     const { storedConfigs } = meshPolyhedraVertexAttribute(meshId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
@@ -68,7 +68,7 @@ function useMeshPolyhedraVertexAttributeConfig(): UseMeshPolyhedraVertexAttribut
     }
     return 0;
   }
-  function meshPolyhedraVertexAttributeItem(meshId: MeshId): number {
+  function meshPolyhedraVertexAttributeItem(meshId: MeshId): AttributeItem {
     const { item, name } = meshPolyhedraVertexAttribute(meshId);
     return item ?? meshPolyhedraVertexAttributeLastItem(meshId, name);
   }
@@ -136,7 +136,7 @@ function useMeshPolyhedraVertexAttributeConfigWriter(): UseMeshPolyhedraVertexAt
   async function setMeshPolyhedraVertexAttributeStoredConfig(
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: number | undefined,
+    item: AttributeItem | undefined,
     config: Partial<AttributeStoredConfig>,
   ): Promise<string> {
     const result = await mutateMeshPolyhedraVertexStyle(meshId, {

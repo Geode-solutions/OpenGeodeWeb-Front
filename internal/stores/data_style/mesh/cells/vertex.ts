@@ -1,5 +1,5 @@
+import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
-import type { AttributeName } from "@ogw_front/types/attribute";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { ValidAttributeInput } from "@ogw_internal/stores/data_style/attribute_types";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
@@ -114,7 +114,10 @@ function useMeshCellsVertexAttributeStyle(): UseMeshCellsVertexAttributeStyleRet
     });
     return applyVertexAttribute(meshId);
   }
-  async function setMeshCellsVertexAttributeItem(meshId: MeshId, item: number): Promise<unknown> {
+  async function setMeshCellsVertexAttributeItem(
+    meshId: MeshId,
+    item: AttributeItem,
+  ): Promise<unknown> {
     await mutateMeshCellsVertexStyle(meshId, {
       item,
     });

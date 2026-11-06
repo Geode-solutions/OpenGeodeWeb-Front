@@ -1,8 +1,8 @@
+import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
 import type {
   AttributeState,
   AttributeStoredConfig,
 } from "@ogw_internal/stores/data_style/attribute_types";
-import type { AttributeName } from "@ogw_front/types/attribute";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
@@ -14,11 +14,11 @@ interface UseMeshCellsCellAttributeConfigReturn {
   meshCellsCellAttribute: (meshId: MeshId) => AttributeState;
   meshCellsCellAttributeName: (meshId: MeshId) => AttributeName | undefined;
   meshCellsCellAttributeLastItem: (meshId: MeshId, name: AttributeName | undefined) => number;
-  meshCellsCellAttributeItem: (meshId: MeshId) => number;
+  meshCellsCellAttributeItem: (meshId: MeshId) => AttributeItem;
   meshCellsCellAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: number | undefined,
+    item: AttributeItem | undefined,
   ) => AttributeStoredConfig;
 }
 
@@ -27,7 +27,7 @@ interface UseMeshCellsCellAttributeConfigWriterReturn {
   setMeshCellsCellAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: number | undefined,
+    item: AttributeItem | undefined,
     config: Partial<AttributeStoredConfig>,
   ) => Promise<string>;
 }
@@ -41,7 +41,7 @@ function useMeshCellsCellAttributeConfig(): UseMeshCellsCellAttributeConfigRetur
   function meshCellsCellAttributeStoredConfig(
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: number | undefined,
+    item: AttributeItem | undefined,
   ): AttributeStoredConfig {
     const { storedConfigs } = meshCellsCellAttribute(meshId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
@@ -62,7 +62,7 @@ function useMeshCellsCellAttributeConfig(): UseMeshCellsCellAttributeConfigRetur
     }
     return 0;
   }
-  function meshCellsCellAttributeItem(meshId: MeshId): number {
+  function meshCellsCellAttributeItem(meshId: MeshId): AttributeItem {
     const { item, name } = meshCellsCellAttribute(meshId);
     return item ?? meshCellsCellAttributeLastItem(meshId, name);
   }
@@ -128,7 +128,7 @@ function useMeshCellsCellAttributeConfigWriter(): UseMeshCellsCellAttributeConfi
   async function setMeshCellsCellAttributeStoredConfig(
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: number | undefined,
+    item: AttributeItem | undefined,
     config: Partial<AttributeStoredConfig>,
   ): Promise<string> {
     const result = await mutateMeshCellsCellStyle(meshId, {

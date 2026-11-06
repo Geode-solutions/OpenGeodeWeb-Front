@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
 import type { Size, Visibility } from "@ogw_front/types/style";
-import type { AttributeName } from "@ogw_front/types/attribute";
 import { MODEL_VERTEX_COLORING } from "@ogw_front/utils/model_component_coloring";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
@@ -158,7 +158,7 @@ const vertexAttributeName = computed<AttributeName | undefined>({
   },
 });
 
-const vertexAttributeItem = computed<number | undefined>({
+const vertexAttributeItem = computed<AttributeItem | undefined>({
   get: () => pointsStyle.value?.vertexAttributeItem(modelId, referenceComponentId),
   set: async (newValue) => {
     if (newValue === undefined) {

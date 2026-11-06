@@ -5,9 +5,9 @@ import type {
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
+import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { LineId, ModelId } from "@ogw_front/types/identifiers";
-import type { AttributeName } from "@ogw_front/types/attribute";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
@@ -28,7 +28,7 @@ const attributeSchema = viewer_schemas.opengeodeweb_viewer.model.lines.attribute
 
 interface UseModelLinesVertexAttributeReturn {
   modelLinesVertexAttributeName: (modelId: ModelId, lineId?: LineId) => AttributeName | undefined;
-  modelLinesVertexAttributeItem: (modelId: ModelId, lineId?: LineId) => number;
+  modelLinesVertexAttributeItem: (modelId: ModelId, lineId?: LineId) => AttributeItem;
   modelLinesVertexAttributeRange: (
     modelId: ModelId,
     lineId?: LineId,
@@ -44,7 +44,7 @@ interface UseModelLinesVertexAttributeReturn {
     modelId: ModelId,
     lineId: LineId | undefined,
     name: AttributeName | undefined,
-    item: number | undefined,
+    item: AttributeItem | undefined,
   ) => AttributeStoredConfig;
   setModelLinesVertexAttribute: (
     modelId: ModelId,
@@ -59,7 +59,7 @@ interface UseModelLinesVertexAttributeReturn {
   setModelLinesVertexAttributeItem: (
     modelId: ModelId,
     lineIds: LineId[],
-    item: number,
+    item: AttributeItem,
   ) => Promise<unknown>;
   setModelLinesVertexAttributeRange: (
     modelId: ModelId,
@@ -110,7 +110,7 @@ function useModelLinesVertexAttributeGetters(
     modelId: ModelId,
     lineId: LineId | undefined,
     name: AttributeName | undefined,
-    item: number | undefined,
+    item: AttributeItem | undefined,
   ): AttributeStoredConfig {
     const { storedConfigs } = modelLinesVertexAttribute(modelId, lineId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
@@ -138,7 +138,7 @@ function useModelLinesVertexAttributeGetters(
     }
     return 0;
   }
-  function modelLinesVertexAttributeItem(modelId: ModelId, lineId?: LineId): number {
+  function modelLinesVertexAttributeItem(modelId: ModelId, lineId?: LineId): AttributeItem {
     const vertexAttribute = modelLinesVertexAttribute(modelId, lineId);
     return (
       vertexAttribute.item ??
@@ -232,7 +232,7 @@ function useModelLinesVertexAttribute(): UseModelLinesVertexAttributeReturn {
     modelId: ModelId,
     lineIds: LineId[],
     name: AttributeName | undefined,
-    item: number | undefined,
+    item: AttributeItem | undefined,
     config: Partial<AttributeStoredConfig>,
   ): Promise<void> {
     if (name === undefined || item === undefined) {
@@ -317,7 +317,7 @@ function useModelLinesVertexAttribute(): UseModelLinesVertexAttributeReturn {
   async function setModelLinesVertexAttributeItem(
     modelId: ModelId,
     lineIds: LineId[],
-    item: number,
+    item: AttributeItem,
   ): Promise<unknown> {
     await mutateModelLinesVertexStyle(modelId, lineIds, {
       item,

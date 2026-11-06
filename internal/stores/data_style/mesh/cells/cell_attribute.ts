@@ -1,14 +1,14 @@
+import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
 import type {
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
-import type { AttributeName } from "@ogw_front/types/attribute";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 interface UseMeshCellsCellAttributeStyleReturn {
   meshCellsCellAttributeName: (meshId: MeshId) => AttributeName | undefined;
-  meshCellsCellAttributeItem: (meshId: MeshId) => number;
+  meshCellsCellAttributeItem: (meshId: MeshId) => AttributeItem;
   meshCellsCellAttributeRange: (meshId: MeshId) => [number | undefined, number | undefined];
   meshCellsCellAttributeTimeStep: (meshId: MeshId) => number | undefined;
   setMeshCellsCellAttributeTimeStep: (meshId: MeshId, timeStep: number) => Promise<unknown>;
@@ -16,11 +16,11 @@ interface UseMeshCellsCellAttributeStyleReturn {
   meshCellsCellAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: number | undefined,
+    item: AttributeItem | undefined,
   ) => AttributeStoredConfig;
   setMeshCellsCellAttribute: (meshId: MeshId, input: ValidAttributeInput) => Promise<unknown>;
   setMeshCellsCellAttributeName: (meshId: MeshId, name: AttributeName) => Promise<unknown>;
-  setMeshCellsCellAttributeItem: (meshId: MeshId, item: number) => Promise<unknown>;
+  setMeshCellsCellAttributeItem: (meshId: MeshId, item: AttributeItem) => Promise<unknown>;
   setMeshCellsCellAttributeRange: (
     meshId: MeshId,
     minimum: number,

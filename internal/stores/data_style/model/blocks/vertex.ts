@@ -5,9 +5,9 @@ import type {
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
+import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
 import type { BlockId, ModelId } from "@ogw_front/types/identifiers";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
-import type { AttributeName } from "@ogw_front/types/attribute";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
@@ -31,7 +31,7 @@ interface UseModelBlocksVertexAttributeReturn {
     modelId: ModelId,
     blockId?: BlockId,
   ) => AttributeName | undefined;
-  modelBlocksVertexAttributeItem: (modelId: ModelId, blockId?: BlockId) => number;
+  modelBlocksVertexAttributeItem: (modelId: ModelId, blockId?: BlockId) => AttributeItem;
   modelBlocksVertexAttributeRange: (
     modelId: ModelId,
     blockId?: BlockId,
@@ -47,7 +47,7 @@ interface UseModelBlocksVertexAttributeReturn {
     modelId: ModelId,
     blockId: BlockId | undefined,
     name: AttributeName | undefined,
-    item: number | undefined,
+    item: AttributeItem | undefined,
   ) => AttributeStoredConfig;
   setModelBlocksVertexAttribute: (
     modelId: ModelId,
@@ -62,7 +62,7 @@ interface UseModelBlocksVertexAttributeReturn {
   setModelBlocksVertexAttributeItem: (
     modelId: ModelId,
     blockIds: BlockId[],
-    item: number,
+    item: AttributeItem,
   ) => Promise<unknown>;
   setModelBlocksVertexAttributeRange: (
     modelId: ModelId,
@@ -113,7 +113,7 @@ function useModelBlocksVertexAttributeGetters(
     modelId: ModelId,
     blockId: BlockId | undefined,
     name: AttributeName | undefined,
-    item: number | undefined,
+    item: AttributeItem | undefined,
   ): AttributeStoredConfig {
     const { storedConfigs } = modelBlocksVertexAttribute(modelId, blockId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
@@ -141,7 +141,7 @@ function useModelBlocksVertexAttributeGetters(
     }
     return 0;
   }
-  function modelBlocksVertexAttributeItem(modelId: ModelId, blockId?: BlockId): number {
+  function modelBlocksVertexAttributeItem(modelId: ModelId, blockId?: BlockId): AttributeItem {
     const vertexAttribute = modelBlocksVertexAttribute(modelId, blockId);
     return (
       vertexAttribute.item ??
@@ -235,7 +235,7 @@ function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
     modelId: ModelId,
     blockIds: BlockId[],
     name: AttributeName | undefined,
-    item: number | undefined,
+    item: AttributeItem | undefined,
     config: Partial<AttributeStoredConfig>,
   ): Promise<void> {
     if (name === undefined || item === undefined) {
@@ -322,7 +322,7 @@ function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
   async function setModelBlocksVertexAttributeItem(
     modelId: ModelId,
     blockIds: BlockId[],
-    item: number,
+    item: AttributeItem,
   ): Promise<unknown> {
     await mutateModelBlocksVertexStyle(modelId, blockIds, {
       item,

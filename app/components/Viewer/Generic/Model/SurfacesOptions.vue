@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // oxlint-disable eslint/max-lines
-import type { AttributeName } from "@ogw_front/types/attribute";
+import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { SurfaceId } from "@ogw_front/types/identifiers";
@@ -149,7 +149,7 @@ const surfacesVertexAttributeTimeStep = computed<number | undefined>({
   },
 });
 
-const surfacesVertexAttributeItem = computed<string | undefined>({
+const surfacesVertexAttributeItem = computed<AttributeItem>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeItem(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesVertexAttributeItem(modelId, targetSurfaceIds, newValue);
@@ -226,7 +226,7 @@ const surfacesPolygonAttributeTimeStep = computed<number | undefined>({
   },
 });
 
-const surfacesPolygonAttributeItem = computed<string | undefined>({
+const surfacesPolygonAttributeItem = computed<AttributeItem>({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeItem(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesPolygonAttributeItem(modelId, targetSurfaceIds, newValue);
@@ -300,7 +300,7 @@ const vertexAttributeTimeStep = computed<number | undefined>({
   },
 });
 
-const vertexAttributeItem = computed<string | undefined>({
+const vertexAttributeItem = computed<AttributeItem>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeItem(modelId, surfaceId),
   set: async (newValue) => {
     if (surfaceId === undefined) {
@@ -372,7 +372,7 @@ const polygonAttributeTimeStep = computed<number | undefined>({
   },
 });
 
-const polygonAttributeItem = computed<string | undefined>({
+const polygonAttributeItem = computed<AttributeItem>({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeItem(modelId, surfaceId),
   set: async (newValue) => {
     if (surfaceId === undefined) {

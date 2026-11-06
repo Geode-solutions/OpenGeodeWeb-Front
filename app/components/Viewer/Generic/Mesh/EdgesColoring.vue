@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
 import type { DataId, MeshId } from "@ogw_front/types/identifiers";
 import {
   type RangesPerData,
   applyRangesPerData,
   useBatchStyle,
 } from "@ogw_front/composables/batch_style";
-import type { AttributeName } from "@ogw_front/types/attribute";
 import type { Opacity } from "@ogw_front/types/style";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
@@ -68,7 +68,7 @@ const vertex_attribute_time_step = computed<number | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_item = computed<string | undefined>({
+const vertex_attribute_item = computed<AttributeItem>({
   get: () => dataStyleStore.meshEdgesVertexAttributeItem(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>
@@ -133,7 +133,7 @@ const edge_attribute_time_step = computed<number | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
-const edge_attribute_item = computed<string | undefined>({
+const edge_attribute_item = computed<AttributeItem>({
   get: () => dataStyleStore.meshEdgesEdgeAttributeItem(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>

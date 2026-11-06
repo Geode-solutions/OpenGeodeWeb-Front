@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
 import type { DataId, MeshId } from "@ogw_front/types/identifiers";
 import {
   type RangesPerData,
   applyRangesPerData,
   useBatchStyle,
 } from "@ogw_front/composables/batch_style";
-import type { AttributeName } from "@ogw_front/types/attribute";
 import type { Opacity } from "@ogw_front/types/style";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { Texture } from "@ogw_front/types/texture";
@@ -73,7 +73,7 @@ const vertex_attribute_time_step = computed<number | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_item = computed<string | undefined>({
+const vertex_attribute_item = computed<AttributeItem>({
   get: () => dataStyleStore.meshPolygonsVertexAttributeItem(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>
@@ -138,7 +138,7 @@ const polygon_attribute_time_step = computed<number | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
-const polygon_attribute_item = computed<string | undefined>({
+const polygon_attribute_item = computed<AttributeItem>({
   get: () => dataStyleStore.meshPolygonsPolygonAttributeItem(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>

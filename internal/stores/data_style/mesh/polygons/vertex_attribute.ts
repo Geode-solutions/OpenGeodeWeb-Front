@@ -1,14 +1,14 @@
+import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
 import type {
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
-import type { AttributeName } from "@ogw_front/types/attribute";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 interface UseMeshPolygonsVertexAttributeStyleReturn {
   meshPolygonsVertexAttributeName: (meshId: MeshId) => AttributeName | undefined;
-  meshPolygonsVertexAttributeItem: (meshId: MeshId) => number;
+  meshPolygonsVertexAttributeItem: (meshId: MeshId) => AttributeItem;
   meshPolygonsVertexAttributeRange: (meshId: MeshId) => [number | undefined, number | undefined];
   meshPolygonsVertexAttributeTimeStep: (meshId: MeshId) => number | undefined;
   setMeshPolygonsVertexAttributeTimeStep: (meshId: MeshId, timeStep: number) => Promise<unknown>;
@@ -16,11 +16,11 @@ interface UseMeshPolygonsVertexAttributeStyleReturn {
   meshPolygonsVertexAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: number | undefined,
+    item: AttributeItem | undefined,
   ) => AttributeStoredConfig;
   setMeshPolygonsVertexAttribute: (meshId: MeshId, input: ValidAttributeInput) => Promise<unknown>;
   setMeshPolygonsVertexAttributeName: (meshId: MeshId, name: AttributeName) => Promise<unknown>;
-  setMeshPolygonsVertexAttributeItem: (meshId: MeshId, item: number) => Promise<unknown>;
+  setMeshPolygonsVertexAttributeItem: (meshId: MeshId, item: AttributeItem) => Promise<unknown>;
   setMeshPolygonsVertexAttributeRange: (
     meshId: MeshId,
     minimum: number,

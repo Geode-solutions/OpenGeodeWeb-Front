@@ -5,9 +5,9 @@ import type {
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
+import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { LineId, ModelId } from "@ogw_front/types/identifiers";
-import type { AttributeName } from "@ogw_front/types/attribute";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
@@ -28,7 +28,7 @@ const attributeSchema = viewer_schemas.opengeodeweb_viewer.model.lines.attribute
 
 interface UseModelLinesEdgeAttributeReturn {
   modelLinesEdgeAttributeName: (modelId: ModelId, lineId?: LineId) => AttributeName | undefined;
-  modelLinesEdgeAttributeItem: (modelId: ModelId, lineId?: LineId) => number;
+  modelLinesEdgeAttributeItem: (modelId: ModelId, lineId?: LineId) => AttributeItem;
   modelLinesEdgeAttributeRange: (
     modelId: ModelId,
     lineId?: LineId,
@@ -44,7 +44,7 @@ interface UseModelLinesEdgeAttributeReturn {
     modelId: ModelId,
     lineId: LineId | undefined,
     name: AttributeName | undefined,
-    item: number | undefined,
+    item: AttributeItem | undefined,
   ) => AttributeStoredConfig;
   setModelLinesEdgeAttribute: (
     modelId: ModelId,
@@ -59,7 +59,7 @@ interface UseModelLinesEdgeAttributeReturn {
   setModelLinesEdgeAttributeItem: (
     modelId: ModelId,
     lineIds: LineId[],
-    item: number,
+    item: AttributeItem,
   ) => Promise<unknown>;
   setModelLinesEdgeAttributeRange: (
     modelId: ModelId,
@@ -110,7 +110,7 @@ function useModelLinesEdgeAttributeGetters(
     modelId: ModelId,
     lineId: LineId | undefined,
     name: AttributeName | undefined,
-    item: number | undefined,
+    item: AttributeItem | undefined,
   ): AttributeStoredConfig {
     const { storedConfigs } = modelLinesEdgeAttribute(modelId, lineId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
@@ -138,7 +138,7 @@ function useModelLinesEdgeAttributeGetters(
     }
     return 0;
   }
-  function modelLinesEdgeAttributeItem(modelId: ModelId, lineId?: LineId): number {
+  function modelLinesEdgeAttributeItem(modelId: ModelId, lineId?: LineId): AttributeItem {
     const edgeAttribute = modelLinesEdgeAttribute(modelId, lineId);
     return (
       edgeAttribute.item ?? modelLinesEdgeAttributeLastItem(modelId, lineId, edgeAttribute.name)
@@ -225,7 +225,7 @@ function useModelLinesEdgeAttribute(): UseModelLinesEdgeAttributeReturn {
     modelId: ModelId,
     lineIds: LineId[],
     name: AttributeName | undefined,
-    item: number | undefined,
+    item: AttributeItem | undefined,
     config: Partial<AttributeStoredConfig>,
   ): Promise<void> {
     if (name === undefined || item === undefined) {
@@ -310,7 +310,7 @@ function useModelLinesEdgeAttribute(): UseModelLinesEdgeAttributeReturn {
   async function setModelLinesEdgeAttributeItem(
     modelId: ModelId,
     lineIds: LineId[],
-    item: number,
+    item: AttributeItem,
   ): Promise<unknown> {
     await mutateModelLinesEdgeStyle(modelId, lineIds, {
       item,

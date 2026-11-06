@@ -5,9 +5,9 @@ import type {
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
+import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
 import type { BlockId, ModelId } from "@ogw_front/types/identifiers";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
-import type { AttributeName } from "@ogw_front/types/attribute";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
@@ -32,7 +32,7 @@ interface UseModelBlocksPolyhedronAttributeReturn {
     modelId: ModelId,
     blockId?: BlockId,
   ) => AttributeName | undefined;
-  modelBlocksPolyhedronAttributeItem: (modelId: ModelId, blockId?: BlockId) => number;
+  modelBlocksPolyhedronAttributeItem: (modelId: ModelId, blockId?: BlockId) => AttributeItem;
   modelBlocksPolyhedronAttributeRange: (
     modelId: ModelId,
     blockId?: BlockId,
@@ -54,7 +54,7 @@ interface UseModelBlocksPolyhedronAttributeReturn {
     modelId: ModelId,
     blockId: BlockId | undefined,
     name: AttributeName | undefined,
-    item: number | undefined,
+    item: AttributeItem | undefined,
   ) => AttributeStoredConfig;
   setModelBlocksPolyhedronAttribute: (
     modelId: ModelId,
@@ -69,7 +69,7 @@ interface UseModelBlocksPolyhedronAttributeReturn {
   setModelBlocksPolyhedronAttributeItem: (
     modelId: ModelId,
     blockIds: BlockId[],
-    item: number,
+    item: AttributeItem,
   ) => Promise<boolean>;
   setModelBlocksPolyhedronAttributeRange: (
     modelId: ModelId,
@@ -120,7 +120,7 @@ function useModelBlocksPolyhedronAttributeGetters(
     modelId: ModelId,
     blockId: BlockId | undefined,
     name: AttributeName | undefined,
-    item: number | undefined,
+    item: AttributeItem | undefined,
   ): AttributeStoredConfig {
     const { storedConfigs } = modelBlocksPolyhedronAttribute(modelId, blockId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
@@ -148,7 +148,7 @@ function useModelBlocksPolyhedronAttributeGetters(
     }
     return 0;
   }
-  function modelBlocksPolyhedronAttributeItem(modelId: ModelId, blockId?: BlockId): number {
+  function modelBlocksPolyhedronAttributeItem(modelId: ModelId, blockId?: BlockId): AttributeItem {
     const polyhedronAttribute = modelBlocksPolyhedronAttribute(modelId, blockId);
     return (
       polyhedronAttribute.item ??
@@ -245,7 +245,7 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
     modelId: ModelId,
     blockIds: BlockId[],
     name: AttributeName | undefined,
-    item: number | undefined,
+    item: AttributeItem | undefined,
     config: Partial<AttributeStoredConfig>,
   ): Promise<void> {
     if (name === undefined || item === undefined) {
@@ -338,7 +338,7 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
   async function setModelBlocksPolyhedronAttributeItem(
     modelId: ModelId,
     blockIds: BlockId[],
-    item: number,
+    item: AttributeItem,
   ): Promise<boolean> {
     await mutateModelBlocksPolyhedronStyle(modelId, blockIds, {
       item,

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // oxlint-disable eslint/max-lines
-import type { AttributeName } from "@ogw_front/types/attribute";
+import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
 import type { BlockId } from "@ogw_front/types/identifiers";
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
@@ -141,7 +141,7 @@ const blocksVertexAttributeTimeStep = computed<number | undefined>({
   },
 });
 
-const blocksVertexAttributeItem = computed<string | undefined>({
+const blocksVertexAttributeItem = computed<AttributeItem>({
   get: () => dataStyleStore.modelBlocksVertexAttributeItem(modelId, referenceBlockId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksVertexAttributeItem(modelId, targetBlockIds, newValue);
@@ -220,7 +220,7 @@ const blocksPolyhedronAttributeTimeStep = computed<number | undefined>({
   },
 });
 
-const blocksPolyhedronAttributeItem = computed<string | undefined>({
+const blocksPolyhedronAttributeItem = computed<AttributeItem>({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeItem(modelId, referenceBlockId.value),
   set: async (newValue) => {
     const applied = await dataStyleStore.setModelBlocksPolyhedronAttributeItem(
@@ -305,7 +305,7 @@ const vertexAttributeTimeStep = computed<number | undefined>({
   },
 });
 
-const vertexAttributeItem = computed<string | undefined>({
+const vertexAttributeItem = computed<AttributeItem>({
   get: () => dataStyleStore.modelBlocksVertexAttributeItem(modelId, blockId),
   set: async (newValue) => {
     if (blockId === undefined) {
@@ -384,7 +384,7 @@ const polyhedronAttributeTimeStep = computed<number | undefined>({
   },
 });
 
-const polyhedronAttributeItem = computed<string | undefined>({
+const polyhedronAttributeItem = computed<AttributeItem>({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeItem(modelId, blockId),
   set: async (newValue) => {
     if (blockId === undefined) {

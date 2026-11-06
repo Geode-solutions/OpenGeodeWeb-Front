@@ -1,14 +1,14 @@
+import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
 import type {
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
-import type { AttributeName } from "@ogw_front/types/attribute";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 interface UseMeshPolyhedraPolyhedronAttributeStyleReturn {
   meshPolyhedraPolyhedronAttributeName: (meshId: MeshId) => AttributeName | undefined;
-  meshPolyhedraPolyhedronAttributeItem: (meshId: MeshId) => number;
+  meshPolyhedraPolyhedronAttributeItem: (meshId: MeshId) => AttributeItem;
   meshPolyhedraPolyhedronAttributeRange: (
     meshId: MeshId,
   ) => [number | undefined, number | undefined];
@@ -21,7 +21,7 @@ interface UseMeshPolyhedraPolyhedronAttributeStyleReturn {
   meshPolyhedraPolyhedronAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: number | undefined,
+    item: AttributeItem | undefined,
   ) => AttributeStoredConfig;
   setMeshPolyhedraPolyhedronAttribute: (
     meshId: MeshId,
@@ -31,7 +31,10 @@ interface UseMeshPolyhedraPolyhedronAttributeStyleReturn {
     meshId: MeshId,
     name: AttributeName,
   ) => Promise<unknown>;
-  setMeshPolyhedraPolyhedronAttributeItem: (meshId: MeshId, item: number) => Promise<unknown>;
+  setMeshPolyhedraPolyhedronAttributeItem: (
+    meshId: MeshId,
+    item: AttributeItem,
+  ) => Promise<unknown>;
   setMeshPolyhedraPolyhedronAttributeRange: (
     meshId: MeshId,
     minimum: number,

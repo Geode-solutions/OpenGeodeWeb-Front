@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
 import type { Opacity, Size, Visibility } from "@ogw_front/types/style";
 import {
   type RangesPerData,
@@ -8,7 +9,6 @@ import {
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
-import type { AttributeName } from "@ogw_front/types/attribute";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
@@ -107,7 +107,7 @@ const vertex_attribute_time_step = computed<number | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_item = computed<string | undefined>({
+const vertex_attribute_item = computed<AttributeItem>({
   get: () => dataStyleStore.meshPointsVertexAttributeItem(dataId.value),
   set: async (newValue) => {
     await applyBatchStyle(dataId.value, (meshId: MeshId) =>

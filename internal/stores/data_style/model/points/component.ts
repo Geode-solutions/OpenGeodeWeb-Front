@@ -1,4 +1,5 @@
 // oxlint-disable eslint/max-lines
+import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
 import type {
   AttributeState,
   AttributeStoredConfig,
@@ -10,7 +11,6 @@ import {
   type RGBAColor,
 } from "@ogw_front/utils/default_styles/constants";
 import type { Size, Visibility } from "@ogw_front/types/style";
-import type { AttributeName } from "@ogw_front/types/attribute";
 import type { ModelId } from "@ogw_front/types/identifiers";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
@@ -121,7 +121,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
     return name === undefined ? 0 : (storedConfigs?.[name]?.lastItem ?? 0);
   }
 
-  function vertexAttributeItem(modelId: ModelId, componentId?: string): number {
+  function vertexAttributeItem(modelId: ModelId, componentId?: string): AttributeItem {
     const { name, item } = vertexAttribute(modelId, componentId);
     return item ?? lastItem(modelId, componentId, name);
   }
@@ -301,7 +301,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
   async function setVertexAttributeItem(
     modelId: ModelId,
     componentIds: string[],
-    item: number,
+    item: AttributeItem,
   ): Promise<unknown> {
     await mutateVertexAttribute(modelId, componentIds, { item });
     const result = await applyVertexAttribute(modelId, componentIds);

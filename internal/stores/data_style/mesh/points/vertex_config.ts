@@ -1,8 +1,8 @@
+import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
 import type {
   AttributeState,
   AttributeStoredConfig,
 } from "@ogw_internal/stores/data_style/attribute_types";
-import type { AttributeName } from "@ogw_front/types/attribute";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
@@ -14,11 +14,11 @@ interface UseMeshPointsVertexAttributeConfigReturn {
   meshPointsVertexAttribute: (meshId: MeshId) => AttributeState;
   meshPointsVertexAttributeName: (meshId: MeshId) => AttributeName | undefined;
   meshPointsVertexAttributeLastItem: (meshId: MeshId, name: AttributeName | undefined) => number;
-  meshPointsVertexAttributeItem: (meshId: MeshId) => number;
+  meshPointsVertexAttributeItem: (meshId: MeshId) => AttributeItem;
   meshPointsVertexAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: number | undefined,
+    item: AttributeItem | undefined,
   ) => AttributeStoredConfig;
 }
 
@@ -27,7 +27,7 @@ interface UseMeshPointsVertexAttributeConfigWriterReturn {
   setMeshPointsVertexAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: number | undefined,
+    item: AttributeItem | undefined,
     config: Partial<AttributeStoredConfig>,
   ) => Promise<string>;
 }
@@ -41,7 +41,7 @@ function useMeshPointsVertexAttributeConfig(): UseMeshPointsVertexAttributeConfi
   function meshPointsVertexAttributeStoredConfig(
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: number | undefined,
+    item: AttributeItem | undefined,
   ): AttributeStoredConfig {
     const { storedConfigs } = meshPointsVertexAttribute(meshId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
@@ -65,7 +65,7 @@ function useMeshPointsVertexAttributeConfig(): UseMeshPointsVertexAttributeConfi
     }
     return 0;
   }
-  function meshPointsVertexAttributeItem(meshId: MeshId): number {
+  function meshPointsVertexAttributeItem(meshId: MeshId): AttributeItem {
     const { item, name } = meshPointsVertexAttribute(meshId);
     return item ?? meshPointsVertexAttributeLastItem(meshId, name);
   }
@@ -133,7 +133,7 @@ function useMeshPointsVertexAttributeConfigWriter(): UseMeshPointsVertexAttribut
   async function setMeshPointsVertexAttributeStoredConfig(
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: number | undefined,
+    item: AttributeItem | undefined,
     config: Partial<AttributeStoredConfig>,
   ): Promise<string> {
     const result = await mutateMeshPointsVertexStyle(meshId, {

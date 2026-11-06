@@ -1,14 +1,14 @@
+import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
 import type {
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
-import type { AttributeName } from "@ogw_front/types/attribute";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 interface UseMeshEdgesVertexAttributeStyleReturn {
   meshEdgesVertexAttributeName: (meshId: MeshId) => AttributeName | undefined;
-  meshEdgesVertexAttributeItem: (meshId: MeshId) => number;
+  meshEdgesVertexAttributeItem: (meshId: MeshId) => AttributeItem;
   meshEdgesVertexAttributeRange: (meshId: MeshId) => [number | undefined, number | undefined];
   meshEdgesVertexAttributeTimeStep: (meshId: MeshId) => number | undefined;
   setMeshEdgesVertexAttributeTimeStep: (meshId: MeshId, timeStep: number) => Promise<unknown>;
@@ -16,11 +16,11 @@ interface UseMeshEdgesVertexAttributeStyleReturn {
   meshEdgesVertexAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: number | undefined,
+    item: AttributeItem | undefined,
   ) => AttributeStoredConfig;
   setMeshEdgesVertexAttribute: (meshId: MeshId, input: ValidAttributeInput) => Promise<unknown>;
   setMeshEdgesVertexAttributeName: (meshId: MeshId, name: AttributeName) => Promise<unknown>;
-  setMeshEdgesVertexAttributeItem: (meshId: MeshId, item: number) => Promise<unknown>;
+  setMeshEdgesVertexAttributeItem: (meshId: MeshId, item: AttributeItem) => Promise<unknown>;
   setMeshEdgesVertexAttributeRange: (
     meshId: MeshId,
     minimum: number,
