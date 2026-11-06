@@ -22,6 +22,9 @@ type LineId = ModelComponentId;
 // A surface of a model, by its id in the model
 type SurfaceId = ModelComponentId;
 
+// A block of a model, by its id in the model
+type BlockId = ModelComponentId;
+
 // Type of an OpenGeode object, as named by OpenGeode (BRep, TriangulatedSurface3D, ...)
 type GeodeObjectType = string;
 
@@ -50,6 +53,7 @@ interface ModelIdentified {
 }
 
 export type {
+  BlockId,
   CornerId,
   DataId,
   DataIdentified,
