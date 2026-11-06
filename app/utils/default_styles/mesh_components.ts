@@ -2,6 +2,7 @@ import {
   type AttributeConfig,
   CELLS_DEFAULT_COLOR,
   CELLS_DEFAULT_VISIBILITY,
+  type ComponentColoring,
   EDGES_DEFAULT_COLOR,
   EDGES_DEFAULT_VISIBILITY,
   EDGES_DEFAULT_WIDTH,
@@ -21,33 +22,27 @@ function emptyAttributeConfig(): AttributeConfig {
   return { name: undefined, storedConfigs: {} };
 }
 
-interface MeshComponentColoring {
-  active: string;
-  constant: RGBAColor;
-  vertex: AttributeConfig;
-}
-
-interface MeshEdgesColoring extends MeshComponentColoring {
+interface MeshEdgesColoring extends ComponentColoring {
   edge: AttributeConfig;
 }
 
-interface MeshCellsColoring extends MeshComponentColoring {
+interface MeshCellsColoring extends ComponentColoring {
   cell: AttributeConfig;
   textures: MeshApplyTexturesParams["textures"];
 }
 
-interface MeshPolygonsColoring extends MeshComponentColoring {
+interface MeshPolygonsColoring extends ComponentColoring {
   textures: MeshApplyTexturesParams["textures"];
   polygon: AttributeConfig;
 }
 
-interface MeshPolyhedraColoring extends MeshComponentColoring {
+interface MeshPolyhedraColoring extends ComponentColoring {
   polyhedron: AttributeConfig;
 }
 
 interface MeshPointsStyle {
   visibility: boolean;
-  coloring: MeshComponentColoring;
+  coloring: ComponentColoring;
   size: number;
 }
 

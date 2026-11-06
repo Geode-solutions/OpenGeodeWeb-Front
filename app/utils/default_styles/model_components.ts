@@ -6,6 +6,7 @@ import {
   CORNERS_DEFAULT_ACTIVE_COLORING,
   CORNERS_DEFAULT_COLOR,
   CORNERS_DEFAULT_VISIBILITY,
+  type ComponentColoring,
   EDGES_DEFAULT_VISIBILITY,
   EDGES_DEFAULT_WIDTH,
   LINES_DEFAULT_ACTIVE_COLORING,
@@ -23,27 +24,21 @@ function emptyAttributeConfig(): AttributeConfig {
   return { name: undefined, storedConfigs: {} };
 }
 
-interface ModelComponentColoring {
-  active: string;
-  constant: RGBAColor;
-  vertex: AttributeConfig;
-}
-
-interface ModelLinesColoring extends ModelComponentColoring {
+interface ModelLinesColoring extends ComponentColoring {
   edge: AttributeConfig;
 }
 
-interface ModelSurfacesColoring extends ModelComponentColoring {
+interface ModelSurfacesColoring extends ComponentColoring {
   polygon: AttributeConfig;
 }
 
-interface ModelBlocksColoring extends ModelComponentColoring {
+interface ModelBlocksColoring extends ComponentColoring {
   polyhedron: AttributeConfig;
 }
 
 interface ModelCornersStyle {
   visibility: boolean;
-  coloring: ModelComponentColoring;
+  coloring: ComponentColoring;
 }
 
 interface ModelLinesStyle {

@@ -1,4 +1,8 @@
-import { MODEL_DEFAULT_ACTIVE_COLORING, MODEL_DEFAULT_COLOR, type RGBAColor } from "./constants";
+import {
+  type ComponentColoring,
+  MODEL_DEFAULT_ACTIVE_COLORING,
+  MODEL_DEFAULT_COLOR,
+} from "./constants";
 import {
   type ModelBlocksStyle,
   type ModelCornersStyle,
@@ -16,7 +20,7 @@ import {
 
 interface ModelWithoutBlocksStyle {
   visibility: boolean;
-  coloring: { active: string; constant: RGBAColor };
+  coloring: Pick<ComponentColoring, "active" | "constant">;
   corners: ModelCornersStyle;
   lines: ModelLinesStyle;
   surfaces: ModelSurfacesStyle;
