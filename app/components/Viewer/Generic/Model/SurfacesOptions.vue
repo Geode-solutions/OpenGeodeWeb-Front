@@ -1,8 +1,8 @@
 <script setup lang="ts">
 // oxlint-disable eslint/max-lines
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
-import type { ModelComponentId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { SurfaceId } from "@ogw_front/types/identifiers";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
@@ -11,7 +11,7 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 interface Props {
   modelId: string;
-  surfaceId?: ModelComponentId;
+  surfaceId?: SurfaceId;
   targetSurfaceIds: string[];
   collections?: CollectionComponent[];
   activeTab?: string;

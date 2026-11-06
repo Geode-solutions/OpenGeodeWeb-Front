@@ -1,4 +1,4 @@
-import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
+import type { ModelId, SurfaceId } from "@ogw_front/types/identifiers";
 import {
   applyModelSurfacesConstantColoring,
   applyModelSurfacesPolygonColoring,
@@ -41,7 +41,7 @@ export function useModelSurfacesStyle(): UseModelSurfacesStyleReturn {
 
   async function applyModelSurfacesVisibilityStyle(
     modelId: ModelId,
-    surfaces_ids: ModelComponentId[],
+    surfaces_ids: SurfaceId[],
   ): Promise<void> {
     const visibilityGroups: Record<string, string[]> = {};
     for (const surfaces_id of surfaces_ids) {
@@ -64,7 +64,7 @@ export function useModelSurfacesStyle(): UseModelSurfacesStyleReturn {
 
   async function applyModelSurfacesColoringStyle(
     modelId: ModelId,
-    surfaces_ids: ModelComponentId[],
+    surfaces_ids: SurfaceId[],
   ): Promise<unknown[]> {
     const activeColoringGroups: Record<string, string[]> = {};
     for (const surfaces_id of surfaces_ids) {
