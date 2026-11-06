@@ -450,7 +450,7 @@ const attributeSchemas = {
   <div v-show="!activeTab || activeTab === 'type'" data-testid="modelComponentTypeOptions">
     <VisibilitySwitch data-testid="modelSurfacesVisibilitySwitch" v-model="surfacesVisibility" />
     <ViewerOptionsColoringTypeSelector
-      :id="modelId"
+      :data-id="modelId"
       :componentIds="targetSurfaceIds"
       v-model:coloring_style_key="surfacesActiveColoring"
       v-model:color="surfacesColor"
@@ -479,7 +479,7 @@ const attributeSchemas = {
   >
     <VisibilitySwitch v-model="surfaceVisibility" />
     <ViewerOptionsColoringTypeSelector
-      :id="modelId"
+      :data-id="modelId"
       :componentIds="surfaceComponentIds"
       v-model:coloring_style_key="surfaceActiveColoring"
       v-model:color="surfaceColor"

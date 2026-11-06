@@ -101,7 +101,7 @@ const modelComponentsActiveColoring = computed<string | undefined>({
 
     <div v-if="!componentType && !componentId" v-show="activeTab === 'components'">
       <ViewerOptionsColoringTypeSelector
-        :id="modelId"
+        :data-id="modelId"
         v-model:coloring_style_key="modelComponentsActiveColoring"
         v-model:color="modelComponentsColor"
         :capabilities="{ color: { available: true } }"

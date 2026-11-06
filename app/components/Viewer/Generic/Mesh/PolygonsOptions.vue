@@ -59,7 +59,7 @@ const visibility = computed<boolean>({
       />
       <template v-if="visibility">
         <v-divider />
-        <ViewerGenericMeshPolygonsColoring :id="id" :capabilities="capabilities" />
+        <ViewerGenericMeshPolygonsColoring :data-id="id" :capabilities="capabilities" />
       </template>
     </template>
   </ViewerContextMenuItem>

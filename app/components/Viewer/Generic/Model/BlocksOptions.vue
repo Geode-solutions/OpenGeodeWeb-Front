@@ -478,7 +478,7 @@ const attributeSchemas = {
   <div v-show="!activeTab || activeTab === 'type'" data-testid="modelComponentTypeOptions">
     <VisibilitySwitch data-testid="modelBlocksVisibilitySwitch" v-model="blocksVisibility" />
     <ViewerOptionsColoringTypeSelector
-      :id="modelId"
+      :data-id="modelId"
       :componentIds="targetBlockIds"
       v-model:coloring_style_key="blocksActiveColoring"
       v-model:color="blocksColor"
@@ -507,7 +507,7 @@ const attributeSchemas = {
   >
     <VisibilitySwitch v-model="blockVisibility" />
     <ViewerOptionsColoringTypeSelector
-      :id="modelId"
+      :data-id="modelId"
       :componentIds="blockComponentIds"
       v-model:coloring_style_key="blockActiveColoring"
       v-model:color="blockColor"

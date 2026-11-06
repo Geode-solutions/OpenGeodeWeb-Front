@@ -174,7 +174,7 @@ async function setVertexAttributeRangesPerData(ranges: RangesPerData): Promise<v
         <v-divider class="my-2" />
         <ViewerOptionsSizeSlider data-testid="meshPointsSizeSlider" v-model="size" />
         <ViewerOptionsColoringTypeSelector
-          :id="id"
+          :data-id="id"
           v-model:coloring_style_key="coloring_style_key"
           v-model:color="color"
           v-model:opacity="opacity"

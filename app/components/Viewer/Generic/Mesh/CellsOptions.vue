@@ -45,7 +45,7 @@ const visibility = computed<boolean>({
       <ViewerOptionsVisibilitySwitch data-testid="meshCellsVisibilitySwitch" v-model="visibility" />
       <template v-if="visibility">
         <v-divider />
-        <ViewerGenericMeshCellsColoring :id="id" />
+        <ViewerGenericMeshCellsColoring :data-id="id" />
       </template>
     </template>
   </ViewerContextMenuItem>

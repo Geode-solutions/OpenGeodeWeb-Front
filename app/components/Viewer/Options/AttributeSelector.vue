@@ -16,6 +16,7 @@ import {
 import { type RangesPerData, useBatchGroup } from "@ogw_front/composables/batch_style";
 import { getAttributeRange, intersectAttributes } from "@ogw_front/utils/attributes";
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
+import type { DataId } from "@ogw_front/types/identifiers";
 import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar.vue";
 import ViewerOptionsNoDataColorInfo from "@ogw_front/components/Viewer/Options/NoDataColorInfo.vue";
 import ViewerOptionsTimeStepSlider from "@ogw_front/components/Viewer/Options/TimeStepSlider.vue";
@@ -34,12 +35,12 @@ const attributeNoDataColor = defineModel<typeof DEFAULT_NO_DATA_COLOR>("attribut
 const attributeTimeStep = defineModel<number>("attributeTimeStep");
 
 interface Props {
-  id: string;
+  dataId: DataId;
   componentIds?: string[];
   schemas: AttributeSchemas;
 }
 
-const { id, componentIds = undefined, schemas } = defineProps<Props>();
+const { dataId, componentIds = undefined, schemas } = defineProps<Props>();
 
 interface Emits {
   "update:attributeColorMap": [colorMap: string];
@@ -55,7 +56,7 @@ const rangesPerTarget = ref(new Map<string, AttributeRangeInfo>());
 let rangesName: string | undefined = undefined;
 let rangesLoading: Promise<void> = Promise.resolve();
 
-const groupTargetIds = useBatchGroup(() => id);
+const groupTargetIds = useBatchGroup(() => dataId);
 
 const currentAttribute = computed<AttributeInfo | undefined>(() =>
   attributes.value.find((attr) => attr.attribute_name === attributeName.value),
@@ -84,7 +85,7 @@ const componentItems = computed<{ title: string; value: number }[]>(() => {
 });
 
 function requestParams(): AttributeRequestParams | undefined {
-  return attributeRequestParams(schemas, id, componentIds);
+  return attributeRequestParams(schemas, dataId, componentIds);
 }
 
 function getRangeTargets(name: string): [string, AttributeRequestParams | undefined][] {
@@ -95,7 +96,7 @@ function getRangeTargets(name: string): [string, AttributeRequestParams | undefi
       )
       .map(([targetId]) => [targetId, { id: targetId }]);
   }
-  return [[id, requestParams()]];
+  return [[dataId, requestParams()]];
 }
 
 // Ranges are computed by the back for the selected attribute only, as scanning every step of every series is slow
@@ -127,7 +128,10 @@ async function loadRanges(name: string): Promise<void> {
 }
 
 function applyRange(): void {
-  const { min, max } = getAttributeRange(rangesPerTarget.value.get(id), attributeItem.value ?? 0);
+  const { min, max } = getAttributeRange(
+    rangesPerTarget.value.get(dataId),
+    attributeItem.value ?? 0,
+  );
   attributeRange.value = [min, max];
 }
 
@@ -188,7 +192,7 @@ onMounted(async () => {
 });
 
 watch(
-  [(): string => id, (): string[] | undefined => componentIds, (): AttributeSchemas => schemas],
+  [(): string => dataId, (): string[] | undefined => componentIds, (): AttributeSchemas => schemas],
   async () => {
     await getAttributes();
   },

@@ -4,6 +4,7 @@ import {
   applyRangesPerData,
   useBatchStyle,
 } from "@ogw_front/composables/batch_style";
+import type { DataId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import { useBatchStyleModel } from "@ogw_front/composables/batch_style_model";
@@ -15,37 +16,37 @@ const hybridViewerStore = useHybridViewerStore();
 const { applyBatchStyle } = useBatchStyle();
 
 interface Props {
-  id: string;
+  dataId: DataId;
 }
 
-const { id } = defineProps<Props>();
+const { dataId } = defineProps<Props>();
 
 const coloring_style_key = computed<string>({
-  get: () => dataStyleStore.meshEdgesActiveColoring(id),
+  get: () => dataStyleStore.meshEdgesActiveColoring(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(id, (targetId: string) =>
+    await applyBatchStyle(dataId, (targetId: string) =>
       dataStyleStore.setMeshEdgesActiveColoring(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const color = useBatchStyleModel<RGBAColor>(
-  () => id,
+  () => dataId,
   (targetId) => dataStyleStore.meshEdgesColor(targetId) as RGBAColor | undefined,
   (targetId, value) => dataStyleStore.setMeshEdgesColor(targetId, value),
 );
 const opacity = useBatchStyleModel<number>(
-  () => id,
+  () => dataId,
   (targetId) => dataStyleStore.meshEdgesOpacity(targetId),
   (targetId, value) => dataStyleStore.setMeshEdgesOpacity(targetId, value),
 );
 const vertex_attribute_name = computed<string | undefined>({
-  get: () => dataStyleStore.meshEdgesVertexAttributeName(id),
+  get: () => dataStyleStore.meshEdgesVertexAttributeName(dataId),
   set: async (newValue) => {
     if (newValue === undefined) {
       return;
     }
-    await applyBatchStyle(id, (targetId: string) =>
+    await applyBatchStyle(dataId, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshEdgesVertexAttributeName(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
@@ -53,64 +54,64 @@ const vertex_attribute_name = computed<string | undefined>({
 });
 
 const vertex_attribute_time_step = computed<number | undefined>({
-  get: () => dataStyleStore.meshEdgesVertexAttributeTimeStep(id),
+  get: () => dataStyleStore.meshEdgesVertexAttributeTimeStep(dataId),
   set: async (newValue) => {
     if (newValue === undefined) {
       return;
     }
-    await applyBatchStyle(id, (targetId: string) =>
+    await applyBatchStyle(dataId, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshEdgesVertexAttributeTimeStep(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_item = computed<string | undefined>({
-  get: () => dataStyleStore.meshEdgesVertexAttributeItem(id),
+  get: () => dataStyleStore.meshEdgesVertexAttributeItem(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(id, (targetId: string) =>
+    await applyBatchStyle(dataId, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshEdgesVertexAttributeItem(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_range = computed<[number, number] | undefined>({
-  get: () => dataStyleStore.meshEdgesVertexAttributeRange(id),
+  get: () => dataStyleStore.meshEdgesVertexAttributeRange(dataId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
     if (minimum === undefined || maximum === undefined) {
       return;
     }
-    await applyBatchStyle(id, (targetId: string) =>
+    await applyBatchStyle(dataId, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshEdgesVertexAttributeRange(targetId, minimum, maximum)),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_color_map = computed<Map<string, RGBAColor>>({
-  get: () => dataStyleStore.meshEdgesVertexAttributeColorMap(id),
+  get: () => dataStyleStore.meshEdgesVertexAttributeColorMap(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(id, (targetId: string) =>
+    await applyBatchStyle(dataId, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshEdgesVertexAttributeColorMap(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_no_data_color = computed<RGBAColor>({
-  get: () => dataStyleStore.meshEdgesVertexAttributeNoDataColor(id),
+  get: () => dataStyleStore.meshEdgesVertexAttributeNoDataColor(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(id, (targetId: string) =>
+    await applyBatchStyle(dataId, (targetId: string) =>
       dataStyleStore.setMeshEdgesVertexAttributeNoDataColor(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const edge_attribute_name = computed<string | undefined>({
-  get: () => dataStyleStore.meshEdgesEdgeAttributeName(id),
+  get: () => dataStyleStore.meshEdgesEdgeAttributeName(dataId),
   set: async (newValue) => {
     if (newValue === undefined) {
       return;
     }
-    await applyBatchStyle(id, (targetId: string) =>
+    await applyBatchStyle(dataId, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshEdgesEdgeAttributeName(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
@@ -118,52 +119,52 @@ const edge_attribute_name = computed<string | undefined>({
 });
 
 const edge_attribute_time_step = computed<number | undefined>({
-  get: () => dataStyleStore.meshEdgesEdgeAttributeTimeStep(id),
+  get: () => dataStyleStore.meshEdgesEdgeAttributeTimeStep(dataId),
   set: async (newValue) => {
     if (newValue === undefined) {
       return;
     }
-    await applyBatchStyle(id, (targetId: string) =>
+    await applyBatchStyle(dataId, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshEdgesEdgeAttributeTimeStep(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const edge_attribute_item = computed<string | undefined>({
-  get: () => dataStyleStore.meshEdgesEdgeAttributeItem(id),
+  get: () => dataStyleStore.meshEdgesEdgeAttributeItem(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(id, (targetId: string) =>
+    await applyBatchStyle(dataId, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshEdgesEdgeAttributeItem(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const edge_attribute_range = computed<[number, number] | undefined>({
-  get: () => dataStyleStore.meshEdgesEdgeAttributeRange(id),
+  get: () => dataStyleStore.meshEdgesEdgeAttributeRange(dataId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
     if (minimum === undefined || maximum === undefined) {
       return;
     }
-    await applyBatchStyle(id, (targetId: string) =>
+    await applyBatchStyle(dataId, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshEdgesEdgeAttributeRange(targetId, minimum, maximum)),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const edge_attribute_color_map = computed<Map<string, RGBAColor>>({
-  get: () => dataStyleStore.meshEdgesEdgeAttributeColorMap(id),
+  get: () => dataStyleStore.meshEdgesEdgeAttributeColorMap(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(id, (targetId: string) =>
+    await applyBatchStyle(dataId, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshEdgesEdgeAttributeColorMap(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const edge_attribute_no_data_color = computed<RGBAColor>({
-  get: () => dataStyleStore.meshEdgesEdgeAttributeNoDataColor(id),
+  get: () => dataStyleStore.meshEdgesEdgeAttributeNoDataColor(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(id, (targetId: string) =>
+    await applyBatchStyle(dataId, (targetId: string) =>
       dataStyleStore.setMeshEdgesEdgeAttributeNoDataColor(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -187,7 +188,7 @@ async function setEdgeAttributeRangesPerData(ranges: RangesPerData): Promise<voi
 
 <template>
   <ViewerOptionsColoringTypeSelector
-    :id="id"
+    :data-id="dataId"
     v-model:coloring_style_key="coloring_style_key"
     v-model:color="color"
     v-model:opacity="opacity"

@@ -127,7 +127,7 @@ const { capabilities, schemas: attributeSchemas } = MODEL_VERTEX_COLORING;
   <div v-show="!activeTab || activeTab === 'component'" data-testid="modelComponentOptions">
     <VisibilitySwitch v-model="cornerVisibility" />
     <ViewerOptionsColoringTypeSelector
-      :id="modelId"
+      :data-id="modelId"
       :componentIds="cornerComponentIds"
       v-model:coloring_style_key="cornerActiveColoring"
       v-model:color="cornerColor"

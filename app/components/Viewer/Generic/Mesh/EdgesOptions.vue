@@ -69,7 +69,7 @@ const size = computed<number>({
       <template v-if="visibility">
         <v-divider class="my-2" />
         <ViewerOptionsWidthSlider data-testid="meshEdgesWidthSlider" v-model="size" />
-        <ViewerGenericMeshEdgesColoring :id="id" :capabilities="capabilities" />
+        <ViewerGenericMeshEdgesColoring :data-id="id" :capabilities="capabilities" />
       </template>
     </template>
   </ViewerContextMenuItem>
