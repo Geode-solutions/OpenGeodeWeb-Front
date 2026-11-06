@@ -60,7 +60,7 @@ watch(
       return;
     }
 
-    const modelId = asString(newMeta.modelId) ?? asString(newMeta.id);
+    const modelId = asString(newMeta.modelId) ?? asString(newMeta.data_id);
     if (newMeta.pickedComponentId && modelId) {
       const components = await dataStore.getAllMeshComponents(modelId);
       const comp = components.find(
@@ -128,13 +128,15 @@ function formatId(id: string | undefined): string {
   return `${id.slice(0, ID_SLICE_START)}...${id.slice(id.length - ID_SLICE_END_OFFSET)}`;
 }
 
-const formattedId = computed<string>(() => formatId(metaData.id));
+const formattedId = computed<string>(() => formatId(metaData.data_id));
 
 const crsStore = useCrsStore();
 // A model component shares the model CRS: the CRS row is only shown for a data
-const isData = computed<boolean>(() => metaData.id !== undefined && metaData.modelId === undefined);
+const isData = computed<boolean>(
+  () => metaData.data_id !== undefined && metaData.modelId === undefined,
+);
 // The menu metadata is a snapshot taken when it opened: read the item live so a CRS edit shows at once
-const liveItem = useLiveDataItem(() => (isData.value ? metaData.id : undefined));
+const liveItem = useLiveDataItem(() => (isData.value ? metaData.data_id : undefined));
 const liveCrs = computed(() => liveItem.value?.crs ?? metaData.crs);
 </script>
 
@@ -164,17 +166,17 @@ const liveCrs = computed(() => liveItem.value?.crs ?? metaData.crs);
             {{ metaData.geode_object_type }}
           </v-col>
           <v-col
-            v-if="metaData.id"
+            v-if="metaData.data_id"
             class="id-badge-container mt-1 d-inline-flex align-center px-2 py-0.5"
-            @click.stop="copyId(metaData.id)"
+            @click.stop="copyId(metaData.data_id)"
           >
             <span class="id-text">
-              {{ isCopied(metaData.id) ? "COPIED!" : formattedId }}
+              {{ isCopied(metaData.data_id) ? "COPIED!" : formattedId }}
             </span>
             <v-icon
-              :icon="isCopied(metaData.id) ? 'mdi-check' : 'mdi-content-copy'"
+              :icon="isCopied(metaData.data_id) ? 'mdi-check' : 'mdi-content-copy'"
               size="10"
-              :color="isCopied(metaData.id) ? 'success' : 'white'"
+              :color="isCopied(metaData.data_id) ? 'success' : 'white'"
               class="ml-1"
             />
           </v-col>
@@ -195,7 +197,7 @@ const liveCrs = computed(() => liveItem.value?.crs ?? metaData.crs);
               size="x-small"
               color="white"
               class="ml-1"
-              @click.stop="crsStore.requestCrsEdit(metaData.id)"
+              @click.stop="crsStore.requestCrsEdit(metaData.data_id)"
             />
           </v-col>
 
