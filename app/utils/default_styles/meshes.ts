@@ -32,11 +32,7 @@ interface SurfaceStyle extends EdgedCurveStyle {
   polygons: MeshPolygonsStyle;
 }
 
-interface SolidStyle {
-  visibility: boolean;
-  points: MeshPointsStyle;
-  edges: MeshEdgesStyle;
-  polygons: MeshPolygonsStyle;
+interface SolidStyle extends SurfaceStyle {
   polyhedra: MeshPolyhedraStyle;
 }
 
