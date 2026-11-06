@@ -4,13 +4,13 @@ import type {
   AttributeStoredConfig,
 } from "@ogw_internal/stores/data_style/attribute_types";
 import {
-  DEFAULT_NO_DATA_COLOR,
   POINTS_DEFAULT_COLOR,
   POINTS_DEFAULT_SIZE,
   POINTS_DEFAULT_VISIBILITY,
   type RGBAColor,
 } from "@ogw_front/utils/default_styles/constants";
 import type { DataId } from "@ogw_front/types/identifiers";
+import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { groupBy } from "@ogw_internal/stores/data_style/model/component_style";
 import merge from "lodash/merge";
@@ -125,13 +125,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
     const item = vertexAttributeItem(modelId, componentId);
     const config = name === undefined ? undefined : storedConfigs?.[name]?.[item];
     // A stored config may be partial, missing fields fall back to the defaults
-    return {
-      minimum: undefined,
-      maximum: undefined,
-      colorMap: undefined,
-      no_data_color: DEFAULT_NO_DATA_COLOR,
-      ...config,
-    };
+    return { ...defaultAttributeStoredConfig(), ...config };
   }
 
   function vertexAttributeRange(
