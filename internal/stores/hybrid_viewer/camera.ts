@@ -2,6 +2,7 @@ import { EASE_EXPONENT, applyCameraOptions, getImageStyle, toBounds } from "./ca
 import { animateCamera, computeAnimationDuration, getCameraOptions } from "./camera_animation";
 import { requireRenderWindow, useHybridViewerCore } from "./core";
 import type { CameraOptions } from "./vtk_types";
+import type { DataId } from "@ogw_front/types/identifiers";
 import { animateCameraOrientation } from "./camera_orientation";
 import { useHybridViewerScene } from "./scene";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -89,19 +90,23 @@ const useHybridViewerCamera = createSharedComposable(() => {
     syncRemoteCamera();
   }
 
-  async function performFocusCameraOnObject(id: string, block_ids: number[] = []): Promise<void> {
+  async function performFocusCameraOnObject(
+    dataId: DataId,
+    block_ids: number[] = [],
+  ): Promise<void> {
     const { genericRenderWindow } = useHybridViewerCore();
     const { hybridDb } = useHybridViewerScene();
-    if (!hybridDb[id]) {
+    if (!hybridDb[dataId]) {
       return;
     }
     const viewerStore = useViewerStore();
-    let bounds: [number, number, number, number, number, number] = hybridDb[id].actor.getBounds();
+    let bounds: [number, number, number, number, number, number] =
+      hybridDb[dataId].actor.getBounds();
     if (block_ids.length > 0) {
       const response = await viewerStore.request({
         schema: viewer_schemas.opengeodeweb_viewer.model.get_blocks_bounds,
         params: {
-          id,
+          id: dataId,
           block_ids,
         },
       });
@@ -116,8 +121,8 @@ const useHybridViewerCamera = createSharedComposable(() => {
     performSetCamera(targetOptions);
   }
 
-  async function focusCameraOnObject(id: string, block_ids: number[] = []): Promise<void> {
-    await performFocusCameraOnObject(id, block_ids);
+  async function focusCameraOnObject(dataId: DataId, block_ids: number[] = []): Promise<void> {
+    await performFocusCameraOnObject(dataId, block_ids);
   }
 
   function setCameraOrientation(orientation: string): void {
