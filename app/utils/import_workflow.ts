@@ -6,6 +6,7 @@ import { consola } from "consola";
 // Local imports
 import { type LegacyDataId, fromLegacyDataId } from "@ogw_front/utils/legacy_data_id";
 import { type NewDataItem, useDataStore } from "@ogw_front/stores/data";
+import type { DataId } from "@ogw_front/types/identifiers";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
@@ -75,8 +76,8 @@ async function importDataItem(item: NewDataItem): Promise<string> {
 }
 // Every item comes through here: from the back-end, which still names its data id `id`, or from a project
 async function importItem(imported: LegacyDataId<NewDataItem> | NewDataItem): Promise<string> {
-  const id = await importDataItem(fromLegacyDataId(imported));
-  return id;
+  const dataId = await importDataItem(fromLegacyDataId(imported));
+  return dataId;
 }
 async function importFile(filename: string, geode_object_type: string): Promise<string> {
   const backStore = useBackStore();
@@ -113,8 +114,8 @@ async function importWorkflow(files: readonly FileToImport[]): Promise<string[]>
     // A failing file does not prevent the other files from being imported
     const chunk_results = await Promise.allSettled(
       chunk.map(async ({ filename, geode_object_type }) => {
-        const id = await importFile(filename, geode_object_type);
-        return id;
+        const dataId = await importFile(filename, geode_object_type);
+        return dataId;
       }),
     );
     for (const result of chunk_results) {
@@ -157,8 +158,8 @@ async function importWorkflowFromSnapshot(
     const chunk = chunks[chunkIndex] ?? [];
     const chunk_ids = await Promise.all(
       chunk.map(async (item) => {
-        const id = await importItem(item);
-        return id;
+        const dataId = await importItem(item);
+        return dataId;
       }),
     );
     ids.push(...chunk_ids);
@@ -174,32 +175,32 @@ async function importWorkflowFromSnapshot(
 
 // Reloads the viewer object under the same id with its stored style, after the back rewrote its files.
 async function reloadObject(
-  id: string,
+  dataId: DataId,
   { rebuildActor = false }: { rebuildActor?: boolean } = {},
 ): Promise<void> {
   const dataStore = useDataStore();
   const dataStyleStore = useDataStyleStore();
   const hybridViewerStore = useHybridViewerStore();
-  const item = await dataStore.item(id);
-  await dataStore.deregisterObject(id);
-  await dataStore.registerObject(id, item.name ?? id);
+  const item = await dataStore.item(dataId);
+  await dataStore.deregisterObject(dataId);
+  await dataStore.registerObject(dataId, item.name ?? dataId);
   // Only when the geometry moved: the local actor is rebuilt from the stored light viewable
   if (rebuildActor) {
-    await hybridViewerStore.addItem(id);
+    await hybridViewerStore.addItem(dataId);
   }
-  await dataStyleStore.applyDefaultStyle(id);
+  await dataStyleStore.applyDefaultStyle(dataId);
   await hybridViewerStore.remoteRender();
 }
 
 // The time series only adds attributes to the model, so the viewer object is reloaded.
-async function applyTimeSeriesWorkflow(filename: string, id: string): Promise<string> {
+async function applyTimeSeriesWorkflow(filename: string, dataId: DataId): Promise<string> {
   const backStore = useBackStore();
   await backStore.request({
     schema: back_schemas.opengeodeweb_back.apply_time_series,
-    params: { id, filename },
+    params: { id: dataId, filename },
   });
-  await reloadObject(id);
-  return id;
+  await reloadObject(dataId);
+  return dataId;
 }
 
 export {

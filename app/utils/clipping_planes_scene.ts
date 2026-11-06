@@ -75,7 +75,7 @@ function resolveActiveActors(
     targetIds = allItems.map((item: Readonly<DataIdentified>) => item.data_id);
   }
   const targeted = targetIds
-    .map((id) => hybridDb[id]?.actor)
+    .map((dataId) => hybridDb[dataId]?.actor)
     .filter((actor: vtkActor | undefined): actor is vtkActor => actor !== undefined);
   if (targeted.length > 0) {
     return targeted;

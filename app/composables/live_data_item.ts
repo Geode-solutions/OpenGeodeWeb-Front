@@ -1,17 +1,18 @@
 import { type DataItem, useDataStore } from "@ogw_front/stores/data";
 import type { EffectScope, MaybeRefOrGetter, ShallowRef } from "vue";
+import type { DataId } from "@ogw_front/types/identifiers";
 
 // Live view of a data item whose id can change: tree labels are reused by the virtual list,
 // And the info card shows whichever object the menu was last opened on.
 export function useLiveDataItem(
-  id: MaybeRefOrGetter<string | undefined>,
+  dataId: MaybeRefOrGetter<DataId | undefined>,
 ): ShallowRef<DataItem | undefined> {
   const dataStore = useDataStore();
   const item = shallowRef<DataItem | undefined>(undefined);
   let itemScope: EffectScope | undefined = undefined;
 
   watch(
-    () => toValue(id),
+    () => toValue(dataId),
     (newId) => {
       itemScope?.stop();
       itemScope = undefined;
