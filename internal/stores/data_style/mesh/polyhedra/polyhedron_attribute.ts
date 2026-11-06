@@ -1,12 +1,6 @@
 import type { AttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_types";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
-interface AttributeState {
-  name?: string;
-  item?: number;
-  storedConfigs?: Record<string, { lastItem: number } & Record<string, AttributeStoredConfig>>;
-}
-
 interface AttributeInput {
   name: string | undefined;
   item: number | undefined;
@@ -68,4 +62,4 @@ interface UseMeshPolyhedraPolyhedronAttributeStyleReturn {
   ) => Promise<unknown>;
 }
 export { isMeshPolyhedraPolyhedronAttributeValid };
-export type { AttributeState, ValidAttributeInput, UseMeshPolyhedraPolyhedronAttributeStyleReturn };
+export type { ValidAttributeInput, UseMeshPolyhedraPolyhedronAttributeStyleReturn };

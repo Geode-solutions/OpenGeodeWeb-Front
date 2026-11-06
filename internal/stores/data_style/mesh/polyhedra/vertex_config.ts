@@ -1,6 +1,8 @@
+import type {
+  AttributeState,
+  AttributeStoredConfig,
+} from "@ogw_internal/stores/data_style/attribute_types";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
-import type { AttributeState } from "./vertex_attribute";
-import type { AttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_types";
 
 // Local imports
 import { useMeshPolyhedraCommonStyle } from "./common";
