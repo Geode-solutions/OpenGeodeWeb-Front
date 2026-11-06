@@ -3,13 +3,6 @@ import type { AttributeRange } from "@ogw_front/composables/batch_style";
 import type { DataId } from "@ogw_front/types/identifiers";
 import { getAttributeRange } from "@ogw_front/utils/attributes";
 
-interface AttributeInfo {
-  attribute_name: string;
-  nb_items: number;
-  time_steps?: number[];
-  [key: string]: unknown;
-}
-
 // The minimum and maximum of an attribute range: each one is clamped by the other
 function useAttributeRangeBounds(attributeRange: Ref<(number | undefined)[]>): {
   rangeMin: WritableComputedRef<number | undefined>;
@@ -116,8 +109,8 @@ function attributeRequestParams(
   return { id: dataId, component_ids: componentIds };
 }
 
+export type { AttributeInfo } from "@ogw_front/utils/attributes";
 export {
-  type AttributeInfo,
   type AttributeRequestParams,
   attributeItemOptions,
   attributeRequestParams,

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import {
   type AttributeInfo,
-  type AttributeSource,
-  isValidThresholdAttribute,
-} from "@ogw_front/utils/threshold";
+  attributeArrayName,
+  getAttributeRange,
+} from "@ogw_front/utils/attributes";
+import { type AttributeSource, isValidThresholdAttribute } from "@ogw_front/utils/threshold";
 import type { Threshold, ThresholdAttribute } from "@ogw_internal/stores/hybrid_viewer/filters";
-import { attributeArrayName, getAttributeRange } from "@ogw_front/utils/attributes";
 import ViewerOptionsAttributeRangeSelector from "@ogw_front/components/Viewer/Options/AttributeRangeSelector.vue";
 import { fetchAttributeRange } from "@ogw_front/utils/attribute_range";
 import { useBackStore } from "@ogw_front/stores/back";
