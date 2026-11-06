@@ -5,6 +5,7 @@ import type {
   ObjectStyle,
   SceneStyle,
 } from "@ogw_internal/stores/data_style/types";
+import type { DataId } from "@ogw_front/types/identifiers";
 import type { Table } from "dexie";
 import { database } from "@ogw_internal/database/database.js";
 import { getDefaultStyle } from "@ogw_front/utils/default_styles";
@@ -58,43 +59,43 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     "model_component_datastyle",
   );
 
-  async function addDataStyle(id: string, geode_object: string): Promise<void> {
+  async function addDataStyle(dataId: DataId, geode_object: string): Promise<void> {
     const defaultStyle = getDefaultStyle(geode_object);
     await data_style_db.put(
-      structuredClone({ data_id: id, ...(isRecord(defaultStyle) ? defaultStyle : {}) }),
+      structuredClone({ data_id: dataId, ...(isRecord(defaultStyle) ? defaultStyle : {}) }),
     );
   }
 
-  async function setVisibility(id: string, visibility: boolean): Promise<unknown> {
-    const item = await dataStore.item(id);
+  async function setVisibility(dataId: DataId, visibility: boolean): Promise<unknown> {
+    const item = await dataStore.item(dataId);
     if (!(await dataStore.isItemViewable(item))) {
-      return dataStyleState.mutateStyle(id, { visibility });
+      return dataStyleState.mutateStyle(dataId, { visibility });
     }
 
     const { viewer_type } = item;
 
     if (viewer_type === "mesh") {
-      return meshStyleStore.setMeshVisibility(id, visibility);
+      return meshStyleStore.setMeshVisibility(dataId, visibility);
     }
     if (viewer_type === "model") {
-      return modelStyleStore.setModelVisibility(id, visibility);
+      return modelStyleStore.setModelVisibility(dataId, visibility);
     }
     throw new Error("Unknown viewer_type");
   }
 
-  async function applyDefaultStyle(id: string): Promise<unknown[]> {
-    const item = await dataStore.item(id);
+  async function applyDefaultStyle(dataId: DataId): Promise<unknown[]> {
+    const item = await dataStore.item(dataId);
     if (!(await dataStore.isItemViewable(item))) {
-      throw new Error(`applyDefaultStyle called for non-viewable item: ${id}`);
+      throw new Error(`applyDefaultStyle called for non-viewable item: ${dataId}`);
     }
 
     const { viewer_type } = item;
 
     if (viewer_type === "mesh") {
-      return meshStyleStore.applyMeshStyle(id);
+      return meshStyleStore.applyMeshStyle(dataId);
     }
     if (viewer_type === "model") {
-      return modelStyleStore.applyModelStyle(id);
+      return modelStyleStore.applyModelStyle(dataId);
     }
     throw new Error(`Unknown viewer_type: ${viewer_type}`);
   }
@@ -118,9 +119,9 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
     const style_promises = Object.entries(stylesSnapshot).map(
       // oxlint-disable-next-line prefer-readonly-parameter-types -- same external ObjectStyle limitation as above.
-      async ([id, style]: readonly [string, LegacyDataId<ObjectStyle> | ObjectStyle]) => {
+      async ([dataId, style]: readonly [string, LegacyDataId<ObjectStyle> | ObjectStyle]) => {
         const key = await data_style_db.put(
-          structuredClone({ ...fromLegacyDataId<ObjectStyle>(style), data_id: id }),
+          structuredClone({ ...fromLegacyDataId<ObjectStyle>(style), data_id: dataId }),
         );
         return key;
       },
@@ -149,16 +150,16 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
   async function applyAllStylesFromState(): Promise<void> {
     const ids = Object.keys(dataStyleState.styles.value);
-    const promises = ids.map(async (id) => {
-      const meta = await dataStore.item(id);
+    const promises = ids.map(async (dataId) => {
+      const meta = await dataStore.item(dataId);
       if (!(await dataStore.isItemViewable(meta))) {
         return;
       }
       const viewerType = meta.viewer_type;
       if (viewerType === "mesh") {
-        await meshStyleStore.applyMeshStyle(id);
+        await meshStyleStore.applyMeshStyle(dataId);
       } else if (viewerType === "model") {
-        await modelStyleStore.applyModelStyle(id);
+        await modelStyleStore.applyModelStyle(dataId);
       }
     });
     await Promise.all(promises);

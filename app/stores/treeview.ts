@@ -5,6 +5,7 @@ import { consola } from "consola";
 import { defineStore } from "pinia";
 
 import type {
+  DataId,
   GeodeId,
   GeodeIdentified,
   GeodeObjectType,
@@ -166,13 +167,13 @@ export const useTreeviewStore = defineStore("treeview", () => {
   function addItem(
     geodeObjectType: GeodeObjectType,
     name: string,
-    id: string,
+    dataId: DataId,
     geode_id: GeodeId,
     viewer_type: ViewerType,
   ): void {
     const child: TreeviewChild = {
       title: name,
-      id,
+      id: dataId,
       geode_id,
       viewer_type,
       geode_object_type: geodeObjectType,
@@ -196,22 +197,22 @@ export const useTreeviewStore = defineStore("treeview", () => {
         groupA.title.localeCompare(groupB.title, undefined, sort_options),
       );
     }
-    selection.value = [...selection.value, id];
+    selection.value = [...selection.value, dataId];
   }
 
-  function removeItem(id: string): void {
+  function removeItem(dataId: DataId): void {
     for (let index = 0; index < items.value.length; index += 1) {
       const group = items.value[index];
       if (!group) {
         continue;
       }
-      const childIndex = group.children.findIndex((child) => child.id === id);
+      const childIndex = group.children.findIndex((child) => child.id === dataId);
       if (childIndex !== -1) {
         group.children.splice(childIndex, 1);
         if (group.children.length === 0) {
           items.value.splice(index, 1);
         }
-        selection.value = selection.value.filter((selection_id) => selection_id !== id);
+        selection.value = selection.value.filter((selection_id) => selection_id !== dataId);
         return;
       }
     }
@@ -328,9 +329,9 @@ export const useTreeviewStore = defineStore("treeview", () => {
     };
   }
 
-  function renameItem(id: string, newName: string): void {
+  function renameItem(dataId: DataId, newName: string): void {
     for (const group of items.value) {
-      const child = group.children.find((childItem) => childItem.id === id);
+      const child = group.children.find((childItem) => childItem.id === dataId);
       if (child) {
         child.title = newName;
         const options = { numeric: true, sensitivity: "base" as const };
@@ -340,7 +341,9 @@ export const useTreeviewStore = defineStore("treeview", () => {
         break;
       }
     }
-    const view = opened_views.value.find((openedView: ReadonlyOpenedView) => openedView.id === id);
+    const view = opened_views.value.find(
+      (openedView: ReadonlyOpenedView) => openedView.id === dataId,
+    );
     if (view) {
       view.title = newName;
     }
