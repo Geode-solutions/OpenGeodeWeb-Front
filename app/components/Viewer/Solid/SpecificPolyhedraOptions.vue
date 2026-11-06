@@ -47,7 +47,7 @@ const visibility = computed<boolean>({
         v-model="visibility"
       />
       <template v-if="visibility">
-        <ViewerSolidSpecificPolyhedraColoring :id="id" />
+        <ViewerSolidSpecificPolyhedraColoring :data-id="id" />
       </template>
     </template>
   </ViewerContextMenuItem>

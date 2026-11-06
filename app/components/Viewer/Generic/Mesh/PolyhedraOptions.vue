@@ -48,7 +48,7 @@ const visibility = computed<boolean>({
       />
       <template v-if="visibility">
         <v-divider />
-        <ViewerGenericMeshPolyhedraColoring :id="id" />
+        <ViewerGenericMeshPolyhedraColoring :data-id="id" />
       </template>
     </template>
   </ViewerContextMenuItem>

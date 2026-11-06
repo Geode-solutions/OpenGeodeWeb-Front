@@ -212,7 +212,7 @@ const { capabilities, schemas: attributeSchemas } = MODEL_VERTEX_COLORING;
     <template v-if="visibility">
       <ViewerOptionsSizeSlider data-testid="modelComponentPointsSizeSlider" v-model="size" />
       <ViewerOptionsColoringTypeSelector
-        :id="modelId"
+        :data-id="modelId"
         :componentIds="allComponentIds"
         v-model:coloring_style_key="activeColoring"
         v-model:color="color"

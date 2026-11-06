@@ -5,6 +5,7 @@ import {
   buildColoringStyles,
   resolveAttributeSchemas,
 } from "@ogw_front/utils/coloring_styles";
+import type { DataId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { RangesPerData } from "@ogw_front/composables/batch_style";
 import ViewerOptionsAttributeSelector from "@ogw_front/components/Viewer/Options/AttributeSelector.vue";
@@ -78,7 +79,7 @@ const polyhedron_attribute_no_data_color = defineModel<RGBAColor>(
 const polyhedron_attribute_time_step = defineModel<number>("polyhedron_attribute_time_step");
 
 interface Props {
-  id: string;
+  dataId: DataId;
   componentIds?: string[];
   capabilities?: Record<string, CapabilityConfig>;
   schemas?: Schemas;
@@ -86,7 +87,7 @@ interface Props {
 }
 
 const {
-  id,
+  dataId,
   componentIds = undefined,
   capabilities = {},
   schemas = {},
@@ -237,7 +238,7 @@ watch(
         <ViewerOptionsColorPicker v-model="color" />
       </template>
       <template v-if="active_key === textures_dict['value']">
-        <ViewerOptionsTexturesSelector v-model="textures" :id="id" />
+        <ViewerOptionsTexturesSelector v-model="textures" :data-id="dataId" />
       </template>
       <template v-if="active_key === vertex_dict['value'] && hasColorMap('vertex')">
         <ViewerOptionsAttributeSelector
@@ -248,7 +249,7 @@ watch(
           v-model:attributeNoDataColor="vertex_attribute_no_data_color"
           v-model:attributeTimeStep="vertex_attribute_time_step"
           @ranges_per_data="emit('vertex_attribute_ranges_per_data', $event)"
-          :id="id"
+          :data-id="dataId"
           :componentIds="componentIds"
           :schemas="vertexSchemas"
         />
@@ -262,7 +263,7 @@ watch(
           v-model:attributeNoDataColor="edge_attribute_no_data_color"
           v-model:attributeTimeStep="edge_attribute_time_step"
           @ranges_per_data="emit('edge_attribute_ranges_per_data', $event)"
-          :id="id"
+          :data-id="dataId"
           :componentIds="componentIds"
           :schemas="edgeSchemas"
         />
@@ -276,7 +277,7 @@ watch(
           v-model:attributeNoDataColor="cell_attribute_no_data_color"
           v-model:attributeTimeStep="cell_attribute_time_step"
           @ranges_per_data="emit('cell_attribute_ranges_per_data', $event)"
-          :id="id"
+          :data-id="dataId"
           :componentIds="componentIds"
           :schemas="cellSchemas"
         />
@@ -290,7 +291,7 @@ watch(
           v-model:attributeNoDataColor="polygon_attribute_no_data_color"
           v-model:attributeTimeStep="polygon_attribute_time_step"
           @ranges_per_data="emit('polygon_attribute_ranges_per_data', $event)"
-          :id="id"
+          :data-id="dataId"
           :componentIds="componentIds"
           :schemas="polygonSchemas"
         />
@@ -304,7 +305,7 @@ watch(
           v-model:attributeNoDataColor="polyhedron_attribute_no_data_color"
           v-model:attributeTimeStep="polyhedron_attribute_time_step"
           @ranges_per_data="emit('polyhedron_attribute_ranges_per_data', $event)"
-          :id="id"
+          :data-id="dataId"
           :componentIds="componentIds"
           :schemas="polyhedronSchemas"
         />

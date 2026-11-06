@@ -206,7 +206,7 @@ const attributeSchemas = {
     <template v-if="visibility">
       <ViewerOptionsWidthSlider data-testid="modelComponentEdgesWidthSlider" v-model="width" />
       <ViewerOptionsColoringTypeSelector
-        :id="modelId"
+        :data-id="modelId"
         :componentIds="allComponentIds"
         v-model:coloring_style_key="activeColoring"
         v-model:color="color"

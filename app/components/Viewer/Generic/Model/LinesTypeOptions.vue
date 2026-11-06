@@ -205,7 +205,7 @@ const { capabilities, schemas: attributeSchemas } = MODEL_LINE_COLORING;
   <div v-show="!activeTab || activeTab === 'type'" data-testid="modelComponentTypeOptions">
     <VisibilitySwitch data-testid="modelLinesVisibilitySwitch" v-model="linesVisibility" />
     <ViewerOptionsColoringTypeSelector
-      :id="modelId"
+      :data-id="modelId"
       :componentIds="targetLineIds"
       v-model:coloring_style_key="linesActiveColoring"
       v-model:color="linesColor"

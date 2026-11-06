@@ -66,7 +66,7 @@ async function mountSelector(
   const wrapper = await mountSuspended(AttributeSelector, {
     global: { plugins: [vuetify] },
     props: {
-      id: "id",
+      dataId: "id",
       schemas: VERTEX_SCHEMAS,
       attributeName,
       attributeItem: 0,
@@ -145,7 +145,7 @@ describe("attributeSelector attribute names", () => {
       setup: () => (): VNode =>
         h("div", { "data-rerenders": rerenders.value }, [
           h(AttributeSelector, {
-            id: "id",
+            dataId: "id",
             componentIds: componentIds.value,
             schemas: VERTEX_SCHEMAS,
           }),

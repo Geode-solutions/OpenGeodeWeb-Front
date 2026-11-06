@@ -47,7 +47,7 @@ const visibility = computed<boolean>({
         v-model="visibility"
       />
       <template v-if="visibility">
-        <ViewerSurfacePolygonsColoring :id="id" />
+        <ViewerSurfacePolygonsColoring :data-id="id" />
       </template>
     </template>
   </ViewerContextMenuItem>

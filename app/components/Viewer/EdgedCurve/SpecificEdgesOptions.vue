@@ -55,7 +55,7 @@ const width = computed<number>({
       <template v-if="visibility">
         <v-divider class="my-2" />
         <ViewerOptionsWidthSlider data-testid="meshEdgesWidthSlider" v-model="width" />
-        <ViewerEdgedCurveSpecificEdgesColoring :id="id" />
+        <ViewerEdgedCurveSpecificEdgesColoring :data-id="id" />
       </template>
     </template>
   </ViewerContextMenuItem>
