@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 
+import type { GeodeObjectType, GeodeObjectTyped } from "@ogw_front/types/identifiers";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStore } from "@ogw_front/stores/data";
 
 const schema = schemas.opengeodeweb_back.time_series_allowed_objects;
 
-interface Target {
+interface Target extends GeodeObjectTyped {
   id: string;
   name: string;
-  geode_object_type: string;
 }
 
 const emit = defineEmits<{
-  update_values: [values: { target_id: string; geode_object_type: string }];
+  update_values: [values: { target_id: string; geode_object_type: GeodeObjectType }];
   increment_step: [];
   decrement_step: [];
 }>();

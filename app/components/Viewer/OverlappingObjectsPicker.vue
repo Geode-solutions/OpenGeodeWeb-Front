@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { GeodeObjectType } from "@ogw_front/types/identifiers";
 import GlassCard from "@ogw_front/components/GlassCard.vue";
 import { formatListId } from "@ogw_front/utils/name_cleaner";
 import { geode_objects } from "@ogw_front/assets/geode_objects";
@@ -8,7 +9,7 @@ interface IntermediateItem {
   viewer_id: number | undefined;
   name: string;
   viewer_type: string | undefined;
-  geode_object_type: string | undefined;
+  geode_object_type: GeodeObjectType | undefined;
 }
 
 interface Props {

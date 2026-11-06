@@ -4,6 +4,7 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schem
 import { consola } from "consola";
 
 // Local imports
+import type { GeodeObjectType, GeodeObjectTyped } from "@ogw_front/types/identifiers";
 import { type LegacyDataId, fromLegacyDataId } from "@ogw_front/utils/legacy_data_id";
 import { type NewDataItem, useDataStore } from "@ogw_front/stores/data";
 import { useBackStore } from "@ogw_front/stores/back";
@@ -12,9 +13,8 @@ import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
-interface FileToImport {
+interface FileToImport extends Readonly<GeodeObjectTyped> {
   readonly filename: string;
-  readonly geode_object_type: string;
 }
 
 // NewDataItem has mutable array fields (mesh_components, collection_components), so it can't
@@ -78,7 +78,7 @@ async function importItem(imported: LegacyDataId<NewDataItem> | NewDataItem): Pr
   const id = await importDataItem(fromLegacyDataId(imported));
   return id;
 }
-async function importFile(filename: string, geode_object_type: string): Promise<string> {
+async function importFile(filename: string, geode_object_type: GeodeObjectType): Promise<string> {
   const backStore = useBackStore();
   const schema = back_schemas.opengeodeweb_back.save_viewable_file;
   const params = {

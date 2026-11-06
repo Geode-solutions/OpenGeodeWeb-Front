@@ -1,4 +1,4 @@
-import type { DataIdentified } from "@ogw_front/types/identifiers";
+import type { DataIdentified, GeodeObjectType } from "@ogw_front/types/identifiers";
 
 const GRID_TYPES = new Set([
   "RegularGrid2D",
@@ -15,7 +15,7 @@ const SLICE_AXES = [
 const DEFAULT_SLICE_AXIS: SliceAxis = 2;
 
 function areAllGrids(
-  items: (DataIdentified & { geode_object_type: string })[],
+  items: (DataIdentified & { geode_object_type: GeodeObjectType })[],
   ids: string[],
 ): boolean {
   const targetedItems = items.filter((item) => ids.includes(item.data_id));

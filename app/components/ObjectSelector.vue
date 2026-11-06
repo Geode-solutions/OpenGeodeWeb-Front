@@ -5,6 +5,7 @@ import {
   resolveAllowedObjectsPerFile,
 } from "@ogw_shared/utils/response_handlers/load.js";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
+import type { GeodeObjectType } from "@ogw_front/types/identifiers";
 import { geode_objects } from "@ogw_front/assets/geode_objects";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { useBackStore } from "@ogw_front/stores/back";
@@ -65,7 +66,7 @@ function emitGeodeObjectTypes(geode_object_types: Record<string, string>): void 
   emit("increment_step");
 }
 
-function setGeodeObject(geode_object_type: string | undefined): void {
+function setGeodeObject(geode_object_type: GeodeObjectType | undefined): void {
   if (!geode_object_type) {
     return;
   }

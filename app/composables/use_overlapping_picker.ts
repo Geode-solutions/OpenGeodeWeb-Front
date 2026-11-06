@@ -2,6 +2,7 @@ import { ref } from "vue";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 import { type DataItem, useDataStore } from "@ogw_front/stores/data";
+import type { GeodeObjectType } from "@ogw_front/types/identifiers";
 import { computeMenuPosition } from "@ogw_front/composables/overlapping_picker_menu";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -16,7 +17,7 @@ interface ProposedItem {
   viewer_id: number | undefined;
   name: string;
   viewer_type: string | undefined;
-  geode_object_type: string | undefined;
+  geode_object_type: GeodeObjectType | undefined;
 }
 
 interface ViewerIdResult {

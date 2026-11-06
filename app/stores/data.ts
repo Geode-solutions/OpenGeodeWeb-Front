@@ -11,6 +11,7 @@ import type {
   DataIdentified,
   GeodeId,
   GeodeIdentified,
+  GeodeObjectTyped,
 } from "@ogw_front/types/identifiers";
 import { type LegacyDataId, fromLegacyDataId } from "@ogw_front/utils/legacy_data_id";
 import { type ModelComponentRecord, useDataMesh } from "./data_helpers/mesh.js";
@@ -20,10 +21,9 @@ import { useDataCollections } from "./data_helpers/collections.js";
 import { useDataRelations } from "./data_helpers/relations.js";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
-interface DataItem extends DataIdentified, GeodeIdentified {
+interface DataItem extends DataIdentified, GeodeIdentified, GeodeObjectTyped {
   name: string;
   viewer_type: string;
-  geode_object_type: string;
   visible: boolean;
   created_at: string;
   is_viewable?: boolean;
@@ -44,10 +44,9 @@ interface ModelComponentInput extends GeodeIdentified {
   items?: string[];
 }
 
-interface NewDataItem extends DataIdentified, GeodeIdentified {
+interface NewDataItem extends DataIdentified, GeodeIdentified, GeodeObjectTyped {
   name?: string;
   viewer_type: string;
-  geode_object_type: string;
   is_viewable?: boolean;
   binary_light_viewable?: string;
   crs?: CRSList;
@@ -64,10 +63,9 @@ interface ModelComponentRelationRecord extends DataIdentified {
   type: string;
 }
 
-interface ViewableItemLike {
+interface ViewableItemLike extends Partial<GeodeObjectTyped> {
   is_viewable?: boolean;
   binary_light_viewable?: string;
-  geode_object_type?: string;
   data_id?: DataId;
   title?: string;
 }
