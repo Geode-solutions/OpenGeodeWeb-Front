@@ -6,7 +6,7 @@ import {
   storeMethod,
   useAttributeColoringStyle,
 } from "@ogw_front/composables/attribute_coloring_style";
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { ModelId } from "@ogw_front/types/identifiers";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 
@@ -20,7 +20,7 @@ interface ComponentGroup {
 
 function modelColoring(
   dataStyleStore: object,
-  modelId: DataId,
+  modelId: ModelId,
   { type, activeColoring, componentIds }: ComponentGroup,
 ): AttributeColoring {
   const methodName = `${type}s${attributeType(activeColoring)}`;

@@ -6,7 +6,7 @@ import {
   POINTS_COMPONENT_TYPES,
   useModelComponentPointsStyle,
 } from "@ogw_internal/stores/data_style/model/points/component";
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { ModelId } from "@ogw_front/types/identifiers";
 import { useModelPointsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -14,8 +14,8 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const schema = viewer_schemas.opengeodeweb_viewer.model.points.visibility;
 
 export function useModelPointsVisibilityStyle(): {
-  modelPointsVisibility: (modelId: DataId) => boolean | undefined;
-  setModelPointsVisibility: (modelId: DataId, visibility: boolean) => Promise<unknown>;
+  modelPointsVisibility: (modelId: ModelId) => boolean | undefined;
+  setModelPointsVisibility: (modelId: ModelId, visibility: boolean) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const modelPointsCommonStyle = useModelPointsCommonStyle();
@@ -23,12 +23,12 @@ export function useModelPointsVisibilityStyle(): {
     useModelComponentPointsStyle(type),
   );
 
-  function modelPointsVisibility(modelId: DataId): boolean | undefined {
+  function modelPointsVisibility(modelId: ModelId): boolean | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- points style values are dynamically typed at runtime.
     return modelPointsCommonStyle.modelPointsStyle(modelId).visibility as boolean | undefined;
   }
 
-  async function setModelPointsVisibility(modelId: DataId, visibility: boolean): Promise<unknown> {
+  async function setModelPointsVisibility(modelId: ModelId, visibility: boolean): Promise<unknown> {
     const params = { id: modelId, visibility };
     const result = await viewerStore.request(
       { schema, params },

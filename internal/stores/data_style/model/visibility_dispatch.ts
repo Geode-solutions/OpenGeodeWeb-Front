@@ -1,4 +1,4 @@
-import type { DataId, GeodeIdentified } from "@ogw_front/types/identifiers";
+import type { GeodeIdentified, ModelId } from "@ogw_front/types/identifiers";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import { useDataStore } from "@ogw_front/stores/data";
 
@@ -22,7 +22,7 @@ async function callComponentStyleFunction(
 }
 
 async function getModelComponentsMap(
-  modelId: DataId,
+  modelId: ModelId,
 ): Promise<{ allComponents: ModelComponent[]; componentsMap: Record<string, ModelComponent> }> {
   const dataStore = useDataStore();
   const results = await Promise.all(
@@ -80,7 +80,7 @@ function groupIdsByComponentType(
 }
 
 async function dispatchToComponentTypes(
-  modelId: DataId,
+  modelId: ModelId,
   componentIds: string[],
   action: string,
   { componentStyleFunctions }: { componentStyleFunctions: ComponentStyleFunctions },

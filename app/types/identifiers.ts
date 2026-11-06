@@ -7,6 +7,9 @@ type DataId = string;
 // Id of a component of a model (a corner, a line, a surface or a block): its geode_id
 type ModelComponentId = GeodeId;
 
+// The data of a model, the data a model style or a model component applies to
+type ModelId = DataId;
+
 // Type of an OpenGeode object, as named by OpenGeode (BRep, TriangulatedSurface3D, ...)
 type GeodeObjectType = string;
 
@@ -31,7 +34,7 @@ interface ViewerTyped {
 
 // The data a model style or a model component applies to
 interface ModelIdentified {
-  modelId: DataId;
+  modelId: ModelId;
 }
 
 export type {
@@ -42,6 +45,7 @@ export type {
   GeodeObjectType,
   GeodeObjectTyped,
   ModelComponentId,
+  ModelId,
   ModelIdentified,
   ViewerType,
   ViewerTyped,

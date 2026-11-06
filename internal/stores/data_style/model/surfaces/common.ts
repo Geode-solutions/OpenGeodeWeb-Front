@@ -1,36 +1,36 @@
-import type { DataId, ModelComponentId } from "@ogw_front/types/identifiers";
+import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import merge from "lodash/merge";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 
 interface UseModelSurfacesCommonStyleReturn {
-  modelSurfacesStyle: (modelId: DataId) => StyleValues;
-  modelSurfaceStyle: (modelId: DataId, surface_id?: ModelComponentId) => StyleValues;
-  modelSurfaceColoring: (modelId: DataId, surface_id?: ModelComponentId) => StyleValues;
+  modelSurfacesStyle: (modelId: ModelId) => StyleValues;
+  modelSurfaceStyle: (modelId: ModelId, surface_id?: ModelComponentId) => StyleValues;
+  modelSurfaceColoring: (modelId: ModelId, surface_id?: ModelComponentId) => StyleValues;
   mutateModelSurfacesColoring: (
-    modelId: DataId,
+    modelId: ModelId,
     surfaces_ids: readonly ModelComponentId[],
     values: StyleValues,
   ) => Promise<void>;
-  mutateModelSurfacesTypeColoring: (modelId: DataId, values: StyleValues) => Promise<void>;
+  mutateModelSurfacesTypeColoring: (modelId: ModelId, values: StyleValues) => Promise<void>;
 }
 
 export function useModelSurfacesCommonStyle(): UseModelSurfacesCommonStyleReturn {
   const dataStyleState = useDataStyleState();
   const modelCommonStyle = useModelCommonStyle();
 
-  function modelSurfacesStyle(modelId: DataId): StyleValues {
+  function modelSurfacesStyle(modelId: ModelId): StyleValues {
     return dataStyleState.getStyle(modelId).surfaces ?? {};
   }
 
-  function modelComponentTypeSurfacesStyle(modelId: DataId): StyleValues {
+  function modelComponentTypeSurfacesStyle(modelId: ModelId): StyleValues {
     const defaultStyle = modelSurfacesStyle(modelId);
     const typeStyle = dataStyleState.getModelComponentTypeStyle(modelId, "Surface");
     return merge({}, defaultStyle, typeStyle);
   }
 
-  function modelSurfaceStyle(modelId: DataId, surface_id?: ModelComponentId): StyleValues {
+  function modelSurfaceStyle(modelId: ModelId, surface_id?: ModelComponentId): StyleValues {
     if (surface_id === undefined) {
       return modelComponentTypeSurfacesStyle(modelId);
     }
@@ -39,13 +39,13 @@ export function useModelSurfacesCommonStyle(): UseModelSurfacesCommonStyleReturn
     return merge({}, typeStyle, individualStyle);
   }
 
-  function modelSurfaceColoring(modelId: DataId, surface_id?: ModelComponentId): StyleValues {
+  function modelSurfaceColoring(modelId: ModelId, surface_id?: ModelComponentId): StyleValues {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
     return modelSurfaceStyle(modelId, surface_id).coloring as StyleValues;
   }
 
   async function mutateModelSurfacesColoring(
-    modelId: DataId,
+    modelId: ModelId,
     surfaces_ids: readonly ModelComponentId[],
     values: StyleValues,
   ): Promise<void> {
@@ -55,7 +55,7 @@ export function useModelSurfacesCommonStyle(): UseModelSurfacesCommonStyleReturn
   }
 
   async function mutateModelSurfacesTypeColoring(
-    modelId: DataId,
+    modelId: ModelId,
     values: StyleValues,
   ): Promise<void> {
     await modelCommonStyle.mutateModelComponentTypeStyle(modelId, "Surface", {

@@ -1,4 +1,4 @@
-import type { DataId, ModelComponentId } from "@ogw_front/types/identifiers";
+import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
@@ -13,17 +13,17 @@ const schema = viewer_schemas.opengeodeweb_viewer.model.surfaces.color;
 
 export function useModelSurfacesColor(): {
   setModelSurfacesColor: (
-    modelId: DataId,
+    modelId: ModelId,
     surfaces_ids: ModelComponentId[],
     color: RGBAColor | undefined,
     activeColoring?: string,
     collectionId?: string,
   ) => Promise<unknown>;
-  modelSurfaceColoring: (modelId: DataId, surface_id?: ModelComponentId) => StyleValues;
-  modelSurfaceColor: (modelId: DataId, surface_id?: ModelComponentId) => RGBAColor | undefined;
-  modelSurfaceActiveColoring: (modelId: DataId, surface_id?: ModelComponentId) => unknown;
+  modelSurfaceColoring: (modelId: ModelId, surface_id?: ModelComponentId) => StyleValues;
+  modelSurfaceColor: (modelId: ModelId, surface_id?: ModelComponentId) => RGBAColor | undefined;
+  modelSurfaceActiveColoring: (modelId: ModelId, surface_id?: ModelComponentId) => unknown;
   setModelSurfacesActiveColoring: (
-    modelId: DataId,
+    modelId: ModelId,
     surfaces_ids: ModelComponentId[],
     activeColoring: string,
     collectionId?: string,
@@ -35,13 +35,13 @@ export function useModelSurfacesColor(): {
   const modelSurfacesVertexAttribute = useModelSurfacesVertexAttribute();
   const modelSurfacesPolygonAttribute = useModelSurfacesPolygonAttribute();
 
-  function modelSurfaceColoring(modelId: DataId, surface_id?: ModelComponentId): StyleValues {
+  function modelSurfaceColoring(modelId: ModelId, surface_id?: ModelComponentId): StyleValues {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
     return modelSurfacesCommonStyle.modelSurfaceStyle(modelId, surface_id).coloring as StyleValues;
   }
 
   function modelSurfaceColor(
-    modelId: DataId,
+    modelId: ModelId,
     surface_id?: ModelComponentId,
   ): RGBAColor | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.constant shape is defined by the data style schema.
@@ -49,7 +49,7 @@ export function useModelSurfacesColor(): {
   }
 
   async function setModelSurfacesColor(
-    modelId: DataId,
+    modelId: ModelId,
     surfaces_ids: ModelComponentId[],
     color: RGBAColor | undefined,
     activeColoring = "constant",
@@ -66,12 +66,12 @@ export function useModelSurfacesColor(): {
     return result;
   }
 
-  function modelSurfaceActiveColoring(modelId: DataId, surface_id?: ModelComponentId): unknown {
+  function modelSurfaceActiveColoring(modelId: ModelId, surface_id?: ModelComponentId): unknown {
     return modelSurfaceColoring(modelId, surface_id).active;
   }
 
   async function applyVertexColoring(
-    modelId: DataId,
+    modelId: ModelId,
     surfaces_ids: ModelComponentId[],
   ): Promise<unknown> {
     const name = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeName(
@@ -107,7 +107,7 @@ export function useModelSurfacesColor(): {
   }
 
   async function applyPolygonColoring(
-    modelId: DataId,
+    modelId: ModelId,
     surfaces_ids: ModelComponentId[],
   ): Promise<unknown> {
     const name = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeName(
@@ -143,7 +143,7 @@ export function useModelSurfacesColor(): {
   }
 
   async function setModelSurfacesActiveColoring(
-    modelId: DataId,
+    modelId: ModelId,
     surfaces_ids: ModelComponentId[],
     activeColoring: string,
     collectionId?: string,

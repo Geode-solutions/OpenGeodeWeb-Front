@@ -5,7 +5,7 @@ import type {
   SceneStyle,
   StyleValues,
 } from "./types";
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { ModelId } from "@ogw_front/types/identifiers";
 import type { Observable as RxObservable } from "rxjs";
 import { getDefaultSceneStyle } from "@ogw_front/utils/default_styles";
 import { getTable } from "@ogw_internal/database/database";
@@ -20,24 +20,24 @@ interface SharedState {
   sceneStyle: Ref<SceneStyle>;
   loadFromDatabase: () => Promise<void>;
   updateComponentStyleCache: (
-    modelId: DataId,
+    modelId: ModelId,
     componentId: string,
     styleValues: StyleValues,
   ) => void;
   bulkUpdateComponentStyleCache: (
-    modelId: DataId,
+    modelId: ModelId,
     componentStyleUpdates: readonly {
       readonly id_component: string;
       readonly values: StyleValues;
     }[],
   ) => void;
   bulkUpdateComponentStylesCache: (
-    modelId: DataId,
+    modelId: ModelId,
     componentIds: readonly string[],
     styleValues: StyleValues,
   ) => void;
   updateModelComponentTypeStyleCache: (
-    modelId: DataId,
+    modelId: ModelId,
     componentType: string,
     styleValues: StyleValues,
   ) => void;
@@ -106,7 +106,7 @@ function getSharedState(): SharedState {
   void loadFromDatabase();
 
   function updateComponentStyleCache(
-    modelId: DataId,
+    modelId: ModelId,
     componentId: string,
     styleValues: StyleValues,
   ): void {
@@ -123,7 +123,7 @@ function getSharedState(): SharedState {
   }
 
   function bulkUpdateComponentStyleCache(
-    modelId: DataId,
+    modelId: ModelId,
     componentStyleUpdates: readonly {
       readonly id_component: string;
       readonly values: StyleValues;
@@ -146,7 +146,7 @@ function getSharedState(): SharedState {
   }
 
   function bulkUpdateComponentStylesCache(
-    modelId: DataId,
+    modelId: ModelId,
     componentIds: readonly string[],
     styleValues: StyleValues,
   ): void {
@@ -167,7 +167,7 @@ function getSharedState(): SharedState {
   }
 
   function updateModelComponentTypeStyleCache(
-    modelId: DataId,
+    modelId: ModelId,
     componentType: string,
     styleValues: StyleValues,
   ): void {

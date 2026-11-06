@@ -1,12 +1,12 @@
 // Local imports
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { ModelId } from "@ogw_front/types/identifiers";
 import { useModelPointsCommonStyle } from "./common";
 import { useModelPointsSizeStyle } from "./size";
 import { useModelPointsVisibilityStyle } from "./visibility";
 import { whenDefined } from "@ogw_internal/stores/data_style/when_defined";
 
 export function useModelPointsStyle(): {
-  applyModelPointsStyle: (modelId: DataId) => Promise<unknown[]>;
+  applyModelPointsStyle: (modelId: ModelId) => Promise<unknown[]>;
 } & ReturnType<typeof useModelPointsCommonStyle> &
   ReturnType<typeof useModelPointsVisibilityStyle> &
   ReturnType<typeof useModelPointsSizeStyle> {
@@ -14,7 +14,7 @@ export function useModelPointsStyle(): {
   const modelPointsVisibilityStyle = useModelPointsVisibilityStyle();
   const modelPointsSizeStyle = useModelPointsSizeStyle();
 
-  async function applyModelPointsStyle(modelId: DataId): Promise<unknown[]> {
+  async function applyModelPointsStyle(modelId: ModelId): Promise<unknown[]> {
     const style = modelPointsCommonStyle.modelPointsStyle(modelId);
     const result = await Promise.all([
       whenDefined(

@@ -1,4 +1,4 @@
-import type { DataId, ModelIdentified } from "@ogw_front/types/identifiers";
+import type { ModelId, ModelIdentified } from "@ogw_front/types/identifiers";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import type { ModelComponentRecord } from "@ogw_front/stores/data_helpers/mesh";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
@@ -74,7 +74,7 @@ function computeTypeSelection(
 }
 
 function buildSelection(
-  modelId: DataId,
+  modelId: ModelId,
   components: readonly ModelComponentRecord[],
   dataStyleState: DataStyleState,
 ): string[] {
@@ -96,7 +96,7 @@ function buildSelection(
 const selectionCache = new Map<string, ComputedRef<string[]>>();
 
 function useModelSelection(
-  modelId: DataId | undefined,
+  modelId: ModelId | undefined,
   dataStyleState: DataStyleState,
 ): ComputedRef<string[]> {
   if (modelId === undefined || modelId === "") {
