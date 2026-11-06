@@ -20,10 +20,7 @@ interface EdgedCurveStyle extends PointSetStyle {
   edges: MeshEdgesStyle;
 }
 
-interface Grid2dStyle {
-  visibility: boolean;
-  points: MeshPointsStyle;
-  edges: MeshEdgesStyle;
+interface Grid2dStyle extends EdgedCurveStyle {
   cells: MeshCellsStyle;
 }
 
