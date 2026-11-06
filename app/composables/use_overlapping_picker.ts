@@ -182,4 +182,4 @@ export function useOverlappingPicker(): UseOverlappingPickerReturn {
   };
 }
 
-export type { ViewerIdResult };
+export type { ProposedItem, ViewerIdResult };

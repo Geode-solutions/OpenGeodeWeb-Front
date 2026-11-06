@@ -1,33 +1,25 @@
 <script setup lang="ts">
-import type { GeodeObjectType, ViewerType } from "@ogw_front/types/identifiers";
 import GlassCard from "@ogw_front/components/GlassCard.vue";
+import type { ProposedItem } from "@ogw_front/composables/use_overlapping_picker";
 import { formatListId } from "@ogw_front/utils/name_cleaner";
 import { geode_objects } from "@ogw_front/assets/geode_objects";
 
-interface IntermediateItem {
-  id: string;
-  viewer_id: number | undefined;
-  name: string;
-  viewer_type: ViewerType | undefined;
-  geode_object_type: GeodeObjectType | undefined;
-}
-
 interface Props {
   displayIntermediate: boolean;
-  intermediateItems: IntermediateItem[];
+  intermediateItems: ProposedItem[];
   menuStyle: Record<string, unknown>;
 }
 
 const { displayIntermediate, intermediateItems, menuStyle } = defineProps<Props>();
 
 interface Emits {
-  select: [item: IntermediateItem];
+  select: [item: ProposedItem];
   "update:displayIntermediate": [val: boolean];
 }
 
 const emit = defineEmits<Emits>();
 
-function selectItem(item: IntermediateItem): void {
+function selectItem(item: ProposedItem): void {
   emit("select", item);
 }
 
