@@ -16,10 +16,10 @@ import type {
 } from "@ogw_front/types/identifiers";
 import { type LegacyDataId, fromLegacyDataId } from "@ogw_front/utils/legacy_data_id";
 import { type ModelComponentRecord, useDataMesh } from "./data_helpers/mesh.js";
+import { type ModelComponentRelationRecord, useDataRelations } from "./data_helpers/relations.js";
 import { database } from "@ogw_internal/database/database.js";
 import { liveObservable } from "@ogw_front/utils/live_observable";
 import { useDataCollections } from "./data_helpers/collections.js";
-import { useDataRelations } from "./data_helpers/relations.js";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 interface DataItem extends DataIdentified, GeodeIdentified, GeodeObjectTyped, ViewerTyped {
@@ -54,12 +54,6 @@ interface NewDataItem extends DataIdentified, GeodeIdentified, GeodeObjectTyped,
   mesh_components?: ModelComponentInput[];
   collection_components?: ModelComponentInput[];
   nb_vertices?: number;
-}
-
-interface ModelComponentRelationRecord extends DataIdentified {
-  parent: string;
-  child: string;
-  type: string;
 }
 
 interface ViewableItemLike extends Partial<GeodeObjectTyped> {
@@ -458,4 +452,4 @@ export const useDataStore = defineStore("data", () => {
   };
 });
 
-export type { CrsItem, DataItem, NewDataItem, ModelComponentInput, ModelComponentRelationRecord };
+export type { CrsItem, DataItem, NewDataItem, ModelComponentInput };

@@ -1,17 +1,11 @@
 import { type FormattedComponent, type ModelComponentRecord, useDataMesh } from "./mesh.js";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
+import type { ModelComponentRelationRecord } from "./relations.js";
 import type { Ref } from "vue";
 import { getTable } from "@ogw_internal/database/database.js";
 import { liveObservable } from "@ogw_front/utils/live_observable";
 import { pluralize } from "@ogw_front/utils/string";
 import { useObservable } from "@vueuse/rxjs";
-
-interface ModelComponentRelationRecord {
-  id: string;
-  parent: string;
-  child: string;
-  type: string;
-}
 
 interface CollectionComponent extends FormattedComponent {
   readonly children: readonly FormattedComponent[];
@@ -127,4 +121,4 @@ export function useDataCollections(): {
   };
 }
 
-export type { CollectionComponent, CollectionComponentGroup, ModelComponentRelationRecord };
+export type { CollectionComponent, CollectionComponentGroup };

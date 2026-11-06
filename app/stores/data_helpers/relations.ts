@@ -3,19 +3,19 @@ import {
   type ModelComponentRecord,
   toFormattedComponent,
 } from "./mesh.js";
+import type { DataIdentified } from "@ogw_front/types/identifiers";
 import { Dexie } from "dexie";
 import { getTable } from "@ogw_internal/database/database.js";
-
-interface ModelComponentRelationRecord {
-  id: string;
-  parent: string;
-  child: string;
-  type: string;
-}
 
 interface ComponentRelations {
   readonly boundaries: readonly FormattedComponent[];
   readonly internals: readonly FormattedComponent[];
+}
+
+interface ModelComponentRelationRecord extends DataIdentified {
+  parent: string;
+  child: string;
+  type: string;
 }
 
 export function useDataRelations(): {
@@ -56,4 +56,4 @@ export function useDataRelations(): {
   return { getComponentRelations };
 }
 
-export type { ComponentRelations };
+export type { ComponentRelations, ModelComponentRelationRecord };
