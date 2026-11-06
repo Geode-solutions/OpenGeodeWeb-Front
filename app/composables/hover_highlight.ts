@@ -1,3 +1,4 @@
+import type { DataId } from "@ogw_front/types/identifiers";
 import type { ParamsOf } from "@ogw_shared/utils/types";
 import { consola } from "consola";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -18,12 +19,12 @@ export function useHoverhighlight(): {
   const dataStore = useDataStore();
   let timer: ReturnType<typeof setTimeout> | undefined = undefined;
   // Item hovered last, whose highlight may still be pending
-  let currentId: string | undefined = undefined;
+  let currentId: DataId | undefined = undefined;
   // Item the viewer was asked to highlight, the only one to unhighlight
-  let highlighted: { id: string; type: HighlightType } | undefined = undefined;
+  let highlighted: { dataId: DataId; type: HighlightType } | undefined = undefined;
 
   function onHoverEnter(
-    id: string,
+    dataId: DataId,
     block_ids_provider: BlockIdsProvider = [],
     type: HighlightType = "model",
     immediate = false,
@@ -35,9 +36,9 @@ export function useHoverhighlight(): {
     const schema = vtk_schemas.opengeodeweb_viewer[type].highlight;
 
     async function highlightAction(): Promise<void> {
-      currentId = id;
+      currentId = dataId;
 
-      if (!(await dataStore.isItemViewable(id))) {
+      if (!(await dataStore.isItemViewable(dataId))) {
         return;
       }
 
@@ -52,20 +53,20 @@ export function useHoverhighlight(): {
         .map((blockId) => Math.trunc(blockId))
         .filter((blockId) => !Number.isNaN(blockId));
 
-      if (currentId !== id) {
+      if (currentId !== dataId) {
         return;
       }
 
-      highlighted = { id, type };
+      highlighted = { dataId, type };
       const params = {
-        id,
+        id: dataId,
         visibility: true,
         ...(type === "model" && { block_ids }),
       };
       try {
         await viewerStore.request({ schema, params });
       } catch (error) {
-        consola.error(`Highlight failed for ${type} ${id}:`, error);
+        consola.error(`Highlight failed for ${type} ${dataId}:`, error);
       }
     }
 
@@ -90,7 +91,7 @@ export function useHoverhighlight(): {
 
   async function unhighlightAction(
     type: HighlightType,
-    id: string,
+    dataId: DataId,
     request: {
       schema: HighlightSchema;
       params?: ParamsOf<HighlightSchema>;
@@ -100,28 +101,28 @@ export function useHoverhighlight(): {
     try {
       await viewerStore.request(request);
     } catch (error) {
-      consola.error(`Unhighlight failed for ${type} ${id}:`, error);
+      consola.error(`Unhighlight failed for ${type} ${dataId}:`, error);
     }
   }
 
-  function onHoverLeave(id: string): void {
+  function onHoverLeave(dataId: DataId): void {
     if (timer) {
       clearTimeout(timer);
       timer = undefined;
     }
-    if (currentId === id) {
+    if (currentId === dataId) {
       currentId = undefined;
     }
-    if (highlighted?.id === id) {
+    if (highlighted?.dataId === dataId) {
       const { type } = highlighted;
       const schema = vtk_schemas.opengeodeweb_viewer[type].highlight;
       const params = {
-        id,
+        id: dataId,
         visibility: false,
         ...(type === "model" && { block_ids: [] }),
       };
       // oxlint-disable-next-line typescript/no-floating-promises -- unhighlightAction catches its own errors internally.
-      unhighlightAction(type, id, { schema, params });
+      unhighlightAction(type, dataId, { schema, params });
       highlighted = undefined;
     }
   }

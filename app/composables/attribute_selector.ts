@@ -1,5 +1,6 @@
 import type { AttributeRangeInfo, AttributeSchemas } from "@ogw_front/utils/attribute_range";
 import type { AttributeRange } from "@ogw_front/composables/batch_style";
+import type { DataId } from "@ogw_front/types/identifiers";
 import { getAttributeRange } from "@ogw_front/utils/attributes";
 
 // The minimum and maximum of an attribute range: each one is clamped by the other
@@ -95,17 +96,17 @@ interface AttributeRequestParams {
 // Params of the "names" request, or undefined when the schema needs components and none is selected
 function attributeRequestParams(
   schemas: AttributeSchemas,
-  id: string,
+  dataId: DataId,
   componentIds: string[] | undefined,
 ): AttributeRequestParams | undefined {
   const { properties } = schemas.names;
   if (typeof properties !== "object" || properties === null || !("component_ids" in properties)) {
-    return { id };
+    return { id: dataId };
   }
   if (!Array.isArray(componentIds) || componentIds.length === 0) {
     return undefined;
   }
-  return { id, component_ids: componentIds };
+  return { id: dataId, component_ids: componentIds };
 }
 
 export type { AttributeInfo } from "@ogw_front/utils/attributes";
