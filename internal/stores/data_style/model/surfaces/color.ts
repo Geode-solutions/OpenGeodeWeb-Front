@@ -1,11 +1,12 @@
-import { isModelSurfacesPolygonAttributeValid, useModelSurfacesPolygonAttribute } from "./polygon";
-import { isModelSurfacesVertexAttributeValid, useModelSurfacesVertexAttribute } from "./vertex";
 import type { DataId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
+import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 import { useModelSurfacesCommonStyle } from "./common";
+import { useModelSurfacesPolygonAttribute } from "./polygon";
+import { useModelSurfacesVertexAttribute } from "./vertex";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 const schema = viewer_schemas.opengeodeweb_viewer.model.surfaces.color;
@@ -88,7 +89,7 @@ export function useModelSurfacesColor(): {
       surfaces_ids[0],
     );
     const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
-    if (isModelSurfacesVertexAttributeValid(attribute)) {
+    if (isAttributeValid(attribute)) {
       const result = await modelSurfacesVertexAttribute.setModelSurfacesVertexAttribute(
         modelId,
         surfaces_ids,
@@ -121,7 +122,7 @@ export function useModelSurfacesColor(): {
       surfaces_ids[0],
     );
     const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
-    if (isModelSurfacesPolygonAttributeValid(attribute)) {
+    if (isAttributeValid(attribute)) {
       const result = await modelSurfacesPolygonAttribute.setModelSurfacesPolygonAttribute(
         modelId,
         surfaces_ids,

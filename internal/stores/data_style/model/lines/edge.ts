@@ -7,6 +7,7 @@ import type {
 } from "@ogw_internal/stores/data_style/attribute_types";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { DataId } from "@ogw_front/types/identifiers";
+import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
@@ -22,16 +23,6 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
 const attributeSchema = viewer_schemas.opengeodeweb_viewer.model.lines.attribute.edge.attribute;
-
-function isModelLinesEdgeAttributeValid(input: AttributeInput): input is ValidAttributeInput {
-  return (
-    input.name !== undefined &&
-    input.item !== undefined &&
-    input.minimum !== undefined &&
-    input.maximum !== undefined &&
-    input.colorMap !== undefined
-  );
-}
 
 interface UseModelLinesEdgeAttributeReturn {
   modelLinesEdgeAttributeName: (modelId: DataId, lineId?: string) => string | undefined;
@@ -300,7 +291,7 @@ function useModelLinesEdgeAttribute(): UseModelLinesEdgeAttributeReturn {
       colorMap: storedConfig.colorMap,
       no_data_color: storedConfig.no_data_color,
     };
-    if (isModelLinesEdgeAttributeValid(attribute)) {
+    if (isAttributeValid(attribute)) {
       await setModelLinesEdgeAttribute(modelId, lineIds, attribute);
     }
   }
@@ -418,4 +409,4 @@ function useModelLinesEdgeAttribute(): UseModelLinesEdgeAttributeReturn {
     setModelLinesEdgeAttributeNoDataColor,
   };
 }
-export { isModelLinesEdgeAttributeValid, useModelLinesEdgeAttribute };
+export { useModelLinesEdgeAttribute };

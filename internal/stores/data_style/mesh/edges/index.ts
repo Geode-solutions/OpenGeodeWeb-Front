@@ -1,12 +1,13 @@
 // Third party imports
 
 // Local imports
-import { isMeshEdgesEdgeAttributeValid, useMeshEdgesEdgeAttributeStyle } from "./edge";
-import { isMeshEdgesVertexAttributeValid, useMeshEdgesVertexAttributeStyle } from "./vertex";
 import type { DataId } from "@ogw_front/types/identifiers";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
+import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import { useMeshEdgesColorStyle } from "./color";
 import { useMeshEdgesCommonStyle } from "./common";
+import { useMeshEdgesEdgeAttributeStyle } from "./edge";
+import { useMeshEdgesVertexAttributeStyle } from "./vertex";
 import { useMeshEdgesVisibilityStyle } from "./visibility";
 import { useMeshEdgesWidthStyle } from "./width";
 import { whenDefined } from "@ogw_internal/stores/data_style/when_defined";
@@ -30,7 +31,7 @@ function handleMeshEdgesVertexColoring(
   const colorMap = vertexAttributeStyle.meshEdgesVertexAttributeColorMap(meshId);
   const no_data_color = vertexAttributeStyle.meshEdgesVertexAttributeNoDataColor(meshId);
   const vertex_attribute = { name, item, minimum, maximum, colorMap, no_data_color };
-  if (!isMeshEdgesVertexAttributeValid(vertex_attribute)) {
+  if (!isAttributeValid(vertex_attribute)) {
     return undefined;
   }
   return vertexAttributeStyle.setMeshEdgesVertexAttribute(meshId, vertex_attribute);
@@ -46,7 +47,7 @@ function handleMeshEdgesEdgeColoring(
   const colorMap = edgeAttributeStyle.meshEdgesEdgeAttributeColorMap(meshId);
   const no_data_color = edgeAttributeStyle.meshEdgesEdgeAttributeNoDataColor(meshId);
   const edge_attribute = { name, item, minimum, maximum, colorMap, no_data_color };
-  if (!isMeshEdgesEdgeAttributeValid(edge_attribute)) {
+  if (!isAttributeValid(edge_attribute)) {
     return undefined;
   }
   return edgeAttributeStyle.setMeshEdgesEdgeAttribute(meshId, edge_attribute);

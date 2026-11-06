@@ -1,13 +1,11 @@
-import {
-  isModelBlocksPolyhedronAttributeValid,
-  useModelBlocksPolyhedronAttribute,
-} from "./polyhedron";
-import { isModelBlocksVertexAttributeValid, useModelBlocksVertexAttribute } from "./vertex";
 import type { DataId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
+import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelBlocksCommonStyle } from "./common";
+import { useModelBlocksPolyhedronAttribute } from "./polyhedron";
+import { useModelBlocksVertexAttribute } from "./vertex";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
@@ -85,7 +83,7 @@ export function useModelBlocksColor(): {
       blocks_ids[0],
     );
     const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
-    if (isModelBlocksVertexAttributeValid(attribute)) {
+    if (isAttributeValid(attribute)) {
       await modelBlocksVertexAttribute.setModelBlocksVertexAttribute(
         modelId,
         blocks_ids,
@@ -116,7 +114,7 @@ export function useModelBlocksColor(): {
       blocks_ids[0],
     );
     const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
-    if (isModelBlocksPolyhedronAttributeValid(attribute)) {
+    if (isAttributeValid(attribute)) {
       await modelBlocksPolyhedronAttribute.setModelBlocksPolyhedronAttribute(
         modelId,
         blocks_ids,

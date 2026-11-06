@@ -1,14 +1,9 @@
 import type { AttributeGroup, ColorGroup } from "./coloring_groups";
-import {
-  isModelSurfacesPolygonAttributeValid,
-  type useModelSurfacesPolygonAttribute,
-} from "./polygon";
-import {
-  isModelSurfacesVertexAttributeValid,
-  type useModelSurfacesVertexAttribute,
-} from "./vertex";
 import type { DataId } from "@ogw_front/types/identifiers";
+import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import type { useModelSurfacesColor } from "./color";
+import type { useModelSurfacesPolygonAttribute } from "./polygon";
+import type { useModelSurfacesVertexAttribute } from "./vertex";
 
 type ColorStyle = ReturnType<typeof useModelSurfacesColor>;
 type VertexAttributeStyle = ReturnType<typeof useModelSurfacesVertexAttribute>;
@@ -67,7 +62,7 @@ function groupModelSurfacesVertexAttributes(
       colorMap,
       no_data_color,
     };
-    if (!isModelSurfacesVertexAttributeValid(attribute)) {
+    if (!isAttributeValid(attribute)) {
       continue;
     }
     const key = [name, item, colorMap, minimum, maximum, JSON.stringify(no_data_color)].join("_");
@@ -141,7 +136,7 @@ function groupModelSurfacesPolygonAttributes(
       colorMap,
       no_data_color,
     };
-    if (!isModelSurfacesPolygonAttributeValid(attribute)) {
+    if (!isAttributeValid(attribute)) {
       continue;
     }
     const key = [name, item, colorMap, minimum, maximum, JSON.stringify(no_data_color)].join("_");

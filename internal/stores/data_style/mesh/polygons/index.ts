@@ -1,16 +1,14 @@
 // Third party imports
 
 // Local imports
-import {
-  isMeshPolygonsPolygonAttributeValid,
-  useMeshPolygonsPolygonAttributeStyle,
-} from "./polygon";
-import { isMeshPolygonsVertexAttributeValid, useMeshPolygonsVertexAttributeStyle } from "./vertex";
 import type { DataId } from "@ogw_front/types/identifiers";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
+import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import { useMeshPolygonsColorStyle } from "./color";
 import { useMeshPolygonsCommonStyle } from "./common";
+import { useMeshPolygonsPolygonAttributeStyle } from "./polygon";
 import { useMeshPolygonsTexturesStyle } from "./textures";
+import { useMeshPolygonsVertexAttributeStyle } from "./vertex";
 import { useMeshPolygonsVisibilityStyle } from "./visibility";
 import { whenDefined } from "@ogw_internal/stores/data_style/when_defined";
 
@@ -34,7 +32,7 @@ function handleMeshPolygonsVertexColoring(
   const colorMap = vertexAttributeStyle.meshPolygonsVertexAttributeColorMap(meshId);
   const no_data_color = vertexAttributeStyle.meshPolygonsVertexAttributeNoDataColor(meshId);
   const vertex_attribute = { name, item, minimum, maximum, colorMap, no_data_color };
-  if (!isMeshPolygonsVertexAttributeValid(vertex_attribute)) {
+  if (!isAttributeValid(vertex_attribute)) {
     return undefined;
   }
   return vertexAttributeStyle.setMeshPolygonsVertexAttribute(meshId, vertex_attribute);
@@ -57,7 +55,7 @@ function handleMeshPolygonsPolygonColoring(
     colorMap,
     no_data_color,
   };
-  if (!isMeshPolygonsPolygonAttributeValid(polygon_attribute)) {
+  if (!isAttributeValid(polygon_attribute)) {
     return undefined;
   }
   return polygonAttributeStyle.setMeshPolygonsPolygonAttribute(meshId, polygon_attribute);

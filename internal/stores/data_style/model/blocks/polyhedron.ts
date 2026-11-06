@@ -7,6 +7,7 @@ import type {
 } from "@ogw_internal/stores/data_style/attribute_types";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { DataId } from "@ogw_front/types/identifiers";
+import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
@@ -23,18 +24,6 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 // Local constants
 const modelBlockPolyhedronAttributeSchema =
   viewer_schemas.opengeodeweb_viewer.model.blocks.attribute.polyhedron.attribute;
-
-function isModelBlocksPolyhedronAttributeValid(
-  input: AttributeInput,
-): input is ValidAttributeInput {
-  return (
-    input.name !== undefined &&
-    input.item !== undefined &&
-    input.minimum !== undefined &&
-    input.maximum !== undefined &&
-    input.colorMap !== undefined
-  );
-}
 
 interface UseModelBlocksPolyhedronAttributeReturn {
   modelBlocksPolyhedronAttributeName: (modelId: DataId, blockId?: string) => string | undefined;
@@ -319,7 +308,7 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
       colorMap: storedConfig.colorMap,
       no_data_color: storedConfig.no_data_color,
     };
-    if (!isModelBlocksPolyhedronAttributeValid(attribute)) {
+    if (!isAttributeValid(attribute)) {
       return false;
     }
     await setModelBlocksPolyhedronAttribute(modelId, blockIds, attribute);
@@ -446,4 +435,4 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
     setModelBlocksPolyhedronAttributeNoDataColor,
   };
 }
-export { isModelBlocksPolyhedronAttributeValid, useModelBlocksPolyhedronAttribute };
+export { useModelBlocksPolyhedronAttribute };

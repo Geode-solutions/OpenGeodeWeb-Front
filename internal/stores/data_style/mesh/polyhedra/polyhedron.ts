@@ -1,20 +1,18 @@
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { DataId } from "@ogw_front/types/identifiers";
 import type { ValidAttributeInput } from "@ogw_internal/stores/data_style/attribute_types";
+import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import {
-  type UseMeshPolyhedraPolyhedronAttributeStyleReturn,
-  isMeshPolyhedraPolyhedronAttributeValid,
-} from "./polyhedron_attribute";
-import {
   useMeshPolyhedraPolyhedronAttributeConfig,
   useMeshPolyhedraPolyhedronAttributeConfigValues,
   useMeshPolyhedraPolyhedronAttributeConfigWriter,
 } from "./polyhedron_config";
+import type { UseMeshPolyhedraPolyhedronAttributeStyleReturn } from "./polyhedron_attribute";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { useAttributeTimeStepStyle } from "@ogw_internal/stores/data_style/time_step";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -98,7 +96,7 @@ function useMeshPolyhedraPolyhedronAttributeStyle(): UseMeshPolyhedraPolyhedronA
       colorMap: storedConfig.colorMap,
       no_data_color: storedConfig.no_data_color,
     };
-    if (isMeshPolyhedraPolyhedronAttributeValid(attribute)) {
+    if (isAttributeValid(attribute)) {
       const result = await setMeshPolyhedraPolyhedronAttribute(meshId, attribute);
       return result;
     }
@@ -190,4 +188,3 @@ function useMeshPolyhedraPolyhedronAttributeStyle(): UseMeshPolyhedraPolyhedronA
   };
 }
 export { useMeshPolyhedraPolyhedronAttributeStyle };
-export { isMeshPolyhedraPolyhedronAttributeValid } from "./polyhedron_attribute";

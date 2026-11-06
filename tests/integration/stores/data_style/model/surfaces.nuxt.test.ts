@@ -10,8 +10,7 @@ import { Status } from "@ogw_front/utils/status";
 import { assertDefined } from "@ogw_tests/utils";
 import { cleanupBackend } from "@ogw_server/utils/cleanup";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
-import { isModelSurfacesPolygonAttributeValid } from "@ogw_internal/stores/data_style/model/surfaces/polygon";
-import { isModelSurfacesVertexAttributeValid } from "@ogw_internal/stores/data_style/model/surfaces/vertex";
+import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -124,7 +123,7 @@ describe("model surfaces", () => {
       "coloring vertex attribute",
       () => {
         expect(
-          isModelSurfacesVertexAttributeValid({
+          isAttributeValid({
             name: "points",
             item: 0,
             minimum: undefined,
@@ -347,7 +346,7 @@ describe("model surfaces", () => {
       "coloring polygon attribute — guard on missing parameters",
       () => {
         expect(
-          isModelSurfacesPolygonAttributeValid({
+          isAttributeValid({
             name: "triangle_vertices",
             item: 0,
             minimum: undefined,

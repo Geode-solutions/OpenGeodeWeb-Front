@@ -1,20 +1,18 @@
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { DataId } from "@ogw_front/types/identifiers";
 import type { ValidAttributeInput } from "@ogw_internal/stores/data_style/attribute_types";
+import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import {
-  type UseMeshCellsCellAttributeStyleReturn,
-  isMeshCellsCellAttributeValid,
-} from "./cell_attribute";
-import {
   useMeshCellsCellAttributeConfig,
   useMeshCellsCellAttributeConfigValues,
   useMeshCellsCellAttributeConfigWriter,
 } from "./cell_config";
+import type { UseMeshCellsCellAttributeStyleReturn } from "./cell_attribute";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { useAttributeTimeStepStyle } from "@ogw_internal/stores/data_style/time_step";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -93,7 +91,7 @@ function useMeshCellsCellAttributeStyle(): UseMeshCellsCellAttributeStyleReturn 
       colorMap: storedConfig.colorMap,
       no_data_color: storedConfig.no_data_color,
     };
-    if (isMeshCellsCellAttributeValid(attribute)) {
+    if (isAttributeValid(attribute)) {
       const result = await setMeshCellsCellAttribute(meshId, attribute);
       return result;
     }
@@ -179,4 +177,3 @@ function useMeshCellsCellAttributeStyle(): UseMeshCellsCellAttributeStyleReturn 
   };
 }
 export { useMeshCellsCellAttributeStyle };
-export { isMeshCellsCellAttributeValid } from "./cell_attribute";

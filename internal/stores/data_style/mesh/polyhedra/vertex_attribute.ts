@@ -1,20 +1,9 @@
 import type {
-  AttributeInput,
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
 import type { DataId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
-
-function isMeshPolyhedraVertexAttributeValid(input: AttributeInput): input is ValidAttributeInput {
-  return (
-    input.name !== undefined &&
-    input.item !== undefined &&
-    input.minimum !== undefined &&
-    input.maximum !== undefined &&
-    input.colorMap !== undefined
-  );
-}
 
 interface UseMeshPolyhedraVertexAttributeStyleReturn {
   meshPolyhedraVertexAttributeName: (meshId: DataId) => string | undefined;
@@ -46,5 +35,4 @@ interface UseMeshPolyhedraVertexAttributeStyleReturn {
     no_data_color: RGBAColor,
   ) => Promise<unknown>;
 }
-export { isMeshPolyhedraVertexAttributeValid };
 export type { UseMeshPolyhedraVertexAttributeStyleReturn };

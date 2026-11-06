@@ -1,10 +1,11 @@
-import { isModelCornersVertexAttributeValid, useModelCornersVertexAttribute } from "./vertex";
 import type { DataId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { ValidAttributeInput } from "@ogw_internal/stores/data_style/attribute_types";
+import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelCornersColor } from "./color";
 import { useModelCornersCommonStyle } from "./common";
+import { useModelCornersVertexAttribute } from "./vertex";
 import { useModelCornersVisibility } from "./visibility";
 
 interface ColorGroup {
@@ -114,7 +115,7 @@ export function useModelCornersStyle(): ModelCornersStyleApi {
         colorMap,
         no_data_color,
       };
-      if (!isModelCornersVertexAttributeValid(attribute)) {
+      if (!isAttributeValid(attribute)) {
         continue;
       }
       const key = [name, item, colorMap, minimum, maximum, JSON.stringify(no_data_color)].join("_");
