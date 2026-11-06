@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { DEBOUNCE_DELAY, DEFAULT_NORMALS } from "@ogw_front/utils/clipping_planes";
+import {
+  DEBOUNCE_DELAY,
+  DEFAULT_NORMALS,
+  DEFAULT_PLANE_OPACITY,
+  getPlaneRgbaColor,
+} from "@ogw_front/utils/clipping_planes";
 import type { ClippingPlane } from "@ogw_front/composables/clipping_planes_widget_entries";
 import ClippingPlaneCard from "@ogw_front/components/ClippingPlaneCard.vue";
 import SliceCard from "@ogw_front/components/SliceCard.vue";
@@ -26,7 +31,10 @@ function newItemId(): number {
   lastItemId += 1;
   return lastItemId;
 }
-const planes = ref<ClippingPlane[]>([{ id: newItemId(), origin: undefined, normal: [1, 0, 0] }]);
+function createPlane(origin: ClippingPlane["origin"], normal: number[]): ClippingPlane {
+  return { id: newItemId(), origin, normal, opacity: DEFAULT_PLANE_OPACITY };
+}
+const planes = ref<ClippingPlane[]>([createPlane(undefined, [1, 0, 0])]);
 const allItems = dataStore.refRegisteredItems();
 const targetIds = computed<string[]>(() => {
   if (targetAllVisible.value) {
@@ -84,9 +92,10 @@ async function applyClippingPlanes(): Promise<void> {
   }
   const center = getSceneCenter();
   const untargetedIds = getUntargetedIds();
-  const planesData = planes.value.map((plane) => ({
+  const planesData = planes.value.map((plane, index) => ({
     origin: (plane.origin || center).map(Number),
     normal: plane.normal.map(Number),
+    color: getPlaneRgbaColor(index, plane.opacity),
   }));
   if (targetIds.value.length > 0) {
     await hybridViewerStore.setClippingPlanes(
@@ -112,7 +121,7 @@ function addPlane(): void {
   // Satisfy noUncheckedIndexedAccess and are never hit at runtime.
   const normal = DEFAULT_NORMALS[planes.value.length % DEFAULT_NORMALS.length] ??
     DEFAULT_NORMALS[0] ?? [1, 0, 0];
-  planes.value.push({ id: newItemId(), origin: getSceneCenter(), normal });
+  planes.value.push(createPlane([...getSceneCenter()], normal));
 }
 
 function removePlane(index: number): void {
@@ -127,7 +136,7 @@ function flipNormal(plane: { normal: number[] }): void {
 
 async function resetClippingPlanes(): Promise<void> {
   setFromWidget(true);
-  planes.value = [{ id: newItemId(), origin: undefined, normal: [1, 0, 0] }];
+  planes.value = [createPlane(undefined, [1, 0, 0])];
   resetSlices();
   updateWidgetPlacement({ isReset: true });
   setFromWidget(false);

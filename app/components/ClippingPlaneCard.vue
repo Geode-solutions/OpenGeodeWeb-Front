@@ -2,7 +2,7 @@
 import { getPlaneCssColor } from "@ogw_front/utils/clipping_planes";
 
 interface Props {
-  plane: { origin?: number[]; normal: number[] };
+  plane: { origin?: number[]; normal: number[]; opacity: number };
   index: number;
 }
 
@@ -45,6 +45,23 @@ const emit = defineEmits<Emits>();
           variant="text"
           color="error"
           @click="emit('remove')"
+        />
+      </v-col>
+    </v-row>
+
+    <v-row align="center" no-gutters class="mb-1">
+      <v-col cols="auto" class="text-caption text-medium-emphasis">Opacity</v-col>
+      <v-col class="px-2">
+        <v-slider
+          v-model="plane.opacity"
+          data-testid="planeOpacitySlider"
+          :min="0"
+          :max="1"
+          :step="0.05"
+          :color="getPlaneCssColor(index)"
+          track-color="grey-lighten-2"
+          density="compact"
+          hide-details
         />
       </v-col>
     </v-row>
