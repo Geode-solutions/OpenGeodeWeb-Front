@@ -1,10 +1,10 @@
+import type { DataId, GeodeObjectType } from "@ogw_front/types/identifiers";
 import { type LegacyDataId, fromLegacyDataId } from "@ogw_front/utils/legacy_data_id";
 import type {
   ModelComponentStyle,
   ModelComponentTypeStyle,
   ObjectStyle,
 } from "@ogw_internal/stores/data_style/types";
-import type { DataId } from "@ogw_front/types/identifiers";
 import type { Table } from "dexie";
 import { database } from "@ogw_internal/database/database.js";
 import { getDefaultStyle } from "@ogw_front/utils/default_styles";
@@ -55,8 +55,8 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     "model_component_datastyle",
   );
 
-  async function addDataStyle(dataId: DataId, geode_object: string): Promise<void> {
-    const defaultStyle = getDefaultStyle(geode_object);
+  async function addDataStyle(dataId: DataId, geodeObjectType: GeodeObjectType): Promise<void> {
+    const defaultStyle = getDefaultStyle(geodeObjectType);
     await data_style_db.put(
       structuredClone({ data_id: dataId, ...(isRecord(defaultStyle) ? defaultStyle : {}) }),
     );
