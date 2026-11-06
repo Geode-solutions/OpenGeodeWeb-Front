@@ -10,6 +10,8 @@ import type {
   GeodeIdentified,
   GeodeObjectType,
   GeodeObjectTyped,
+  ViewerType,
+  ViewerTyped,
 } from "@ogw_front/types/identifiers";
 import type { Table } from "dexie";
 import { ref, watch } from "vue";
@@ -25,10 +27,9 @@ interface OpenedView extends Partial<GeodeObjectTyped> {
   opened: string[];
 }
 
-interface TreeviewChild extends GeodeIdentified, GeodeObjectTyped {
+interface TreeviewChild extends GeodeIdentified, GeodeObjectTyped, ViewerTyped {
   title: string;
   id: string;
-  viewer_type: string;
 }
 
 interface TreeviewGroup {
@@ -174,7 +175,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     name: string,
     dataId: DataId,
     geode_id: GeodeId,
-    viewer_type: string,
+    viewer_type: ViewerType,
   ): void {
     const child: TreeviewChild = {
       title: name,

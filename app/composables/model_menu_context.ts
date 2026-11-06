@@ -1,13 +1,12 @@
 import { type ComputedRef, type Ref, computed, ref, watch } from "vue";
+import type { DataId, ViewerTyped } from "@ogw_front/types/identifiers";
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
-import type { DataId } from "@ogw_front/types/identifiers";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import { useDataStore } from "@ogw_front/stores/data";
 
-interface ModelMenuMetaData {
+interface ModelMenuMetaData extends Partial<ViewerTyped> {
   modelId?: DataId;
   pickedComponentId?: string;
-  viewer_type?: string;
   modelComponentType?: string;
   targetComponentIds?: string[];
 }

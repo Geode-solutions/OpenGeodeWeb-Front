@@ -7,6 +7,9 @@ type DataId = string;
 // Type of an OpenGeode object, as named by OpenGeode (BRep, TriangulatedSurface3D, ...)
 type GeodeObjectType = string;
 
+// What a data is displayed as in the viewer: mesh, model, or an entry of the menus (basemap, model_component, ...)
+type ViewerType = string;
+
 interface GeodeIdentified {
   geode_id: GeodeId;
 }
@@ -19,4 +22,17 @@ interface GeodeObjectTyped {
   geode_object_type: GeodeObjectType;
 }
 
-export type { DataId, DataIdentified, GeodeId, GeodeIdentified, GeodeObjectType, GeodeObjectTyped };
+interface ViewerTyped {
+  viewer_type: ViewerType;
+}
+
+export type {
+  DataId,
+  DataIdentified,
+  GeodeId,
+  GeodeIdentified,
+  GeodeObjectType,
+  GeodeObjectTyped,
+  ViewerType,
+  ViewerTyped,
+};

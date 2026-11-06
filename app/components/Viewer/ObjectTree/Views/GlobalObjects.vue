@@ -1,5 +1,6 @@
 <script setup lang="ts">
 // oxlint-disable max-dependencies
+import type { GeodeObjectTyped, ViewerTyped } from "@ogw_front/types/identifiers";
 import {
   type MapStyle,
   basemapGroup,
@@ -10,7 +11,6 @@ import {
 import { type TreeMenuPayload, compareSelections } from "@ogw_front/utils/treeview";
 import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
-import type { GeodeObjectTyped } from "@ogw_front/types/identifiers";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { useBasemapStore } from "@ogw_front/stores/basemap";
@@ -34,11 +34,10 @@ interface Emits {
 
 const emit = defineEmits<Emits>();
 
-interface TreeGroupItem extends Partial<GeodeObjectTyped> {
+interface TreeGroupItem extends Partial<GeodeObjectTyped>, Partial<ViewerTyped> {
   raw?: TreeGroupItem;
   id: string;
   title?: string;
-  viewer_type?: string;
   children?: TreeGroupItem[];
 }
 
