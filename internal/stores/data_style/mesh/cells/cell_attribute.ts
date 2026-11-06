@@ -1,4 +1,9 @@
-import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
+import type {
+  AttributeColorMap,
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+} from "@ogw_front/types/attribute";
 import type {
   AttributeStoredConfig,
   ValidAttributeInput,
@@ -12,7 +17,7 @@ interface UseMeshCellsCellAttributeStyleReturn {
   meshCellsCellAttributeRange: (meshId: MeshId) => AttributeRange;
   meshCellsCellAttributeTimeStep: (meshId: MeshId) => number | undefined;
   setMeshCellsCellAttributeTimeStep: (meshId: MeshId, timeStep: number) => Promise<unknown>;
-  meshCellsCellAttributeColorMap: (meshId: MeshId) => string | undefined;
+  meshCellsCellAttributeColorMap: (meshId: MeshId) => AttributeColorMap | undefined;
   meshCellsCellAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
@@ -28,7 +33,7 @@ interface UseMeshCellsCellAttributeStyleReturn {
   ) => Promise<unknown>;
   setMeshCellsCellAttributeColorMap: (
     meshId: MeshId,
-    colorMap: string | undefined,
+    colorMap: AttributeColorMap | undefined,
   ) => Promise<unknown>;
   meshCellsCellAttributeNoDataColor: (meshId: MeshId) => RGBAColor;
   setMeshCellsCellAttributeNoDataColor: (

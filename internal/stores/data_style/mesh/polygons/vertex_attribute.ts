@@ -1,4 +1,9 @@
-import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
+import type {
+  AttributeColorMap,
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+} from "@ogw_front/types/attribute";
 import type {
   AttributeStoredConfig,
   ValidAttributeInput,
@@ -12,7 +17,7 @@ interface UseMeshPolygonsVertexAttributeStyleReturn {
   meshPolygonsVertexAttributeRange: (meshId: MeshId) => AttributeRange;
   meshPolygonsVertexAttributeTimeStep: (meshId: MeshId) => number | undefined;
   setMeshPolygonsVertexAttributeTimeStep: (meshId: MeshId, timeStep: number) => Promise<unknown>;
-  meshPolygonsVertexAttributeColorMap: (meshId: MeshId) => string | undefined;
+  meshPolygonsVertexAttributeColorMap: (meshId: MeshId) => AttributeColorMap | undefined;
   meshPolygonsVertexAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
@@ -28,7 +33,7 @@ interface UseMeshPolygonsVertexAttributeStyleReturn {
   ) => Promise<unknown>;
   setMeshPolygonsVertexAttributeColorMap: (
     meshId: MeshId,
-    colorMap: string | undefined,
+    colorMap: AttributeColorMap | undefined,
   ) => Promise<unknown>;
   meshPolygonsVertexAttributeNoDataColor: (meshId: MeshId) => RGBAColor;
   setMeshPolygonsVertexAttributeNoDataColor: (

@@ -1,5 +1,10 @@
 // oxlint-disable eslint/max-lines
-import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
+import type {
+  AttributeColorMap,
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+} from "@ogw_front/types/attribute";
 import type {
   AttributeState,
   AttributeStoredConfig,
@@ -136,7 +141,10 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
     return [minimum, maximum];
   }
 
-  function vertexAttributeColorMap(modelId: ModelId, componentId?: string): string | undefined {
+  function vertexAttributeColorMap(
+    modelId: ModelId,
+    componentId?: string,
+  ): AttributeColorMap | undefined {
     return storedConfig(modelId, componentId).colorMap;
   }
 
@@ -320,7 +328,7 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
   async function setVertexAttributeColorMap(
     modelId: ModelId,
     componentIds: string[],
-    colorMap: string | undefined,
+    colorMap: AttributeColorMap | undefined,
   ): Promise<unknown> {
     await mutateStoredConfig(modelId, componentIds, { colorMap });
     const result = await applyVertexAttribute(modelId, componentIds);

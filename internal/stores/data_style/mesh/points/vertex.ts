@@ -1,4 +1,4 @@
-import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
+import type { AttributeColorMap, AttributeItem, AttributeName } from "@ogw_front/types/attribute";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { ValidAttributeInput } from "@ogw_internal/stores/data_style/attribute_types";
@@ -149,7 +149,7 @@ function useMeshPointsVertexAttributeStyle(): UseMeshPointsVertexAttributeStyleR
   }
   async function setMeshPointsVertexAttributeColorMap(
     meshId: MeshId,
-    colorMap: string | undefined,
+    colorMap: AttributeColorMap | undefined,
   ): Promise<unknown> {
     const name = meshPointsVertexAttributeName(meshId);
     const item = meshPointsVertexAttributeItem(meshId);

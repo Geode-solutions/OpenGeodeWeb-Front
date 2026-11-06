@@ -1,4 +1,9 @@
-import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
+import type {
+  AttributeColorMap,
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+} from "@ogw_front/types/attribute";
 import type {
   AttributeStoredConfig,
   ValidAttributeInput,
@@ -12,7 +17,7 @@ interface UseMeshEdgesVertexAttributeStyleReturn {
   meshEdgesVertexAttributeRange: (meshId: MeshId) => AttributeRange;
   meshEdgesVertexAttributeTimeStep: (meshId: MeshId) => number | undefined;
   setMeshEdgesVertexAttributeTimeStep: (meshId: MeshId, timeStep: number) => Promise<unknown>;
-  meshEdgesVertexAttributeColorMap: (meshId: MeshId) => string | undefined;
+  meshEdgesVertexAttributeColorMap: (meshId: MeshId) => AttributeColorMap | undefined;
   meshEdgesVertexAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
@@ -28,7 +33,7 @@ interface UseMeshEdgesVertexAttributeStyleReturn {
   ) => Promise<unknown>;
   setMeshEdgesVertexAttributeColorMap: (
     meshId: MeshId,
-    colorMap: string | undefined,
+    colorMap: AttributeColorMap | undefined,
   ) => Promise<unknown>;
   meshEdgesVertexAttributeNoDataColor: (meshId: MeshId) => RGBAColor;
   setMeshEdgesVertexAttributeNoDataColor: (

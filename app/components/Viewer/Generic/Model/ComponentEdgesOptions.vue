@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
+import type { AttributeColorMap, AttributeItem, AttributeName } from "@ogw_front/types/attribute";
 import type { Visibility, Width } from "@ogw_front/types/style";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
@@ -164,7 +164,7 @@ const vertexAttributeRange = computed<(number | undefined)[] | undefined>({
   },
 });
 
-const vertexAttributeColorMap = computed<string | undefined>({
+const vertexAttributeColorMap = computed<AttributeColorMap | undefined>({
   get: () => edgesStyle.value?.vertexAttributeColorMap(modelId, referenceComponentId),
   set: async (newValue) => {
     await applyEdgesStyle((style, ids) => style.setVertexAttributeColorMap(modelId, ids, newValue));

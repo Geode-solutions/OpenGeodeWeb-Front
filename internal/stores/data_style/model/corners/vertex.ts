@@ -1,11 +1,16 @@
 // oxlint-disable eslint/max-lines
 import type {
+  AttributeColorMap,
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+} from "@ogw_front/types/attribute";
+import type {
   AttributeInput,
   AttributeState,
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
-import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
 import type { CornerId, ModelId } from "@ogw_front/types/identifiers";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
@@ -47,7 +52,7 @@ interface ModelCornersVertexAttributeApi {
   modelCornersVertexAttributeColorMap: (
     modelId: ModelId,
     cornerId?: CornerId,
-  ) => string | undefined;
+  ) => AttributeColorMap | undefined;
   modelCornersVertexAttributeStoredConfig: (
     modelId: ModelId,
     cornerId: CornerId | undefined,
@@ -151,7 +156,7 @@ function useModelCornersVertexAttributeGetters(
   function modelCornersVertexAttributeColorMap(
     modelId: ModelId,
     cornerId?: CornerId,
-  ): string | undefined {
+  ): AttributeColorMap | undefined {
     const name = modelCornersVertexAttributeName(modelId, cornerId);
     const item = modelCornersVertexAttributeItem(modelId, cornerId);
     return modelCornersVertexAttributeStoredConfig(modelId, cornerId, name, item).colorMap;
@@ -358,7 +363,7 @@ function useModelCornersVertexAttribute(): ModelCornersVertexAttributeApi {
   async function setModelCornersVertexAttributeColorMap(
     modelId: ModelId,
     cornerIds: CornerId[],
-    colorMap: string | undefined,
+    colorMap: AttributeColorMap | undefined,
   ): Promise<void> {
     const name = modelCornersVertexAttributeName(modelId, cornerIds[0]);
     const item = modelCornersVertexAttributeItem(modelId, cornerIds[0]);

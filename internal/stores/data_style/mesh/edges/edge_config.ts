@@ -1,4 +1,9 @@
-import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
+import type {
+  AttributeColorMap,
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+} from "@ogw_front/types/attribute";
 import type {
   AttributeState,
   AttributeStoredConfig,
@@ -77,7 +82,7 @@ function useMeshEdgesEdgeAttributeConfig(): UseMeshEdgesEdgeAttributeConfigRetur
 
 interface UseMeshEdgesEdgeAttributeConfigValuesReturn {
   meshEdgesEdgeAttributeRange: (meshId: MeshId) => AttributeRange;
-  meshEdgesEdgeAttributeColorMap: (meshId: MeshId) => string | undefined;
+  meshEdgesEdgeAttributeColorMap: (meshId: MeshId) => AttributeColorMap | undefined;
   meshEdgesEdgeAttributeNoDataColor: (meshId: MeshId) => RGBAColor;
 }
 
@@ -93,7 +98,7 @@ function useMeshEdgesEdgeAttributeConfigValues(): UseMeshEdgesEdgeAttributeConfi
     const storedConfig = meshEdgesEdgeAttributeStoredConfig(meshId, name, item);
     return [storedConfig.minimum, storedConfig.maximum];
   }
-  function meshEdgesEdgeAttributeColorMap(meshId: MeshId): string | undefined {
+  function meshEdgesEdgeAttributeColorMap(meshId: MeshId): AttributeColorMap | undefined {
     const name = meshEdgesEdgeAttributeName(meshId);
     const item = meshEdgesEdgeAttributeItem(meshId);
     const storedConfig = meshEdgesEdgeAttributeStoredConfig(meshId, name, item);

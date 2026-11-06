@@ -1,11 +1,16 @@
 // oxlint-disable eslint/max-lines
 import type {
+  AttributeColorMap,
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+} from "@ogw_front/types/attribute";
+import type {
   AttributeInput,
   AttributeState,
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
-import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { ModelId, SurfaceId } from "@ogw_front/types/identifiers";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
@@ -46,7 +51,7 @@ interface UseModelSurfacesPolygonAttributeReturn {
   modelSurfacesPolygonAttributeColorMap: (
     modelId: ModelId,
     surfaceId?: SurfaceId,
-  ) => string | undefined;
+  ) => AttributeColorMap | undefined;
   modelSurfacesPolygonAttributeStoredConfig: (
     modelId: ModelId,
     surfaceId: SurfaceId | undefined,
@@ -77,7 +82,7 @@ interface UseModelSurfacesPolygonAttributeReturn {
   setModelSurfacesPolygonAttributeColorMap: (
     modelId: ModelId,
     surfaceIds: SurfaceId[],
-    colorMap: string | undefined,
+    colorMap: AttributeColorMap | undefined,
   ) => Promise<void>;
   modelSurfacesPolygonAttributeNoDataColor: (modelId: ModelId, surfaceId?: SurfaceId) => RGBAColor;
   setModelSurfacesPolygonAttributeNoDataColor: (
@@ -170,7 +175,7 @@ function useModelSurfacesPolygonAttributeGetters(
   function modelSurfacesPolygonAttributeColorMap(
     modelId: ModelId,
     surfaceId?: SurfaceId,
-  ): string | undefined {
+  ): AttributeColorMap | undefined {
     const name = modelSurfacesPolygonAttributeName(modelId, surfaceId);
     const item = modelSurfacesPolygonAttributeItem(modelId, surfaceId);
     const storedConfig = modelSurfacesPolygonAttributeStoredConfig(modelId, surfaceId, name, item);
@@ -381,7 +386,7 @@ function useModelSurfacesPolygonAttribute(): UseModelSurfacesPolygonAttributeRet
   async function setModelSurfacesPolygonAttributeColorMap(
     modelId: ModelId,
     surfaceIds: SurfaceId[],
-    colorMap: string | undefined,
+    colorMap: AttributeColorMap | undefined,
   ): Promise<void> {
     const name = modelSurfacesPolygonAttributeName(modelId, surfaceIds[0]);
     const item = modelSurfacesPolygonAttributeItem(modelId, surfaceIds[0]);

@@ -1,11 +1,16 @@
 // oxlint-disable eslint/max-lines
 import type {
+  AttributeColorMap,
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+} from "@ogw_front/types/attribute";
+import type {
   AttributeInput,
   AttributeState,
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
-import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
 import type { BlockId, ModelId } from "@ogw_front/types/identifiers";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
@@ -46,7 +51,7 @@ interface UseModelBlocksPolyhedronAttributeReturn {
   modelBlocksPolyhedronAttributeColorMap: (
     modelId: ModelId,
     blockId?: BlockId,
-  ) => string | undefined;
+  ) => AttributeColorMap | undefined;
   modelBlocksPolyhedronAttributeStoredConfig: (
     modelId: ModelId,
     blockId: BlockId | undefined,
@@ -77,7 +82,7 @@ interface UseModelBlocksPolyhedronAttributeReturn {
   setModelBlocksPolyhedronAttributeColorMap: (
     modelId: ModelId,
     blockIds: BlockId[],
-    colorMap: string | undefined,
+    colorMap: AttributeColorMap | undefined,
   ) => Promise<boolean>;
   modelBlocksPolyhedronAttributeNoDataColor: (modelId: ModelId, blockId?: BlockId) => RGBAColor;
   setModelBlocksPolyhedronAttributeNoDataColor: (
@@ -165,7 +170,7 @@ function useModelBlocksPolyhedronAttributeGetters(
   function modelBlocksPolyhedronAttributeColorMap(
     modelId: ModelId,
     blockId?: BlockId,
-  ): string | undefined {
+  ): AttributeColorMap | undefined {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockId);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockId);
     const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(modelId, blockId, name, item);
@@ -396,7 +401,7 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
   async function setModelBlocksPolyhedronAttributeColorMap(
     modelId: ModelId,
     blockIds: BlockId[],
-    colorMap: string | undefined,
+    colorMap: AttributeColorMap | undefined,
   ): Promise<boolean> {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockIds[0]);

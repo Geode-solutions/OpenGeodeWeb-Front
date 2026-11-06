@@ -1,4 +1,4 @@
-import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
+import type { AttributeColorMap, AttributeItem, AttributeName } from "@ogw_front/types/attribute";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 // The same fields while the user has not chosen them yet
@@ -16,7 +16,7 @@ interface AttributeBounds {
 }
 
 interface AttributeColorMapped {
-  colorMap: string;
+  colorMap: AttributeColorMap;
 }
 
 // What is kept of an attribute coloring when another attribute is picked

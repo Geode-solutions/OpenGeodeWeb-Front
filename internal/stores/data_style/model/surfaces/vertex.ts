@@ -1,11 +1,16 @@
 // oxlint-disable eslint/max-lines
 import type {
+  AttributeColorMap,
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+} from "@ogw_front/types/attribute";
+import type {
   AttributeInput,
   AttributeState,
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
-import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { ModelId, SurfaceId } from "@ogw_front/types/identifiers";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
@@ -46,7 +51,7 @@ interface UseModelSurfacesVertexAttributeReturn {
   modelSurfacesVertexAttributeColorMap: (
     modelId: ModelId,
     surfaceId?: SurfaceId,
-  ) => string | undefined;
+  ) => AttributeColorMap | undefined;
   modelSurfacesVertexAttributeStoredConfig: (
     modelId: ModelId,
     surfaceId: SurfaceId | undefined,
@@ -77,7 +82,7 @@ interface UseModelSurfacesVertexAttributeReturn {
   setModelSurfacesVertexAttributeColorMap: (
     modelId: ModelId,
     surfaceIds: SurfaceId[],
-    colorMap: string | undefined,
+    colorMap: AttributeColorMap | undefined,
   ) => Promise<unknown>;
   modelSurfacesVertexAttributeNoDataColor: (modelId: ModelId, surfaceId?: SurfaceId) => RGBAColor;
   setModelSurfacesVertexAttributeNoDataColor: (
@@ -170,7 +175,7 @@ function useModelSurfacesVertexAttributeGetters(
   function modelSurfacesVertexAttributeColorMap(
     modelId: ModelId,
     surfaceId?: SurfaceId,
-  ): string | undefined {
+  ): AttributeColorMap | undefined {
     const name = modelSurfacesVertexAttributeName(modelId, surfaceId);
     const item = modelSurfacesVertexAttributeItem(modelId, surfaceId);
     const storedConfig = modelSurfacesVertexAttributeStoredConfig(modelId, surfaceId, name, item);
@@ -386,7 +391,7 @@ function useModelSurfacesVertexAttribute(): UseModelSurfacesVertexAttributeRetur
   async function setModelSurfacesVertexAttributeColorMap(
     modelId: ModelId,
     surfaceIds: SurfaceId[],
-    colorMap: string | undefined,
+    colorMap: AttributeColorMap | undefined,
   ): Promise<unknown> {
     const name = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
     const item = modelSurfacesVertexAttributeItem(modelId, surfaceIds[0]);

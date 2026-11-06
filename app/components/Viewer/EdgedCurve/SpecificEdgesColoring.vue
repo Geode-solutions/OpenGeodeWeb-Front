@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
+import type {
+  AttributeColorMap,
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+} from "@ogw_front/types/attribute";
 import type { DataId, MeshId } from "@ogw_front/types/identifiers";
 import {
   type RangesPerData,
@@ -89,7 +94,7 @@ const vertex_attribute_range = computed<AttributeRange>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_color_map = computed<Map<string, RGBAColor>>({
+const vertex_attribute_color_map = computed<AttributeColorMap | undefined>({
   get: () => dataStyleStore.meshEdgesVertexAttributeColorMap(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>
@@ -154,7 +159,7 @@ const edge_attribute_range = computed<AttributeRange>({
     hybridViewerStore.remoteRender();
   },
 });
-const edge_attribute_color_map = computed<Map<string, RGBAColor>>({
+const edge_attribute_color_map = computed<AttributeColorMap | undefined>({
   get: () => dataStyleStore.meshEdgesEdgeAttributeColorMap(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>

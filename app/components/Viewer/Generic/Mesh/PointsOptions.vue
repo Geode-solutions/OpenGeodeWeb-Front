@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
+import type {
+  AttributeColorMap,
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+} from "@ogw_front/types/attribute";
 import type { Opacity, Size, Visibility } from "@ogw_front/types/style";
 import {
   type RangesPerData,
@@ -129,7 +134,7 @@ const vertex_attribute_range = computed<AttributeRange>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_color_map = computed<Map<string, RGBAColor>>({
+const vertex_attribute_color_map = computed<AttributeColorMap | undefined>({
   get: () => dataStyleStore.meshPointsVertexAttributeColorMap(dataId.value),
   set: async (newValue) => {
     await applyBatchStyle(dataId.value, (meshId: MeshId) =>

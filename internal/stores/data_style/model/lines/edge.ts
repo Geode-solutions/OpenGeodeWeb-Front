@@ -1,11 +1,16 @@
 // oxlint-disable eslint/max-lines
 import type {
+  AttributeColorMap,
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+} from "@ogw_front/types/attribute";
+import type {
   AttributeInput,
   AttributeState,
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
-import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { LineId, ModelId } from "@ogw_front/types/identifiers";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
@@ -36,7 +41,10 @@ interface UseModelLinesEdgeAttributeReturn {
     lineIds: LineId[],
     timeStep: number,
   ) => Promise<void>;
-  modelLinesEdgeAttributeColorMap: (modelId: ModelId, lineId?: LineId) => string | undefined;
+  modelLinesEdgeAttributeColorMap: (
+    modelId: ModelId,
+    lineId?: LineId,
+  ) => AttributeColorMap | undefined;
   modelLinesEdgeAttributeStoredConfig: (
     modelId: ModelId,
     lineId: LineId | undefined,
@@ -67,7 +75,7 @@ interface UseModelLinesEdgeAttributeReturn {
   setModelLinesEdgeAttributeColorMap: (
     modelId: ModelId,
     lineIds: LineId[],
-    colorMap: string | undefined,
+    colorMap: AttributeColorMap | undefined,
   ) => Promise<unknown>;
   modelLinesEdgeAttributeNoDataColor: (modelId: ModelId, lineId?: LineId) => RGBAColor;
   setModelLinesEdgeAttributeNoDataColor: (
@@ -148,7 +156,10 @@ function useModelLinesEdgeAttributeGetters(
     const { minimum, maximum } = storedConfig;
     return [minimum, maximum];
   }
-  function modelLinesEdgeAttributeColorMap(modelId: ModelId, lineId?: LineId): string | undefined {
+  function modelLinesEdgeAttributeColorMap(
+    modelId: ModelId,
+    lineId?: LineId,
+  ): AttributeColorMap | undefined {
     const name = modelLinesEdgeAttributeName(modelId, lineId);
     const item = modelLinesEdgeAttributeItem(modelId, lineId);
     const storedConfig = modelLinesEdgeAttributeStoredConfig(modelId, lineId, name, item);
@@ -363,7 +374,7 @@ function useModelLinesEdgeAttribute(): UseModelLinesEdgeAttributeReturn {
   async function setModelLinesEdgeAttributeColorMap(
     modelId: ModelId,
     lineIds: LineId[],
-    colorMap: string | undefined,
+    colorMap: AttributeColorMap | undefined,
   ): Promise<unknown> {
     const name = modelLinesEdgeAttributeName(modelId, lineIds[0]);
     const item = modelLinesEdgeAttributeItem(modelId, lineIds[0]);

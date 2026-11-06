@@ -1,4 +1,9 @@
-import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
+import type {
+  AttributeColorMap,
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+} from "@ogw_front/types/attribute";
 import type {
   AttributeState,
   AttributeStoredConfig,
@@ -77,7 +82,7 @@ function useMeshCellsCellAttributeConfig(): UseMeshCellsCellAttributeConfigRetur
 
 interface UseMeshCellsCellAttributeConfigValuesReturn {
   meshCellsCellAttributeRange: (meshId: MeshId) => AttributeRange;
-  meshCellsCellAttributeColorMap: (meshId: MeshId) => string | undefined;
+  meshCellsCellAttributeColorMap: (meshId: MeshId) => AttributeColorMap | undefined;
   meshCellsCellAttributeNoDataColor: (meshId: MeshId) => RGBAColor;
 }
 
@@ -93,7 +98,7 @@ function useMeshCellsCellAttributeConfigValues(): UseMeshCellsCellAttributeConfi
     const storedConfig = meshCellsCellAttributeStoredConfig(meshId, name, item);
     return [storedConfig.minimum, storedConfig.maximum];
   }
-  function meshCellsCellAttributeColorMap(meshId: MeshId): string | undefined {
+  function meshCellsCellAttributeColorMap(meshId: MeshId): AttributeColorMap | undefined {
     const name = meshCellsCellAttributeName(meshId);
     const item = meshCellsCellAttributeItem(meshId);
     const storedConfig = meshCellsCellAttributeStoredConfig(meshId, name, item);

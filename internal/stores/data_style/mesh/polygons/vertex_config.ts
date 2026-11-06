@@ -1,4 +1,9 @@
-import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
+import type {
+  AttributeColorMap,
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+} from "@ogw_front/types/attribute";
 import type {
   AttributeState,
   AttributeStoredConfig,
@@ -83,7 +88,7 @@ function useMeshPolygonsVertexAttributeConfig(): UseMeshPolygonsVertexAttributeC
 
 interface UseMeshPolygonsVertexAttributeConfigValuesReturn {
   meshPolygonsVertexAttributeRange: (meshId: MeshId) => AttributeRange;
-  meshPolygonsVertexAttributeColorMap: (meshId: MeshId) => string | undefined;
+  meshPolygonsVertexAttributeColorMap: (meshId: MeshId) => AttributeColorMap | undefined;
   meshPolygonsVertexAttributeNoDataColor: (meshId: MeshId) => RGBAColor;
 }
 
@@ -99,7 +104,7 @@ function useMeshPolygonsVertexAttributeConfigValues(): UseMeshPolygonsVertexAttr
     const storedConfig = meshPolygonsVertexAttributeStoredConfig(meshId, name, item);
     return [storedConfig.minimum, storedConfig.maximum];
   }
-  function meshPolygonsVertexAttributeColorMap(meshId: MeshId): string | undefined {
+  function meshPolygonsVertexAttributeColorMap(meshId: MeshId): AttributeColorMap | undefined {
     const name = meshPolygonsVertexAttributeName(meshId);
     const item = meshPolygonsVertexAttributeItem(meshId);
     const storedConfig = meshPolygonsVertexAttributeStoredConfig(meshId, name, item);

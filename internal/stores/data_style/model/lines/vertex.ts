@@ -1,11 +1,16 @@
 // oxlint-disable eslint/max-lines
 import type {
+  AttributeColorMap,
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+} from "@ogw_front/types/attribute";
+import type {
   AttributeInput,
   AttributeState,
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
-import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { LineId, ModelId } from "@ogw_front/types/identifiers";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
@@ -36,7 +41,10 @@ interface UseModelLinesVertexAttributeReturn {
     lineIds: LineId[],
     timeStep: number,
   ) => Promise<void>;
-  modelLinesVertexAttributeColorMap: (modelId: ModelId, lineId?: LineId) => string | undefined;
+  modelLinesVertexAttributeColorMap: (
+    modelId: ModelId,
+    lineId?: LineId,
+  ) => AttributeColorMap | undefined;
   modelLinesVertexAttributeStoredConfig: (
     modelId: ModelId,
     lineId: LineId | undefined,
@@ -67,7 +75,7 @@ interface UseModelLinesVertexAttributeReturn {
   setModelLinesVertexAttributeColorMap: (
     modelId: ModelId,
     lineIds: LineId[],
-    colorMap: string | undefined,
+    colorMap: AttributeColorMap | undefined,
   ) => Promise<unknown>;
   modelLinesVertexAttributeNoDataColor: (modelId: ModelId, lineId?: LineId) => RGBAColor;
   setModelLinesVertexAttributeNoDataColor: (
@@ -152,7 +160,7 @@ function useModelLinesVertexAttributeGetters(
   function modelLinesVertexAttributeColorMap(
     modelId: ModelId,
     lineId?: LineId,
-  ): string | undefined {
+  ): AttributeColorMap | undefined {
     const name = modelLinesVertexAttributeName(modelId, lineId);
     const item = modelLinesVertexAttributeItem(modelId, lineId);
     const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineId, name, item);
@@ -370,7 +378,7 @@ function useModelLinesVertexAttribute(): UseModelLinesVertexAttributeReturn {
   async function setModelLinesVertexAttributeColorMap(
     modelId: ModelId,
     lineIds: LineId[],
-    colorMap: string | undefined,
+    colorMap: AttributeColorMap | undefined,
   ): Promise<unknown> {
     const name = modelLinesVertexAttributeName(modelId, lineIds[0]);
     const item = modelLinesVertexAttributeItem(modelId, lineIds[0]);

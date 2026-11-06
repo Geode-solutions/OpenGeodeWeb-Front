@@ -1,4 +1,9 @@
-import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
+import type {
+  AttributeColorMap,
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+} from "@ogw_front/types/attribute";
 import type {
   AttributeState,
   AttributeStoredConfig,
@@ -83,7 +88,7 @@ function useMeshPolyhedraVertexAttributeConfig(): UseMeshPolyhedraVertexAttribut
 
 interface UseMeshPolyhedraVertexAttributeConfigValuesReturn {
   meshPolyhedraVertexAttributeRange: (meshId: MeshId) => AttributeRange;
-  meshPolyhedraVertexAttributeColorMap: (meshId: MeshId) => string | undefined;
+  meshPolyhedraVertexAttributeColorMap: (meshId: MeshId) => AttributeColorMap | undefined;
   meshPolyhedraVertexAttributeNoDataColor: (meshId: MeshId) => RGBAColor;
 }
 
@@ -99,7 +104,7 @@ function useMeshPolyhedraVertexAttributeConfigValues(): UseMeshPolyhedraVertexAt
     const storedConfig = meshPolyhedraVertexAttributeStoredConfig(meshId, name, item);
     return [storedConfig.minimum, storedConfig.maximum];
   }
-  function meshPolyhedraVertexAttributeColorMap(meshId: MeshId): string | undefined {
+  function meshPolyhedraVertexAttributeColorMap(meshId: MeshId): AttributeColorMap | undefined {
     const name = meshPolyhedraVertexAttributeName(meshId);
     const item = meshPolyhedraVertexAttributeItem(meshId);
     const storedConfig = meshPolyhedraVertexAttributeStoredConfig(meshId, name, item);

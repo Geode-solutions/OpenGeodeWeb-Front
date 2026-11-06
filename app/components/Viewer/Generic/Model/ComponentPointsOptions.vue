@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
+import type { AttributeColorMap, AttributeItem, AttributeName } from "@ogw_front/types/attribute";
 import type { Size, Visibility } from "@ogw_front/types/style";
 import { MODEL_VERTEX_COLORING } from "@ogw_front/utils/model_component_coloring";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
@@ -184,7 +184,7 @@ const vertexAttributeRange = computed<(number | undefined)[] | undefined>({
   },
 });
 
-const vertexAttributeColorMap = computed<string | undefined>({
+const vertexAttributeColorMap = computed<AttributeColorMap | undefined>({
   get: () => pointsStyle.value?.vertexAttributeColorMap(modelId, referenceComponentId),
   set: async (newValue) => {
     await applyPointsStyle((style, ids) =>

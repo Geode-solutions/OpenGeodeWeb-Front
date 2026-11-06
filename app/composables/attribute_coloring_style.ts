@@ -1,7 +1,7 @@
+import type { AttributeColorMap, ValidAttributeRange } from "@ogw_front/types/attribute";
 import { type AttributeInfo, getAttributeRange } from "@ogw_front/utils/attributes";
 import { type AttributeSchemas, fetchAttributeRange } from "@ogw_front/utils/attribute_range";
 import type { JsonRpcSchema } from "@ogw_shared/utils/types";
-import type { ValidAttributeRange } from "@ogw_front/types/attribute";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -20,9 +20,9 @@ interface AttributeNamesResponse {
 }
 
 interface AttributeColoringStyle {
-  currentColormap: ComputedRef<string>;
+  currentColormap: ComputedRef<AttributeColorMap>;
   currentRange: WritableComputedRef<Readonly<ValidAttributeRange>>;
-  applyGlobalColormap: (colorMap: string) => Promise<void>;
+  applyGlobalColormap: (colorMap: AttributeColorMap) => Promise<void>;
   resetGlobalRange: () => Promise<void>;
   currentTimeSteps: Ref<number[]>;
   currentTimeStep: WritableComputedRef<number>;
@@ -77,7 +77,7 @@ function useAttributeColoringStyle(colorings: Ref<AttributeColoring[]>): Attribu
     await hybridViewerStore.remoteRender();
   }
 
-  const currentColormap = computed((): string => {
+  const currentColormap = computed((): AttributeColorMap => {
     const [coloring] = colorings.value;
     if (!coloring) {
       return "batlow";
@@ -85,7 +85,7 @@ function useAttributeColoringStyle(colorings: Ref<AttributeColoring[]>): Attribu
     return String(coloring.read("ColorMap"));
   });
 
-  async function applyGlobalColormap(colorMap: string): Promise<void> {
+  async function applyGlobalColormap(colorMap: AttributeColorMap): Promise<void> {
     await writeAll("ColorMap", colorMap);
   }
 

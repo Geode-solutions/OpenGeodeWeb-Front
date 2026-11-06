@@ -1,4 +1,9 @@
-import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
+import type {
+  AttributeColorMap,
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+} from "@ogw_front/types/attribute";
 import type {
   AttributeState,
   AttributeStoredConfig,
@@ -86,7 +91,7 @@ function useMeshPolyhedraPolyhedronAttributeConfig(): UseMeshPolyhedraPolyhedron
 
 interface UseMeshPolyhedraPolyhedronAttributeConfigValuesReturn {
   meshPolyhedraPolyhedronAttributeRange: (meshId: MeshId) => AttributeRange;
-  meshPolyhedraPolyhedronAttributeColorMap: (meshId: MeshId) => string | undefined;
+  meshPolyhedraPolyhedronAttributeColorMap: (meshId: MeshId) => AttributeColorMap | undefined;
   meshPolyhedraPolyhedronAttributeNoDataColor: (meshId: MeshId) => RGBAColor;
 }
 
@@ -102,7 +107,7 @@ function useMeshPolyhedraPolyhedronAttributeConfigValues(): UseMeshPolyhedraPoly
     const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(meshId, name, item);
     return [storedConfig.minimum, storedConfig.maximum];
   }
-  function meshPolyhedraPolyhedronAttributeColorMap(meshId: MeshId): string | undefined {
+  function meshPolyhedraPolyhedronAttributeColorMap(meshId: MeshId): AttributeColorMap | undefined {
     const name = meshPolyhedraPolyhedronAttributeName(meshId);
     const item = meshPolyhedraPolyhedronAttributeItem(meshId);
     const storedConfig = meshPolyhedraPolyhedronAttributeStoredConfig(meshId, name, item);
