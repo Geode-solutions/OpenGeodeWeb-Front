@@ -24,6 +24,15 @@ interface AttributeStoredConfig
   no_data_color: RGBAColor;
 }
 
+// The input of an attribute coloring while the user has not chosen all of it yet
+interface AttributeInput
+  extends
+    Undefinable<AttributeSelection>,
+    Undefinable<AttributeBounds>,
+    Undefinable<AttributeColorMapped> {
+  no_data_color?: RGBAColor;
+}
+
 interface ValidAttributeInput extends AttributeSelection, AttributeBounds, AttributeColorMapped {
   no_data_color?: RGBAColor;
 }
@@ -35,6 +44,7 @@ interface AttributeState extends Partial<AttributeSelection> {
 export type {
   AttributeBounds,
   AttributeColorMapped,
+  AttributeInput,
   AttributeSelection,
   AttributeState,
   AttributeStoredConfig,

@@ -1,17 +1,9 @@
 import type {
+  AttributeInput,
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
-
-interface AttributeInput {
-  name: string | undefined;
-  item: number | undefined;
-  minimum: number | undefined;
-  maximum: number | undefined;
-  colorMap: string | undefined;
-  no_data_color?: RGBAColor;
-}
 
 function isMeshPolyhedraVertexAttributeValid(input: AttributeInput): input is ValidAttributeInput {
   return (

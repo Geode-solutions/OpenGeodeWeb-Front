@@ -1,5 +1,6 @@
 // oxlint-disable eslint/max-lines
 import type {
+  AttributeInput,
   AttributeState,
   AttributeStoredConfig,
   ValidAttributeInput,
@@ -21,15 +22,6 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 // Local constants
 const modelBlockPolyhedronAttributeSchema =
   viewer_schemas.opengeodeweb_viewer.model.blocks.attribute.polyhedron.attribute;
-
-interface AttributeInput {
-  name: string | undefined;
-  item: number | undefined;
-  minimum: number | undefined;
-  maximum: number | undefined;
-  colorMap: string | undefined;
-  no_data_color?: RGBAColor;
-}
 
 function isModelBlocksPolyhedronAttributeValid(
   input: AttributeInput,
