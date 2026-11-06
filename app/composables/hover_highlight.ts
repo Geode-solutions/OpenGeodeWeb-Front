@@ -17,8 +17,10 @@ export function useHoverhighlight(): {
   const viewerStore = useViewerStore();
   const dataStore = useDataStore();
   let timer: ReturnType<typeof setTimeout> | undefined = undefined;
+  // Item hovered last, whose highlight may still be pending
   let currentId: string | undefined = undefined;
-  let currentType: HighlightType | undefined = undefined;
+  // Item the viewer was asked to highlight, the only one to unhighlight
+  let highlighted: { id: string; type: HighlightType } | undefined = undefined;
 
   function onHoverEnter(
     id: string,
@@ -34,7 +36,6 @@ export function useHoverhighlight(): {
 
     async function highlightAction(): Promise<void> {
       currentId = id;
-      currentType = type;
 
       if (!(await dataStore.isItemViewable(id))) {
         return;
@@ -55,6 +56,7 @@ export function useHoverhighlight(): {
         return;
       }
 
+      highlighted = { id, type };
       const params = {
         id,
         visibility: true,
@@ -107,22 +109,20 @@ export function useHoverhighlight(): {
       clearTimeout(timer);
       timer = undefined;
     }
-    if (currentId === id && currentType) {
-      const schema = vtk_schemas.opengeodeweb_viewer[currentType].highlight;
+    if (currentId === id) {
+      currentId = undefined;
+    }
+    if (highlighted?.id === id) {
+      const { type } = highlighted;
+      const schema = vtk_schemas.opengeodeweb_viewer[type].highlight;
       const params = {
         id,
         visibility: false,
-        ...(currentType === "model" && { block_ids: [] }),
+        ...(type === "model" && { block_ids: [] }),
       };
       // oxlint-disable-next-line typescript/no-floating-promises -- unhighlightAction catches its own errors internally.
-      unhighlightAction(currentType, id, { schema, params });
-      currentId = undefined;
-      currentType = undefined;
-    }
-
-    if (currentId === undefined) {
-      currentId = undefined;
-      currentType = undefined;
+      unhighlightAction(type, id, { schema, params });
+      highlighted = undefined;
     }
   }
 
