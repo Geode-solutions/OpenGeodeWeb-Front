@@ -4,4 +4,9 @@ interface TreeNode {
   title: string;
 }
 
-export type { TreeNode };
+// A node that groups other nodes
+interface TreeGroup<Child> extends TreeNode {
+  children: Child[];
+}
+
+export type { TreeGroup, TreeNode };

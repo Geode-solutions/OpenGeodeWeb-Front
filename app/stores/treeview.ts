@@ -13,7 +13,7 @@ import type {
   ViewerTyped,
 } from "@ogw_front/types/identifiers";
 import type { Table } from "dexie";
-import type { TreeNode } from "@ogw_front/types/tree";
+import type { TreeGroup, TreeNode } from "@ogw_front/types/tree";
 import { ref, watch } from "vue";
 import { database } from "@ogw_internal/database/database";
 
@@ -29,11 +29,7 @@ interface OpenedView extends Partial<GeodeObjectTyped> {
 
 interface TreeviewChild extends TreeNode, GeodeIdentified, GeodeObjectTyped, ViewerTyped {}
 
-interface TreeviewGroup {
-  id: string;
-  title: string;
-  children: TreeviewChild[];
-}
+type TreeviewGroup = TreeGroup<TreeviewChild>;
 
 interface TreeviewConfigRecord {
   id: string;
