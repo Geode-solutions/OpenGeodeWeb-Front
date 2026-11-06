@@ -2,6 +2,7 @@ import type { JsonRpcSchema, ParamsOf, ResponseOf } from "@ogw_shared/utils/type
 import viewer_schemas, {
   type ViewerClippingPlanesParams,
 } from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
+import type { DataId } from "@ogw_front/types/identifiers";
 import type { SliceAxis } from "@ogw_front/utils/slice";
 import { useHybridViewerCore } from "./core";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -81,22 +82,22 @@ function useHybridViewerFilters(): {
   setExplode: typeof setExplode;
   setSlice: typeof setSlice;
   setThreshold: typeof setThreshold;
-  getThresholds: (id: string) => Threshold[];
-  addThreshold: (id: string) => void;
-  removeThreshold: (id: string, index: number) => void;
-  removeThresholds: (id: string) => void;
+  getThresholds: (dataId: DataId) => Threshold[];
+  addThreshold: (dataId: DataId) => void;
+  removeThreshold: (dataId: DataId, index: number) => void;
+  removeThresholds: (dataId: DataId) => void;
 } {
   const thresholds = reactive<Record<string, Threshold[]>>({});
   let lastThresholdId = 0;
 
-  function getThresholds(id: string): Threshold[] {
-    return thresholds[id] ?? [];
+  function getThresholds(dataId: DataId): Threshold[] {
+    return thresholds[dataId] ?? [];
   }
 
-  function addThreshold(id: string): void {
+  function addThreshold(dataId: DataId): void {
     lastThresholdId += 1;
-    thresholds[id] ??= [];
-    thresholds[id].push({
+    thresholds[dataId] ??= [];
+    thresholds[dataId].push({
       id: lastThresholdId,
       sourceIndex: undefined,
       attributeName: undefined,
@@ -107,12 +108,12 @@ function useHybridViewerFilters(): {
     });
   }
 
-  function removeThreshold(id: string, index: number): void {
-    thresholds[id]?.splice(index, 1);
+  function removeThreshold(dataId: DataId, index: number): void {
+    thresholds[dataId]?.splice(index, 1);
   }
 
-  function removeThresholds(id: string): void {
-    thresholds[id] = [];
+  function removeThresholds(dataId: DataId): void {
+    thresholds[dataId] = [];
   }
 
   return {
