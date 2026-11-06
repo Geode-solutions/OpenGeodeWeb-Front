@@ -25,72 +25,72 @@ interface Props {
 
 const { itemProps } = defineProps<Props>();
 
-const id = toRef(() => itemProps.id);
+const dataId = toRef(() => itemProps.id);
 
 const visibility = computed({
-  get: () => dataStyleStore.meshPointsVisibility(id.value),
+  get: () => dataStyleStore.meshPointsVisibility(dataId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
       return;
     }
-    await applyBatchStyle(id.value, (targetId: string) =>
+    await applyBatchStyle(dataId.value, (targetId: string) =>
       dataStyleStore.setMeshPointsVisibility(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const size = computed({
-  get: () => dataStyleStore.meshPointsSize(id.value),
+  get: () => dataStyleStore.meshPointsSize(dataId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
       return;
     }
-    await applyBatchStyle(id.value, (targetId: string) =>
+    await applyBatchStyle(dataId.value, (targetId: string) =>
       dataStyleStore.setMeshPointsSize(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const coloring_style_key = computed({
-  get: () => dataStyleStore.meshPointsActiveColoring(id.value),
+  get: () => dataStyleStore.meshPointsActiveColoring(dataId.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId: string) =>
+    await applyBatchStyle(dataId.value, (targetId: string) =>
       dataStyleStore.setMeshPointsActiveColoring(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const color = computed<RGBAColor | undefined>({
-  get: () => dataStyleStore.meshPointsColor(id.value) as RGBAColor | undefined,
+  get: () => dataStyleStore.meshPointsColor(dataId.value) as RGBAColor | undefined,
   set: async (newValue) => {
     if (newValue === undefined) {
       return;
     }
-    await applyBatchStyle(id.value, (targetId: string) =>
+    await applyBatchStyle(dataId.value, (targetId: string) =>
       dataStyleStore.setMeshPointsColor(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const opacity = computed<number | undefined>({
-  get: () => dataStyleStore.meshPointsOpacity(id.value),
+  get: () => dataStyleStore.meshPointsOpacity(dataId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
       return;
     }
-    await applyBatchStyle(id.value, (targetId: string) =>
+    await applyBatchStyle(dataId.value, (targetId: string) =>
       dataStyleStore.setMeshPointsOpacity(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_name = computed({
-  get: () => dataStyleStore.meshPointsVertexAttributeName(id.value),
+  get: () => dataStyleStore.meshPointsVertexAttributeName(dataId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
       return;
     }
-    await applyBatchStyle(id.value, (targetId: string) =>
+    await applyBatchStyle(dataId.value, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshPointsVertexAttributeName(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
@@ -98,52 +98,52 @@ const vertex_attribute_name = computed({
 });
 
 const vertex_attribute_time_step = computed({
-  get: () => dataStyleStore.meshPointsVertexAttributeTimeStep(id.value),
+  get: () => dataStyleStore.meshPointsVertexAttributeTimeStep(dataId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
       return;
     }
-    await applyBatchStyle(id.value, (targetId: string) =>
+    await applyBatchStyle(dataId.value, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshPointsVertexAttributeTimeStep(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_item = computed({
-  get: () => dataStyleStore.meshPointsVertexAttributeItem(id.value),
+  get: () => dataStyleStore.meshPointsVertexAttributeItem(dataId.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId: string) =>
+    await applyBatchStyle(dataId.value, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshPointsVertexAttributeItem(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_range = computed({
-  get: () => dataStyleStore.meshPointsVertexAttributeRange(id.value),
+  get: () => dataStyleStore.meshPointsVertexAttributeRange(dataId.value),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
     if (minimum === undefined || maximum === undefined) {
       return;
     }
-    await applyBatchStyle(id.value, (targetId: string) =>
+    await applyBatchStyle(dataId.value, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshPointsVertexAttributeRange(targetId, minimum, maximum)),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_color_map = computed({
-  get: () => dataStyleStore.meshPointsVertexAttributeColorMap(id.value),
+  get: () => dataStyleStore.meshPointsVertexAttributeColorMap(dataId.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId: string) =>
+    await applyBatchStyle(dataId.value, (targetId: string) =>
       Promise.resolve(dataStyleStore.setMeshPointsVertexAttributeColorMap(targetId, newValue)),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const vertex_attribute_no_data_color = computed<RGBAColor>({
-  get: () => dataStyleStore.meshPointsVertexAttributeNoDataColor(id.value),
+  get: () => dataStyleStore.meshPointsVertexAttributeNoDataColor(dataId.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId: string) =>
+    await applyBatchStyle(dataId.value, (targetId: string) =>
       dataStyleStore.setMeshPointsVertexAttributeNoDataColor(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -174,7 +174,7 @@ async function setVertexAttributeRangesPerData(ranges: RangesPerData): Promise<v
         <v-divider class="my-2" />
         <ViewerOptionsSizeSlider data-testid="meshPointsSizeSlider" v-model="size" />
         <ViewerOptionsColoringTypeSelector
-          :data-id="id"
+          :data-id="dataId"
           v-model:coloring_style_key="coloring_style_key"
           v-model:color="color"
           v-model:opacity="opacity"

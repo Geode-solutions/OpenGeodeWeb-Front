@@ -31,12 +31,12 @@ const {
   capabilities = {},
 } = defineProps<Props>();
 
-const id = toRef(() => itemProps.id);
+const dataId = toRef(() => itemProps.id);
 
 const visibility = computed<boolean>({
-  get: () => dataStyleStore.meshPolygonsVisibility(id.value),
+  get: () => dataStyleStore.meshPolygonsVisibility(dataId.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId: string) =>
+    await applyBatchStyle(dataId.value, (targetId: string) =>
       dataStyleStore.setMeshPolygonsVisibility(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -59,7 +59,7 @@ const visibility = computed<boolean>({
       />
       <template v-if="visibility">
         <v-divider />
-        <ViewerGenericMeshPolygonsColoring :data-id="id" :capabilities="capabilities" />
+        <ViewerGenericMeshPolygonsColoring :data-id="dataId" :capabilities="capabilities" />
       </template>
     </template>
   </ViewerContextMenuItem>
