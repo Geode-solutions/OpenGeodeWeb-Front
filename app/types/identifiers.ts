@@ -4,6 +4,9 @@ type GeodeId = string;
 // Id of a data loaded in the app, unique even when the same data is loaded twice (see GeodeId)
 type DataId = string;
 
+// Id of a component of a model (a corner, a line, a surface or a block): its geode_id
+type ModelComponentId = GeodeId;
+
 // Type of an OpenGeode object, as named by OpenGeode (BRep, TriangulatedSurface3D, ...)
 type GeodeObjectType = string;
 
@@ -33,6 +36,7 @@ export type {
   GeodeIdentified,
   GeodeObjectType,
   GeodeObjectTyped,
+  ModelComponentId,
   ViewerType,
   ViewerTyped,
 };

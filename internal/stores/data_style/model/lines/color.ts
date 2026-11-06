@@ -1,4 +1,4 @@
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { DataId, ModelComponentId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
@@ -14,17 +14,17 @@ const schema = viewer_schemas.opengeodeweb_viewer.model.lines.color;
 export function useModelLinesColor(): {
   setModelLinesColor: (
     modelId: DataId,
-    lines_ids: string[],
+    lines_ids: ModelComponentId[],
     color: RGBAColor | undefined,
     activeColoring?: string,
     collectionId?: string,
   ) => Promise<unknown>;
-  modelLineColoring: (modelId: DataId, line_id?: string) => StyleValues;
-  modelLineColor: (modelId: DataId, line_id?: string) => RGBAColor | undefined;
-  modelLineActiveColoring: (modelId: DataId, line_id?: string) => unknown;
+  modelLineColoring: (modelId: DataId, line_id?: ModelComponentId) => StyleValues;
+  modelLineColor: (modelId: DataId, line_id?: ModelComponentId) => RGBAColor | undefined;
+  modelLineActiveColoring: (modelId: DataId, line_id?: ModelComponentId) => unknown;
   setModelLinesActiveColoring: (
     modelId: DataId,
-    lines_ids: string[],
+    lines_ids: ModelComponentId[],
     activeColoring: string,
     collectionId?: string,
   ) => Promise<unknown>;
@@ -35,19 +35,19 @@ export function useModelLinesColor(): {
   const modelLinesVertexAttribute = useModelLinesVertexAttribute();
   const modelLinesEdgeAttribute = useModelLinesEdgeAttribute();
 
-  function modelLineColoring(modelId: DataId, line_id?: string): StyleValues {
+  function modelLineColoring(modelId: DataId, line_id?: ModelComponentId): StyleValues {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
     return modelLinesCommonStyle.modelLineStyle(modelId, line_id).coloring as StyleValues;
   }
 
-  function modelLineColor(modelId: DataId, line_id?: string): RGBAColor | undefined {
+  function modelLineColor(modelId: DataId, line_id?: ModelComponentId): RGBAColor | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.constant shape is defined by the data style schema.
     return modelLineColoring(modelId, line_id).constant as RGBAColor | undefined;
   }
 
   async function setModelLinesColor(
     modelId: DataId,
-    lines_ids: string[],
+    lines_ids: ModelComponentId[],
     color: RGBAColor | undefined,
     activeColoring = "constant",
     collectionId?: string,
@@ -63,11 +63,14 @@ export function useModelLinesColor(): {
     return result;
   }
 
-  function modelLineActiveColoring(modelId: DataId, line_id?: string): unknown {
+  function modelLineActiveColoring(modelId: DataId, line_id?: ModelComponentId): unknown {
     return modelLineColoring(modelId, line_id).active;
   }
 
-  async function applyVertexColoring(modelId: DataId, lines_ids: string[]): Promise<unknown> {
+  async function applyVertexColoring(
+    modelId: DataId,
+    lines_ids: ModelComponentId[],
+  ): Promise<unknown> {
     const name = modelLinesVertexAttribute.modelLinesVertexAttributeName(modelId, lines_ids[0]);
     const item = modelLinesVertexAttribute.modelLinesVertexAttributeItem(modelId, lines_ids[0]);
     const [minimum, maximum] = modelLinesVertexAttribute.modelLinesVertexAttributeRange(
@@ -94,7 +97,10 @@ export function useModelLinesColor(): {
     return undefined;
   }
 
-  async function applyEdgeColoring(modelId: DataId, lines_ids: string[]): Promise<unknown> {
+  async function applyEdgeColoring(
+    modelId: DataId,
+    lines_ids: ModelComponentId[],
+  ): Promise<unknown> {
     const name = modelLinesEdgeAttribute.modelLinesEdgeAttributeName(modelId, lines_ids[0]);
     const item = modelLinesEdgeAttribute.modelLinesEdgeAttributeItem(modelId, lines_ids[0]);
     const [minimum, maximum] = modelLinesEdgeAttribute.modelLinesEdgeAttributeRange(
@@ -120,7 +126,7 @@ export function useModelLinesColor(): {
 
   async function setModelLinesActiveColoring(
     modelId: DataId,
-    lines_ids: string[],
+    lines_ids: ModelComponentId[],
     activeColoring: string,
     collectionId?: string,
   ): Promise<unknown> {

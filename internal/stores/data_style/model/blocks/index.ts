@@ -1,9 +1,9 @@
+import type { DataId, ModelComponentId } from "@ogw_front/types/identifiers";
 import {
   applyModelBlocksConstantColoring,
   applyModelBlocksPolyhedronColoring,
   applyModelBlocksVertexColoring,
 } from "./apply_coloring";
-import type { DataId } from "@ogw_front/types/identifiers";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelBlocksColor } from "./color";
 import { useModelBlocksCommonStyle } from "./common";
@@ -41,7 +41,7 @@ export function useModelBlocksStyle(): UseModelBlocksStyleReturn {
 
   async function applyModelBlocksVisibilityStyle(
     modelId: DataId,
-    blocks_ids: string[],
+    blocks_ids: ModelComponentId[],
   ): Promise<unknown[]> {
     const visibilityGroups: Record<string, string[]> = {};
     for (const block_id of blocks_ids) {
@@ -65,7 +65,7 @@ export function useModelBlocksStyle(): UseModelBlocksStyleReturn {
 
   async function applyModelBlocksColoringStyle(
     modelId: DataId,
-    blocks_ids: string[],
+    blocks_ids: ModelComponentId[],
   ): Promise<unknown[]> {
     const activeColoringGroups: Record<string, string[]> = {};
     for (const block_id of blocks_ids) {

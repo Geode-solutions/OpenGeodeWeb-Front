@@ -1,4 +1,4 @@
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { DataId, ModelComponentId } from "@ogw_front/types/identifiers";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import merge from "lodash/merge";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
@@ -6,11 +6,11 @@ import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/commo
 
 export function useModelCornersCommonStyle(): {
   modelCornersStyle: (modelId: DataId) => StyleValues;
-  modelCornerStyle: (modelId: DataId, corner_id?: string) => StyleValues;
-  modelCornerColoring: (modelId: DataId, corner_id?: string) => StyleValues;
+  modelCornerStyle: (modelId: DataId, corner_id?: ModelComponentId) => StyleValues;
+  modelCornerColoring: (modelId: DataId, corner_id?: ModelComponentId) => StyleValues;
   mutateModelCornersColoring: (
     modelId: DataId,
-    corners_ids: string[],
+    corners_ids: ModelComponentId[],
     values: StyleValues,
   ) => Promise<void>;
   mutateModelCornersTypeColoring: (modelId: DataId, values: StyleValues) => Promise<void>;
@@ -32,7 +32,7 @@ export function useModelCornersCommonStyle(): {
     return merge({}, defaultStyle, typeStyle);
   }
 
-  function modelCornerStyle(modelId: DataId, corner_id?: string): StyleValues {
+  function modelCornerStyle(modelId: DataId, corner_id?: ModelComponentId): StyleValues {
     if (corner_id === undefined) {
       return modelComponentTypeCornersStyle(modelId);
     }
@@ -41,14 +41,14 @@ export function useModelCornersCommonStyle(): {
     return merge({}, typeStyle, individualStyle);
   }
 
-  function modelCornerColoring(modelId: DataId, corner_id?: string): StyleValues {
+  function modelCornerColoring(modelId: DataId, corner_id?: ModelComponentId): StyleValues {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring is a StyleValues sub-object stored under a StyleValues index signature.
     return modelCornerStyle(modelId, corner_id).coloring as StyleValues;
   }
 
   async function mutateModelCornersColoring(
     modelId: DataId,
-    corners_ids: string[],
+    corners_ids: ModelComponentId[],
     values: StyleValues,
   ): Promise<void> {
     await modelCommonStyle.mutateComponentStyles(modelId, corners_ids, {

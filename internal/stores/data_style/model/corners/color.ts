@@ -1,4 +1,4 @@
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { DataId, ModelComponentId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
@@ -13,17 +13,17 @@ const schema = viewer_schemas.opengeodeweb_viewer.model.corners.color;
 interface ModelCornersColorApi {
   setModelCornersColor: (
     modelId: DataId,
-    corners_ids: string[],
+    corners_ids: ModelComponentId[],
     color: RGBAColor | undefined,
     activeColoring?: string,
     collectionId?: string,
   ) => Promise<unknown>;
-  modelCornerColoring: (modelId: DataId, corner_id?: string) => StyleValues;
-  modelCornerColor: (modelId: DataId, corner_id?: string) => RGBAColor | undefined;
-  modelCornerActiveColoring: (modelId: DataId, corner_id?: string) => unknown;
+  modelCornerColoring: (modelId: DataId, corner_id?: ModelComponentId) => StyleValues;
+  modelCornerColor: (modelId: DataId, corner_id?: ModelComponentId) => RGBAColor | undefined;
+  modelCornerActiveColoring: (modelId: DataId, corner_id?: ModelComponentId) => unknown;
   setModelCornersActiveColoring: (
     modelId: DataId,
-    corners_ids: string[],
+    corners_ids: ModelComponentId[],
     activeColoring: string,
     collectionId?: string,
   ) => Promise<unknown>;
@@ -35,19 +35,19 @@ export function useModelCornersColor(): ModelCornersColorApi {
   const modelCornersCommonStyle = useModelCornersCommonStyle();
   const modelCornersVertexAttribute = useModelCornersVertexAttribute();
 
-  function modelCornerColoring(modelId: DataId, corner_id?: string): StyleValues {
+  function modelCornerColoring(modelId: DataId, corner_id?: ModelComponentId): StyleValues {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring is a StyleValues sub-object stored under a StyleValues index signature.
     return modelCornersCommonStyle.modelCornerStyle(modelId, corner_id).coloring as StyleValues;
   }
 
-  function modelCornerColor(modelId: DataId, corner_id?: string): RGBAColor | undefined {
+  function modelCornerColor(modelId: DataId, corner_id?: ModelComponentId): RGBAColor | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.constant shape is defined by the data style schema.
     return modelCornerColoring(modelId, corner_id).constant as RGBAColor | undefined;
   }
 
   async function setModelCornersColor(
     modelId: DataId,
-    corners_ids: string[],
+    corners_ids: ModelComponentId[],
     color: RGBAColor | undefined,
     activeColoring = "constant",
     collectionId?: string,
@@ -63,13 +63,13 @@ export function useModelCornersColor(): ModelCornersColorApi {
     return result;
   }
 
-  function modelCornerActiveColoring(modelId: DataId, corner_id?: string): unknown {
+  function modelCornerActiveColoring(modelId: DataId, corner_id?: ModelComponentId): unknown {
     return modelCornerColoring(modelId, corner_id).active;
   }
 
   async function setModelCornersActiveColoring(
     modelId: DataId,
-    corners_ids: string[],
+    corners_ids: ModelComponentId[],
     activeColoring: string,
     collectionId?: string,
   ): Promise<unknown> {
