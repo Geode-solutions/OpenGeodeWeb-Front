@@ -9,13 +9,6 @@ interface AttributeSource {
   location: "point" | "cell";
 }
 
-interface AttributeInfo {
-  attribute_name: string;
-  nb_items: number;
-  time_steps?: number[];
-  [key: string]: unknown;
-}
-
 function isValidThresholdAttribute(
   attribute: Partial<ThresholdAttribute>,
 ): attribute is ThresholdAttribute {
@@ -30,4 +23,4 @@ function isValidThresholdAttribute(
 }
 
 export { isValidThresholdAttribute };
-export type { AttributeInfo, AttributeSource };
+export type { AttributeSource };

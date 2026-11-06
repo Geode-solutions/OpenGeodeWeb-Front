@@ -1,7 +1,7 @@
+import { type AttributeInfo, getAttributeRange } from "@ogw_front/utils/attributes";
 import { type AttributeSchemas, fetchAttributeRange } from "@ogw_front/utils/attribute_range";
 import type { JsonRpcSchema } from "@ogw_shared/utils/types";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
-import { getAttributeRange } from "@ogw_front/utils/attributes";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
@@ -15,7 +15,7 @@ interface AttributeColoring {
 }
 
 interface AttributeNamesResponse {
-  attributes: { attribute_name: string; time_steps?: number[] }[];
+  attributes: Pick<AttributeInfo, "attribute_name" | "time_steps">[];
 }
 
 interface AttributeColoringStyle {

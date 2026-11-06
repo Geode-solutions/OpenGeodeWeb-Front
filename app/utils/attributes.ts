@@ -90,10 +90,17 @@ function intersectBy<TItem>(
   );
 }
 
+// An attribute of a data: its name, its number of items and the time steps it is defined at
 interface NamedAttribute {
   attribute_name: string;
   nb_items: number;
   time_steps?: readonly number[];
+}
+
+// What the back-end answers for an attribute, which may carry more fields than these
+interface AttributeInfo extends NamedAttribute {
+  time_steps?: number[];
+  [key: string]: unknown;
 }
 
 function sameTimeSteps(left: NamedAttribute, right: NamedAttribute): boolean {
@@ -128,6 +135,7 @@ function attributeArrayName(name: string, timeStep: number | undefined): string 
   return timeStep === undefined ? name : `${name}@${timeStep}`;
 }
 
+export type { AttributeInfo, NamedAttribute };
 export {
   MESH_ELEMENT_KINDS,
   MODEL_COMPONENT_ATTRIBUTE_SCHEMAS,
