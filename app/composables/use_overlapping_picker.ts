@@ -1,8 +1,8 @@
 import { ref } from "vue";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
+import type { DataIdentified, GeodeObjectType, ViewerType } from "@ogw_front/types/identifiers";
 import { type DataItem, useDataStore } from "@ogw_front/stores/data";
-import type { GeodeObjectType, ViewerType } from "@ogw_front/types/identifiers";
 import { computeMenuPosition } from "@ogw_front/composables/overlapping_picker_menu";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -12,8 +12,7 @@ interface PickedItem {
   viewer_id: number | undefined;
 }
 
-interface ProposedItem {
-  id: string;
+interface ProposedItem extends DataIdentified {
   viewer_id: number | undefined;
   name: string;
   viewer_type: ViewerType | undefined;
@@ -64,7 +63,7 @@ export function useOverlappingPicker(): UseOverlappingPickerReturn {
         try {
           const item = await dataStore.item(pick.id);
           return {
-            id: pick.id,
+            data_id: pick.id,
             viewer_id: pick.viewer_id,
             name: item.name || "Unnamed Object",
             viewer_type: item.viewer_type,
@@ -72,7 +71,7 @@ export function useOverlappingPicker(): UseOverlappingPickerReturn {
           };
         } catch {
           return {
-            id: pick.id,
+            data_id: pick.id,
             viewer_id: pick.viewer_id,
             name: "Unnamed Object",
             viewer_type: undefined,
@@ -162,7 +161,7 @@ export function useOverlappingPicker(): UseOverlappingPickerReturn {
       resolveIntermediate = (chosenResult: ProposedItem | undefined): void => {
         displayIntermediate.value = false;
         if (chosenResult) {
-          resolve({ id: chosenResult.id, viewer_id: chosenResult.viewer_id });
+          resolve({ id: chosenResult.data_id, viewer_id: chosenResult.viewer_id });
         } else {
           resolve({ id: undefined, viewer_id: undefined, dismissed: true });
         }

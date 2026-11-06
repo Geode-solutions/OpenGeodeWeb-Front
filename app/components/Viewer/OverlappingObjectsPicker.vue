@@ -57,7 +57,7 @@ function handleUpdate(val: boolean): void {
       <v-list class="py-1 bg-transparent" density="compact">
         <v-list-item
           v-for="item in intermediateItems"
-          :key="`${item.id}-${item.viewer_id}`"
+          :key="`${item.data_id}-${item.viewer_id}`"
           class="intermediate-picker-item px-3 py-2"
           @click="selectItem(item)"
         >
@@ -82,7 +82,7 @@ function handleUpdate(val: boolean): void {
           >
             <span class="font-weight-medium mr-1">{{ item.geode_object_type }}</span>
             <span style="font-family: monospace; opacity: 0.65; font-size: 0.72rem"
-              >&middot; {{ formatListId(item.id) }}</span
+              >&middot; {{ formatListId(item.data_id) }}</span
             >
           </v-list-item-subtitle>
         </v-list-item>
