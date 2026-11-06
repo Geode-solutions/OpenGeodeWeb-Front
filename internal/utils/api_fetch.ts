@@ -132,4 +132,4 @@ async function api_fetch(
 }
 
 export { api_fetch };
-export type { Microservice };
+export type { FetchErrorLike, Microservice };
