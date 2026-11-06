@@ -1,4 +1,4 @@
-import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
+import type { LineId, ModelId } from "@ogw_front/types/identifiers";
 import {
   applyModelLinesConstantColoring,
   applyModelLinesEdgeColoring,
@@ -36,7 +36,7 @@ export function useModelLinesStyle(): ReturnType<typeof useModelLinesCommonStyle
 
   async function applyModelLinesVisibilityStyle(
     modelId: ModelId,
-    lines_ids: ModelComponentId[],
+    lines_ids: LineId[],
   ): Promise<void> {
     const visibilityGroups: Record<string, string[]> = {};
     for (const line_id of lines_ids) {
@@ -59,7 +59,7 @@ export function useModelLinesStyle(): ReturnType<typeof useModelLinesCommonStyle
 
   async function applyModelLinesColoringStyle(
     modelId: ModelId,
-    lines_ids: ModelComponentId[],
+    lines_ids: LineId[],
   ): Promise<unknown[]> {
     const activeColoringGroups: Record<string, string[]> = {};
     for (const line_id of lines_ids) {

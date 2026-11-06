@@ -1,4 +1,4 @@
-import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
+import type { LineId, ModelId } from "@ogw_front/types/identifiers";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import merge from "lodash/merge";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
@@ -6,11 +6,11 @@ import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/commo
 
 export function useModelLinesCommonStyle(): {
   modelLinesStyle: (modelId: ModelId) => StyleValues;
-  modelLineStyle: (modelId: ModelId, line_id?: ModelComponentId) => StyleValues;
-  modelLineColoring: (modelId: ModelId, line_id?: ModelComponentId) => StyleValues;
+  modelLineStyle: (modelId: ModelId, line_id?: LineId) => StyleValues;
+  modelLineColoring: (modelId: ModelId, line_id?: LineId) => StyleValues;
   mutateModelLinesColoring: (
     modelId: ModelId,
-    lines_ids: ModelComponentId[],
+    lines_ids: LineId[],
     values: StyleValues,
   ) => Promise<void>;
   mutateModelLinesTypeColoring: (modelId: ModelId, values: StyleValues) => Promise<void>;
@@ -28,7 +28,7 @@ export function useModelLinesCommonStyle(): {
     return merge({}, defaultStyle, typeStyle);
   }
 
-  function modelLineStyle(modelId: ModelId, line_id?: ModelComponentId): StyleValues {
+  function modelLineStyle(modelId: ModelId, line_id?: LineId): StyleValues {
     if (line_id === undefined) {
       return modelComponentTypeLinesStyle(modelId);
     }
@@ -37,14 +37,14 @@ export function useModelLinesCommonStyle(): {
     return merge({}, typeStyle, individualStyle);
   }
 
-  function modelLineColoring(modelId: ModelId, line_id?: ModelComponentId): StyleValues {
+  function modelLineColoring(modelId: ModelId, line_id?: LineId): StyleValues {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
     return modelLineStyle(modelId, line_id).coloring as StyleValues;
   }
 
   async function mutateModelLinesColoring(
     modelId: ModelId,
-    lines_ids: ModelComponentId[],
+    lines_ids: LineId[],
     values: StyleValues,
   ): Promise<void> {
     await modelCommonStyle.mutateComponentStyles(modelId, lines_ids, {
