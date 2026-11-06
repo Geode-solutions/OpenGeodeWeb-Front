@@ -29,6 +29,11 @@ interface ViewerTyped {
   viewer_type: ViewerType;
 }
 
+// The data a model style or a model component applies to
+interface ModelIdentified {
+  modelId: DataId;
+}
+
 export type {
   DataId,
   DataIdentified,
@@ -37,6 +42,7 @@ export type {
   GeodeObjectType,
   GeodeObjectTyped,
   ModelComponentId,
+  ModelIdentified,
   ViewerType,
   ViewerTyped,
 };

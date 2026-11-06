@@ -1,4 +1,4 @@
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { ModelIdentified } from "@ogw_front/types/identifiers";
 
 function compareSelections<Item>(
   current: readonly Item[],
@@ -22,11 +22,10 @@ interface GeodeObjectTypeMenuPayload {
   targetIds: string[];
 }
 
-interface ModelComponentMenuPayload {
+interface ModelComponentMenuPayload extends ModelIdentified {
   event: MouseEvent;
   itemId: string;
   context_type: "model_component" | "model_component_type";
-  modelId: DataId;
   modelComponentType?: string;
   targetComponentIds?: string[];
 }

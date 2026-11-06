@@ -1,4 +1,4 @@
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { DataId, ModelIdentified } from "@ogw_front/types/identifiers";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import type { ModelComponentRecord } from "@ogw_front/stores/data_helpers/mesh";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
@@ -29,8 +29,7 @@ function groupComponentsByType(
   return componentsByType;
 }
 
-interface TypeSelectionContext {
-  readonly modelId: DataId;
+interface TypeSelectionContext extends Readonly<ModelIdentified> {
   readonly groupStyles: ReturnType<DataStyleState["getStyle"]>;
   readonly dataStyleState: DataStyleState;
 }
