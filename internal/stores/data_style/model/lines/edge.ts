@@ -1,5 +1,6 @@
 // oxlint-disable eslint/max-lines
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { AttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_types";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
@@ -15,13 +16,6 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
 const attributeSchema = viewer_schemas.opengeodeweb_viewer.model.lines.attribute.edge.attribute;
-
-interface AttributeStoredConfig {
-  minimum: number | undefined;
-  maximum: number | undefined;
-  colorMap: string | undefined;
-  no_data_color: RGBAColor;
-}
 
 interface AttributeState {
   name?: string;

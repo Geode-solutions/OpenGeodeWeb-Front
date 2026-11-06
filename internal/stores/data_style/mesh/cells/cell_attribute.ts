@@ -1,11 +1,5 @@
+import type { AttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_types";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
-
-interface AttributeStoredConfig {
-  minimum: number | undefined;
-  maximum: number | undefined;
-  colorMap: string | undefined;
-  no_data_color: RGBAColor;
-}
 
 interface AttributeState {
   name?: string;
@@ -66,9 +60,4 @@ interface UseMeshCellsCellAttributeStyleReturn {
   setMeshCellsCellAttributeNoDataColor: (id: string, no_data_color: RGBAColor) => Promise<unknown>;
 }
 export { isMeshCellsCellAttributeValid };
-export type {
-  AttributeStoredConfig,
-  AttributeState,
-  ValidAttributeInput,
-  UseMeshCellsCellAttributeStyleReturn,
-};
+export type { AttributeState, ValidAttributeInput, UseMeshCellsCellAttributeStyleReturn };

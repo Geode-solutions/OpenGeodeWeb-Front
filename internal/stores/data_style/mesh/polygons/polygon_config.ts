@@ -1,5 +1,6 @@
-import type { AttributeState, AttributeStoredConfig } from "./polygon_attribute";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { AttributeState } from "./polygon_attribute";
+import type { AttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_types";
 
 // Local imports
 import { useMeshPolygonsCommonStyle } from "./common";

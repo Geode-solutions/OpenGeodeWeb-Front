@@ -1,4 +1,4 @@
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { AttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_types";
 
 function groupBy(componentIds: string[], key: (componentId: string) => string): string[][] {
   const groups: Record<string, string[]> = {};
@@ -10,13 +10,6 @@ function groupBy(componentIds: string[], key: (componentId: string) => string): 
   return Object.values(groups);
 }
 
-interface AttributeStoredConfig {
-  minimum: number | undefined;
-  maximum: number | undefined;
-  colorMap: string | undefined;
-  no_data_color: RGBAColor;
-}
-
 interface AttributeState {
   name?: string;
   item?: number;
@@ -24,4 +17,4 @@ interface AttributeState {
 }
 
 export { groupBy };
-export type { AttributeState, AttributeStoredConfig };
+export type { AttributeState };
