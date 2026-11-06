@@ -24,11 +24,7 @@ interface Grid2dStyle extends EdgedCurveStyle {
   cells: MeshCellsStyle;
 }
 
-interface Grid3dStyle {
-  visibility: boolean;
-  points: MeshPointsStyle;
-  edges: MeshEdgesStyle;
-  cells: MeshCellsStyle;
+interface Grid3dStyle extends Grid2dStyle {
   polyhedra: MeshPolyhedraStyle;
 }
 
