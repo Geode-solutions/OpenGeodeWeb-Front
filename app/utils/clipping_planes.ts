@@ -21,6 +21,16 @@ function getPlaneColor(index: number): readonly number[] {
   return PLANE_COLORS[index % PLANE_COLORS.length] ?? COLOR_BLUE;
 }
 
+function getPlaneRgbaColor(
+  index: number,
+  alpha: number,
+): { red: number; green: number; blue: number; alpha: number } {
+  const [red = 0, green = 0, blue = 0] = getPlaneColor(index).map((channel) =>
+    Math.round(channel * RGB_MAX_VALUE),
+  );
+  return { red, green, blue, alpha };
+}
+
 function getPlaneCssColor(index: number): string {
   const rgb = getPlaneColor(index);
   return `rgb(${rgb.map((channel) => Math.round(channel * RGB_MAX_VALUE)).join(",")})`;
@@ -89,6 +99,7 @@ export {
   PLANE_COLORS,
   DEFAULT_NORMALS,
   getPlaneColor,
+  getPlaneRgbaColor,
   getPlaneCssColor,
   hasPlaneChanged,
   getPlaneStyle,

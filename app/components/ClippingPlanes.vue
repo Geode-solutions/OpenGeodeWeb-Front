@@ -3,7 +3,7 @@ import {
   DEBOUNCE_DELAY,
   DEFAULT_NORMALS,
   DEFAULT_PLANE_OPACITY,
-  getPlaneColor,
+  getPlaneRgbaColor,
 } from "@ogw_front/utils/clipping_planes";
 import type { ClippingPlane } from "@ogw_front/composables/clipping_planes_widget_entries";
 import ClippingPlaneCard from "@ogw_front/components/ClippingPlaneCard.vue";
@@ -95,8 +95,7 @@ async function applyClippingPlanes(): Promise<void> {
   const planesData = planes.value.map((plane, index) => ({
     origin: (plane.origin || center).map(Number),
     normal: plane.normal.map(Number),
-    color: [...getPlaneColor(index)],
-    opacity: plane.opacity,
+    color: getPlaneRgbaColor(index, plane.opacity),
   }));
   if (targetIds.value.length > 0) {
     await hybridViewerStore.setClippingPlanes(
