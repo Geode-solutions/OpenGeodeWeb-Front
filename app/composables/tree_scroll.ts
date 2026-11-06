@@ -150,3 +150,5 @@ export function useTreeScroll(
     getScrollInfo,
   };
 }
+
+export type { ScrollInfo };
