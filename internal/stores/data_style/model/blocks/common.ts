@@ -1,4 +1,4 @@
-import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
+import type { BlockId, ModelId } from "@ogw_front/types/identifiers";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import merge from "lodash/merge";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
@@ -6,11 +6,11 @@ import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/commo
 
 export function useModelBlocksCommonStyle(): {
   modelBlocksStyle: (modelId: ModelId) => StyleValues;
-  modelBlockStyle: (modelId: ModelId, block_id?: ModelComponentId) => StyleValues;
-  modelBlockColoring: (modelId: ModelId, block_id?: ModelComponentId) => StyleValues;
+  modelBlockStyle: (modelId: ModelId, block_id?: BlockId) => StyleValues;
+  modelBlockColoring: (modelId: ModelId, block_id?: BlockId) => StyleValues;
   mutateModelBlocksColoring: (
     modelId: ModelId,
-    blocks_ids: ModelComponentId[],
+    blocks_ids: BlockId[],
     values: StyleValues,
   ) => Promise<void>;
   mutateModelBlocksTypeColoring: (modelId: ModelId, values: StyleValues) => Promise<void>;
@@ -28,7 +28,7 @@ export function useModelBlocksCommonStyle(): {
     return merge({}, defaultStyle, typeStyle);
   }
 
-  function modelBlockStyle(modelId: ModelId, block_id?: ModelComponentId): StyleValues {
+  function modelBlockStyle(modelId: ModelId, block_id?: BlockId): StyleValues {
     if (block_id === undefined) {
       return modelComponentTypeBlocksStyle(modelId);
     }
@@ -37,14 +37,14 @@ export function useModelBlocksCommonStyle(): {
     return merge({}, typeStyle, individualStyle);
   }
 
-  function modelBlockColoring(modelId: ModelId, block_id?: ModelComponentId): StyleValues {
+  function modelBlockColoring(modelId: ModelId, block_id?: BlockId): StyleValues {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
     return modelBlockStyle(modelId, block_id).coloring as StyleValues;
   }
 
   async function mutateModelBlocksColoring(
     modelId: ModelId,
-    blocks_ids: ModelComponentId[],
+    blocks_ids: BlockId[],
     values: StyleValues,
   ): Promise<void> {
     await modelCommonStyle.mutateComponentStyles(modelId, blocks_ids, {

@@ -1,4 +1,4 @@
-import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
+import type { BlockId, ModelId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
@@ -12,19 +12,19 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed
 const schema = viewer_schemas.opengeodeweb_viewer.model.blocks.color;
 
 export function useModelBlocksColor(): {
-  modelBlockColoring: (modelId: ModelId, block_id?: ModelComponentId) => StyleValues;
-  modelBlockColor: (modelId: ModelId, block_id?: ModelComponentId) => RGBAColor | undefined;
+  modelBlockColoring: (modelId: ModelId, block_id?: BlockId) => StyleValues;
+  modelBlockColor: (modelId: ModelId, block_id?: BlockId) => RGBAColor | undefined;
   setModelBlocksColor: (
     modelId: ModelId,
-    blocks_ids: ModelComponentId[],
+    blocks_ids: BlockId[],
     color: RGBAColor | undefined,
     activeColoring?: string,
     collectionId?: string,
   ) => Promise<unknown>;
-  modelBlockActiveColoring: (modelId: ModelId, block_id?: ModelComponentId) => unknown;
+  modelBlockActiveColoring: (modelId: ModelId, block_id?: BlockId) => unknown;
   setModelBlocksActiveColoring: (
     modelId: ModelId,
-    blocks_ids: ModelComponentId[],
+    blocks_ids: BlockId[],
     activeColoring: string,
     collectionId?: string,
   ) => Promise<void>;
@@ -35,19 +35,19 @@ export function useModelBlocksColor(): {
   const modelBlocksVertexAttribute = useModelBlocksVertexAttribute();
   const modelBlocksPolyhedronAttribute = useModelBlocksPolyhedronAttribute();
 
-  function modelBlockColoring(modelId: ModelId, block_id?: ModelComponentId): StyleValues {
+  function modelBlockColoring(modelId: ModelId, block_id?: BlockId): StyleValues {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
     return modelBlocksCommonStyle.modelBlockStyle(modelId, block_id).coloring as StyleValues;
   }
 
-  function modelBlockColor(modelId: ModelId, block_id?: ModelComponentId): RGBAColor | undefined {
+  function modelBlockColor(modelId: ModelId, block_id?: BlockId): RGBAColor | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.constant shape is defined by the data style schema.
     return modelBlockColoring(modelId, block_id).constant as RGBAColor | undefined;
   }
 
   async function setModelBlocksColor(
     modelId: ModelId,
-    blocks_ids: ModelComponentId[],
+    blocks_ids: BlockId[],
     color: RGBAColor | undefined,
     activeColoring = "constant",
     collectionId?: string,
@@ -63,14 +63,11 @@ export function useModelBlocksColor(): {
     return result;
   }
 
-  function modelBlockActiveColoring(modelId: ModelId, block_id?: ModelComponentId): unknown {
+  function modelBlockActiveColoring(modelId: ModelId, block_id?: BlockId): unknown {
     return modelBlockColoring(modelId, block_id).active;
   }
 
-  async function applyVertexColoring(
-    modelId: ModelId,
-    blocks_ids: ModelComponentId[],
-  ): Promise<void> {
+  async function applyVertexColoring(modelId: ModelId, blocks_ids: BlockId[]): Promise<void> {
     const name = modelBlocksVertexAttribute.modelBlocksVertexAttributeName(modelId, blocks_ids[0]);
     const item = modelBlocksVertexAttribute.modelBlocksVertexAttributeItem(modelId, blocks_ids[0]);
     const [minimum, maximum] = modelBlocksVertexAttribute.modelBlocksVertexAttributeRange(
@@ -95,10 +92,7 @@ export function useModelBlocksColor(): {
     }
   }
 
-  async function applyPolyhedronColoring(
-    modelId: ModelId,
-    blocks_ids: ModelComponentId[],
-  ): Promise<void> {
+  async function applyPolyhedronColoring(modelId: ModelId, blocks_ids: BlockId[]): Promise<void> {
     const name = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeName(
       modelId,
       blocks_ids[0],
@@ -131,7 +125,7 @@ export function useModelBlocksColor(): {
 
   async function setModelBlocksActiveColoring(
     modelId: ModelId,
-    blocks_ids: ModelComponentId[],
+    blocks_ids: BlockId[],
     activeColoring: string,
     collectionId?: string,
   ): Promise<void> {
