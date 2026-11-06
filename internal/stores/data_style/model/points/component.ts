@@ -1,5 +1,5 @@
 // oxlint-disable eslint/max-lines
-import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
+import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
 import type {
   AttributeState,
   AttributeStoredConfig,
@@ -134,10 +134,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
     return { ...defaultAttributeStoredConfig(), ...config };
   }
 
-  function vertexAttributeRange(
-    modelId: ModelId,
-    componentId?: string,
-  ): [number | undefined, number | undefined] {
+  function vertexAttributeRange(modelId: ModelId, componentId?: string): AttributeRange {
     const { minimum, maximum } = storedConfig(modelId, componentId);
     return [minimum, maximum];
   }

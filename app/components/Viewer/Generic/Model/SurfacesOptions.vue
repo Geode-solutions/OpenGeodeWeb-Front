@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // oxlint-disable eslint/max-lines
-import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
+import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { SurfaceId } from "@ogw_front/types/identifiers";
@@ -157,7 +157,7 @@ const surfacesVertexAttributeItem = computed<AttributeItem>({
   },
 });
 
-const surfacesVertexAttributeRange = computed<[number, number] | undefined>({
+const surfacesVertexAttributeRange = computed<AttributeRange>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeRange(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -234,7 +234,7 @@ const surfacesPolygonAttributeItem = computed<AttributeItem>({
   },
 });
 
-const surfacesPolygonAttributeRange = computed<[number, number] | undefined>({
+const surfacesPolygonAttributeRange = computed<AttributeRange>({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeRange(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -311,7 +311,7 @@ const vertexAttributeItem = computed<AttributeItem>({
   },
 });
 
-const vertexAttributeRange = computed<[number, number] | undefined>({
+const vertexAttributeRange = computed<AttributeRange>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeRange(modelId, surfaceId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -383,7 +383,7 @@ const polygonAttributeItem = computed<AttributeItem>({
   },
 });
 
-const polygonAttributeRange = computed<[number, number] | undefined>({
+const polygonAttributeRange = computed<AttributeRange>({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeRange(modelId, surfaceId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;

@@ -5,7 +5,7 @@ import type {
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
-import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
+import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { LineId, ModelId } from "@ogw_front/types/identifiers";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
@@ -29,10 +29,7 @@ const attributeSchema = viewer_schemas.opengeodeweb_viewer.model.lines.attribute
 interface UseModelLinesEdgeAttributeReturn {
   modelLinesEdgeAttributeName: (modelId: ModelId, lineId?: LineId) => AttributeName | undefined;
   modelLinesEdgeAttributeItem: (modelId: ModelId, lineId?: LineId) => AttributeItem;
-  modelLinesEdgeAttributeRange: (
-    modelId: ModelId,
-    lineId?: LineId,
-  ) => [number | undefined, number | undefined];
+  modelLinesEdgeAttributeRange: (modelId: ModelId, lineId?: LineId) => AttributeRange;
   modelLinesEdgeAttributeTimeStep: (modelId: ModelId, lineId?: LineId) => number | undefined;
   setModelLinesEdgeAttributeTimeStep: (
     modelId: ModelId,
@@ -144,10 +141,7 @@ function useModelLinesEdgeAttributeGetters(
       edgeAttribute.item ?? modelLinesEdgeAttributeLastItem(modelId, lineId, edgeAttribute.name)
     );
   }
-  function modelLinesEdgeAttributeRange(
-    modelId: ModelId,
-    lineId?: LineId,
-  ): [number | undefined, number | undefined] {
+  function modelLinesEdgeAttributeRange(modelId: ModelId, lineId?: LineId): AttributeRange {
     const name = modelLinesEdgeAttributeName(modelId, lineId);
     const item = modelLinesEdgeAttributeItem(modelId, lineId);
     const storedConfig = modelLinesEdgeAttributeStoredConfig(modelId, lineId, name, item);

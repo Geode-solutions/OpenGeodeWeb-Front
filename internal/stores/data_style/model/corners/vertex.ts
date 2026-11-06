@@ -5,7 +5,7 @@ import type {
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
-import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
+import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
 import type { CornerId, ModelId } from "@ogw_front/types/identifiers";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
@@ -34,10 +34,7 @@ interface ModelCornersVertexAttributeApi {
     cornerId?: CornerId,
   ) => AttributeName | undefined;
   modelCornersVertexAttributeItem: (modelId: ModelId, cornerId?: CornerId) => AttributeItem;
-  modelCornersVertexAttributeRange: (
-    modelId: ModelId,
-    cornerId?: CornerId,
-  ) => [number | undefined, number | undefined];
+  modelCornersVertexAttributeRange: (modelId: ModelId, cornerId?: CornerId) => AttributeRange;
   modelCornersVertexAttributeTimeStep: (
     modelId: ModelId,
     cornerId?: CornerId,
@@ -140,10 +137,7 @@ function useModelCornersVertexAttributeGetters(
       modelCornersVertexAttributeLastItem(modelId, cornerId, vertexAttribute.name)
     );
   }
-  function modelCornersVertexAttributeRange(
-    modelId: ModelId,
-    cornerId?: CornerId,
-  ): [number | undefined, number | undefined] {
+  function modelCornersVertexAttributeRange(modelId: ModelId, cornerId?: CornerId): AttributeRange {
     const name = modelCornersVertexAttributeName(modelId, cornerId);
     const item = modelCornersVertexAttributeItem(modelId, cornerId);
     const { minimum, maximum } = modelCornersVertexAttributeStoredConfig(

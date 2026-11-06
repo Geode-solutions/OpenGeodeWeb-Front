@@ -1,4 +1,4 @@
-import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
+import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
 import type {
   AttributeState,
   AttributeStoredConfig,
@@ -79,7 +79,7 @@ function useMeshPointsVertexAttributeConfig(): UseMeshPointsVertexAttributeConfi
 }
 
 interface UseMeshPointsVertexAttributeConfigValuesReturn {
-  meshPointsVertexAttributeRange: (meshId: MeshId) => [number | undefined, number | undefined];
+  meshPointsVertexAttributeRange: (meshId: MeshId) => AttributeRange;
   meshPointsVertexAttributeColorMap: (meshId: MeshId) => string | undefined;
   meshPointsVertexAttributeNoDataColor: (meshId: MeshId) => RGBAColor;
 }
@@ -90,9 +90,7 @@ function useMeshPointsVertexAttributeConfigValues(): UseMeshPointsVertexAttribut
     meshPointsVertexAttributeItem,
     meshPointsVertexAttributeStoredConfig,
   } = useMeshPointsVertexAttributeConfig();
-  function meshPointsVertexAttributeRange(
-    meshId: MeshId,
-  ): [number | undefined, number | undefined] {
+  function meshPointsVertexAttributeRange(meshId: MeshId): AttributeRange {
     const name = meshPointsVertexAttributeName(meshId);
     const item = meshPointsVertexAttributeItem(meshId);
     const storedConfig = meshPointsVertexAttributeStoredConfig(meshId, name, item);

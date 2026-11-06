@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
+import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import { MODEL_LINE_COLORING } from "@ogw_front/utils/model_component_coloring";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
@@ -109,7 +109,7 @@ const linesVertexAttributeItem = computed<AttributeItem>({
   },
 });
 
-const linesVertexAttributeRange = computed<[number, number] | undefined>({
+const linesVertexAttributeRange = computed<AttributeRange>({
   get: () => dataStyleStore.modelLinesVertexAttributeRange(modelId, referenceLineId.value),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -172,7 +172,7 @@ const linesEdgeAttributeItem = computed<AttributeItem>({
   },
 });
 
-const linesEdgeAttributeRange = computed<[number, number] | undefined>({
+const linesEdgeAttributeRange = computed<AttributeRange>({
   get: () => dataStyleStore.modelLinesEdgeAttributeRange(modelId, referenceLineId.value),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;

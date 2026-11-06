@@ -1,4 +1,4 @@
-import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
+import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
 import type {
   AttributeStoredConfig,
   ValidAttributeInput,
@@ -9,7 +9,7 @@ import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 interface UseMeshPolygonsPolygonAttributeStyleReturn {
   meshPolygonsPolygonAttributeName: (meshId: MeshId) => AttributeName | undefined;
   meshPolygonsPolygonAttributeItem: (meshId: MeshId) => AttributeItem;
-  meshPolygonsPolygonAttributeRange: (meshId: MeshId) => [number | undefined, number | undefined];
+  meshPolygonsPolygonAttributeRange: (meshId: MeshId) => AttributeRange;
   meshPolygonsPolygonAttributeTimeStep: (meshId: MeshId) => number | undefined;
   setMeshPolygonsPolygonAttributeTimeStep: (meshId: MeshId, timeStep: number) => Promise<unknown>;
   meshPolygonsPolygonAttributeColorMap: (meshId: MeshId) => string | undefined;

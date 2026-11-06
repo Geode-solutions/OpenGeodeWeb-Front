@@ -1,4 +1,4 @@
-import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
+import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
 import type {
   AttributeState,
   AttributeStoredConfig,
@@ -79,7 +79,7 @@ function useMeshCellsVertexAttributeConfig(): UseMeshCellsVertexAttributeConfigR
 }
 
 interface UseMeshCellsVertexAttributeConfigValuesReturn {
-  meshCellsVertexAttributeRange: (meshId: MeshId) => [number | undefined, number | undefined];
+  meshCellsVertexAttributeRange: (meshId: MeshId) => AttributeRange;
   meshCellsVertexAttributeColorMap: (meshId: MeshId) => string | undefined;
   meshCellsVertexAttributeNoDataColor: (meshId: MeshId) => RGBAColor;
 }
@@ -90,7 +90,7 @@ function useMeshCellsVertexAttributeConfigValues(): UseMeshCellsVertexAttributeC
     meshCellsVertexAttributeItem,
     meshCellsVertexAttributeStoredConfig,
   } = useMeshCellsVertexAttributeConfig();
-  function meshCellsVertexAttributeRange(meshId: MeshId): [number | undefined, number | undefined] {
+  function meshCellsVertexAttributeRange(meshId: MeshId): AttributeRange {
     const name = meshCellsVertexAttributeName(meshId);
     const item = meshCellsVertexAttributeItem(meshId);
     const storedConfig = meshCellsVertexAttributeStoredConfig(meshId, name, item);

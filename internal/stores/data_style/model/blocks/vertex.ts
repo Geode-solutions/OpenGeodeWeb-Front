@@ -5,7 +5,7 @@ import type {
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
-import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
+import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
 import type { BlockId, ModelId } from "@ogw_front/types/identifiers";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
@@ -32,10 +32,7 @@ interface UseModelBlocksVertexAttributeReturn {
     blockId?: BlockId,
   ) => AttributeName | undefined;
   modelBlocksVertexAttributeItem: (modelId: ModelId, blockId?: BlockId) => AttributeItem;
-  modelBlocksVertexAttributeRange: (
-    modelId: ModelId,
-    blockId?: BlockId,
-  ) => [number | undefined, number | undefined];
+  modelBlocksVertexAttributeRange: (modelId: ModelId, blockId?: BlockId) => AttributeRange;
   modelBlocksVertexAttributeTimeStep: (modelId: ModelId, blockId?: BlockId) => number | undefined;
   setModelBlocksVertexAttributeTimeStep: (
     modelId: ModelId,
@@ -148,10 +145,7 @@ function useModelBlocksVertexAttributeGetters(
       modelBlocksVertexAttributeLastItem(modelId, blockId, vertexAttribute.name)
     );
   }
-  function modelBlocksVertexAttributeRange(
-    modelId: ModelId,
-    blockId?: BlockId,
-  ): [number | undefined, number | undefined] {
+  function modelBlocksVertexAttributeRange(modelId: ModelId, blockId?: BlockId): AttributeRange {
     const name = modelBlocksVertexAttributeName(modelId, blockId);
     const item = modelBlocksVertexAttributeItem(modelId, blockId);
     const storedConfig = modelBlocksVertexAttributeStoredConfig(modelId, blockId, name, item);

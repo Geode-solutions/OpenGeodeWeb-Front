@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
+import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
 import type { CornerId } from "@ogw_front/types/identifiers";
 import { MODEL_VERTEX_COLORING } from "@ogw_front/utils/model_component_coloring";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
@@ -89,7 +89,7 @@ const vertexAttributeItem = computed<AttributeItem>({
   },
 });
 
-const vertexAttributeRange = computed<[number, number] | undefined>({
+const vertexAttributeRange = computed<AttributeRange>({
   get: () => dataStyleStore.modelCornersVertexAttributeRange(modelId, cornerId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;

@@ -5,7 +5,7 @@ import type {
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
-import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
+import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { ModelId, SurfaceId } from "@ogw_front/types/identifiers";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
@@ -33,10 +33,7 @@ interface UseModelSurfacesPolygonAttributeReturn {
     surfaceId?: SurfaceId,
   ) => AttributeName | undefined;
   modelSurfacesPolygonAttributeItem: (modelId: ModelId, surfaceId?: SurfaceId) => AttributeItem;
-  modelSurfacesPolygonAttributeRange: (
-    modelId: ModelId,
-    surfaceId?: SurfaceId,
-  ) => [number | undefined, number | undefined];
+  modelSurfacesPolygonAttributeRange: (modelId: ModelId, surfaceId?: SurfaceId) => AttributeRange;
   modelSurfacesPolygonAttributeTimeStep: (
     modelId: ModelId,
     surfaceId?: SurfaceId,
@@ -163,7 +160,7 @@ function useModelSurfacesPolygonAttributeGetters(
   function modelSurfacesPolygonAttributeRange(
     modelId: ModelId,
     surfaceId?: SurfaceId,
-  ): [number | undefined, number | undefined] {
+  ): AttributeRange {
     const name = modelSurfacesPolygonAttributeName(modelId, surfaceId);
     const item = modelSurfacesPolygonAttributeItem(modelId, surfaceId);
     const storedConfig = modelSurfacesPolygonAttributeStoredConfig(modelId, surfaceId, name, item);

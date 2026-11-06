@@ -1,4 +1,4 @@
-import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
+import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
 import type {
   AttributeStoredConfig,
   ValidAttributeInput,
@@ -9,9 +9,7 @@ import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 interface UseMeshPolyhedraPolyhedronAttributeStyleReturn {
   meshPolyhedraPolyhedronAttributeName: (meshId: MeshId) => AttributeName | undefined;
   meshPolyhedraPolyhedronAttributeItem: (meshId: MeshId) => AttributeItem;
-  meshPolyhedraPolyhedronAttributeRange: (
-    meshId: MeshId,
-  ) => [number | undefined, number | undefined];
+  meshPolyhedraPolyhedronAttributeRange: (meshId: MeshId) => AttributeRange;
   meshPolyhedraPolyhedronAttributeTimeStep: (meshId: MeshId) => number | undefined;
   setMeshPolyhedraPolyhedronAttributeTimeStep: (
     meshId: MeshId,

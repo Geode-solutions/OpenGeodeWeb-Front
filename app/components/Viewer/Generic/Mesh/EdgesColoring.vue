@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
+import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
 import type { DataId, MeshId } from "@ogw_front/types/identifiers";
 import {
   type RangesPerData,
@@ -77,7 +77,7 @@ const vertex_attribute_item = computed<AttributeItem>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_range = computed<[number, number] | undefined>({
+const vertex_attribute_range = computed<AttributeRange>({
   get: () => dataStyleStore.meshEdgesVertexAttributeRange(dataId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -142,7 +142,7 @@ const edge_attribute_item = computed<AttributeItem>({
     hybridViewerStore.remoteRender();
   },
 });
-const edge_attribute_range = computed<[number, number] | undefined>({
+const edge_attribute_range = computed<AttributeRange>({
   get: () => dataStyleStore.meshEdgesEdgeAttributeRange(dataId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;

@@ -5,7 +5,7 @@ import type {
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
-import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
+import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { LineId, ModelId } from "@ogw_front/types/identifiers";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
@@ -29,10 +29,7 @@ const attributeSchema = viewer_schemas.opengeodeweb_viewer.model.lines.attribute
 interface UseModelLinesVertexAttributeReturn {
   modelLinesVertexAttributeName: (modelId: ModelId, lineId?: LineId) => AttributeName | undefined;
   modelLinesVertexAttributeItem: (modelId: ModelId, lineId?: LineId) => AttributeItem;
-  modelLinesVertexAttributeRange: (
-    modelId: ModelId,
-    lineId?: LineId,
-  ) => [number | undefined, number | undefined];
+  modelLinesVertexAttributeRange: (modelId: ModelId, lineId?: LineId) => AttributeRange;
   modelLinesVertexAttributeTimeStep: (modelId: ModelId, lineId?: LineId) => number | undefined;
   setModelLinesVertexAttributeTimeStep: (
     modelId: ModelId,
@@ -145,10 +142,7 @@ function useModelLinesVertexAttributeGetters(
       modelLinesVertexAttributeLastItem(modelId, lineId, vertexAttribute.name)
     );
   }
-  function modelLinesVertexAttributeRange(
-    modelId: ModelId,
-    lineId?: LineId,
-  ): [number | undefined, number | undefined] {
+  function modelLinesVertexAttributeRange(modelId: ModelId, lineId?: LineId): AttributeRange {
     const name = modelLinesVertexAttributeName(modelId, lineId);
     const item = modelLinesVertexAttributeItem(modelId, lineId);
     const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineId, name, item);

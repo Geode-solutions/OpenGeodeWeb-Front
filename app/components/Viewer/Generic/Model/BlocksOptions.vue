@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // oxlint-disable eslint/max-lines
-import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
+import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
 import type { BlockId } from "@ogw_front/types/identifiers";
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
@@ -149,7 +149,7 @@ const blocksVertexAttributeItem = computed<AttributeItem>({
   },
 });
 
-const blocksVertexAttributeRange = computed<[number, number] | undefined>({
+const blocksVertexAttributeRange = computed<AttributeRange>({
   get: () => dataStyleStore.modelBlocksVertexAttributeRange(modelId, referenceBlockId.value),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -234,7 +234,7 @@ const blocksPolyhedronAttributeItem = computed<AttributeItem>({
   },
 });
 
-const blocksPolyhedronAttributeRange = computed<[number, number] | undefined>({
+const blocksPolyhedronAttributeRange = computed<AttributeRange>({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeRange(modelId, referenceBlockId.value),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -316,7 +316,7 @@ const vertexAttributeItem = computed<AttributeItem>({
   },
 });
 
-const vertexAttributeRange = computed<[number, number] | undefined>({
+const vertexAttributeRange = computed<AttributeRange>({
   get: () => dataStyleStore.modelBlocksVertexAttributeRange(modelId, blockId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -401,7 +401,7 @@ const polyhedronAttributeItem = computed<AttributeItem>({
   },
 });
 
-const polyhedronAttributeRange = computed<[number, number] | undefined>({
+const polyhedronAttributeRange = computed<AttributeRange>({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeRange(modelId, blockId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;

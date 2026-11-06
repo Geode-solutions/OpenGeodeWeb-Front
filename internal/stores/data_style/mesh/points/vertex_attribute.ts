@@ -1,4 +1,4 @@
-import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
+import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
 import type {
   AttributeStoredConfig,
   ValidAttributeInput,
@@ -9,7 +9,7 @@ import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 interface UseMeshPointsVertexAttributeStyleReturn {
   meshPointsVertexAttributeName: (meshId: MeshId) => AttributeName | undefined;
   meshPointsVertexAttributeItem: (meshId: MeshId) => AttributeItem;
-  meshPointsVertexAttributeRange: (meshId: MeshId) => [number | undefined, number | undefined];
+  meshPointsVertexAttributeRange: (meshId: MeshId) => AttributeRange;
   meshPointsVertexAttributeTimeStep: (meshId: MeshId) => number | undefined;
   setMeshPointsVertexAttributeTimeStep: (meshId: MeshId, timeStep: number) => Promise<unknown>;
   meshPointsVertexAttributeColorMap: (meshId: MeshId) => string | undefined;

@@ -1,4 +1,4 @@
-import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
+import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
 import type {
   AttributeState,
   AttributeStoredConfig,
@@ -82,7 +82,7 @@ function useMeshPolyhedraVertexAttributeConfig(): UseMeshPolyhedraVertexAttribut
 }
 
 interface UseMeshPolyhedraVertexAttributeConfigValuesReturn {
-  meshPolyhedraVertexAttributeRange: (meshId: MeshId) => [number | undefined, number | undefined];
+  meshPolyhedraVertexAttributeRange: (meshId: MeshId) => AttributeRange;
   meshPolyhedraVertexAttributeColorMap: (meshId: MeshId) => string | undefined;
   meshPolyhedraVertexAttributeNoDataColor: (meshId: MeshId) => RGBAColor;
 }
@@ -93,9 +93,7 @@ function useMeshPolyhedraVertexAttributeConfigValues(): UseMeshPolyhedraVertexAt
     meshPolyhedraVertexAttributeItem,
     meshPolyhedraVertexAttributeStoredConfig,
   } = useMeshPolyhedraVertexAttributeConfig();
-  function meshPolyhedraVertexAttributeRange(
-    meshId: MeshId,
-  ): [number | undefined, number | undefined] {
+  function meshPolyhedraVertexAttributeRange(meshId: MeshId): AttributeRange {
     const name = meshPolyhedraVertexAttributeName(meshId);
     const item = meshPolyhedraVertexAttributeItem(meshId);
     const storedConfig = meshPolyhedraVertexAttributeStoredConfig(meshId, name, item);

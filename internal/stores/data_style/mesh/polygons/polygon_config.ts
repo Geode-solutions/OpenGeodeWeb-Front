@@ -1,4 +1,4 @@
-import type { AttributeItem, AttributeName } from "@ogw_front/types/attribute";
+import type { AttributeItem, AttributeName, AttributeRange } from "@ogw_front/types/attribute";
 import type {
   AttributeState,
   AttributeStoredConfig,
@@ -82,7 +82,7 @@ function useMeshPolygonsPolygonAttributeConfig(): UseMeshPolygonsPolygonAttribut
 }
 
 interface UseMeshPolygonsPolygonAttributeConfigValuesReturn {
-  meshPolygonsPolygonAttributeRange: (meshId: MeshId) => [number | undefined, number | undefined];
+  meshPolygonsPolygonAttributeRange: (meshId: MeshId) => AttributeRange;
   meshPolygonsPolygonAttributeColorMap: (meshId: MeshId) => string | undefined;
   meshPolygonsPolygonAttributeNoDataColor: (meshId: MeshId) => RGBAColor;
 }
@@ -93,9 +93,7 @@ function useMeshPolygonsPolygonAttributeConfigValues(): UseMeshPolygonsPolygonAt
     meshPolygonsPolygonAttributeItem,
     meshPolygonsPolygonAttributeStoredConfig,
   } = useMeshPolygonsPolygonAttributeConfig();
-  function meshPolygonsPolygonAttributeRange(
-    meshId: MeshId,
-  ): [number | undefined, number | undefined] {
+  function meshPolygonsPolygonAttributeRange(meshId: MeshId): AttributeRange {
     const name = meshPolygonsPolygonAttributeName(meshId);
     const item = meshPolygonsPolygonAttributeItem(meshId);
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(meshId, name, item);
