@@ -1,8 +1,9 @@
 import type { AttributeGroup, ColorGroup } from "./coloring_groups";
-import { isModelLinesEdgeAttributeValid, type useModelLinesEdgeAttribute } from "./edge";
-import { isModelLinesVertexAttributeValid, type useModelLinesVertexAttribute } from "./vertex";
 import type { DataId } from "@ogw_front/types/identifiers";
+import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import type { useModelLinesColor } from "./color";
+import type { useModelLinesEdgeAttribute } from "./edge";
+import type { useModelLinesVertexAttribute } from "./vertex";
 
 type ColorStyle = ReturnType<typeof useModelLinesColor>;
 type VertexAttributeStyle = ReturnType<typeof useModelLinesVertexAttribute>;
@@ -52,7 +53,7 @@ function groupModelLinesVertexAttributes(
       colorMap,
       no_data_color,
     };
-    if (!isModelLinesVertexAttributeValid(attribute)) {
+    if (!isAttributeValid(attribute)) {
       continue;
     }
     const key = [name, item, colorMap, minimum, maximum, JSON.stringify(no_data_color)].join("_");
@@ -113,7 +114,7 @@ function groupModelLinesEdgeAttributes(
       colorMap,
       no_data_color,
     };
-    if (!isModelLinesEdgeAttributeValid(attribute)) {
+    if (!isAttributeValid(attribute)) {
       continue;
     }
     const key = [name, item, colorMap, minimum, maximum, JSON.stringify(no_data_color)].join("_");

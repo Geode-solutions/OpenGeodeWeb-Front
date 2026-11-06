@@ -1,13 +1,14 @@
 // Third party imports
 
 // Local imports
-import { isMeshCellsCellAttributeValid, useMeshCellsCellAttributeStyle } from "./cell";
-import { isMeshCellsVertexAttributeValid, useMeshCellsVertexAttributeStyle } from "./vertex";
 import type { DataId } from "@ogw_front/types/identifiers";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
+import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
+import { useMeshCellsCellAttributeStyle } from "./cell";
 import { useMeshCellsColorStyle } from "./color";
 import { useMeshCellsCommonStyle } from "./common";
 import { useMeshCellsTexturesStyle } from "./textures";
+import { useMeshCellsVertexAttributeStyle } from "./vertex";
 import { useMeshCellsVisibilityStyle } from "./visibility";
 import { whenDefined } from "@ogw_internal/stores/data_style/when_defined";
 
@@ -31,7 +32,7 @@ function handleMeshCellsVertexColoring(
   const colorMap = vertexAttributeStyle.meshCellsVertexAttributeColorMap(meshId);
   const no_data_color = vertexAttributeStyle.meshCellsVertexAttributeNoDataColor(meshId);
   const vertex_attribute = { name, item, minimum, maximum, colorMap, no_data_color };
-  if (!isMeshCellsVertexAttributeValid(vertex_attribute)) {
+  if (!isAttributeValid(vertex_attribute)) {
     return undefined;
   }
   return vertexAttributeStyle.setMeshCellsVertexAttribute(meshId, vertex_attribute);
@@ -47,7 +48,7 @@ function handleMeshCellsCellColoring(
   const colorMap = cellAttributeStyle.meshCellsCellAttributeColorMap(meshId);
   const no_data_color = cellAttributeStyle.meshCellsCellAttributeNoDataColor(meshId);
   const cell_attribute = { name, item, minimum, maximum, colorMap, no_data_color };
-  if (!isMeshCellsCellAttributeValid(cell_attribute)) {
+  if (!isAttributeValid(cell_attribute)) {
     return undefined;
   }
   return cellAttributeStyle.setMeshCellsCellAttribute(meshId, cell_attribute);

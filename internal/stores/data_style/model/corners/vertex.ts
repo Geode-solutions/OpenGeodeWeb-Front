@@ -7,6 +7,7 @@ import type {
 } from "@ogw_internal/stores/data_style/attribute_types";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { DataId } from "@ogw_front/types/identifiers";
+import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
@@ -61,16 +62,6 @@ interface ModelCornersVertexAttributeApi {
   setModelCornersVertexAttributeColorMap: IdsFn<string | undefined>;
   modelCornersVertexAttributeNoDataColor: (modelId: DataId, cornerId?: string) => RGBAColor;
   setModelCornersVertexAttributeNoDataColor: IdsFn<RGBAColor>;
-}
-
-function isModelCornersVertexAttributeValid(input: AttributeInput): input is ValidAttributeInput {
-  return (
-    input.name !== undefined &&
-    input.item !== undefined &&
-    input.minimum !== undefined &&
-    input.maximum !== undefined &&
-    input.colorMap !== undefined
-  );
 }
 
 type ModelCornersVertexAttributeGetters = Pick<
@@ -288,7 +279,7 @@ function useModelCornersVertexAttribute(): ModelCornersVertexAttributeApi {
       colorMap: storedConfig.colorMap,
       no_data_color: storedConfig.no_data_color,
     };
-    if (isModelCornersVertexAttributeValid(attribute)) {
+    if (isAttributeValid(attribute)) {
       await setModelCornersVertexAttribute(modelId, cornerIds, attribute);
     }
   }
@@ -399,4 +390,4 @@ function useModelCornersVertexAttribute(): ModelCornersVertexAttributeApi {
     setModelCornersVertexAttributeNoDataColor,
   };
 }
-export { isModelCornersVertexAttributeValid, useModelCornersVertexAttribute };
+export { useModelCornersVertexAttribute };

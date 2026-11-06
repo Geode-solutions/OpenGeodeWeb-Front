@@ -1,11 +1,12 @@
-import { isModelLinesEdgeAttributeValid, useModelLinesEdgeAttribute } from "./edge";
-import { isModelLinesVertexAttributeValid, useModelLinesVertexAttribute } from "./vertex";
 import type { DataId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
+import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 import { useModelLinesCommonStyle } from "./common";
+import { useModelLinesEdgeAttribute } from "./edge";
+import { useModelLinesVertexAttribute } from "./vertex";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 const schema = viewer_schemas.opengeodeweb_viewer.model.lines.color;
@@ -82,7 +83,7 @@ export function useModelLinesColor(): {
       lines_ids[0],
     );
     const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
-    if (isModelLinesVertexAttributeValid(attribute)) {
+    if (isAttributeValid(attribute)) {
       const result = await modelLinesVertexAttribute.setModelLinesVertexAttribute(
         modelId,
         lines_ids,
@@ -106,7 +107,7 @@ export function useModelLinesColor(): {
       lines_ids[0],
     );
     const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
-    if (isModelLinesEdgeAttributeValid(attribute)) {
+    if (isAttributeValid(attribute)) {
       const result = await modelLinesEdgeAttribute.setModelLinesEdgeAttribute(
         modelId,
         lines_ids,

@@ -1,20 +1,18 @@
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { DataId } from "@ogw_front/types/identifiers";
 import type { ValidAttributeInput } from "@ogw_internal/stores/data_style/attribute_types";
+import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import {
-  type UseMeshPolygonsVertexAttributeStyleReturn,
-  isMeshPolygonsVertexAttributeValid,
-} from "./vertex_attribute";
-import {
   useMeshPolygonsVertexAttributeConfig,
   useMeshPolygonsVertexAttributeConfigValues,
   useMeshPolygonsVertexAttributeConfigWriter,
 } from "./vertex_config";
+import type { UseMeshPolygonsVertexAttributeStyleReturn } from "./vertex_attribute";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { useAttributeTimeStepStyle } from "@ogw_internal/stores/data_style/time_step";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -98,7 +96,7 @@ function useMeshPolygonsVertexAttributeStyle(): UseMeshPolygonsVertexAttributeSt
       colorMap: storedConfig.colorMap,
       no_data_color: storedConfig.no_data_color,
     };
-    if (isMeshPolygonsVertexAttributeValid(attribute)) {
+    if (isAttributeValid(attribute)) {
       const result = await setMeshPolygonsVertexAttribute(meshId, attribute);
       return result;
     }
@@ -190,4 +188,3 @@ function useMeshPolygonsVertexAttributeStyle(): UseMeshPolygonsVertexAttributeSt
   };
 }
 export { useMeshPolygonsVertexAttributeStyle };
-export { isMeshPolygonsVertexAttributeValid } from "./vertex_attribute";

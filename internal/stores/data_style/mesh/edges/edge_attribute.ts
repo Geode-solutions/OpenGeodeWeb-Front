@@ -1,20 +1,9 @@
 import type {
-  AttributeInput,
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
 import type { DataId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
-
-function isMeshEdgesEdgeAttributeValid(input: AttributeInput): input is ValidAttributeInput {
-  return (
-    input.name !== undefined &&
-    input.item !== undefined &&
-    input.minimum !== undefined &&
-    input.maximum !== undefined &&
-    input.colorMap !== undefined
-  );
-}
 
 interface UseMeshEdgesEdgeAttributeStyleReturn {
   meshEdgesEdgeAttributeName: (meshId: DataId) => string | undefined;
@@ -46,5 +35,4 @@ interface UseMeshEdgesEdgeAttributeStyleReturn {
     no_data_color: RGBAColor,
   ) => Promise<unknown>;
 }
-export { isMeshEdgesEdgeAttributeValid };
 export type { UseMeshEdgesEdgeAttributeStyleReturn };

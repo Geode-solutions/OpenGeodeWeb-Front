@@ -7,6 +7,7 @@ import type {
 } from "@ogw_internal/stores/data_style/attribute_types";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { DataId } from "@ogw_front/types/identifiers";
+import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
@@ -22,16 +23,6 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 // Local constants
 const attributeSchema = viewer_schemas.opengeodeweb_viewer.model.blocks.attribute.vertex.attribute;
-
-function isModelBlocksVertexAttributeValid(input: AttributeInput): input is ValidAttributeInput {
-  return (
-    input.name !== undefined &&
-    input.item !== undefined &&
-    input.minimum !== undefined &&
-    input.maximum !== undefined &&
-    input.colorMap !== undefined
-  );
-}
 
 interface UseModelBlocksVertexAttributeReturn {
   modelBlocksVertexAttributeName: (modelId: DataId, blockId?: string) => string | undefined;
@@ -307,7 +298,7 @@ function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
       colorMap: storedConfig.colorMap,
       no_data_color: storedConfig.no_data_color,
     };
-    if (isModelBlocksVertexAttributeValid(attribute)) {
+    if (isAttributeValid(attribute)) {
       const result = await setModelBlocksVertexAttribute(modelId, blockIds, attribute);
       return result;
     }
@@ -427,4 +418,4 @@ function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
     setModelBlocksVertexAttributeNoDataColor,
   };
 }
-export { isModelBlocksVertexAttributeValid, useModelBlocksVertexAttribute };
+export { useModelBlocksVertexAttribute };

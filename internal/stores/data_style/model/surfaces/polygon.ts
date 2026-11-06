@@ -7,6 +7,7 @@ import type {
 } from "@ogw_internal/stores/data_style/attribute_types";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { DataId } from "@ogw_front/types/identifiers";
+import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
@@ -23,16 +24,6 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 // Local constants
 const attributeSchema =
   viewer_schemas.opengeodeweb_viewer.model.surfaces.attribute.polygon.attribute;
-
-function isModelSurfacesPolygonAttributeValid(input: AttributeInput): input is ValidAttributeInput {
-  return (
-    input.name !== undefined &&
-    input.item !== undefined &&
-    input.minimum !== undefined &&
-    input.maximum !== undefined &&
-    input.colorMap !== undefined
-  );
-}
 
 interface UseModelSurfacesPolygonAttributeReturn {
   modelSurfacesPolygonAttributeName: (modelId: DataId, surfaceId?: string) => string | undefined;
@@ -317,7 +308,7 @@ function useModelSurfacesPolygonAttribute(): UseModelSurfacesPolygonAttributeRet
       colorMap: storedConfig.colorMap,
       no_data_color: storedConfig.no_data_color,
     };
-    if (isModelSurfacesPolygonAttributeValid(attribute)) {
+    if (isAttributeValid(attribute)) {
       await setModelSurfacesPolygonAttribute(modelId, surfaceIds, attribute);
     }
   }
@@ -435,4 +426,4 @@ function useModelSurfacesPolygonAttribute(): UseModelSurfacesPolygonAttributeRet
     setModelSurfacesPolygonAttributeNoDataColor,
   };
 }
-export { isModelSurfacesPolygonAttributeValid, useModelSurfacesPolygonAttribute };
+export { useModelSurfacesPolygonAttribute };

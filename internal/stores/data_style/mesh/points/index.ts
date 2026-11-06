@@ -1,12 +1,13 @@
 // Third party imports
 
 // Local imports
-import { isMeshPointsVertexAttributeValid, useMeshPointsVertexAttributeStyle } from "./vertex";
 import type { DataId } from "@ogw_front/types/identifiers";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
+import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import { useMeshPointsColorStyle } from "./color";
 import { useMeshPointsCommonStyle } from "./common";
 import { useMeshPointsSizeStyle } from "./size";
+import { useMeshPointsVertexAttributeStyle } from "./vertex";
 import { useMeshPointsVisibilityStyle } from "./visibility";
 import { whenDefined } from "@ogw_internal/stores/data_style/when_defined";
 
@@ -28,7 +29,7 @@ function handleMeshPointsVertexColoring(
   const colorMap = vertexAttributeStyle.meshPointsVertexAttributeColorMap(meshId);
   const no_data_color = vertexAttributeStyle.meshPointsVertexAttributeNoDataColor(meshId);
   const vertex_attribute = { name, item, minimum, maximum, colorMap, no_data_color };
-  if (!isMeshPointsVertexAttributeValid(vertex_attribute)) {
+  if (!isAttributeValid(vertex_attribute)) {
     return undefined;
   }
   return vertexAttributeStyle.setMeshPointsVertexAttribute(meshId, vertex_attribute);

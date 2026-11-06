@@ -1,18 +1,13 @@
 // Third party imports
 
 // Local imports
-import {
-  isMeshPolyhedraPolyhedronAttributeValid,
-  useMeshPolyhedraPolyhedronAttributeStyle,
-} from "./polyhedron";
-import {
-  isMeshPolyhedraVertexAttributeValid,
-  useMeshPolyhedraVertexAttributeStyle,
-} from "./vertex";
 import type { DataId } from "@ogw_front/types/identifiers";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
+import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import { useMeshPolyhedraColorStyle } from "./color";
 import { useMeshPolyhedraCommonStyle } from "./common";
+import { useMeshPolyhedraPolyhedronAttributeStyle } from "./polyhedron";
+import { useMeshPolyhedraVertexAttributeStyle } from "./vertex";
 import { useMeshPolyhedraVisibilityStyle } from "./visibility";
 import { whenDefined } from "@ogw_internal/stores/data_style/when_defined";
 
@@ -35,7 +30,7 @@ function handleMeshPolyhedraVertexColoring(
   const colorMap = vertexAttributeStyle.meshPolyhedraVertexAttributeColorMap(meshId);
   const no_data_color = vertexAttributeStyle.meshPolyhedraVertexAttributeNoDataColor(meshId);
   const vertex_attribute = { name, item, minimum, maximum, colorMap, no_data_color };
-  if (!isMeshPolyhedraVertexAttributeValid(vertex_attribute)) {
+  if (!isAttributeValid(vertex_attribute)) {
     return undefined;
   }
   return vertexAttributeStyle.setMeshPolyhedraVertexAttribute(meshId, vertex_attribute);
@@ -59,7 +54,7 @@ function handleMeshPolyhedraPolyhedronColoring(
     colorMap,
     no_data_color,
   };
-  if (!isMeshPolyhedraPolyhedronAttributeValid(polyhedron_attribute)) {
+  if (!isAttributeValid(polyhedron_attribute)) {
     return undefined;
   }
   return polyhedronAttributeStyle.setMeshPolyhedraPolyhedronAttribute(meshId, polyhedron_attribute);
