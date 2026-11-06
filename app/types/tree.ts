@@ -9,4 +9,9 @@ interface TreeGroup<Child> extends TreeNode {
   children: Child[];
 }
 
-export type { TreeGroup, TreeNode };
+// A node that groups other nodes and whose list of children is not changed
+interface ReadonlyTreeGroup<Child> extends TreeNode {
+  readonly children: readonly Child[];
+}
+
+export type { ReadonlyTreeGroup, TreeGroup, TreeNode };

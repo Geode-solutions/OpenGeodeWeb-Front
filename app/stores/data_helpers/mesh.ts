@@ -1,4 +1,5 @@
 import type { DataIdentified, GeodeIdentified } from "@ogw_front/types/identifiers";
+import type { ReadonlyTreeGroup } from "@ogw_front/types/tree";
 import type { Table } from "dexie";
 import { database } from "@ogw_internal/database/database.js";
 import { liveObservable } from "@ogw_front/utils/live_observable";
@@ -19,11 +20,7 @@ interface FormattedComponent extends Readonly<GeodeIdentified> {
   readonly is_active: boolean;
 }
 
-interface FormattedComponentGroup {
-  id: string;
-  title: string;
-  readonly children: readonly FormattedComponent[];
-}
+type FormattedComponentGroup = ReadonlyTreeGroup<FormattedComponent>;
 
 function toFormattedComponent(meshComponent: ModelComponentRecord): FormattedComponent {
   return {
