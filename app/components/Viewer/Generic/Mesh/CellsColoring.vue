@@ -6,15 +6,11 @@ import {
 } from "@ogw_front/composables/batch_style";
 import type { DataId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { Texture } from "@ogw_front/types/texture";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import { useBatchStyleModel } from "@ogw_front/composables/batch_style_model";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-
-interface Texture {
-  id: string;
-  texture_name: string;
-}
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();

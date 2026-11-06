@@ -1,11 +1,7 @@
 <script setup lang="ts">
 import type { DataId } from "@ogw_front/types/identifiers";
+import type { Texture } from "@ogw_front/types/texture";
 import ViewerOptionsTextureItem from "@ogw_front/components/Viewer/Options/TextureItem.vue";
-
-interface Texture {
-  id: string;
-  texture_name: string;
-}
 
 const textures = defineModel<Texture[]>();
 
