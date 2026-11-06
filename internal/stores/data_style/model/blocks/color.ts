@@ -1,4 +1,4 @@
-import type { DataId, ModelComponentId } from "@ogw_front/types/identifiers";
+import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
@@ -12,18 +12,18 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed
 const schema = viewer_schemas.opengeodeweb_viewer.model.blocks.color;
 
 export function useModelBlocksColor(): {
-  modelBlockColoring: (modelId: DataId, block_id?: ModelComponentId) => StyleValues;
-  modelBlockColor: (modelId: DataId, block_id?: ModelComponentId) => RGBAColor | undefined;
+  modelBlockColoring: (modelId: ModelId, block_id?: ModelComponentId) => StyleValues;
+  modelBlockColor: (modelId: ModelId, block_id?: ModelComponentId) => RGBAColor | undefined;
   setModelBlocksColor: (
-    modelId: DataId,
+    modelId: ModelId,
     blocks_ids: ModelComponentId[],
     color: RGBAColor | undefined,
     activeColoring?: string,
     collectionId?: string,
   ) => Promise<unknown>;
-  modelBlockActiveColoring: (modelId: DataId, block_id?: ModelComponentId) => unknown;
+  modelBlockActiveColoring: (modelId: ModelId, block_id?: ModelComponentId) => unknown;
   setModelBlocksActiveColoring: (
-    modelId: DataId,
+    modelId: ModelId,
     blocks_ids: ModelComponentId[],
     activeColoring: string,
     collectionId?: string,
@@ -35,18 +35,18 @@ export function useModelBlocksColor(): {
   const modelBlocksVertexAttribute = useModelBlocksVertexAttribute();
   const modelBlocksPolyhedronAttribute = useModelBlocksPolyhedronAttribute();
 
-  function modelBlockColoring(modelId: DataId, block_id?: ModelComponentId): StyleValues {
+  function modelBlockColoring(modelId: ModelId, block_id?: ModelComponentId): StyleValues {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
     return modelBlocksCommonStyle.modelBlockStyle(modelId, block_id).coloring as StyleValues;
   }
 
-  function modelBlockColor(modelId: DataId, block_id?: ModelComponentId): RGBAColor | undefined {
+  function modelBlockColor(modelId: ModelId, block_id?: ModelComponentId): RGBAColor | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.constant shape is defined by the data style schema.
     return modelBlockColoring(modelId, block_id).constant as RGBAColor | undefined;
   }
 
   async function setModelBlocksColor(
-    modelId: DataId,
+    modelId: ModelId,
     blocks_ids: ModelComponentId[],
     color: RGBAColor | undefined,
     activeColoring = "constant",
@@ -63,12 +63,12 @@ export function useModelBlocksColor(): {
     return result;
   }
 
-  function modelBlockActiveColoring(modelId: DataId, block_id?: ModelComponentId): unknown {
+  function modelBlockActiveColoring(modelId: ModelId, block_id?: ModelComponentId): unknown {
     return modelBlockColoring(modelId, block_id).active;
   }
 
   async function applyVertexColoring(
-    modelId: DataId,
+    modelId: ModelId,
     blocks_ids: ModelComponentId[],
   ): Promise<void> {
     const name = modelBlocksVertexAttribute.modelBlocksVertexAttributeName(modelId, blocks_ids[0]);
@@ -96,7 +96,7 @@ export function useModelBlocksColor(): {
   }
 
   async function applyPolyhedronColoring(
-    modelId: DataId,
+    modelId: ModelId,
     blocks_ids: ModelComponentId[],
   ): Promise<void> {
     const name = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeName(
@@ -130,7 +130,7 @@ export function useModelBlocksColor(): {
   }
 
   async function setModelBlocksActiveColoring(
-    modelId: DataId,
+    modelId: ModelId,
     blocks_ids: ModelComponentId[],
     activeColoring: string,
     collectionId?: string,

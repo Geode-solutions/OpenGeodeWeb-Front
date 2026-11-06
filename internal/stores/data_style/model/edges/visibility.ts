@@ -5,7 +5,7 @@ import {
   EDGES_COMPONENT_TYPES,
   useModelComponentEdgesStyle,
 } from "@ogw_internal/stores/data_style/model/edges/component";
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { ModelId } from "@ogw_front/types/identifiers";
 import { useModelEdgesCommonStyle } from "./common";
 import { useModelEdgesWidthStyle } from "./width";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -15,9 +15,9 @@ import { whenDefined } from "@ogw_internal/stores/data_style/when_defined";
 const schema = viewer_schemas.opengeodeweb_viewer.model.edges.visibility;
 
 interface ModelEdgesVisibilityStyleApi {
-  modelEdgesVisibility: (modelId: DataId) => boolean | undefined;
-  setModelEdgesVisibility: (modelId: DataId, visibility: boolean) => Promise<unknown>;
-  applyModelEdgesStyle: (modelId: DataId) => Promise<unknown[]>;
+  modelEdgesVisibility: (modelId: ModelId) => boolean | undefined;
+  setModelEdgesVisibility: (modelId: ModelId, visibility: boolean) => Promise<unknown>;
+  applyModelEdgesStyle: (modelId: ModelId) => Promise<unknown[]>;
 }
 
 export function useModelEdgesVisibilityStyle(): ModelEdgesVisibilityStyleApi {
@@ -28,7 +28,7 @@ export function useModelEdgesVisibilityStyle(): ModelEdgesVisibilityStyleApi {
     useModelComponentEdgesStyle(type),
   );
 
-  function modelEdgesVisibility(modelId: DataId): boolean | undefined {
+  function modelEdgesVisibility(modelId: ModelId): boolean | undefined {
     const { visibility } = modelEdgesCommonStyle.modelEdgesStyle(modelId);
     if (typeof visibility === "boolean") {
       return visibility;
@@ -36,7 +36,7 @@ export function useModelEdgesVisibilityStyle(): ModelEdgesVisibilityStyleApi {
     return undefined;
   }
 
-  async function setModelEdgesVisibility(modelId: DataId, visibility: boolean): Promise<unknown> {
+  async function setModelEdgesVisibility(modelId: ModelId, visibility: boolean): Promise<unknown> {
     const params = { id: modelId, visibility };
     const result = await viewerStore.request(
       { schema, params },
@@ -54,7 +54,7 @@ export function useModelEdgesVisibilityStyle(): ModelEdgesVisibilityStyleApi {
     return result;
   }
 
-  async function applyModelEdgesStyle(modelId: DataId): Promise<unknown[]> {
+  async function applyModelEdgesStyle(modelId: ModelId): Promise<unknown[]> {
     const visibilityResult = await whenDefined(
       modelEdgesVisibility(modelId),
       async (visibility) => {

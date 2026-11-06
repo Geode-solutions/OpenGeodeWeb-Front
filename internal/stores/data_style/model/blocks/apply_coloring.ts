@@ -1,5 +1,5 @@
 import type { AttributeGroup, ColorGroup } from "./coloring_groups";
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { ModelId } from "@ogw_front/types/identifiers";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import type { useModelBlocksColor } from "./color";
 import type { useModelBlocksPolyhedronAttribute } from "./polyhedron";
@@ -10,7 +10,7 @@ type VertexAttributeStyle = ReturnType<typeof useModelBlocksVertexAttribute>;
 type PolyhedronAttributeStyle = ReturnType<typeof useModelBlocksPolyhedronAttribute>;
 
 function applyModelBlocksConstantColoring(
-  modelId: DataId,
+  modelId: ModelId,
   type_blocks_ids: string[],
   modelColorStyle: ColorStyle,
 ): Promise<unknown>[] {
@@ -28,7 +28,7 @@ function applyModelBlocksConstantColoring(
 }
 
 function groupModelBlocksVertexAttributes(
-  modelId: DataId,
+  modelId: ModelId,
   type_blocks_ids: string[],
   modelBlocksVertexAttribute: VertexAttributeStyle,
 ): Record<string, AttributeGroup> {
@@ -67,7 +67,7 @@ function groupModelBlocksVertexAttributes(
 }
 
 function applyModelBlocksVertexColoring(
-  modelId: DataId,
+  modelId: ModelId,
   type_blocks_ids: string[],
   modelBlocksVertexAttribute: VertexAttributeStyle,
 ): Promise<unknown>[] {
@@ -92,7 +92,7 @@ function applyModelBlocksVertexColoring(
 }
 
 function groupModelBlocksPolyhedronAttributes(
-  modelId: DataId,
+  modelId: ModelId,
   type_blocks_ids: string[],
   modelBlocksPolyhedronAttribute: PolyhedronAttributeStyle,
 ): Record<string, AttributeGroup> {
@@ -137,7 +137,7 @@ function groupModelBlocksPolyhedronAttributes(
 }
 
 function applyModelBlocksPolyhedronColoring(
-  modelId: DataId,
+  modelId: ModelId,
   type_blocks_ids: string[],
   modelBlocksPolyhedronAttribute: PolyhedronAttributeStyle,
 ): Promise<unknown>[] {

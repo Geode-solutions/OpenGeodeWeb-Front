@@ -1,4 +1,4 @@
-import type { DataId, ModelComponentId } from "@ogw_front/types/identifiers";
+import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
 import {
   applyModelBlocksConstantColoring,
   applyModelBlocksPolyhedronColoring,
@@ -18,8 +18,8 @@ async function setModelBlocksDefaultStyle(_id: string): Promise<void> {
 }
 
 type UseModelBlocksStyleReturn = {
-  applyModelBlocksStyle: (modelId: DataId) => Promise<void>;
-  setModelBlocksDefaultStyle: (modelId: DataId) => Promise<void>;
+  applyModelBlocksStyle: (modelId: ModelId) => Promise<void>;
+  setModelBlocksDefaultStyle: (modelId: ModelId) => Promise<void>;
 } & ReturnType<typeof useModelBlocksCommonStyle> &
   ReturnType<typeof useModelBlocksVisibility> &
   ReturnType<typeof useModelBlocksColor> &
@@ -40,7 +40,7 @@ export function useModelBlocksStyle(): UseModelBlocksStyleReturn {
   const modelBlocksEdgesStyle = useModelBlocksEdgesStyle();
 
   async function applyModelBlocksVisibilityStyle(
-    modelId: DataId,
+    modelId: ModelId,
     blocks_ids: ModelComponentId[],
   ): Promise<unknown[]> {
     const visibilityGroups: Record<string, string[]> = {};
@@ -64,7 +64,7 @@ export function useModelBlocksStyle(): UseModelBlocksStyleReturn {
   }
 
   async function applyModelBlocksColoringStyle(
-    modelId: DataId,
+    modelId: ModelId,
     blocks_ids: ModelComponentId[],
   ): Promise<unknown[]> {
     const activeColoringGroups: Record<string, string[]> = {};
@@ -104,7 +104,7 @@ export function useModelBlocksStyle(): UseModelBlocksStyleReturn {
     return result;
   }
 
-  async function applyModelBlocksStyle(modelId: DataId): Promise<void> {
+  async function applyModelBlocksStyle(modelId: ModelId): Promise<void> {
     const blocks_ids = await dataStore.getBlocksGeodeIds(modelId);
     if (blocks_ids.length === 0) {
       return;

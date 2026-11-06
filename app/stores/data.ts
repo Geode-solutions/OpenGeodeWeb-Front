@@ -12,6 +12,7 @@ import type {
   GeodeId,
   GeodeIdentified,
   GeodeObjectTyped,
+  ModelId,
   ViewerTyped,
 } from "@ogw_front/types/identifiers";
 import { type LegacyDataId, fromLegacyDataId } from "@ogw_front/utils/legacy_data_id";
@@ -193,7 +194,7 @@ export const useDataStore = defineStore("data", () => {
     return computed(() => items.value.filter((data_item) => isRegistered(data_item.data_id)));
   }
   async function meshComponentType(
-    modelId: DataId,
+    modelId: ModelId,
     geode_id: GeodeId,
   ): Promise<string | undefined> {
     const component = await model_components_db
@@ -316,7 +317,7 @@ export const useDataStore = defineStore("data", () => {
     return lastKey;
   }
   async function getComponentByViewerId(
-    modelId: DataId,
+    modelId: ModelId,
     viewer_id: string | number,
   ): Promise<ModelComponentRecord | undefined> {
     const component = await model_components_db
@@ -327,7 +328,7 @@ export const useDataStore = defineStore("data", () => {
     return component;
   }
   async function getComponentsByViewerIds(
-    modelId: DataId,
+    modelId: ModelId,
     viewer_ids: number[],
   ): Promise<ModelComponentRecord[]> {
     const components = await model_components_db
@@ -337,7 +338,7 @@ export const useDataStore = defineStore("data", () => {
       .toArray();
     return components;
   }
-  async function deleteModelComponents(modelId: DataId): Promise<void> {
+  async function deleteModelComponents(modelId: ModelId): Promise<void> {
     await model_components_db.where("data_id").equals(modelId).delete();
     await model_components_relation_db.where("data_id").equals(modelId).delete();
   }
@@ -351,14 +352,14 @@ export const useDataStore = defineStore("data", () => {
     await data_db.update(dataId, changes);
   }
 
-  async function getAllModelComponentsViewerIds(modelId: DataId): Promise<number[]> {
+  async function getAllModelComponentsViewerIds(modelId: ModelId): Promise<number[]> {
     const components = await model_components_db.where("data_id").equals(modelId).toArray();
     return components.map((component: ModelComponentRecord) =>
       Math.trunc(Number(component.viewer_id)),
     );
   }
   async function getMeshComponentsViewerIds(
-    modelId: DataId,
+    modelId: ModelId,
     meshComponentGeodeIds: readonly string[],
   ): Promise<number[]> {
     const components = await model_components_db

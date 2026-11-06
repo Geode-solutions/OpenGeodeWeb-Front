@@ -6,7 +6,7 @@ import type {
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
-import type { DataId, ModelComponentId } from "@ogw_front/types/identifiers";
+import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
@@ -26,60 +26,63 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const attributeSchema = viewer_schemas.opengeodeweb_viewer.model.lines.attribute.vertex.attribute;
 
 interface UseModelLinesVertexAttributeReturn {
-  modelLinesVertexAttributeName: (modelId: DataId, lineId?: ModelComponentId) => string | undefined;
-  modelLinesVertexAttributeItem: (modelId: DataId, lineId?: ModelComponentId) => number;
+  modelLinesVertexAttributeName: (
+    modelId: ModelId,
+    lineId?: ModelComponentId,
+  ) => string | undefined;
+  modelLinesVertexAttributeItem: (modelId: ModelId, lineId?: ModelComponentId) => number;
   modelLinesVertexAttributeRange: (
-    modelId: DataId,
+    modelId: ModelId,
     lineId?: ModelComponentId,
   ) => [number | undefined, number | undefined];
   modelLinesVertexAttributeTimeStep: (
-    modelId: DataId,
+    modelId: ModelId,
     lineId?: ModelComponentId,
   ) => number | undefined;
   setModelLinesVertexAttributeTimeStep: (
-    modelId: DataId,
+    modelId: ModelId,
     lineIds: ModelComponentId[],
     timeStep: number,
   ) => Promise<void>;
   modelLinesVertexAttributeColorMap: (
-    modelId: DataId,
+    modelId: ModelId,
     lineId?: ModelComponentId,
   ) => string | undefined;
   modelLinesVertexAttributeStoredConfig: (
-    modelId: DataId,
+    modelId: ModelId,
     lineId: ModelComponentId | undefined,
     name: string | undefined,
     item: number | undefined,
   ) => AttributeStoredConfig;
   setModelLinesVertexAttribute: (
-    modelId: DataId,
+    modelId: ModelId,
     lineIds: ModelComponentId[],
     input: ValidAttributeInput,
   ) => Promise<unknown>;
   setModelLinesVertexAttributeName: (
-    modelId: DataId,
+    modelId: ModelId,
     lineIds: ModelComponentId[],
     name: string,
   ) => Promise<unknown>;
   setModelLinesVertexAttributeItem: (
-    modelId: DataId,
+    modelId: ModelId,
     lineIds: ModelComponentId[],
     item: number,
   ) => Promise<unknown>;
   setModelLinesVertexAttributeRange: (
-    modelId: DataId,
+    modelId: ModelId,
     lineIds: ModelComponentId[],
     minimum: number,
     maximum: number,
   ) => Promise<unknown>;
   setModelLinesVertexAttributeColorMap: (
-    modelId: DataId,
+    modelId: ModelId,
     lineIds: ModelComponentId[],
     colorMap: string | undefined,
   ) => Promise<unknown>;
-  modelLinesVertexAttributeNoDataColor: (modelId: DataId, lineId?: ModelComponentId) => RGBAColor;
+  modelLinesVertexAttributeNoDataColor: (modelId: ModelId, lineId?: ModelComponentId) => RGBAColor;
   setModelLinesVertexAttributeNoDataColor: (
-    modelId: DataId,
+    modelId: ModelId,
     lineIds: ModelComponentId[],
     no_data_color: RGBAColor,
   ) => Promise<unknown>;
@@ -96,7 +99,7 @@ type ModelLinesVertexAttributeGetters = Pick<
   | "modelLinesVertexAttributeTimeStep"
 > & {
   modelLinesVertexAttributeLastItem: (
-    modelId: DataId,
+    modelId: ModelId,
     componentId: string | undefined,
     name: string | undefined,
   ) => number;
@@ -107,12 +110,12 @@ function useModelLinesVertexAttributeGetters(
   modelLinesCommonStyle: ReturnType<typeof useModelLinesCommonStyle>,
 ): ModelLinesVertexAttributeGetters {
   const { attributeTimeStep } = useAttributeTimeStepStyle();
-  function modelLinesVertexAttribute(modelId: DataId, lineId?: ModelComponentId): AttributeState {
+  function modelLinesVertexAttribute(modelId: ModelId, lineId?: ModelComponentId): AttributeState {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.vertex shape is defined by the data style schema.
     return modelLinesCommonStyle.modelLineColoring(modelId, lineId).vertex as AttributeState;
   }
   function modelLinesVertexAttributeStoredConfig(
-    modelId: DataId,
+    modelId: ModelId,
     lineId: ModelComponentId | undefined,
     name: string | undefined,
     item: number | undefined,
@@ -126,13 +129,13 @@ function useModelLinesVertexAttributeGetters(
     return defaultAttributeStoredConfig();
   }
   function modelLinesVertexAttributeName(
-    modelId: DataId,
+    modelId: ModelId,
     lineId?: ModelComponentId,
   ): string | undefined {
     return modelLinesVertexAttribute(modelId, lineId).name;
   }
   function modelLinesVertexAttributeLastItem(
-    modelId: DataId,
+    modelId: ModelId,
     lineId: ModelComponentId | undefined,
     name: string | undefined,
   ): number {
@@ -143,7 +146,7 @@ function useModelLinesVertexAttributeGetters(
     }
     return 0;
   }
-  function modelLinesVertexAttributeItem(modelId: DataId, lineId?: ModelComponentId): number {
+  function modelLinesVertexAttributeItem(modelId: ModelId, lineId?: ModelComponentId): number {
     const vertexAttribute = modelLinesVertexAttribute(modelId, lineId);
     return (
       vertexAttribute.item ??
@@ -151,7 +154,7 @@ function useModelLinesVertexAttributeGetters(
     );
   }
   function modelLinesVertexAttributeRange(
-    modelId: DataId,
+    modelId: ModelId,
     lineId?: ModelComponentId,
   ): [number | undefined, number | undefined] {
     const name = modelLinesVertexAttributeName(modelId, lineId);
@@ -161,7 +164,7 @@ function useModelLinesVertexAttributeGetters(
     return [minimum, maximum];
   }
   function modelLinesVertexAttributeColorMap(
-    modelId: DataId,
+    modelId: ModelId,
     lineId?: ModelComponentId,
   ): string | undefined {
     const name = modelLinesVertexAttributeName(modelId, lineId);
@@ -170,7 +173,7 @@ function useModelLinesVertexAttributeGetters(
     return storedConfig.colorMap;
   }
   function modelLinesVertexAttributeNoDataColor(
-    modelId: DataId,
+    modelId: ModelId,
     lineId?: ModelComponentId,
   ): RGBAColor {
     const name = modelLinesVertexAttributeName(modelId, lineId);
@@ -179,7 +182,7 @@ function useModelLinesVertexAttributeGetters(
     return storedConfig.no_data_color;
   }
   function modelLinesVertexAttributeTimeStep(
-    modelId: DataId,
+    modelId: ModelId,
     lineId?: ModelComponentId,
   ): number | undefined {
     return attributeTimeStep(
@@ -217,7 +220,7 @@ function useModelLinesVertexAttribute(): UseModelLinesVertexAttributeReturn {
   } = useModelLinesVertexAttributeGetters(modelLinesCommonStyle);
   const viewerStore = useViewerStore();
   async function mutateModelLinesVertexStyle(
-    modelId: DataId,
+    modelId: ModelId,
     lineIds: ModelComponentId[],
     values: Record<string, unknown>,
   ): Promise<void> {
@@ -237,7 +240,7 @@ function useModelLinesVertexAttribute(): UseModelLinesVertexAttributeReturn {
     await Promise.all(tasks);
   }
   async function setModelLinesVertexAttributeStoredConfig(
-    modelId: DataId,
+    modelId: ModelId,
     lineIds: ModelComponentId[],
     name: string | undefined,
     item: number | undefined,
@@ -256,7 +259,7 @@ function useModelLinesVertexAttribute(): UseModelLinesVertexAttributeReturn {
     });
   }
   async function setModelLinesVertexAttribute(
-    modelId: DataId,
+    modelId: ModelId,
     lineIds: ModelComponentId[],
     {
       name,
@@ -294,7 +297,10 @@ function useModelLinesVertexAttribute(): UseModelLinesVertexAttributeReturn {
       params,
     });
   }
-  async function applyVertexAttribute(modelId: DataId, lineIds: ModelComponentId[]): Promise<void> {
+  async function applyVertexAttribute(
+    modelId: ModelId,
+    lineIds: ModelComponentId[],
+  ): Promise<void> {
     const name = modelLinesVertexAttributeName(modelId, lineIds[0]);
     const item = modelLinesVertexAttributeItem(modelId, lineIds[0]);
     const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineIds[0], name, item);
@@ -311,7 +317,7 @@ function useModelLinesVertexAttribute(): UseModelLinesVertexAttributeReturn {
     }
   }
   async function setModelLinesVertexAttributeName(
-    modelId: DataId,
+    modelId: ModelId,
     lineIds: ModelComponentId[],
     name: string,
   ): Promise<unknown> {
@@ -323,7 +329,7 @@ function useModelLinesVertexAttribute(): UseModelLinesVertexAttributeReturn {
     return applyVertexAttribute(modelId, lineIds);
   }
   async function setModelLinesVertexAttributeItem(
-    modelId: DataId,
+    modelId: ModelId,
     lineIds: ModelComponentId[],
     item: number,
   ): Promise<unknown> {
@@ -333,7 +339,7 @@ function useModelLinesVertexAttribute(): UseModelLinesVertexAttributeReturn {
     return applyVertexAttribute(modelId, lineIds);
   }
   async function setModelLinesVertexAttributeTimeStep(
-    modelId: DataId,
+    modelId: ModelId,
     lineIds: ModelComponentId[],
     timeStep: number,
   ): Promise<void> {
@@ -368,7 +374,7 @@ function useModelLinesVertexAttribute(): UseModelLinesVertexAttributeReturn {
     ]);
   }
   async function setModelLinesVertexAttributeRange(
-    modelId: DataId,
+    modelId: ModelId,
     lineIds: ModelComponentId[],
     minimum: number,
     maximum: number,
@@ -382,7 +388,7 @@ function useModelLinesVertexAttribute(): UseModelLinesVertexAttributeReturn {
     return applyVertexAttribute(modelId, lineIds);
   }
   async function setModelLinesVertexAttributeColorMap(
-    modelId: DataId,
+    modelId: ModelId,
     lineIds: ModelComponentId[],
     colorMap: string | undefined,
   ): Promise<unknown> {
@@ -394,7 +400,7 @@ function useModelLinesVertexAttribute(): UseModelLinesVertexAttributeReturn {
     return applyVertexAttribute(modelId, lineIds);
   }
   async function setModelLinesVertexAttributeNoDataColor(
-    modelId: DataId,
+    modelId: ModelId,
     lineIds: ModelComponentId[],
     no_data_color: RGBAColor,
   ): Promise<unknown> {

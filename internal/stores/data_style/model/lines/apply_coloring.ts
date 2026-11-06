@@ -1,5 +1,5 @@
 import type { AttributeGroup, ColorGroup } from "./coloring_groups";
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { ModelId } from "@ogw_front/types/identifiers";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import type { useModelLinesColor } from "./color";
 import type { useModelLinesEdgeAttribute } from "./edge";
@@ -10,7 +10,7 @@ type VertexAttributeStyle = ReturnType<typeof useModelLinesVertexAttribute>;
 type EdgeAttributeStyle = ReturnType<typeof useModelLinesEdgeAttribute>;
 
 function applyModelLinesConstantColoring(
-  modelId: DataId,
+  modelId: ModelId,
   type_lines_ids: string[],
   modelColorStyle: ColorStyle,
 ): Promise<unknown>[] {
@@ -28,7 +28,7 @@ function applyModelLinesConstantColoring(
 }
 
 function groupModelLinesVertexAttributes(
-  modelId: DataId,
+  modelId: ModelId,
   type_lines_ids: string[],
   modelLinesVertexAttribute: VertexAttributeStyle,
 ): Record<string, AttributeGroup> {
@@ -64,7 +64,7 @@ function groupModelLinesVertexAttributes(
 }
 
 function applyModelLinesVertexColoring(
-  modelId: DataId,
+  modelId: ModelId,
   type_lines_ids: string[],
   modelLinesVertexAttribute: VertexAttributeStyle,
 ): Promise<unknown>[] {
@@ -89,7 +89,7 @@ function applyModelLinesVertexColoring(
 }
 
 function groupModelLinesEdgeAttributes(
-  modelId: DataId,
+  modelId: ModelId,
   type_lines_ids: string[],
   modelLinesEdgeAttribute: EdgeAttributeStyle,
 ): Record<string, AttributeGroup> {
@@ -125,7 +125,7 @@ function groupModelLinesEdgeAttributes(
 }
 
 function applyModelLinesEdgeColoring(
-  modelId: DataId,
+  modelId: ModelId,
   type_lines_ids: string[],
   modelLinesEdgeAttribute: EdgeAttributeStyle,
 ): Promise<unknown>[] {

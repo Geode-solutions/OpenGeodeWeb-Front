@@ -3,8 +3,8 @@ import {
   type ModelComponentRecord,
   toFormattedComponent,
 } from "./mesh.js";
-import type { DataId } from "@ogw_front/types/identifiers";
 import { Dexie } from "dexie";
+import type { ModelId } from "@ogw_front/types/identifiers";
 import { getTable } from "@ogw_internal/database/database.js";
 
 interface ModelComponentRelationRecord {
@@ -28,7 +28,7 @@ export function useDataRelations(): {
   );
 
   async function getRelatedComponents(
-    modelId: DataId,
+    modelId: ModelId,
     relations: readonly ModelComponentRelationRecord[],
     type: string,
   ): Promise<FormattedComponent[]> {
@@ -40,7 +40,7 @@ export function useDataRelations(): {
   }
 
   async function getComponentRelations(
-    modelId: DataId,
+    modelId: ModelId,
     componentId: string,
   ): Promise<ComponentRelations> {
     const relations = await model_components_relation_db

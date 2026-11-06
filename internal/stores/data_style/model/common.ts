@@ -4,7 +4,7 @@ import {
   useModelComponentsPerComponentStyleMutation,
   useModelComponentsStyleMutation,
 } from "./common_mutations";
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { ModelId } from "@ogw_front/types/identifiers";
 import type { ParamsOf } from "@ogw_shared/utils/types.js";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
@@ -46,7 +46,7 @@ interface UseModelCommonStyleReturn {
     component_updates: ComponentStyleUpdate[],
   ) => Promise<void>;
   setModelTypeColor: (
-    modelId: DataId,
+    modelId: ModelId,
     component_ids: string[],
     color: RGBAColor | undefined,
     schema: ModelColorSchema,
@@ -54,7 +54,7 @@ interface UseModelCommonStyleReturn {
     collectionId?: string,
   ) => Promise<unknown>;
   setModelTypeVisibility: (
-    modelId: DataId,
+    modelId: ModelId,
     component_ids: string[],
     visibility: boolean,
     schema: ModelVisibilitySchema,
@@ -69,7 +69,7 @@ export function useModelCommonStyle(): UseModelCommonStyleReturn {
   const { mutateComponentStyles } = useModelComponentsStyleMutation();
   const { bulkMutateComponentStylesPerComponent } = useModelComponentsPerComponentStyleMutation();
   async function setModelTypeColor(
-    modelId: DataId,
+    modelId: ModelId,
     component_ids: string[],
     color: RGBAColor | undefined,
     schema: ModelColorSchema,
@@ -137,7 +137,7 @@ export function useModelCommonStyle(): UseModelCommonStyleReturn {
   }
 
   async function setModelTypeVisibility(
-    modelId: DataId,
+    modelId: ModelId,
     component_ids: string[],
     visibility: boolean,
     schema: ModelVisibilitySchema,

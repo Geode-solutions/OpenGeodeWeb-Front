@@ -1,4 +1,4 @@
-import type { DataId, ModelComponentId } from "@ogw_front/types/identifiers";
+import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
 import {
   applyModelLinesConstantColoring,
   applyModelLinesEdgeColoring,
@@ -23,8 +23,8 @@ export function useModelLinesStyle(): ReturnType<typeof useModelLinesCommonStyle
   ReturnType<typeof useModelLinesPointsStyle> &
   ReturnType<typeof useModelLinesVertexAttribute> &
   ReturnType<typeof useModelLinesEdgeAttribute> & {
-    applyModelLinesStyle: (modelId: DataId) => Promise<void>;
-    setModelLinesDefaultStyle: (modelId: DataId) => Promise<void>;
+    applyModelLinesStyle: (modelId: ModelId) => Promise<void>;
+    setModelLinesDefaultStyle: (modelId: ModelId) => Promise<void>;
   } {
   const dataStore = useDataStore();
   const modelCommonStyle = useModelLinesCommonStyle();
@@ -35,7 +35,7 @@ export function useModelLinesStyle(): ReturnType<typeof useModelLinesCommonStyle
   const modelLinesPointsStyle = useModelLinesPointsStyle();
 
   async function applyModelLinesVisibilityStyle(
-    modelId: DataId,
+    modelId: ModelId,
     lines_ids: ModelComponentId[],
   ): Promise<void> {
     const visibilityGroups: Record<string, string[]> = {};
@@ -58,7 +58,7 @@ export function useModelLinesStyle(): ReturnType<typeof useModelLinesCommonStyle
   }
 
   async function applyModelLinesColoringStyle(
-    modelId: DataId,
+    modelId: ModelId,
     lines_ids: ModelComponentId[],
   ): Promise<unknown[]> {
     const activeColoringGroups: Record<string, string[]> = {};
@@ -93,7 +93,7 @@ export function useModelLinesStyle(): ReturnType<typeof useModelLinesCommonStyle
     return results;
   }
 
-  async function applyModelLinesStyle(modelId: DataId): Promise<void> {
+  async function applyModelLinesStyle(modelId: ModelId): Promise<void> {
     const lines_ids = await dataStore.getLinesGeodeIds(modelId);
     if (lines_ids.length === 0) {
       return;

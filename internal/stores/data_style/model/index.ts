@@ -1,5 +1,5 @@
 import type { ComputedRef } from "vue";
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { ModelId } from "@ogw_front/types/identifiers";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useModelBlocksStyle } from "./blocks";
@@ -20,9 +20,9 @@ type UseModelStyleReturn = ReturnType<typeof useModelColorStyle> &
   ReturnType<typeof useModelLinesStyle> &
   ReturnType<typeof useModelPointsStyle> &
   ReturnType<typeof useModelSurfacesStyle> & {
-    visibleMeshComponents: (modelId: DataId) => ComputedRef<string[]>;
-    applyModelStyle: (modelId: DataId) => Promise<unknown[]>;
-    setModelMeshComponentsDefaultStyle: (modelId: DataId) => Promise<unknown[]>;
+    visibleMeshComponents: (modelId: ModelId) => ComputedRef<string[]>;
+    applyModelStyle: (modelId: ModelId) => Promise<unknown[]>;
+    setModelMeshComponentsDefaultStyle: (modelId: ModelId) => Promise<unknown[]>;
   };
 
 // oxlint-disable-next-line max-lines-per-function, max-statements
@@ -46,11 +46,11 @@ function useModelStyle(): UseModelStyleReturn {
   const modelColorStyle = useModelColorStyle(componentStyleFunctions);
   const modelVisibilityStyle = useModelVisibilityStyle(componentStyleFunctions);
 
-  function visibleMeshComponents(modelId: DataId): ComputedRef<string[]> {
+  function visibleMeshComponents(modelId: ModelId): ComputedRef<string[]> {
     return useModelSelection(modelId, dataStyleState);
   }
 
-  async function applyModelStyle(modelId: DataId): Promise<unknown[]> {
+  async function applyModelStyle(modelId: ModelId): Promise<unknown[]> {
     const style = dataStyleState.getStyle(modelId);
 
     const results = await Promise.all([
@@ -73,7 +73,7 @@ function useModelStyle(): UseModelStyleReturn {
     return results;
   }
 
-  async function setModelMeshComponentsDefaultStyle(modelId: DataId): Promise<unknown[]> {
+  async function setModelMeshComponentsDefaultStyle(modelId: ModelId): Promise<unknown[]> {
     await dataStore.item(modelId);
     const results = await Promise.all([
       modelBlocksStyle.setModelBlocksDefaultStyle(modelId),
