@@ -97,12 +97,28 @@ function isModelCornersVertexAttributeValid(input: AttributeInput): input is Val
   );
 }
 
+type ModelCornersVertexAttributeGetters = Pick<
+  ModelCornersVertexAttributeApi,
+  | "modelCornersVertexAttributeStoredConfig"
+  | "modelCornersVertexAttributeName"
+  | "modelCornersVertexAttributeItem"
+  | "modelCornersVertexAttributeRange"
+  | "modelCornersVertexAttributeColorMap"
+  | "modelCornersVertexAttributeNoDataColor"
+  | "modelCornersVertexAttributeTimeStep"
+> & {
+  modelCornersVertexAttributeLastItem: (
+    modelId: string,
+    componentId: string | undefined,
+    name: string | undefined,
+  ) => number;
+};
+
 // oxlint-disable-next-line max-lines-per-function
-function useModelCornersVertexAttribute(): ModelCornersVertexAttributeApi {
-  const { attributeTimeStep, setAttributeTimeStep, seriesArrayName } = useAttributeTimeStepStyle();
-  const dataStore = useDataStore();
-  const modelCornersCommonStyle = useModelCornersCommonStyle();
-  const viewerStore = useViewerStore();
+function useModelCornersVertexAttributeGetters(
+  modelCornersCommonStyle: ReturnType<typeof useModelCornersCommonStyle>,
+): ModelCornersVertexAttributeGetters {
+  const { attributeTimeStep } = useAttributeTimeStepStyle();
   function modelCornersVertexAttribute(modelId: string, cornerId?: string): AttributeState {
     // oxlint-disable-next-line no-unsafe-type-assertion -- vertex is a StyleValues sub-object stored under a StyleValues index signature.
     return modelCornersCommonStyle.modelCornerColoring(modelId, cornerId).vertex as AttributeState;
@@ -126,40 +142,6 @@ function useModelCornersVertexAttribute(): ModelCornersVertexAttributeApi {
       colorMap: undefined,
       no_data_color: DEFAULT_NO_DATA_COLOR,
     };
-  }
-  async function mutateModelCornersVertexStyle(
-    modelId: string,
-    cornerIds: string[],
-    values: Record<string, unknown>,
-  ): Promise<void> {
-    const tasks: Promise<void>[] = [
-      modelCornersCommonStyle.mutateModelCornersColoring(modelId, cornerIds, {
-        vertex: values,
-      }),
-    ];
-    const totalCornerIds = await dataStore.getCornersGeodeIds(modelId);
-    if (cornerIds.length === totalCornerIds.length) {
-      tasks.push(
-        modelCornersCommonStyle.mutateModelCornersTypeColoring(modelId, {
-          vertex: values,
-        }),
-      );
-    }
-    await Promise.all(tasks);
-  }
-  async function setModelCornersVertexAttributeStoredConfig(
-    modelId: string,
-    cornerIds: string[],
-    name: string | undefined,
-    item: number | undefined,
-    config: Partial<AttributeStoredConfig>,
-  ): Promise<void> {
-    if (name === undefined || item === undefined) {
-      return;
-    }
-    await mutateModelCornersVertexStyle(modelId, cornerIds, {
-      storedConfigs: { [name]: { lastItem: item, [item]: config } },
-    });
   }
   function modelCornersVertexAttributeName(modelId: string, cornerId?: string): string | undefined {
     return modelCornersVertexAttribute(modelId, cornerId).name;
@@ -218,6 +200,68 @@ function useModelCornersVertexAttribute(): ModelCornersVertexAttributeApi {
       attributeSchema.$id,
       modelCornersVertexAttribute(modelId, cornerId).name,
     );
+  }
+  return {
+    modelCornersVertexAttributeStoredConfig,
+    modelCornersVertexAttributeName,
+    modelCornersVertexAttributeLastItem,
+    modelCornersVertexAttributeItem,
+    modelCornersVertexAttributeRange,
+    modelCornersVertexAttributeColorMap,
+    modelCornersVertexAttributeNoDataColor,
+    modelCornersVertexAttributeTimeStep,
+  };
+}
+
+// oxlint-disable-next-line max-lines-per-function
+function useModelCornersVertexAttribute(): ModelCornersVertexAttributeApi {
+  const { setAttributeTimeStep, seriesArrayName } = useAttributeTimeStepStyle();
+  const dataStore = useDataStore();
+  const modelCornersCommonStyle = useModelCornersCommonStyle();
+  const {
+    modelCornersVertexAttributeStoredConfig,
+    modelCornersVertexAttributeName,
+    modelCornersVertexAttributeLastItem,
+    modelCornersVertexAttributeItem,
+    modelCornersVertexAttributeRange,
+    modelCornersVertexAttributeColorMap,
+    modelCornersVertexAttributeNoDataColor,
+    modelCornersVertexAttributeTimeStep,
+  } = useModelCornersVertexAttributeGetters(modelCornersCommonStyle);
+  const viewerStore = useViewerStore();
+  async function mutateModelCornersVertexStyle(
+    modelId: string,
+    cornerIds: string[],
+    values: Record<string, unknown>,
+  ): Promise<void> {
+    const tasks: Promise<void>[] = [
+      modelCornersCommonStyle.mutateModelCornersColoring(modelId, cornerIds, {
+        vertex: values,
+      }),
+    ];
+    const totalCornerIds = await dataStore.getCornersGeodeIds(modelId);
+    if (cornerIds.length === totalCornerIds.length) {
+      tasks.push(
+        modelCornersCommonStyle.mutateModelCornersTypeColoring(modelId, {
+          vertex: values,
+        }),
+      );
+    }
+    await Promise.all(tasks);
+  }
+  async function setModelCornersVertexAttributeStoredConfig(
+    modelId: string,
+    cornerIds: string[],
+    name: string | undefined,
+    item: number | undefined,
+    config: Partial<AttributeStoredConfig>,
+  ): Promise<void> {
+    if (name === undefined || item === undefined) {
+      return;
+    }
+    await mutateModelCornersVertexStyle(modelId, cornerIds, {
+      storedConfigs: { [name]: { lastItem: item, [item]: config } },
+    });
   }
   async function setModelCornersVertexAttribute(
     modelId: string,

@@ -40,33 +40,60 @@ function requiredQueryInt(event: H3Event, key: string): number {
   return parsed;
 }
 
+interface UploadQuery {
+  projectName: string;
+  filename: string;
+  totalChunks: number;
+  chunkIndex: number;
+}
+
+function parseUploadQuery(event: H3Event): UploadQuery {
+  const projectName = requiredQueryString(event, "projectName");
+  const filename = requiredQueryString(event, "filename");
+  const totalChunks = requiredQueryInt(event, "total_chunks");
+  const chunkIndex = requiredQueryInt(event, "chunk_index");
+  if (chunkIndex >= totalChunks) {
+    throw createError({ statusCode: 400, message: "chunk_index must be less than total_chunks" });
+  }
+  return { projectName, filename, totalChunks, chunkIndex };
+}
+
+function requiredBodyStream(event: H3Event): ReadableStream<unknown> {
+  const webStream = getRequestWebStream(event);
+  if (!webStream) {
+    throw createError({ statusCode: 400, message: "No request body received" });
+  }
+  return webStream;
+}
+
+async function writeChunk(
+  webStream: ReadableStream<unknown>,
+  partPath: string,
+  chunkIndex: number,
+): Promise<void> {
+  const writeStream = fs.createWriteStream(partPath, { flags: chunkIndex === 0 ? "w" : "a" });
+  await pipeline(Readable.fromWeb(toNodeWebStream(webStream)), writeStream);
+}
+
+async function enforceSizeLimit(partPath: string): Promise<void> {
+  const { size } = await fs.promises.stat(partPath);
+  if (size > FILE_SIZE_LIMIT) {
+    await fs.promises.unlink(partPath);
+    throw createError({ statusCode: 400, message: "File too large" });
+  }
+}
+
 // The file is sent as a raw (non-multipart) body, split into sequential chunks the client uploads in order (see OpenGeodeWeb-Front's upload_file.ts and OpenGeodeWeb-Back's upload_file route, which use the same protocol). Each chunk is appended to a `.part` file; the last one triggers the existing zip-metadata registration.
 export default defineRawEventHandler(
   schemas.api.local.extensions.upload,
   async (event: H3Event): Promise<LocalExtensionsUploadResponse> => {
-    const projectName = requiredQueryString(event, "projectName");
-    const filename = requiredQueryString(event, "filename");
-    const totalChunks = requiredQueryInt(event, "total_chunks");
-    const chunkIndex = requiredQueryInt(event, "chunk_index");
-    if (chunkIndex >= totalChunks) {
-      throw createError({ statusCode: 400, message: "chunk_index must be less than total_chunks" });
-    }
-
-    const webStream = getRequestWebStream(event);
-    if (!webStream) {
-      throw createError({ statusCode: 400, message: "No request body received" });
-    }
+    const { projectName, filename, totalChunks, chunkIndex } = parseUploadQuery(event);
+    const webStream = requiredBodyStream(event);
 
     const targetPath = targetExtensionFilePath(projectName, filename);
     const partPath = `${targetPath}.part`;
-    const writeStream = fs.createWriteStream(partPath, { flags: chunkIndex === 0 ? "w" : "a" });
-    await pipeline(Readable.fromWeb(toNodeWebStream(webStream)), writeStream);
-
-    const { size } = await fs.promises.stat(partPath);
-    if (size > FILE_SIZE_LIMIT) {
-      await fs.promises.unlink(partPath);
-      throw createError({ statusCode: 400, message: "File too large" });
-    }
+    await writeChunk(webStream, partPath, chunkIndex);
+    await enforceSizeLimit(partPath);
 
     if (chunkIndex < totalChunks - 1) {
       return { statusCode: CODE_200 };

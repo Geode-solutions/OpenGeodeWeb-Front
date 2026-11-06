@@ -65,6 +65,57 @@ export function useModelLinesColor(): {
     return modelLineColoring(id, line_id).active;
   }
 
+  async function applyVertexColoring(modelId: string, lines_ids: string[]): Promise<unknown> {
+    const name = modelLinesVertexAttribute.modelLinesVertexAttributeName(modelId, lines_ids[0]);
+    const item = modelLinesVertexAttribute.modelLinesVertexAttributeItem(modelId, lines_ids[0]);
+    const [minimum, maximum] = modelLinesVertexAttribute.modelLinesVertexAttributeRange(
+      modelId,
+      lines_ids[0],
+    );
+    const colorMap = modelLinesVertexAttribute.modelLinesVertexAttributeColorMap(
+      modelId,
+      lines_ids[0],
+    );
+    const no_data_color = modelLinesVertexAttribute.modelLinesVertexAttributeNoDataColor(
+      modelId,
+      lines_ids[0],
+    );
+    const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
+    if (isModelLinesVertexAttributeValid(attribute)) {
+      const result = await modelLinesVertexAttribute.setModelLinesVertexAttribute(
+        modelId,
+        lines_ids,
+        attribute,
+      );
+      return result;
+    }
+    return undefined;
+  }
+
+  async function applyEdgeColoring(modelId: string, lines_ids: string[]): Promise<unknown> {
+    const name = modelLinesEdgeAttribute.modelLinesEdgeAttributeName(modelId, lines_ids[0]);
+    const item = modelLinesEdgeAttribute.modelLinesEdgeAttributeItem(modelId, lines_ids[0]);
+    const [minimum, maximum] = modelLinesEdgeAttribute.modelLinesEdgeAttributeRange(
+      modelId,
+      lines_ids[0],
+    );
+    const colorMap = modelLinesEdgeAttribute.modelLinesEdgeAttributeColorMap(modelId, lines_ids[0]);
+    const no_data_color = modelLinesEdgeAttribute.modelLinesEdgeAttributeNoDataColor(
+      modelId,
+      lines_ids[0],
+    );
+    const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
+    if (isModelLinesEdgeAttributeValid(attribute)) {
+      const result = await modelLinesEdgeAttribute.setModelLinesEdgeAttribute(
+        modelId,
+        lines_ids,
+        attribute,
+      );
+      return result;
+    }
+    return undefined;
+  }
+
   async function setModelLinesActiveColoring(
     modelId: string,
     lines_ids: string[],
@@ -86,47 +137,9 @@ export function useModelLinesColor(): {
     }
 
     if (activeColoring === "vertex") {
-      const name = modelLinesVertexAttribute.modelLinesVertexAttributeName(modelId, lines_ids[0]);
-      const item = modelLinesVertexAttribute.modelLinesVertexAttributeItem(modelId, lines_ids[0]);
-      const [minimum, maximum] = modelLinesVertexAttribute.modelLinesVertexAttributeRange(
-        modelId,
-        lines_ids[0],
-      );
-      const colorMap = modelLinesVertexAttribute.modelLinesVertexAttributeColorMap(
-        modelId,
-        lines_ids[0],
-      );
-      const no_data_color = modelLinesVertexAttribute.modelLinesVertexAttributeNoDataColor(
-        modelId,
-        lines_ids[0],
-      );
-      const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
-      if (isModelLinesVertexAttributeValid(attribute)) {
-        return modelLinesVertexAttribute.setModelLinesVertexAttribute(
-          modelId,
-          lines_ids,
-          attribute,
-        );
-      }
+      return applyVertexColoring(modelId, lines_ids);
     } else if (activeColoring === "edge") {
-      const name = modelLinesEdgeAttribute.modelLinesEdgeAttributeName(modelId, lines_ids[0]);
-      const item = modelLinesEdgeAttribute.modelLinesEdgeAttributeItem(modelId, lines_ids[0]);
-      const [minimum, maximum] = modelLinesEdgeAttribute.modelLinesEdgeAttributeRange(
-        modelId,
-        lines_ids[0],
-      );
-      const colorMap = modelLinesEdgeAttribute.modelLinesEdgeAttributeColorMap(
-        modelId,
-        lines_ids[0],
-      );
-      const no_data_color = modelLinesEdgeAttribute.modelLinesEdgeAttributeNoDataColor(
-        modelId,
-        lines_ids[0],
-      );
-      const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
-      if (isModelLinesEdgeAttributeValid(attribute)) {
-        return modelLinesEdgeAttribute.setModelLinesEdgeAttribute(modelId, lines_ids, attribute);
-      }
+      return applyEdgeColoring(modelId, lines_ids);
     }
     return undefined;
   }

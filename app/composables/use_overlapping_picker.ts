@@ -2,6 +2,7 @@ import { ref } from "vue";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 import { type DataItem, useDataStore } from "@ogw_front/stores/data";
+import { computeMenuPosition } from "@ogw_front/composables/overlapping_picker_menu";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -21,6 +22,8 @@ interface ProposedItem {
 interface ViewerIdResult {
   id: string | undefined;
   viewer_id: number | undefined;
+  // True when objects were under the cursor but the user closed the picker without choosing
+  dismissed?: boolean;
 }
 
 interface GetViewerIdParams {
@@ -102,13 +105,7 @@ export function useOverlappingPicker(): UseOverlappingPickerReturn {
     }
   }
 
-  async function get_viewer_id({
-    x,
-    y,
-    containerWidth,
-    containerHeight,
-    containerRect,
-  }: GetViewerIdParams): Promise<ViewerIdResult> {
+  async function getViewableIds(): Promise<string[]> {
     const activeIds = new Set(dataItems.value.map((i: DataItem) => i.id));
     const visibleStyleIds = Object.keys(dataStyleStore.styles).filter(
       (styleId) => activeIds.has(styleId) && dataStyleStore.objectVisibility(styleId) === true,
@@ -123,15 +120,30 @@ export function useOverlappingPicker(): UseOverlappingPickerReturn {
         }
       }),
     );
-    const ids = viewableChecks.filter((id): id is string => Boolean(id));
+    return viewableChecks.filter((id): id is string => Boolean(id));
+  }
 
-    const result: ViewerIdResult = { id: undefined, viewer_id: undefined };
+  function showIntermediateMenu(
+    { x, y, containerWidth, containerHeight, containerRect }: GetViewerIdParams,
+    itemCount: number,
+  ): void {
+    const position = computeMenuPosition({ x, y, containerWidth, containerHeight, itemCount });
+    intermediateMenuX.value = containerRect.left + position.x;
+    intermediateMenuY.value = containerRect.top + position.y;
+    displayIntermediate.value = true;
+  }
+
+  async function get_viewer_id(params: GetViewerIdParams): Promise<ViewerIdResult> {
+    const ids = await getViewableIds();
+
     const schema = viewer_schemas.opengeodeweb_viewer.viewer.picked_ids;
-    const params = { x, y, ids };
-    const { array_ids, viewer_id } = await viewerStore.request({ schema, params });
+    const { array_ids, viewer_id } = await viewerStore.request({
+      schema,
+      params: { x: params.x, y: params.y, ids },
+    });
 
     if (array_ids.length === 0) {
-      return result;
+      return { id: undefined, viewer_id: undefined };
     }
 
     const pickedList: PickedItem[] = array_ids.map((pickId) => ({ id: pickId, viewer_id }));
@@ -142,31 +154,7 @@ export function useOverlappingPicker(): UseOverlappingPickerReturn {
 
     const proposedItems = await fetchProposedItems(pickedList);
     intermediateItems.value = proposedItems;
-
-    const yUI = containerHeight - y;
-    const MENU_WIDTH = 340;
-    const MENU_BASE_HEIGHT = 55;
-    const MENU_ITEM_HEIGHT = 48;
-    const MENU_HEIGHT = MENU_BASE_HEIGHT + proposedItems.length * MENU_ITEM_HEIGHT;
-    const CLAMP_MARGIN = 10;
-    const clampedX = Math.min(
-      Math.max(x, CLAMP_MARGIN),
-      containerWidth - MENU_WIDTH - CLAMP_MARGIN,
-    );
-    let clampedY = yUI;
-    if (yUI + MENU_HEIGHT > containerHeight - CLAMP_MARGIN) {
-      clampedY = Math.max(yUI - MENU_HEIGHT, CLAMP_MARGIN);
-    } else {
-      clampedY = Math.max(yUI, CLAMP_MARGIN);
-    }
-    clampedY = Math.min(
-      Math.max(clampedY, CLAMP_MARGIN),
-      containerHeight - MENU_HEIGHT - CLAMP_MARGIN,
-    );
-
-    intermediateMenuX.value = containerRect.left + clampedX;
-    intermediateMenuY.value = containerRect.top + clampedY;
-    displayIntermediate.value = true;
+    showIntermediateMenu(params, proposedItems.length);
 
     /* eslint-disable-next-line promise/avoid-new */
     return new Promise<ViewerIdResult>((resolve) => {
@@ -175,7 +163,7 @@ export function useOverlappingPicker(): UseOverlappingPickerReturn {
         if (chosenResult) {
           resolve({ id: chosenResult.id, viewer_id: chosenResult.viewer_id });
         } else {
-          resolve({ id: undefined, viewer_id: undefined });
+          resolve({ id: undefined, viewer_id: undefined, dismissed: true });
         }
       };
     });

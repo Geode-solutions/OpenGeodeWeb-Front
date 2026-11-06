@@ -1,3 +1,5 @@
+import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+
 type StyleValues = Record<string, unknown>;
 
 interface ObjectStyle {
@@ -28,4 +30,25 @@ interface ModelComponentStyle extends StyleValues {
   id_component: string;
 }
 
-export type { ModelComponentStyle, ModelComponentTypeStyle, ObjectStyle, StyleValues };
+type SceneFontFamily = "arial" | "courier" | "times";
+type SceneOrientationWidget = "axes" | "compass";
+
+interface SceneStyle {
+  id: "scene";
+  background_color: RGBAColor;
+  text: {
+    color: RGBAColor;
+    font_family: SceneFontFamily;
+  };
+  orientation_widget: SceneOrientationWidget;
+}
+
+export type {
+  ModelComponentStyle,
+  ModelComponentTypeStyle,
+  ObjectStyle,
+  SceneFontFamily,
+  SceneOrientationWidget,
+  SceneStyle,
+  StyleValues,
+};

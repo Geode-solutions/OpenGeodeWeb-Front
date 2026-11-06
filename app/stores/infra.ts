@@ -14,6 +14,31 @@ declare global {
   var electronAPI: ElectronApi["electronAPI"];
 }
 
+async function launchLocalServices(
+  currentMode: string,
+  microservices: readonly Microservice[],
+): Promise<void> {
+  const { useAppStore } = await import("@ogw_front/stores/app");
+  const appStore = useAppStore();
+  await appStore.createProjectFolder();
+  if (currentMode === appMode.DESKTOP) {
+    globalThis.electronAPI.project_folder_path({
+      projectFolderPath: appStore.projectFolderPath,
+    });
+  }
+  await setAppBaseUrl(appStore.base_url);
+  const microservices_with_launch = microservices.filter((store: Microservice) => store.launch);
+  const launch_promises = microservices_with_launch.map(async (store: Microservice) => {
+    const result = await store.launch?.({
+      projectFolderPath: appStore.projectFolderPath,
+    });
+    return result;
+  });
+  const { registerRunningExtensions } = await import("@ogw_front/utils/extension");
+  launch_promises.push(registerRunningExtensions());
+  await Promise.all(launch_promises);
+}
+
 export const useInfraStore = defineStore("infra", {
   state: () => ({
     app_mode: useRuntimeConfig().public.MODE,
@@ -63,27 +88,7 @@ export const useInfraStore = defineStore("infra", {
             throw error;
           }
         } else {
-          const { useAppStore } = await import("@ogw_front/stores/app");
-          const appStore = useAppStore();
-          await appStore.createProjectFolder();
-          if (this.app_mode === appMode.DESKTOP) {
-            globalThis.electronAPI.project_folder_path({
-              projectFolderPath: appStore.projectFolderPath,
-            });
-          }
-          await setAppBaseUrl(appStore.base_url);
-          const microservices_with_launch = this.microservices.filter(
-            (store: Microservice) => store.launch,
-          );
-          const launch_promises = microservices_with_launch.map(async (store: Microservice) => {
-            const result = await store.launch?.({
-              projectFolderPath: appStore.projectFolderPath,
-            });
-            return result;
-          });
-          const { registerRunningExtensions } = await import("@ogw_front/utils/extension");
-          launch_promises.push(registerRunningExtensions());
-          await Promise.all(launch_promises);
+          await launchLocalServices(this.app_mode, this.microservices);
         }
         this.status = Status.CREATED;
         return this.create_connection();

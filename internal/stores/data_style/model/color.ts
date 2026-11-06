@@ -46,6 +46,29 @@ function attributeFn<Signature>(method: unknown): Signature {
   return method as Signature;
 }
 
+// Re-applies the attribute name, range and color map of `firstId` to every id in `componentIds`
+async function applyAttributeAccessors(
+  modelId: string,
+  componentIds: string[],
+  firstId: string,
+  accessors: AttributeAccessors,
+): Promise<void> {
+  const { getName, setName, getRange, setRange, getColorMap, setColorMap } = accessors;
+  const name = getName(modelId, firstId);
+  if (name === undefined || name === "") {
+    return;
+  }
+  await setName(modelId, componentIds, name);
+  const [minimum, maximum] = getRange(modelId, firstId);
+  if (minimum !== undefined && maximum !== undefined) {
+    await setRange(modelId, componentIds, minimum, maximum);
+  }
+  const colorMap = getColorMap(modelId, firstId);
+  if (colorMap !== undefined && colorMap !== "") {
+    await setColorMap(modelId, componentIds, colorMap);
+  }
+}
+
 // oxlint-disable-next-line max-lines-per-function
 function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
   getModelColor: (modelId: string) => RGBAColor | undefined;
@@ -270,23 +293,11 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
     if (attributeFunctions === undefined) {
       return;
     }
-    const { getName, setName, getRange, setRange, getColorMap, setColorMap } = attributeFunctions;
     const [firstId] = idsForType;
     if (firstId === undefined) {
       return;
     }
-    const name = getName(modelId, firstId);
-    if (name !== undefined && name !== "") {
-      await setName(modelId, idsForType, name);
-      const [minimum, maximum] = getRange(modelId, firstId);
-      if (minimum !== undefined && maximum !== undefined) {
-        await setRange(modelId, idsForType, minimum, maximum);
-      }
-      const colorMap = getColorMap(modelId, firstId);
-      if (colorMap !== undefined && colorMap !== "") {
-        await setColorMap(modelId, idsForType, colorMap);
-      }
-    }
+    await applyAttributeAccessors(modelId, idsForType, firstId, attributeFunctions);
   }
   async function setModelComponentActiveColoring(
     modelId: string,
@@ -310,19 +321,7 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
     if (attributeFunctions === undefined) {
       return;
     }
-    const { getName, setName, getRange, setRange, getColorMap, setColorMap } = attributeFunctions;
-    const name = getName(modelId, componentId);
-    if (name !== undefined && name !== "") {
-      await setName(modelId, [componentId], name);
-      const [minimum, maximum] = getRange(modelId, componentId);
-      if (minimum !== undefined && maximum !== undefined) {
-        await setRange(modelId, [componentId], minimum, maximum);
-      }
-      const colorMap = getColorMap(modelId, componentId);
-      if (colorMap !== undefined && colorMap !== "") {
-        await setColorMap(modelId, [componentId], colorMap);
-      }
-    }
+    await applyAttributeAccessors(modelId, [componentId], componentId, attributeFunctions);
   }
   function getModelColor(modelId: string): RGBAColor | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.

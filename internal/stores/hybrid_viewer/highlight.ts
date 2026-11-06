@@ -10,6 +10,34 @@ import { useHybridViewerCore } from "./core";
 import { useHybridViewerScene } from "./scene";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
+async function lookupModelName(modelId: string): Promise<string | undefined> {
+  const modelRecord = (await database.data?.get(modelId)) as { name?: string } | undefined;
+  return modelRecord?.name;
+}
+
+async function lookupComponentInfo(
+  modelId: string,
+  geodeId: string | undefined,
+): Promise<HoverComponentInfo | undefined> {
+  const modelComponentsTable = database.model_components;
+  if (geodeId === undefined || !modelComponentsTable) {
+    return undefined;
+  }
+  const components = modelComponentsTable.where("[id+geode_id]");
+  const query = components.equals([modelId, geodeId] as IndexableType);
+  const component = (await query.first()) as
+    | { name?: string; geode_id?: string; type?: string }
+    | undefined;
+  if (!component) {
+    return undefined;
+  }
+  return {
+    name: component.name ?? "",
+    id: component.geode_id ?? "",
+    type: component.type ?? "",
+  };
+}
+
 // Shared via createSharedComposable (rather than merged into the parent hybridViewer store) so sibling slices, e.g. ruler.ts and viewport.ts, can read hover state/clearHoverHighlight/hoverHighlight directly without importing the parent store and creating a cycle. A Pinia store would work too but its $id/$patch/... properties would leak into the composed store's spread and collapse its inferred type.
 const useHybridViewerHighlight = createSharedComposable(() => {
   const is_hover_highlight = ref(false);
@@ -67,6 +95,47 @@ const useHybridViewerHighlight = createSharedComposable(() => {
       .catch(() => undefined);
   }
 
+  async function handleHoverResponse(
+    response: ViewerHighlightResponse,
+    relativeMousePosition: { x: number; y: number },
+  ): Promise<void> {
+    if (
+      !is_hover_highlight.value ||
+      response.id === undefined ||
+      response.picked_id === undefined ||
+      response.picked_id === -1
+    ) {
+      clearHoverData();
+      return;
+    }
+    const hoverKey = `${response.id}_${response.field_type}_${response.picked_id}`;
+    if (currentHoverId.value === hoverKey) {
+      return;
+    }
+    if (hoverTimeoutRef.value) {
+      clearTimeout(hoverTimeoutRef.value);
+      hoverTimeoutRef.value = undefined;
+    }
+    hoverData.value = undefined;
+    currentHoverId.value = hoverKey;
+    const modelName = await lookupModelName(response.id);
+    const componentInfo = await lookupComponentInfo(response.id, response.geode_id);
+    const newHoverData: HoverData = {
+      modelId: response.id,
+      modelName,
+      blockName: response.geode_id,
+      pickedId: response.picked_id,
+      fieldType: response.field_type,
+      component: componentInfo,
+      attributes: response.attributes ?? {},
+    };
+    hoverTimeoutRef.value = setTimeout(() => {
+      hoverPosition.value = relativeMousePosition;
+      hoverData.value = newHoverData;
+      hoverTimeoutRef.value = undefined;
+    }, HOVER_TIMEOUT_MS);
+  }
+
   const hoverHighlight = useDebounceFn((event: MouseEvent) => {
     const { genericRenderWindow } = useHybridViewerCore();
     const containerElement = genericRenderWindow.value?.getContainer();
@@ -81,60 +150,7 @@ const useHybridViewerHighlight = createSharedComposable(() => {
       };
     }
     requestHoverHighlight(event, async (response) => {
-      if (
-        !is_hover_highlight.value ||
-        response.id === undefined ||
-        response.picked_id === undefined ||
-        response.picked_id === -1
-      ) {
-        clearHoverData();
-        return;
-      }
-      const hoverKey = `${response.id}_${response.field_type}_${response.picked_id}`;
-      if (currentHoverId.value === hoverKey) {
-        return;
-      }
-      if (hoverTimeoutRef.value) {
-        clearTimeout(hoverTimeoutRef.value);
-        hoverTimeoutRef.value = undefined;
-      }
-      hoverData.value = undefined;
-      currentHoverId.value = hoverKey;
-      let componentInfo: HoverComponentInfo | undefined = undefined;
-      let modelName: string | undefined = undefined;
-      const modelRecord = (await database.data?.get(response.id)) as { name?: string } | undefined;
-      if (modelRecord) {
-        modelName = modelRecord.name;
-      }
-      const modelComponentsTable = database.model_components;
-      if (response.geode_id !== undefined && modelComponentsTable) {
-        const components = modelComponentsTable.where("[id+geode_id]");
-        const query = components.equals([response.id, response.geode_id] as IndexableType);
-        const component = (await query.first()) as
-          | { name?: string; geode_id?: string; type?: string }
-          | undefined;
-        if (component) {
-          componentInfo = {
-            name: component.name ?? "",
-            id: component.geode_id ?? "",
-            type: component.type ?? "",
-          };
-        }
-      }
-      const newHoverData: HoverData = {
-        modelId: response.id,
-        modelName,
-        blockName: response.geode_id,
-        pickedId: response.picked_id,
-        fieldType: response.field_type,
-        component: componentInfo,
-        attributes: response.attributes ?? {},
-      };
-      hoverTimeoutRef.value = setTimeout(() => {
-        hoverPosition.value = relativeMousePosition;
-        hoverData.value = newHoverData;
-        hoverTimeoutRef.value = undefined;
-      }, HOVER_TIMEOUT_MS);
+      await handleHoverResponse(response, relativeMousePosition);
     });
   }, HOVER_DEBOUNCE_MS);
 

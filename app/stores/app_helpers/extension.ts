@@ -26,6 +26,85 @@ interface ExtensionData {
   enabled: boolean;
 }
 
+async function transformBlobUrl(
+  path: string,
+  transformer: ((code: string) => string) | undefined,
+): Promise<string> {
+  if (!transformer || !path.startsWith("blob:")) {
+    return path;
+  }
+  const response = await fetch(path);
+  const code = await response.text();
+  const transformedCode = transformer(code);
+
+  const newBlob = new Blob([transformedCode], {
+    type: "application/javascript",
+  });
+  return URL.createObjectURL(newBlob);
+}
+
+async function importExtensionModule(
+  path: string,
+  transformer: ((code: string) => string) | undefined,
+  extensionPort: string,
+  serverPort?: string,
+): Promise<ExtensionModule> {
+  const finalURL = await transformBlobUrl(path, transformer);
+  // oxlint-disable-next-line no-inline-comments, no-unsafe-assignment
+  const extensionModule: ExtensionModule = await import(/* @vite-ignore */ finalURL);
+  const store = extensionModule.metadata.store();
+  store.$patch?.({
+    default_local_port: extensionPort,
+    ...(serverPort !== undefined && { nitro_port: serverPort }),
+  });
+
+  if (finalURL !== path && finalURL.startsWith("blob:")) {
+    URL.revokeObjectURL(finalURL);
+  }
+  return extensionModule;
+}
+
+function validateExtensionModule(
+  extensionModule: ExtensionModule,
+  api: unknown,
+  loaded: Map<string, ExtensionData>,
+): void {
+  if (!extensionModule.metadata?.id) {
+    throw new Error("Extension must have metadata.id");
+  }
+
+  const extensionId = extensionModule.metadata.id;
+
+  if (loaded.has(extensionId)) {
+    consola.warn(`[AppStore] Extension "${extensionId}" is already loaded`);
+    throw new Error(`Extension "${extensionId}" is already loaded.`);
+  }
+
+  if (api === undefined) {
+    throw new Error("Extension API not initialized");
+  }
+
+  if (typeof extensionModule.install !== "function") {
+    throw new TypeError("Extension must export an install function");
+  }
+}
+
+function createExtensionData(
+  extensionModule: ExtensionModule,
+  path: string,
+  backendPath: string | undefined,
+): ExtensionData {
+  return {
+    module: extensionModule,
+    id: extensionModule.metadata.id,
+    path,
+    backendPath,
+    loadedAt: new Date().toISOString(),
+    metadata: extensionModule.metadata,
+    enabled: true,
+  };
+}
+
 // oxlint-disable-next-line max-lines-per-function, max-statements
 export function useAppExtensions(): {
   loadedExtensions: typeof loadedExtensions;
@@ -63,61 +142,21 @@ export function useAppExtensions(): {
     backendPath?: string,
   ): Promise<ExtensionModule> {
     try {
-      let finalURL = path;
-
-      if (codeTransformer.value && path.startsWith("blob:")) {
-        const response = await fetch(path);
-        const code = await response.text();
-        const transformedCode = codeTransformer.value(code);
-
-        const newBlob = new Blob([transformedCode], {
-          type: "application/javascript",
-        });
-        finalURL = URL.createObjectURL(newBlob);
-      }
-      // oxlint-disable-next-line no-inline-comments, no-unsafe-assignment
-      const extensionModule: ExtensionModule = await import(/* @vite-ignore */ finalURL);
-      const store = extensionModule.metadata.store();
-      store.$patch?.({
-        default_local_port: extensionPort,
-        ...(serverPort !== undefined && { nitro_port: serverPort }),
-      });
-
-      if (finalURL !== path && finalURL.startsWith("blob:")) {
-        URL.revokeObjectURL(finalURL);
-      }
-
-      if (!extensionModule.metadata?.id) {
-        throw new Error("Extension must have metadata.id");
-      }
-
+      const extensionModule = await importExtensionModule(
+        path,
+        codeTransformer.value,
+        extensionPort,
+        serverPort,
+      );
+      validateExtensionModule(extensionModule, extensionAPI.value, loadedExtensions.value);
       const extensionId = extensionModule.metadata.id;
-
-      if (loadedExtensions.value.has(extensionId)) {
-        consola.warn(`[AppStore] Extension "${extensionId}" is already loaded`);
-        throw new Error(`Extension "${extensionId}" is already loaded.`);
-      }
-
-      if (extensionAPI.value === undefined) {
-        throw new Error("Extension API not initialized");
-      }
-
-      if (typeof extensionModule.install !== "function") {
-        throw new TypeError("Extension must export an install function");
-      }
 
       await extensionModule.install(extensionAPI.value, backendPath);
 
-      const extensionData: ExtensionData = {
-        module: extensionModule,
-        id: extensionId,
-        path,
-        backendPath,
-        loadedAt: new Date().toISOString(),
-        metadata: extensionModule.metadata,
-        enabled: true,
-      };
-      loadedExtensions.value.set(extensionId, extensionData);
+      loadedExtensions.value.set(
+        extensionId,
+        createExtensionData(extensionModule, path, backendPath),
+      );
 
       consola.info(`[AppStore] Extension loaded successfully: ${extensionId}`);
       return extensionModule;
