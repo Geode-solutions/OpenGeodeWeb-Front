@@ -4,27 +4,31 @@ import { consola } from "consola";
 // oxlint-disable eslint/sort-imports, eslint/max-lines
 import { defineStore } from "pinia";
 
-import type { DataId, GeodeId, GeodeIdentified } from "@ogw_front/types/identifiers";
+import type {
+  DataId,
+  GeodeId,
+  GeodeIdentified,
+  GeodeObjectType,
+  GeodeObjectTyped,
+} from "@ogw_front/types/identifiers";
 import type { Table } from "dexie";
 import { ref, watch } from "vue";
 import { database } from "@ogw_internal/database/database";
 
 const PANEL_WIDTH = 300;
 
-interface OpenedView {
+interface OpenedView extends Partial<GeodeObjectTyped> {
   type: "object" | "component";
   id: string;
   title: string;
   scrollTop: number;
   opened: string[];
-  geode_object_type?: string;
 }
 
-interface TreeviewChild extends GeodeIdentified {
+interface TreeviewChild extends GeodeIdentified, GeodeObjectTyped {
   title: string;
   id: string;
   viewer_type: string;
-  geode_object_type: string;
 }
 
 interface TreeviewGroup {
@@ -166,7 +170,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
   }
 
   function addItem(
-    geodeObjectType: string,
+    geodeObjectType: GeodeObjectType,
     name: string,
     dataId: DataId,
     geode_id: GeodeId,
@@ -222,7 +226,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
   function displayAdditionalTree(
     id: string,
     title: string | undefined,
-    geodeObjectType: string,
+    geodeObjectType: GeodeObjectType,
   ): void {
     const index = opened_views.value.findIndex((view: ReadonlyOpenedView) => view.id === id);
     if (index !== -1) {

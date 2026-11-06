@@ -1,8 +1,8 @@
+import type { DataId, GeodeObjectType } from "@ogw_front/types/identifiers";
 import back_schemas, {
   type CRSList,
 } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { oldestCrs, sameCrs } from "@ogw_front/utils/crs";
-import type { DataId } from "@ogw_front/types/identifiers";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStore } from "@ogw_front/stores/data";
 
@@ -53,7 +53,7 @@ export const useCrsStore = defineStore("crs", () => {
     return mismatched;
   });
 
-  async function fetchGeographicList(geodeObjectType: string): Promise<CRSList[]> {
+  async function fetchGeographicList(geodeObjectType: GeodeObjectType): Promise<CRSList[]> {
     try {
       const response = await backStore.request({
         schema: back_schemas.opengeodeweb_back.crs.geographic_list,
@@ -70,7 +70,7 @@ export const useCrsStore = defineStore("crs", () => {
     return [];
   }
 
-  async function geographicList(geodeObjectType: string): Promise<CRSList[]> {
+  async function geographicList(geodeObjectType: GeodeObjectType): Promise<CRSList[]> {
     // The promise is cached, so dialogs opened together share a single request.
     // The back still checks each CRS against the list of the data dimension
     geographicListPromise ??= fetchGeographicList(geodeObjectType);
