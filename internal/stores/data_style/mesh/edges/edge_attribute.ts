@@ -1,4 +1,7 @@
-import type { AttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_types";
+import type {
+  AttributeStoredConfig,
+  ValidAttributeInput,
+} from "@ogw_internal/stores/data_style/attribute_types";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 interface AttributeInput {
@@ -7,15 +10,6 @@ interface AttributeInput {
   minimum: number | undefined;
   maximum: number | undefined;
   colorMap: string | undefined;
-  no_data_color?: RGBAColor;
-}
-
-interface ValidAttributeInput {
-  name: string;
-  item: number;
-  minimum: number;
-  maximum: number;
-  colorMap: string;
   no_data_color?: RGBAColor;
 }
 
@@ -54,4 +48,4 @@ interface UseMeshEdgesEdgeAttributeStyleReturn {
   setMeshEdgesEdgeAttributeNoDataColor: (id: string, no_data_color: RGBAColor) => Promise<unknown>;
 }
 export { isMeshEdgesEdgeAttributeValid };
-export type { ValidAttributeInput, UseMeshEdgesEdgeAttributeStyleReturn };
+export type { UseMeshEdgesEdgeAttributeStyleReturn };

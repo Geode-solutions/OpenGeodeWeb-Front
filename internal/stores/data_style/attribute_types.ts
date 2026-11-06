@@ -24,6 +24,10 @@ interface AttributeStoredConfig
   no_data_color: RGBAColor;
 }
 
+interface ValidAttributeInput extends AttributeSelection, AttributeBounds, AttributeColorMapped {
+  no_data_color?: RGBAColor;
+}
+
 interface AttributeState extends Partial<AttributeSelection> {
   storedConfigs?: Record<string, { lastItem: number } & Record<string, AttributeStoredConfig>>;
 }
@@ -34,4 +38,5 @@ export type {
   AttributeSelection,
   AttributeState,
   AttributeStoredConfig,
+  ValidAttributeInput,
 };

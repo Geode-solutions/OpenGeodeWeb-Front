@@ -1,4 +1,5 @@
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { ValidAttributeInput } from "@ogw_internal/stores/data_style/attribute_types";
 // Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
@@ -6,7 +7,6 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed
 // Local imports
 import {
   type UseMeshPolygonsPolygonAttributeStyleReturn,
-  type ValidAttributeInput,
   isMeshPolygonsPolygonAttributeValid,
 } from "./polygon_attribute";
 import {
