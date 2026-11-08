@@ -1,14 +1,10 @@
+import type { ModelId, ModelIdentified } from "@ogw_front/types/identifiers";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
+import type { ModelComponentRecord } from "@ogw_front/stores/data_helpers/mesh";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import type { Table } from "dexie";
 import { database } from "@ogw_internal/database/database";
 import type { useDataStyleState } from "@ogw_internal/stores/data_style/state";
-
-interface ModelComponentRecord {
-  id: string;
-  geode_id: string;
-  type: string;
-}
 
 type DataStyleState = ReturnType<typeof useDataStyleState>;
 
@@ -33,8 +29,7 @@ function groupComponentsByType(
   return componentsByType;
 }
 
-interface TypeSelectionContext {
-  readonly modelId: string;
+interface TypeSelectionContext extends Readonly<ModelIdentified> {
   readonly groupStyles: ReturnType<DataStyleState["getStyle"]>;
   readonly dataStyleState: DataStyleState;
 }
@@ -79,7 +74,7 @@ function computeTypeSelection(
 }
 
 function buildSelection(
-  modelId: string,
+  modelId: ModelId,
   components: readonly ModelComponentRecord[],
   dataStyleState: DataStyleState,
 ): string[] {
@@ -101,7 +96,7 @@ function buildSelection(
 const selectionCache = new Map<string, ComputedRef<string[]>>();
 
 function useModelSelection(
-  modelId: string | undefined,
+  modelId: ModelId | undefined,
   dataStyleState: DataStyleState,
 ): ComputedRef<string[]> {
   if (modelId === undefined || modelId === "") {
@@ -118,7 +113,7 @@ function useModelSelection(
 
   void (async (): Promise<void> => {
     try {
-      allComponents.value = await model_components_db.where("id").equals(modelId).toArray();
+      allComponents.value = await model_components_db.where("data_id").equals(modelId).toArray();
     } catch {
       allComponents.value = [];
     }

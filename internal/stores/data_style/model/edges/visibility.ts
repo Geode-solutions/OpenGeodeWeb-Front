@@ -5,6 +5,8 @@ import {
   EDGES_COMPONENT_TYPES,
   useModelComponentEdgesStyle,
 } from "@ogw_internal/stores/data_style/model/edges/component";
+import type { ModelId } from "@ogw_front/types/identifiers";
+import type { Visibility } from "@ogw_front/types/style";
 import { useModelEdgesCommonStyle } from "./common";
 import { useModelEdgesWidthStyle } from "./width";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -14,9 +16,9 @@ import { whenDefined } from "@ogw_internal/stores/data_style/when_defined";
 const schema = viewer_schemas.opengeodeweb_viewer.model.edges.visibility;
 
 interface ModelEdgesVisibilityStyleApi {
-  modelEdgesVisibility: (id: string) => boolean | undefined;
-  setModelEdgesVisibility: (id: string, visibility: boolean) => Promise<unknown>;
-  applyModelEdgesStyle: (id: string) => Promise<unknown[]>;
+  modelEdgesVisibility: (modelId: ModelId) => Visibility | undefined;
+  setModelEdgesVisibility: (modelId: ModelId, visibility: Visibility) => Promise<unknown>;
+  applyModelEdgesStyle: (modelId: ModelId) => Promise<unknown[]>;
 }
 
 export function useModelEdgesVisibilityStyle(): ModelEdgesVisibilityStyleApi {
@@ -27,24 +29,27 @@ export function useModelEdgesVisibilityStyle(): ModelEdgesVisibilityStyleApi {
     useModelComponentEdgesStyle(type),
   );
 
-  function modelEdgesVisibility(id: string): boolean | undefined {
-    const { visibility } = modelEdgesCommonStyle.modelEdgesStyle(id);
+  function modelEdgesVisibility(modelId: ModelId): Visibility | undefined {
+    const { visibility } = modelEdgesCommonStyle.modelEdgesStyle(modelId);
     if (typeof visibility === "boolean") {
       return visibility;
     }
     return undefined;
   }
 
-  async function setModelEdgesVisibility(id: string, visibility: boolean): Promise<unknown> {
-    const params = { id, visibility };
+  async function setModelEdgesVisibility(
+    modelId: ModelId,
+    visibility: Visibility,
+  ): Promise<unknown> {
+    const params = { id: modelId, visibility };
     const result = await viewerStore.request(
       { schema, params },
       {
         response_function: async () => {
           await Promise.all([
-            modelEdgesCommonStyle.mutateModelEdgesStyle(id, { visibility }),
+            modelEdgesCommonStyle.mutateModelEdgesStyle(modelId, { visibility }),
             ...componentsEdgesStyles.map(async (edgesStyle) => {
-              await edgesStyle.mutateStyledEdges(id, { visibility });
+              await edgesStyle.mutateStyledEdges(modelId, { visibility });
             }),
           ]);
         },
@@ -53,15 +58,18 @@ export function useModelEdgesVisibilityStyle(): ModelEdgesVisibilityStyleApi {
     return result;
   }
 
-  async function applyModelEdgesStyle(id: string): Promise<unknown[]> {
-    const visibilityResult = await whenDefined(modelEdgesVisibility(id), async (visibility) => {
-      const applied = await setModelEdgesVisibility(id, visibility);
-      return applied;
-    });
+  async function applyModelEdgesStyle(modelId: ModelId): Promise<unknown[]> {
+    const visibilityResult = await whenDefined(
+      modelEdgesVisibility(modelId),
+      async (visibility) => {
+        const applied = await setModelEdgesVisibility(modelId, visibility);
+        return applied;
+      },
+    );
     const widthResult = await whenDefined(
-      modelEdgesWidthStyle.modelEdgesWidth(id),
+      modelEdgesWidthStyle.modelEdgesWidth(modelId),
       async (width) => {
-        const applied = await modelEdgesWidthStyle.setModelEdgesWidth(id, width);
+        const applied = await modelEdgesWidthStyle.setModelEdgesWidth(modelId, width);
         return applied;
       },
     );

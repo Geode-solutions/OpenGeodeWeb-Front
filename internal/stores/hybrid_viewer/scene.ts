@@ -4,6 +4,8 @@ import { requireRenderWindow, useHybridViewerCore } from "./core";
 import viewer_schemas, {
   type ViewerSetBackgroundColorParams,
 } from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
+import type { DataId } from "@ogw_front/types/identifiers";
+import type { Visibility } from "@ogw_front/types/style";
 import { base64ToArrayBuffer } from "./base64";
 import { getCameraOptions } from "./camera_animation";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -40,13 +42,13 @@ function followZScaling(camera: vtkCamera, ratio: number): void {
   camera.setPosition(positionX, positionY, positionZ + offset);
 }
 
-async function fetchBinaryLightViewable(id: string): Promise<string | undefined> {
+async function fetchBinaryLightViewable(dataId: DataId): Promise<string | undefined> {
   const dataStore = useDataStore();
-  const isViewable = await dataStore.isItemViewable(id);
+  const isViewable = await dataStore.isItemViewable(dataId);
   if (!isViewable) {
     return undefined;
   }
-  const value = await dataStore.item(id);
+  const value = await dataStore.item(dataId);
   return value.binary_light_viewable;
 }
 
@@ -70,12 +72,12 @@ const useHybridViewerScene = createSharedComposable(() => {
   const hybridDb = reactive<HybridDb>({});
   const zScale = ref(1);
 
-  async function addItem(id: string): Promise<void> {
+  async function addItem(dataId: DataId): Promise<void> {
     const { genericRenderWindow } = useHybridViewerCore();
     if (!genericRenderWindow.value) {
       return;
     }
-    const binaryLightViewable = await fetchBinaryLightViewable(id);
+    const binaryLightViewable = await fetchBinaryLightViewable(dataId);
     if (binaryLightViewable === undefined) {
       return;
     }
@@ -83,35 +85,35 @@ const useHybridViewerScene = createSharedComposable(() => {
     const entry = createHybridDbEntry(binaryLightViewable, zScale.value);
     const renderer = genericRenderWindow.value.getRenderer();
     // Replacing an actor keeps the camera where the user left it
-    const isFirst = !hybridDb[id] && renderer.getActors().length === 0;
-    if (hybridDb[id]) {
-      renderer.removeActor(hybridDb[id].actor);
+    const isFirst = !hybridDb[dataId] && renderer.getActors().length === 0;
+    if (hybridDb[dataId]) {
+      renderer.removeActor(hybridDb[dataId].actor);
     }
     renderer.addActor(entry.actor);
     if (isFirst) {
       renderer.resetCamera();
     }
-    hybridDb[id] = entry;
+    hybridDb[dataId] = entry;
   }
 
-  function removeItem(id: string): void {
+  function removeItem(dataId: DataId): void {
     const { genericRenderWindow } = useHybridViewerCore();
-    if (!hybridDb[id]) {
+    if (!hybridDb[dataId]) {
       return;
     }
     const renderer = requireRenderWindow(genericRenderWindow).getRenderer();
-    renderer.removeActor(hybridDb[id].actor);
+    renderer.removeActor(hybridDb[dataId].actor);
     const renderWindow = requireRenderWindow(genericRenderWindow).getRenderWindow();
     renderWindow.render();
-    Reflect.deleteProperty(hybridDb, id);
+    Reflect.deleteProperty(hybridDb, dataId);
   }
 
-  function setVisibility(id: string, visibility: boolean): void {
+  function setVisibility(dataId: DataId, visibility: Visibility): void {
     const { genericRenderWindow } = useHybridViewerCore();
-    if (!hybridDb[id]) {
+    if (!hybridDb[dataId]) {
       return;
     }
-    hybridDb[id].actor.setVisibility(visibility);
+    hybridDb[dataId].actor.setVisibility(visibility);
     const renderWindow = requireRenderWindow(genericRenderWindow).getRenderWindow();
     renderWindow.render();
   }
@@ -155,8 +157,8 @@ const useHybridViewerScene = createSharedComposable(() => {
     }
     const renderWindow = requireRenderWindow(genericRenderWindow).getRenderWindow();
     renderWindow.render();
-    for (const id of Object.keys(hybridDb)) {
-      Reflect.deleteProperty(hybridDb, id);
+    for (const dataId of Object.keys(hybridDb)) {
+      Reflect.deleteProperty(hybridDb, dataId);
     }
   }
 

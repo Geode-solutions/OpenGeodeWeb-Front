@@ -1,14 +1,9 @@
 import type { DisplayItem, EmitFn } from "./virtual_tree";
+import type { ScrollInfo } from "./tree_scroll";
 
 interface VisibleBounds {
   firstVisible: number;
   lastVisible: number;
-}
-
-interface ScrollInfo {
-  scrollTop: number;
-  containerHeight: number;
-  itemHeight: number;
 }
 
 type ReadonlyDisplayItem = Omit<DisplayItem, "raw"> & {

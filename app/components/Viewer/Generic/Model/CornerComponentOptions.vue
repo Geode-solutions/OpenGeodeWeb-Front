@@ -1,14 +1,22 @@
 <script setup lang="ts">
+import type {
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+  AttributeTimeStep,
+} from "@ogw_front/types/attribute";
+import type { CornerId } from "@ogw_front/types/identifiers";
 import { MODEL_VERTEX_COLORING } from "@ogw_front/utils/model_component_coloring";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
+import type { Visibility } from "@ogw_front/types/style";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 interface Props {
   modelId: string;
-  cornerId?: string;
+  cornerId?: CornerId;
   activeTab?: string;
 }
 
@@ -19,7 +27,7 @@ const hybridViewerStore = useHybridViewerStore();
 
 const cornerComponentIds = computed<string[]>(() => (cornerId !== undefined && [cornerId]) || []);
 
-const cornerVisibility = computed<boolean | undefined>({
+const cornerVisibility = computed<Visibility | undefined>({
   get: () => dataStyleStore.modelCornerVisibility(modelId, cornerId) as boolean | undefined,
   set: async (newValue) => {
     if (newValue === undefined || cornerId === undefined) {
@@ -53,7 +61,7 @@ const cornerActiveColoring = computed<string | undefined>({
 });
 
 // Individual Attributes
-const vertexAttributeName = computed<string | undefined>({
+const vertexAttributeName = computed<AttributeName | undefined>({
   get: () => dataStyleStore.modelCornersVertexAttributeName(modelId, cornerId),
   set: async (newValue) => {
     if (cornerId === undefined || newValue === undefined) {
@@ -64,7 +72,7 @@ const vertexAttributeName = computed<string | undefined>({
   },
 });
 
-const vertexAttributeTimeStep = computed<number | undefined>({
+const vertexAttributeTimeStep = computed<AttributeTimeStep | undefined>({
   get: () => dataStyleStore.modelCornersVertexAttributeTimeStep(modelId, cornerId),
   set: async (newValue) => {
     if (cornerId === undefined || newValue === undefined) {
@@ -75,7 +83,7 @@ const vertexAttributeTimeStep = computed<number | undefined>({
   },
 });
 
-const vertexAttributeItem = computed<string | undefined>({
+const vertexAttributeItem = computed<AttributeItem>({
   get: () => dataStyleStore.modelCornersVertexAttributeItem(modelId, cornerId),
   set: async (newValue) => {
     if (cornerId === undefined) {
@@ -86,7 +94,7 @@ const vertexAttributeItem = computed<string | undefined>({
   },
 });
 
-const vertexAttributeRange = computed<[number, number] | undefined>({
+const vertexAttributeRange = computed<AttributeRange>({
   get: () => dataStyleStore.modelCornersVertexAttributeRange(modelId, cornerId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -127,7 +135,7 @@ const { capabilities, schemas: attributeSchemas } = MODEL_VERTEX_COLORING;
   <div v-show="!activeTab || activeTab === 'component'" data-testid="modelComponentOptions">
     <VisibilitySwitch v-model="cornerVisibility" />
     <ViewerOptionsColoringTypeSelector
-      :id="modelId"
+      :data-id="modelId"
       :componentIds="cornerComponentIds"
       v-model:coloring_style_key="cornerActiveColoring"
       v-model:color="cornerColor"

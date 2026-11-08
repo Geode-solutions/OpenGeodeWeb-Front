@@ -1,14 +1,16 @@
 import type { AttributeGroup, ColorGroup } from "./coloring_groups";
-import { isModelLinesEdgeAttributeValid, type useModelLinesEdgeAttribute } from "./edge";
-import { isModelLinesVertexAttributeValid, type useModelLinesVertexAttribute } from "./vertex";
+import type { ModelId } from "@ogw_front/types/identifiers";
+import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import type { useModelLinesColor } from "./color";
+import type { useModelLinesEdgeAttribute } from "./edge";
+import type { useModelLinesVertexAttribute } from "./vertex";
 
 type ColorStyle = ReturnType<typeof useModelLinesColor>;
 type VertexAttributeStyle = ReturnType<typeof useModelLinesVertexAttribute>;
 type EdgeAttributeStyle = ReturnType<typeof useModelLinesEdgeAttribute>;
 
 function applyModelLinesConstantColoring(
-  modelId: string,
+  modelId: ModelId,
   type_lines_ids: string[],
   modelColorStyle: ColorStyle,
 ): Promise<unknown>[] {
@@ -26,7 +28,7 @@ function applyModelLinesConstantColoring(
 }
 
 function groupModelLinesVertexAttributes(
-  modelId: string,
+  modelId: ModelId,
   type_lines_ids: string[],
   modelLinesVertexAttribute: VertexAttributeStyle,
 ): Record<string, AttributeGroup> {
@@ -51,7 +53,7 @@ function groupModelLinesVertexAttributes(
       colorMap,
       no_data_color,
     };
-    if (!isModelLinesVertexAttributeValid(attribute)) {
+    if (!isAttributeValid(attribute)) {
       continue;
     }
     const key = [name, item, colorMap, minimum, maximum, JSON.stringify(no_data_color)].join("_");
@@ -62,7 +64,7 @@ function groupModelLinesVertexAttributes(
 }
 
 function applyModelLinesVertexColoring(
-  modelId: string,
+  modelId: ModelId,
   type_lines_ids: string[],
   modelLinesVertexAttribute: VertexAttributeStyle,
 ): Promise<unknown>[] {
@@ -87,7 +89,7 @@ function applyModelLinesVertexColoring(
 }
 
 function groupModelLinesEdgeAttributes(
-  modelId: string,
+  modelId: ModelId,
   type_lines_ids: string[],
   modelLinesEdgeAttribute: EdgeAttributeStyle,
 ): Record<string, AttributeGroup> {
@@ -112,7 +114,7 @@ function groupModelLinesEdgeAttributes(
       colorMap,
       no_data_color,
     };
-    if (!isModelLinesEdgeAttributeValid(attribute)) {
+    if (!isAttributeValid(attribute)) {
       continue;
     }
     const key = [name, item, colorMap, minimum, maximum, JSON.stringify(no_data_color)].join("_");
@@ -123,7 +125,7 @@ function groupModelLinesEdgeAttributes(
 }
 
 function applyModelLinesEdgeColoring(
-  modelId: string,
+  modelId: ModelId,
   type_lines_ids: string[],
   modelLinesEdgeAttribute: EdgeAttributeStyle,
 ): Promise<unknown>[] {

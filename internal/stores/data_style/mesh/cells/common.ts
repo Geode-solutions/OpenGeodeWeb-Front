@@ -1,40 +1,41 @@
+import type { MeshId } from "@ogw_front/types/identifiers";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 
 export function useMeshCellsCommonStyle(): {
-  meshCellsStyle: (id: string) => StyleValues;
-  meshCellsColoring: (id: string) => StyleValues;
-  mutateMeshCellsStyle: (id: string, values: StyleValues) => Promise<string>;
-  mutateMeshCellsColoring: (id: string, values: StyleValues) => Promise<string>;
-  mutateMeshCellsCellStyle: (id: string, values: StyleValues) => Promise<string>;
+  meshCellsStyle: (meshId: MeshId) => StyleValues;
+  meshCellsColoring: (meshId: MeshId) => StyleValues;
+  mutateMeshCellsStyle: (meshId: MeshId, values: StyleValues) => Promise<string>;
+  mutateMeshCellsColoring: (meshId: MeshId, values: StyleValues) => Promise<string>;
+  mutateMeshCellsCellStyle: (meshId: MeshId, values: StyleValues) => Promise<string>;
 } {
   const dataStyleState = useDataStyleState();
 
-  async function mutateMeshCellsStyle(id: string, values: StyleValues): Promise<string> {
-    const result = await dataStyleState.mutateStyle(id, {
+  async function mutateMeshCellsStyle(meshId: MeshId, values: StyleValues): Promise<string> {
+    const result = await dataStyleState.mutateStyle(meshId, {
       cells: values,
     });
     return result;
   }
 
-  function meshCellsStyle(id: string): StyleValues {
-    return dataStyleState.getStyle(id).cells ?? {};
+  function meshCellsStyle(meshId: MeshId): StyleValues {
+    return dataStyleState.getStyle(meshId).cells ?? {};
   }
 
-  function meshCellsColoring(id: string): StyleValues {
+  function meshCellsColoring(meshId: MeshId): StyleValues {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
-    return meshCellsStyle(id).coloring as StyleValues;
+    return meshCellsStyle(meshId).coloring as StyleValues;
   }
 
-  async function mutateMeshCellsColoring(id: string, values: StyleValues): Promise<string> {
-    const result = await mutateMeshCellsStyle(id, {
+  async function mutateMeshCellsColoring(meshId: MeshId, values: StyleValues): Promise<string> {
+    const result = await mutateMeshCellsStyle(meshId, {
       coloring: values,
     });
     return result;
   }
 
-  async function mutateMeshCellsCellStyle(id: string, values: StyleValues): Promise<string> {
-    const result = await mutateMeshCellsColoring(id, {
+  async function mutateMeshCellsCellStyle(meshId: MeshId, values: StyleValues): Promise<string> {
+    const result = await mutateMeshCellsColoring(meshId, {
       cell: values,
     });
     return result;

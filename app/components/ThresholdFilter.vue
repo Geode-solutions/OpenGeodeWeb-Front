@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Threshold, ThresholdAttribute } from "@ogw_internal/stores/hybrid_viewer/filters";
 import type { AttributeSource } from "@ogw_front/utils/threshold";
+import type { DataId } from "@ogw_front/types/identifiers";
 import ThresholdCard from "@ogw_front/components/ThresholdCard.vue";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import { fetchSources } from "@ogw_front/utils/threshold_sources";
@@ -32,8 +33,8 @@ const cards = useTemplateRef("cards");
 const allItems = dataStore.refAllItems();
 const availableDatasets = computed<{ title: string; value: string }[]>(() =>
   allItems.value.map((item) => ({
-    title: item.name || item.id,
-    value: item.id,
+    title: item.name || item.data_id,
+    value: item.data_id,
   })),
 );
 
@@ -63,9 +64,9 @@ function removeThreshold(index: number): void {
   }
 }
 
-async function clearThresholds(id: string): Promise<void> {
-  hybridViewerStore.removeThresholds(id);
-  await hybridViewerStore.setThreshold([id], []);
+async function clearThresholds(dataId: DataId): Promise<void> {
+  hybridViewerStore.removeThresholds(dataId);
+  await hybridViewerStore.setThreshold([dataId], []);
 }
 
 async function resetRanges(): Promise<void> {
@@ -79,17 +80,17 @@ async function removeThresholds(): Promise<void> {
   }
 }
 
-watch(selectedDatasetId, async (id, previousId) => {
+watch(selectedDatasetId, async (dataId, previousId) => {
   if (previousId) {
     await clearThresholds(previousId);
   }
-  if (id) {
-    sources.value = await fetchSources(dataStore, id);
+  if (dataId) {
+    sources.value = await fetchSources(dataStore, dataId);
   } else {
     sources.value = [];
   }
-  if (id && hybridViewerStore.getThresholds(id).length === 0) {
-    hybridViewerStore.addThreshold(id);
+  if (dataId && hybridViewerStore.getThresholds(dataId).length === 0) {
+    hybridViewerStore.addThreshold(dataId);
   }
 });
 

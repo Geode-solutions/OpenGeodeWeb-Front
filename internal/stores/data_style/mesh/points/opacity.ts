@@ -1,3 +1,5 @@
+import type { MeshId } from "@ogw_front/types/identifiers";
+import type { Opacity } from "@ogw_front/types/style";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
@@ -11,21 +13,21 @@ const schema = viewer_schemas.opengeodeweb_viewer.mesh.points.opacity;
 
 // The opacity is the constant color alpha, the viewer applies it whatever the coloring
 export function useMeshPointsOpacityStyle(): {
-  meshPointsOpacity: (id: string) => number | undefined;
-  setMeshPointsOpacity: (id: string, opacity: number) => Promise<unknown>;
+  meshPointsOpacity: (meshId: MeshId) => Opacity | undefined;
+  setMeshPointsOpacity: (meshId: MeshId, opacity: Opacity) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const meshPointsCommonStyle = useMeshPointsCommonStyle();
 
-  function meshPointsConstantColor(id: string): RGBAColor | undefined {
+  function meshPointsConstantColor(meshId: MeshId): RGBAColor | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.constant shape is defined by the data style schema.
-    return meshPointsCommonStyle.meshPointsColoring(id).constant as RGBAColor | undefined;
+    return meshPointsCommonStyle.meshPointsColoring(meshId).constant as RGBAColor | undefined;
   }
-  function meshPointsOpacity(id: string): number | undefined {
-    return meshPointsConstantColor(id)?.alpha;
+  function meshPointsOpacity(meshId: MeshId): Opacity | undefined {
+    return meshPointsConstantColor(meshId)?.alpha;
   }
-  async function setMeshPointsOpacity(id: string, opacity: number): Promise<unknown> {
-    const params = { id, opacity };
+  async function setMeshPointsOpacity(meshId: MeshId, opacity: Opacity): Promise<unknown> {
+    const params = { id: meshId, opacity };
     const result = await viewerStore.request(
       {
         schema,
@@ -33,11 +35,11 @@ export function useMeshPointsOpacityStyle(): {
       },
       {
         response_function: async () => {
-          const color = meshPointsConstantColor(id);
+          const color = meshPointsConstantColor(meshId);
           if (color === undefined) {
             return undefined;
           }
-          const mutateResult = await meshPointsCommonStyle.mutateMeshPointsColoring(id, {
+          const mutateResult = await meshPointsCommonStyle.mutateMeshPointsColoring(meshId, {
             constant: { ...color, alpha: opacity },
           });
           return mutateResult;

@@ -23,7 +23,7 @@ async function mountSelector(coloringStyleKey: string): Promise<VueWrapper> {
       },
     },
     props: {
-      id: ID,
+      dataId: ID,
       coloring_style_key: coloringStyleKey,
       color: COLOR,
       opacity: OPACITY,

@@ -1,32 +1,25 @@
 <script setup lang="ts">
 import GlassCard from "@ogw_front/components/GlassCard.vue";
+import type { ProposedItem } from "@ogw_front/composables/use_overlapping_picker";
 import { formatListId } from "@ogw_front/utils/name_cleaner";
 import { geode_objects } from "@ogw_front/assets/geode_objects";
 
-interface IntermediateItem {
-  id: string;
-  viewer_id: number | undefined;
-  name: string;
-  viewer_type: string | undefined;
-  geode_object_type: string | undefined;
-}
-
 interface Props {
   displayIntermediate: boolean;
-  intermediateItems: IntermediateItem[];
+  intermediateItems: ProposedItem[];
   menuStyle: Record<string, unknown>;
 }
 
 const { displayIntermediate, intermediateItems, menuStyle } = defineProps<Props>();
 
 interface Emits {
-  select: [item: IntermediateItem];
+  select: [item: ProposedItem];
   "update:displayIntermediate": [val: boolean];
 }
 
 const emit = defineEmits<Emits>();
 
-function selectItem(item: IntermediateItem): void {
+function selectItem(item: ProposedItem): void {
   emit("select", item);
 }
 
@@ -64,7 +57,7 @@ function handleUpdate(val: boolean): void {
       <v-list class="py-1 bg-transparent" density="compact">
         <v-list-item
           v-for="item in intermediateItems"
-          :key="`${item.id}-${item.viewer_id}`"
+          :key="`${item.data_id}-${item.viewer_id}`"
           class="intermediate-picker-item px-3 py-2"
           @click="selectItem(item)"
         >
@@ -89,7 +82,7 @@ function handleUpdate(val: boolean): void {
           >
             <span class="font-weight-medium mr-1">{{ item.geode_object_type }}</span>
             <span style="font-family: monospace; opacity: 0.65; font-size: 0.72rem"
-              >&middot; {{ formatListId(item.id) }}</span
+              >&middot; {{ formatListId(item.data_id) }}</span
             >
           </v-list-item-subtitle>
         </v-list-item>

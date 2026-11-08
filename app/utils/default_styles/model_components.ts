@@ -6,6 +6,7 @@ import {
   CORNERS_DEFAULT_ACTIVE_COLORING,
   CORNERS_DEFAULT_COLOR,
   CORNERS_DEFAULT_VISIBILITY,
+  type ComponentColoring,
   EDGES_DEFAULT_VISIBILITY,
   EDGES_DEFAULT_WIDTH,
   LINES_DEFAULT_ACTIVE_COLORING,
@@ -18,61 +19,56 @@ import {
   SURFACES_DEFAULT_COLOR,
   SURFACES_DEFAULT_VISIBILITY,
 } from "./constants";
+import type { Size, Visibility, Width } from "@ogw_front/types/style";
 
 function emptyAttributeConfig(): AttributeConfig {
   return { name: undefined, storedConfigs: {} };
 }
 
-interface ModelComponentColoring {
-  active: string;
-  constant: RGBAColor;
-  vertex: AttributeConfig;
-}
-
-interface ModelLinesColoring extends ModelComponentColoring {
+interface ModelLinesColoring extends ComponentColoring {
   edge: AttributeConfig;
 }
 
-interface ModelSurfacesColoring extends ModelComponentColoring {
+interface ModelSurfacesColoring extends ComponentColoring {
   polygon: AttributeConfig;
 }
 
-interface ModelBlocksColoring extends ModelComponentColoring {
+interface ModelBlocksColoring extends ComponentColoring {
   polyhedron: AttributeConfig;
 }
 
 interface ModelCornersStyle {
-  visibility: boolean;
-  coloring: ModelComponentColoring;
+  visibility: Visibility;
+  coloring: ComponentColoring;
 }
 
 interface ModelLinesStyle {
-  visibility: boolean;
+  visibility: Visibility;
   coloring: ModelLinesColoring;
 }
 
 interface ModelSurfacesStyle {
-  visibility: boolean;
+  visibility: Visibility;
   coloring: ModelSurfacesColoring;
 }
 
 interface ModelBlocksStyle {
-  visibility: boolean;
+  visibility: Visibility;
   coloring: ModelBlocksColoring;
 }
 
 interface ModelPointsStyle {
-  visibility: boolean;
-  size: number;
+  visibility: Visibility;
+  size: Size;
 }
 
 interface ModelEdgesStyle {
-  visibility: boolean;
-  width: number;
+  visibility: Visibility;
+  width: Width;
 }
 
 function modelCornersDefaultStyle(
-  visibility: boolean = CORNERS_DEFAULT_VISIBILITY,
+  visibility: Visibility = CORNERS_DEFAULT_VISIBILITY,
   constant: RGBAColor = CORNERS_DEFAULT_COLOR,
 ): ModelCornersStyle {
   return {
@@ -86,7 +82,7 @@ function modelCornersDefaultStyle(
 }
 
 function modelLinesDefaultStyle(
-  visibility: boolean = LINES_DEFAULT_VISIBILITY,
+  visibility: Visibility = LINES_DEFAULT_VISIBILITY,
   constant: RGBAColor = LINES_DEFAULT_COLOR,
 ): ModelLinesStyle {
   return {
@@ -101,7 +97,7 @@ function modelLinesDefaultStyle(
 }
 
 function modelSurfacesDefaultStyle(
-  visibility: boolean = SURFACES_DEFAULT_VISIBILITY,
+  visibility: Visibility = SURFACES_DEFAULT_VISIBILITY,
   constant: RGBAColor = SURFACES_DEFAULT_COLOR,
 ): ModelSurfacesStyle {
   return {
@@ -116,7 +112,7 @@ function modelSurfacesDefaultStyle(
 }
 
 function modelBlocksDefaultStyle(
-  visibility: boolean = BLOCKS_DEFAULT_VISIBILITY,
+  visibility: Visibility = BLOCKS_DEFAULT_VISIBILITY,
   constant: RGBAColor = BLOCKS_DEFAULT_COLOR,
 ): ModelBlocksStyle {
   return {
@@ -131,15 +127,15 @@ function modelBlocksDefaultStyle(
 }
 
 function modelPointsDefaultStyle(
-  visibility: boolean = POINTS_DEFAULT_VISIBILITY,
-  size: number = POINTS_DEFAULT_SIZE,
+  visibility: Visibility = POINTS_DEFAULT_VISIBILITY,
+  size: Size = POINTS_DEFAULT_SIZE,
 ): ModelPointsStyle {
   return { visibility, size };
 }
 
 function modelEdgesDefaultStyle(
-  visibility: boolean = EDGES_DEFAULT_VISIBILITY,
-  width: number = EDGES_DEFAULT_WIDTH,
+  visibility: Visibility = EDGES_DEFAULT_VISIBILITY,
+  width: Width = EDGES_DEFAULT_WIDTH,
 ): ModelEdgesStyle {
   return { visibility, width };
 }

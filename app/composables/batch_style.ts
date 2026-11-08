@@ -1,3 +1,8 @@
+import type {
+  AttributeRangeMaximum,
+  AttributeRangeMinimum,
+  ValidAttributeRange,
+} from "@ogw_front/types/attribute";
 import {
   type ComputedRef,
   type InjectionKey,
@@ -7,11 +12,11 @@ import {
   provide,
   toValue,
 } from "vue";
+import type { DataId } from "@ogw_front/types/identifiers";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
-type AttributeRange = [number, number];
-type RangesPerData = ReadonlyMap<string, AttributeRange>;
+type RangesPerData = ReadonlyMap<string, ValidAttributeRange>;
 
 const BATCH_GROUP_KEY: InjectionKey<ComputedRef<string[]>> = Symbol("batch_group");
 
@@ -23,18 +28,22 @@ function injectBatchGroup(): ComputedRef<string[]> {
   return inject(BATCH_GROUP_KEY, () => computed(() => []), true);
 }
 
-function groupTargetsOf(targetIds: string[], id: string): string[] | undefined {
-  return targetIds.includes(id) ? targetIds : undefined;
+function groupTargetsOf(targetIds: string[], dataId: DataId): string[] | undefined {
+  return targetIds.includes(dataId) ? targetIds : undefined;
 }
 
-function useBatchGroup(id: MaybeRefOrGetter<string>): ComputedRef<string[] | undefined> {
+function useBatchGroup(dataId: MaybeRefOrGetter<DataId>): ComputedRef<string[] | undefined> {
   const group = injectBatchGroup();
-  return computed(() => groupTargetsOf(group.value, toValue(id)));
+  return computed(() => groupTargetsOf(group.value, toValue(dataId)));
 }
 
 async function applyRangesPerData(
   ranges: RangesPerData,
-  setRange: (id: string, minimum: number, maximum: number) => unknown,
+  setRange: (
+    dataId: DataId,
+    minimum: AttributeRangeMinimum,
+    maximum: AttributeRangeMaximum,
+  ) => unknown,
 ): Promise<void> {
   await Promise.all(
     [...ranges].map(async ([targetId, [minimum, maximum]]) => {
@@ -45,7 +54,7 @@ async function applyRangesPerData(
 
 async function applyActionOn(
   targets: readonly string[],
-  action: (id: string) => Promise<unknown>,
+  action: (dataId: DataId) => Promise<unknown>,
 ): Promise<void> {
   await Promise.all(
     targets.map(async (targetId) => {
@@ -60,23 +69,23 @@ function useBatchStyle(): { applyBatchStyle: typeof applyBatchStyle } {
   const group = injectBatchGroup();
 
   async function applyBatchStyle(
-    id: string,
-    action: (id: string) => Promise<unknown>,
+    dataId: DataId,
+    action: (dataId: DataId) => Promise<unknown>,
   ): Promise<void> {
-    const groupTargets = groupTargetsOf(group.value, id);
+    const groupTargets = groupTargetsOf(group.value, dataId);
     if (groupTargets) {
       await applyActionOn(groupTargets, action);
       return;
     }
 
-    const isActive = treeviewStore.activeItems.includes(id);
+    const isActive = treeviewStore.activeItems.includes(dataId);
     if (!isActive || treeviewStore.activeItems.length <= 1) {
-      await action(id);
+      await action(dataId);
       return;
     }
 
     try {
-      const currentItem = await dataStore.item(id);
+      const currentItem = await dataStore.item(dataId);
       const targetType = currentItem.geode_object_type;
 
       const promises = treeviewStore.activeItems.map(async (selectedId) => {
@@ -92,7 +101,7 @@ function useBatchStyle(): { applyBatchStyle: typeof applyBatchStyle } {
 
       await Promise.all(promises);
     } catch {
-      await action(id);
+      await action(dataId);
     }
   }
 
@@ -100,4 +109,4 @@ function useBatchStyle(): { applyBatchStyle: typeof applyBatchStyle } {
 }
 
 export { BATCH_GROUP_KEY, applyRangesPerData, provideBatchGroup, useBatchGroup, useBatchStyle };
-export type { AttributeRange, RangesPerData };
+export type { RangesPerData };

@@ -1,3 +1,5 @@
+import type { Opacity } from "@ogw_front/types/style";
+
 const AXIS_SCALE = 0.45;
 const SIZE_RATIO = 0.1;
 const DEBOUNCE_DELAY = 200;
@@ -52,9 +54,9 @@ function hasPlaneChanged(
 }
 
 interface PlaneVisualState {
-  readonly plane: { readonly opacity: number; readonly color: readonly number[] };
-  readonly normal: { readonly opacity: number; readonly color: readonly number[] };
-  readonly origin: { readonly opacity: number; readonly color: readonly number[] };
+  readonly plane: { readonly opacity: Opacity; readonly color: readonly number[] };
+  readonly normal: { readonly opacity: Opacity; readonly color: readonly number[] };
+  readonly origin: { readonly opacity: Opacity; readonly color: readonly number[] };
 }
 
 interface PlaneStyle {
@@ -64,7 +66,7 @@ interface PlaneStyle {
     readonly display2D: { readonly representation: number };
     readonly outline: {
       readonly color: readonly number[];
-      readonly opacity: number;
+      readonly opacity: Opacity;
       readonly representation: number;
       readonly interpolation: number;
     };

@@ -1,3 +1,4 @@
+import type { AttributeName } from "@ogw_front/types/attribute";
 import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
 import { useBackStore } from "@ogw_front/stores/back";
 
@@ -34,7 +35,7 @@ async function requestAttributeRange(
 async function fetchAttributeRange(
   rangeSchema: JsonRpcSchema,
   target: AttributeRangeTarget,
-  attributeName: string,
+  attributeName: AttributeName,
 ): Promise<AttributeRangeInfo> {
   const params = { ...target, attribute_name: attributeName };
   const key = JSON.stringify([rangeSchema.$id, params]);

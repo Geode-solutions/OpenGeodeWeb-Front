@@ -1,3 +1,4 @@
+import type { GeodeId, GeodeIdentified, ModelId } from "@ogw_front/types/identifiers";
 import { HOVER_DEBOUNCE_MS, HOVER_TIMEOUT_MS } from "./constants";
 import type { HoverComponentInfo, HoverData } from "./vtk_types";
 import viewer_schemas, {
@@ -10,23 +11,23 @@ import { useHybridViewerCore } from "./core";
 import { useHybridViewerScene } from "./scene";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
-async function lookupModelName(modelId: string): Promise<string | undefined> {
+async function lookupModelName(modelId: ModelId): Promise<string | undefined> {
   const modelRecord = (await database.data?.get(modelId)) as { name?: string } | undefined;
   return modelRecord?.name;
 }
 
 async function lookupComponentInfo(
-  modelId: string,
-  geodeId: string | undefined,
+  modelId: ModelId,
+  geodeId: GeodeId | undefined,
 ): Promise<HoverComponentInfo | undefined> {
   const modelComponentsTable = database.model_components;
   if (geodeId === undefined || !modelComponentsTable) {
     return undefined;
   }
-  const components = modelComponentsTable.where("[id+geode_id]");
+  const components = modelComponentsTable.where("[data_id+geode_id]");
   const query = components.equals([modelId, geodeId] as IndexableType);
   const component = (await query.first()) as
-    | { name?: string; geode_id?: string; type?: string }
+    | (Partial<GeodeIdentified> & { name?: string; type?: string })
     | undefined;
   if (!component) {
     return undefined;

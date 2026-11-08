@@ -16,7 +16,7 @@ import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants
 import { Status } from "@ogw_front/utils/status";
 import { assertDefined } from "@ogw_tests/utils";
 import { cleanupBackend } from "@ogw_server/utils/cleanup";
-import { isModelCornersVertexAttributeValid } from "@ogw_internal/stores/data_style/model/corners/vertex";
+import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -42,7 +42,7 @@ describe("model corners", () => {
         maximum: undefined,
         colorMap: undefined,
       };
-      expect(isModelCornersVertexAttributeValid(attribute)).toBe(false);
+      expect(isAttributeValid(attribute)).toBe(false);
     });
 
     test("coloring vertex attribute — no request until range+colormap set", async () => {

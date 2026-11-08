@@ -1,8 +1,16 @@
 <script setup lang="ts">
 // oxlint-disable eslint/max-lines
+import type {
+  AttributeItem,
+  AttributeName,
+  AttributeRange,
+  AttributeTimeStep,
+} from "@ogw_front/types/attribute";
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { SurfaceId } from "@ogw_front/types/identifiers";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
+import type { Visibility } from "@ogw_front/types/style";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -10,7 +18,7 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 interface Props {
   modelId: string;
-  surfaceId?: string;
+  surfaceId?: SurfaceId;
   targetSurfaceIds: string[];
   collections?: CollectionComponent[];
   activeTab?: string;
@@ -36,7 +44,7 @@ const surfaceComponentIds = computed<string[]>(
 );
 
 // Visibility
-const surfacesVisibility = computed<boolean>({
+const surfacesVisibility = computed<Visibility>({
   get: () => {
     if (collections) {
       return targetSurfaceIds.every((id) => dataStyleStore.modelSurfaceVisibility(modelId, id));
@@ -49,7 +57,7 @@ const surfacesVisibility = computed<boolean>({
   },
 });
 
-const surfaceVisibility = computed<boolean>({
+const surfaceVisibility = computed<Visibility>({
   get: () => dataStyleStore.modelSurfaceVisibility(modelId, surfaceId) as boolean | undefined,
   set: async (newValue) => {
     if (surfaceId === undefined) {
@@ -120,7 +128,7 @@ const surfaceActiveColoring = computed<string | undefined>({
 });
 
 // Group Attributes
-const surfacesVertexAttributeName = computed<string | undefined>({
+const surfacesVertexAttributeName = computed<AttributeName | undefined>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeName(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -131,7 +139,7 @@ const surfacesVertexAttributeName = computed<string | undefined>({
   },
 });
 
-const surfacesVertexAttributeTimeStep = computed<number | undefined>({
+const surfacesVertexAttributeTimeStep = computed<AttributeTimeStep | undefined>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeTimeStep(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -146,7 +154,7 @@ const surfacesVertexAttributeTimeStep = computed<number | undefined>({
   },
 });
 
-const surfacesVertexAttributeItem = computed<string | undefined>({
+const surfacesVertexAttributeItem = computed<AttributeItem>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeItem(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesVertexAttributeItem(modelId, targetSurfaceIds, newValue);
@@ -154,7 +162,7 @@ const surfacesVertexAttributeItem = computed<string | undefined>({
   },
 });
 
-const surfacesVertexAttributeRange = computed<[number, number] | undefined>({
+const surfacesVertexAttributeRange = computed<AttributeRange>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeRange(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -196,7 +204,7 @@ const surfacesVertexAttributeNoDataColor = computed<RGBAColor>({
   },
 });
 
-const surfacesPolygonAttributeName = computed<string | undefined>({
+const surfacesPolygonAttributeName = computed<AttributeName | undefined>({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeName(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -207,7 +215,7 @@ const surfacesPolygonAttributeName = computed<string | undefined>({
   },
 });
 
-const surfacesPolygonAttributeTimeStep = computed<number | undefined>({
+const surfacesPolygonAttributeTimeStep = computed<AttributeTimeStep | undefined>({
   get: () =>
     dataStyleStore.modelSurfacesPolygonAttributeTimeStep(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
@@ -223,7 +231,7 @@ const surfacesPolygonAttributeTimeStep = computed<number | undefined>({
   },
 });
 
-const surfacesPolygonAttributeItem = computed<string | undefined>({
+const surfacesPolygonAttributeItem = computed<AttributeItem>({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeItem(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesPolygonAttributeItem(modelId, targetSurfaceIds, newValue);
@@ -231,7 +239,7 @@ const surfacesPolygonAttributeItem = computed<string | undefined>({
   },
 });
 
-const surfacesPolygonAttributeRange = computed<[number, number] | undefined>({
+const surfacesPolygonAttributeRange = computed<AttributeRange>({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeRange(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -275,7 +283,7 @@ const surfacesPolygonAttributeNoDataColor = computed<RGBAColor>({
 });
 
 // Individual Attributes
-const vertexAttributeName = computed<string | undefined>({
+const vertexAttributeName = computed<AttributeName | undefined>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeName(modelId, surfaceId),
   set: async (newValue) => {
     if (surfaceId === undefined || newValue === undefined) {
@@ -286,7 +294,7 @@ const vertexAttributeName = computed<string | undefined>({
   },
 });
 
-const vertexAttributeTimeStep = computed<number | undefined>({
+const vertexAttributeTimeStep = computed<AttributeTimeStep | undefined>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeTimeStep(modelId, surfaceId),
   set: async (newValue) => {
     if (surfaceId === undefined || newValue === undefined) {
@@ -297,7 +305,7 @@ const vertexAttributeTimeStep = computed<number | undefined>({
   },
 });
 
-const vertexAttributeItem = computed<string | undefined>({
+const vertexAttributeItem = computed<AttributeItem>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeItem(modelId, surfaceId),
   set: async (newValue) => {
     if (surfaceId === undefined) {
@@ -308,7 +316,7 @@ const vertexAttributeItem = computed<string | undefined>({
   },
 });
 
-const vertexAttributeRange = computed<[number, number] | undefined>({
+const vertexAttributeRange = computed<AttributeRange>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeRange(modelId, surfaceId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -347,7 +355,7 @@ const vertexAttributeNoDataColor = computed<RGBAColor>({
   },
 });
 
-const polygonAttributeName = computed<string | undefined>({
+const polygonAttributeName = computed<AttributeName | undefined>({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeName(modelId, surfaceId),
   set: async (newValue) => {
     if (surfaceId === undefined || newValue === undefined) {
@@ -358,7 +366,7 @@ const polygonAttributeName = computed<string | undefined>({
   },
 });
 
-const polygonAttributeTimeStep = computed<number | undefined>({
+const polygonAttributeTimeStep = computed<AttributeTimeStep | undefined>({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeTimeStep(modelId, surfaceId),
   set: async (newValue) => {
     if (surfaceId === undefined || newValue === undefined) {
@@ -369,7 +377,7 @@ const polygonAttributeTimeStep = computed<number | undefined>({
   },
 });
 
-const polygonAttributeItem = computed<string | undefined>({
+const polygonAttributeItem = computed<AttributeItem>({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeItem(modelId, surfaceId),
   set: async (newValue) => {
     if (surfaceId === undefined) {
@@ -380,7 +388,7 @@ const polygonAttributeItem = computed<string | undefined>({
   },
 });
 
-const polygonAttributeRange = computed<[number, number] | undefined>({
+const polygonAttributeRange = computed<AttributeRange>({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeRange(modelId, surfaceId),
   set: async (newValue) => {
     const [minimum, maximum] = newValue;
@@ -450,7 +458,7 @@ const attributeSchemas = {
   <div v-show="!activeTab || activeTab === 'type'" data-testid="modelComponentTypeOptions">
     <VisibilitySwitch data-testid="modelSurfacesVisibilitySwitch" v-model="surfacesVisibility" />
     <ViewerOptionsColoringTypeSelector
-      :id="modelId"
+      :data-id="modelId"
       :componentIds="targetSurfaceIds"
       v-model:coloring_style_key="surfacesActiveColoring"
       v-model:color="surfacesColor"
@@ -479,7 +487,7 @@ const attributeSchemas = {
   >
     <VisibilitySwitch v-model="surfaceVisibility" />
     <ViewerOptionsColoringTypeSelector
-      :id="modelId"
+      :data-id="modelId"
       :componentIds="surfaceComponentIds"
       v-model:coloring_style_key="surfaceActiveColoring"
       v-model:color="surfaceColor"

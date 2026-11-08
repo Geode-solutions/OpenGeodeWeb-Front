@@ -46,8 +46,8 @@ const factor = ref<number>(factorRange.defaultValue);
 const allItems = dataStore.refRegisteredItems();
 const availableDatasets = computed<{ title: string; value: string }[]>(() =>
   allItems.value.map((item) => ({
-    title: item.name || item.id,
-    value: item.id,
+    title: item.name || item.data_id,
+    value: item.data_id,
   })),
 );
 
@@ -55,12 +55,12 @@ let appliedFactor: number | undefined = undefined;
 
 async function applyFactor(): Promise<void> {
   appliedFactor = factor.value;
-  const allIds = allItems.value.map((item) => item.id);
+  const allIds = allItems.value.map((item) => item.data_id);
   if (allIds.length === 0) {
     return;
   }
   const targetIds = targetAllVisible.value ? allIds : selectedDatasetIds.value;
-  const untargetedIds = allIds.filter((id) => !targetIds.includes(id));
+  const untargetedIds = allIds.filter((dataId) => !targetIds.includes(dataId));
 
   if (targetIds.length > 0) {
     await setFactor(targetIds, Number(factor.value));

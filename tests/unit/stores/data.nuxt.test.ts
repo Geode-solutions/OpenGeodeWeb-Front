@@ -26,7 +26,7 @@ describe("useDataStore - collections", () => {
     const dataId = "a".repeat(DATA_ID_LENGTH);
     const geodeId = "01a08187-2c4c-7e64-85c5-52c3439f0626";
     await dataStore.addItem({
-      id: dataId,
+      data_id: dataId,
       geode_id: geodeId,
       name: "cube",
       viewer_type: "model",
@@ -41,7 +41,7 @@ describe("useDataStore - collections", () => {
     const dataId = "b".repeat(DATA_ID_LENGTH);
     const crs = { authority: "EPSG", code: "2154", name: "RGF93 v1 / Lambert-93" };
     await dataStore.addItem({
-      id: dataId,
+      data_id: dataId,
       geode_id: "01a08187-2c4c-7e64-85c5-52c3439f0627",
       name: "points",
       viewer_type: "mesh",
@@ -63,7 +63,7 @@ describe("useDataStore - collections", () => {
     };
     const line1 = { ...component("line1", "Line", 2), boundaries: ["corner"] };
     const model = {
-      id: modelId,
+      data_id: modelId,
       geode_id: modelId,
       viewer_type: "model",
       geode_object_type: "Section",
@@ -79,7 +79,7 @@ describe("useDataStore - collections", () => {
     await dataStore.addComponentRelations(model);
     const otherModel = {
       ...model,
-      id: otherModelId,
+      data_id: otherModelId,
       mesh_components: [{ ...surface, boundaries: ["line2"], internals: [] }],
     };
     await dataStore.addComponents(otherModel);
@@ -111,23 +111,23 @@ describe("useDataStore - collections", () => {
 
       // Standard viewable item (BRep)
       expect(
-        dataStore.isItemViewable({ id: "1", title: "BRep 1", geode_object_type: "BRep" }),
+        dataStore.isItemViewable({ data_id: "1", title: "BRep 1", geode_object_type: "BRep" }),
       ).toBe(true);
 
       // Group node for viewable type
-      expect(dataStore.isItemViewable({ id: "BRep", title: "BRep" })).toBe(true);
+      expect(dataStore.isItemViewable({ data_id: "BRep", title: "BRep" })).toBe(true);
 
       // HorizonStack3D leaf item
       expect(
         dataStore.isItemViewable({
-          id: "2",
+          data_id: "2",
           title: "HS 1",
           geode_object_type: "HorizonStack3D",
         }),
       ).toBe(false);
 
       // HorizonStack3D group node
-      expect(dataStore.isItemViewable({ id: "HorizonStack3D", title: "HorizonStack3D" })).toBe(
+      expect(dataStore.isItemViewable({ data_id: "HorizonStack3D", title: "HorizonStack3D" })).toBe(
         false,
       );
     });

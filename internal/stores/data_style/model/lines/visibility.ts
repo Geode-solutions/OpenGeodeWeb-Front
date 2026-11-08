@@ -1,3 +1,5 @@
+import type { LineId, ModelId } from "@ogw_front/types/identifiers";
+import type { Visibility } from "@ogw_front/types/style";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 import { useModelLinesCommonStyle } from "./common";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
@@ -6,23 +8,23 @@ const schema = viewer_schemas.opengeodeweb_viewer.model.lines.visibility;
 
 export function useModelLinesVisibility(): {
   setModelLinesVisibility: (
-    modelId: string,
-    lines_ids: string[],
-    visibility: boolean,
+    modelId: ModelId,
+    lines_ids: LineId[],
+    visibility: Visibility,
   ) => Promise<unknown>;
-  modelLineVisibility: (id: string, line_id?: string) => unknown;
+  modelLineVisibility: (modelId: ModelId, line_id?: LineId) => unknown;
 } {
   const modelCommonStyle = useModelCommonStyle();
   const modelLinesCommonStyle = useModelLinesCommonStyle();
 
-  function modelLineVisibility(id: string, line_id?: string): unknown {
-    return modelLinesCommonStyle.modelLineStyle(id, line_id).visibility;
+  function modelLineVisibility(modelId: ModelId, line_id?: LineId): unknown {
+    return modelLinesCommonStyle.modelLineStyle(modelId, line_id).visibility;
   }
 
   async function setModelLinesVisibility(
-    modelId: string,
-    lines_ids: string[],
-    visibility: boolean,
+    modelId: ModelId,
+    lines_ids: LineId[],
+    visibility: Visibility,
   ): Promise<unknown> {
     const result = await modelCommonStyle.setModelTypeVisibility(
       modelId,

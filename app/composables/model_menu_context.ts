@@ -1,12 +1,11 @@
 import { type ComputedRef, type Ref, computed, ref, watch } from "vue";
+import type { ModelId, ModelIdentified, ViewerTyped } from "@ogw_front/types/identifiers";
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import { useDataStore } from "@ogw_front/stores/data";
 
-interface ModelMenuMetaData {
-  modelId?: string;
+interface ModelMenuMetaData extends Partial<ViewerTyped>, Partial<ModelIdentified> {
   pickedComponentId?: string;
-  viewer_type?: string;
   modelComponentType?: string;
   targetComponentIds?: string[];
 }
@@ -17,7 +16,7 @@ interface ModelMenuItemProps {
 }
 
 interface ModelMenuContext {
-  modelId: ComputedRef<string>;
+  modelId: ComputedRef<ModelId>;
   componentId: ComputedRef<string | undefined>;
   componentType: Ref<string | undefined>;
   collections: Ref<CollectionComponent[] | undefined>;

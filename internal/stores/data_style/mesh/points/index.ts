@@ -1,11 +1,13 @@
 // Third party imports
 
 // Local imports
-import { isMeshPointsVertexAttributeValid, useMeshPointsVertexAttributeStyle } from "./vertex";
+import type { MeshId } from "@ogw_front/types/identifiers";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
+import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import { useMeshPointsColorStyle } from "./color";
 import { useMeshPointsCommonStyle } from "./common";
 import { useMeshPointsSizeStyle } from "./size";
+import { useMeshPointsVertexAttributeStyle } from "./vertex";
 import { useMeshPointsVisibilityStyle } from "./visibility";
 import { whenDefined } from "@ogw_internal/stores/data_style/when_defined";
 
@@ -18,53 +20,53 @@ interface MeshPointsActiveColoringDeps {
 }
 
 function handleMeshPointsVertexColoring(
-  id: string,
+  meshId: MeshId,
   vertexAttributeStyle: ReturnType<typeof useMeshPointsVertexAttributeStyle>,
 ): Promise<unknown> | undefined {
-  const name = vertexAttributeStyle.meshPointsVertexAttributeName(id);
-  const item = vertexAttributeStyle.meshPointsVertexAttributeItem(id);
-  const [minimum, maximum] = vertexAttributeStyle.meshPointsVertexAttributeRange(id);
-  const colorMap = vertexAttributeStyle.meshPointsVertexAttributeColorMap(id);
-  const no_data_color = vertexAttributeStyle.meshPointsVertexAttributeNoDataColor(id);
+  const name = vertexAttributeStyle.meshPointsVertexAttributeName(meshId);
+  const item = vertexAttributeStyle.meshPointsVertexAttributeItem(meshId);
+  const [minimum, maximum] = vertexAttributeStyle.meshPointsVertexAttributeRange(meshId);
+  const colorMap = vertexAttributeStyle.meshPointsVertexAttributeColorMap(meshId);
+  const no_data_color = vertexAttributeStyle.meshPointsVertexAttributeNoDataColor(meshId);
   const vertex_attribute = { name, item, minimum, maximum, colorMap, no_data_color };
-  if (!isMeshPointsVertexAttributeValid(vertex_attribute)) {
+  if (!isAttributeValid(vertex_attribute)) {
     return undefined;
   }
-  return vertexAttributeStyle.setMeshPointsVertexAttribute(id, vertex_attribute);
+  return vertexAttributeStyle.setMeshPointsVertexAttribute(meshId, vertex_attribute);
 }
 
 async function applyMeshPointsActiveColoring(
-  id: string,
+  meshId: MeshId,
   type: string | undefined,
   deps: MeshPointsActiveColoringDeps,
 ): Promise<unknown> {
-  await deps.commonStyle.mutateMeshPointsStyle(id, {
+  await deps.commonStyle.mutateMeshPointsStyle(meshId, {
     coloring: { active: type },
   });
   if (type === "constant") {
-    const result = await whenDefined(deps.colorStyle.meshPointsColor(id), async (value) => {
-      const applied = await deps.colorStyle.setMeshPointsColor(id, value);
+    const result = await whenDefined(deps.colorStyle.meshPointsColor(meshId), async (value) => {
+      const applied = await deps.colorStyle.setMeshPointsColor(meshId, value);
       return applied;
     });
     return result;
   }
   if (type === "vertex") {
-    const result = await handleMeshPointsVertexColoring(id, deps.vertexAttributeStyle);
+    const result = await handleMeshPointsVertexColoring(meshId, deps.vertexAttributeStyle);
     return result;
   }
   throw new Error(`Unknown mesh points coloring type: ${type}`);
 }
 
 async function setMeshPointsActiveColoring(
-  id: string,
+  meshId: MeshId,
   type: string | undefined,
   deps: MeshPointsActiveColoringDeps,
 ): Promise<unknown> {
-  const result = await applyMeshPointsActiveColoring(id, type, deps);
+  const result = await applyMeshPointsActiveColoring(meshId, type, deps);
   if (type !== "constant") {
     // Attribute and textures colorings keep the actor opacity: restore the stored one
-    await whenDefined(deps.colorStyle.meshPointsOpacity(id), async (value) => {
-      const applied = await deps.colorStyle.setMeshPointsOpacity(id, value);
+    await whenDefined(deps.colorStyle.meshPointsOpacity(meshId), async (value) => {
+      const applied = await deps.colorStyle.setMeshPointsOpacity(meshId, value);
       return applied;
     });
   }
@@ -72,31 +74,31 @@ async function setMeshPointsActiveColoring(
 }
 
 async function applyMeshPointsStyle(
-  id: string,
+  meshId: MeshId,
   visibilityStyle: ReturnType<typeof useMeshPointsVisibilityStyle>,
   sizeStyle: ReturnType<typeof useMeshPointsSizeStyle>,
   activeColoringType: string | undefined,
   deps: MeshPointsActiveColoringDeps,
 ): Promise<unknown[]> {
   const result = await Promise.all([
-    whenDefined(visibilityStyle.meshPointsVisibility(id), async (value) => {
-      const applied = await visibilityStyle.setMeshPointsVisibility(id, value);
+    whenDefined(visibilityStyle.meshPointsVisibility(meshId), async (value) => {
+      const applied = await visibilityStyle.setMeshPointsVisibility(meshId, value);
       return applied;
     }),
-    whenDefined(sizeStyle.meshPointsSize(id), async (value) => {
-      const applied = await sizeStyle.setMeshPointsSize(id, value);
+    whenDefined(sizeStyle.meshPointsSize(meshId), async (value) => {
+      const applied = await sizeStyle.setMeshPointsSize(meshId, value);
       return applied;
     }),
-    setMeshPointsActiveColoring(id, activeColoringType, deps),
+    setMeshPointsActiveColoring(meshId, activeColoringType, deps),
   ]);
   return result;
 }
 
 type UseMeshPointsStyleReturn = ReturnType<typeof useMeshPointsCommonStyle> & {
-  meshPointsColoring: (id: string) => StyleValues;
-  meshPointsActiveColoring: (id: string) => string | undefined;
-  setMeshPointsActiveColoring: (id: string, type: string | undefined) => Promise<unknown>;
-  applyMeshPointsStyle: (id: string) => Promise<unknown[]>;
+  meshPointsColoring: (meshId: MeshId) => StyleValues;
+  meshPointsActiveColoring: (meshId: MeshId) => string | undefined;
+  setMeshPointsActiveColoring: (meshId: MeshId, type: string | undefined) => Promise<unknown>;
+  applyMeshPointsStyle: (meshId: MeshId) => Promise<unknown[]>;
 } & ReturnType<typeof useMeshPointsVisibilityStyle> &
   ReturnType<typeof useMeshPointsColorStyle> &
   ReturnType<typeof useMeshPointsSizeStyle> &
@@ -115,29 +117,29 @@ export function useMeshPointsStyle(): UseMeshPointsStyleReturn {
     vertexAttributeStyle: meshPointsVertexAttributeStyle,
   };
 
-  function meshPointsColoring(id: string): StyleValues {
-    return meshPointsCommonStyle.meshPointsColoring(id);
+  function meshPointsColoring(meshId: MeshId): StyleValues {
+    return meshPointsCommonStyle.meshPointsColoring(meshId);
   }
 
-  function meshPointsActiveColoring(id: string): string | undefined {
+  function meshPointsActiveColoring(meshId: MeshId): string | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.active is defined as string in the data style schema.
-    return meshPointsColoring(id).active as string | undefined;
+    return meshPointsColoring(meshId).active as string | undefined;
   }
 
   async function boundSetMeshPointsActiveColoring(
-    id: string,
+    meshId: MeshId,
     type: string | undefined,
   ): Promise<unknown> {
-    const result = await setMeshPointsActiveColoring(id, type, activeColoringDeps);
+    const result = await setMeshPointsActiveColoring(meshId, type, activeColoringDeps);
     return result;
   }
 
-  async function boundApplyMeshPointsStyle(id: string): Promise<unknown[]> {
+  async function boundApplyMeshPointsStyle(meshId: MeshId): Promise<unknown[]> {
     const result = await applyMeshPointsStyle(
-      id,
+      meshId,
       meshPointsVisibility,
       meshPointsSizeStyle,
-      meshPointsActiveColoring(id),
+      meshPointsActiveColoring(meshId),
       activeColoringDeps,
     );
     return result;

@@ -1,20 +1,16 @@
 import type { AttributeGroup, ColorGroup } from "./coloring_groups";
-import {
-  isModelSurfacesPolygonAttributeValid,
-  type useModelSurfacesPolygonAttribute,
-} from "./polygon";
-import {
-  isModelSurfacesVertexAttributeValid,
-  type useModelSurfacesVertexAttribute,
-} from "./vertex";
+import type { ModelId } from "@ogw_front/types/identifiers";
+import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import type { useModelSurfacesColor } from "./color";
+import type { useModelSurfacesPolygonAttribute } from "./polygon";
+import type { useModelSurfacesVertexAttribute } from "./vertex";
 
 type ColorStyle = ReturnType<typeof useModelSurfacesColor>;
 type VertexAttributeStyle = ReturnType<typeof useModelSurfacesVertexAttribute>;
 type PolygonAttributeStyle = ReturnType<typeof useModelSurfacesPolygonAttribute>;
 
 function applyModelSurfacesConstantColoring(
-  modelId: string,
+  modelId: ModelId,
   type_surfaces_ids: string[],
   modelColorStyle: ColorStyle,
 ): Promise<unknown>[] {
@@ -32,7 +28,7 @@ function applyModelSurfacesConstantColoring(
 }
 
 function groupModelSurfacesVertexAttributes(
-  modelId: string,
+  modelId: ModelId,
   type_surfaces_ids: string[],
   modelSurfacesVertexAttribute: VertexAttributeStyle,
 ): Record<string, AttributeGroup> {
@@ -66,7 +62,7 @@ function groupModelSurfacesVertexAttributes(
       colorMap,
       no_data_color,
     };
-    if (!isModelSurfacesVertexAttributeValid(attribute)) {
+    if (!isAttributeValid(attribute)) {
       continue;
     }
     const key = [name, item, colorMap, minimum, maximum, JSON.stringify(no_data_color)].join("_");
@@ -77,7 +73,7 @@ function groupModelSurfacesVertexAttributes(
 }
 
 function applyModelSurfacesVertexColoring(
-  modelId: string,
+  modelId: ModelId,
   type_surfaces_ids: string[],
   modelSurfacesVertexAttribute: VertexAttributeStyle,
 ): Promise<unknown>[] {
@@ -106,7 +102,7 @@ function applyModelSurfacesVertexColoring(
 }
 
 function groupModelSurfacesPolygonAttributes(
-  modelId: string,
+  modelId: ModelId,
   type_surfaces_ids: string[],
   modelSurfacesPolygonAttribute: PolygonAttributeStyle,
 ): Record<string, AttributeGroup> {
@@ -140,7 +136,7 @@ function groupModelSurfacesPolygonAttributes(
       colorMap,
       no_data_color,
     };
-    if (!isModelSurfacesPolygonAttributeValid(attribute)) {
+    if (!isAttributeValid(attribute)) {
       continue;
     }
     const key = [name, item, colorMap, minimum, maximum, JSON.stringify(no_data_color)].join("_");
@@ -151,7 +147,7 @@ function groupModelSurfacesPolygonAttributes(
 }
 
 function applyModelSurfacesPolygonColoring(
-  modelId: string,
+  modelId: ModelId,
   type_surfaces_ids: string[],
   modelSurfacesPolygonAttribute: PolygonAttributeStyle,
 ): Promise<unknown>[] {

@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import {
   type AttributeInfo,
-  type AttributeSource,
-  isValidThresholdAttribute,
-} from "@ogw_front/utils/threshold";
+  attributeArrayName,
+  getAttributeRange,
+} from "@ogw_front/utils/attributes";
+import { type AttributeSource, isValidThresholdAttribute } from "@ogw_front/utils/threshold";
 import type { Threshold, ThresholdAttribute } from "@ogw_internal/stores/hybrid_viewer/filters";
-import { attributeArrayName, getAttributeRange } from "@ogw_front/utils/attributes";
+import type { AttributeTimeStep } from "@ogw_front/types/attribute";
 import ViewerOptionsAttributeRangeSelector from "@ogw_front/components/Viewer/Options/AttributeRangeSelector.vue";
 import { fetchAttributeRange } from "@ogw_front/utils/attribute_range";
 import { useBackStore } from "@ogw_front/stores/back";
@@ -50,7 +51,7 @@ const currentSource = computed<AttributeSource | undefined>(
 const currentAttribute = computed<AttributeInfo | undefined>(() =>
   attributes.value.find((attribute) => attribute.attribute_name === attributeName.value),
 );
-const currentTimeStep = computed<number | undefined>(() => {
+const currentTimeStep = computed<AttributeTimeStep | undefined>(() => {
   if (!currentSource.value || !currentAttribute.value?.time_steps?.length) {
     return undefined;
   }

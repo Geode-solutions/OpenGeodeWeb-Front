@@ -1,5 +1,6 @@
 import type { CrsItem, NewDataItem } from "@ogw_front/stores/data";
 import type { CRSList } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
+import type { LegacyDataId } from "@ogw_front/utils/legacy_data_id";
 
 function formatCrs(crs: CRSList | undefined): string {
   return crs ? `${crs.authority}:${crs.code} — ${crs.name}` : "None";
@@ -27,7 +28,9 @@ function sameCrsState(left: CRSList | undefined, right: CRSList | undefined): bo
 
 // The CRS of the oldest georeferenced data: the project CRS of a project saved before it was stored
 function oldestCrs(
-  items: readonly Pick<CrsItem, "crs" | "created_at">[] | readonly NewDataItem[],
+  items:
+    | readonly Pick<CrsItem, "crs" | "created_at">[]
+    | readonly (LegacyDataId<NewDataItem> | NewDataItem)[],
 ): CRSList | undefined {
   return items
     .filter((item) => item.crs !== undefined)

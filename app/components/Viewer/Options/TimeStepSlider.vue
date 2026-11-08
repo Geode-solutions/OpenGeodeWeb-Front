@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { AttributeTimeStep } from "@ogw_front/types/attribute";
+
 const timeStep = defineModel<number>();
 
 interface Props {
@@ -7,7 +9,7 @@ interface Props {
 
 const { timeSteps } = defineProps<Props>();
 
-const sliderTimeStep = ref<number>(0);
+const sliderTimeStep = ref<AttributeTimeStep>(0);
 
 watch(
   timeStep,

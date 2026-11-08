@@ -7,13 +7,17 @@ import pTimeout from "p-timeout";
 import type { RequestHandlers } from "./types.js";
 import { hasBody } from "./file.js";
 
-interface FetchRawOptions {
+// What a fetch sends and where
+interface FetchRequest {
   route: string;
   method?: string;
   params?: unknown;
   baseURL?: string;
-  headers?: Record<string, string>;
   max_retry?: number;
+}
+
+interface FetchRawOptions extends FetchRequest {
+  headers?: Record<string, string>;
   timeout?: number;
   expectEvent?: boolean;
 }
@@ -34,13 +38,8 @@ function resolveHeaders(
   return resolvedHeaders;
 }
 
-interface PerformFetchOptions extends RequestHandlers {
-  route: string;
-  method?: string;
-  params?: unknown;
-  baseURL?: string;
+interface PerformFetchOptions extends FetchRequest, RequestHandlers {
   headers: Record<string, string>;
-  max_retry?: number;
 }
 
 async function performFetch({

@@ -13,7 +13,7 @@ async function addItems(ids: string[]): Promise<void> {
   for (const id of ids) {
     // oxlint-disable-next-line no-await-in-loop
     await dataStore.addItem({
-      id,
+      data_id: id,
       geode_id: id,
       name: id,
       viewer_type: "mesh",
@@ -22,8 +22,8 @@ async function addItems(ids: string[]): Promise<void> {
   }
 }
 
-function registeredIds(items: { id: string }[]): string[] {
-  return items.map((registeredItem) => registeredItem.id);
+function registeredIds(items: { data_id: string }[]): string[] {
+  return items.map((registeredItem) => registeredItem.data_id);
 }
 
 describe("useDataStore - collections", () => {

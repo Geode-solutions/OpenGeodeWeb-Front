@@ -1,8 +1,14 @@
+import type {
+  DataIdentified,
+  GeodeObjectType,
+  GeodeObjectTyped,
+  ViewerType,
+  ViewerTyped,
+} from "@ogw_front/types/identifiers";
 import { type MenuItems, menusData } from "./menu_helpers/menus_data.js";
 
-interface MenuMetaData {
-  viewer_type?: string;
-  geode_object_type?: string;
+interface MenuMetaData
+  extends Partial<DataIdentified>, Partial<GeodeObjectTyped>, Partial<ViewerTyped> {
   targetIds?: string[];
   [key: string]: unknown;
 }
@@ -38,19 +44,19 @@ export const useMenuStore = defineStore("menu", () => {
   );
 
   function getMenuItems(
-    objectType: string | undefined,
-    geodeObject: string | undefined,
+    viewerType: ViewerType | undefined,
+    geodeObjectType: GeodeObjectType | undefined,
   ): MenuItems {
     if (
-      objectType === undefined ||
-      objectType === "" ||
-      geodeObject === undefined ||
-      geodeObject === "" ||
-      !menus.value[objectType]
+      viewerType === undefined ||
+      viewerType === "" ||
+      geodeObjectType === undefined ||
+      geodeObjectType === "" ||
+      !menus.value[viewerType]
     ) {
       return [];
     }
-    return menus.value[objectType]?.[geodeObject] ?? [];
+    return menus.value[viewerType]?.[geodeObjectType] ?? [];
   }
 
   function closeMenu(): void {

@@ -2,6 +2,8 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
+import type { MeshId } from "@ogw_front/types/identifiers";
+import type { Visibility } from "@ogw_front/types/style";
 import { useMeshCellsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -9,18 +11,18 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const schema = viewer_schemas.opengeodeweb_viewer.mesh.cells.visibility;
 
 export function useMeshCellsVisibilityStyle(): {
-  meshCellsVisibility: (id: string) => boolean | undefined;
-  setMeshCellsVisibility: (id: string, visibility: boolean) => Promise<unknown>;
+  meshCellsVisibility: (meshId: MeshId) => Visibility | undefined;
+  setMeshCellsVisibility: (meshId: MeshId, visibility: Visibility) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const meshCellsCommonStyle = useMeshCellsCommonStyle();
 
-  function meshCellsVisibility(id: string): boolean | undefined {
+  function meshCellsVisibility(meshId: MeshId): Visibility | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- visibility is defined as boolean in the data style schema.
-    return meshCellsCommonStyle.meshCellsStyle(id).visibility as boolean | undefined;
+    return meshCellsCommonStyle.meshCellsStyle(meshId).visibility as Visibility | undefined;
   }
-  async function setMeshCellsVisibility(id: string, visibility: boolean): Promise<unknown> {
-    const params = { id, visibility };
+  async function setMeshCellsVisibility(meshId: MeshId, visibility: Visibility): Promise<unknown> {
+    const params = { id: meshId, visibility };
     const result = await viewerStore.request(
       {
         schema,
@@ -28,7 +30,9 @@ export function useMeshCellsVisibilityStyle(): {
       },
       {
         response_function: async () => {
-          const mutateResult = await meshCellsCommonStyle.mutateMeshCellsStyle(id, { visibility });
+          const mutateResult = await meshCellsCommonStyle.mutateMeshCellsStyle(meshId, {
+            visibility,
+          });
           return mutateResult;
         },
       },

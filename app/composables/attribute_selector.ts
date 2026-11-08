@@ -1,13 +1,7 @@
 import type { AttributeRangeInfo, AttributeSchemas } from "@ogw_front/utils/attribute_range";
-import type { AttributeRange } from "@ogw_front/composables/batch_style";
+import type { AttributeTimeStep, ValidAttributeRange } from "@ogw_front/types/attribute";
+import type { DataId } from "@ogw_front/types/identifiers";
 import { getAttributeRange } from "@ogw_front/utils/attributes";
-
-interface AttributeInfo {
-  attribute_name: string;
-  nb_items: number;
-  time_steps?: number[];
-  [key: string]: unknown;
-}
 
 // The minimum and maximum of an attribute range: each one is clamped by the other
 function useAttributeRangeBounds(attributeRange: Ref<(number | undefined)[]>): {
@@ -57,8 +51,8 @@ function attributeItemOptions(itemCount: number): { title: string; value: number
 function attributeRangesPerTarget(
   rangesPerTarget: ReadonlyMap<string, AttributeRangeInfo>,
   item: number,
-): Map<string, AttributeRange> {
-  const ranges = new Map<string, AttributeRange>();
+): Map<string, ValidAttributeRange> {
+  const ranges = new Map<string, ValidAttributeRange>();
   for (const [targetId, range] of rangesPerTarget) {
     const { min, max } = getAttributeRange(range, item);
     ranges.set(targetId, [min, max]);
@@ -70,7 +64,7 @@ function attributeRangesPerTarget(
 function useSeriesTimeStepCommit(
   timeSteps: ComputedRef<number[]>,
   seriesName: () => string | undefined,
-  attributeTimeStep: Readonly<Ref<number | undefined>>,
+  attributeTimeStep: Readonly<Ref<AttributeTimeStep | undefined>>,
   resetTimeStep: () => void,
 ): () => void {
   let committedSeries: string | undefined = undefined;
@@ -102,21 +96,21 @@ interface AttributeRequestParams {
 // Params of the "names" request, or undefined when the schema needs components and none is selected
 function attributeRequestParams(
   schemas: AttributeSchemas,
-  id: string,
+  dataId: DataId,
   componentIds: string[] | undefined,
 ): AttributeRequestParams | undefined {
   const { properties } = schemas.names;
   if (typeof properties !== "object" || properties === null || !("component_ids" in properties)) {
-    return { id };
+    return { id: dataId };
   }
   if (!Array.isArray(componentIds) || componentIds.length === 0) {
     return undefined;
   }
-  return { id, component_ids: componentIds };
+  return { id: dataId, component_ids: componentIds };
 }
 
+export type { AttributeInfo } from "@ogw_front/utils/attributes";
 export {
-  type AttributeInfo,
   type AttributeRequestParams,
   attributeItemOptions,
   attributeRequestParams,

@@ -1,15 +1,21 @@
+import type { AttributeName, AttributeTimeStep } from "@ogw_front/types/attribute";
+import type { DataId } from "@ogw_front/types/identifiers";
 import { attributeArrayName } from "@ogw_front/utils/attributes";
 import { useDataStyleState } from "./state";
 
 interface UseAttributeTimeStepStyleReturn {
-  attributeTimeStep: (id: string, key: string, name: string | undefined) => number | undefined;
-  setAttributeTimeStep: (
-    id: string,
+  attributeTimeStep: (
+    dataId: DataId,
     key: string,
-    name: string,
-    timeStep: number,
+    name: AttributeName | undefined,
+  ) => AttributeTimeStep | undefined;
+  setAttributeTimeStep: (
+    dataId: DataId,
+    key: string,
+    name: AttributeName,
+    timeStep: AttributeTimeStep,
   ) => Promise<unknown>;
-  seriesArrayName: (id: string, key: string, name: string) => string;
+  seriesArrayName: (dataId: DataId, key: string, name: AttributeName) => string;
 }
 
 // Re-render the other components showing the same series, one request per group.
@@ -42,31 +48,31 @@ function useAttributeTimeStepStyle(): UseAttributeTimeStepStyleReturn {
   const dataStyleState = useDataStyleState();
 
   function attributeTimeStep(
-    id: string,
+    dataId: DataId,
     key: string,
-    name: string | undefined,
-  ): number | undefined {
+    name: AttributeName | undefined,
+  ): AttributeTimeStep | undefined {
     if (name === undefined) {
       return undefined;
     }
-    return dataStyleState.getStyle(id).timeSteps?.[key]?.[name];
+    return dataStyleState.getStyle(dataId).timeSteps?.[key]?.[name];
   }
 
   async function setAttributeTimeStep(
-    id: string,
+    dataId: DataId,
     key: string,
-    name: string,
-    timeStep: number,
+    name: AttributeName,
+    timeStep: AttributeTimeStep,
   ): Promise<unknown> {
-    const result = await dataStyleState.mutateStyle(id, {
+    const result = await dataStyleState.mutateStyle(dataId, {
       timeSteps: { [key]: { [name]: timeStep } },
     });
     return result;
   }
 
   // VTK array name of the series at its current time step
-  function seriesArrayName(id: string, key: string, name: string): string {
-    return attributeArrayName(name, attributeTimeStep(id, key, name));
+  function seriesArrayName(dataId: DataId, key: string, name: AttributeName): string {
+    return attributeArrayName(name, attributeTimeStep(dataId, key, name));
   }
 
   return { attributeTimeStep, setAttributeTimeStep, seriesArrayName };

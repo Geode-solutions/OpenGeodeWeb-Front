@@ -5,6 +5,7 @@ import type {
   SceneStyle,
   StyleValues,
 } from "./types";
+import type { ModelId } from "@ogw_front/types/identifiers";
 import type { Observable as RxObservable } from "rxjs";
 import { getDefaultSceneStyle } from "@ogw_front/utils/default_styles";
 import { getTable } from "@ogw_internal/database/database";
@@ -19,24 +20,24 @@ interface SharedState {
   sceneStyle: Ref<SceneStyle>;
   loadFromDatabase: () => Promise<void>;
   updateComponentStyleCache: (
-    modelId: string,
+    modelId: ModelId,
     componentId: string,
     styleValues: StyleValues,
   ) => void;
   bulkUpdateComponentStyleCache: (
-    modelId: string,
+    modelId: ModelId,
     componentStyleUpdates: readonly {
       readonly id_component: string;
       readonly values: StyleValues;
     }[],
   ) => void;
   bulkUpdateComponentStylesCache: (
-    modelId: string,
+    modelId: ModelId,
     componentIds: readonly string[],
     styleValues: StyleValues,
   ) => void;
   updateModelComponentTypeStyleCache: (
-    modelId: string,
+    modelId: ModelId,
     componentType: string,
     styleValues: StyleValues,
   ) => void;
@@ -64,7 +65,7 @@ function getSharedState(): SharedState {
     const objectStyles = await dataStyleTable.toArray();
     const stylesByObjectId: Record<string, ObjectStyle> = {};
     for (const objectStyle of objectStyles) {
-      stylesByObjectId[objectStyle.id] = objectStyle;
+      stylesByObjectId[objectStyle.data_id] = objectStyle;
     }
     return stylesByObjectId;
   });
@@ -105,7 +106,7 @@ function getSharedState(): SharedState {
   void loadFromDatabase();
 
   function updateComponentStyleCache(
-    modelId: string,
+    modelId: ModelId,
     componentId: string,
     styleValues: StyleValues,
   ): void {
@@ -122,7 +123,7 @@ function getSharedState(): SharedState {
   }
 
   function bulkUpdateComponentStyleCache(
-    modelId: string,
+    modelId: ModelId,
     componentStyleUpdates: readonly {
       readonly id_component: string;
       readonly values: StyleValues;
@@ -145,7 +146,7 @@ function getSharedState(): SharedState {
   }
 
   function bulkUpdateComponentStylesCache(
-    modelId: string,
+    modelId: ModelId,
     componentIds: readonly string[],
     styleValues: StyleValues,
   ): void {
@@ -166,7 +167,7 @@ function getSharedState(): SharedState {
   }
 
   function updateModelComponentTypeStyleCache(
-    modelId: string,
+    modelId: ModelId,
     componentType: string,
     styleValues: StyleValues,
   ): void {
@@ -176,7 +177,7 @@ function getSharedState(): SharedState {
   }
 
   function updateStyleCache(objectId: string, styleValues: StyleValues): void {
-    styles.value[objectId] ??= { id: objectId };
+    styles.value[objectId] ??= { data_id: objectId };
     merge(styles.value[objectId], styleValues);
   }
 

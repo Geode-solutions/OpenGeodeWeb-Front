@@ -4,34 +4,33 @@ import { consola } from "consola";
 // oxlint-disable eslint/sort-imports, eslint/max-lines
 import { defineStore } from "pinia";
 
+import type {
+  DataId,
+  GeodeId,
+  GeodeIdentified,
+  GeodeObjectType,
+  GeodeObjectTyped,
+  ViewerType,
+  ViewerTyped,
+} from "@ogw_front/types/identifiers";
 import type { Table } from "dexie";
+import type { TreeGroup, TreeNode } from "@ogw_front/types/tree";
 import { ref, watch } from "vue";
 import { database } from "@ogw_internal/database/database";
 
 const PANEL_WIDTH = 300;
 
-interface OpenedView {
+interface OpenedView extends Partial<GeodeObjectTyped> {
   type: "object" | "component";
   id: string;
   title: string;
   scrollTop: number;
   opened: string[];
-  geode_object_type?: string;
 }
 
-interface TreeviewChild {
-  title: string;
-  id: string;
-  geode_id: string;
-  viewer_type: string;
-  geode_object_type: string;
-}
+interface TreeviewChild extends TreeNode, GeodeIdentified, GeodeObjectTyped, ViewerTyped {}
 
-interface TreeviewGroup {
-  id: string;
-  title: string;
-  children: TreeviewChild[];
-}
+type TreeviewGroup = TreeGroup<TreeviewChild>;
 
 interface TreeviewConfigRecord {
   id: string;
@@ -166,15 +165,15 @@ export const useTreeviewStore = defineStore("treeview", () => {
   }
 
   function addItem(
-    geodeObjectType: string,
+    geodeObjectType: GeodeObjectType,
     name: string,
-    id: string,
-    geode_id: string,
-    viewer_type: string,
+    dataId: DataId,
+    geode_id: GeodeId,
+    viewer_type: ViewerType,
   ): void {
     const child: TreeviewChild = {
       title: name,
-      id,
+      id: dataId,
       geode_id,
       viewer_type,
       geode_object_type: geodeObjectType,
@@ -198,22 +197,22 @@ export const useTreeviewStore = defineStore("treeview", () => {
         groupA.title.localeCompare(groupB.title, undefined, sort_options),
       );
     }
-    selection.value = [...selection.value, id];
+    selection.value = [...selection.value, dataId];
   }
 
-  function removeItem(id: string): void {
+  function removeItem(dataId: DataId): void {
     for (let index = 0; index < items.value.length; index += 1) {
       const group = items.value[index];
       if (!group) {
         continue;
       }
-      const childIndex = group.children.findIndex((child) => child.id === id);
+      const childIndex = group.children.findIndex((child) => child.id === dataId);
       if (childIndex !== -1) {
         group.children.splice(childIndex, 1);
         if (group.children.length === 0) {
           items.value.splice(index, 1);
         }
-        selection.value = selection.value.filter((selection_id) => selection_id !== id);
+        selection.value = selection.value.filter((selection_id) => selection_id !== dataId);
         return;
       }
     }
@@ -222,7 +221,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
   function displayAdditionalTree(
     id: string,
     title: string | undefined,
-    geodeObjectType: string,
+    geodeObjectType: GeodeObjectType,
   ): void {
     const index = opened_views.value.findIndex((view: ReadonlyOpenedView) => view.id === id);
     if (index !== -1) {
@@ -330,9 +329,9 @@ export const useTreeviewStore = defineStore("treeview", () => {
     };
   }
 
-  function renameItem(id: string, newName: string): void {
+  function renameItem(dataId: DataId, newName: string): void {
     for (const group of items.value) {
-      const child = group.children.find((childItem) => childItem.id === id);
+      const child = group.children.find((childItem) => childItem.id === dataId);
       if (child) {
         child.title = newName;
         const options = { numeric: true, sensitivity: "base" as const };
@@ -342,7 +341,9 @@ export const useTreeviewStore = defineStore("treeview", () => {
         break;
       }
     }
-    const view = opened_views.value.find((openedView: ReadonlyOpenedView) => openedView.id === id);
+    const view = opened_views.value.find(
+      (openedView: ReadonlyOpenedView) => openedView.id === dataId,
+    );
     if (view) {
       view.title = newName;
     }

@@ -10,45 +10,30 @@ import {
   meshPolygonsDefaultStyle,
   meshPolyhedraDefaultStyle,
 } from "./mesh_components";
+import type { Visibility } from "@ogw_front/types/style";
 
 interface PointSetStyle {
-  visibility: boolean;
+  visibility: Visibility;
   points: MeshPointsStyle;
 }
 
-interface EdgedCurveStyle {
-  visibility: boolean;
-  points: MeshPointsStyle;
+interface EdgedCurveStyle extends PointSetStyle {
   edges: MeshEdgesStyle;
 }
 
-interface Grid2dStyle {
-  visibility: boolean;
-  points: MeshPointsStyle;
-  edges: MeshEdgesStyle;
+interface Grid2dStyle extends EdgedCurveStyle {
   cells: MeshCellsStyle;
 }
 
-interface Grid3dStyle {
-  visibility: boolean;
-  points: MeshPointsStyle;
-  edges: MeshEdgesStyle;
-  cells: MeshCellsStyle;
+interface Grid3dStyle extends Grid2dStyle {
   polyhedra: MeshPolyhedraStyle;
 }
 
-interface SurfaceStyle {
-  visibility: boolean;
-  points: MeshPointsStyle;
-  edges: MeshEdgesStyle;
+interface SurfaceStyle extends EdgedCurveStyle {
   polygons: MeshPolygonsStyle;
 }
 
-interface SolidStyle {
-  visibility: boolean;
-  points: MeshPointsStyle;
-  edges: MeshEdgesStyle;
-  polygons: MeshPolygonsStyle;
+interface SolidStyle extends SurfaceStyle {
   polyhedra: MeshPolyhedraStyle;
 }
 

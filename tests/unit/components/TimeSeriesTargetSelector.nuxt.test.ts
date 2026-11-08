@@ -21,8 +21,8 @@ describe("time series target selector", () => {
     const dataStore = useDataStore(pinia);
     dataStore.allItems = mockAs<typeof dataStore.allItems>(
       vi.fn().mockResolvedValue([
-        { id: "brep_id", name: "cube", geode_object_type: "BRep" },
-        { id: "points_id", name: "points", geode_object_type: "PointSet3D" },
+        { data_id: "brep_id", name: "cube", geode_object_type: "BRep" },
+        { data_id: "points_id", name: "points", geode_object_type: "PointSet3D" },
       ]),
     );
     const wrapper = await mountSuspended(TimeSeriesTargetSelector, {

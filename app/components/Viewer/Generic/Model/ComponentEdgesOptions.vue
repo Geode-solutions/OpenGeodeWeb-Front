@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { AttributeColorMap, AttributeItem, AttributeName } from "@ogw_front/types/attribute";
+import type { Visibility, Width } from "@ogw_front/types/style";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import ViewerOptionsWidthSlider from "@ogw_front/components/Viewer/Options/Sliders/Width.vue";
@@ -86,7 +88,7 @@ async function applyEdgesStyle(
   hybridViewerStore.remoteRender();
 }
 
-const visibility = computed<boolean | undefined>({
+const visibility = computed<Visibility | undefined>({
   get: () => edgesStyle.value?.visibility(modelId, referenceComponentId),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -96,7 +98,7 @@ const visibility = computed<boolean | undefined>({
   },
 });
 
-const width = computed<number | undefined>({
+const width = computed<Width | undefined>({
   get: () => edgesStyle.value?.width(modelId, referenceComponentId),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -126,7 +128,7 @@ const color = computed<RGBAColor | undefined>({
   },
 });
 
-const vertexAttributeName = computed<string | undefined>({
+const vertexAttributeName = computed<AttributeName | undefined>({
   get: () => edgesStyle.value?.vertexAttributeName(modelId, referenceComponentId),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -136,7 +138,7 @@ const vertexAttributeName = computed<string | undefined>({
   },
 });
 
-const vertexAttributeItem = computed<number | undefined>({
+const vertexAttributeItem = computed<AttributeItem | undefined>({
   get: () => edgesStyle.value?.vertexAttributeItem(modelId, referenceComponentId),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -162,7 +164,7 @@ const vertexAttributeRange = computed<(number | undefined)[] | undefined>({
   },
 });
 
-const vertexAttributeColorMap = computed<string | undefined>({
+const vertexAttributeColorMap = computed<AttributeColorMap | undefined>({
   get: () => edgesStyle.value?.vertexAttributeColorMap(modelId, referenceComponentId),
   set: async (newValue) => {
     await applyEdgesStyle((style, ids) => style.setVertexAttributeColorMap(modelId, ids, newValue));
@@ -206,7 +208,7 @@ const attributeSchemas = {
     <template v-if="visibility">
       <ViewerOptionsWidthSlider data-testid="modelComponentEdgesWidthSlider" v-model="width" />
       <ViewerOptionsColoringTypeSelector
-        :id="modelId"
+        :data-id="modelId"
         :componentIds="allComponentIds"
         v-model:coloring_style_key="activeColoring"
         v-model:color="color"

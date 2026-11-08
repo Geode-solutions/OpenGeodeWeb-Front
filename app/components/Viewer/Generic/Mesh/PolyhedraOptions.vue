@@ -2,8 +2,10 @@
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import type { MeshId } from "@ogw_front/types/identifiers";
 import ViewerGenericMeshPolyhedraColoring from "@ogw_front/components/Viewer/Generic/Mesh/PolyhedraColoring.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
+import type { Visibility } from "@ogw_front/types/style";
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -20,13 +22,13 @@ interface Props {
 
 const { itemProps, btnImage, tooltip = "Polyhedra options" } = defineProps<Props>();
 
-const id = toRef(() => itemProps.id);
+const dataId = toRef(() => itemProps.id);
 
-const visibility = computed<boolean>({
-  get: () => dataStyleStore.meshPolyhedraVisibility(id.value),
+const visibility = computed<Visibility>({
+  get: () => dataStyleStore.meshPolyhedraVisibility(dataId.value),
   set: async (newValue) => {
-    await applyBatchStyle(id.value, (targetId: string) =>
-      dataStyleStore.setMeshPolyhedraVisibility(targetId, newValue),
+    await applyBatchStyle(dataId.value, (meshId: MeshId) =>
+      dataStyleStore.setMeshPolyhedraVisibility(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
@@ -48,7 +50,7 @@ const visibility = computed<boolean>({
       />
       <template v-if="visibility">
         <v-divider />
-        <ViewerGenericMeshPolyhedraColoring :id="id" />
+        <ViewerGenericMeshPolyhedraColoring :data-id="dataId" />
       </template>
     </template>
   </ViewerContextMenuItem>
