@@ -61,6 +61,10 @@
     "test:integration": "npm run tests -- --project integration",
     "geode_objects": "tsx scripts/generate_geode_objects.ts && prettier ./assets/geode_objects.ts --write",
     "build": "npm run prepare:types && rolldown -c rolldown.config.ts",
+    "build:browser": "npm run build && cross-env MODE=BROWSER nuxi build tests/e2e/app",
+    "preview:browser": "node tests/e2e/app/.output/server/index.mjs",
+    "test:e2e": "npx playwright test --config ./tests/e2e/playwright.config.ts",
+    "test:e2e:browser": "npm run test:e2e -- --project=browser-chrome",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
