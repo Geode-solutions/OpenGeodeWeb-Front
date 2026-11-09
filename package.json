@@ -21,6 +21,7 @@
     "internal",
     "server",
     "shared",
+    "tests/browser/helpers",
     ".build",
     "nuxt.config.ts",
     "opengeodeweb_front_schemas.json",
@@ -38,6 +39,10 @@
     "./server/utils/*.js": {
       "types": "./server/utils/*.ts",
       "default": "./.build/server/utils/*.js"
+    },
+    "./tests/browser/helpers/*.js": {
+      "types": "./tests/browser/helpers/*.ts",
+      "default": "./.build/tests/browser/helpers/*.js"
     },
     "./shared/*.js": {
       "types": "./shared/*.ts",
@@ -59,12 +64,9 @@
     "tests": "npm run prepare:types && vitest --config ./tests/vitest.config.ts",
     "test:unit": "npm run tests -- --project unit",
     "test:integration": "npm run tests -- --project integration",
+    "test:browser": "npm run tests -- --project browser --run",
     "geode_objects": "tsx scripts/generate_geode_objects.ts && prettier ./assets/geode_objects.ts --write",
     "build": "npm run prepare:types && rolldown -c rolldown.config.ts",
-    "build:browser": "npm run build && cross-env MODE=BROWSER nuxi build tests/e2e/app",
-    "preview:browser": "node tests/e2e/app/.output/server/index.mjs",
-    "test:e2e": "npx playwright test --config ./tests/e2e/playwright.config.ts",
-    "test:e2e:browser": "npm run test:e2e -- --project=browser-chrome",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
@@ -110,10 +112,12 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@nuxt/test-utils": "4.1.0",
+    "@nuxt/test-utils": "4.4.0",
     "@pinia/testing": "2.0.1",
+    "@playwright/test": "1.54.1",
     "@types/lodash": "4.17.25",
     "@vitejs/plugin-vue": "6.0.8",
+    "@vitest/browser-playwright": "5.1.0",
     "@vue/test-utils": "2.4.11",
     "cross-env": "10.0.0",
     "happy-dom": "20.0.11",
@@ -124,11 +128,13 @@
     "prettier": "3.8.1",
     "resize-observer-polyfill": "1.5.1",
     "rolldown": "1.2.8",
+    "std-env": "3.9.0",
     "tsx": "4.23.13",
     "unplugin-auto-import": "20.0.0",
     "vite": "8.2.0",
     "vite-plugin-vuetify": "2.1.3",
-    "vitest": "4.1.10",
+    "vitest": "5.1.0",
+    "vitest-browser-vue": "^3.1.0",
     "vitest-environment-nuxt": "2.0.0",
     "vitest-indexeddb": "0.0.1"
   },

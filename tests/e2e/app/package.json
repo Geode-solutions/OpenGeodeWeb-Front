@@ -1,6 +1,0 @@
-{
-  "name": "ogw-e2e-app",
-  "version": "0.0.0",
-  "private": true,
-  "description": "Minimal viewer app used to run the viewer e2e tests against OpenGeodeWeb-Front"
-}

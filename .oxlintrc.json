@@ -123,6 +123,13 @@
   },
   "overrides": [
     {
+      // The e2e helpers are published as is (see rolldown.config.ts): no path alias, so the apps consuming them resolve their imports
+      "files": ["tests/browser/helpers/**"],
+      "rules": {
+        "import/no-relative-parent-imports": "off"
+      }
+    },
+    {
       "files": ["**/components/**"],
       "rules": {
         "unicorn/filename-case": [
