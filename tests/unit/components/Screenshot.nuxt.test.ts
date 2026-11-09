@@ -1,6 +1,6 @@
 // Third party imports
 import { type VueWrapper, flushPromises } from "@vue/test-utils";
-import { describe, expect, test, vi } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import { mountSuspended } from "@nuxt/test-utils/runtime";
 
 // Local imports
@@ -52,6 +52,10 @@ async function mountScreenshot(): Promise<Record<string, unknown>> {
 }
 
 describe("screenshot", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   test("has no background color picker", async () => {
     const wrapper = await mountSuspended(Screenshot, {
       global: { plugins: [vuetify] },
@@ -139,7 +143,6 @@ describe("screenshot", () => {
     expect(sizeInput(wrapper, "screenshotWidthInput")).toBe(String(WINDOW_WIDTH * PIXEL_RATIO));
     expect(sizeInput(wrapper, "screenshotHeightInput")).toBe(String(WINDOW_HEIGHT * PIXEL_RATIO));
     expect(wrapper.find('[data-testid="screenshotWidthInput"]').text()).toContain("≈");
-    vi.unstubAllGlobals();
   });
 
   test("sends the chosen size with the scene screenshot request", async () => {
