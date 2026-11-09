@@ -65,8 +65,10 @@
     "test:unit": "npm run tests -- --project unit",
     "test:integration": "npm run tests -- --project integration",
     "test:browser": "npm run tests -- --project browser --run",
+    "test:e2e:browser": "npm run test:browser --",
     "geode_objects": "tsx scripts/generate_geode_objects.ts && prettier ./assets/geode_objects.ts --write",
     "build": "npm run prepare:types && rolldown -c rolldown.config.ts",
+    "build:browser": "npm run build",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
