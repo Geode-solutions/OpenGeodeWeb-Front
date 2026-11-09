@@ -48,15 +48,18 @@ const browserAliases = [
   ...Object.entries(aliases).map(([find, replacement]) => ({ find, replacement })),
 ];
 
+// Vite module ids use forward slashes, on Windows too
+const browserHelpersId = browserHelpersPath.split(path.sep).join("/");
+
 // The helpers build file paths from import.meta.dirname, which a browser module does not have
 const helpersDirnamePlugin = {
   name: "ogw:helpers-import-meta-dirname",
   enforce: "pre" as const,
   transform(code: string, id: string): string | undefined {
-    if (!id.startsWith(browserHelpersPath) || !code.includes("import.meta.dirname")) {
+    if (!id.startsWith(browserHelpersId) || !code.includes("import.meta.dirname")) {
       return undefined;
     }
-    return code.replaceAll("import.meta.dirname", JSON.stringify(path.dirname(id)));
+    return code.replaceAll("import.meta.dirname", JSON.stringify(path.posix.dirname(id)));
   },
 };
 
