@@ -9,16 +9,8 @@ import {
   meshViewerObjectType,
   vertexAttributeType,
 } from "../../../constants";
-import {
-  ensureMenuOpen,
-  moveMouseOutOfTheWay,
-  openStyleMenu,
-} from "../../../viewer_interaction";
-import {
-  setFeatureAttribute,
-  setFeatureColorMap,
-  setFeatureItem,
-} from "../../helpers/attribute";
+import { ensureMenuOpen, moveMouseOutOfTheWay, openStyleMenu } from "../../../viewer_interaction";
+import { setFeatureAttribute, setFeatureColorMap, setFeatureItem } from "../../helpers/attribute";
 import type { Page } from "@playwright/test";
 import { waitForActionSettled } from "../../../wait_for_action_settled";
 

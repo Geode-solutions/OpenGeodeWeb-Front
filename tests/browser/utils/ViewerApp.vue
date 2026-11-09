@@ -22,7 +22,11 @@ const { containerWidth, containerHeight, openTreeMenu, openViewerMenu } = useVie
 <template>
   <v-app data-testid="ogwApp">
     <v-main>
-      <div ref="cardContainer" class="w-100 h-100 fill-height" @contextmenu.prevent="openViewerMenu">
+      <div
+        ref="cardContainer"
+        class="w-100 h-100 fill-height"
+        @contextmenu.prevent="openViewerMenu"
+      >
         <HybridRenderingView>
           <template #ui>
             <ViewerUI

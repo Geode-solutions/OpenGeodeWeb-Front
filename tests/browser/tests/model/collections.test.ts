@@ -2,7 +2,10 @@
 import { expect } from "@playwright/test";
 
 // Local imports
-import { defaultDataName, structuralModelGeodeObjectType } from "@ogw_tests/browser/helpers/constants";
+import {
+  defaultDataName,
+  structuralModelGeodeObjectType,
+} from "@ogw_tests/browser/helpers/constants";
 import {
   getModelComponentTypeTab,
   getModelComponentsObjectTree,

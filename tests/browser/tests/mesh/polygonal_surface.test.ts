@@ -12,7 +12,10 @@ import {
   highlightData,
   openObjectsTree,
 } from "@ogw_tests/browser/helpers/object_trees/main_object_tree";
-import { defaultDataName, polygonalSurfaceGeodeObjectType } from "@ogw_tests/browser/helpers/constants";
+import {
+  defaultDataName,
+  polygonalSurfaceGeodeObjectType,
+} from "@ogw_tests/browser/helpers/constants";
 import {
   openMeshPolygonsMenu,
   setMeshEdgesColor,

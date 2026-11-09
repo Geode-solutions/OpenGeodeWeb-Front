@@ -1,9 +1,5 @@
 import type { Locator, Page } from "@playwright/test";
-import {
-  SLIDER_PINK,
-  clickColorPickerCanvas,
-  clickColorPickerSlider,
-} from "./color_picker";
+import { SLIDER_PINK, clickColorPickerCanvas, clickColorPickerSlider } from "./color_picker";
 import { ensureMenuOpen, moveMouseOutOfTheWay } from "../../viewer_interaction";
 import { getMenuContainer, resetMenuScroll } from "./attribute_menu";
 import { waitForActionSettled } from "../../wait_for_action_settled";

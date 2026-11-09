@@ -3,7 +3,10 @@
 // Third party imports
 
 // Local imports
-import { defaultDataName, triangulatedSurfaceGeodeObjectType } from "@ogw_tests/browser/helpers/constants";
+import {
+  defaultDataName,
+  triangulatedSurfaceGeodeObjectType,
+} from "@ogw_tests/browser/helpers/constants";
 import {
   expandMainObjectTree,
   highlightData,

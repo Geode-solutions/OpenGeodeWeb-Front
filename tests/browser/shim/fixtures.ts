@@ -40,23 +40,28 @@ function screenshotName(title: string): string {
 
 function test(title: string, body: (fixtures: Fixtures) => Promise<void>): void {
   // test.slow() is called inside the body, once the timeout already runs: it is read from the source
-  const timeout = body.toString().includes("test.slow(") ? TEST_TIMEOUT * SLOW_FACTOR : TEST_TIMEOUT;
-  it(title, async () => {
-    const screenshotMask: ScreenshotMask = { locators: [] };
-    await body({ window, screenshotMask });
-    // Never capture while the microservices are still busy
-    await waitForActionSettled(window);
-    await vitestExpect.element(vitestPage.getByTestId(APP_TEST_ID)).toMatchScreenshot(
-      screenshotName(title),
-      {
-        screenshotOptions: {
-          mask: screenshotMask.locators.flatMap((locator) =>
-            locator.elements().map((element) => vitestPage.elementLocator(element)),
-          ),
-        },
-      },
-    );
-  }, timeout);
+  const timeout = body.toString().includes("test.slow(")
+    ? TEST_TIMEOUT * SLOW_FACTOR
+    : TEST_TIMEOUT;
+  it(
+    title,
+    async () => {
+      const screenshotMask: ScreenshotMask = { locators: [] };
+      await body({ window, screenshotMask });
+      // Never capture while the microservices are still busy
+      await waitForActionSettled(window);
+      await vitestExpect
+        .element(vitestPage.getByTestId(APP_TEST_ID))
+        .toMatchScreenshot(screenshotName(title), {
+          screenshotOptions: {
+            mask: screenshotMask.locators.flatMap((locator) =>
+              locator.elements().map((element) => vitestPage.elementLocator(element)),
+            ),
+          },
+        });
+    },
+    timeout,
+  );
 }
 
 // Playwright options with no equivalent: the tests of a file already run in order, in their own page

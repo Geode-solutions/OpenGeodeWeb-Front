@@ -3,11 +3,7 @@ import {
   clickColorPickerCanvas,
   clickColorPickerSlider,
 } from "../../helpers/color_picker";
-import {
-  ensureMenuOpen,
-  moveMouseOutOfTheWay,
-  openStyleMenu,
-} from "../../../viewer_interaction";
+import { ensureMenuOpen, moveMouseOutOfTheWay, openStyleMenu } from "../../../viewer_interaction";
 import {
   meshViewerObjectType,
   polygonAttributeType,

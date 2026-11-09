@@ -3,22 +3,14 @@ import {
   clickColorPickerCanvas,
   clickColorPickerSlider,
 } from "../../helpers/color_picker";
-import {
-  ensureMenuOpen,
-  moveMouseOutOfTheWay,
-  openStyleMenu,
-} from "../../../viewer_interaction";
+import { ensureMenuOpen, moveMouseOutOfTheWay, openStyleMenu } from "../../../viewer_interaction";
 import {
   meshViewerObjectType,
   polyhedraFeatureName,
   polyhedronAttributeType,
   vertexAttributeType,
 } from "../../../constants";
-import {
-  setFeatureAttribute,
-  setFeatureColorMap,
-  setFeatureItem,
-} from "../../helpers/attribute";
+import { setFeatureAttribute, setFeatureColorMap, setFeatureItem } from "../../helpers/attribute";
 import type { Page } from "@playwright/test";
 import { waitForActionSettled } from "../../../wait_for_action_settled";
 

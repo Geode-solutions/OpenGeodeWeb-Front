@@ -4,7 +4,10 @@
 import { expect } from "@playwright/test";
 
 // Local imports
-import { brepGeodeObjectType, polygonalSurfaceGeodeObjectType } from "@ogw_tests/browser/helpers/constants";
+import {
+  brepGeodeObjectType,
+  polygonalSurfaceGeodeObjectType,
+} from "@ogw_tests/browser/helpers/constants";
 import { expandMainObjectTree } from "@ogw_tests/browser/helpers/object_trees/main_object_tree";
 import { loadVeaseTestDatas } from "@ogw_tests/browser/shim/load";
 import { test } from "@ogw_tests/browser/shim/fixtures";

@@ -109,7 +109,9 @@ function isHiddenForAria(element: Element): boolean {
 }
 
 function isElementEnabled(element: Element): boolean {
-  return !(element as HTMLInputElement).disabled && element.getAttribute("aria-disabled") !== "true";
+  return (
+    !(element as HTMLInputElement).disabled && element.getAttribute("aria-disabled") !== "true"
+  );
 }
 
 function isElementChecked(element: Element): boolean {
@@ -120,7 +122,8 @@ function isElementChecked(element: Element): boolean {
 }
 
 const ROLE_SELECTORS: Record<string, string> = {
-  button: 'button, [role="button"], input[type="button"], input[type="submit"], input[type="reset"]',
+  button:
+    'button, [role="button"], input[type="button"], input[type="submit"], input[type="reset"]',
   checkbox: 'input[type="checkbox"], [role="checkbox"]',
   option: 'option, [role="option"]',
   slider: 'input[type="range"], [role="slider"]',
@@ -234,9 +237,7 @@ class Locator {
           .filter(
             (element) =>
               matchesText(element.textContent, text, exact) &&
-              ![...element.children].some((child) =>
-                matchesText(child.textContent, text, exact),
-              ),
+              ![...element.children].some((child) => matchesText(child.textContent, text, exact)),
           ),
       `getByText(${String(text)})`,
     );
@@ -298,7 +299,11 @@ class Locator {
   }
 
   async #attached(timeout = DEFAULT_TIMEOUT): Promise<Element> {
-    return poll(() => this.#single(), timeout, () => `${this.#description} was not found`);
+    return poll(
+      () => this.#single(),
+      timeout,
+      () => `${this.#description} was not found`,
+    );
   }
 
   // Like Playwright's actionability checks: attached, visible and enabled, unless forced
@@ -319,7 +324,10 @@ class Locator {
     );
   }
 
-  async waitFor({ state = "visible", timeout = DEFAULT_TIMEOUT }: { state?: WaitState; timeout?: number } = {}): Promise<void> {
+  async waitFor({
+    state = "visible",
+    timeout = DEFAULT_TIMEOUT,
+  }: { state?: WaitState; timeout?: number } = {}): Promise<void> {
     await poll(
       () => {
         const [element] = this.elements();
@@ -556,7 +564,10 @@ class Page {
   async waitForFunction<Argument>(
     pageFunction: (argument: Argument) => unknown,
     argument?: Argument,
-    { timeout = DEFAULT_TIMEOUT, polling = POLL_INTERVAL }: { timeout?: number; polling?: number } = {},
+    {
+      timeout = DEFAULT_TIMEOUT,
+      polling = POLL_INTERVAL,
+    }: { timeout?: number; polling?: number } = {},
   ): Promise<void> {
     const deadline = Date.now() + timeout;
     while (!pageFunction(argument as Argument)) {
@@ -580,8 +591,15 @@ class Page {
 
 type LocatorAssertion = (locator: Locator) => Promise<boolean> | boolean;
 
-function locatorMatchers(locator: Locator, negated: boolean): Record<string, (...args: never[]) => Promise<void>> {
-  async function assert(name: string, check: LocatorAssertion, timeout = EXPECT_TIMEOUT): Promise<void> {
+function locatorMatchers(
+  locator: Locator,
+  negated: boolean,
+): Record<string, (...args: never[]) => Promise<void>> {
+  async function assert(
+    name: string,
+    check: LocatorAssertion,
+    timeout = EXPECT_TIMEOUT,
+  ): Promise<void> {
     await poll(
       () => {
         try {
@@ -605,51 +623,92 @@ function locatorMatchers(locator: Locator, negated: boolean): Record<string, (..
   const single = (): Element | undefined => locator.elements()[0];
   return {
     toBeVisible: async ({ timeout }: { timeout?: number } = {}) =>
-      assert("toBeVisible", () => {
-        const element = single();
-        return element !== undefined && isElementVisible(element);
-      }, timeout),
+      assert(
+        "toBeVisible",
+        () => {
+          const element = single();
+          return element !== undefined && isElementVisible(element);
+        },
+        timeout,
+      ),
     toBeHidden: async ({ timeout }: { timeout?: number } = {}) =>
-      assert("toBeHidden", () => {
-        const element = single();
-        return element === undefined || !isElementVisible(element);
-      }, timeout),
+      assert(
+        "toBeHidden",
+        () => {
+          const element = single();
+          return element === undefined || !isElementVisible(element);
+        },
+        timeout,
+      ),
     toBeAttached: async ({ timeout }: { timeout?: number } = {}) =>
       assert("toBeAttached", () => single() !== undefined, timeout),
     toBeEnabled: async ({ timeout }: { timeout?: number } = {}) =>
-      assert("toBeEnabled", () => {
-        const element = single();
-        return element !== undefined && isElementEnabled(element);
-      }, timeout),
+      assert(
+        "toBeEnabled",
+        () => {
+          const element = single();
+          return element !== undefined && isElementEnabled(element);
+        },
+        timeout,
+      ),
     toBeDisabled: async ({ timeout }: { timeout?: number } = {}) =>
-      assert("toBeDisabled", () => {
-        const element = single();
-        return element !== undefined && !isElementEnabled(element);
-      }, timeout),
+      assert(
+        "toBeDisabled",
+        () => {
+          const element = single();
+          return element !== undefined && !isElementEnabled(element);
+        },
+        timeout,
+      ),
     toBeChecked: async ({ timeout }: { timeout?: number } = {}) =>
-      assert("toBeChecked", () => {
-        const element = single();
-        return element !== undefined && isElementChecked(element);
-      }, timeout),
+      assert(
+        "toBeChecked",
+        () => {
+          const element = single();
+          return element !== undefined && isElementChecked(element);
+        },
+        timeout,
+      ),
     toHaveCount: async (count: number, { timeout }: { timeout?: number } = {}) =>
       assert(`toHaveCount(${count})`, () => locator.elements().length === count, timeout),
     toHaveText: async (text: string | RegExp, { timeout }: { timeout?: number } = {}) =>
-      assert(`toHaveText(${String(text)})`, () => {
-        const element = single();
-        return element !== undefined && matchesText(element.textContent, text, typeof text === "string");
-      }, timeout),
+      assert(
+        `toHaveText(${String(text)})`,
+        () => {
+          const element = single();
+          return (
+            element !== undefined &&
+            matchesText(element.textContent, text, typeof text === "string")
+          );
+        },
+        timeout,
+      ),
     toContainText: async (text: string | RegExp, { timeout }: { timeout?: number } = {}) =>
-      assert(`toContainText(${String(text)})`, () => {
-        const element = single();
-        return element !== undefined && matchesText(element.textContent, text);
-      }, timeout),
+      assert(
+        `toContainText(${String(text)})`,
+        () => {
+          const element = single();
+          return element !== undefined && matchesText(element.textContent, text);
+        },
+        timeout,
+      ),
     toHaveValue: async (value: string, { timeout }: { timeout?: number } = {}) =>
-      assert(`toHaveValue(${value})`, () => (single() as HTMLInputElement | undefined)?.value === value, timeout),
+      assert(
+        `toHaveValue(${value})`,
+        () => (single() as HTMLInputElement | undefined)?.value === value,
+        timeout,
+      ),
     toHaveAttribute: async (name: string, value?: string, { timeout }: { timeout?: number } = {}) =>
-      assert(`toHaveAttribute(${name})`, () => {
-        const attribute = single()?.getAttribute(name);
-        return value === undefined ? attribute !== null && attribute !== undefined : attribute === value;
-      }, timeout),
+      assert(
+        `toHaveAttribute(${name})`,
+        () => {
+          const attribute = single()?.getAttribute(name);
+          return value === undefined
+            ? attribute !== null && attribute !== undefined
+            : attribute === value;
+        },
+        timeout,
+      ),
   };
 }
 

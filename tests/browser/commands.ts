@@ -60,7 +60,9 @@ const stopMicroservices: BrowserCommand<[projectFolderPath: string]> = async (
 
 function playwrightPage(context: BrowserCommandContext): Page {
   if (context.provider.name !== "playwright") {
-    throw new Error(`The mouse command needs the playwright provider, not ${context.provider.name}`);
+    throw new Error(
+      `The mouse command needs the playwright provider, not ${context.provider.name}`,
+    );
   }
   // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the playwright provider adds `page` to the context
   return (context as unknown as { page: Page }).page;
@@ -76,28 +78,29 @@ interface MouseOptions {
 }
 
 // Playwright's page.mouse takes coordinates of the top page: the test page is an iframe in it
-const mouse: BrowserCommand<[action: MouseAction, x: number, y: number, options?: MouseOptions]> =
-  async (context, action, x, y, options = {}): Promise<void> => {
-    const page = playwrightPage(context);
-    if (action === "down") {
-      await page.mouse.down({ button: options.button });
-      return;
-    }
-    if (action === "up") {
-      await page.mouse.up({ button: options.button });
-      return;
-    }
-    if (action === "wheel") {
-      await page.mouse.wheel(x, y);
-      return;
-    }
-    const box = await page.locator('[data-vitest="true"]').boundingBox();
-    if (!box) {
-      throw new Error("The test iframe has no bounding box");
-    }
-    const scale = options.viewportWidth ? box.width / options.viewportWidth : 1;
-    await page.mouse.move(box.x + x * scale, box.y + y * scale, { steps: options.steps });
-  };
+const mouse: BrowserCommand<
+  [action: MouseAction, x: number, y: number, options?: MouseOptions]
+> = async (context, action, x, y, options = {}): Promise<void> => {
+  const page = playwrightPage(context);
+  if (action === "down") {
+    await page.mouse.down({ button: options.button });
+    return;
+  }
+  if (action === "up") {
+    await page.mouse.up({ button: options.button });
+    return;
+  }
+  if (action === "wheel") {
+    await page.mouse.wheel(x, y);
+    return;
+  }
+  const box = await page.locator('[data-vitest="true"]').boundingBox();
+  if (!box) {
+    throw new Error("The test iframe has no bounding box");
+  }
+  const scale = options.viewportWidth ? box.width / options.viewportWidth : 1;
+  await page.mouse.move(box.x + x * scale, box.y + y * scale, { steps: options.steps });
+};
 
 const readFileBase64: BrowserCommand<[filePath: string]> = async (
   _context,

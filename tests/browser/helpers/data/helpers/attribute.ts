@@ -148,9 +148,5 @@ async function setFeatureTimeStep(
 }
 
 export { resetMenuScroll } from "./attribute_menu";
-export {
-  setFeatureColorMap,
-  setFeatureNoDataColor,
-  setQuickColorMap,
-} from "./attribute_colors";
+export { setFeatureColorMap, setFeatureNoDataColor, setQuickColorMap } from "./attribute_colors";
 export { applyAttribute, setFeatureAttribute, setFeatureItem, setFeatureTimeStep };

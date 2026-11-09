@@ -1,5 +1,8 @@
 // Third party imports
-import { brepGeodeObjectType, polygonalSurfaceGeodeObjectType } from "@ogw_tests/browser/helpers/constants";
+import {
+  brepGeodeObjectType,
+  polygonalSurfaceGeodeObjectType,
+} from "@ogw_tests/browser/helpers/constants";
 import { closeAllMenus, moveMouseOutOfTheWay } from "@ogw_tests/browser/helpers/app_interaction";
 import {
   closeModelComponentsTree,
@@ -14,7 +17,10 @@ import {
   getMainObjectTree,
   openObjectsTree,
 } from "@ogw_tests/browser/helpers/object_trees/main_object_tree";
-import { getQuickColormapPicker, viewerQuickColormap } from "@ogw_tests/browser/helpers/viewer_interaction";
+import {
+  getQuickColormapPicker,
+  viewerQuickColormap,
+} from "@ogw_tests/browser/helpers/viewer_interaction";
 import {
   removeThresholdFilter,
   selectThresholdSurfacePolygon,

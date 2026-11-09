@@ -1,8 +1,4 @@
-import {
-  applyAttribute,
-  setFeatureNoDataColor,
-  setFeatureTimeStep,
-} from "../helpers/attribute";
+import { applyAttribute, setFeatureNoDataColor, setFeatureTimeStep } from "../helpers/attribute";
 import {
   cellAttributeType,
   edgeAttributeType,
