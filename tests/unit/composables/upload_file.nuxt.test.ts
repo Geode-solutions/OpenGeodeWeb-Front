@@ -31,13 +31,26 @@ function queryString(value: unknown): string | undefined {
   return typeof value === "string" ? value : undefined;
 }
 
+// The body can be a Blob of another realm (Node's or the test window's): `instanceof Blob` fails on it, so it
+// Is recognized by what the test uses
+function isBlob(value: unknown): value is Blob {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "size" in value &&
+    typeof value.size === "number" &&
+    "text" in value &&
+    typeof value.text === "function"
+  );
+}
+
 function mockRequestBody(event: H3Event): Blob {
   const request: unknown = event.node.req;
   if (
     typeof request === "object" &&
     request !== null &&
     "body" in request &&
-    request.body instanceof Blob
+    isBlob(request.body)
   ) {
     return request.body;
   }
