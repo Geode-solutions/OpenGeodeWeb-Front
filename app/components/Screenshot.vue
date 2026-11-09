@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import {
+  MAX_SCREENSHOT_SIZE,
+  MIN_SCREENSHOT_SIZE,
+  useScreenshotSize,
+} from "@ogw_front/composables/screenshot_size";
 import viewer_schemas, {
   type ViewerTakeScreenshotParams,
 } from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
@@ -9,6 +14,7 @@ import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 const DEFAULT_PANEL_WIDTH = 260;
+const EXTENSION_SELECT_WIDTH = 80;
 
 const show = defineModel<boolean>({ default: false });
 
@@ -33,6 +39,8 @@ const output_extension = ref<ViewerTakeScreenshotParams["output_extension"]>("pn
 const include_background = ref<boolean>(true);
 const include_ui = ref<boolean>(false);
 const screenshot_type = ref<string>("file");
+const { screenshot_size, displayed_size, resetSize, setWidth, setHeight } =
+  useScreenshotSize(include_ui);
 
 const { copy } = useClipboardItems();
 
@@ -65,6 +73,7 @@ async function takeSceneScreenshot(current_filename: string): Promise<void> {
     filename: current_filename,
     output_extension: output_extension.value,
     include_background: include_background.value,
+    ...screenshot_size.value,
   };
   await viewerStore.request(
     {
@@ -146,6 +155,16 @@ watch([output_extension, include_ui], ([extension, with_ui]) => {
   }
 });
 
+watch(
+  show,
+  (opened) => {
+    if (opened) {
+      resetSize();
+    }
+  },
+  { immediate: true },
+);
+
 watch(screenshot_type, (value) => {
   if (value === "clipboard") {
     output_extension.value = "png";
@@ -203,8 +222,8 @@ function handleClose(): void {
         </v-col>
       </v-row>
 
-      <v-row dense v-if="screenshot_type === 'file'">
-        <v-col cols="12" class="py-1">
+      <v-row dense v-if="screenshot_type === 'file'" class="flex-nowrap">
+        <v-col class="py-1">
           <v-text-field
             data-testid="screenshotFileNameInput"
             v-model="filename"
@@ -215,11 +234,11 @@ function handleClose(): void {
             class="text-caption"
           ></v-text-field>
         </v-col>
-        <v-col cols="12" class="py-1">
+        <v-col class="py-1 flex-grow-0" :style="{ minWidth: `${EXTENSION_SELECT_WIDTH}px` }">
           <v-select
             v-model="output_extension"
             :items="output_extensions"
-            label="Extension"
+            label="Ext."
             variant="outlined"
             density="compact"
             data-testid="screenshotExtensionSelect"
@@ -230,29 +249,67 @@ function handleClose(): void {
         </v-col>
       </v-row>
 
-      <v-row dense>
-        <v-col cols="12" class="py-1">
-          <v-switch
+      <v-row dense class="flex-nowrap align-center">
+        <v-col class="py-1">
+          <v-number-input
+            data-testid="screenshotWidthInput"
+            :model-value="displayed_size.width"
+            :min="MIN_SCREENSHOT_SIZE"
+            :max="MAX_SCREENSHOT_SIZE"
+            :readonly="include_ui"
+            :prefix="include_ui ? '≈' : undefined"
+            label="Width"
+            control-variant="hidden"
+            variant="outlined"
+            density="compact"
+            hide-details
+            class="text-caption"
+            @update:model-value="setWidth"
+          />
+        </v-col>
+        <span class="text-caption">×</span>
+        <v-col class="py-1">
+          <v-number-input
+            data-testid="screenshotHeightInput"
+            :model-value="displayed_size.height"
+            :min="MIN_SCREENSHOT_SIZE"
+            :max="MAX_SCREENSHOT_SIZE"
+            :readonly="include_ui"
+            :prefix="include_ui ? '≈' : undefined"
+            label="Height"
+            control-variant="hidden"
+            variant="outlined"
+            density="compact"
+            hide-details
+            class="text-caption"
+            @update:model-value="setHeight"
+          />
+        </v-col>
+        <span class="text-caption">px</span>
+        <v-icon icon="mdi-lock" size="small" class="ml-1" title="Aspect ratio locked to the view" />
+      </v-row>
+
+      <v-row dense class="flex-nowrap">
+        <v-col class="py-0">
+          <v-checkbox
             data-testid="screenshotIncludeUiSwitch"
             v-model="include_ui"
             label="Include UI"
             density="compact"
             hide-details
-            inset
             class="text-caption"
-          ></v-switch>
+          ></v-checkbox>
         </v-col>
-        <v-col cols="12" class="py-1">
-          <v-switch
+        <v-col class="py-0">
+          <v-checkbox
             data-testid="screenshotIncludeBackgroundSwitch"
             v-model="include_background"
             :disabled="(screenshot_type === 'file' && output_extension !== 'png') || include_ui"
-            label="Include background"
+            label="Background"
             density="compact"
             hide-details
-            inset
             class="text-caption"
-          ></v-switch>
+          ></v-checkbox>
         </v-col>
       </v-row>
     </v-container>
