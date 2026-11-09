@@ -3,8 +3,16 @@ import {
   clickColorPickerCanvas,
   clickColorPickerSlider,
 } from "#browser_helpers/data/helpers/color_picker";
-import { ensureMenuOpen, moveMouseOutOfTheWay, openStyleMenu } from "#browser_helpers/viewer_interaction";
-import { meshViewerObjectType, pointsFeatureName, vertexAttributeType } from "#browser_helpers/constants";
+import {
+  ensureMenuOpen,
+  moveMouseOutOfTheWay,
+  openStyleMenu,
+} from "#browser_helpers/viewer_interaction";
+import {
+  meshViewerObjectType,
+  pointsFeatureName,
+  vertexAttributeType,
+} from "#browser_helpers/constants";
 import type { Page } from "@playwright/test";
 import { setFeatureAttribute } from "#browser_helpers/data/helpers/attribute";
 import { waitForActionSettled } from "#browser_helpers/wait_for_action_settled";

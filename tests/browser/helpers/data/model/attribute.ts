@@ -1,4 +1,8 @@
-import { applyAttribute, setFeatureNoDataColor, setFeatureTimeStep } from "#browser_helpers/data/helpers/attribute";
+import {
+  applyAttribute,
+  setFeatureNoDataColor,
+  setFeatureTimeStep,
+} from "#browser_helpers/data/helpers/attribute";
 import {
   cellAttributeType,
   edgeAttributeType,

@@ -7,11 +7,7 @@ import type { BrowserCommandContext } from "vitest/node";
 import type { Page } from "playwright";
 
 // Local imports
-import type {
-  addMicroserviceMetadatas,
-  runBack,
-  runViewer,
-} from "@ogw_server/utils/microservices";
+import type { addMicroserviceMetadatas, runBack, runViewer } from "@ogw_server/utils/microservices";
 import type { createPath, generateProjectFolderPath } from "@ogw_server/utils/path";
 import type { cleanupBackend } from "@ogw_server/utils/cleanup";
 

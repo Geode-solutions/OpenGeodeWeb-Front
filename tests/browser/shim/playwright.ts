@@ -492,10 +492,7 @@ class Locator {
   }
 
   public async evaluateAll<Result, Argument>(
-    pageFunction: (
-      elements: Element[],
-      argument: Argument | undefined,
-    ) => Result | Promise<Result>,
+    pageFunction: (elements: Element[], argument: Argument | undefined) => Result | Promise<Result>,
     argument?: Argument,
   ): Promise<Result> {
     const result = await pageFunction(this.elements(), argument);
@@ -666,7 +663,11 @@ interface TimeoutOptions {
 }
 
 function locatorMatchers(locator: Locator, negated: boolean): Record<string, LocatorMatcher> {
-  async function assert(name: string, check: LocatorCheck, timeout = EXPECT_TIMEOUT): Promise<void> {
+  async function assert(
+    name: string,
+    check: LocatorCheck,
+    timeout = EXPECT_TIMEOUT,
+  ): Promise<void> {
     await poll(
       () => {
         try {
