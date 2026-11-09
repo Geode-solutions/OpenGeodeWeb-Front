@@ -256,6 +256,7 @@ onBeforeUnmount(cleanupLocalWidget);
         v-model="selectedDatasetIds"
         data-testid="selectedDatasetsSelect"
         :items="availableDatasets"
+        :item-props="() => ({ 'data-testid': 'selectedDatasetsOption' })"
         label="Select datasets"
         multiple
         chips
