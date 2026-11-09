@@ -162,6 +162,8 @@ describe("screenshot", () => {
     // oxlint-disable-next-line no-unsafe-type-assertion -- script setup functions are not typed on vm
     await (state.takeScreenshot as () => Promise<void>)();
 
-    expect(request.mock.calls[0]?.[0]).toMatchObject({ params: { width: LOCKED_WIDTH, height: LOCKED_HEIGHT } });
+    expect(request.mock.calls[0]?.[0]).toMatchObject({
+      params: { width: LOCKED_WIDTH, height: LOCKED_HEIGHT },
+    });
   });
 });
