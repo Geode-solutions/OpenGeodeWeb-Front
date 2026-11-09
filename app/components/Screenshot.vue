@@ -291,25 +291,27 @@ function handleClose(): void {
 
       <v-row dense class="flex-nowrap">
         <v-col class="py-0">
-          <v-checkbox
+          <v-switch
             data-testid="screenshotIncludeUiSwitch"
             v-model="include_ui"
             label="Include UI"
             density="compact"
             hide-details
+            inset
             class="text-caption"
-          ></v-checkbox>
+          ></v-switch>
         </v-col>
         <v-col class="py-0">
-          <v-checkbox
+          <v-switch
             data-testid="screenshotIncludeBackgroundSwitch"
             v-model="include_background"
             :disabled="(screenshot_type === 'file' && output_extension !== 'png') || include_ui"
             label="Background"
             density="compact"
             hide-details
+            inset
             class="text-caption"
-          ></v-checkbox>
+          ></v-switch>
         </v-col>
       </v-row>
     </v-container>
