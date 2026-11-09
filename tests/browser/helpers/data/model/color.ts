@@ -6,7 +6,7 @@ import {
   setColorWithSlider,
   setColoringStyle,
   setOpacity,
-} from "../helpers/color";
+} from "#browser_helpers/data/helpers/color";
 import type { Page } from "@playwright/test";
 import { showModelStyleOptions } from "./style_menu";
 

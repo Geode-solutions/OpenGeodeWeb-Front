@@ -1,6 +1,6 @@
-import { ensureFeatureVisible, ensureMenuOpen } from "../../viewer_interaction";
+import { ensureFeatureVisible, ensureMenuOpen } from "#browser_helpers/viewer_interaction";
 import type { Page } from "@playwright/test";
-import { waitForActionSettled } from "../../wait_for_action_settled";
+import { waitForActionSettled } from "#browser_helpers/wait_for_action_settled";
 
 interface Texture {
   name: string;

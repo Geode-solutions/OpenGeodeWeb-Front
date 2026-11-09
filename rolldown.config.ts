@@ -51,7 +51,8 @@ const helpersAssetsPlugin = {
 };
 
 function isExternal(id: string): boolean {
-  if (id.startsWith(".") || path.isAbsolute(id)) {
+  // The e2e helpers import each other through the "imports" of package.json: bundled, as relative imports
+  if (id.startsWith(".") || path.isAbsolute(id) || id.startsWith("#browser_helpers/")) {
     return false;
   }
   if (id === ownPackageName || id.startsWith(`${ownPackageName}/`)) {

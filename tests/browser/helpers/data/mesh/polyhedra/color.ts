@@ -1,5 +1,5 @@
 import type { Locator, Page } from "@playwright/test";
-import { meshViewerObjectType, polyhedraFeatureName } from "../../../constants";
+import { meshViewerObjectType, polyhedraFeatureName } from "#browser_helpers/constants";
 import {
   setFeatureColor,
   setFeatureColorBlack,
@@ -9,7 +9,7 @@ import {
   setFeatureCopyColor,
   setFeatureOpacity,
   setFeaturePasteColorInput,
-} from "../../helpers/color";
+} from "#browser_helpers/data/helpers/color";
 
 async function setMeshPolyhedraOpacity(window: Page, percent: number): Promise<void> {
   await setFeatureOpacity(window, meshViewerObjectType, polyhedraFeatureName, percent);

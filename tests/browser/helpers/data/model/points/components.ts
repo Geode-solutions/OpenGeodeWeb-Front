@@ -1,10 +1,10 @@
 import type { Locator, Page } from "@playwright/test";
-import { ensureFeatureVisible, ensureMenuOpen } from "../../../viewer_interaction";
-import { applyAttribute } from "../../helpers/attribute";
-import { selectModelTab } from "../../../model_tabs";
-import { setColor } from "../../helpers/color";
-import { vertexAttributeType } from "../../../constants";
-import { waitForActionSettled } from "../../../wait_for_action_settled";
+import { ensureFeatureVisible, ensureMenuOpen } from "#browser_helpers/viewer_interaction";
+import { applyAttribute } from "#browser_helpers/data/helpers/attribute";
+import { selectModelTab } from "#browser_helpers/model_tabs";
+import { setColor } from "#browser_helpers/data/helpers/color";
+import { vertexAttributeType } from "#browser_helpers/constants";
+import { waitForActionSettled } from "#browser_helpers/wait_for_action_settled";
 
 const modelPointsMenuTestId = "modelPointsMenu";
 

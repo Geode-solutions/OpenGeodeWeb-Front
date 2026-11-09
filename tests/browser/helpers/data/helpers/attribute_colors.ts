@@ -1,8 +1,8 @@
 import type { Locator, Page } from "@playwright/test";
 import { SLIDER_PINK, clickColorPickerCanvas, clickColorPickerSlider } from "./color_picker";
-import { ensureMenuOpen, moveMouseOutOfTheWay } from "../../viewer_interaction";
+import { ensureMenuOpen, moveMouseOutOfTheWay } from "#browser_helpers/viewer_interaction";
 import { getMenuContainer, resetMenuScroll } from "./attribute_menu";
-import { waitForActionSettled } from "../../wait_for_action_settled";
+import { waitForActionSettled } from "#browser_helpers/wait_for_action_settled";
 
 async function setFeatureColorMap(
   window: Page,

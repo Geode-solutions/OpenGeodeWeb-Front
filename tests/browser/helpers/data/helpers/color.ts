@@ -7,9 +7,9 @@ import {
   pasteColorInputText,
   setColorInputText,
 } from "./color_picker";
-import { ensureFeatureVisible, ensureMenuOpen } from "../../viewer_interaction";
-import { moveMouseOutOfTheWay } from "../../app_interaction";
-import { waitForActionSettled } from "../../wait_for_action_settled";
+import { ensureFeatureVisible, ensureMenuOpen } from "#browser_helpers/viewer_interaction";
+import { moveMouseOutOfTheWay } from "#browser_helpers/app_interaction";
+import { waitForActionSettled } from "#browser_helpers/wait_for_action_settled";
 
 async function setColoringStyle(
   window: Page,

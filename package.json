@@ -34,6 +34,9 @@
   ],
   "type": "module",
   "main": "./nuxt.config.ts",
+  "imports": {
+    "#browser_helpers/*": "./tests/browser/helpers/*.ts"
+  },
   "exports": {
     ".": "./nuxt.config.ts",
     "./server/utils/*.js": {

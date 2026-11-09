@@ -3,8 +3,17 @@ import fs from "node:fs/promises";
 import path from "node:path";
 
 // Third party imports
-import type { BrowserCommand, BrowserCommandContext } from "vitest/node";
+import type { BrowserCommandContext } from "vitest/node";
 import type { Page } from "playwright";
+
+// Local imports
+import type {
+  addMicroserviceMetadatas,
+  runBack,
+  runViewer,
+} from "@ogw_server/utils/microservices";
+import type { createPath, generateProjectFolderPath } from "@ogw_server/utils/path";
+import type { cleanupBackend } from "@ogw_server/utils/cleanup";
 
 // Browser commands: run in Node, called from the tests through `commands` of "vitest/browser"
 
@@ -12,6 +21,7 @@ const COMMAND_BACK = "opengeodeweb-back";
 const COMMAND_VIEWER = "opengeodeweb-viewer";
 const PROJECT = "ogw-vitest-browser";
 const rootPath = path.resolve(import.meta.dirname, "..", "..");
+const serverUtilsPath = path.join(rootPath, "server", "utils");
 // The back reads the test data straight from the fixtures folder
 const uploadFolderPath = path.resolve(import.meta.dirname, "data");
 
@@ -21,51 +31,20 @@ interface Microservices {
   projectFolderPath: string;
 }
 
-type MicroservicesModule = typeof import("../../server/utils/microservices");
-type PathModule = typeof import("../../server/utils/path");
-type CleanupModule = typeof import("../../server/utils/cleanup");
+// The server utils the commands load (see importServerUtils)
+interface MicroservicesUtils {
+  addMicroserviceMetadatas: typeof addMicroserviceMetadatas;
+  runBack: typeof runBack;
+  runViewer: typeof runViewer;
+}
 
-// Each test file gets its own back and viewer, like each Vease e2e file gets its own app
-const startMicroservices: BrowserCommand<[]> = async (context): Promise<Microservices> => {
-  const serverUtils = path.join(rootPath, "server", "utils");
-  const { addMicroserviceMetadatas, runBack, runViewer } =
-    await context.project.import<MicroservicesModule>(path.join(serverUtils, "microservices.ts"));
-  const { createPath, generateProjectFolderPath } = await context.project.import<PathModule>(
-    path.join(serverUtils, "path.ts"),
-  );
-  const projectFolderPath = generateProjectFolderPath(PROJECT);
-  createPath(projectFolderPath);
-  const [backPort, viewerPort] = await Promise.all([
-    runBack(COMMAND_BACK, rootPath, { projectFolderPath, uploadFolderPath }),
-    runViewer(COMMAND_VIEWER, rootPath, { projectFolderPath }),
-  ]);
-  addMicroserviceMetadatas(projectFolderPath, { type: "back", name: COMMAND_BACK, port: backPort });
-  addMicroserviceMetadatas(projectFolderPath, {
-    type: "viewer",
-    name: COMMAND_VIEWER,
-    port: viewerPort,
-  });
-  return { backPort, viewerPort, projectFolderPath };
-};
+interface PathUtils {
+  createPath: typeof createPath;
+  generateProjectFolderPath: typeof generateProjectFolderPath;
+}
 
-const stopMicroservices: BrowserCommand<[projectFolderPath: string]> = async (
-  context,
-  projectFolderPath,
-): Promise<void> => {
-  const { cleanupBackend } = await context.project.import<CleanupModule>(
-    path.join(rootPath, "server", "utils", "cleanup.ts"),
-  );
-  await cleanupBackend(projectFolderPath);
-};
-
-function playwrightPage(context: BrowserCommandContext): Page {
-  if (context.provider.name !== "playwright") {
-    throw new Error(
-      `The mouse command needs the playwright provider, not ${context.provider.name}`,
-    );
-  }
-  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the playwright provider adds `page` to the context
-  return (context as unknown as { page: Page }).page;
+interface CleanupUtils {
+  cleanupBackend: typeof cleanupBackend;
 }
 
 type MouseAction = "move" | "down" | "up" | "wheel";
@@ -77,10 +56,64 @@ interface MouseOptions {
   viewportWidth?: number;
 }
 
+// The server utils are loaded through Vite, like the tests: they use its aliases
+async function importServerUtils<Module>(
+  context: BrowserCommandContext,
+  fileName: string,
+): Promise<Module> {
+  const serverUtils = await context.project.import<Module>(path.join(serverUtilsPath, fileName));
+  return serverUtils;
+}
+
+// Each test file gets its own back and viewer, like each Vease e2e file gets its own app
+async function startMicroservices(context: BrowserCommandContext): Promise<Microservices> {
+  const microservices = await importServerUtils<MicroservicesUtils>(context, "microservices.ts");
+  const paths = await importServerUtils<PathUtils>(context, "path.ts");
+  const projectFolderPath = paths.generateProjectFolderPath(PROJECT);
+  paths.createPath(projectFolderPath);
+  const [backPort, viewerPort] = await Promise.all([
+    microservices.runBack(COMMAND_BACK, rootPath, { projectFolderPath, uploadFolderPath }),
+    microservices.runViewer(COMMAND_VIEWER, rootPath, { projectFolderPath }),
+  ]);
+  microservices.addMicroserviceMetadatas(projectFolderPath, {
+    type: "back",
+    name: COMMAND_BACK,
+    port: backPort,
+  });
+  microservices.addMicroserviceMetadatas(projectFolderPath, {
+    type: "viewer",
+    name: COMMAND_VIEWER,
+    port: viewerPort,
+  });
+  return { backPort, viewerPort, projectFolderPath };
+}
+
+async function stopMicroservices(
+  context: BrowserCommandContext,
+  projectFolderPath: string,
+): Promise<void> {
+  const cleanup = await importServerUtils<CleanupUtils>(context, "cleanup.ts");
+  await cleanup.cleanupBackend(projectFolderPath);
+}
+
+function playwrightPage(context: BrowserCommandContext): Page {
+  if (context.provider.name !== "playwright") {
+    throw new Error(
+      `The mouse command needs the playwright provider, not ${context.provider.name}`,
+    );
+  }
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the playwright provider adds `page` to the context
+  return (context as unknown as { page: Page }).page;
+}
+
 // Playwright's page.mouse takes coordinates of the top page: the test page is an iframe in it
-const mouse: BrowserCommand<
-  [action: MouseAction, x: number, y: number, options?: MouseOptions]
-> = async (context, action, x, y, options = {}): Promise<void> => {
+async function mouse(
+  context: BrowserCommandContext,
+  action: MouseAction,
+  x: number,
+  y: number,
+  options: MouseOptions = {},
+): Promise<void> {
   const page = playwrightPage(context);
   if (action === "down") {
     await page.mouse.down({ button: options.button });
@@ -98,17 +131,17 @@ const mouse: BrowserCommand<
   if (!box) {
     throw new Error("The test iframe has no bounding box");
   }
-  const scale = options.viewportWidth ? box.width / options.viewportWidth : 1;
+  let scale = 1;
+  if (options.viewportWidth !== undefined && options.viewportWidth > 0) {
+    scale = box.width / options.viewportWidth;
+  }
   await page.mouse.move(box.x + x * scale, box.y + y * scale, { steps: options.steps });
-};
+}
 
-const readFileBase64: BrowserCommand<[filePath: string]> = async (
-  _context,
-  filePath,
-): Promise<string> => {
+async function readFileBase64(_context: BrowserCommandContext, filePath: string): Promise<string> {
   const content = await fs.readFile(filePath);
   return content.toString("base64");
-};
+}
 
 const browserCommands = { mouse, readFileBase64, startMicroservices, stopMicroservices };
 

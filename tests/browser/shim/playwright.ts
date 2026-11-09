@@ -1,10 +1,11 @@
 // A subset of the Playwright test API, implemented inside the page, so that the e2e helpers written for
-// Playwright (tests/browser/helpers, shared with Vease) run unchanged in Vitest browser mode. The locators are resolved in
-// the DOM, the input events are sent by Vitest's playwright provider. Only what the helpers use is here.
-// oxlint-disable max-lines, max-classes-per-file
+// Playwright (tests/browser/helpers, shared with Vease) run unchanged in Vitest browser mode. The locators are
+// Resolved in the DOM, the input events are sent by Vitest's playwright provider. Only what the helpers use is here.
+// The classes mirror Playwright's API: some of their methods do not need `this`
+// oxlint-disable max-lines, max-classes-per-file, class-methods-use-this
 
 // Third party imports
-import { commands, page as vitestPage, userEvent } from "vitest/browser";
+import { commands, userEvent, page as vitestPage } from "vitest/browser";
 import { expect as vitestExpect } from "vitest";
 
 const DEFAULT_TIMEOUT = 30_000;
@@ -12,10 +13,11 @@ const EXPECT_TIMEOUT = 5000;
 const POLL_INTERVAL = 20;
 
 type Root = Element | Document;
-type Query = (roots: Root[]) => Element[];
+type Query = (roots: Root[]) => Root[];
+type MouseButton = "left" | "right" | "middle";
 
 interface ClickOptions {
-  button?: "left" | "right" | "middle";
+  button?: MouseButton;
   position?: { x: number; y: number };
   force?: boolean;
   delay?: number;
@@ -38,13 +40,20 @@ interface RoleOptions {
   checked?: boolean;
 }
 
+interface BoundingBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 type WaitState = "attached" | "detached" | "visible" | "hidden";
 
 // ---- DOM helpers
 
-function sleep(milliseconds: number): Promise<void> {
+async function sleep(milliseconds: number): Promise<void> {
   // oxlint-disable-next-line promise/avoid-new
-  return new Promise((resolve) => {
+  await new Promise((resolve) => {
     setTimeout(resolve, milliseconds);
   });
 }
@@ -68,13 +77,18 @@ async function poll<Result>(
   }
 }
 
-function inDocumentOrder(elements: Element[]): Element[] {
-  return [...new Set(elements)].toSorted((first, second) => {
+function isElement(root: Root): root is Element {
+  return root instanceof Element;
+}
+
+function inDocumentOrder(roots: Root[]): Root[] {
+  return [...new Set(roots)].toSorted((first, second) => {
     if (first === second) {
       return 0;
     }
     // oxlint-disable-next-line no-bitwise
-    return first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
+    const following = first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_FOLLOWING;
+    return following === 0 ? 1 : -1;
   });
 }
 
@@ -89,7 +103,10 @@ function matchesText(content: string | null, expected: string | RegExp, exact = 
     return expected.test(text);
   }
   const wanted = normalizeWhitespace(expected);
-  return exact ? text === wanted : text.toLowerCase().includes(wanted.toLowerCase());
+  if (exact) {
+    return text === wanted;
+  }
+  return text.toLowerCase().includes(wanted.toLowerCase());
 }
 
 // Like Playwright: a non-empty bounding box and no visibility:hidden
@@ -109,9 +126,8 @@ function isHiddenForAria(element: Element): boolean {
 }
 
 function isElementEnabled(element: Element): boolean {
-  return (
-    !(element as HTMLInputElement).disabled && element.getAttribute("aria-disabled") !== "true"
-  );
+  const disabled = "disabled" in element && element.disabled === true;
+  return !disabled && element.getAttribute("aria-disabled") !== "true";
 }
 
 function isElementChecked(element: Element): boolean {
@@ -119,6 +135,13 @@ function isElementChecked(element: Element): boolean {
     return element.checked;
   }
   return element.getAttribute("aria-checked") === "true";
+}
+
+function asHtmlElement(element: Element): HTMLElement {
+  if (!(element instanceof HTMLElement)) {
+    throw new TypeError(`${element.tagName} is not an HTML element`);
+  }
+  return element;
 }
 
 const ROLE_SELECTORS: Record<string, string> = {
@@ -140,20 +163,24 @@ function accessibleName(element: Element): string {
   if (labelledBy !== null && labelledBy !== "") {
     return labelledBy
       .split(" ")
-      .map((id) => document.getElementById(id)?.textContent ?? "")
+      .map((id) => document.querySelector(`#${CSS.escape(id)}`)?.textContent ?? "")
       .join(" ");
   }
-  if (element instanceof HTMLInputElement && element.labels && element.labels.length > 0) {
+  if (element instanceof HTMLInputElement && element.labels !== null && element.labels.length > 0) {
     return [...element.labels].map((labelElement) => labelElement.textContent).join(" ");
   }
   return element.textContent ?? "";
 }
 
+// Playwright key names ("Control+A") to user-event keyboard syntax ("{Control>}A{/Control}")
 function keyboardSyntax(key: string): string {
   const parts = key.split("+");
   const main = parts.pop() ?? "";
-  const mainKey = main.length === 1 ? main : `{${main}}`;
-  return parts.reduce((text, modifier) => `{${modifier}>}${text}{/${modifier}}`, mainKey);
+  let text = main.length === 1 ? main : `{${main}}`;
+  for (const modifier of parts) {
+    text = `{${modifier}>}${text}{/${modifier}}`;
+  }
+  return text;
 }
 
 function mimeType(fileName: string): string {
@@ -168,25 +195,25 @@ class Locator {
   readonly #query: Query;
   readonly #description: string;
 
-  constructor(query: Query, description: string) {
+  public constructor(query: Query, description: string) {
     this.#query = query;
     this.#description = description;
   }
 
-  toString(): string {
+  public toString(): string {
     return this.#description;
   }
 
   // Elements matched under the given roots, used for `has` filters
-  query(roots: Root[]): Element[] {
-    return this.#query(roots);
+  public query(roots: Root[]): Element[] {
+    return this.#query(roots).filter((root) => isElement(root));
   }
 
-  elements(): Element[] {
-    return this.#query([document]);
+  public elements(): Element[] {
+    return this.query([document]);
   }
 
-  #chain(step: (elements: Root[]) => Element[], description: string): Locator {
+  #chain(step: (roots: Root[]) => Root[], description: string): Locator {
     return new Locator(
       (roots) => inDocumentOrder(step(this.#query(roots))),
       `${this.#description}.${description}`,
@@ -196,19 +223,23 @@ class Locator {
   // -- Selectors
 
   // Like Playwright, the options filter the matched elements
-  locator(selector: string, options?: FilterOptions): Locator {
+  public locator(selector: string, options?: FilterOptions): Locator {
     const located = this.#chain(
       (roots) => roots.flatMap((root) => [...root.querySelectorAll(selector)]),
       `locator(${selector})`,
     );
-    return options ? located.filter(options) : located;
+    if (options === undefined) {
+      return located;
+    }
+    // A copy: an object literal, not a function reference passed to filter
+    return located.filter({ ...options });
   }
 
-  getByTestId(testId: string): Locator {
+  public getByTestId(testId: string): Locator {
     return this.locator(`[data-testid="${CSS.escape(testId)}"]`);
   }
 
-  getByRole(role: string, options: RoleOptions = {}): Locator {
+  public getByRole(role: string, options: RoleOptions = {}): Locator {
     const selector = ROLE_SELECTORS[role] ?? `[role="${role}"]`;
     return this.#chain(
       (roots) =>
@@ -229,7 +260,7 @@ class Locator {
   }
 
   // The innermost elements whose text matches
-  getByText(text: string | RegExp, { exact = false }: { exact?: boolean } = {}): Locator {
+  public getByText(text: string | RegExp, { exact = false }: { exact?: boolean } = {}): Locator {
     return this.#chain(
       (roots) =>
         roots
@@ -243,45 +274,51 @@ class Locator {
     );
   }
 
-  filter({ hasText, hasNotText, has, hasNot, visible }: FilterOptions): Locator {
+  public filter({ hasText, hasNotText, has, hasNot, visible }: FilterOptions): Locator {
     return this.#chain(
       (roots) =>
-        (roots as Element[]).filter(
-          (element) =>
-            (hasText === undefined || matchesText(element.textContent, hasText)) &&
-            (hasNotText === undefined || !matchesText(element.textContent, hasNotText)) &&
-            (has === undefined || has.query([element]).length > 0) &&
-            (hasNot === undefined || hasNot.query([element]).length === 0) &&
-            (visible === undefined || isElementVisible(element) === visible),
-        ),
+        roots
+          .filter((root) => isElement(root))
+          .filter(
+            (element) =>
+              (hasText === undefined || matchesText(element.textContent, hasText)) &&
+              (hasNotText === undefined || !matchesText(element.textContent, hasNotText)) &&
+              (has === undefined || has.query([element]).length > 0) &&
+              (hasNot === undefined || hasNot.query([element]).length === 0) &&
+              (visible === undefined || isElementVisible(element) === visible),
+          ),
       "filter()",
     );
   }
 
-  nth(index: number): Locator {
+  public nth(index: number): Locator {
     return this.#chain((roots) => {
-      const elements = roots as Element[];
-      const element = index < 0 ? elements.at(index) : elements[index];
-      return element ? [element] : [];
+      const root = roots.at(index);
+      if (root === undefined) {
+        return [];
+      }
+      return [root];
     }, `nth(${index})`);
   }
 
-  first(): Locator {
+  public first(): Locator {
     return this.nth(0);
   }
 
-  last(): Locator {
+  public last(): Locator {
     return this.nth(-1);
   }
 
-  or(other: Locator): Locator {
+  // Playwright's name
+  // oxlint-disable-next-line id-length
+  public or(other: Locator): Locator {
     return new Locator(
       (roots) => inDocumentOrder([...this.#query(roots), ...other.query(roots)]),
       `${this.#description}.or(${other.toString()})`,
     );
   }
 
-  async all(): Promise<Locator[]> {
+  public async all(): Promise<Locator[]> {
     await Promise.resolve();
     return this.elements().map((_element, index) => this.nth(index));
   }
@@ -299,19 +336,20 @@ class Locator {
   }
 
   async #attached(timeout = DEFAULT_TIMEOUT): Promise<Element> {
-    return poll(
+    const element = await poll(
       () => this.#single(),
       timeout,
       () => `${this.#description} was not found`,
     );
+    return element;
   }
 
   // Like Playwright's actionability checks: attached, visible and enabled, unless forced
   async #actionable(force = false, timeout = DEFAULT_TIMEOUT): Promise<Element> {
-    return poll(
+    const actionable = await poll(
       () => {
         const element = this.#single();
-        if (!element) {
+        if (element === undefined) {
           return undefined;
         }
         if (force || (isElementVisible(element) && isElementEnabled(element))) {
@@ -322,9 +360,10 @@ class Locator {
       timeout,
       () => `${this.#description} is not visible and enabled`,
     );
+    return actionable;
   }
 
-  async waitFor({
+  public async waitFor({
     state = "visible",
     timeout = DEFAULT_TIMEOUT,
   }: { state?: WaitState; timeout?: number } = {}): Promise<void> {
@@ -347,8 +386,8 @@ class Locator {
   // -- Actions
 
   // The mouse is moved to the target first, without Playwright's hit-target check. Each action costs a round
-  // trip to Node here, slower than in Playwright: a hover tooltip (500 ms delay) of the element clicked before
-  // then has time to open over the target, and Playwright retries without moving the mouse away from it
+  // Trip to Node here, slower than in Playwright: a hover tooltip (500 ms delay) of the element clicked before
+  // Then has time to open over the target, and Playwright retries without moving the mouse away from it
   async #moveMouseTo(element: Element, position?: { x: number; y: number }): Promise<void> {
     element.scrollIntoView({ block: "nearest", inline: "nearest" });
     const rect = element.getBoundingClientRect();
@@ -357,36 +396,36 @@ class Locator {
     await commands.mouse("move", x, y, { viewportWidth: globalThis.innerWidth });
   }
 
-  async click(options: ClickOptions = {}): Promise<void> {
+  public async click(options: ClickOptions = {}): Promise<void> {
     const element = await this.#actionable(options.force, options.timeout);
     await this.#moveMouseTo(element, options.position);
     await vitestPage.elementLocator(element).click(options);
   }
 
-  async dblclick(options: ClickOptions = {}): Promise<void> {
+  public async dblclick(options: ClickOptions = {}): Promise<void> {
     const element = await this.#actionable(options.force, options.timeout);
     await this.#moveMouseTo(element, options.position);
     await vitestPage.elementLocator(element).dblClick(options);
   }
 
-  async hover(options: ClickOptions = {}): Promise<void> {
+  public async hover(options: ClickOptions = {}): Promise<void> {
     const element = await this.#actionable(options.force, options.timeout);
     await this.#moveMouseTo(element, options.position);
     await vitestPage.elementLocator(element).hover(options);
   }
 
-  async fill(value: string, options: { force?: boolean } = {}): Promise<void> {
+  public async fill(value: string, options: { force?: boolean } = {}): Promise<void> {
     const element = await this.#actionable(options.force);
     await vitestPage.elementLocator(element).fill(value);
   }
 
-  async press(key: string): Promise<void> {
+  public async press(key: string): Promise<void> {
     const element = await this.#actionable();
-    (element as HTMLElement).focus();
+    asHtmlElement(element).focus();
     await userEvent.keyboard(keyboardSyntax(key));
   }
 
-  async setChecked(checked: boolean, options: ClickOptions = {}): Promise<void> {
+  public async setChecked(checked: boolean, options: ClickOptions = {}): Promise<void> {
     const element = await this.#actionable(options.force, options.timeout);
     if (isElementChecked(element) === checked) {
       return;
@@ -400,28 +439,34 @@ class Locator {
     );
   }
 
-  async check(options: ClickOptions = {}): Promise<void> {
+  public async check(options: ClickOptions = {}): Promise<void> {
     await this.setChecked(true, options);
   }
 
-  async uncheck(options: ClickOptions = {}): Promise<void> {
+  public async uncheck(options: ClickOptions = {}): Promise<void> {
     await this.setChecked(false, options);
   }
 
-  async focus(): Promise<void> {
-    ((await this.#attached()) as HTMLElement).focus();
+  public async focus(): Promise<void> {
+    const element = await this.#attached();
+    asHtmlElement(element).focus();
   }
 
-  async blur(): Promise<void> {
-    ((await this.#attached()) as HTMLElement).blur();
+  public async blur(): Promise<void> {
+    const element = await this.#attached();
+    asHtmlElement(element).blur();
   }
 
-  async scrollIntoViewIfNeeded(): Promise<void> {
-    (await this.#attached()).scrollIntoView({ block: "nearest" });
+  public async scrollIntoViewIfNeeded(): Promise<void> {
+    const element = await this.#attached();
+    element.scrollIntoView({ block: "nearest" });
   }
 
-  async setInputFiles(filePaths: string | string[]): Promise<void> {
-    const input = (await this.#attached()) as HTMLInputElement;
+  public async setInputFiles(filePaths: string | string[]): Promise<void> {
+    const input = await this.#attached();
+    if (!(input instanceof HTMLInputElement)) {
+      throw new TypeError(`${this.#description} is not an input`);
+    }
     const transfer = new DataTransfer();
     for (const filePath of [filePaths].flat()) {
       // oxlint-disable-next-line no-await-in-loop
@@ -437,69 +482,81 @@ class Locator {
 
   // -- Reading
 
-  async evaluate<Result, Argument>(
-    pageFunction: (element: Element, argument: Argument) => Result | Promise<Result>,
+  public async evaluate<Result, Argument>(
+    pageFunction: (element: Element, argument: Argument | undefined) => Result | Promise<Result>,
     argument?: Argument,
   ): Promise<Result> {
     const element = await this.#attached();
-    return pageFunction(element, argument as Argument);
+    const result = await pageFunction(element, argument);
+    return result;
   }
 
-  async evaluateAll<Result, Argument>(
-    pageFunction: (elements: Element[], argument: Argument) => Result | Promise<Result>,
+  public async evaluateAll<Result, Argument>(
+    pageFunction: (
+      elements: Element[],
+      argument: Argument | undefined,
+    ) => Result | Promise<Result>,
     argument?: Argument,
   ): Promise<Result> {
-    return pageFunction(this.elements(), argument as Argument);
+    const result = await pageFunction(this.elements(), argument);
+    return result;
   }
 
-  async isVisible(): Promise<boolean> {
+  public async isVisible(): Promise<boolean> {
     await Promise.resolve();
     const element = this.#single();
     return element !== undefined && isElementVisible(element);
   }
 
-  async isHidden(): Promise<boolean> {
-    return !(await this.isVisible());
+  public async isHidden(): Promise<boolean> {
+    const visible = await this.isVisible();
+    return !visible;
   }
 
-  async isChecked(): Promise<boolean> {
-    return isElementChecked(await this.#attached());
+  public async isChecked(): Promise<boolean> {
+    const element = await this.#attached();
+    return isElementChecked(element);
   }
 
-  async isEnabled(): Promise<boolean> {
-    return isElementEnabled(await this.#attached());
+  public async isEnabled(): Promise<boolean> {
+    const element = await this.#attached();
+    return isElementEnabled(element);
   }
 
-  async isDisabled(): Promise<boolean> {
-    return !(await this.isEnabled());
+  public async isDisabled(): Promise<boolean> {
+    const enabled = await this.isEnabled();
+    return !enabled;
   }
 
-  async count(): Promise<number> {
+  public async count(): Promise<number> {
     await Promise.resolve();
     return this.elements().length;
   }
 
-  async getAttribute(name: string): Promise<string | null> {
-    return (await this.#attached()).getAttribute(name);
+  public async getAttribute(name: string): Promise<string | null> {
+    const element = await this.#attached();
+    return element.getAttribute(name);
   }
 
-  async textContent(): Promise<string | null> {
-    return (await this.#attached()).textContent;
+  public async textContent(): Promise<string | null> {
+    const element = await this.#attached();
+    return element.textContent;
   }
 
-  async innerText(): Promise<string> {
-    return ((await this.#attached()) as HTMLElement).innerText;
+  public async inputValue(): Promise<string> {
+    const element = await this.#attached();
+    if (!(element instanceof HTMLInputElement)) {
+      throw new TypeError(`${this.#description} is not an input`);
+    }
+    return element.value;
   }
 
-  async inputValue(): Promise<string> {
-    return ((await this.#attached()) as HTMLInputElement).value;
-  }
-
-  // In the coordinates of the test page, which the mouse command maps to the top page
-  async boundingBox(): Promise<{ x: number; y: number; width: number; height: number } | null> {
+  // In the coordinates of the test page, which the mouse command maps to the top page. Playwright returns null
+  // For a hidden element: the helpers only test the result, undefined does the same
+  public async boundingBox(): Promise<BoundingBox | undefined> {
     const element = await this.#attached();
     if (!isElementVisible(element)) {
-      return null;
+      return undefined;
     }
     const { x, y, width, height } = element.getBoundingClientRect();
     return { x, y, width, height };
@@ -508,61 +565,70 @@ class Locator {
 
 // ---- Page
 
-const documentRoot = new Locator((roots) => roots as Element[], "page");
+const documentRoot = new Locator((roots) => roots, "page");
 
-function mouseOptions(options: { steps?: number; button?: "left" | "right" | "middle" } = {}): {
+function mouseOptions(options: { steps?: number; button?: MouseButton } = {}): {
   steps?: number;
-  button?: "left" | "right" | "middle";
+  button?: MouseButton;
   viewportWidth: number;
 } {
   return { ...options, viewportWidth: globalThis.innerWidth };
 }
 
 class Page {
-  readonly mouse = {
-    move: (x: number, y: number, options: { steps?: number } = {}): Promise<void> =>
-      commands.mouse("move", x, y, mouseOptions(options)),
-    down: (options: { button?: "left" | "right" | "middle" } = {}): Promise<void> =>
-      commands.mouse("down", 0, 0, mouseOptions(options)),
-    up: (options: { button?: "left" | "right" | "middle" } = {}): Promise<void> =>
-      commands.mouse("up", 0, 0, mouseOptions(options)),
-    wheel: (deltaX: number, deltaY: number): Promise<void> =>
-      commands.mouse("wheel", deltaX, deltaY, mouseOptions()),
+  public readonly mouse = {
+    move: async (x: number, y: number, options: { steps?: number } = {}): Promise<void> => {
+      await commands.mouse("move", x, y, mouseOptions(options));
+    },
+    down: async (options: { button?: MouseButton } = {}): Promise<void> => {
+      await commands.mouse("down", 0, 0, mouseOptions(options));
+    },
+    // Playwright's name
+    // oxlint-disable-next-line id-length
+    up: async (options: { button?: MouseButton } = {}): Promise<void> => {
+      await commands.mouse("up", 0, 0, mouseOptions(options));
+    },
+    wheel: async (deltaX: number, deltaY: number): Promise<void> => {
+      await commands.mouse("wheel", deltaX, deltaY, mouseOptions());
+    },
   };
 
-  readonly keyboard = {
-    press: (key: string): Promise<void> => userEvent.keyboard(keyboardSyntax(key)),
+  public readonly keyboard = {
+    press: async (key: string): Promise<void> => {
+      await userEvent.keyboard(keyboardSyntax(key));
+    },
   };
 
-  locator(selector: string, options?: FilterOptions): Locator {
+  public locator(selector: string, options?: FilterOptions): Locator {
     return documentRoot.locator(selector, options);
   }
 
-  getByTestId(testId: string): Locator {
+  public getByTestId(testId: string): Locator {
     return documentRoot.getByTestId(testId);
   }
 
-  getByRole(role: string, options?: RoleOptions): Locator {
+  public getByRole(role: string, options?: RoleOptions): Locator {
     return documentRoot.getByRole(role, options);
   }
 
-  getByText(text: string | RegExp, options?: { exact?: boolean }): Locator {
+  public getByText(text: string | RegExp, options?: { exact?: boolean }): Locator {
     return documentRoot.getByText(text, options);
   }
 
-  async waitForTimeout(milliseconds: number): Promise<void> {
+  public async waitForTimeout(milliseconds: number): Promise<void> {
     await sleep(milliseconds);
   }
 
-  async evaluate<Result, Argument>(
-    pageFunction: (argument: Argument) => Result | Promise<Result>,
+  public async evaluate<Result, Argument>(
+    pageFunction: (argument: Argument | undefined) => Result | Promise<Result>,
     argument?: Argument,
   ): Promise<Result> {
-    return pageFunction(argument as Argument);
+    const result = await pageFunction(argument);
+    return result;
   }
 
-  async waitForFunction<Argument>(
-    pageFunction: (argument: Argument) => unknown,
+  public async waitForFunction<Argument>(
+    pageFunction: (argument: Argument | undefined) => unknown,
     argument?: Argument,
     {
       timeout = DEFAULT_TIMEOUT,
@@ -570,16 +636,19 @@ class Page {
     }: { timeout?: number; polling?: number } = {},
   ): Promise<void> {
     const deadline = Date.now() + timeout;
-    while (!pageFunction(argument as Argument)) {
+    // Like Playwright, any truthy value ends the wait
+    let done = Boolean(pageFunction(argument));
+    while (!done) {
       if (timeout > 0 && Date.now() > deadline) {
         throw new Error("waitForFunction timed out");
       }
       // oxlint-disable-next-line no-await-in-loop
       await sleep(polling);
+      done = Boolean(pageFunction(argument));
     }
   }
 
-  async addStyleTag({ content }: { content: string }): Promise<void> {
+  public async addStyleTag({ content }: { content: string }): Promise<void> {
     await Promise.resolve();
     const style = document.createElement("style");
     style.textContent = content;
@@ -589,30 +658,21 @@ class Page {
 
 // ---- expect: retrying assertions on locators, Vitest's expect for anything else
 
-type LocatorAssertion = (locator: Locator) => Promise<boolean> | boolean;
+type LocatorCheck = () => boolean;
+type LocatorMatcher = (...args: never[]) => Promise<void>;
 
-function locatorMatchers(
-  locator: Locator,
-  negated: boolean,
-): Record<string, (...args: never[]) => Promise<void>> {
-  async function assert(
-    name: string,
-    check: LocatorAssertion,
-    timeout = EXPECT_TIMEOUT,
-  ): Promise<void> {
+interface TimeoutOptions {
+  timeout?: number;
+}
+
+function locatorMatchers(locator: Locator, negated: boolean): Record<string, LocatorMatcher> {
+  async function assert(name: string, check: LocatorCheck, timeout = EXPECT_TIMEOUT): Promise<void> {
     await poll(
       () => {
         try {
-          // Synchronous checks only: the locator reads are synchronous under the hood
-          const result = check(locator);
-          if (result instanceof Promise) {
-            throw new TypeError("asynchronous check");
-          }
-          return result === !negated ? true : undefined;
-        } catch (error) {
-          if (error instanceof TypeError) {
-            throw error;
-          }
+          return check() === !negated ? true : undefined;
+        } catch {
+          // The element changes while it is read: check again
           return undefined;
         }
       },
@@ -620,59 +680,48 @@ function locatorMatchers(
       () => `expect(${locator.toString()})${negated ? ".not" : ""}.${name} failed`,
     );
   }
-  const single = (): Element | undefined => locator.elements()[0];
+  function single(): Element | undefined {
+    return locator.elements()[0];
+  }
+  function visible(): boolean {
+    const element = single();
+    return element !== undefined && isElementVisible(element);
+  }
+  function enabled(): boolean {
+    const element = single();
+    return element !== undefined && isElementEnabled(element);
+  }
   return {
-    toBeVisible: async ({ timeout }: { timeout?: number } = {}) =>
-      assert(
-        "toBeVisible",
-        () => {
-          const element = single();
-          return element !== undefined && isElementVisible(element);
-        },
-        timeout,
-      ),
-    toBeHidden: async ({ timeout }: { timeout?: number } = {}) =>
-      assert(
-        "toBeHidden",
-        () => {
-          const element = single();
-          return element === undefined || !isElementVisible(element);
-        },
-        timeout,
-      ),
-    toBeAttached: async ({ timeout }: { timeout?: number } = {}) =>
-      assert("toBeAttached", () => single() !== undefined, timeout),
-    toBeEnabled: async ({ timeout }: { timeout?: number } = {}) =>
-      assert(
-        "toBeEnabled",
-        () => {
-          const element = single();
-          return element !== undefined && isElementEnabled(element);
-        },
-        timeout,
-      ),
-    toBeDisabled: async ({ timeout }: { timeout?: number } = {}) =>
-      assert(
-        "toBeDisabled",
-        () => {
-          const element = single();
-          return element !== undefined && !isElementEnabled(element);
-        },
-        timeout,
-      ),
-    toBeChecked: async ({ timeout }: { timeout?: number } = {}) =>
-      assert(
+    toBeVisible: async ({ timeout }: TimeoutOptions = {}): Promise<void> => {
+      await assert("toBeVisible", visible, timeout);
+    },
+    toBeHidden: async ({ timeout }: TimeoutOptions = {}): Promise<void> => {
+      await assert("toBeHidden", () => !visible(), timeout);
+    },
+    toBeAttached: async ({ timeout }: TimeoutOptions = {}): Promise<void> => {
+      await assert("toBeAttached", () => single() !== undefined, timeout);
+    },
+    toBeEnabled: async ({ timeout }: TimeoutOptions = {}): Promise<void> => {
+      await assert("toBeEnabled", enabled, timeout);
+    },
+    toBeDisabled: async ({ timeout }: TimeoutOptions = {}): Promise<void> => {
+      await assert("toBeDisabled", () => single() !== undefined && !enabled(), timeout);
+    },
+    toBeChecked: async ({ timeout }: TimeoutOptions = {}): Promise<void> => {
+      await assert(
         "toBeChecked",
         () => {
           const element = single();
           return element !== undefined && isElementChecked(element);
         },
         timeout,
-      ),
-    toHaveCount: async (count: number, { timeout }: { timeout?: number } = {}) =>
-      assert(`toHaveCount(${count})`, () => locator.elements().length === count, timeout),
-    toHaveText: async (text: string | RegExp, { timeout }: { timeout?: number } = {}) =>
-      assert(
+      );
+    },
+    toHaveCount: async (count: number, { timeout }: TimeoutOptions = {}): Promise<void> => {
+      await assert(`toHaveCount(${count})`, () => locator.elements().length === count, timeout);
+    },
+    toHaveText: async (text: string | RegExp, { timeout }: TimeoutOptions = {}): Promise<void> => {
+      await assert(
         `toHaveText(${String(text)})`,
         () => {
           const element = single();
@@ -682,33 +731,48 @@ function locatorMatchers(
           );
         },
         timeout,
-      ),
-    toContainText: async (text: string | RegExp, { timeout }: { timeout?: number } = {}) =>
-      assert(
+      );
+    },
+    toContainText: async (
+      text: string | RegExp,
+      { timeout }: TimeoutOptions = {},
+    ): Promise<void> => {
+      await assert(
         `toContainText(${String(text)})`,
         () => {
           const element = single();
           return element !== undefined && matchesText(element.textContent, text);
         },
         timeout,
-      ),
-    toHaveValue: async (value: string, { timeout }: { timeout?: number } = {}) =>
-      assert(
+      );
+    },
+    toHaveValue: async (value: string, { timeout }: TimeoutOptions = {}): Promise<void> => {
+      await assert(
         `toHaveValue(${value})`,
-        () => (single() as HTMLInputElement | undefined)?.value === value,
+        () => {
+          const element = single();
+          return element instanceof HTMLInputElement && element.value === value;
+        },
         timeout,
-      ),
-    toHaveAttribute: async (name: string, value?: string, { timeout }: { timeout?: number } = {}) =>
-      assert(
+      );
+    },
+    toHaveAttribute: async (
+      name: string,
+      value?: string,
+      { timeout }: TimeoutOptions = {},
+    ): Promise<void> => {
+      await assert(
         `toHaveAttribute(${name})`,
         () => {
           const attribute = single()?.getAttribute(name);
-          return value === undefined
-            ? attribute !== null && attribute !== undefined
-            : attribute === value;
+          if (value === undefined) {
+            return attribute !== null && attribute !== undefined;
+          }
+          return attribute === value;
         },
         timeout,
-      ),
+      );
+    },
   };
 }
 
@@ -716,6 +780,8 @@ function expect(subject: unknown): unknown {
   if (subject instanceof Locator) {
     return { ...locatorMatchers(subject, false), not: locatorMatchers(subject, true) };
   }
+  // The matchers are called by the test on the returned value
+  // oxlint-disable-next-line vitest/valid-expect
   return vitestExpect(subject);
 }
 expect.poll = vitestExpect.poll;

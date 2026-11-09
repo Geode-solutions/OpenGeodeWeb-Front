@@ -1,9 +1,9 @@
 // Browser mode version of Vease's e2e loader (tests/e2e/utils/load.ts): the files are imported through the stores, the
-// back reading them from the fixtures folder (see ../commands.ts), with the object type the import UI picks
+// Back reading them from the fixtures folder (see ../commands.ts), with the object type the import UI picks
 
 // Local imports
 import type { GeodeObjectType } from "@ogw_front/types/identifiers";
-import type { Page } from "./playwright";
+import type { Page } from "@playwright/test";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { importWorkflow } from "@ogw_front/utils/import_workflow";
 import { resolveAllowedObjects } from "@ogw_shared/utils/response_handlers/load.js";
@@ -20,7 +20,7 @@ async function geodeObjectType(filename: string): Promise<GeodeObjectType> {
     throw new Error(`No geode object type could be chosen for ${filename}`);
   }
   // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the back only answers with its own object types
-  return selectedGeodeObject as GeodeObjectType;
+  return selectedGeodeObject;
 }
 
 async function loadVeaseTestDatas(

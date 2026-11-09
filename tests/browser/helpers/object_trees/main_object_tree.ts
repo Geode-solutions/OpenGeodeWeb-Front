@@ -8,8 +8,8 @@ import {
   openObjectTreeContextMenu,
 } from "./common";
 import { consola } from "consola";
-import { moveMouseOutOfTheWay } from "../app_interaction";
-import { waitForActionSettled } from "../wait_for_action_settled";
+import { moveMouseOutOfTheWay } from "#browser_helpers/app_interaction";
+import { waitForActionSettled } from "#browser_helpers/wait_for_action_settled";
 
 // On the Windows desktop build the tree row sometimes receives a stray mouseleave while the (slow) highlight render runs, which drops both the tooltip and the highlight before the screenshot.
 // The cursor is never moved by the test in between, so re-hovering restores the intended state.

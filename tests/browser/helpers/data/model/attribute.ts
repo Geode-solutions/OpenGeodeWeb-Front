@@ -1,11 +1,11 @@
-import { applyAttribute, setFeatureNoDataColor, setFeatureTimeStep } from "../helpers/attribute";
+import { applyAttribute, setFeatureNoDataColor, setFeatureTimeStep } from "#browser_helpers/data/helpers/attribute";
 import {
   cellAttributeType,
   edgeAttributeType,
   polygonAttributeType,
   polyhedronAttributeType,
   vertexAttributeType,
-} from "../../constants";
+} from "#browser_helpers/constants";
 import type { Page } from "@playwright/test";
 import { showModelStyleOptions } from "./style_menu";
 

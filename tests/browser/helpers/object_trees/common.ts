@@ -1,6 +1,6 @@
 import type { Locator, Page } from "@playwright/test";
-import { closeAllMenus, moveMouseOutOfTheWay } from "../app_interaction";
-import { waitForActionSettled } from "../wait_for_action_settled";
+import { closeAllMenus, moveMouseOutOfTheWay } from "#browser_helpers/app_interaction";
+import { waitForActionSettled } from "#browser_helpers/wait_for_action_settled";
 
 async function clickCollapseOrExpandAll(
   window: Page,

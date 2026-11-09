@@ -1,6 +1,6 @@
 import type { Locator, Page } from "@playwright/test";
-import { moveMouseOutOfTheWay } from "../../app_interaction";
-import { waitForActionSettled } from "../../wait_for_action_settled";
+import { moveMouseOutOfTheWay } from "#browser_helpers/app_interaction";
+import { waitForActionSettled } from "#browser_helpers/wait_for_action_settled";
 
 const MAX_PERCENTAGE = 100;
 const SLIDER_BLUE = 0.7;

@@ -3,10 +3,10 @@ import {
   ensureFeatureVisible,
   ensureMenuOpen,
   moveMouseOutOfTheWay,
-} from "../../viewer_interaction";
+} from "#browser_helpers/viewer_interaction";
 import { getMenuContainer, resetMenuScroll } from "./attribute_menu";
 import { setFeatureColorMap } from "./attribute_colors";
-import { waitForActionSettled } from "../../wait_for_action_settled";
+import { waitForActionSettled } from "#browser_helpers/wait_for_action_settled";
 
 async function setFeatureItem(
   window: Page,

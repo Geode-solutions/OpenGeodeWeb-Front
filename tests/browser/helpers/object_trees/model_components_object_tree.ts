@@ -6,11 +6,11 @@ import {
   expandGeodeObjectTypeInTree,
   getTreeRowByTextAndParent,
 } from "./common";
-import { closeAllMenus, moveMouseOutOfTheWay } from "../app_interaction";
-import { ensureMenuOpen, resetMenuScroll } from "../viewer_interaction";
+import { closeAllMenus, moveMouseOutOfTheWay } from "#browser_helpers/app_interaction";
+import { ensureMenuOpen, resetMenuScroll } from "#browser_helpers/viewer_interaction";
 import { expandGeodeObjectType, getMainObjectTree } from "./main_object_tree";
-import { setModelColor } from "../data/model/color";
-import { waitForActionSettled } from "../wait_for_action_settled";
+import { setModelColor } from "#browser_helpers/data/model/color";
+import { waitForActionSettled } from "#browser_helpers/wait_for_action_settled";
 
 function getModelComponentsObjectTree(window: Page): Locator {
   return window.getByTestId("modelComponentsObjectTree");

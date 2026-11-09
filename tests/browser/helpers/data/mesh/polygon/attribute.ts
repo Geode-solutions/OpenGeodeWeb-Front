@@ -2,22 +2,22 @@ import {
   SLIDER_PINK,
   clickColorPickerCanvas,
   clickColorPickerSlider,
-} from "../../helpers/color_picker";
-import { ensureMenuOpen, moveMouseOutOfTheWay, openStyleMenu } from "../../../viewer_interaction";
+} from "#browser_helpers/data/helpers/color_picker";
+import { ensureMenuOpen, moveMouseOutOfTheWay, openStyleMenu } from "#browser_helpers/viewer_interaction";
 import {
   meshViewerObjectType,
   polygonAttributeType,
   polygonsFeatureName,
   vertexAttributeType,
-} from "../../../constants";
+} from "#browser_helpers/constants";
 import {
   setFeatureAttribute,
   setFeatureColorMap,
   setFeatureItem,
   setFeatureTimeStep,
-} from "../../helpers/attribute";
+} from "#browser_helpers/data/helpers/attribute";
 import type { Page } from "@playwright/test";
-import { waitForActionSettled } from "../../../wait_for_action_settled";
+import { waitForActionSettled } from "#browser_helpers/wait_for_action_settled";
 
 interface AttributeOptions {
   item?: number;

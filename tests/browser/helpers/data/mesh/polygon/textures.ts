@@ -5,8 +5,8 @@ import path from "node:path";
 import type { Page } from "@playwright/test";
 
 // Local imports
-import { meshViewerObjectType, polygonsFeatureName } from "../../../constants";
-import { setFeatureTextures } from "../../helpers/textures";
+import { meshViewerObjectType, polygonsFeatureName } from "#browser_helpers/constants";
+import { setFeatureTextures } from "#browser_helpers/data/helpers/textures";
 
 const __dirname = import.meta.dirname;
 const texture = {
