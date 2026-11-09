@@ -1,5 +1,5 @@
 // Third party imports
-import { type H3Event, getQuery } from "h3";
+import { type H3Event, getQuery, readRawBody } from "h3";
 import { beforeEach, describe, expect, test } from "vitest";
 import { registerEndpoint } from "@nuxt/test-utils/runtime";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
@@ -44,17 +44,28 @@ function isBlob(value: unknown): value is Blob {
   );
 }
 
-function mockRequestBody(event: H3Event): Blob {
-  const request: unknown = event.node.req;
-  if (
-    typeof request === "object" &&
-    request !== null &&
-    "body" in request &&
-    isBlob(request.body)
-  ) {
-    return request.body;
+function describeBody(body: unknown): string {
+  if (typeof body !== "object" || body === null) {
+    return typeof body;
   }
-  throw new Error("Mock request does not have a Blob body");
+  return Object.prototype.toString.call(body);
+}
+
+// The mock request keeps the body as fetch got it: a Blob, which H3's readRawBody() can't convert (it only
+// Handles Buffer, stream, FormData and plain object shapes), else one of these
+async function mockRequestBodyText(event: H3Event): Promise<string> {
+  const request: unknown = event.node.req;
+  const body: unknown =
+    typeof request === "object" && request !== null && "body" in request ? request.body : undefined;
+  if (isBlob(body)) {
+    const text = await body.text();
+    return text;
+  }
+  const rawBody = await readRawBody(event, "utf8");
+  if (rawBody === undefined) {
+    throw new Error(`Mock request body could not be read (${describeBody(body)})`);
+  }
+  return rawBody;
 }
 
 describe("upload_file", () => {
@@ -100,15 +111,13 @@ describe("upload_file", () => {
     let receivedFilename: string | undefined = undefined;
     registerEndpoint(schema.$id, {
       method: "PUT",
-      // H3's readRawBody() can't convert a Blob/File body (it only handles Buffer/stream/FormData/plain-object shapes), so this reads the mock request's raw body directly to inspect what was actually sent.
       handler: async (event: H3Event) => {
         const query = getQuery(event);
         receivedFilename = queryString(query.filename);
-        const rawBody = mockRequestBody(event);
         receivedChunks.push({
           index: queryString(query.chunk_index),
           total: queryString(query.total_chunks),
-          body: await rawBody.text(),
+          body: await mockRequestBodyText(event),
         });
         return { test: "ok" };
       },
@@ -131,11 +140,10 @@ describe("upload_file", () => {
       method: "PUT",
       handler: async (event: H3Event) => {
         const query = getQuery(event);
-        const rawBody = mockRequestBody(event);
         receivedChunks.push({
           index: queryString(query.chunk_index),
           total: queryString(query.total_chunks),
-          body: await rawBody.text(),
+          body: await mockRequestBodyText(event),
         });
         return { test: "ok" };
       },
