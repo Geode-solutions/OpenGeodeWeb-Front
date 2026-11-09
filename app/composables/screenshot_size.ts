@@ -58,16 +58,19 @@ function useScreenshotSize(include_ui: Readonly<Ref<boolean>>): ScreenshotSizeSt
   // `value` is null when the field is cleared (VNumberInput): keep the current size
   function setWidth(value: number | null | undefined): void {
     if (typeof value === "number") {
-      const width = clampSize(value);
-      const height = clampSize(width / ratioOf(viewerStore.view_size));
+      // Cap the edited side so the derived one stays within the bounds and keeps the ratio
+      const ratio = ratioOf(viewerStore.view_size);
+      const width = clampSize(Math.min(value, MAX_SCREENSHOT_SIZE * ratio));
+      const height = clampSize(width / ratio);
       screenshot_size.value = { width, height };
     }
   }
 
   function setHeight(value: number | null | undefined): void {
     if (typeof value === "number") {
-      const height = clampSize(value);
-      const width = clampSize(height * ratioOf(viewerStore.view_size));
+      const ratio = ratioOf(viewerStore.view_size);
+      const height = clampSize(Math.min(value, MAX_SCREENSHOT_SIZE / ratio));
+      const width = clampSize(height * ratio);
       screenshot_size.value = { width, height };
     }
   }

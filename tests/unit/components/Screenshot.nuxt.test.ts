@@ -123,6 +123,13 @@ describe("screenshot", () => {
     expect(state.screenshot_size).toStrictEqual({ width: 1, height: 1 });
   });
 
+  test("keeps the ratio when clamping a non-square view to the max size", async () => {
+    const state = await mountScreenshot();
+    // oxlint-disable-next-line no-unsafe-type-assertion -- script setup functions are not typed on vm
+    (state.setHeight as SizeSetter)(MAX_SIZE);
+    expect(state.screenshot_size).toStrictEqual({ width: MAX_SIZE, height: CLAMPED_HEIGHT });
+  });
+
   test("shows the read-only tab size when UI is included", async () => {
     vi.stubGlobal("innerWidth", WINDOW_WIDTH);
     vi.stubGlobal("innerHeight", WINDOW_HEIGHT);
