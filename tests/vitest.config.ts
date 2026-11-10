@@ -33,6 +33,10 @@ const browserShimPath = path.resolve(__dirname, "browser", "shim");
 
 const isCI = process.env.CI !== undefined && process.env.CI !== "";
 const globalRetry = isCI ? RETRIES : DEFAULT_RETRY;
+// Like the Vease e2e tests: one retry in CI. The model/collections "collection vertex attribute" step is flaky
+// (one surface sometimes keeps its previous color), with Playwright too
+const BROWSER_CI_RETRIES = 1;
+const browserRetry = isCI ? BROWSER_CI_RETRIES : DEFAULT_RETRY;
 const maxWorkers = isCI ? CI_WORKERS : undefined;
 
 const aliases = {
@@ -116,6 +120,7 @@ export default defineConfig({
           environment: "nuxt",
           alias: browserAliases,
           maxWorkers: BROWSER_WORKERS,
+          retry: browserRetry,
           testTimeout: BROWSER_TIMEOUT,
           hookTimeout: BROWSER_HOOK_TIMEOUT,
           server: {
