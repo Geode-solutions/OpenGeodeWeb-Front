@@ -39,6 +39,8 @@ async function resize(width: number, height: number): Promise<void> {
   if (viewStream.value) {
     viewStream.value.setSize(width, height);
   }
+  // Size of the server render window, used as the default screenshot size
+  viewerStore.set_view_size(Math.round(width), Math.round(height));
   renderWindow.getRenderWindow().render();
   await remoteRender();
 }

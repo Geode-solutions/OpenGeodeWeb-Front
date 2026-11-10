@@ -29,6 +29,11 @@ import type {
 } from "@ogw_shared/utils/types.js";
 import type { RpcClient } from "@ogw_shared/utils/call_raw.js";
 
+interface ViewSize {
+  width: number;
+  height: number;
+}
+
 interface PickedPoint {
   x: number | undefined;
   y: number | undefined;
@@ -50,6 +55,8 @@ export const useViewerStore = defineStore(
       y: undefined,
       z: undefined,
     });
+    // Pixel size of the remote rendering view, as sent to the server by RemoteView.resize()
+    const view_size = ref<ViewSize>({ width: 0, height: 0 });
     const request_counter = ref(0);
     const status = ref(Status.NOT_CONNECTED);
     const version = ref("0.0.0");
@@ -72,6 +79,9 @@ export const useViewerStore = defineStore(
     const is_busy = computed(() => request_counter.value > 0);
     function toggle_picking_mode(value: boolean): void {
       picking_mode.value = value;
+    }
+    function set_view_size(width: number, height: number): void {
+      view_size.value = { width, height };
     }
     // oxlint-disable-next-line unicorn/consistent-function-scoping
     async function request<Schema extends JsonRpcSchema>(
@@ -152,6 +162,8 @@ export const useViewerStore = defineStore(
       config,
       picking_mode,
       picked_point,
+      view_size,
+      set_view_size,
       request_counter,
       status,
       protocol,
@@ -173,7 +185,7 @@ export const useViewerStore = defineStore(
   },
   {
     share: {
-      omit: ["status", "client"],
+      omit: ["status", "client", "view_size"],
     },
   },
 );
