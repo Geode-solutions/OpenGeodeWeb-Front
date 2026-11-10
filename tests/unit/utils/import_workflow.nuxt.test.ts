@@ -117,11 +117,9 @@ describe("import workflow", () => {
 
   test("a failing file does not prevent the others from being imported", async () => {
     const { request, remoteRender } = setup();
-    request
-      .mockRejectedValueOnce(new Error("cannot load"))
-      .mockResolvedValueOnce({
-        data: [{ id: "model.og_brep", name: "model", viewer_type: "mesh" }],
-      });
+    request.mockRejectedValueOnce(new Error("cannot load")).mockResolvedValueOnce({
+      data: [{ id: "model.og_brep", name: "model", viewer_type: "mesh" }],
+    });
     const dataStore = useDataStore();
     dataStore.addItem = mockAs<typeof dataStore.addItem>(vi.fn().mockResolvedValue(undefined));
     dataStore.isItemViewable = mockAs<typeof dataStore.isItemViewable>(
