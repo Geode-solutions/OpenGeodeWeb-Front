@@ -73,7 +73,11 @@ async function files_uploaded_event(value: UploadFile[]): Promise<void> {
       { schema, params },
       {
         response_function: (response) => {
-          textureId.value = response.id;
+          // A texture file holds a single image: the first imported object is the texture
+          const [texture] = response.data;
+          if (texture) {
+            textureId.value = texture.id;
+          }
         },
       },
     );
