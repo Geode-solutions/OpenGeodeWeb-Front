@@ -5,7 +5,6 @@ import { mountSuspended } from "@nuxt/test-utils/runtime";
 // Local imports
 import ViewerApp from "@ogw_tests/browser/components/ViewerApp.vue";
 import { appMode } from "@ogw_shared/app_mode";
-import { importWorkflow } from "@ogw_front/utils/import_workflow";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useInfraStore } from "@ogw_front/stores/infra";
@@ -45,12 +44,4 @@ async function stopViewerApp(): Promise<void> {
   }
 }
 
-// The files are in the folder the back reads its uploads from (see ../commands.ts)
-async function loadTestDatas(
-  files: { filename: string; geode_object_type: string }[],
-): Promise<void> {
-  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the test names the object types
-  await importWorkflow(files);
-}
-
-export { APP_TEST_ID, loadTestDatas, startViewerApp, stopViewerApp };
+export { APP_TEST_ID, startViewerApp, stopViewerApp };

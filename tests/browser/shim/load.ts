@@ -26,7 +26,7 @@ async function geodeObjectType(filename: string): Promise<GeodeObjectType> {
 async function loadVeaseTestDatas(
   window: Page,
   inputDataFilenames: string[],
-  { loadTimeout = LOAD_TIMEOUT }: { loadTimeout?: number; inputDataPath?: string } = {},
+  { loadTimeout = LOAD_TIMEOUT }: { loadTimeout?: number } = {},
 ): Promise<void> {
   const files = await Promise.all(
     inputDataFilenames.map(async (filename) => ({
@@ -38,21 +38,4 @@ async function loadVeaseTestDatas(
   await waitForActionSettled(window, loadTimeout);
 }
 
-function unsupported(name: string): () => never {
-  return () => {
-    throw new Error(`${name} drives Vease's import UI, which the browser tests do not have`);
-  };
-}
-
-const applyTimeSeries = unsupported("applyTimeSeries");
-const selectTimeSeriesFile = unsupported("selectTimeSeriesFile");
-const selectTimeSeriesFolder = unsupported("selectTimeSeriesFolder");
-const selectTimeSeriesTarget = unsupported("selectTimeSeriesTarget");
-
-export {
-  applyTimeSeries,
-  loadVeaseTestDatas,
-  selectTimeSeriesFile,
-  selectTimeSeriesFolder,
-  selectTimeSeriesTarget,
-};
+export { loadVeaseTestDatas };

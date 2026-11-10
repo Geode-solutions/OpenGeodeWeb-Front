@@ -130,7 +130,7 @@
     "oxlint": "latest",
     "oxlint-tsgolint": "latest",
     "playwright": "1.54.1",
-    "playwright-core": "1.52.0",
+    "playwright-core": "1.54.1",
     "prettier": "3.8.1",
     "resize-observer-polyfill": "1.5.1",
     "rolldown": "1.2.8",
