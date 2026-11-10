@@ -11,6 +11,9 @@ import { appMode } from "@ogw_shared/app_mode";
 import { useInfraStore } from "@ogw_front/stores/infra";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
+const VIEW_WIDTH = 1920;
+const VIEW_HEIGHT = 1080;
+
 stubNavigatorLocks();
 
 describe("viewer store", () => {
@@ -31,6 +34,19 @@ describe("viewer store", () => {
         }>();
         expectTypeOf(viewerStore.picked_point.x).toEqualTypeOf<number | undefined>();
         expectTypeOf(viewerStore.status).toBeString();
+      },
+      TIMEOUT,
+    );
+  });
+
+  describe("actions", () => {
+    test(
+      "set_view_size",
+      () => {
+        const viewerStore = useViewerStore();
+        expect(viewerStore.view_size).toStrictEqual({ width: 0, height: 0 });
+        viewerStore.set_view_size(VIEW_WIDTH, VIEW_HEIGHT);
+        expect(viewerStore.view_size).toStrictEqual({ width: VIEW_WIDTH, height: VIEW_HEIGHT });
       },
       TIMEOUT,
     );
