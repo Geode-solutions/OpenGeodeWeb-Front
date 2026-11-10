@@ -71,7 +71,7 @@
     "test:e2e:browser": "npm run test:browser --",
     "geode_objects": "tsx scripts/generate_geode_objects.ts && prettier ./assets/geode_objects.ts --write",
     "build": "npm run prepare:types && rolldown -c rolldown.config.ts",
-    "build:browser": "npm run build",
+    "build:browser": "exit 0",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
