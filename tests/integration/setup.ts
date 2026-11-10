@@ -71,7 +71,10 @@ async function setupIntegrationTests(
   const viewerStore = useViewerStore();
   const { projectFolderPath } = await runMicroservices();
   await viewerStore.ws_connect();
-  const id = await importFile(file_name, geode_object);
+  const [id] = await importFile(file_name, geode_object);
+  if (id === undefined) {
+    throw new Error(`No object imported from ${file_name}`);
+  }
   expect(viewerStore.status).toBe(Status.CONNECTED);
   consola.debug("end of setupIntegrationTests", { id, projectFolderPath });
   return { id, projectFolderPath };
