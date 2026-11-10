@@ -78,7 +78,8 @@ async function importItem(imported: LegacyDataId<NewDataItem> | NewDataItem): Pr
   const dataId = await importDataItem(fromLegacyDataId(imported));
   return dataId;
 }
-async function importFile(filename: string, geode_object_type: GeodeObjectType): Promise<string> {
+// A single file can hold several objects: every one of them is imported, ids are returned in the response order
+async function importFile(filename: string, geode_object_type: GeodeObjectType): Promise<string[]> {
   const backStore = useBackStore();
   const schema = back_schemas.opengeodeweb_back.save_viewable_file;
   const params = {
@@ -89,8 +90,15 @@ async function importFile(filename: string, geode_object_type: GeodeObjectType):
     schema,
     params,
   });
-  // oxlint-disable-next-line no-unsafe-type-assertion -- this is the trusted API boundary; the back-end response shape matches NewDataItem, except for its legacy id.
-  return importItem(response as LegacyDataId<NewDataItem>);
+  // oxlint-disable-next-line no-unsafe-type-assertion -- this is the trusted API boundary; each back-end response item matches NewDataItem, except for its legacy id.
+  const items = response.data as LegacyDataId<NewDataItem>[];
+  const dataIds = await Promise.all(
+    items.map(async (item) => {
+      const dataId = await importItem(item);
+      return dataId;
+    }),
+  );
+  return dataIds;
 }
 
 async function importWorkflow(files: readonly FileToImport[]): Promise<string[]> {
@@ -113,13 +121,13 @@ async function importWorkflow(files: readonly FileToImport[]): Promise<string[]>
     // A failing file does not prevent the other files from being imported
     const chunk_results = await Promise.allSettled(
       chunk.map(async ({ filename, geode_object_type }) => {
-        const dataId = await importFile(filename, geode_object_type);
-        return dataId;
+        const dataIds = await importFile(filename, geode_object_type);
+        return dataIds;
       }),
     );
     for (const result of chunk_results) {
       if (result.status === "fulfilled") {
-        results.push(result.value);
+        results.push(...result.value);
       } else {
         errors.push(result.reason);
       }

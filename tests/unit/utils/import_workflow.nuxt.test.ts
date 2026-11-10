@@ -5,6 +5,7 @@ import { type Mock, describe, expect, test, vi } from "vitest";
 // Local imports
 import {
   applyTimeSeriesWorkflow,
+  importFile,
   importWorkflow,
   reloadObject,
 } from "@ogw_front/utils/import_workflow";
@@ -118,7 +119,7 @@ describe("import workflow", () => {
     const { request, remoteRender } = setup();
     request
       .mockRejectedValueOnce(new Error("cannot load"))
-      .mockResolvedValueOnce({ id: "model.og_brep", name: "model", viewer_type: "mesh" });
+      .mockResolvedValueOnce({ data: [{ id: "model.og_brep", name: "model", viewer_type: "mesh" }] });
     const dataStore = useDataStore();
     dataStore.addItem = mockAs<typeof dataStore.addItem>(vi.fn().mockResolvedValue(undefined));
     dataStore.isItemViewable = mockAs<typeof dataStore.isItemViewable>(
@@ -135,5 +136,54 @@ describe("import workflow", () => {
       expect.objectContaining({ data_id: "model.og_brep" }),
     );
     expect(remoteRender).toHaveBeenCalledWith();
+  });
+
+  test("flattens the ids of every object imported from every file", async () => {
+    const { request } = setup();
+    request
+      .mockResolvedValueOnce({
+        data: [
+          { id: "first_a", name: "a", viewer_type: "mesh" },
+          { id: "first_b", name: "b", viewer_type: "mesh" },
+        ],
+      })
+      .mockResolvedValueOnce({ data: [{ id: "second", name: "c", viewer_type: "mesh" }] });
+    const dataStore = useDataStore();
+    dataStore.addItem = mockAs<typeof dataStore.addItem>(vi.fn().mockResolvedValue(undefined));
+    dataStore.isItemViewable = mockAs<typeof dataStore.isItemViewable>(
+      vi.fn().mockResolvedValue(false),
+    );
+
+    const ids = await importWorkflow([
+      { filename: "first.vtu", geode_object_type: "SolidMesh3D" },
+      { filename: "second.vtu", geode_object_type: "SolidMesh3D" },
+    ]);
+
+    expect(ids).toStrictEqual(["first_a", "first_b", "second"]);
+  });
+});
+
+describe("import file", () => {
+  setupActivePinia();
+
+  test("imports every object of the file, in the response order", async () => {
+    const { request } = setup();
+    request.mockResolvedValueOnce({
+      data: [
+        { id: "surface", name: "surface", viewer_type: "mesh" },
+        { id: "curve", name: "curve", viewer_type: "mesh" },
+      ],
+    });
+    const dataStore = useDataStore();
+    dataStore.addItem = mockAs<typeof dataStore.addItem>(vi.fn().mockResolvedValue(undefined));
+    dataStore.isItemViewable = mockAs<typeof dataStore.isItemViewable>(
+      vi.fn().mockResolvedValue(false),
+    );
+
+    const ids = await importFile("several.vtp", "PolygonalSurface3D");
+
+    expect(ids).toStrictEqual(["surface", "curve"]);
+    expect(dataStore.addItem).toHaveBeenCalledWith(expect.objectContaining({ data_id: "surface" }));
+    expect(dataStore.addItem).toHaveBeenCalledWith(expect.objectContaining({ data_id: "curve" }));
   });
 });
