@@ -64,7 +64,8 @@ watch(
   },
 );
 
-watch([width, height], () => {
+watch([width, height], ([new_width, new_height]) => {
+  viewerStore.set_view_size(Math.round(new_width), Math.round(new_height));
   resize();
 });
 

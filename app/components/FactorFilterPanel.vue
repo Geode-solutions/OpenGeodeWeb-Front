@@ -144,6 +144,7 @@ watch(
         v-model="selectedDatasetIds"
         :data-testid="`${testIdPrefix}SelectedDatasetsSelect`"
         :items="availableDatasets"
+        :item-props="() => ({ 'data-testid': `${testIdPrefix}SelectedDatasetsOption` })"
         label="Select datasets"
         multiple
         chips
