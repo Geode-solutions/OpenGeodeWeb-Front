@@ -51,7 +51,7 @@ function commitMaximum(): void {
 </script>
 
 <template>
-  <v-row dense align="center" no-gutters>
+  <v-row density="compact" align="center" no-gutters>
     <v-col cols="5" class="pe-1">
       <v-text-field
         data-testid="attributeMinInput"

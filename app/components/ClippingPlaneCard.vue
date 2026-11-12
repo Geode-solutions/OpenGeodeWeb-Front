@@ -69,7 +69,7 @@ const emit = defineEmits<Emits>();
     <v-row no-gutters class="mb-1">
       <v-col class="text-caption text-medium-emphasis">Origin [X, Y, Z]</v-col>
     </v-row>
-    <v-row v-if="plane.origin" dense class="mb-2">
+    <v-row v-if="plane.origin" density="compact" class="mb-2">
       <v-col v-for="axis in 3" :key="'orig-' + axis" cols="4">
         <v-text-field
           v-model.number="plane.origin[axis - 1]"
@@ -83,7 +83,7 @@ const emit = defineEmits<Emits>();
         />
       </v-col>
     </v-row>
-    <v-row v-else dense class="mb-2">
+    <v-row v-else density="compact" class="mb-2">
       <v-col v-for="axis in 3" :key="'orig-placeholder-' + axis" cols="4">
         <v-text-field
           placeholder="—"
@@ -112,7 +112,7 @@ const emit = defineEmits<Emits>();
         </v-btn>
       </v-col>
     </v-row>
-    <v-row dense>
+    <v-row density="compact">
       <v-col v-for="axis in 3" :key="'norm-' + axis" cols="4">
         <v-text-field
           v-model.number="plane.normal[axis - 1]"

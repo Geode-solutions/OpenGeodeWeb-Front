@@ -36,7 +36,7 @@ function runAction(feedback: (typeof feedbackStore.feedbacks)[number]): void {
     timeout="-1"
     z-index="4"
   >
-    <v-row dense class="flex-nowrap">
+    <v-row density="compact" class="flex-nowrap">
       <v-col cols="auto">
         <v-tooltip v-if="feedback.type === 'error'" location="left">
           <span>
