@@ -1,5 +1,6 @@
 import { Database, database, getTable } from "@ogw_internal/database/database.js";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
+import type { Dexie } from "dexie";
 
 interface ConfigRecord {
   id: string;
@@ -7,6 +8,9 @@ interface ConfigRecord {
 }
 
 const ROW: ConfigRecord = { id: "main", value: 1 };
+const UPDATED_ROW: ConfigRecord = { id: "main", value: 2 };
+
+vi.setConfig({ testTimeout: 5000 });
 
 describe("tables taken before tables are added", () => {
   test("keep reading and writing the reopened database", async () => {
@@ -16,8 +20,19 @@ describe("tables taken before tables are added", () => {
     await Database.addTables({ live_table_test: "id" });
 
     await fromGetTable.put(ROW);
-    expect(await fromGetTable.get("main")).toStrictEqual(ROW);
-    expect(await fromProxy?.get("main")).toStrictEqual(ROW);
-    expect(await getTable<ConfigRecord>("live_table_test").count()).toBe(0);
+    await expect(fromGetTable.get("main")).resolves.toStrictEqual(ROW);
+    await expect(fromProxy?.get("main")).resolves.toStrictEqual(ROW);
+    await expect(getTable<ConfigRecord>("live_table_test").count()).resolves.toBe(0);
+  });
+
+  test("can be given to a transaction", async () => {
+    const table = getTable<ConfigRecord>("treeview_config");
+
+    // oxlint-disable-next-line no-unsafe-type-assertion -- the shared database proxy forwards to a Dexie instance.
+    await (database as unknown as Dexie).transaction("rw", table, async () => {
+      await table.put(UPDATED_ROW);
+    });
+
+    await expect(table.get("main")).resolves.toStrictEqual(UPDATED_ROW);
   });
 });

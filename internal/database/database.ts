@@ -105,21 +105,23 @@ function currentInstance(): Dexie {
 }
 
 function liveTable<TRow>(tableName: string): Table<TRow, string> {
-  return new Proxy(
-    {},
-    {
-      get(_target, prop: string | symbol): unknown {
-        const table = currentInstance().table(tableName);
-        const value: unknown = Reflect.get(table, prop, table);
-        if (typeof value === "function") {
-          // oxlint-disable-next-line no-unsafe-return
-          return value.bind(table);
-        }
-        return value;
-      },
+  const handler: ProxyHandler<object> = {
+    get(_target, prop: string | symbol): unknown {
+      const table = currentInstance().table(tableName);
+      const value: unknown = Reflect.get(table, prop, table);
+      if (typeof value === "function") {
+        // oxlint-disable-next-line no-unsafe-return
+        return value.bind(table);
+      }
+      return value;
     },
-    // oxlint-disable-next-line no-unsafe-type-assertion -- the proxy forwards every access to a Dexie Table.
-  ) as Table<TRow, string>;
+    // Dexie checks that the tables given to a transaction are instances of its Table.
+    getPrototypeOf(): object | null {
+      return Reflect.getPrototypeOf(currentInstance().table(tableName));
+    },
+  };
+  // oxlint-disable-next-line no-unsafe-type-assertion -- the proxy forwards every access to a Dexie Table.
+  return new Proxy({}, handler) as Table<TRow, string>;
 }
 
 function isTableName(instance: Dexie, prop: string | symbol): prop is string {
