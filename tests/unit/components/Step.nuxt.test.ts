@@ -34,8 +34,9 @@ describe("step", () => {
     const wrapper = mount(
       {
         components: { Step },
+        // ObjectSelector has an async setup: in the app, NuxtPage provides the Suspense boundary
         template:
-          '<v-stepper-vertical><Step :stepIndex="0" :stepperTree="stepperTree" /></v-stepper-vertical>',
+          '<Suspense><v-stepper-vertical><Step :stepIndex="0" :stepperTree="stepperTree" /></v-stepper-vertical></Suspense>',
         setup() {
           return { stepperTree: stepper_tree };
         },
