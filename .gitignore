@@ -44,3 +44,6 @@ VTK.txt
 # Compiled Node-safe build of server/utils/ and shared/ (see rolldown.config.ts)
 /.build
 /opengeodeweb_front_schemas.js
+
+# Vitest browser mode output
+.vitest

@@ -1,0 +1,103 @@
+import {
+  SLIDER_PINK,
+  clickColorPickerCanvas,
+  clickColorPickerSlider,
+} from "#browser_helpers/data/helpers/color_picker";
+import {
+  edgeAttributeType,
+  edgesFeatureName,
+  meshViewerObjectType,
+  vertexAttributeType,
+} from "#browser_helpers/constants";
+import {
+  ensureMenuOpen,
+  moveMouseOutOfTheWay,
+  openStyleMenu,
+} from "#browser_helpers/viewer_interaction";
+import {
+  setFeatureAttribute,
+  setFeatureColorMap,
+  setFeatureItem,
+} from "#browser_helpers/data/helpers/attribute";
+import type { Page } from "@playwright/test";
+import { waitForActionSettled } from "#browser_helpers/wait_for_action_settled";
+
+interface AttributeOptions {
+  item?: number;
+  colorMap?: string;
+  min?: number | string;
+  max?: number | string;
+}
+
+async function setMeshEdgesVertexAttribute(
+  window: Page,
+  attributeName: string,
+  options: AttributeOptions = {},
+): Promise<void> {
+  await setFeatureAttribute(
+    window,
+    meshViewerObjectType,
+    edgesFeatureName,
+    vertexAttributeType,
+    attributeName,
+    options,
+  );
+}
+
+async function setMeshEdgesEdgeAttribute(
+  window: Page,
+  attributeName: string,
+  options: AttributeOptions = {},
+): Promise<void> {
+  await setFeatureAttribute(
+    window,
+    meshViewerObjectType,
+    edgesFeatureName,
+    edgeAttributeType,
+    attributeName,
+    options,
+  );
+}
+
+async function setMeshEdgesItem(window: Page, item: number): Promise<void> {
+  const menuTestId = `${meshViewerObjectType}${edgesFeatureName}Menu`;
+  await setFeatureItem(window, menuTestId, item);
+}
+
+async function setMeshEdgesColorMap(window: Page, colorMap: string): Promise<void> {
+  const menuTestId = `${meshViewerObjectType}${edgesFeatureName}Menu`;
+  await setFeatureColorMap(window, menuTestId, colorMap);
+}
+
+async function openMeshEdgesMenu(window: Page): Promise<void> {
+  const menuTestId = `${meshViewerObjectType}${edgesFeatureName}Menu`;
+  await openStyleMenu(window, menuTestId);
+}
+
+async function setMeshEdgesNoDataColor(window: Page): Promise<void> {
+  const menuTestId = `${meshViewerObjectType}${edgesFeatureName}Menu`;
+  await ensureMenuOpen(window, menuTestId);
+  const noDataColorBtn = window.getByTestId("noDataColorBtn").first();
+  await noDataColorBtn.waitFor({ state: "visible" });
+  await noDataColorBtn.click();
+  await waitForActionSettled(window);
+  await window
+    .getByTestId("colorPicker")
+    .filter({ visible: true })
+    .first()
+    .waitFor({ state: "visible" });
+  await clickColorPickerSlider(window, SLIDER_PINK);
+  await clickColorPickerCanvas(window);
+  await noDataColorBtn.click();
+  await moveMouseOutOfTheWay(window);
+  await waitForActionSettled(window);
+}
+
+export {
+  openMeshEdgesMenu,
+  setMeshEdgesColorMap,
+  setMeshEdgesEdgeAttribute,
+  setMeshEdgesItem,
+  setMeshEdgesNoDataColor,
+  setMeshEdgesVertexAttribute,
+};

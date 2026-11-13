@@ -24,8 +24,35 @@ function collectTsFiles(dir: string): string[] {
 
 const ownPackageName = package_json.name;
 
+// The e2e helpers, shared with the apps built on this layer (their Playwright tests import the built files)
+const BROWSER_HELPERS_FOLDER = "tests/browser/helpers";
+
+function collectAssets(dir: string): string[] {
+  return fs
+    .readdirSync(dir, { withFileTypes: true, recursive: true })
+    .filter((entry) => entry.isFile() && !entry.name.endsWith(".ts"))
+    .map((entry) => path.join(entry.parentPath, entry.name));
+}
+
+// The helpers read their files (the texture image) next to them, in the build too
+const helpersAssetsPlugin = {
+  name: "helpers-assets",
+  buildStart(this: {
+    emitFile: (file: { type: "asset"; fileName: string; source: Uint8Array }) => string;
+  }): void {
+    for (const asset of collectAssets(BROWSER_HELPERS_FOLDER)) {
+      this.emitFile({
+        type: "asset",
+        fileName: path.relative(".", asset).split(path.sep).join("/"),
+        source: fs.readFileSync(asset),
+      });
+    }
+  },
+};
+
 function isExternal(id: string): boolean {
-  if (id.startsWith(".") || path.isAbsolute(id)) {
+  // The e2e helpers import each other through the "imports" of package.json: bundled, as relative imports
+  if (id.startsWith(".") || path.isAbsolute(id) || id.startsWith("#browser_helpers/")) {
     return false;
   }
   if (id === ownPackageName || id.startsWith(`${ownPackageName}/`)) {
@@ -36,9 +63,14 @@ function isExternal(id: string): boolean {
 
 // oxlint-disable-next-line import/no-default-export
 export default defineConfig({
-  input: [...collectTsFiles("server/utils"), ...collectTsFiles("shared")],
+  input: [
+    ...collectTsFiles("server/utils"),
+    ...collectTsFiles("shared"),
+    ...collectTsFiles(BROWSER_HELPERS_FOLDER),
+  ],
   platform: "node",
   external: isExternal,
+  plugins: [helpersAssetsPlugin],
   output: {
     dir: ".build",
     format: "esm",

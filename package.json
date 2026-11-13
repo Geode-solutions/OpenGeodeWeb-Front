@@ -21,6 +21,7 @@
     "internal",
     "server",
     "shared",
+    "tests/browser/helpers",
     ".build",
     "nuxt.config.ts",
     "opengeodeweb_front_schemas.json",
@@ -33,11 +34,18 @@
   ],
   "type": "module",
   "main": "./nuxt.config.ts",
+  "imports": {
+    "#browser_helpers/*": "./tests/browser/helpers/*.ts"
+  },
   "exports": {
     ".": "./nuxt.config.ts",
     "./server/utils/*.js": {
       "types": "./server/utils/*.ts",
       "default": "./.build/server/utils/*.js"
+    },
+    "./tests/browser/helpers/*.js": {
+      "types": "./tests/browser/helpers/*.ts",
+      "default": "./.build/tests/browser/helpers/*.js"
     },
     "./shared/*.js": {
       "types": "./shared/*.ts",
@@ -59,8 +67,11 @@
     "tests": "npm run prepare:types && vitest --config ./tests/vitest.config.ts",
     "test:unit": "npm run tests -- --project unit",
     "test:integration": "npm run tests -- --project integration",
+    "test:browser": "npm run tests -- --project browser --run",
+    "test:e2e:browser": "npm run test:browser --",
     "geode_objects": "tsx scripts/generate_geode_objects.ts && prettier ./assets/geode_objects.ts --write",
     "build": "npm run prepare:types && rolldown -c rolldown.config.ts",
+    "build:browser": "exit 0",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
@@ -106,25 +117,30 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@nuxt/test-utils": "4.1.0",
+    "@nuxt/test-utils": "4.4.0",
     "@pinia/testing": "2.0.1",
+    "@playwright/test": "1.54.1",
     "@types/lodash": "4.17.25",
     "@vitejs/plugin-vue": "6.0.8",
+    "@vitest/browser-playwright": "5.1.0",
     "@vue/test-utils": "2.4.11",
     "cross-env": "10.0.0",
     "happy-dom": "20.0.11",
     "msw": "2.11.1",
     "oxlint": "latest",
     "oxlint-tsgolint": "latest",
-    "playwright-core": "1.52.0",
+    "playwright": "1.54.1",
+    "playwright-core": "1.54.1",
     "prettier": "3.8.1",
     "resize-observer-polyfill": "1.5.1",
     "rolldown": "1.2.8",
+    "std-env": "3.9.0",
     "tsx": "4.23.13",
     "unplugin-auto-import": "20.0.0",
     "vite": "8.2.0",
     "vite-plugin-vuetify": "2.1.3",
-    "vitest": "4.1.10",
+    "vitest": "5.1.0",
+    "vitest-browser-vue": "3.1.0",
     "vitest-environment-nuxt": "2.0.0",
     "vitest-indexeddb": "0.0.1"
   },
