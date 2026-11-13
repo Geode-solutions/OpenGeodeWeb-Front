@@ -17,7 +17,10 @@ async function geodeObjectType(filename: string): Promise<GeodeObjectType> {
   const response = await useBackStore().request({ schema, params: { filename } });
   const [file] = resolveAllowedObjectsPerFile([filename], [response]);
   // The back selects the type; otherwise the import UI preselects the best candidate
-  const [selectedGeodeObject] = [...(file?.selectedGeodeObjects ?? []), ...(file?.candidates ?? [])];
+  const [selectedGeodeObject] = [
+    ...(file?.selectedGeodeObjects ?? []),
+    ...(file?.candidates ?? []),
+  ];
   if (selectedGeodeObject === undefined) {
     throw new Error(`No geode object type could be chosen for ${filename}`);
   }
