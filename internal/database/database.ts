@@ -94,27 +94,64 @@ await initialDatabase.clear();
 // The set of tables is assembled dynamically at runtime (Database.addTable/addTables add stores on the fly), so fully modelling this with Dexie's row generics isn't worth it here: the proxy target is typed loosely as "any table name maps to a Dexie Table of loosely-typed rows".
 type DatabaseTables = Record<string, Table<Record<string, unknown>, string>>;
 
+// Database.addTables closes the current instance and opens a new one, so a table taken from an instance must not be kept: a store keeping it would query a closed database.
+// A live table resolves the table of the current instance at each access instead.
+function currentInstance(): Dexie {
+  // Set at module load time below; always defined by the time the database is used.
+  if (!databaseContainer.instance) {
+    throw new Error("The database is not open");
+  }
+  return databaseContainer.instance;
+}
+
+function liveTable<TRow>(tableName: string): Table<TRow, string> {
+  const handler: ProxyHandler<object> = {
+    get(_target, prop: string | symbol): unknown {
+      const table = currentInstance().table(tableName);
+      const value: unknown = Reflect.get(table, prop, table);
+      if (typeof value === "function") {
+        // oxlint-disable-next-line no-unsafe-return
+        return value.bind(table);
+      }
+      return value;
+    },
+    // Dexie checks that the tables given to a transaction are instances of its Table.
+    getPrototypeOf(): object | null {
+      return Reflect.getPrototypeOf(currentInstance().table(tableName));
+    },
+  };
+  // oxlint-disable-next-line no-unsafe-type-assertion -- the proxy forwards every access to a Dexie Table.
+  return new Proxy({}, handler) as Table<TRow, string>;
+}
+
+function isTableName(instance: Dexie, prop: string | symbol): prop is string {
+  return typeof prop === "string" && instance.tables.some((table) => table.name === prop);
+}
+
 const database = new Proxy<DatabaseTables>(
   {},
   {
     get(_target, prop: string | symbol): unknown {
+      const dexie = currentInstance();
+      if (isTableName(dexie, prop)) {
+        return liveTable(prop);
+      }
       // The instance is a Dexie subclass whose tables are only known dynamically at runtime.
       // oxlint-disable-next-line no-unsafe-type-assertion
-      const instance = databaseContainer.instance as unknown as Record<string | symbol, unknown>;
+      const instance = dexie as unknown as Record<string | symbol, unknown>;
       const value = instance[prop];
       if (typeof value === "function") {
         // oxlint-disable-next-line no-unsafe-return
-        return value.bind(databaseContainer.instance);
+        return value.bind(dexie);
       }
       return value;
     },
   },
 );
 
-// The proxy only knows the loose DatabaseTables shape; callers cast to the row type they know a given table holds.
+// Callers cast to the row type they know a given table holds.
 function getTable<TRow>(tableName: string): Table<TRow, string> {
-  // oxlint-disable-next-line no-unsafe-type-assertion
-  return database[tableName] as unknown as Table<TRow, string>;
+  return liveTable<TRow>(tableName);
 }
 
 export { Database, database, getTable };

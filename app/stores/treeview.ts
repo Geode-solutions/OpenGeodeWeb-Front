@@ -13,10 +13,9 @@ import type {
   ViewerType,
   ViewerTyped,
 } from "@ogw_front/types/identifiers";
-import type { Table } from "dexie";
 import type { TreeGroup, TreeNode } from "@ogw_front/types/tree";
 import { ref, watch } from "vue";
-import { database } from "@ogw_internal/database/database";
+import { getTable } from "@ogw_internal/database/database";
 
 const PANEL_WIDTH = 300;
 
@@ -90,12 +89,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
   const pendingSelectionIds = ref<string[]>([]);
   const rowHeights = ref<number[]>([]);
 
-  // The database's table map is dynamically assembled at runtime (see internal/database/database.ts), so its exported type is a loose `{}`; cast it to the shape it actually has at runtime rather than widening every call site.
-  type DatabaseTables = Record<string, unknown>;
-  // oxlint-disable-next-line no-unsafe-type-assertion -- database's table map is dynamically typed at runtime; see comment above.
-  const typedDatabase = database as unknown as DatabaseTables;
-  // oxlint-disable-next-line no-unsafe-type-assertion -- database's table map is dynamically typed at runtime; see comment above.
-  const treeview_config_db = typedDatabase.treeview_config as Table<TreeviewConfigRecord, string>;
+  const treeview_config_db = getTable<TreeviewConfigRecord>("treeview_config");
 
   async function loadConfig(): Promise<void> {
     try {
@@ -116,7 +110,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
         rowHeights.value = config.rowHeights;
       }
     } catch (error) {
-      consola.error("Failed to load treeview config:", error);
+      consola.error("Failed to load treeview config:", String(error));
     }
   }
   // oxlint-disable-next-line typescript/no-floating-promises -- loadConfig catches its own errors internally.
@@ -124,7 +118,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
 
   watch(
     [opened_views, panelWidth, additionalPanelWidth, selection, rowHeights],
-    () => {
+    async () => {
       // oxlint-disable-next-line unicorn/prefer-structured-clone, no-unsafe-type-assertion -- JSON round-trip of a known-shape ref; result matches the source type.
       const clean_opened_views = JSON.parse(JSON.stringify(opened_views.value)) as OpenedView[];
       // oxlint-disable-next-line unicorn/prefer-structured-clone, no-unsafe-type-assertion -- JSON round-trip of a known-shape ref; result matches the source type.
@@ -132,15 +126,19 @@ export const useTreeviewStore = defineStore("treeview", () => {
       // oxlint-disable-next-line unicorn/prefer-structured-clone, no-unsafe-type-assertion -- JSON round-trip of a known-shape ref; result matches the source type.
       const clean_rowHeights = JSON.parse(JSON.stringify(rowHeights.value)) as number[];
 
-      // oxlint-disable-next-line typescript/no-floating-promises -- best-effort persistence; failures aren't actionable here.
-      treeview_config_db.put({
-        id: "main",
-        opened_views: clean_opened_views,
-        panelWidth: panelWidth.value,
-        additionalPanelWidth: additionalPanelWidth.value,
-        selectionIds: clean_selectionIds,
-        rowHeights: clean_rowHeights,
-      });
+      // Best-effort persistence: a failure is logged, not thrown.
+      try {
+        await treeview_config_db.put({
+          id: "main",
+          opened_views: clean_opened_views,
+          panelWidth: panelWidth.value,
+          additionalPanelWidth: additionalPanelWidth.value,
+          selectionIds: clean_selectionIds,
+          rowHeights: clean_rowHeights,
+        });
+      } catch (error) {
+        consola.error("Failed to save treeview config:", String(error));
+      }
     },
     { deep: true },
   );
