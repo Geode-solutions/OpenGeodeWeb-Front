@@ -1,8 +1,15 @@
 interface AllowedObject {
   readonly is_loadable: number;
   readonly object_priority?: number;
+  readonly loadable_family?: string;
 }
 type AllowedObjectMap = Record<string, AllowedObject>;
+// Mirrors the allowed_objects route response
+interface AllowedObjectsResponse {
+  readonly allowed_objects: AllowedObjectMap;
+  // One type per content of the file, empty when the user has to choose
+  readonly objects_to_load: readonly string[];
+}
 
 function getFileExtension(filename: string): string {
   return filename.slice(filename.lastIndexOf(".") + 1);
@@ -14,47 +21,6 @@ function getObject(objectMap: AllowedObjectMap, key: string): AllowedObject {
     throw new Error(`Unknown geode object key: ${key}`);
   }
   return object;
-}
-
-function selectGeodeObject(objectMap: AllowedObjectMap): string | undefined {
-  const objectKeys = Object.keys(objectMap);
-  if (objectKeys.length === 0) {
-    return undefined;
-  }
-  const [firstKey] = objectKeys;
-  if (
-    objectKeys.length === 1 &&
-    firstKey !== undefined &&
-    getObject(objectMap, firstKey).is_loadable > 0
-  ) {
-    return firstKey;
-  }
-
-  const highestLoadScore = Math.max(
-    ...objectKeys.map((key) => getObject(objectMap, key).is_loadable),
-  );
-  if (highestLoadScore <= 0) {
-    return undefined;
-  }
-
-  const bestScoreObjects = objectKeys.filter(
-    (key) => getObject(objectMap, key).is_loadable === highestLoadScore,
-  );
-  if (bestScoreObjects.length === 1) {
-    return bestScoreObjects[0];
-  }
-
-  const highestPriority = Math.max(
-    ...bestScoreObjects.map((key) => getObject(objectMap, key).object_priority ?? -Infinity),
-  );
-  const bestPriorityObjects = bestScoreObjects.filter(
-    (key) => getObject(objectMap, key).object_priority === highestPriority,
-  );
-  if (highestPriority !== -Infinity && bestPriorityObjects.length === 1) {
-    return bestPriorityObjects[0];
-  }
-
-  return undefined;
 }
 
 function intersectAllowedObjects(allowedObjectsList: readonly AllowedObjectMap[]): {
@@ -90,27 +56,22 @@ function resolveAllowedObjects(
 ): {
   mergedAllowedObjects: AllowedObjectMap;
   multipleFilesNoCommon: boolean;
-  selectedGeodeObject: string | undefined;
 } {
   const { commonKeys, allKeys, mergedAllowedObjects } = intersectAllowedObjects(allowedObjectsList);
 
   const multipleFilesNoCommon =
     filenames.length > 1 && allKeys.length > 0 && commonKeys.length === 0;
 
-  const selectedGeodeObject = selectGeodeObject(mergedAllowedObjects);
-
-  return {
-    mergedAllowedObjects,
-    multipleFilesNoCommon,
-    selectedGeodeObject,
-  };
+  // No automatic pick here: the backend is the only one selecting types, the user chooses
+  return { mergedAllowedObjects, multipleFilesNoCommon };
 }
 
 interface FileAllowedObjects {
   readonly filename: string;
   // Loadable types only, sorted by best is_loadable then best object_priority
   readonly candidates: string[];
-  readonly selectedGeodeObject: string | undefined;
+  // Types the backend selected to load every content of the file, empty when the user has to choose
+  readonly selectedGeodeObjects: string[];
 }
 
 function sortCandidates(objectMap: AllowedObjectMap): string[] {
@@ -126,20 +87,20 @@ function sortCandidates(objectMap: AllowedObjectMap): string[] {
     });
 }
 
-// Each file gets its own geode object type; files are no longer required to share one
+// Each file gets its own geode object types; files are no longer required to share one
 function resolveAllowedObjectsPerFile(
   filenames: readonly string[],
-  allowedObjectsList: readonly AllowedObjectMap[],
+  responses: readonly AllowedObjectsResponse[],
 ): FileAllowedObjects[] {
   return filenames.map((filename, index) => {
-    const objectMap = allowedObjectsList[index] ?? {};
+    const response = responses[index];
     return {
       filename,
-      candidates: sortCandidates(objectMap),
-      selectedGeodeObject: selectGeodeObject(objectMap),
+      candidates: sortCandidates(response?.allowed_objects ?? {}),
+      selectedGeodeObjects: [...(response?.objects_to_load ?? [])],
     };
   });
 }
 
 export { resolveAllowedObjects, resolveAllowedObjectsPerFile, getFileExtension };
-export type { FileAllowedObjects };
+export type { AllowedObjectMap, AllowedObjectsResponse, FileAllowedObjects };
