@@ -160,7 +160,15 @@ export const useTreeviewStore = defineStore("treeview", () => {
     { deep: true },
   );
 
+  // No mouseleave is sent for an element removed under the cursor: clear the hover here
+  function clearHoveredModel(id: string): void {
+    if (hoveredModelId.value === id) {
+      hoveredModelId.value = undefined;
+    }
+  }
+
   function closeView(id: string): void {
+    clearHoveredModel(id);
     opened_views.value = opened_views.value.filter((view: ReadonlyOpenedView) => view.id !== id);
   }
 
@@ -216,6 +224,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
   }
 
   function removeItem(dataId: DataId): void {
+    clearHoveredModel(dataId);
     for (let index = 0; index < items.value.length; index += 1) {
       const group = items.value[index];
       if (!group) {

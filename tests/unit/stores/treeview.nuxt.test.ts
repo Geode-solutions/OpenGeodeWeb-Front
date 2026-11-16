@@ -126,4 +126,28 @@ describe("treeview store model tree link", () => {
     treeviewStore.setHoveredModel(undefined);
     expect(treeviewStore.hoveredModelId).toBeUndefined();
   });
+
+  test("closing a hovered view clears the hovered model", () => {
+    const treeviewStore = useTreeviewStore();
+    treeviewStore.displayAdditionalTree("a", "corbi", "BRep");
+    treeviewStore.setHoveredModel("a");
+    treeviewStore.closeView("a");
+    expect(treeviewStore.hoveredModelId).toBeUndefined();
+  });
+
+  test("closing another view keeps the hovered model", () => {
+    const treeviewStore = useTreeviewStore();
+    treeviewStore.displayAdditionalTree("a", "corbi", "BRep");
+    treeviewStore.setHoveredModel("b");
+    treeviewStore.closeView("a");
+    expect(treeviewStore.hoveredModelId).toBe("b");
+  });
+
+  test("removing a hovered data clears the hovered model", () => {
+    const treeviewStore = useTreeviewStore();
+    treeviewStore.addItem("BRep", "corbi", "a", "geode-a", "model");
+    treeviewStore.setHoveredModel("a");
+    treeviewStore.removeItem("a");
+    expect(treeviewStore.hoveredModelId).toBeUndefined();
+  });
 });
