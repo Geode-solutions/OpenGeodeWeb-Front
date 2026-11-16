@@ -5,8 +5,7 @@ import type { TreeMenuPayload } from "@ogw_front/utils/treeview";
 import ViewerObjectTreeBox from "@ogw_front/components/Viewer/ObjectTree/Box.vue";
 import { geode_objects } from "@ogw_front/assets/geode_objects";
 import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
-import { useDataStore } from "@ogw_front/stores/data";
-import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
+import { useModelHeaderHover } from "@ogw_front/composables/model_header_hover";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const WIDTH_MIN = 100;
@@ -25,8 +24,7 @@ interface Props {
 const { containerWidth } = defineProps<Props>();
 
 const treeviewStore = useTreeviewStore();
-const dataStore = useDataStore();
-const { onHoverEnter, onHoverLeave } = useHoverhighlight();
+const { onModelHeaderEnter, onModelHeaderLeave } = useModelHeaderHover();
 
 interface Emits {
   "show-menu": [payload: TreeMenuPayload];
@@ -90,19 +88,6 @@ watch([maxWidth, (): number => additionalViews.value.length], ([newMax]): void =
     }
   }
 });
-
-// Hovering a model tree header shows its model in the viewer and its row in the objects tree
-function onModelHeaderEnter(modelId: string): void {
-  treeviewStore.setHoveredModel(modelId);
-  onHoverEnter(modelId, () => dataStore.getAllModelComponentsViewerIds(modelId), "model");
-}
-
-function onModelHeaderLeave(modelId: string): void {
-  if (treeviewStore.hoveredModelId === modelId) {
-    treeviewStore.setHoveredModel(undefined);
-  }
-  onHoverLeave(modelId);
-}
 
 function modelGeodeId(modelId: string): string | undefined {
   for (const group of treeviewStore.items) {
