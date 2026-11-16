@@ -26,6 +26,8 @@ const {
   accent = undefined,
 } = defineProps<Props>();
 
+const slots = useSlots();
+
 interface Emits {
   close: [];
   dragstart: [event: DragEvent];
@@ -129,20 +131,27 @@ watch(
       />
       <v-icon v-else-if="mdiIcon" size="24" class="mr-2">{{ mdiIcon }}</v-icon>
       <v-icon v-else-if="closable" size="24" class="mr-2">mdi-drag-variant</v-icon>
-      <span
-        class="text-subtitle-2 font-weight-bold d-inline-flex align-center"
-        style="
-          height: 24px;
-          line-height: 1;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          flex-shrink: 1;
-          min-width: 0;
-        "
-      >
-        {{ title }}
-      </span>
+      <v-tooltip :disabled="!slots.tooltip" location="bottom start" open-delay="400">
+        <template #activator="{ props: tooltipProps }">
+          <span
+            v-bind="tooltipProps"
+            data-testid="treeBoxTitle"
+            class="text-subtitle-2 font-weight-bold d-inline-flex align-center"
+            style="
+              height: 24px;
+              line-height: 1;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              flex-shrink: 1;
+              min-width: 0;
+            "
+          >
+            {{ title }}
+          </span>
+        </template>
+        <slot name="tooltip" />
+      </v-tooltip>
       <v-spacer />
       <v-btn
         v-if="closable"

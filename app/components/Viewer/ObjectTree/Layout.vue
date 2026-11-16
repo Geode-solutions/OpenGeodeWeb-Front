@@ -104,6 +104,16 @@ function onModelHeaderLeave(modelId: string): void {
   onHoverLeave(modelId);
 }
 
+function modelGeodeId(modelId: string): string | undefined {
+  for (const group of treeviewStore.items) {
+    const child = group.children.find((item) => item.id === modelId);
+    if (child) {
+      return child.geode_id;
+    }
+  }
+  return undefined;
+}
+
 function onDragStart(index: number): void {
   draggedIndex.value = index;
 }
@@ -306,6 +316,17 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
               @header-enter="onModelHeaderEnter(view.id)"
               @header-leave="onModelHeaderLeave(view.id)"
             >
+              <template #tooltip>
+                <div data-testid="modelTreeTooltip" class="d-flex flex-column ga-1 text-caption">
+                  <span><strong class="mr-1">Name:</strong>{{ view.title }}</span>
+                  <span v-if="view.geode_object_type">
+                    <strong class="mr-1">Type:</strong>{{ view.geode_object_type }}
+                  </span>
+                  <span v-if="modelGeodeId(view.id)">
+                    <strong class="mr-1">ID:</strong>{{ modelGeodeId(view.id) }}
+                  </span>
+                </div>
+              </template>
               <ModelTree
                 data-testid="modelComponentsObjectTree"
                 :id="view.id"
