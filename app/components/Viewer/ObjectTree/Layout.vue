@@ -5,6 +5,8 @@ import type { TreeMenuPayload } from "@ogw_front/utils/treeview";
 import ViewerObjectTreeBox from "@ogw_front/components/Viewer/ObjectTree/Box.vue";
 import { geode_objects } from "@ogw_front/assets/geode_objects";
 import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
+import { useDataStore } from "@ogw_front/stores/data";
+import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const WIDTH_MIN = 100;
@@ -23,6 +25,8 @@ interface Props {
 const { containerWidth } = defineProps<Props>();
 
 const treeviewStore = useTreeviewStore();
+const dataStore = useDataStore();
+const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 
 interface Emits {
   "show-menu": [payload: TreeMenuPayload];
@@ -86,6 +90,19 @@ watch([maxWidth, (): number => additionalViews.value.length], ([newMax]): void =
     }
   }
 });
+
+// Hovering a model tree header shows its model in the viewer and its row in the objects tree
+function onModelHeaderEnter(modelId: string): void {
+  treeviewStore.setHoveredModel(modelId);
+  onHoverEnter(modelId, () => dataStore.getAllModelComponentsViewerIds(modelId), "model");
+}
+
+function onModelHeaderLeave(modelId: string): void {
+  if (treeviewStore.hoveredModelId === modelId) {
+    treeviewStore.setHoveredModel(undefined);
+  }
+  onHoverLeave(modelId);
+}
 
 function onDragStart(index: number): void {
   draggedIndex.value = index;
@@ -278,9 +295,16 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
               closable
               :border-radius="`0 ${index === 0 ? '16px' : '0'} ${index === additionalViews.length - 1 ? '16px' : '0'} 0`"
               :border-left="false"
+              :accent="
+                view.color
+                  ? { color: view.color, highlighted: treeviewStore.hoveredModelId === view.id }
+                  : undefined
+              "
               @close="treeviewStore.closeView(view.id)"
               @dragstart="onDragStart(index + 1)"
               @update:scroll-top="treeviewStore.setScrollTop(view.id, $event)"
+              @header-enter="onModelHeaderEnter(view.id)"
+              @header-leave="onModelHeaderLeave(view.id)"
             >
               <ModelTree
                 data-testid="modelComponentsObjectTree"
