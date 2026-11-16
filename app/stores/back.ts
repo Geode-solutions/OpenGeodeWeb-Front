@@ -22,8 +22,8 @@ const DEFAULT_PING_INTERVAL_SECONDS = 10;
 const LOCALHOST = "localhost";
 const IPV4_LOOPBACK = "127.0.0.1";
 
-// The local back (Werkzeug) only listens on IPv4. With "localhost", browsers try ::1 first,
-// and Windows is slow to refuse it: every request to the back would pay that delay.
+// The local back (Werkzeug) only listens on IPv4. With "localhost", browsers try ::1 first.
+// Windows is slow to refuse it: every request to the back would pay that delay.
 function back_domain_name(domain_name: string): string {
   return domain_name === LOCALHOST ? IPV4_LOOPBACK : domain_name;
 }
