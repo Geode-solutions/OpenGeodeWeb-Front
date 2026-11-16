@@ -119,4 +119,11 @@ describe("treeview store model tree link", () => {
     expect(viewColor("a")).not.toBe(viewColor("b"));
   });
 
+  test("hovered model is shared and cleared", () => {
+    const treeviewStore = useTreeviewStore();
+    treeviewStore.setHoveredModel("a");
+    expect(treeviewStore.hoveredModelId).toBe("a");
+    treeviewStore.setHoveredModel(undefined);
+    expect(treeviewStore.hoveredModelId).toBeUndefined();
+  });
 });

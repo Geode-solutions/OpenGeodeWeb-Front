@@ -103,6 +103,8 @@ export const useTreeviewStore = defineStore("treeview", () => {
   const isImporting = ref(false);
   const pendingSelectionIds = ref<string[]>([]);
   const rowHeights = ref<number[]>([]);
+  // Model hovered in the objects tree or on its model tree header: not saved
+  const hoveredModelId = ref<string | undefined>(undefined);
 
   const treeview_config_db = getTable<TreeviewConfigRecord>("treeview_config");
 
@@ -253,6 +255,10 @@ export const useTreeviewStore = defineStore("treeview", () => {
     });
   }
 
+  function setHoveredModel(id: string | undefined): void {
+    hoveredModelId.value = id;
+  }
+
   function moveView(from_index: number, to_index: number): void {
     if (from_index !== 0 && to_index !== 0) {
       const [element] = opened_views.value.splice(from_index, 1);
@@ -374,6 +380,8 @@ export const useTreeviewStore = defineStore("treeview", () => {
     additionalPanelWidth,
     isImporting,
     rowHeights,
+    hoveredModelId,
+    setHoveredModel,
     addItem,
     removeItem,
     renameItem,
