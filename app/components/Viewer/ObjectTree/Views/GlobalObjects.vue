@@ -139,6 +139,11 @@ function showMenu(event: MouseEvent, item: TreeGroupItem): void {
   });
 }
 
+// Color of the opened model tree of a data, the link between the row and that tree
+function modelTreeColor(id: string): string | undefined {
+  return treeviewStore.opened_views.find((view) => view.id === id)?.color;
+}
+
 function isModel(item: TreeGroupItem): boolean {
   const actualItem = item.raw || item;
   return (
@@ -259,8 +264,13 @@ function expandAll(): void {
             size="medium"
             style="height: 23px; width: 23px"
             class="ml-2"
-            variant="text"
-            v-tooltip="'Model\'s mesh components'"
+            :variant="modelTreeColor(item.id as string) ? 'tonal' : 'text'"
+            :color="modelTreeColor(item.id as string)"
+            v-tooltip="
+              modelTreeColor(item.id as string)
+                ? 'Close model\'s mesh components'
+                : 'Model\'s mesh components'
+            "
             @click.stop="
               treeviewStore.displayAdditionalTree(
                 item.id as string,
