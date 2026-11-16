@@ -26,6 +26,8 @@ const ownPackageName = package_json.name;
 
 // The e2e helpers, shared with the apps built on this layer (their Playwright tests import the built files)
 const BROWSER_HELPERS_FOLDER = "tests/browser/helpers";
+// The viewer tests, run by these apps against their own UI (with the data of tests/browser/data)
+const BROWSER_SUITES_FOLDER = "tests/browser/suites";
 
 function collectAssets(dir: string): string[] {
   return fs
@@ -67,6 +69,7 @@ export default defineConfig({
     ...collectTsFiles("server/utils"),
     ...collectTsFiles("shared"),
     ...collectTsFiles(BROWSER_HELPERS_FOLDER),
+    ...collectTsFiles(BROWSER_SUITES_FOLDER),
   ],
   platform: "node",
   external: isExternal,

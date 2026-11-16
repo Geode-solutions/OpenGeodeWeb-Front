@@ -6,7 +6,7 @@ import { useInfraStore } from "@ogw_front/stores/infra";
 import { useMenuStore } from "@ogw_front/stores/menu";
 import { useViewerContextMenu } from "@ogw_front/composables/viewer_context_menu";
 
-// The viewer as an app hosts it (the viewer page of Vease): the right click opens the circular menu
+// The viewer as an app built on this layer hosts it: the right click opens the circular menu
 const infraStore = useInfraStore();
 const menuStore = useMenuStore();
 const cardContainer = useTemplateRef("cardContainer");

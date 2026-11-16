@@ -1,4 +1,4 @@
-// Browser mode version of Vease's e2e fixture (tests/e2e/utils/fixtures.ts): same `test` signature, one app per test file
+// The test fixture of the suites (see ../helpers/suite_runtime.ts) in browser mode: one app per test file
 // (Vitest runs each file in its own page) and the same screenshot taken at the end of each passing test
 
 // Third party imports
@@ -66,7 +66,7 @@ function test(title: string, body: (fixtures: Fixtures) => Promise<void>): void 
     : TEST_TIMEOUT;
 
   vitestTest(
-    // The title of the Vease test
+    // The title given by the suite
     // oxlint-disable-next-line vitest/valid-title
     title,
     async () => {

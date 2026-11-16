@@ -1,5 +1,5 @@
-// Browser mode version of Vease's e2e loader (tests/e2e/utils/load.ts): the files are imported through the stores, the
-// Back reading them from the fixtures folder (see ../commands.ts), with the object type the import UI picks
+// The loadTestDatas of the suites (see ../helpers/suite_runtime.ts) in browser mode: the files are imported through the
+// Stores, the back reading them from the data folder (see ../commands.ts), with the object type the import UI picks
 
 // Local imports
 import type { GeodeObjectType } from "@ogw_front/types/identifiers";
@@ -28,7 +28,7 @@ async function geodeObjectType(filename: string): Promise<GeodeObjectType> {
   return selectedGeodeObject;
 }
 
-async function loadVeaseTestDatas(
+async function loadTestDatas(
   window: Page,
   inputDataFilenames: string[],
   { loadTimeout = LOAD_TIMEOUT }: { loadTimeout?: number } = {},
@@ -43,4 +43,4 @@ async function loadVeaseTestDatas(
   await waitForActionSettled(window, loadTimeout);
 }
 
-export { loadVeaseTestDatas };
+export { loadTestDatas };
