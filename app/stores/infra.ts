@@ -3,6 +3,9 @@ import { appMode } from "@ogw_shared/app_mode";
 import { setAppBaseUrl } from "@ogw_shared/scripts";
 import { useCloudStore } from "@ogw_front/stores/cloud";
 
+const LOCALHOST = "localhost";
+const IPV4_LOOPBACK = "127.0.0.1";
+
 interface ElectronApi {
   electronAPI: {
     project_folder_path: (args: { projectFolderPath: string }) => void;
@@ -52,6 +55,11 @@ export const useInfraStore = defineStore("infra", {
     },
     microservices_busy(): boolean {
       return this.microservices.some((store: Microservice) => store.is_busy === true);
+    },
+    // The local Flask microservices (Werkzeug) only listen on IPv4. With "localhost", browsers try ::1 first.
+    // Windows is slow to refuse it: every request to them would pay that delay.
+    microservice_domain_name(): string {
+      return this.domain_name === LOCALHOST ? IPV4_LOOPBACK : this.domain_name;
     },
   },
   actions: {
