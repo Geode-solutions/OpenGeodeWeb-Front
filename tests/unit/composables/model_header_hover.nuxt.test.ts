@@ -30,7 +30,12 @@ function mount<Result>(setup: () => Result): { result: Result; stop: () => void 
   if (result === undefined) {
     throw new Error("setup returned nothing");
   }
-  return { result, stop: () =>{  scope.stop(); } };
+  return {
+    result,
+    stop: () => {
+      scope.stop();
+    },
+  };
 }
 
 function lastVisibility(): unknown {
