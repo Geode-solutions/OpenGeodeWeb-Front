@@ -20,6 +20,8 @@ interface Props {
   active?: unknown[];
   scrollTop?: number;
   options?: Record<string, unknown>;
+  // Row tinted from outside the tree, e.g. while its model tree header is hovered
+  linked?: { id: unknown; color: string };
 }
 
 const {
@@ -29,6 +31,7 @@ const {
   active = [],
   scrollTop = 0,
   options = {},
+  linked = undefined,
 } = defineProps<Props>();
 
 const treeWrapper = ref<HTMLDivElement | undefined>(undefined);
@@ -217,8 +220,14 @@ const { handleKeyDown } = useTreeKeyboardNav(
               'leaf-row': item.isLeaf,
               'is-focused': focusedIndex === index,
               'is-active': item.isActive,
+              'is-linked': linked !== undefined && item.raw[actualItemProps.value] === linked.id,
             },
           ]"
+          :style="
+            linked !== undefined && item.raw[actualItemProps.value] === linked.id
+              ? { '--row-link-color': linked.color }
+              : undefined
+          "
           class="pa-0"
           tabindex="-1"
           @mousedown.prevent
@@ -310,6 +319,11 @@ const { handleKeyDown } = useTreeKeyboardNav(
 
 .tree-row-wrapper.is-active.is-focused {
   box-shadow: inset 0 0 0 2px rgba(var(--v-theme-primary), 0.6);
+}
+
+.tree-row-wrapper.is-linked {
+  background-color: color-mix(in srgb, var(--row-link-color) 22%, transparent) !important;
+  box-shadow: inset 0 0 0 2px var(--row-link-color);
 }
 
 .tree-row-wrapper:hover:not(.is-focused):not(.is-active) {

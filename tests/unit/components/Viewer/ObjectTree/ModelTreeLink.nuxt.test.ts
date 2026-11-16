@@ -66,4 +66,26 @@ describe("model tree link in the objects tree", () => {
     expect(expandButtonColor(wrapper)).toBe(color);
   });
 
+  test("hovering the model row marks it as the hovered model", async () => {
+    const wrapper = await mountObjects();
+    const treeviewStore = useTreeviewStore();
+    await wrapper.get('[data-testid="modelRow"]').trigger("mouseenter");
+    expect(treeviewStore.hoveredModelId).toBe("a");
+    await wrapper.get('[data-testid="modelRow"]').trigger("mouseleave");
+    expect(treeviewStore.hoveredModelId).toBeUndefined();
+  });
+
+  test("the row is linked while its model tree header is hovered", async () => {
+    const wrapper = await mountObjects();
+    const treeviewStore = useTreeviewStore();
+    treeviewStore.displayAdditionalTree("a", "corbi", "BRep");
+    const tree = wrapper.getComponent({ name: "CommonTreeView" });
+    expect(tree.props("linked")).toBeUndefined();
+    treeviewStore.setHoveredModel("a");
+    await flushPromises();
+    expect(tree.props("linked")).toStrictEqual({
+      id: "a",
+      color: treeviewStore.opened_views.find((view) => view.id === "a")?.color,
+    });
+  });
 });
