@@ -43,7 +43,25 @@ type TreeMenuPayload =
   | ModelComponentMenuPayload
   | BasemapMenuPayload;
 
-export { compareSelections };
+// Colors that tie each opened model tree to its row in the objects tree
+const MODEL_TREE_COLORS = [
+  "#1E88E5",
+  "#E53935",
+  "#43A047",
+  "#FB8C00",
+  "#8E24AA",
+  "#00ACC1",
+  "#D81B60",
+  "#6D4C41",
+] as const;
+
+// The first color no opened tree uses, cycling once they are all taken
+function nextModelTreeColor(usedColors: readonly (string | undefined)[]): string {
+  const free = MODEL_TREE_COLORS.find((color) => !usedColors.includes(color));
+  return free ?? MODEL_TREE_COLORS[usedColors.length % MODEL_TREE_COLORS.length] ?? "";
+}
+
+export { MODEL_TREE_COLORS, compareSelections, nextModelTreeColor };
 export type {
   DataMenuPayload,
   GeodeObjectTypeMenuPayload,

@@ -16,6 +16,7 @@ import type {
 import type { TreeGroup, TreeNode } from "@ogw_front/types/tree";
 import { ref, watch } from "vue";
 import { getTable } from "@ogw_internal/database/database";
+import { nextModelTreeColor } from "@ogw_front/utils/treeview";
 
 const PANEL_WIDTH = 300;
 
@@ -25,6 +26,8 @@ interface OpenedView extends Partial<GeodeObjectTyped> {
   title: string;
   scrollTop: number;
   opened: string[];
+  // Ties a model tree to its row in the objects tree
+  color?: string;
 }
 
 interface TreeviewChild extends TreeNode, GeodeIdentified, GeodeObjectTyped, ViewerTyped {}
@@ -68,6 +71,18 @@ interface ReadonlyTreeviewSnapshot {
   selection?: readonly (string | { id: string })[];
 }
 
+// Model trees saved before they had a color get one, distinct from the others
+function withModelTreeColors(views: OpenedView[]): OpenedView[] {
+  const used: (string | undefined)[] = views.map((view) => view.color);
+  for (const view of views) {
+    if (view.type === "component" && view.color === undefined) {
+      view.color = nextModelTreeColor(used);
+      used.push(view.color);
+    }
+  }
+  return views;
+}
+
 function snapshotSelectionIds(snapshot: ReadonlyTreeviewSnapshot | undefined): string[] {
   if (snapshot?.selectionIds) {
     return [...snapshot.selectionIds];
@@ -95,7 +110,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     try {
       const config = await treeview_config_db.get("main");
       if (config?.opened_views) {
-        opened_views.value = config.opened_views;
+        opened_views.value = withModelTreeColors(config.opened_views);
       }
       if (config?.panelWidth !== undefined && config.panelWidth !== 0) {
         panelWidth.value = config.panelWidth;
@@ -234,6 +249,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
       geode_object_type: geodeObjectType,
       scrollTop: 0,
       opened: [],
+      color: nextModelTreeColor(opened_views.value.map((view) => view.color)),
     });
   }
 
@@ -248,8 +264,10 @@ export const useTreeviewStore = defineStore("treeview", () => {
 
   function importStores(snapshot: ReadonlyTreeviewSnapshot | undefined): void {
     if (snapshot?.opened_views) {
-      // oxlint-disable-next-line no-unsafe-type-assertion -- narrowing the readonly parameter view back to the mutable working type; these objects aren't actually frozen at runtime.
-      opened_views.value = [...snapshot.opened_views] as OpenedView[];
+      // Copies: the snapshot keeps its views as they were saved
+      opened_views.value = withModelTreeColors(
+        snapshot.opened_views.map((view) => ({ ...view, opened: [...view.opened] })),
+      );
     } else {
       opened_views.value = defaultOpenedViews();
     }

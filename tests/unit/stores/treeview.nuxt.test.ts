@@ -73,3 +73,50 @@ describe("treeview store actions", () => {
     );
   });
 });
+
+function viewColor(id: string): string | undefined {
+  return useTreeviewStore().opened_views.find((view) => view.id === id)?.color;
+}
+
+describe("treeview store model tree link", () => {
+  beforeEach(() => {
+    setupActivePinia();
+  });
+
+  test("each opened model tree gets its own color", () => {
+    const treeviewStore = useTreeviewStore();
+    treeviewStore.displayAdditionalTree("a", "corbi", "BRep");
+    treeviewStore.displayAdditionalTree("b", "corbi", "BRep");
+    expect(viewColor("a")).toBeDefined();
+    expect(viewColor("b")).toBeDefined();
+    expect(viewColor("a")).not.toBe(viewColor("b"));
+  });
+
+  test("a color stays with its tree when another one closes", () => {
+    const treeviewStore = useTreeviewStore();
+    treeviewStore.displayAdditionalTree("a", "corbi", "BRep");
+    treeviewStore.displayAdditionalTree("b", "corbi", "BRep");
+    const colorB = viewColor("b");
+    treeviewStore.closeView("a");
+    expect(viewColor("b")).toBe(colorB);
+    // The freed color goes to the next tree, never the one still in use
+    treeviewStore.displayAdditionalTree("c", "other", "BRep");
+    expect(viewColor("c")).not.toBe(colorB);
+  });
+
+  test("model trees restored without a color get distinct ones", () => {
+    const treeviewStore = useTreeviewStore();
+    treeviewStore.importStores({
+      opened_views: [
+        { type: "object", id: "main", title: "Objects", scrollTop: 0, opened: [] },
+        { type: "component", id: "a", title: "corbi", scrollTop: 0, opened: [] },
+        { type: "component", id: "b", title: "corbi", scrollTop: 0, opened: [] },
+      ],
+    });
+    expect(viewColor("main")).toBeUndefined();
+    expect(viewColor("a")).toBeDefined();
+    expect(viewColor("b")).toBeDefined();
+    expect(viewColor("a")).not.toBe(viewColor("b"));
+  });
+
+});
