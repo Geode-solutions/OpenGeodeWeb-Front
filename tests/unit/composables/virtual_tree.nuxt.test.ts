@@ -7,8 +7,6 @@ import { ref } from "vue";
 // Local imports
 import { type EmitFn, useVirtualTree } from "@ogw_front/composables/virtual_tree";
 
-vi.setConfig({ testTimeout: 10_000 });
-
 function rows(tree: ReturnType<typeof useVirtualTree>): unknown[] {
   return tree.displayItems.value.map((row) => [row.id, row.depth, row.isLeaf, row.isExpandable]);
 }
