@@ -29,7 +29,7 @@ type BlockId = ModelComponentId;
 type GeodeObjectType = string;
 
 // What a data is displayed as in the viewer: mesh, model, or an entry of the menus (basemap, model_component, ...)
-type ViewerType = string;
+type ViewerObjectType = string;
 
 interface GeodeIdentified {
   geode_id: GeodeId;
@@ -43,8 +43,8 @@ interface GeodeObjectTyped {
   geode_object_type: GeodeObjectType;
 }
 
-interface ViewerTyped {
-  viewer_type: ViewerType;
+interface ViewerObjectTyped {
+  viewer_object_type: ViewerObjectType;
 }
 
 // The data a model style or a model component applies to
@@ -67,6 +67,6 @@ export type {
   ModelId,
   ModelIdentified,
   SurfaceId,
-  ViewerType,
-  ViewerTyped,
+  ViewerObjectType,
+  ViewerObjectTyped,
 };
