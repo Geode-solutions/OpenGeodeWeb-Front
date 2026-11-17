@@ -4,6 +4,7 @@ import type { ViewerRequest } from "./request.js";
 import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_typed_schemas.js";
 import opengeodeweb_viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 import { useAppStore } from "@ogw_front/stores/app";
+import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 async function pickWorldPosition(request: ViewerRequest, x: number, y: number): Promise<Vector3> {
   const schema = opengeodeweb_viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
@@ -65,4 +66,14 @@ async function fetchViewerVersion(
   return result;
 }
 
-export { fetchViewerVersion, launchViewerMicroservice, pickWorldPosition };
+// Shows the viewer's warnings about its rendering setup, e.g. software rendering fallback
+async function showRenderingWarnings(request: ViewerRequest): Promise<void> {
+  const schema = opengeodeweb_viewer_schemas.opengeodeweb_viewer.rendering_warnings;
+  const { warnings } = await request({ schema });
+  const feedbackStore = useFeedbackStore();
+  for (const warning of warnings) {
+    feedbackStore.add_warning(warning);
+  }
+}
+
+export { fetchViewerVersion, launchViewerMicroservice, pickWorldPosition, showRenderingWarnings };

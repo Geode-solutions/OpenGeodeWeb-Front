@@ -12,6 +12,7 @@ import {
   fetchViewerVersion,
   launchViewerMicroservice,
   pickWorldPosition,
+  showRenderingWarnings,
 } from "./viewer_helpers/actions.js";
 import {
   getWebsocketApiPort,
@@ -137,6 +138,7 @@ export const useViewerStore = defineStore(
           status.value = Status.NOT_CONNECTED;
           throw error;
         }
+        await showRenderingWarnings(request);
       });
     }
     async function launch(args: Readonly<{ projectFolderPath: string }>): Promise<unknown> {
