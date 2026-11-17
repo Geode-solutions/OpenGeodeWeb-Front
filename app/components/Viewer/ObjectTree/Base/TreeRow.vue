@@ -65,7 +65,7 @@ function handleRowClick(event: MouseEvent): void {
         v-if="item.isExpandable"
         :data-testid="item.isOpen ? 'collapseTreeRowButton' : 'expandTreeRowButton'"
         :icon="item.isOpen ? 'mdi-menu-down' : 'mdi-menu-right'"
-        :class="{ 'me-1': !item.isLeaf }"
+        :class="item.isLeaf ? 'icon-placeholder' : 'me-1'"
         color="black"
         @click.stop="$emit('toggle-open', item.raw)"
       />
