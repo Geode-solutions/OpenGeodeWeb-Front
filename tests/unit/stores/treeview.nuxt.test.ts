@@ -28,25 +28,25 @@ describe("treeview store actions", () => {
     const treeviewStore = useTreeviewStore();
     const testItems = [
       {
-        geode_object_type: "BRep",
+        geode_object_type: "BRep" as const,
         name: "test_brep.og_brep",
         id: "1",
         geode_id: "00000000-0000-0000-0000-000000000001",
-        viewer_object_type: "model",
+        viewer_object_type: "model" as const,
       },
       {
-        geode_object_type: "BRep",
+        geode_object_type: "BRep" as const,
         name: "test_brep_2.og_brep",
         id: "2",
         geode_id: "00000000-0000-0000-0000-000000000002",
-        viewer_object_type: "model",
+        viewer_object_type: "model" as const,
       },
       {
-        geode_object_type: "EdgedCurve2D",
+        geode_object_type: "EdgedCurve2D" as const,
         name: "test_edgedcurve.og_edc2d",
         id: "2",
         geode_id: "00000000-0000-0000-0000-000000000003",
-        viewer_object_type: "mesh",
+        viewer_object_type: "mesh" as const,
       },
     ];
 

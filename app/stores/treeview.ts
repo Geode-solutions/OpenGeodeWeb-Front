@@ -8,11 +8,13 @@ import type {
   DataId,
   GeodeId,
   GeodeIdentified,
-  GeodeObjectType,
   GeodeObjectTyped,
-  ViewerObjectType,
   ViewerObjectTyped,
 } from "@ogw_front/types/identifiers";
+import type {
+  GeodeObjectType,
+  ViewerObjectType,
+} from "@geode/opengeodeweb-microservice/data_types";
 import type { TreeGroup, TreeNode } from "@ogw_front/types/tree";
 import { ref, watch } from "vue";
 import { getTable } from "@ogw_internal/database/database";

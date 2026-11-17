@@ -1,8 +1,9 @@
-import type { DataId, GeodeObjectType } from "@ogw_front/types/identifiers";
 import back_schemas, {
   type CRSList,
 } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { oldestCrs, sameCrs } from "@ogw_front/utils/crs";
+import type { DataId } from "@ogw_front/types/identifiers";
+import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStore } from "@ogw_front/stores/data";
 

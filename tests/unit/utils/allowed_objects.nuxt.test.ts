@@ -14,14 +14,14 @@ describe("resolve allowed objects per file", () => {
       ["mesh.vtu", "model.og_brep"],
       [
         {
-          allowed_objects: { SolidMesh3D: { is_loadable: LOADABLE } },
-          objects_to_load: ["SolidMesh3D"],
+          allowed_objects: { TetrahedralSolid3D: { is_loadable: LOADABLE } },
+          objects_to_load: ["TetrahedralSolid3D"],
         },
         { allowed_objects: { BRep: { is_loadable: LOADABLE } }, objects_to_load: ["BRep"] },
       ],
     );
     expect(resolved.map((file) => file.selectedGeodeObjects)).toStrictEqual([
-      ["SolidMesh3D"],
+      ["TetrahedralSolid3D"],
       ["BRep"],
     ]);
   });
@@ -66,7 +66,12 @@ describe("resolve allowed objects per file", () => {
   test("gives no candidate to a file that cannot be loaded", () => {
     const [resolved] = resolveAllowedObjectsPerFile(
       ["broken.vtu"],
-      [{ allowed_objects: { SolidMesh3D: { is_loadable: NOT_LOADABLE } }, objects_to_load: [] }],
+      [
+        {
+          allowed_objects: { TetrahedralSolid3D: { is_loadable: NOT_LOADABLE } },
+          objects_to_load: [],
+        },
+      ],
     );
     expect(resolved?.candidates).toStrictEqual([]);
     expect(resolved?.selectedGeodeObjects).toStrictEqual([]);

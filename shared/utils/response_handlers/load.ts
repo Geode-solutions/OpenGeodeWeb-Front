@@ -1,3 +1,5 @@
+import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
+
 interface AllowedObject {
   readonly is_loadable: number;
   readonly object_priority?: number;
@@ -71,7 +73,7 @@ interface FileAllowedObjects {
   // Loadable types only, sorted by best is_loadable then best object_priority
   readonly candidates: string[];
   // Types the backend selected to load every content of the file, empty when the user has to choose
-  readonly selectedGeodeObjects: string[];
+  readonly selectedGeodeObjects: GeodeObjectType[];
 }
 
 function sortCandidates(objectMap: AllowedObjectMap): string[] {
@@ -97,7 +99,8 @@ function resolveAllowedObjectsPerFile(
     return {
       filename,
       candidates: sortCandidates(response?.allowed_objects ?? {}),
-      selectedGeodeObjects: [...(response?.objects_to_load ?? [])],
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the back only answers with its own object types
+      selectedGeodeObjects: [...(response?.objects_to_load ?? [])] as GeodeObjectType[],
     };
   });
 }

@@ -1,12 +1,12 @@
 import { ref } from "vue";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
+import { type DataItem, useDataStore } from "@ogw_front/stores/data";
 import type {
-  DataIdentified,
   GeodeObjectType,
   ViewerObjectType,
-} from "@ogw_front/types/identifiers";
-import { type DataItem, useDataStore } from "@ogw_front/stores/data";
+} from "@geode/opengeodeweb-microservice/data_types";
+import type { DataIdentified } from "@ogw_front/types/identifiers";
 import { computeMenuPosition } from "@ogw_front/composables/overlapping_picker_menu";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useViewerStore } from "@ogw_front/stores/viewer";

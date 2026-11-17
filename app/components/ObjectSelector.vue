@@ -7,7 +7,7 @@ import {
   resolveAllowedObjectsPerFile,
 } from "@ogw_shared/utils/response_handlers/load.js";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
-import type { GeodeObjectType } from "@ogw_front/types/identifiers";
+import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import { geode_objects } from "@ogw_front/assets/geode_objects";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { useBackStore } from "@ogw_front/stores/back";
@@ -237,7 +237,7 @@ await getAllowedGeodeObjects();
               class="card ma-2"
               hover
               rounded
-              @click="setGeodeObject(key)"
+              @click="setGeodeObject(key as GeodeObjectType)"
               :disabled="!value['is_loadable']"
               :elevation="value['is_loadable'] ? 5 : 3"
             >

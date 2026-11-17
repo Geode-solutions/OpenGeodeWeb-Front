@@ -162,14 +162,14 @@ describe("missing files selector", () => {
       global: { plugins: [vuetify, pinia] },
       props: {
         multiple: true,
-        geodeObjectTypes: { "a.vtu": ["SolidMesh3D"], "b.og_brep": ["BRep"] },
+        geodeObjectTypes: { "a.vtu": ["TetrahedralSolid3D"], "b.og_brep": ["BRep"] },
         filenames: ["a.vtu", "b.og_brep", "file.toto"],
       },
     });
     await flushPromises();
 
     expect(request_mock.mock.calls.map(([request]) => request.params)).toStrictEqual([
-      { geode_object_type: "SolidMesh3D", filename: "a.vtu" },
+      { geode_object_type: "TetrahedralSolid3D", filename: "a.vtu" },
       { geode_object_type: "BRep", filename: "b.og_brep" },
     ]);
     expect(wrapper.text()).toContain("a.vtu");

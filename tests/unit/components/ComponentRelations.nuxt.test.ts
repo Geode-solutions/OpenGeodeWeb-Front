@@ -30,8 +30,8 @@ describe("component relations", () => {
     const model = {
       data_id: MODEL_ID,
       geode_id: MODEL_ID,
-      viewer_object_type: "model",
-      geode_object_type: "Section",
+      viewer_object_type: "model" as const,
+      geode_object_type: "Section" as const,
       mesh_components: COMPONENTS.map(([geode_id, type], viewer_id) => ({
         geode_id,
         name: geode_id,

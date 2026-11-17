@@ -11,6 +11,7 @@ import {
 import { type TreeMenuPayload, compareSelections } from "@ogw_front/utils/treeview";
 import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
+import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import { useBasemapStore } from "@ogw_front/stores/basemap";
@@ -295,7 +296,7 @@ function expandAll(): void {
               treeviewStore.displayAdditionalTree(
                 item.id as string,
                 item.title as string | undefined,
-                item.geode_object_type as string,
+                item.geode_object_type as GeodeObjectType,
               )
             "
           >
