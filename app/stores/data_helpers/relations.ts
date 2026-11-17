@@ -27,11 +27,9 @@ type MutableComponentRelations = { [Key in keyof ComponentRelations]: FormattedC
 
 function groupRelationsByParent(
   relations: readonly ModelComponentRelationRecord[],
-  components: readonly ModelComponentRecord[],
+  components: readonly FormattedComponent[],
 ): Record<string, ComponentRelations> {
-  const componentsById = new Map(
-    components.map((component) => [component.geode_id, toFormattedComponent(component)]),
-  );
+  const componentsById = new Map(components.map((component) => [component.id, component]));
   const byParent: Record<string, MutableComponentRelations> = {};
   for (const relation of relations) {
     const key = RELATION_KEYS[relation.type];
@@ -80,14 +78,13 @@ export function useDataRelations(): {
     return { boundaries, internals };
   }
 
-  // The boundaries and internals of every component of the model, read in two queries
+  // The boundaries and internals of every component of the model, among the given components:
+  // The caller already holds them, so only the relations are read
   async function fetchAllComponentRelations(
     modelId: ModelId,
+    components: readonly FormattedComponent[],
   ): Promise<Record<string, ComponentRelations>> {
-    const [relations, components] = await Promise.all([
-      model_components_relation_db.where("data_id").equals(modelId).toArray(),
-      model_components_db.where("data_id").equals(modelId).toArray(),
-    ]);
+    const relations = await model_components_relation_db.where("data_id").equals(modelId).toArray();
     return groupRelationsByParent(relations, components);
   }
 

@@ -134,7 +134,10 @@ describe("useDataStore - collections", () => {
       mesh_components: [{ ...component("line2", "Line", 3), boundaries: ["corner"] }],
     });
 
-    const relations = await dataStore.fetchAllComponentRelations(modelId);
+    const relations = await dataStore.fetchAllComponentRelations(
+      modelId,
+      await dataStore.getAllMeshComponents(modelId),
+    );
     // The collection link of the fault is not a boundary nor an internal relation
     expect(Object.keys(relations).toSorted()).toStrictEqual(["line1", "surface"]);
     expect(relations.surface?.boundaries.map((boundary) => boundary.id).toSorted()).toStrictEqual([

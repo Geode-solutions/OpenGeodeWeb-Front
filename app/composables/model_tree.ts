@@ -87,6 +87,24 @@ function attachRelationDetails<Component extends { readonly id: string }>(
   });
 }
 
+async function fetchModelTreeData(modelId: ModelId): Promise<{
+  meshByType: Record<string, FormattedComponent[]>;
+  collectionsByType: Record<string, CollectionComponent[]>;
+  relations: Record<string, ComponentRelations>;
+}> {
+  const dataStore = useDataStore();
+  const [meshByType, collectionsByType] = await Promise.all([
+    dataStore.fetchAllMeshComponents(modelId),
+    dataStore.fetchAllCollectionComponents(modelId),
+  ]);
+  // Boundaries and internals are mesh components: the ones just read are reused
+  const relations = await dataStore.fetchAllComponentRelations(
+    modelId,
+    Object.values(meshByType).flat(),
+  );
+  return { meshByType, collectionsByType, relations };
+}
+
 export function useModelTree(modelId: ModelId): {
   isLoading: ComputedRef<boolean>;
   localCategories: Ref<ModelTreeCategory[]>;
@@ -110,11 +128,11 @@ export function useModelTree(modelId: ModelId): {
       if (!mesh || !collections) {
         return;
       }
-      const [meshByType, collectionsByType, relationsByComponent] = await Promise.all([
-        dataStore.fetchAllMeshComponents(modelId),
-        dataStore.fetchAllCollectionComponents(modelId),
-        dataStore.fetchAllComponentRelations(modelId),
-      ]);
+      const {
+        meshByType,
+        collectionsByType,
+        relations: relationsByComponent,
+      } = await fetchModelTreeData(modelId);
       relations.value = markRaw(relationsByComponent);
       cache.value = markRaw({ ...meshByType, ...collectionsByType });
       localCategories.value = [...mesh, ...collections];
