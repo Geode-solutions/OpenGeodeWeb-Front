@@ -2,7 +2,7 @@
   <v-card
     color="transparent"
     elevation="0"
-    class="mt-8 d-flex align-center justify-center ga-2 text-white"
+    class="mt-8 d-flex align-center justify-center ga-2 text-high-emphasis"
     style="opacity: 0.6; letter-spacing: 0.08em"
   >
     <v-icon icon="mdi-leaf" size="14" />
