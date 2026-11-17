@@ -72,19 +72,55 @@ function useModelVisibility(modelId: ModelId): {
 type WithRelationDetails<Component> = Component & { details?: RelationGroup[] };
 
 // Components get their relations as details: expanding one lists them without making it a
-// Branch, so its own visibility stays its own
-function attachRelationDetails<Component extends { readonly id: string }>(
-  components: readonly Component[],
-  relations: Readonly<Record<string, ComponentRelations>>,
-  sortType: string,
-): WithRelationDetails<Component>[] {
-  return components.map((component) => {
-    const componentRelations = relations[component.id];
-    if (!componentRelations) {
-      return component;
+// Branch, so its own visibility stays its own. The groups of a component are built once per sort:
+// Recomputing the tree (filter, search, cache update) reuses them instead of rebuilding them all
+function useRelationDetails(): {
+  setRelations: (relations: Record<string, ComponentRelations>) => void;
+  attach: <Component extends { readonly id: string }>(
+    components: readonly Component[],
+    sortType: string,
+  ) => WithRelationDetails<Component>[];
+} {
+  const relations = shallowRef<Readonly<Record<string, ComponentRelations>>>({});
+  const groupsByComponent = new Map<string, RelationGroup[]>();
+  let groupsSortType: string | undefined = undefined;
+
+  function setRelations(newRelations: Record<string, ComponentRelations>): void {
+    groupsByComponent.clear();
+    relations.value = markRaw(newRelations);
+  }
+
+  function groupsOf(
+    componentId: string,
+    componentRelations: ComponentRelations,
+    sortType: string,
+  ): RelationGroup[] {
+    if (sortType !== groupsSortType) {
+      groupsByComponent.clear();
+      groupsSortType = sortType;
     }
-    return { ...component, details: relationGroups(component.id, componentRelations, sortType) };
-  });
+    let groups = groupsByComponent.get(componentId);
+    if (groups === undefined) {
+      groups = relationGroups(componentId, componentRelations, sortType);
+      groupsByComponent.set(componentId, groups);
+    }
+    return groups;
+  }
+
+  function attach<Component extends { readonly id: string }>(
+    components: readonly Component[],
+    sortType: string,
+  ): WithRelationDetails<Component>[] {
+    return components.map((component) => {
+      const componentRelations = relations.value[component.id];
+      if (!componentRelations) {
+        return component;
+      }
+      return { ...component, details: groupsOf(component.id, componentRelations, sortType) };
+    });
+  }
+
+  return { setRelations, attach };
 }
 
 async function fetchModelTreeData(modelId: ModelId): Promise<{
@@ -119,7 +155,7 @@ export function useModelTree(modelId: ModelId): {
   const cache = ref<ModelTreeCache | undefined>(undefined);
   const localCategories = ref<ModelTreeCategory[]>([]);
   const collectionTypes = ref<Set<string>>(new Set());
-  const relations = ref<Record<string, ComponentRelations>>({});
+  const relationDetails = useRelationDetails();
 
   // The mesh cache also groups collection components by their type; the collections cache overrides those keys with the real collection -> mesh components hierarchy.
   watch(
@@ -128,12 +164,8 @@ export function useModelTree(modelId: ModelId): {
       if (!mesh || !collections) {
         return;
       }
-      const {
-        meshByType,
-        collectionsByType,
-        relations: relationsByComponent,
-      } = await fetchModelTreeData(modelId);
-      relations.value = markRaw(relationsByComponent);
+      const { meshByType, collectionsByType, relations } = await fetchModelTreeData(modelId);
+      relationDetails.setRelations(relations);
       cache.value = markRaw({ ...meshByType, ...collectionsByType });
       localCategories.value = [...mesh, ...collections];
       collectionTypes.value = new Set(Object.keys(collectionsByType));
@@ -148,8 +180,10 @@ export function useModelTree(modelId: ModelId): {
     components: readonly Component[],
     sortType: string,
   ): WithRelationDetails<Component>[] {
-    const byComponent = collectionTypes.value.has(categoryId) ? {} : relations.value;
-    return attachRelationDetails(components, byComponent, sortType);
+    if (collectionTypes.value.has(categoryId)) {
+      return [...components];
+    }
+    return relationDetails.attach(components, sortType);
   }
 
   return {
