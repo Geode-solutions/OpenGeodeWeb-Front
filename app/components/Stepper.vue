@@ -28,7 +28,9 @@ const { steps, current_step_index } = toRefs(state) as unknown as {
         <v-icon icon="mdi-file-upload-outline" class="mr-3 title-text" size="32" />
         <h2 class="title-text">Import Data</h2>
       </div>
-      <p class="text-white text-body-1">Select and configure your files for a seamless import.</p>
+      <p class="text-medium-emphasis text-body-1">
+        Select and configure your files for a seamless import.
+      </p>
     </div>
   </v-card-item>
 
@@ -55,26 +57,26 @@ const { steps, current_step_index } = toRefs(state) as unknown as {
 }
 
 .custom-stepper :deep(.v-stepper-vertical-item__content) {
-  background: rgba(255, 255, 255, 0.03) !important;
+  background: rgba(var(--v-theme-on-surface), 0.04) !important;
   border-radius: 12px;
   margin: 8px 16px 16px 40px !important;
   padding: 16px !important;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
 }
 
 .custom-stepper :deep(.v-avatar) {
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.1) !important;
-  color: white !important;
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+  background: rgba(var(--v-theme-on-surface), 0.08) !important;
+  color: rgb(var(--v-theme-on-surface)) !important;
 }
 
 .custom-stepper :deep(.v-stepper-vertical-item--active .v-avatar) {
-  background: #3c9983 !important;
-  border-color: #3c9983;
-  color: #0a0f0e !important;
+  background: rgb(var(--v-theme-primary)) !important;
+  border-color: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-on-primary)) !important;
 }
 
 .custom-stepper :deep(.v-stepper-vertical-item__connector) {
-  border-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(var(--v-border-color), var(--v-border-opacity)) !important;
 }
 </style>

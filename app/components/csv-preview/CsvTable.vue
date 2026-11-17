@@ -47,7 +47,7 @@ function getColumnClass(key: string): string {
 </script>
 
 <template>
-  <div class="d-flex flex-column bg-black-opacity-20 overflow-hidden h-100">
+  <div class="d-flex flex-column bg-inset overflow-hidden h-100">
     <div class="pa-4 d-flex align-center border-b border-opacity-10">
       <v-icon icon="mdi-table-eye" size="small" class="mr-2 opacity-60" />
       <span class="text-subtitle-2 font-weight-medium opacity-80">
@@ -90,15 +90,17 @@ function getColumnClass(key: string): string {
 </template>
 
 <style scoped>
-.bg-black-opacity-20 {
-  background: rgba(0, 0, 0, 0.2);
+.bg-inset {
+  background: rgba(var(--v-theme-background), 0.6);
 }
 
 :deep(.v-data-table__th) {
-  background: #1e1e1e !important; /* Solid background to prevent overlap transparency */
+  background: rgb(
+    var(--v-theme-surface)
+  ) !important; /* Solid background to prevent overlap transparency */
   color: rgba(var(--v-theme-primary), 0.9) !important;
   font-weight: bold !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-bottom: 1px solid rgba(var(--v-border-color), var(--v-border-opacity)) !important;
   text-transform: uppercase;
   font-size: 0.75rem;
   letter-spacing: 0.5px;
@@ -107,8 +109,8 @@ function getColumnClass(key: string): string {
 }
 
 :deep(.v-data-table__td) {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-  color: rgba(255, 255, 255, 0.8) !important;
+  border-bottom: 1px solid rgba(var(--v-border-color), var(--v-border-opacity)) !important;
+  color: rgba(var(--v-theme-on-surface), 0.8) !important;
 }
 
 :deep(.v-data-table__tr:hover td) {

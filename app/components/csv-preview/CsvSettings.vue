@@ -67,7 +67,7 @@ watch(customValue, (newVal) => {
 </script>
 
 <template>
-  <div class="pa-6 overflow-y-auto border-e border-opacity-10 bg-white-opacity-5">
+  <div class="pa-6 overflow-y-auto border-e border-opacity-10 bg-subtle">
     <div class="text-overline mb-4 text-primary font-weight-bold">Parser Settings</div>
 
     <v-select
@@ -176,7 +176,7 @@ watch(customValue, (newVal) => {
 </template>
 
 <style scoped>
-.bg-white-opacity-5 {
-  background: rgba(255, 255, 255, 0.03);
+.bg-subtle {
+  background: rgba(var(--v-theme-on-surface), 0.04);
 }
 </style>

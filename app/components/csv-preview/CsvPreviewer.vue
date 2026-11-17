@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useToggle } from "@vueuse/core";
 
+import ChromeTheme from "@ogw_front/components/ChromeTheme.vue";
+
 import CsvSettings from "./CsvSettings.vue";
 import CsvTable from "./CsvTable.vue";
 
@@ -213,77 +215,67 @@ function onConfirm(): void {
     @update:model-value="emit('update:modelValue', $event)"
     max-width="1200px"
   >
-    <v-card class="glass-ui rounded-xl overflow-hidden border-opacity-10" color="grey-darken-4">
-      <v-toolbar color="transparent" flat class="px-4">
-        <v-icon icon="mdi-file-table" size="32" color="primary" class="ml-1" />
-        <v-toolbar-title class="text-h6 font-weight-bold text-white">
-          CSV Previewer & Configuration
-        </v-toolbar-title>
-        <v-spacer />
-        <v-btn
-          icon="mdi-close"
-          variant="text"
-          color="white"
-          @click="emit('update:modelValue', false)"
-        />
-      </v-toolbar>
+    <ChromeTheme>
+      <v-card class="glass-ui rounded-xl overflow-hidden border-opacity-10">
+        <v-toolbar color="transparent" flat class="px-4">
+          <v-icon icon="mdi-file-table" size="32" color="primary" class="ml-1" />
+          <v-toolbar-title class="text-h6 font-weight-bold">
+            CSV Previewer & Configuration
+          </v-toolbar-title>
+          <v-spacer />
+          <v-btn icon="mdi-close" variant="text" @click="emit('update:modelValue', false)" />
+        </v-toolbar>
 
-      <v-divider class="border-opacity-10" />
+        <v-divider class="border-opacity-10" />
 
-      <div class="previewer-grid">
-        <CsvSettings
-          v-model:separator="separator"
-          v-model:header-row="headerRow"
-          v-model:first-row="firstRow"
-          v-model:x-column="xColumn"
-          v-model:y-column="yColumn"
-          v-model:z-column="zColumn"
-          :headers="previewHeaders"
-        />
+        <div class="previewer-grid">
+          <CsvSettings
+            v-model:separator="separator"
+            v-model:header-row="headerRow"
+            v-model:first-row="firstRow"
+            v-model:x-column="xColumn"
+            v-model:y-column="yColumn"
+            v-model:z-column="zColumn"
+            :headers="previewHeaders"
+          />
 
-        <CsvTable
-          :headers="previewHeaders"
-          :rows="previewRows"
-          :loading="loading"
-          :coordinates="{ x: xColumn, y: yColumn, z: zColumn }"
-          :separator="separator"
-          :header-row="headerRow"
-          :first-row="firstRow"
-        />
-      </div>
+          <CsvTable
+            :headers="previewHeaders"
+            :rows="previewRows"
+            :loading="loading"
+            :coordinates="{ x: xColumn, y: yColumn, z: zColumn }"
+            :separator="separator"
+            :header-row="headerRow"
+            :first-row="firstRow"
+          />
+        </div>
 
-      <v-divider class="border-opacity-10" />
+        <v-divider class="border-opacity-10" />
 
-      <v-card-actions class="pa-4 bg-white-opacity-5">
-        <v-spacer />
-        <v-btn
-          variant="text"
-          class="text-none px-6"
-          color="white"
-          @click="emit('update:modelValue', false)"
-        >
-          Cancel
-        </v-btn>
-        <v-btn
-          variant="flat"
-          color="primary"
-          class="text-none px-8 rounded-lg font-weight-bold"
-          @click="onConfirm"
-          :disabled="!previewHeaders.length || !isFormValid"
-        >
-          Confirm
-        </v-btn>
-      </v-card-actions>
-    </v-card>
+        <v-card-actions class="pa-4 bg-subtle">
+          <v-spacer />
+          <v-btn variant="text" class="text-none px-6" @click="emit('update:modelValue', false)">
+            Cancel
+          </v-btn>
+          <v-btn
+            variant="flat"
+            color="primary"
+            class="text-none px-8 rounded-lg font-weight-bold"
+            @click="onConfirm"
+            :disabled="!previewHeaders.length || !isFormValid"
+          >
+            Confirm
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </ChromeTheme>
   </v-dialog>
 </template>
 
 <style scoped>
 .glass-ui {
-  background: rgba(30, 30, 30, 0.8) !important;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgb(var(--v-theme-surface)) !important;
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
 }
 
 .previewer-grid {
@@ -293,8 +285,8 @@ function onConfirm(): void {
   overflow: hidden;
 }
 
-.bg-white-opacity-5 {
-  background: rgba(255, 255, 255, 0.03);
+.bg-subtle {
+  background: rgba(var(--v-theme-on-surface), 0.04);
 }
 
 /* Custom scrollbar */
@@ -305,10 +297,10 @@ function onConfirm(): void {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(var(--v-theme-on-surface), 0.1);
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(var(--v-theme-on-surface), 0.2);
 }
 </style>

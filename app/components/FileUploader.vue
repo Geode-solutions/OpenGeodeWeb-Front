@@ -179,15 +179,14 @@ watch(
   <v-card-text v-if="!mini && internal_files.length" class="mt-6 pa-0">
     <v-sheet class="d-flex align-center mb-4" color="transparent">
       <v-icon icon="mdi-file-check" class="mr-3" color="primary" size="24" />
-      <span class="text-subtitle-1 font-weight-bold text-white"> Selected files </span>
-      <v-chip size="small" class="ml-3 bg-white-opacity-10" color="white" variant="flat">
+      <span class="text-subtitle-1 font-weight-bold text-high-emphasis"> Selected files </span>
+      <v-chip size="small" class="ml-3" color="primary" variant="tonal">
         {{ internal_files.length }}
       </v-chip>
       <v-spacer />
       <v-btn
         v-if="multiple"
         variant="text"
-        color="white"
         size="small"
         class="text-none opacity-60"
         prepend-icon="mdi-plus"
@@ -202,10 +201,9 @@ watch(
         <v-chip
           closable
           size="default"
-          color="white"
           variant="outlined"
           class="font-weight-medium glass-ui border-opacity-10 px-4"
-          style="background: rgba(255, 255, 255, 0.05) !important"
+          style="background: rgba(var(--v-theme-on-surface), 0.05) !important"
           @click:close="removeFile(index)"
         >
           <v-icon start size="18" :color="isCsv(file) && file.isConfigured ? 'success' : 'primary'">
@@ -217,7 +215,7 @@ watch(
                 : "mdi-file-outline"
             }}
           </v-icon>
-          <span class="text-white">{{ file.displayName || file.name }}</span>
+          <span class="text-high-emphasis">{{ file.displayName || file.name }}</span>
 
           <v-tooltip v-if="isCsv(file)" text="Configure CSV" location="bottom">
             <template #activator="{ props: tooltipProps }">
@@ -273,7 +271,7 @@ watch(
 
 <style scoped>
 .glass-ui {
-  background: rgba(255, 255, 255, 0.05) !important;
+  background: rgba(var(--v-theme-on-surface), 0.05) !important;
   backdrop-filter: blur(10px);
 }
 .hover-opacity-100:hover {

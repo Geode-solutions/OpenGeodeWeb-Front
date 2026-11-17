@@ -23,8 +23,6 @@ const emit = defineEmits<Emits>();
     density="compact"
     hide-details
     bg-color="transparent"
-    color="white"
-    base-color="white"
     v-bind="$attrs"
   >
     <template v-for="(_, slot) in $slots" v-slot:[slot]="scope">
