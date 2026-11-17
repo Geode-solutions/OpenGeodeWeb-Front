@@ -22,6 +22,8 @@
     "server",
     "shared",
     "tests/browser/helpers",
+    "tests/browser/suites",
+    "tests/browser/data",
     ".build",
     "nuxt.config.ts",
     "opengeodeweb_front_schemas.json",
@@ -46,6 +48,10 @@
     "./tests/browser/helpers/*.js": {
       "types": "./tests/browser/helpers/*.ts",
       "default": "./.build/tests/browser/helpers/*.js"
+    },
+    "./tests/browser/suites/*.js": {
+      "types": "./tests/browser/suites/*.ts",
+      "default": "./.build/tests/browser/suites/*.js"
     },
     "./shared/*.js": {
       "types": "./shared/*.ts",
