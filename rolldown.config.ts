@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { defineConfig } from "rolldown";
+import { viteImportGlobPlugin } from "rolldown/experimental";
 
 import package_json from "./package.json" with { type: "json" };
 
@@ -73,7 +74,8 @@ export default defineConfig({
   ],
   platform: "node",
   external: isExternal,
-  plugins: [helpersAssetsPlugin],
+  // The suites index collects the suite files with import.meta.glob
+  plugins: [helpersAssetsPlugin, viteImportGlobPlugin()],
   output: {
     dir: ".build",
     format: "esm",
