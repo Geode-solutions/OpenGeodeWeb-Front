@@ -43,6 +43,19 @@ function createDisplayItem(ctx: FlattenContext, item: TreeItem, depth: number): 
 
 type FlattenChildren = (children: readonly TreeItem[]) => DisplayItem[];
 
+// An expandable row, followed by the rows under it only when it is open
+function expandableRow(
+  entry: DisplayItem,
+  isLeaf: boolean,
+  rowsUnder: () => readonly DisplayItem[],
+): DisplayItem[] {
+  const row = { ...entry, isLeaf, isExpandable: true };
+  if (!row.isOpen) {
+    return [row];
+  }
+  return [row, ...rowsUnder()];
+}
+
 // A branch is kept when it matches or when one of its descendants does
 function flattenSearchedBranch(
   entry: DisplayItem,
@@ -52,11 +65,7 @@ function flattenSearchedBranch(
   if (subtree.length === 0 && !matches) {
     return [];
   }
-  const branch = { ...entry, isLeaf: false, isExpandable: true };
-  if (!branch.isOpen) {
-    return [branch];
-  }
-  return [branch, ...subtree];
+  return expandableRow(entry, false, () => subtree);
 }
 
 function flattenOpenBranch(
@@ -64,11 +73,7 @@ function flattenOpenBranch(
   children: readonly TreeItem[],
   flattenChildren: FlattenChildren,
 ): DisplayItem[] {
-  const branch = { ...entry, isLeaf: false, isExpandable: true };
-  if (!branch.isOpen) {
-    return [branch];
-  }
-  return [branch, ...flattenChildren(children)];
+  return expandableRow(entry, false, () => flattenChildren(children));
 }
 
 // Details hang under a leaf that stays a leaf: selecting or clicking it only targets the item itself
@@ -80,11 +85,7 @@ function flattenLeafDetails(
   if (details.length === 0) {
     return [entry];
   }
-  const leaf = { ...entry, isExpandable: true };
-  if (!leaf.isOpen) {
-    return [leaf];
-  }
-  return [leaf, ...flattenChildren(details)];
+  return expandableRow(entry, true, () => flattenChildren(details));
 }
 
 function flattenNode(
