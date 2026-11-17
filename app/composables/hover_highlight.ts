@@ -11,13 +11,26 @@ type HighlightType = "mesh" | "model";
 type HighlightSchema = (typeof vtk_schemas)["opengeodeweb_viewer"][HighlightType]["highlight"];
 type BlockIdsProvider = readonly number[] | (() => readonly number[] | Promise<readonly number[]>);
 
-export function useHoverhighlight(): {
+// Every live instance, so a highlight can be released from outside the component that started it
+const instances = new Set<(dataId: DataId) => void>();
+
+// Releases the hover and the viewer highlight of a data, whichever component started them:
+// The element under the cursor may be removed, and browsers send no mouseleave for it
+function releaseHoverHighlight(dataId: DataId): void {
+  for (const release of instances) {
+    release(dataId);
+  }
+}
+
+function useHoverhighlight(): {
   onHoverEnter: typeof onHoverEnter;
   onHoverLeave: typeof onHoverLeave;
 } {
   const viewerStore = useViewerStore();
   const dataStore = useDataStore();
   let timer: ReturnType<typeof setTimeout> | undefined = undefined;
+  // Item whose highlight is waiting for the delay
+  let pendingId: DataId | undefined = undefined;
   // Item hovered last, whose highlight may still be pending
   let currentId: DataId | undefined = undefined;
   // Item the viewer was asked to highlight, the only one to unhighlight
@@ -33,6 +46,7 @@ export function useHoverhighlight(): {
       clearTimeout(timer);
       timer = undefined;
     }
+    pendingId = dataId;
     const schema = vtk_schemas.opengeodeweb_viewer[type].highlight;
 
     async function highlightAction(): Promise<void> {
@@ -79,10 +93,12 @@ export function useHoverhighlight(): {
     }
 
     if (immediate) {
+      pendingId = undefined;
       // oxlint-disable-next-line typescript/no-floating-promises -- runHighlightAction catches its own errors internally.
       runHighlightAction();
     } else {
       timer = setTimeout(() => {
+        pendingId = undefined;
         // oxlint-disable-next-line typescript/no-floating-promises -- runHighlightAction catches its own errors internally.
         runHighlightAction();
       }, HOVER_DELAY);
@@ -110,6 +126,9 @@ export function useHoverhighlight(): {
       clearTimeout(timer);
       timer = undefined;
     }
+    if (pendingId === dataId) {
+      pendingId = undefined;
+    }
     if (currentId === dataId) {
       currentId = undefined;
     }
@@ -127,5 +146,26 @@ export function useHoverhighlight(): {
     }
   }
 
+  function release(dataId: DataId): void {
+    if (pendingId === dataId || currentId === dataId || highlighted?.dataId === dataId) {
+      onHoverLeave(dataId);
+    }
+  }
+
+  // A component unmounted while hovered gets no mouseleave either
+  if (getCurrentScope()) {
+    instances.add(release);
+    onScopeDispose(() => {
+      instances.delete(release);
+      for (const dataId of new Set([pendingId, currentId, highlighted?.dataId])) {
+        if (dataId !== undefined) {
+          onHoverLeave(dataId);
+        }
+      }
+    });
+  }
+
   return { onHoverEnter, onHoverLeave };
 }
+
+export { releaseHoverHighlight, useHoverhighlight };
