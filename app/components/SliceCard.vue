@@ -32,7 +32,6 @@ const emit = defineEmits<Emits>();
           :max="maxIndex"
           :step="1"
           color="primary"
-          track-color="grey-lighten-2"
           density="compact"
           hide-details
         />

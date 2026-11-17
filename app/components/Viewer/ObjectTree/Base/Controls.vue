@@ -52,7 +52,6 @@ watch(
           icon="mdi-magnify"
           tooltipLocation="bottom"
           variant="text"
-          color="black"
           @click="showSearch = !showSearch"
         />
 
@@ -62,8 +61,6 @@ watch(
               data-testid="searchObjectsInput"
               :model-value="search"
               placeholder="Search objects..."
-              color="black"
-              base-color="black"
               variant="plain"
               density="compact"
               prepend-inner-icon=""
@@ -90,7 +87,6 @@ watch(
               sortType === 'name' ? 'mdi-sort-alphabetical-ascending' : 'mdi-sort-numeric-ascending'
             "
             variant="text"
-            color="black"
             tooltipLocation="bottom"
             @click="emit('toggle-sort')"
           />
@@ -101,7 +97,6 @@ watch(
                 tooltip="Filter options"
                 icon="mdi-filter-variant"
                 variant="text"
-                color="black"
                 tooltipLocation="bottom"
                 v-bind="menuProps"
               />
@@ -123,7 +118,6 @@ watch(
             :tooltip="isCollapsed ? 'Expand All' : 'Collapse All'"
             :icon="isCollapsed ? 'mdi-expand-all-outline' : 'mdi-collapse-all-outline'"
             variant="text"
-            color="black"
             tooltipLocation="bottom"
             @click="isCollapsed ? emit('expand-all') : emit('collapse-all')"
           />
@@ -143,13 +137,13 @@ watch(
 
 .controls-capsule.is-expanded {
   width: 100%;
-  background-color: rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background-color: rgba(var(--v-theme-on-surface), 0.05);
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.08);
 }
 
 .controls-capsule:hover:not(.is-expanded) {
-  background-color: rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background-color: rgba(var(--v-theme-on-surface), 0.05);
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.08);
 }
 
 :deep(.v-field__input) {

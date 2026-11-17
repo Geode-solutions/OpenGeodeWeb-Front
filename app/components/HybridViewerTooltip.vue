@@ -207,21 +207,21 @@ function formatAttributeValue(val: unknown): string {
 }
 .tooltip-container {
   min-width: 220px;
-  color: white;
+  color: rgb(var(--v-theme-on-surface));
   font-size: 0.875rem;
 }
 .tooltip-label {
-  color: #bdbdbd;
+  color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
   font-weight: bold;
   white-space: nowrap;
 }
 .tooltip-value {
-  color: #a7ffeb;
+  color: rgb(var(--v-theme-primary));
   font-weight: 500;
   white-space: nowrap;
 }
 .tooltip-value-dim {
-  color: #eeeeee;
+  color: rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity));
   font-size: 0.75rem !important;
 }
 .tooltip-label + .tooltip-value,

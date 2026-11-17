@@ -106,7 +106,10 @@ function onCenterClick(event: MouseEvent): void {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, var(--adaptive-opacity));
+  background: rgba(
+    var(--v-theme-surface),
+    max(var(--adaptive-opacity), var(--ogw-viewer-glass-min-opacity, 0))
+  );
   backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
   -webkit-backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
   z-index: 0;
@@ -123,6 +126,9 @@ function onCenterClick(event: MouseEvent): void {
 }
 
 .central-selector-btn:hover::before {
-  background: rgba(255, 255, 255, calc(var(--adaptive-opacity, 0.15) + 0.15));
+  background: rgba(
+    var(--v-theme-surface),
+    calc(max(var(--adaptive-opacity, 0.15), var(--ogw-viewer-glass-min-opacity, 0)) + 0.15)
+  );
 }
 </style>

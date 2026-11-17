@@ -83,7 +83,7 @@ async function saveRename(): void {
             icon
             variant="text"
             size="x-small"
-            color="grey-darken-1"
+            class="text-medium-emphasis"
             @click="startEditing(position)"
           >
             <v-icon size="14">mdi-pencil</v-icon>
@@ -103,7 +103,7 @@ async function saveRename(): void {
       </template>
     </v-list-item>
   </v-list>
-  <div v-else class="text-center text-grey-lighten-1 py-4 italic text-caption">
+  <div v-else class="text-center text-medium-emphasis py-4 italic text-caption">
     <v-icon size="32" class="mb-1 d-block mx-auto opacity-20">mdi-camera-off</v-icon>
     No saved positions yet.
   </div>

@@ -223,8 +223,8 @@ watch(
 <style scoped>
 .color-picker-wrapper {
   width: 220px;
-  background-color: rgba(33, 33, 33, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  background-color: rgba(var(--v-theme-surface), 0.95);
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity)) !important;
   outline: none;
 }
 
@@ -257,7 +257,7 @@ watch(
   width: 100%;
   box-sizing: border-box;
   padding: 6px 10px;
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: rgba(var(--v-theme-on-surface), 0.08);
   border: 1px solid transparent;
   border-radius: 6px;
   outline: none;
@@ -270,6 +270,6 @@ watch(
 }
 
 .color-input-field:focus {
-  border-color: rgba(255, 255, 255, 0.3);
+  border-color: rgba(var(--v-theme-on-surface), 0.3);
 }
 </style>

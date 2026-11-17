@@ -119,7 +119,7 @@ watch(filteredPresets, drawAllCanvases);
       contained
       persistent
       class="align-center justify-center"
-      scrim="#1e1e1e"
+      scrim="surface"
       opacity="0.6"
     >
       <v-progress-circular indeterminate color="primary" />
@@ -134,8 +134,6 @@ watch(filteredPresets, drawAllCanvases);
       variant="solo-filled"
       flat
       class="mb-3"
-      base-color="white"
-      color="white"
     />
 
     <v-list
@@ -150,7 +148,7 @@ watch(filteredPresets, drawAllCanvases);
       <template v-for="(item, itemIdx) in filteredPresets" :key="item.Name">
         <v-list-group v-if="item.Children" :value="item.Name">
           <template #activator="{ props: gProps }">
-            <v-list-item v-bind="gProps" :title="item.Name" class="text-white font-weight-bold" />
+            <v-list-item v-bind="gProps" :title="item.Name" class="font-weight-bold" />
           </template>
 
           <v-list-item
@@ -162,7 +160,7 @@ watch(filteredPresets, drawAllCanvases);
             rounded="md"
           >
             <div class="d-flex flex-column py-1">
-              <span class="text-caption text-grey-lighten-1 mb-1">{{ child.Name }}</span>
+              <span class="text-caption text-medium-emphasis mb-1">{{ child.Name }}</span>
               <canvas
                 :ref="
                   (element: Element | null) =>
@@ -185,7 +183,7 @@ watch(filteredPresets, drawAllCanvases);
           rounded="md"
         >
           <div class="d-flex flex-column py-1">
-            <span class="text-caption text-grey-lighten-1 mb-1">{{ item.Name }}</span>
+            <span class="text-caption text-medium-emphasis mb-1">{{ item.Name }}</span>
             <canvas
               :ref="(element: Element | null) => setCanvasRef(item.Name, element, `s-${itemIdx}`)"
               width="200"
@@ -202,10 +200,10 @@ watch(filteredPresets, drawAllCanvases);
 
 <style scoped>
 .border-thin {
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity)) !important;
 }
 
 .v-list-item {
-  background-color: rgba(255, 255, 255, 0.1) !important;
+  background-color: rgba(var(--v-theme-on-surface), 0.06) !important;
 }
 </style>

@@ -321,7 +321,6 @@ function handleClose(): void {
         <v-btn
           variant="text"
           size="small"
-          color="white"
           data-testid="screenshotCancelButton"
           class="text-caption text-none"
           @click="handleClose"
@@ -334,7 +333,6 @@ function handleClose(): void {
           size="small"
           class="text-caption text-none"
           :disabled="(screenshot_type === 'file' && !filename) || !output_extension"
-          color="white"
           @click="takeScreenshot()"
         >
           Screenshot

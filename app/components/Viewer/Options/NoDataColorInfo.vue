@@ -40,8 +40,8 @@ const cssNoDataColor = computed<string>(() => {
   width: 26px;
   height: 15px;
   border-radius: 3px;
-  border: 2px solid rgba(255, 255, 255, 0.912);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(var(--v-theme-on-surface), 0.912);
+  box-shadow: 0 1px 2px rgba(var(--v-theme-on-surface), 0.3);
   cursor: pointer;
   outline: none;
   transition:
@@ -50,7 +50,7 @@ const cssNoDataColor = computed<string>(() => {
 }
 
 .color-picker-rect-btn:hover {
-  border-color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(var(--v-theme-on-surface), 0.9);
   transform: scale(1.1);
 }
 </style>

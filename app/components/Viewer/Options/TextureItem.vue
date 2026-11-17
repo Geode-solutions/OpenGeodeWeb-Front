@@ -111,7 +111,14 @@ watch(textureId, (value) => {
     />
   </v-col>
   <v-col cols="auto" class="pa-1 d-flex justify-center align-center">
-    <v-badge :model-value="textureId !== ''" color="white" floating dot offset-x="10" offset-y="10">
+    <v-badge
+      :model-value="textureId !== ''"
+      color="primary"
+      floating
+      dot
+      offset-x="10"
+      offset-y="10"
+    >
       <FileUploader
         @files_uploaded="files_uploaded_event($event)"
         :accept="['image/png', 'image/jpeg', 'image/bmp']"

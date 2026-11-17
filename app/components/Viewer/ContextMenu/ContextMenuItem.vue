@@ -162,6 +162,7 @@ export type { ItemProps };
             :src="btnImage"
             height="28"
             width="28"
+            class="ogw-svg-icon"
             style="pointer-events: none; object-fit: contain"
           />
         </v-btn>
@@ -214,7 +215,7 @@ export type { ItemProps };
 
 .menu-btn {
   background: transparent !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity)) !important;
   position: relative;
   overflow: hidden;
   transition: all 0.2s ease;
@@ -224,7 +225,10 @@ export type { ItemProps };
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, var(--adaptive-opacity));
+  background: rgba(
+    var(--v-theme-surface),
+    max(var(--adaptive-opacity), var(--ogw-viewer-glass-min-opacity, 0))
+  );
   backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
   -webkit-backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
   z-index: 0;
@@ -240,12 +244,15 @@ export type { ItemProps };
 }
 
 .menu-btn:hover::before {
-  background: rgba(255, 255, 255, calc(var(--adaptive-opacity, 0.15) + 0.15));
+  background: rgba(
+    var(--v-theme-surface),
+    calc(max(var(--adaptive-opacity, 0.15), var(--ogw-viewer-glass-min-opacity, 0)) + 0.15)
+  );
 }
 
 .menu-btn.v-btn--active {
   background-color: v-bind(primaryColor) !important;
-  color: white !important;
+  color: rgb(var(--v-theme-on-primary)) !important;
 }
 
 .menu-btn.v-btn--active::before {
@@ -254,8 +261,12 @@ export type { ItemProps };
   -webkit-backdrop-filter: none !important;
 }
 
+.ogw-svg-icon ::v-deep(.v-img__img) {
+  filter: var(--ogw-svg-icon-filter, none);
+}
+
 .menu-btn.v-btn--active ::v-deep(.v-img__img) {
-  filter: invert(100%);
+  filter: var(--ogw-svg-icon-active-filter, invert(100%));
 }
 
 .menu-options {

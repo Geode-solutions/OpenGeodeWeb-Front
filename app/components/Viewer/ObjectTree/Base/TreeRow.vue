@@ -66,7 +66,6 @@ function handleRowClick(event: MouseEvent): void {
         :data-testid="item.isOpen ? 'collapseTreeRowButton' : 'expandTreeRowButton'"
         :icon="item.isOpen ? 'mdi-menu-down' : 'mdi-menu-right'"
         :class="item.isLeaf ? 'icon-placeholder' : 'me-1'"
-        color="black"
         @click.stop="$emit('toggle-open', item.raw)"
       />
       <div v-else class="icon-placeholder" />
@@ -77,7 +76,6 @@ function handleRowClick(event: MouseEvent): void {
           icon="mdi-layers-triple"
           variant="text"
           density="compact"
-          color="black"
           class="flex-shrink-0"
           style="z-index: 4"
           @click.stop="triggerHorizonStackModal(item.raw)"
@@ -101,7 +99,6 @@ function handleRowClick(event: MouseEvent): void {
           "
           variant="text"
           density="compact"
-          color="black"
           class="flex-shrink-0"
           @click.stop="$emit('toggle-select', item.raw)"
           @mousedown.stop
@@ -115,7 +112,7 @@ function handleRowClick(event: MouseEvent): void {
       <slot name="title" :item="item.raw" :is-leaf="item.isLeaf">
         <v-list-item-title
           :class="{ 'font-weight-bold': !item.isLeaf }"
-          class="text-black"
+          class="text-high-emphasis"
           style="font-size: 0.8rem !important"
         >
           {{ item.raw[itemProps.title] || item.id }}

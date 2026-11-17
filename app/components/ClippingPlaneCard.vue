@@ -59,7 +59,6 @@ const emit = defineEmits<Emits>();
           :max="1"
           :step="0.05"
           :color="getPlaneCssColor(index)"
-          track-color="grey-lighten-2"
           density="compact"
           hide-details
         />

@@ -139,14 +139,14 @@ async function copyToClipboard(text: string, label: string): Promise<void> {
 
       <div class="d-flex flex-column ga-1">
         <span v-if="actualItem.geode_id" class="text-caption d-flex align-center">
-          <strong class="text-white mr-1">ID:</strong>
+          <strong class="mr-1">ID:</strong>
           <span data-testid="tooltipIdValue">{{ actualItem.geode_id }}</span>
           <v-btn
             data-testid="copyIdBtn"
             icon
             variant="text"
             density="compact"
-            class="ml-1 text-white"
+            class="ml-1"
             style="width: 18px; height: 18px; min-width: 18px; min-height: 18px"
             @click.stop="copyToClipboard(actualItem.geode_id, 'ID')"
           >
@@ -154,14 +154,14 @@ async function copyToClipboard(text: string, label: string): Promise<void> {
           </v-btn>
         </span>
         <span v-if="actualItem.title" class="text-caption d-flex align-center">
-          <strong class="text-white mr-1">Name:</strong>
+          <strong class="mr-1">Name:</strong>
           <span>{{ tooltipTitle }}</span>
           <v-btn
             data-testid="copyNameBtn"
             icon
             variant="text"
             density="compact"
-            class="ml-1 text-white"
+            class="ml-1"
             style="width: 18px; height: 18px; min-width: 18px; min-height: 18px"
             @click.stop="copyToClipboard(actualItem.title, 'Name')"
           >
@@ -169,7 +169,7 @@ async function copyToClipboard(text: string, label: string): Promise<void> {
           </v-btn>
         </span>
         <span v-if="showCrs" class="text-caption d-flex align-center">
-          <strong class="text-white mr-1">CRS:</strong>
+          <strong class="mr-1">CRS:</strong>
           <span data-testid="tooltipCrsValue">{{ crsLabel }}</span>
           <v-btn
             v-if="crsStore.crsEditEnabled"
@@ -177,7 +177,7 @@ async function copyToClipboard(text: string, label: string): Promise<void> {
             icon
             variant="text"
             density="compact"
-            class="ml-1 text-white"
+            class="ml-1"
             style="width: 18px; height: 18px; min-width: 18px; min-height: 18px"
             @click.stop="crsStore.requestCrsEdit(actualItem.id)"
           >
@@ -185,7 +185,7 @@ async function copyToClipboard(text: string, label: string): Promise<void> {
           </v-btn>
         </span>
         <span v-if="actualItem.is_active !== undefined" class="text-caption d-flex align-center">
-          <strong class="text-white mr-1">Status:</strong>
+          <strong class="mr-1">Status:</strong>
           <i class="ml-1">{{ actualItem.is_active ? "Active" : "Inactive" }}</i>
         </span>
         <ComponentRelations

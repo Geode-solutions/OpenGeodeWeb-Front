@@ -127,7 +127,11 @@ watch(
         height="24"
         max-width="24"
         class="mr-2"
-        style="filter: brightness(0); display: flex; align-items: center"
+        style="
+          filter: var(--ogw-mono-icon-filter, brightness(0));
+          display: flex;
+          align-items: center;
+        "
       />
       <v-icon v-else-if="mdiIcon" size="24" class="mr-2">{{ mdiIcon }}</v-icon>
       <v-icon v-else-if="closable" size="24" class="mr-2">mdi-drag-variant</v-icon>
@@ -180,8 +184,8 @@ watch(
   height: 100%;
   min-height: 0;
   background-color: transparent !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity)) !important;
+  box-shadow: 0 4px 15px rgba(var(--v-theme-on-surface), 0.05);
   position: relative;
   overflow: hidden;
   transition:
@@ -193,10 +197,12 @@ watch(
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, var(--adaptive-opacity));
+  background: rgba(
+    var(--v-theme-surface),
+    max(var(--adaptive-opacity), var(--ogw-viewer-glass-min-opacity, 0))
+  );
   backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
   -webkit-backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
-  mix-blend-mode: lighten;
   z-index: 0;
   pointer-events: none;
   border-radius: inherit;
@@ -225,7 +231,7 @@ watch(
   border-color: var(--tree-box-accent) !important;
   box-shadow:
     inset 0 0 0 2px var(--tree-box-accent),
-    0 4px 15px rgba(0, 0, 0, 0.05);
+    0 4px 15px rgba(var(--v-theme-on-surface), 0.05);
 }
 
 .tree-box.is-highlighted .tree-box-header {
@@ -235,8 +241,8 @@ watch(
 .tree-box-header {
   height: 32px !important;
   padding: 0 10px !important;
-  background-color: rgba(255, 255, 255, 0.05);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background-color: rgba(var(--v-theme-surface), 0.05);
+  border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.05);
   flex-shrink: 0;
   font-size: 0.875rem !important;
   line-height: 1.25rem !important;

@@ -49,7 +49,14 @@ const emit = defineEmits<Emits>();
       :src="icon"
       :height="iconSize"
       :width="iconSize"
-      class="d-flex justify-center align-center"
+      class="d-flex justify-center align-center ogw-svg-icon"
     />
   </v-btn>
 </template>
+
+<style scoped>
+/* The viewer SVG icons are drawn in black; apps with a dark chrome can recolor them */
+.ogw-svg-icon :deep(.v-img__img) {
+  filter: var(--ogw-svg-icon-filter, none);
+}
+</style>
