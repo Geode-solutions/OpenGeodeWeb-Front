@@ -105,6 +105,49 @@ describe("useDataStore - collections", () => {
     expect(faultRelations).toStrictEqual({ boundaries: [], internals: [] });
   });
 
+  test("fetchAllComponentRelations groups the relations of a model by parent", async () => {
+    const dataStore = useDataStore();
+    const modelId = "test_model_id";
+    const model = {
+      data_id: modelId,
+      geode_id: modelId,
+      viewer_type: "model",
+      geode_object_type: "Section",
+      mesh_components: [
+        {
+          ...component("surface", "Surface", 1),
+          boundaries: ["line1", "line2"],
+          internals: ["corner"],
+        },
+        { ...component("line1", "Line", 2), boundaries: ["corner"] },
+        component("line2", "Line", 3),
+        component("corner", "Corner", 4),
+      ],
+      collection_components: [{ ...component("fault", "Fault", 0), items: ["surface"] }],
+    };
+    await dataStore.addComponents(model);
+    await dataStore.addComponentRelations(model);
+    await dataStore.addComponents({ ...model, data_id: "other_model_id" });
+    await dataStore.addComponentRelations({
+      ...model,
+      data_id: "other_model_id",
+      mesh_components: [{ ...component("line2", "Line", 3), boundaries: ["corner"] }],
+    });
+
+    const relations = await dataStore.fetchAllComponentRelations(modelId);
+    // The collection link of the fault is not a boundary nor an internal relation
+    expect(Object.keys(relations).toSorted()).toStrictEqual(["line1", "surface"]);
+    expect(relations.surface?.boundaries.map((boundary) => boundary.id).toSorted()).toStrictEqual([
+      "line1",
+      "line2",
+    ]);
+    expect(relations.surface?.internals.map((internal) => internal.id)).toStrictEqual(["corner"]);
+    expect(relations.line1?.boundaries.map((boundary) => boundary.category)).toStrictEqual([
+      "Corner",
+    ]);
+    expect(relations.line1?.internals).toStrictEqual([]);
+  });
+
   describe("isItemViewable", () => {
     test("correctly identifies viewable and HorizonStack3D items", () => {
       const dataStore = useDataStore();

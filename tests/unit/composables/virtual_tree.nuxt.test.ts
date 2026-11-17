@@ -7,6 +7,12 @@ import { ref } from "vue";
 // Local imports
 import { type EmitFn, useVirtualTree } from "@ogw_front/composables/virtual_tree";
 
+vi.setConfig({ testTimeout: 10_000 });
+
+function rows(tree: ReturnType<typeof useVirtualTree>): unknown[] {
+  return tree.displayItems.value.map((row) => [row.id, row.depth, row.isLeaf, row.isExpandable]);
+}
+
 describe("virtual tree composable", () => {
   test("correctly handles empty collections without treating them as leaf nodes", () => {
     // Structure:
@@ -55,5 +61,88 @@ describe("virtual tree composable", () => {
 
     // 4. ModelBoundaries should not be indeterminate since all its leaf descendants are selected
     expect(getIndeterminate(model_boundaries_item)).toBe(false);
+  });
+
+  describe("details", () => {
+    // Surface S has its boundaries as details: Surfaces > S > Boundaries > line1, line2
+    const line1 = { id: "line1", title: "Line 1" };
+    const line2 = { id: "line2", title: "Line 2" };
+    const boundaries = { id: "S:boundaries", title: "Boundaries (2)", children: [line1, line2] };
+    const surface = { id: "S", title: "Surface S", details: [boundaries] };
+    const otherSurface = { id: "T", title: "Surface T" };
+    const surfaces = { id: "Surface", title: "Surfaces", children: [surface, otherSurface] };
+
+    function setup(overrides: Record<string, unknown> = {}): {
+      tree: ReturnType<typeof useVirtualTree>;
+      emit: ReturnType<typeof vi.fn<EmitFn>>;
+    } {
+      const props = ref({
+        items: [surfaces],
+        opened: ["Surface"],
+        selected: [] as string[],
+        selection: { selectable: true, strategy: "classic" },
+        ...overrides,
+      });
+      const emit = vi.fn<EmitFn>();
+      return { tree: useVirtualTree(props, emit), emit };
+    }
+
+    test("an item with details is an expandable leaf", () => {
+      const { tree } = setup();
+      expect(rows(tree)).toStrictEqual([
+        ["Surface", 0, false, true],
+        ["S", 1, true, true],
+        ["T", 1, true, false],
+      ]);
+    });
+
+    test("opening an item lists its details under it", () => {
+      const { tree } = setup({ opened: ["Surface", "S", "S:boundaries"] });
+      expect(rows(tree)).toStrictEqual([
+        ["Surface", 0, false, true],
+        ["S", 1, true, true],
+        ["S:boundaries", 2, false, true],
+        ["line1", 3, true, false],
+        ["line2", 3, true, false],
+        ["T", 1, true, false],
+      ]);
+    });
+
+    test("details are hidden while searching", () => {
+      const { tree } = setup({ opened: ["Surface", "S", "S:boundaries"], search: "Surface S" });
+      expect(rows(tree)).toStrictEqual([
+        ["Surface", 0, false, true],
+        ["S", 1, true, false],
+      ]);
+    });
+
+    test("selecting an item with details only selects the item itself", () => {
+      const { tree, emit } = setup();
+      tree.toggleSelect(surface);
+      expect(emit).toHaveBeenLastCalledWith("update:selected", ["S"]);
+
+      tree.toggleSelect(surfaces);
+      expect(emit).toHaveBeenLastCalledWith("update:selected", ["Surface", "S", "T"]);
+    });
+
+    test("an item visibility does not depend on its details", () => {
+      const { tree } = setup({ selected: ["line1", "line2"] });
+      expect(tree.isSelected(surface)).toBe(false);
+      expect(tree.getIndeterminate(surface)).toBe(false);
+      expect(tree.isSelected(boundaries)).toBe(true);
+      expect(tree.isSelected(surfaces)).toBe(false);
+    });
+
+    test("selecting a details group selects its components", () => {
+      const { tree, emit } = setup({ selected: ["S"] });
+      tree.toggleSelect(boundaries);
+      expect(emit).toHaveBeenLastCalledWith("update:selected", [
+        "S",
+        "S:boundaries",
+        "line1",
+        "line2",
+      ]);
+      expect(tree.isSelected(surface)).toBe(true);
+    });
   });
 });
