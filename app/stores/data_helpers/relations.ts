@@ -18,8 +18,35 @@ interface ModelComponentRelationRecord extends DataIdentified {
   type: string;
 }
 
+const RELATION_KEYS: Readonly<Record<string, keyof ComponentRelations>> = {
+  boundary: "boundaries",
+  internal: "internals",
+};
+
+type MutableComponentRelations = { [Key in keyof ComponentRelations]: FormattedComponent[] };
+
+function groupRelationsByParent(
+  relations: readonly ModelComponentRelationRecord[],
+  components: readonly ModelComponentRecord[],
+): Record<string, ComponentRelations> {
+  const componentsById = new Map(
+    components.map((component) => [component.geode_id, toFormattedComponent(component)]),
+  );
+  const byParent: Record<string, MutableComponentRelations> = {};
+  for (const relation of relations) {
+    const key = RELATION_KEYS[relation.type];
+    const child = componentsById.get(relation.child);
+    if (key !== undefined && child !== undefined) {
+      byParent[relation.parent] ??= { boundaries: [], internals: [] };
+      byParent[relation.parent]?.[key].push(child);
+    }
+  }
+  return byParent;
+}
+
 export function useDataRelations(): {
   getComponentRelations: typeof getComponentRelations;
+  fetchAllComponentRelations: typeof fetchAllComponentRelations;
 } {
   const model_components_db = getTable<ModelComponentRecord>("model_components");
   const model_components_relation_db = getTable<ModelComponentRelationRecord>(
@@ -53,7 +80,18 @@ export function useDataRelations(): {
     return { boundaries, internals };
   }
 
-  return { getComponentRelations };
+  // The boundaries and internals of every component of the model, read in two queries
+  async function fetchAllComponentRelations(
+    modelId: ModelId,
+  ): Promise<Record<string, ComponentRelations>> {
+    const [relations, components] = await Promise.all([
+      model_components_relation_db.where("data_id").equals(modelId).toArray(),
+      model_components_db.where("data_id").equals(modelId).toArray(),
+    ]);
+    return groupRelationsByParent(relations, components);
+  }
+
+  return { getComponentRelations, fetchAllComponentRelations };
 }
 
 export type { ComponentRelations, ModelComponentRelationRecord };
