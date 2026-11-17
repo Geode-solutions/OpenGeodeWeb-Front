@@ -13,6 +13,7 @@ interface FlattenContext {
   openedSet: ComputedRef<Set<unknown>>;
   activeSet: ComputedRef<Set<unknown>>;
   getChildrenOf: (item: TreeItem) => TreeItem[] | undefined;
+  getDetailsOf: (item: TreeItem) => TreeItem[] | undefined;
 }
 
 function matchesSearch(ctx: FlattenContext, item: TreeItem, id: unknown, search: string): boolean {
@@ -36,10 +37,24 @@ function createDisplayItem(ctx: FlattenContext, item: TreeItem, depth: number): 
     isOpen: ctx.openedSet.value.has(id),
     isActive: ctx.activeSet.value.has(id),
     isLeaf: true,
+    isExpandable: false,
   };
 }
 
 type FlattenChildren = (children: readonly TreeItem[]) => DisplayItem[];
+
+// An expandable row, followed by the rows under it only when it is open
+function expandableRow(
+  entry: DisplayItem,
+  isLeaf: boolean,
+  rowsUnder: () => readonly DisplayItem[],
+): DisplayItem[] {
+  const row = { ...entry, isLeaf, isExpandable: true };
+  if (!row.isOpen) {
+    return [row];
+  }
+  return [row, ...rowsUnder()];
+}
 
 // A branch is kept when it matches or when one of its descendants does
 function flattenSearchedBranch(
@@ -50,11 +65,7 @@ function flattenSearchedBranch(
   if (subtree.length === 0 && !matches) {
     return [];
   }
-  const branch = { ...entry, isLeaf: false };
-  if (!branch.isOpen) {
-    return [branch];
-  }
-  return [branch, ...subtree];
+  return expandableRow(entry, false, () => subtree);
 }
 
 function flattenOpenBranch(
@@ -62,11 +73,19 @@ function flattenOpenBranch(
   children: readonly TreeItem[],
   flattenChildren: FlattenChildren,
 ): DisplayItem[] {
-  const branch = { ...entry, isLeaf: false };
-  if (!branch.isOpen) {
-    return [branch];
+  return expandableRow(entry, false, () => flattenChildren(children));
+}
+
+// Details hang under a leaf that stays a leaf: selecting or clicking it only targets the item itself
+function flattenLeafDetails(
+  entry: DisplayItem,
+  details: readonly TreeItem[],
+  flattenChildren: FlattenChildren,
+): DisplayItem[] {
+  if (details.length === 0) {
+    return [entry];
   }
-  return [branch, ...flattenChildren(children)];
+  return expandableRow(entry, true, () => flattenChildren(details));
 }
 
 function flattenNode(
@@ -81,7 +100,11 @@ function flattenNode(
   const searching = search !== undefined && search !== "";
 
   if (children.length === 0) {
-    if (searching && !matchesSearch(ctx, item, entry.id, search)) {
+    // Details are hidden while searching: the search only filters the tree itself
+    if (!searching) {
+      return flattenLeafDetails(entry, ctx.getDetailsOf(item) ?? [], flattenChildren);
+    }
+    if (!matchesSearch(ctx, item, entry.id, search)) {
       return [];
     }
     return [entry];

@@ -62,10 +62,10 @@ function handleRowClick(event: MouseEvent): void {
 
     <div class="d-flex align-center flex-shrink-0">
       <v-icon
-        v-if="!item.isLeaf"
+        v-if="item.isExpandable"
         :data-testid="item.isOpen ? 'collapseTreeRowButton' : 'expandTreeRowButton'"
         :icon="item.isOpen ? 'mdi-menu-down' : 'mdi-menu-right'"
-        class="me-1"
+        :class="item.isLeaf ? 'icon-placeholder' : 'me-1'"
         color="black"
         @click.stop="$emit('toggle-open', item.raw)"
       />

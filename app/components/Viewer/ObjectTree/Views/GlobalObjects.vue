@@ -139,6 +139,24 @@ function showMenu(event: MouseEvent, item: TreeGroupItem): void {
   });
 }
 
+// Color of the opened model tree of a data, the link between the row and that tree
+function modelTreeColor(id: string): string | undefined {
+  return treeviewStore.opened_views.find((view) => view.id === id)?.color;
+}
+
+// The row of the model whose tree header is hovered
+const linkedRow = computed<{ id: string; color: string } | undefined>(() => {
+  const id = treeviewStore.hoveredModelId;
+  if (id === undefined) {
+    return undefined;
+  }
+  const color = modelTreeColor(id);
+  if (color === undefined) {
+    return undefined;
+  }
+  return { id, color };
+});
+
 function isModel(item: TreeGroupItem): boolean {
   const actualItem = item.raw || item;
   return (
@@ -161,6 +179,9 @@ function handleHoverEnter({
   }
 
   const is_model = isModel(item);
+  if (is_model) {
+    treeviewStore.setHoveredModel(actualItem.id);
+  }
 
   onHoverEnter(
     actualItem.id,
@@ -179,6 +200,9 @@ function handleHoverLeave({ item }: { item: TreeGroupItem }): void {
   const actualItem = item.raw || item;
   if (!actualItem.viewer_type) {
     return;
+  }
+  if (treeviewStore.hoveredModelId === actualItem.id) {
+    treeviewStore.setHoveredModel(undefined);
   }
   onHoverLeave(actualItem.id);
 }
@@ -222,6 +246,7 @@ function expandAll(): void {
         customFilter,
       }"
       :scroll-top="mainView?.scrollTop || 0"
+      :linked="linkedRow"
       class="transparent-treeview virtual-tree-height"
       @update:selected="(val) => onUpdateSelection(val as string[])"
       @update:scroll-top="treeviewStore.setScrollTop(mainView?.id ?? '', $event)"
@@ -259,8 +284,13 @@ function expandAll(): void {
             size="medium"
             style="height: 23px; width: 23px"
             class="ml-2"
-            variant="text"
-            v-tooltip="'Model\'s mesh components'"
+            :variant="modelTreeColor(item.id as string) ? 'tonal' : 'text'"
+            :color="modelTreeColor(item.id as string)"
+            v-tooltip="
+              modelTreeColor(item.id as string)
+                ? 'Close model\'s mesh components'
+                : 'Model\'s mesh components'
+            "
             @click.stop="
               treeviewStore.displayAdditionalTree(
                 item.id as string,
