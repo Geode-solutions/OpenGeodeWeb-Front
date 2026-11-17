@@ -35,4 +35,14 @@ describe("viewer rendering warnings", () => {
     },
     TIMEOUT,
   );
+
+  test(
+    "failed request is not thrown",
+    async () => {
+      const request = mockAs<ViewerRequest>(vi.fn().mockRejectedValue(new Error("timeout")));
+      await expect(showRenderingWarnings(request)).resolves.toBeUndefined();
+      expect(useFeedbackStore().feedbacks).toHaveLength(0);
+    },
+    TIMEOUT,
+  );
 });

@@ -61,6 +61,8 @@ export const useViewerStore = defineStore(
     const request_counter = ref(0);
     const status = ref(Status.NOT_CONNECTED);
     const version = ref("0.0.0");
+    // The viewer warnings are shown once, not again on each reconnection
+    const rendering_warnings_shown = ref(false);
     const protocol = computed(() => getWebsocketApiProtocol());
     const port = computed(() => getWebsocketApiPort(default_local_port.value));
     const base_url = computed(() => {
@@ -138,7 +140,10 @@ export const useViewerStore = defineStore(
           status.value = Status.NOT_CONNECTED;
           throw error;
         }
-        await showRenderingWarnings(request);
+        if (!rendering_warnings_shown.value) {
+          rendering_warnings_shown.value = true;
+          void showRenderingWarnings(request);
+        }
       });
     }
     async function launch(args: Readonly<{ projectFolderPath: string }>): Promise<unknown> {

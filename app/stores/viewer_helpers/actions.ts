@@ -1,6 +1,7 @@
 import type { MicroserviceVersionSchema } from "@ogw_shared/utils/types.js";
 import type { Vector3 } from "@kitware/vtk.js/types";
 import type { ViewerRequest } from "./request.js";
+import { consola } from "consola";
 import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_typed_schemas.js";
 import opengeodeweb_viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 import { useAppStore } from "@ogw_front/stores/app";
@@ -66,13 +67,18 @@ async function fetchViewerVersion(
   return result;
 }
 
-// Shows the viewer's warnings about its rendering setup, e.g. software rendering fallback
+// Shows the viewer's warnings about its rendering setup, e.g. software rendering fallback.
+// Informational only: a failure is logged, never thrown, so it cannot break the connection.
 async function showRenderingWarnings(request: ViewerRequest): Promise<void> {
   const schema = opengeodeweb_viewer_schemas.opengeodeweb_viewer.rendering_warnings;
-  const { warnings } = await request({ schema });
-  const feedbackStore = useFeedbackStore();
-  for (const warning of warnings) {
-    feedbackStore.add_warning(warning);
+  try {
+    const { warnings } = await request({ schema });
+    const feedbackStore = useFeedbackStore();
+    for (const warning of warnings) {
+      feedbackStore.add_warning(warning);
+    }
+  } catch (error) {
+    consola.warn("[viewer] Rendering warnings unavailable:", String(error));
   }
 }
 
