@@ -90,7 +90,7 @@ export function useTreeKeyboardNav(
     currentIndex: number,
     lastIndex: number,
   ): number {
-    if (item && !item.isLeaf && !item.isOpen) {
+    if (item && item.isExpandable && !item.isOpen) {
       toggleOpen(item.raw);
       return currentIndex;
     }
@@ -101,7 +101,7 @@ export function useTreeKeyboardNav(
     item: ReadonlyDisplayItem | undefined,
     currentIndex: number,
   ): number {
-    if (item && !item.isLeaf && item.isOpen) {
+    if (item && item.isExpandable && item.isOpen) {
       toggleOpen(item.raw);
       return currentIndex;
     }

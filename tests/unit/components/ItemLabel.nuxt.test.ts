@@ -18,7 +18,15 @@ const DATA_ID = "a".repeat(DATA_ID_LENGTH);
 const GEODE_ID = "01a08187-2c4c-7e64-85c5-52c3439f0626";
 
 function leaf(raw: Record<string, unknown>): DisplayItem {
-  return { raw, id: raw.id, depth: 0, isOpen: false, isActive: false, isLeaf: true };
+  return {
+    raw,
+    id: raw.id,
+    depth: 0,
+    isOpen: false,
+    isActive: false,
+    isLeaf: true,
+    isExpandable: false,
+  };
 }
 
 const VTooltipStub = {

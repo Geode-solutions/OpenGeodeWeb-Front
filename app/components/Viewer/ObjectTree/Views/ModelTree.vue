@@ -22,6 +22,7 @@ interface CollectionTreeItem {
   id: string;
   category?: string;
   children?: CollectionTreeItem[];
+  relation?: string;
   viewer_id?: number;
   title?: string;
 }
@@ -41,6 +42,7 @@ const {
   localCategories,
   cache,
   collectionTypes,
+  withRelations,
   selection: visibleComponents,
   updateVisibility,
 } = useModelTree(id);
@@ -109,10 +111,11 @@ const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
     result.push({
       ...category,
       id: categoryId,
-      children: sortAndFormatItems(
-        cache.value?.[categoryId],
+      children: withRelations(
+        categoryId,
+        sortAndFormatItems(cache.value?.[categoryId], sortType.value) as CollectionTreeItem[],
         sortType.value,
-      ) as unknown as CollectionTreeItem[],
+      ),
     });
   }
   return result;
@@ -131,6 +134,10 @@ function isCollectionNode(item: CollectionTreeItem): boolean {
 
 function showContextMenu(event: MouseEvent, item: CollectionTreeItem): void {
   const actualItem = item.raw || item;
+  // A boundaries or internals group is not a component type: it has no menu
+  if (actualItem.relation !== undefined) {
+    return;
+  }
   if (isCollectionNode(actualItem)) {
     emit("show-menu", {
       event,
