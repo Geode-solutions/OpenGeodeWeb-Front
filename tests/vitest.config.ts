@@ -18,7 +18,7 @@ const BROWSER_TIMEOUT = 60_000;
 const BROWSER_HOOK_TIMEOUT = 180_000;
 const BROWSER_WORKERS = 3;
 const VIEWPORT = { width: 1200, height: 800 };
-// Same tolerances as the Vease e2e tests: the references are made on Linux, Windows text rendering
+// The references are made on Linux: Windows text rendering
 // (DirectWrite vs FreeType) adds about 2% of different pixels
 const SCREENSHOT_THRESHOLD = 0.3;
 const LINUX_MAX_DIFF_PIXEL_RATIO = 0.02;
@@ -33,7 +33,7 @@ const browserShimPath = path.resolve(__dirname, "browser", "shim");
 
 const isCI = process.env.CI !== undefined && process.env.CI !== "";
 const globalRetry = isCI ? RETRIES : DEFAULT_RETRY;
-// Like the Vease e2e tests: one retry in CI. The model/collections "collection vertex attribute" step is flaky
+// One retry in CI. The model/collections "collection vertex attribute" step is flaky
 // (one surface sometimes keeps its previous color), with Playwright too
 const BROWSER_CI_RETRIES = 1;
 const browserRetry = isCI ? BROWSER_CI_RETRIES : DEFAULT_RETRY;
@@ -44,7 +44,8 @@ const aliases = {
   "@geode/opengeodeweb-front/shared": path.resolve(__dirname, "..", "shared"),
 };
 
-// The viewer tests and their helpers (browser/helpers, shared with Vease) are written for Playwright: in
+// The viewer tests and their helpers (browser/suites and browser/helpers, shared with the apps built on this layer)
+// Are written for Playwright: in
 // Browser mode, the Playwright API is replaced by the shim of browser/shim
 const browserAliases = [
   { find: /^@playwright\/test$/u, replacement: path.join(browserShimPath, "playwright.ts") },
@@ -138,7 +139,7 @@ export default defineConfig({
             commands: browserCommands,
             expect: {
               toMatchScreenshot: {
-                // One reference per screenshot for every browser and platform, like the Vease e2e tests
+                // One reference per screenshot for every browser and platform
                 resolveScreenshotPath: ({ arg, root, testFileDirectory, testFileName, ext }) =>
                   path.join(
                     browserScreenshotsPath,

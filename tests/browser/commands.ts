@@ -61,7 +61,7 @@ async function importServerUtils<Module>(
   return serverUtils;
 }
 
-// Each test file gets its own back and viewer, like each Vease e2e file gets its own app
+// Each test file gets its own back and viewer, so that its tests start from an empty app
 async function startMicroservices(context: BrowserCommandContext): Promise<Microservices> {
   const microservices = await importServerUtils<MicroservicesUtils>(context, "microservices.ts");
   const paths = await importServerUtils<PathUtils>(context, "path.ts");

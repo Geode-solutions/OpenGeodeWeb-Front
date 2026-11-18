@@ -1,5 +1,5 @@
 // A subset of the Playwright test API, implemented inside the page, so that the e2e helpers written for
-// Playwright (tests/browser/helpers, shared with Vease) run unchanged in Vitest browser mode. The locators are
+// Playwright (tests/browser/helpers and suites, shared with the apps built on this layer) run unchanged in Vitest browser mode. The locators are
 // Resolved in the DOM, the input events are sent by Vitest's playwright provider. Only what the helpers use is here.
 // The classes mirror Playwright's API: some of their methods do not need `this`
 // oxlint-disable max-lines, max-classes-per-file, class-methods-use-this
