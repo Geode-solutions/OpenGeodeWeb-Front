@@ -21,7 +21,7 @@ const {
   icon = "",
   mdiIcon = "",
   scrollTop = 0,
-  borderRadius = "16px",
+  borderRadius = "var(--ogw-viewer-panel-radius, 16px)",
   borderLeft = true,
   accent = undefined,
 } = defineProps<Props>();
@@ -240,7 +240,7 @@ watch(
 
 .tree-box-header {
   height: 32px !important;
-  padding: 0 10px !important;
+  padding: 0 var(--ogw-viewer-panel-padding, 10px) !important;
   background-color: rgba(var(--v-theme-surface), 0.05);
   border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.05);
   flex-shrink: 0;

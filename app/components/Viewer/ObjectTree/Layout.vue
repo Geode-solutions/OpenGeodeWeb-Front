@@ -16,6 +16,8 @@ const PERCENT_100 = 100;
 const TOTAL_PERCENT = 100;
 const MAX_PANEL_WIDTH_RATIO = 0.8;
 const AUTO_CLOSE_THRESHOLD = 80;
+// Apps can align the panels on their own shape system (fallbacks: the former look)
+const PANEL_RADIUS = "var(--ogw-viewer-panel-radius, 16px)";
 
 interface Props {
   containerWidth: number;
@@ -251,7 +253,7 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
           mdi-icon="mdi-file-tree-outline"
           :scroll-top="mainView?.scrollTop || 0"
           closable
-          :border-radius="additionalViews.length > 0 ? '0' : '0 16px 16px 0'"
+          :border-radius="additionalViews.length > 0 ? '0' : `0 ${PANEL_RADIUS} ${PANEL_RADIUS} 0`"
           :border-left="false"
           @close="treeviewStore.closeView('main')"
           @update:scroll-top="mainView && treeviewStore.setScrollTop(mainView.id, $event)"
@@ -288,7 +290,7 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
               :icon="geode_objects[view.geode_object_type ?? '']?.image"
               :scroll-top="view.scrollTop"
               closable
-              :border-radius="`0 ${index === 0 ? '16px' : '0'} ${index === additionalViews.length - 1 ? '16px' : '0'} 0`"
+              :border-radius="`0 ${index === 0 ? PANEL_RADIUS : '0'} ${index === additionalViews.length - 1 ? PANEL_RADIUS : '0'} 0`"
               :border-left="false"
               :accent="
                 view.color
@@ -346,16 +348,16 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
   position: absolute;
   z-index: 1;
   left: 0;
-  top: 8px;
-  height: calc(100% - 16px);
+  top: var(--ogw-viewer-panel-inset, 8px);
+  height: calc(100% - 2 * var(--ogw-viewer-panel-inset, 8px));
   pointer-events: auto;
 }
 
 .activity-bar {
   width: 48px;
   height: 100%;
-  border-radius: 16px 0 0 16px;
-  margin-left: 10px;
+  border-radius: var(--ogw-viewer-panel-radius, 16px) 0 0 var(--ogw-viewer-panel-radius, 16px);
+  margin-left: var(--ogw-viewer-panel-inset, 10px);
   border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
   border-right: none;
   box-shadow: 0 4px 15px rgba(var(--v-theme-on-surface), 0.05);
@@ -368,7 +370,7 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
 }
 
 .activity-bar.is-closed {
-  border-radius: 16px;
+  border-radius: var(--ogw-viewer-panel-radius, 16px);
   border-right: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
 }
 
@@ -433,7 +435,7 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
 
 .view-wrapper.drag-over {
   border: 2px dashed rgba(var(--v-theme-on-surface), 0.2);
-  border-radius: 16px;
+  border-radius: var(--ogw-viewer-panel-radius, 16px);
   background-color: rgba(var(--v-theme-on-surface), 0.02);
 }
 

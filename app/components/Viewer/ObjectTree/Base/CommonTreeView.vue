@@ -293,7 +293,7 @@ const { handleKeyDown } = useTreeKeyboardNav(
 .tree-row-wrapper {
   min-height: 28px !important;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: var(--ogw-viewer-row-radius, 4px);
   margin: 0 2px;
 }
 
