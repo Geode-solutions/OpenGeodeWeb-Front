@@ -127,7 +127,7 @@ export const useDataStore = defineStore("data", () => {
     formatedCollectionComponents,
     refFormatedCollectionComponents,
   } = useDataCollections();
-  const { getComponentRelations } = useDataRelations();
+  const { getComponentRelations, fetchAllComponentRelations } = useDataRelations();
   // Ids the viewer holds a pipeline for: an item is stored before it is registered, and non viewable items never are
   const registeredIds = reactive(new Set<string>());
   async function item(dataId: DataId): Promise<DataItem> {
@@ -450,6 +450,7 @@ export const useDataStore = defineStore("data", () => {
     formatedCollectionComponents,
     refFormatedCollectionComponents,
     getComponentRelations,
+    fetchAllComponentRelations,
   };
 });
 

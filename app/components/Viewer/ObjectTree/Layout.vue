@@ -5,6 +5,7 @@ import type { TreeMenuPayload } from "@ogw_front/utils/treeview";
 import ViewerObjectTreeBox from "@ogw_front/components/Viewer/ObjectTree/Box.vue";
 import { geode_objects } from "@ogw_front/assets/geode_objects";
 import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
+import { useModelHeaderHover } from "@ogw_front/composables/model_header_hover";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const WIDTH_MIN = 100;
@@ -23,6 +24,7 @@ interface Props {
 const { containerWidth } = defineProps<Props>();
 
 const treeviewStore = useTreeviewStore();
+const { onModelHeaderEnter, onModelHeaderLeave } = useModelHeaderHover();
 
 interface Emits {
   "show-menu": [payload: TreeMenuPayload];
@@ -86,6 +88,16 @@ watch([maxWidth, (): number => additionalViews.value.length], ([newMax]): void =
     }
   }
 });
+
+function modelGeodeId(modelId: string): string | undefined {
+  for (const group of treeviewStore.items) {
+    const child = group.children.find((item) => item.id === modelId);
+    if (child) {
+      return child.geode_id;
+    }
+  }
+  return undefined;
+}
 
 function onDragStart(index: number): void {
   draggedIndex.value = index;
@@ -278,10 +290,28 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
               closable
               :border-radius="`0 ${index === 0 ? '16px' : '0'} ${index === additionalViews.length - 1 ? '16px' : '0'} 0`"
               :border-left="false"
+              :accent="
+                view.color
+                  ? { color: view.color, highlighted: treeviewStore.hoveredModelId === view.id }
+                  : undefined
+              "
               @close="treeviewStore.closeView(view.id)"
               @dragstart="onDragStart(index + 1)"
               @update:scroll-top="treeviewStore.setScrollTop(view.id, $event)"
+              @header-enter="onModelHeaderEnter(view.id)"
+              @header-leave="onModelHeaderLeave(view.id)"
             >
+              <template #tooltip>
+                <div data-testid="modelTreeTooltip" class="d-flex flex-column ga-1 text-caption">
+                  <span><strong class="mr-1">Name:</strong>{{ view.title }}</span>
+                  <span v-if="view.geode_object_type">
+                    <strong class="mr-1">Type:</strong>{{ view.geode_object_type }}
+                  </span>
+                  <span v-if="modelGeodeId(view.id)">
+                    <strong class="mr-1">ID:</strong>{{ modelGeodeId(view.id) }}
+                  </span>
+                </div>
+              </template>
               <ModelTree
                 data-testid="modelComponentsObjectTree"
                 :id="view.id"

@@ -9,6 +9,8 @@ interface ItemPropsConfig {
   value: string;
   title: string;
   children: string;
+  // Sub-tree shown under an item without making it a branch: it stays a leaf for selection and clicks
+  details: string;
   height: number;
   [key: string]: unknown;
 }
@@ -37,6 +39,8 @@ interface DisplayItem {
   isOpen: boolean;
   isActive: boolean;
   isLeaf: boolean;
+  // A leaf can still be expanded when it carries details
+  isExpandable: boolean;
 }
 
 type EmitFn = (event: string, ...args: readonly unknown[]) => void;

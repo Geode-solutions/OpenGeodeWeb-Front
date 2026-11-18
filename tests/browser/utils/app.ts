@@ -27,7 +27,7 @@ async function startViewerApp(): Promise<void> {
   infraStore.register_microservice(viewerStore);
   backStore.default_local_port = String(microservices.backPort);
   viewerStore.default_local_port = String(microservices.viewerPort);
-  // The test pages share the IndexedDB of the origin: start empty, like Vease's clear_db plugin
+  // The test pages share the IndexedDB of the origin: start empty
   await useDataStore().clear();
   await viewerStore.ws_connect();
   // Vue Test Utils stubs <Transition> with a <transition-stub> element by default: it breaks Vuetify's direct

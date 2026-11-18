@@ -11,6 +11,8 @@ interface Props {
   scrollTop?: number;
   borderRadius?: string;
   borderLeft?: boolean;
+  // Ties the box to its row in the objects tree, highlighted while either is hovered
+  accent?: { color: string; highlighted: boolean };
 }
 
 const {
@@ -21,12 +23,17 @@ const {
   scrollTop = 0,
   borderRadius = "16px",
   borderLeft = true,
+  accent = undefined,
 } = defineProps<Props>();
+
+const slots = useSlots();
 
 interface Emits {
   close: [];
   dragstart: [event: DragEvent];
   "update:scrollTop": [value: number];
+  "header-enter": [];
+  "header-leave": [];
 }
 
 const emit = defineEmits<Emits>();
@@ -97,13 +104,21 @@ watch(
     ref="treeview-box"
     variant="outlined"
     class="tree-box d-flex flex-column"
-    :style="[adaptiveStyles, { borderRadius, borderLeft: borderLeft ? undefined : 'none' }]"
+    :class="{ 'is-highlighted': accent?.highlighted }"
+    :style="[
+      adaptiveStyles,
+      { borderRadius, borderLeft: borderLeft ? undefined : 'none' },
+      accent ? { '--tree-box-accent': accent.color } : {},
+    ]"
   >
+    <div v-if="accent" data-testid="treeBoxAccent" class="tree-box-accent" />
     <v-card-title
       class="tree-box-header d-flex align-center"
       :class="{ 'cursor-grab': closable }"
       :draggable="closable"
       @dragstart="emit('dragstart', $event)"
+      @mouseenter="emit('header-enter')"
+      @mouseleave="emit('header-leave')"
     >
       <v-img
         v-if="icon"
@@ -116,20 +131,27 @@ watch(
       />
       <v-icon v-else-if="mdiIcon" size="24" class="mr-2">{{ mdiIcon }}</v-icon>
       <v-icon v-else-if="closable" size="24" class="mr-2">mdi-drag-variant</v-icon>
-      <span
-        class="text-subtitle-2 font-weight-bold d-inline-flex align-center"
-        style="
-          height: 24px;
-          line-height: 1;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          flex-shrink: 1;
-          min-width: 0;
-        "
-      >
-        {{ title }}
-      </span>
+      <v-tooltip :disabled="!slots.tooltip" location="bottom start" open-delay="400">
+        <template #activator="{ props: tooltipProps }">
+          <span
+            v-bind="tooltipProps"
+            data-testid="treeBoxTitle"
+            class="text-subtitle-2 font-weight-bold d-inline-flex align-center"
+            style="
+              height: 24px;
+              line-height: 1;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              flex-shrink: 1;
+              min-width: 0;
+            "
+          >
+            {{ title }}
+          </span>
+        </template>
+        <slot name="tooltip" />
+      </v-tooltip>
       <v-spacer />
       <v-btn
         v-if="closable"
@@ -186,6 +208,28 @@ watch(
 .tree-box > * {
   position: relative;
   z-index: 1;
+}
+
+.tree-box-accent {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: var(--tree-box-accent);
+  pointer-events: none;
+}
+
+.tree-box.is-highlighted {
+  border-color: var(--tree-box-accent) !important;
+  box-shadow:
+    inset 0 0 0 2px var(--tree-box-accent),
+    0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.tree-box.is-highlighted .tree-box-header {
+  background-color: color-mix(in srgb, var(--tree-box-accent) 18%, transparent);
 }
 
 .tree-box-header {
