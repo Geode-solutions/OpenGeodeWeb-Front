@@ -51,7 +51,7 @@ onUnmounted(() => {
       <ChromeTheme>
         <div
           v-if="show"
-          class="transition-swing overflow-y-auto"
+          class="ogw-loading transition-swing overflow-y-auto"
           style="
             position: fixed;
             inset: 0;
