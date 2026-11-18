@@ -35,7 +35,7 @@ export const useBackStore = defineStore("back", {
       return getRestApiPort(this.default_local_port);
     },
     base_url(): string {
-      return this.base_url_for(useInfraStore().microservice_domain_name);
+      return this.base_url_for(useInfraStore().domain_name);
     },
     base_url_for(): (domain_name: string) => string {
       return (domain_name: string) => {

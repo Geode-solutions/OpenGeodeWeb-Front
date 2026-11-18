@@ -30,36 +30,23 @@ describe("infra store", () => {
     });
 
     describe("domain_name", () => {
+      // The local Flask microservices only listen on IPv4: localhost would make browsers try ::1 first
       test("app_mode BROWSER", () => {
         const infraStore = useInfraStore();
         infraStore.app_mode = appMode.BROWSER;
-        expect(infraStore.domain_name).toBe("localhost");
+        expect(infraStore.domain_name).toBe("127.0.0.1");
       });
 
       test("app_mode DESKTOP", () => {
         const infraStore = useInfraStore();
         infraStore.app_mode = appMode.DESKTOP;
-        expect(infraStore.domain_name).toBe("localhost");
+        expect(infraStore.domain_name).toBe("127.0.0.1");
       });
 
       test("app_mode CLOUD", () => {
         const infraStore = useInfraStore();
         infraStore.app_mode = appMode.CLOUD;
-        expect(infraStore.domain_name).toBe("localhost");
-      });
-    });
-
-    describe("microservice_domain_name", () => {
-      test("localhost becomes the IPv4 loopback", () => {
-        const infraStore = useInfraStore();
-        infraStore.domain_name = "localhost";
-        expect(infraStore.microservice_domain_name).toBe("127.0.0.1");
-      });
-
-      test("other hosts are kept", () => {
-        const infraStore = useInfraStore();
-        infraStore.domain_name = "example.com";
-        expect(infraStore.microservice_domain_name).toBe("example.com");
+        expect(infraStore.domain_name).toBe("127.0.0.1");
       });
     });
 
