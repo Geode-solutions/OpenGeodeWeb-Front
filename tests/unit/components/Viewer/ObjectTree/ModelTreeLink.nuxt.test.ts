@@ -10,7 +10,7 @@ import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 vi.setConfig({ testTimeout: 10_000 });
 
-const MODEL = { id: "a", title: "corbi", viewer_type: "model", geode_object_type: "BRep" };
+const MODEL = { id: "a", title: "corbi", viewer_object_type: "model", geode_object_type: "BRep" };
 
 // Renders the append slot of one model row and lets the test hover it
 const TREE_STUB = {

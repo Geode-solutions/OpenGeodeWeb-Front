@@ -30,7 +30,7 @@ const menuStore = useMenuStore();
 const treeviewStore = useTreeviewStore();
 
 const meta_data = computed(() => menuStore.current_meta_data || {});
-const isSceneMenu = computed(() => meta_data.value.viewer_type === "scene");
+const isSceneMenu = computed(() => meta_data.value.viewer_object_type === "scene");
 provideBatchGroup(() => meta_data.value.targetIds ?? []);
 
 const show_menu = ref<boolean>(true);
@@ -114,9 +114,9 @@ useEventListener(globalThis, "mouseup", (event: MouseEvent) => {
 
 const menu_items = shallowRef<Component[]>([]);
 watch(
-  () => [meta_data.value.viewer_type, meta_data.value.geode_object_type],
-  ([viewer_type, geode_object_type]) => {
-    menu_items.value = menuStore.getMenuItems(viewer_type, geode_object_type);
+  () => [meta_data.value.viewer_object_type, meta_data.value.geode_object_type],
+  ([viewer_object_type, geode_object_type]) => {
+    menu_items.value = menuStore.getMenuItems(viewer_object_type, geode_object_type);
   },
   { immediate: true },
 );
@@ -198,7 +198,7 @@ function toggleShowName(): void {
         />
 
         <InfoCard
-          v-if="!isSceneMenu && meta_data.viewer_type !== 'basemap'"
+          v-if="!isSceneMenu && meta_data.viewer_object_type !== 'basemap'"
           v-model:show="showName"
           :meta-data="meta_data"
         />

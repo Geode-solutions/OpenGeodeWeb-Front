@@ -13,7 +13,7 @@ import type {
   GeodeIdentified,
   GeodeObjectTyped,
   ModelId,
-  ViewerTyped,
+  ViewerObjectTyped,
 } from "@ogw_front/types/identifiers";
 import { type LegacyDataId, fromLegacyDataId } from "@ogw_front/utils/legacy_data_id";
 import { type ModelComponentRecord, useDataMesh } from "./data_helpers/mesh.js";
@@ -23,7 +23,7 @@ import { liveObservable } from "@ogw_front/utils/live_observable";
 import { useDataCollections } from "./data_helpers/collections.js";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
-interface DataItem extends DataIdentified, GeodeIdentified, GeodeObjectTyped, ViewerTyped {
+interface DataItem extends DataIdentified, GeodeIdentified, GeodeObjectTyped, ViewerObjectTyped {
   name: string;
   visible: boolean;
   created_at: string;
@@ -45,7 +45,7 @@ interface ModelComponentInput extends GeodeIdentified {
   items?: string[];
 }
 
-interface NewDataItem extends DataIdentified, GeodeIdentified, GeodeObjectTyped, ViewerTyped {
+interface NewDataItem extends DataIdentified, GeodeIdentified, GeodeObjectTyped, ViewerObjectTyped {
   name?: string;
   is_viewable?: boolean;
   binary_light_viewable?: string;
@@ -230,7 +230,7 @@ export const useDataStore = defineStore("data", () => {
       data_id: new_item.data_id,
       geode_id: new_item.geode_id,
       name: new_item.name ?? new_item.data_id,
-      viewer_type: new_item.viewer_type,
+      viewer_object_type: new_item.viewer_object_type,
       geode_object_type: new_item.geode_object_type,
       visible: true,
       created_at: new Date().toISOString(),

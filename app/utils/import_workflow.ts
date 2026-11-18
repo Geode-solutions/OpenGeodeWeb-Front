@@ -37,7 +37,7 @@ async function importDataItem(item: NewDataItem): Promise<string> {
   });
   let addDataComponentsTask: Promise<string | undefined> = Promise.resolve(undefined);
   let addDataRelationsTask: Promise<string | undefined> = Promise.resolve(undefined);
-  if (item.viewer_type === "model") {
+  if (item.viewer_object_type === "model") {
     addDataComponentsTask = dataStore.addComponents(item);
     addDataRelationsTask = dataStore.addComponentRelations(item);
   }
@@ -46,7 +46,7 @@ async function importDataItem(item: NewDataItem): Promise<string> {
     item.name ?? item.data_id,
     item.data_id,
     item.geode_id,
-    item.viewer_type,
+    item.viewer_object_type,
   );
   const addDataStyleTask = dataStyleStore.addDataStyle(item.data_id, item.geode_object_type);
   const addViewerTask = addDataTask.then(async () => {

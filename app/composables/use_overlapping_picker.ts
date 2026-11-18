@@ -1,7 +1,11 @@
 import { ref } from "vue";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
-import type { DataIdentified, GeodeObjectType, ViewerType } from "@ogw_front/types/identifiers";
+import type {
+  DataIdentified,
+  GeodeObjectType,
+  ViewerObjectType,
+} from "@ogw_front/types/identifiers";
 import { type DataItem, useDataStore } from "@ogw_front/stores/data";
 import { computeMenuPosition } from "@ogw_front/composables/overlapping_picker_menu";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -15,7 +19,7 @@ interface PickedItem {
 interface ProposedItem extends DataIdentified {
   viewer_id: number | undefined;
   name: string;
-  viewer_type: ViewerType | undefined;
+  viewer_object_type: ViewerObjectType | undefined;
   geode_object_type: GeodeObjectType | undefined;
 }
 
@@ -66,7 +70,7 @@ export function useOverlappingPicker(): UseOverlappingPickerReturn {
             data_id: pick.id,
             viewer_id: pick.viewer_id,
             name: item.name || "Unnamed Object",
-            viewer_type: item.viewer_type,
+            viewer_object_type: item.viewer_object_type,
             geode_object_type: item.geode_object_type,
           };
         } catch {
@@ -74,7 +78,7 @@ export function useOverlappingPicker(): UseOverlappingPickerReturn {
             data_id: pick.id,
             viewer_id: pick.viewer_id,
             name: "Unnamed Object",
-            viewer_type: undefined,
+            viewer_object_type: undefined,
             geode_object_type: undefined,
           };
         }
