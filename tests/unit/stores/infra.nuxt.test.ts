@@ -49,6 +49,20 @@ describe("infra store", () => {
       });
     });
 
+    describe("microservice_domain_name", () => {
+      test("localhost becomes the IPv4 loopback", () => {
+        const infraStore = useInfraStore();
+        infraStore.domain_name = "localhost";
+        expect(infraStore.microservice_domain_name).toBe("127.0.0.1");
+      });
+
+      test("other hosts are kept", () => {
+        const infraStore = useInfraStore();
+        infraStore.domain_name = "example.com";
+        expect(infraStore.microservice_domain_name).toBe("example.com");
+      });
+    });
+
     describe("microservices_connected", () => {
       test("no microservices registered", () => {
         const infraStore = useInfraStore();
