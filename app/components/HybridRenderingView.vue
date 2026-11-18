@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import ColormapQuickPicker from "@ogw_front/components/Viewer/Options/ColormapQuickPicker.vue";
 import HybridViewerTooltip from "@ogw_front/components/HybridViewerTooltip.vue";
+import OrientationOverlay from "@ogw_front/components/Viewer/OrientationOverlay.vue";
 import ViewToolbar from "@ogw_front/components/ViewToolbar.vue";
 import ZoomBoxOverlay from "@ogw_front/components/ZoomBoxOverlay.vue";
 
@@ -107,6 +108,7 @@ async function handleClick(event: PointerEvent): Promise<void> {
       />
       <ZoomBoxOverlay v-if="hybridViewerStore.is_zoom_box_active" />
       <ViewToolbar />
+      <OrientationOverlay />
       <slot name="ui"></slot>
       <HybridViewerTooltip :container-width="elementWidth" :container-height="elementHeight" />
       <v-col

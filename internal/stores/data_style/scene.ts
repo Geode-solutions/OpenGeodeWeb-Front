@@ -9,6 +9,7 @@ import { getTable } from "@ogw_internal/database/database";
 import { useDataStyleState } from "./state";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
+import { viewerOrientationMarker } from "@ogw_front/composables/orientation_overlay";
 
 // Local constants
 const text_style_schema = viewer_schemas.opengeodeweb_viewer.viewer.set_text_style;
@@ -63,7 +64,8 @@ export function useSceneStyle(): {
 
   async function requestOrientationWidget(marker: SceneOrientationWidget): Promise<unknown> {
     const result = await viewerStore.request(
-      { schema: orientation_widget_schema, params: { marker } },
+      // With the front overlay, the viewer hides its marker while the scene style keeps the choice
+      { schema: orientation_widget_schema, params: { marker: viewerOrientationMarker(marker) } },
       {
         response_function: async () => {
           await saveSceneStyle({ orientation_widget: marker });

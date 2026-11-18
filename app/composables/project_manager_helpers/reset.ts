@@ -1,5 +1,6 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
+import { hideViewerMarker } from "@ogw_front/composables/orientation_overlay";
 import { releaseViewerDatabase } from "@ogw_front/composables/project_manager_helpers/viewer_session";
 import { useBasemapStore } from "@ogw_front/stores/basemap";
 import { useCrsStore } from "@ogw_front/stores/crs";
@@ -23,6 +24,9 @@ async function resetProject(): Promise<void> {
   const resetVisualizationSchema = viewer_schemas.opengeodeweb_viewer.viewer.reset_visualization;
   const timeout = undefined;
   await viewerStore.request({ schema: resetVisualizationSchema, timeout });
+  await hideViewerMarker(async (args) => {
+    await viewerStore.request(args);
+  });
 
   treeviewStore.clear();
   await dataStore.clear();
