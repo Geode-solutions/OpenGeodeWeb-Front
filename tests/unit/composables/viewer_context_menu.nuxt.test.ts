@@ -34,7 +34,7 @@ describe("viewer context menu", () => {
     expect(menuStore.display_menu).toBe(true);
     expect(menuStore.current_id).toBe("scene");
     expect(menuStore.current_meta_data).toStrictEqual({
-      viewer_type: "scene",
+      viewer_object_type: "scene",
       geode_object_type: "scene",
     });
     // No center button in the scene menu: its items sit closer together than object menus
@@ -69,8 +69,8 @@ describe("viewer context menu", () => {
 
     expect(item).not.toHaveBeenCalled();
     expect(openMenu.mock.calls.map(([options]) => [options.id, options.meta_data])).toStrictEqual([
-      ["basemap", { viewer_type: "basemap", geode_object_type: "Basemap" }],
-      ["basemap:routes", { viewer_type: "basemap", geode_object_type: "Map" }],
+      ["basemap", { viewer_object_type: "basemap", geode_object_type: "Basemap" }],
+      ["basemap:routes", { viewer_object_type: "basemap", geode_object_type: "Map" }],
     ]);
   });
 });

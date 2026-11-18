@@ -41,7 +41,7 @@ const snapshotMock = {
       {
         data_id: "abc123",
         geode_id: "11111111-1111-1111-1111-111111111111",
-        viewer_type: "mesh",
+        viewer_object_type: "mesh",
         geode_object_type: "PointSet2D",
         native_file: "native.ext",
         viewable_file: "viewable.ext",

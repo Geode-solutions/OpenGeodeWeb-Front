@@ -102,7 +102,7 @@ describe("project import", () => {
         items: [
           {
             data_id: "abc123",
-            viewer_type: "mesh",
+            viewer_object_type: "mesh",
             geode_object_type: "PointSet2D",
             native_file: "native.ext",
             viewable_file: "viewable.ext",

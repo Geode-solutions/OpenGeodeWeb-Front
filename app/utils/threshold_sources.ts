@@ -32,7 +32,7 @@ async function fetchSources(
   dataId: DataId,
 ): Promise<AttributeSource[]> {
   const item = await dataStore.item(dataId);
-  if (item.viewer_type !== "model") {
+  if (item.viewer_object_type !== "model") {
     return ["vertex", MESH_ELEMENT_KINDS[item.geode_object_type]]
       .filter((kind): kind is string => kind !== undefined)
       .map((kind) => attributeSource(kind, "", { id: dataId }));

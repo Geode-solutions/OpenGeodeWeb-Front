@@ -32,21 +32,21 @@ describe("treeview store actions", () => {
         name: "test_brep.og_brep",
         id: "1",
         geode_id: "00000000-0000-0000-0000-000000000001",
-        viewer_type: "model",
+        viewer_object_type: "model",
       },
       {
         geode_object_type: "BRep",
         name: "test_brep_2.og_brep",
         id: "2",
         geode_id: "00000000-0000-0000-0000-000000000002",
-        viewer_type: "model",
+        viewer_object_type: "model",
       },
       {
         geode_object_type: "EdgedCurve2D",
         name: "test_edgedcurve.og_edc2d",
         id: "2",
         geode_id: "00000000-0000-0000-0000-000000000003",
-        viewer_type: "mesh",
+        viewer_object_type: "mesh",
       },
     ];
 
@@ -56,7 +56,7 @@ describe("treeview store actions", () => {
         testItem.name,
         testItem.id,
         testItem.geode_id,
-        testItem.viewer_type,
+        testItem.viewer_object_type,
       );
       const itemsCopy = [...treeviewStore.items];
       expect(treeviewStore.items).toStrictEqual(itemsCopy.toSorted(sortByTitle));
