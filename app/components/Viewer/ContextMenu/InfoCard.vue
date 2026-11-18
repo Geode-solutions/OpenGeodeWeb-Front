@@ -80,7 +80,7 @@ const cleanName = computed<string>(() => {
   if (!meta) {
     return "Unnamed Object";
   }
-  if (componentName.value && meta.viewer_type === "model_component") {
+  if (componentName.value && meta.viewer_object_type === "model_component") {
     return componentName.value;
   }
   return asString(meta.name) ?? "Unnamed Object";

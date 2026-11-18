@@ -32,7 +32,7 @@ vi.mock(import("@ogw_front/composables/model_tree") as Promise<unknown>, () => (
   }),
 }));
 
-const meshItem = { raw: { id: MESH_ID, viewer_type: "mesh" } };
+const meshItem = { raw: { id: MESH_ID, viewer_object_type: "mesh" } };
 const blockItem = { raw: { id: "block", category: "Block", viewer_id: BLOCK_VIEWER_ID } };
 
 const cases = [

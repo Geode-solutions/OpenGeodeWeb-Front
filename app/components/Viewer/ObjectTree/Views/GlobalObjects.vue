@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // oxlint-disable max-dependencies
-import type { GeodeObjectTyped, ViewerTyped } from "@ogw_front/types/identifiers";
+import type { GeodeObjectTyped, ViewerObjectTyped } from "@ogw_front/types/identifiers";
 import {
   type MapStyle,
   basemapGroup,
@@ -34,7 +34,7 @@ interface Emits {
 
 const emit = defineEmits<Emits>();
 
-interface TreeGroupItem extends Partial<GeodeObjectTyped>, Partial<ViewerTyped> {
+interface TreeGroupItem extends Partial<GeodeObjectTyped>, Partial<ViewerObjectTyped> {
   raw?: TreeGroupItem;
   id: string;
   title?: string;
@@ -160,7 +160,7 @@ const linkedRow = computed<{ id: string; color: string } | undefined>(() => {
 function isModel(item: TreeGroupItem): boolean {
   const actualItem = item.raw || item;
   return (
-    actualItem.viewer_type === "model" ||
+    actualItem.viewer_object_type === "model" ||
     ["BRep", "Section"].includes(actualItem.geode_object_type ?? "")
   );
 }
@@ -174,7 +174,7 @@ function handleHoverEnter({
 }): void {
   const actualItem = item.raw || item;
 
-  if (!actualItem.viewer_type) {
+  if (!actualItem.viewer_object_type) {
     return;
   }
 
@@ -198,7 +198,7 @@ function handleHoverEnter({
 
 function handleHoverLeave({ item }: { item: TreeGroupItem }): void {
   const actualItem = item.raw || item;
-  if (!actualItem.viewer_type) {
+  if (!actualItem.viewer_object_type) {
     return;
   }
   if (treeviewStore.hoveredModelId === actualItem.id) {
@@ -269,7 +269,7 @@ function expandAll(): void {
       <template #append="{ item }">
         <template v-if="item.geode_object_type !== 'HorizonStack3D'">
           <v-btn
-            v-if="item.viewer_type"
+            v-if="item.viewer_object_type"
             data-testid="focusObjectButton"
             icon="mdi-target"
             size="medium"

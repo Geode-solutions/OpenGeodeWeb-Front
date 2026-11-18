@@ -24,7 +24,7 @@ describe("useDataStore - collections", () => {
       data_id: modelId,
       geode_id: "00000000-0000-0000-0000-000000000001",
       name: "Test Model",
-      viewer_type: "model",
+      viewer_object_type: "model",
       geode_object_type: "BRep",
     });
 
@@ -32,7 +32,7 @@ describe("useDataStore - collections", () => {
     await dataStore.addComponents({
       data_id: modelId,
       geode_id: "00000000-0000-0000-0000-000000000001",
-      viewer_type: "model",
+      viewer_object_type: "model",
       geode_object_type: "BRep",
       mesh_components: [
         {
@@ -68,7 +68,7 @@ describe("useDataStore - collections", () => {
     await dataStore.addComponentRelations({
       data_id: modelId,
       geode_id: "00000000-0000-0000-0000-000000000001",
-      viewer_type: "model",
+      viewer_object_type: "model",
       geode_object_type: "BRep",
       collection_components: [
         {

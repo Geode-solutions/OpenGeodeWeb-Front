@@ -10,8 +10,8 @@ import type {
   GeodeIdentified,
   GeodeObjectType,
   GeodeObjectTyped,
-  ViewerType,
-  ViewerTyped,
+  ViewerObjectType,
+  ViewerObjectTyped,
 } from "@ogw_front/types/identifiers";
 import type { TreeGroup, TreeNode } from "@ogw_front/types/tree";
 import { ref, watch } from "vue";
@@ -30,7 +30,7 @@ interface OpenedView extends Partial<GeodeObjectTyped> {
   color?: string;
 }
 
-interface TreeviewChild extends TreeNode, GeodeIdentified, GeodeObjectTyped, ViewerTyped {}
+interface TreeviewChild extends TreeNode, GeodeIdentified, GeodeObjectTyped, ViewerObjectTyped {}
 
 type TreeviewGroup = TreeGroup<TreeviewChild>;
 
@@ -192,13 +192,13 @@ export const useTreeviewStore = defineStore("treeview", () => {
     name: string,
     dataId: DataId,
     geode_id: GeodeId,
-    viewer_type: ViewerType,
+    viewer_object_type: ViewerObjectType,
   ): void {
     const child: TreeviewChild = {
       title: name,
       id: dataId,
       geode_id,
-      viewer_type,
+      viewer_object_type,
       geode_object_type: geodeObjectType,
     };
     let found = false;

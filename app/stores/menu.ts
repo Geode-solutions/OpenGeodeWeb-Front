@@ -2,13 +2,13 @@ import type {
   DataIdentified,
   GeodeObjectType,
   GeodeObjectTyped,
-  ViewerType,
-  ViewerTyped,
+  ViewerObjectType,
+  ViewerObjectTyped,
 } from "@ogw_front/types/identifiers";
 import { type MenuItems, menusData } from "./menu_helpers/menus_data.js";
 
 interface MenuMetaData
-  extends Partial<DataIdentified>, Partial<GeodeObjectTyped>, Partial<ViewerTyped> {
+  extends Partial<DataIdentified>, Partial<GeodeObjectTyped>, Partial<ViewerObjectTyped> {
   targetIds?: string[];
   [key: string]: unknown;
 }
@@ -40,23 +40,23 @@ export const useMenuStore = defineStore("menu", () => {
   const active_item_index = ref<number | undefined>(undefined);
   const current_meta_data = ref<MenuMetaData>({});
   const menuRadius = computed(() =>
-    current_meta_data.value.viewer_type === "scene" ? SCENE_MENU_RADIUS : MENU_RADIUS,
+    current_meta_data.value.viewer_object_type === "scene" ? SCENE_MENU_RADIUS : MENU_RADIUS,
   );
 
   function getMenuItems(
-    viewerType: ViewerType | undefined,
+    viewerObjectType: ViewerObjectType | undefined,
     geodeObjectType: GeodeObjectType | undefined,
   ): MenuItems {
     if (
-      viewerType === undefined ||
-      viewerType === "" ||
+      viewerObjectType === undefined ||
+      viewerObjectType === "" ||
       geodeObjectType === undefined ||
       geodeObjectType === "" ||
-      !menus.value[viewerType]
+      !menus.value[viewerObjectType]
     ) {
       return [];
     }
-    return menus.value[viewerType]?.[geodeObjectType] ?? [];
+    return menus.value[viewerObjectType]?.[geodeObjectType] ?? [];
   }
 
   function closeMenu(): void {
@@ -73,7 +73,7 @@ export const useMenuStore = defineStore("menu", () => {
     closeMenu();
 
     if (meta_data) {
-      const items = getMenuItems(meta_data.viewer_type, meta_data.geode_object_type);
+      const items = getMenuItems(meta_data.viewer_object_type, meta_data.geode_object_type);
       if (items.length === 0) {
         return;
       }
