@@ -33,7 +33,10 @@ const INK = "#1F2E33";
 const ORANGE = "#F48830";
 
 const hybridViewerStore = useHybridViewerStore();
-const strataCanvas = useTemplateRef<HTMLCanvasElement>("strataCanvas");
+// The strata are drawn off the DOM and shown as an SVG image: the viewer keeps a single <canvas>, the
+// VTK one, which the viewer tests locate
+let strataCanvas: HTMLCanvasElement | undefined = undefined;
+const strataImage = ref("");
 
 const basis = computed(() => {
   const pose = toCameraPose(hybridViewerStore.camera_options);
@@ -94,9 +97,10 @@ function showPlanView(): void {
 }
 
 function drawStrata(): void {
-  const canvas = strataCanvas.value;
-  const context = canvas?.getContext("2d");
-  if (!canvas || !context || !basis.value) {
+  strataCanvas ??= document.createElement("canvas");
+  const canvas = strataCanvas;
+  const context = canvas.getContext("2d");
+  if (!context || !basis.value) {
     return;
   }
   const side = Math.ceil(2 * RADIUS * (globalThis.devicePixelRatio || 1));
@@ -105,20 +109,15 @@ function drawStrata(): void {
   const image = context.createImageData(side, side);
   image.data.set(strataPixels(basis.value, side, STRATA_COLOR));
   context.putImageData(image, 0, 0);
+  strataImage.value = canvas.toDataURL();
 }
 
-watch([basis, strataCanvas], drawStrata, { immediate: true, flush: "post" });
+watch(basis, drawStrata, { immediate: true });
 </script>
 
 <template>
   <div class="orientation-globe" data-testid="orientationGlobe">
     <div class="globe-stage">
-      <canvas
-        ref="strataCanvas"
-        class="globe-strata"
-        :style="{ width: `${2 * RADIUS}px`, height: `${2 * RADIUS}px` }"
-        aria-hidden="true"
-      />
       <svg
         :width="SIZE"
         :height="SIZE"
@@ -127,6 +126,16 @@ watch([basis, strataCanvas], drawStrata, { immediate: true, flush: "post" });
         role="group"
         aria-label="Orientation axes"
       >
+        <image
+          v-if="strataImage"
+          class="globe-strata"
+          :href="strataImage"
+          :x="-RADIUS"
+          :y="-RADIUS"
+          :width="2 * RADIUS"
+          :height="2 * RADIUS"
+          aria-hidden="true"
+        />
         <circle class="backdrop" :r="BACKDROP_RADIUS" />
         <g
           class="globe-body"
@@ -217,10 +226,6 @@ watch([basis, strataCanvas], drawStrata, { immediate: true, flush: "post" });
 }
 
 .globe-strata {
-  position: absolute;
-  /* RADIUS */
-  top: calc(50% - 30px);
-  left: calc(50% - 30px);
   pointer-events: none;
 }
 
