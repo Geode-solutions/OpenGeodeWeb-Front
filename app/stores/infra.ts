@@ -58,7 +58,7 @@ export const useInfraStore = defineStore("infra", {
     },
     // The local Flask microservices (Werkzeug) only listen on IPv4. With "localhost", browsers try ::1 first.
     // Windows is slow to refuse it: every request to them would pay that delay.
-    // domain_name itself stays the page host: the app store must remain same-origin (its API has no CORS).
+    // The page host stays in domain_name: the app store must remain same-origin (its API has no CORS).
     microservice_domain_name(): string {
       return this.domain_name === LOCALHOST ? IPV4_LOOPBACK : this.domain_name;
     },
