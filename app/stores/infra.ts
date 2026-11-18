@@ -12,12 +12,6 @@ interface ElectronApi {
   };
 }
 
-// The local Flask microservices (Werkzeug) only listen on IPv4. With "localhost", browsers try ::1 first.
-// Windows is slow to refuse it: every request to them would pay that delay.
-function domainNameFrom(hostname: string): string {
-  return hostname === LOCALHOST ? IPV4_LOOPBACK : hostname;
-}
-
 declare global {
   // oxlint-disable-next-line no-var -- required for global augmentation
   var electronAPI: ElectronApi["electronAPI"];
@@ -53,7 +47,7 @@ export const useInfraStore = defineStore("infra", {
     app_mode: useRuntimeConfig().public.MODE,
     status: Status.NOT_CREATED,
     microservices: [] as Microservice[],
-    domain_name: domainNameFrom(globalThis.location.hostname),
+    domain_name: globalThis.location.hostname,
   }),
   getters: {
     microservices_connected(): boolean {
@@ -61,6 +55,12 @@ export const useInfraStore = defineStore("infra", {
     },
     microservices_busy(): boolean {
       return this.microservices.some((store: Microservice) => store.is_busy === true);
+    },
+    // The local Flask microservices (Werkzeug) only listen on IPv4. With "localhost", browsers try ::1 first.
+    // Windows is slow to refuse it: every request to them would pay that delay.
+    // domain_name itself stays the page host: the app store must remain same-origin (its API has no CORS).
+    microservice_domain_name(): string {
+      return this.domain_name === LOCALHOST ? IPV4_LOOPBACK : this.domain_name;
     },
   },
   actions: {

@@ -82,7 +82,8 @@ describe("back store", () => {
       const backStore = useBackStore();
       infraStore.app_mode = appMode.BROWSER;
       infraStore.domain_name = "localhost";
-      expect(backStore.base_url).toBe(`http://localhost:${PORT_5000}`);
+      // The local back only listens on IPv4: localhost would make browsers try ::1 first
+      expect(backStore.base_url).toBe(`http://127.0.0.1:${PORT_5000}`);
     });
 
     test("app_mode CLOUD", () => {
