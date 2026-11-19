@@ -8,7 +8,7 @@ import {
 } from "@ogw_shared/utils/response_handlers/load.js";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
 import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
-import { geode_objects } from "@ogw_front/assets/geode_objects";
+import { geodeObjectImage } from "@ogw_front/assets/geode_objects";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { useBackStore } from "@ogw_front/stores/back";
 
@@ -94,15 +94,8 @@ function groupPendingFiles(pending: readonly FileAllowedObjects[]): PendingGroup
   return [...groups.values()];
 }
 
-// The geode_objects lookup is fixed and keyed by known object type names; a missing entry only happens if the backend reports a type this table doesn't know about.
 function geodeObjectTooltip(key: string, isLoadable: boolean): string {
-  return isLoadable
-    ? (geode_objects[key]?.tooltip ?? key)
-    : `Data not loadable with this class (${key})`;
-}
-
-function geodeObjectImage(key: string): string | undefined {
-  return geode_objects[key]?.image;
+  return isLoadable ? key : `Data not loadable with this class (${key})`;
 }
 
 function showCommonGeodeObjects(
