@@ -20,6 +20,8 @@ import {
   compassDialPoint,
   compassHeading,
   compassTilt,
+  facingCameraPose,
+  isFacing,
   northUpCameraPose,
 } from "@ogw_front/utils/orientation_compass";
 import { strataOpacity, visibleHeight } from "@ogw_front/utils/orientation_strata";
@@ -42,6 +44,8 @@ const DISTANCE = 10;
 const PRECISION = 6;
 const EAST_HEADING = 90;
 const WEST_HEADING = -90;
+const WEST_TARGET_HEADING = 270;
+const FULL_TURN = 360;
 const ELEVATION_HEIGHT = 5;
 const ORIGIN: Vec3 = [0, 0, 0];
 const UP_X: Vec3 = [1, 0, 0];
@@ -76,6 +80,11 @@ function tiltFrom(position: Vec3, view_up: Vec3): number {
 function northUpFrom(position: Vec3, view_up: Vec3): CameraPose {
   const cameraPose = pose(position, view_up);
   return assertDefined(northUpCameraPose(cameraPose, basisOf(cameraPose)));
+}
+
+function facingFrom(position: Vec3, view_up: Vec3, targetHeading: number): CameraPose {
+  const cameraPose = pose(position, view_up);
+  return assertDefined(facingCameraPose(cameraPose, basisOf(cameraPose), targetHeading));
 }
 
 describe("orientation gizmo projection", () => {
@@ -189,6 +198,21 @@ describe("orientation compass heading", () => {
     expect(northUp.position[1]).toBeCloseTo(-DISTANCE, PRECISION);
     expect(northUp.position[2]).toBeCloseTo(ELEVATION_HEIGHT, PRECISION);
     expect(compassHeading(basisOf(northUp))).toBeCloseTo(0, PRECISION);
+  });
+
+  test("turns the camera to face any heading, keeping its elevation and distance", () => {
+    const facingWest = facingFrom([-DISTANCE, 0, ELEVATION_HEIGHT], UP_Z, WEST_TARGET_HEADING);
+    expect(facingWest.position[0]).toBeCloseTo(DISTANCE, PRECISION);
+    expect(facingWest.position[1]).toBeCloseTo(0, PRECISION);
+    expect(facingWest.position[2]).toBeCloseTo(ELEVATION_HEIGHT, PRECISION);
+    expect(compassHeading(basisOf(facingWest))).toBeCloseTo(WEST_HEADING, PRECISION);
+  });
+
+  test("tells whether the camera already faces a heading", () => {
+    const lookingEast = basisOf(pose([-DISTANCE, 0, ELEVATION_HEIGHT], UP_Z));
+    expect(isFacing(lookingEast, EAST_HEADING)).toBe(true);
+    expect(isFacing(lookingEast, EAST_HEADING + FULL_TURN)).toBe(true);
+    expect(isFacing(lookingEast, 0)).toBe(false);
   });
 
   test("turns a top view so that north is up", () => {

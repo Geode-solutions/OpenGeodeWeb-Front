@@ -15,7 +15,7 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 // Orientation globe: a sphere crossed by horizontal strata (the "round shape & lines" of the Geode
 // Solutions brand, and the geometry of its mark), the world axes from its center and the north as the
 // Brand orange dot. The strata stay horizontal in the world, so up and the tilt read at a glance.
-// A click on an axis label looks from that axis; a click on the globe shows the plan view.
+// A click on an axis label looks from that axis; a click on the globe itself does nothing.
 
 const SIZE = 112;
 const HALF_SIZE = SIZE / 2;
@@ -92,10 +92,6 @@ function lookFrom(label: GlobeLabel): void {
   hybridViewerStore.setCameraOrientation(label.key);
 }
 
-function showPlanView(): void {
-  hybridViewerStore.setCameraOrientation("zplus");
-}
-
 function drawStrata(): void {
   strataCanvas ??= document.createElement("canvas");
   const canvas = strataCanvas;
@@ -137,17 +133,8 @@ watch(basis, drawStrata, { immediate: true });
           aria-hidden="true"
         />
         <circle class="backdrop" :r="BACKDROP_RADIUS" />
-        <g
-          class="globe-body"
-          role="button"
-          tabindex="0"
-          data-testid="orientationGlobe-body"
-          aria-label="Plan view"
-          @click="showPlanView"
-          @keydown.enter.prevent="showPlanView"
-          @keydown.space.prevent="showPlanView"
-        >
-          <title>Plan view</title>
+        <!-- Catches the pointer so a click on the globe neither moves the camera nor reaches the viewer -->
+        <g class="globe-body" data-testid="orientationGlobe-body">
           <circle class="sphere" :r="RADIUS" />
           <path
             v-for="(ring, index) in rings"
@@ -246,8 +233,6 @@ svg {
 }
 
 .globe-body {
-  cursor: pointer;
-  outline: none;
   pointer-events: all;
 }
 
@@ -255,12 +240,6 @@ svg {
   fill: rgba(232, 238, 240, 0.18);
   stroke: rgba(31, 46, 51, 0.6);
   stroke-width: 1.25px;
-  transition: stroke 0.15s ease;
-}
-
-.globe-body:hover .sphere,
-.globe-body:focus-visible .sphere {
-  stroke: rgba(31, 46, 51, 0.9);
 }
 
 .ring-back {

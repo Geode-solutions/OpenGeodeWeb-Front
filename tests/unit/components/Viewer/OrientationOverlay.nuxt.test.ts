@@ -78,6 +78,9 @@ describe("orientation overlay", () => {
     hybridViewerStore.setCameraOrientation = mockAs<typeof hybridViewerStore.setCameraOrientation>(
       vi.fn(),
     );
+    // The globe itself is not a target: only the axis labels move the camera
+    await wrapper.get('[data-testid="orientationGlobe-body"]').trigger("click");
+    expect(hybridViewerStore.setCameraOrientation).not.toHaveBeenCalled();
     await wrapper.get('[data-testid="orientationGlobe-xplus"]').trigger("click");
     expect(hybridViewerStore.setCameraOrientation).toHaveBeenCalledWith("xplus");
   });
@@ -100,6 +103,39 @@ describe("orientation overlay", () => {
     expect(target?.position[0]).toBeCloseTo(0);
     expect(target?.position[1]).toBeCloseTo(-DISTANCE);
     expect(target?.position[2]).toBeCloseTo(HEIGHT);
+  });
+
+  test("a compass letter turns the camera towards its direction", async () => {
+    setOrientationOverlay(true);
+    const wrapper = await mountOverlay();
+    useDataStyleState().sceneStyle.value = {
+      ...useDataStyleStore().sceneStyle,
+      orientation_widget: "compass",
+    };
+    await wrapper.vm.$nextTick();
+    const setCameraMock = vi.fn<(options: CameraOptions) => void>();
+    useHybridViewerStore().setCamera = setCameraMock;
+    // Looking south, the camera stands north of the scene
+    await wrapper.get('[data-testid="orientationCompass-S"]').trigger("click");
+    const target = setCameraMock.mock.calls[0]?.[0];
+    expect(target?.position[0]).toBeCloseTo(0);
+    expect(target?.position[1]).toBeCloseTo(DISTANCE);
+    expect(target?.position[2]).toBeCloseTo(HEIGHT);
+  });
+
+  test("a compass click towards the direction already faced does not call the viewer", async () => {
+    setOrientationOverlay(true);
+    const wrapper = await mountOverlay();
+    useDataStyleState().sceneStyle.value = {
+      ...useDataStyleStore().sceneStyle,
+      orientation_widget: "compass",
+    };
+    await wrapper.vm.$nextTick();
+    const setCameraMock = vi.fn<(options: CameraOptions) => void>();
+    useHybridViewerStore().setCamera = setCameraMock;
+    // The camera looks east
+    await wrapper.get('[data-testid="orientationCompass-E"]').trigger("click");
+    expect(setCameraMock).not.toHaveBeenCalled();
   });
 });
 

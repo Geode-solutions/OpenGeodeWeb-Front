@@ -8,6 +8,9 @@ const RADIANS_PER_DEGREE = Math.PI / DEGREES_PER_HALF_TURN;
 const MIN_HORIZONTAL_RIGHT = 1e-3;
 // The dial is flattened with the camera elevation, down to this ratio so its letters stay readable
 const MIN_COMPASS_TILT = 0.6;
+// Under this heading gap in degrees, the camera already faces the direction: nothing to turn
+const FACING_TOLERANCE = 0.5;
+const FULL_TURN = 360;
 
 interface DialPoint {
   x: number;
@@ -42,21 +45,36 @@ function compassDialPoint(angle: number, radius: number, heading: number, tilt: 
   };
 }
 
+// Whether the camera already looks towards the given heading, clockwise in degrees from north
+function isFacing(basis: ViewBasis, targetHeading: number): boolean {
+  const heading = compassHeading(basis);
+  if (heading === undefined) {
+    return false;
+  }
+  const gap = (((heading - targetHeading) % FULL_TURN) + FULL_TURN) % FULL_TURN;
+  return Math.min(gap, FULL_TURN - gap) < FACING_TOLERANCE;
+}
+
 function rotateAroundZ(vector: Vec3, angle: number): Vec3 {
   const cosine = Math.cos(angle);
   const sine = Math.sin(angle);
   return [vector[0] * cosine - vector[1] * sine, vector[0] * sine + vector[1] * cosine, vector[2]];
 }
 
-// Same camera turned around the vertical axis through its focal point so that it looks north
-// (keeps the elevation and the distance). Undefined when no heading can be read.
-function northUpCameraPose(pose: CameraPose, basis: ViewBasis): CameraPose | undefined {
+// Same camera turned around the vertical axis through its focal point so that it looks towards the
+// Given heading, clockwise in degrees from north (keeps the elevation and the distance). Undefined when
+// No heading can be read.
+function facingCameraPose(
+  pose: CameraPose,
+  basis: ViewBasis,
+  targetHeading: number,
+): CameraPose | undefined {
   const heading = compassHeading(basis);
   if (heading === undefined) {
     return undefined;
   }
-  // A counterclockwise turn by the heading brings the view direction back to north
-  const angle = heading * RADIANS_PER_DEGREE;
+  // A counterclockwise turn by the heading difference brings the view direction to the target
+  const angle = (heading - targetHeading) * RADIANS_PER_DEGREE;
   const [focalX, focalY, focalZ] = pose.focal_point;
   const offset = rotateAroundZ(
     [pose.position[0] - focalX, pose.position[1] - focalY, pose.position[2] - focalZ],
@@ -69,5 +87,17 @@ function northUpCameraPose(pose: CameraPose, basis: ViewBasis): CameraPose | und
   };
 }
 
-export { MIN_COMPASS_TILT, compassDialPoint, compassHeading, compassTilt, northUpCameraPose };
+function northUpCameraPose(pose: CameraPose, basis: ViewBasis): CameraPose | undefined {
+  return facingCameraPose(pose, basis, 0);
+}
+
+export {
+  MIN_COMPASS_TILT,
+  compassDialPoint,
+  compassHeading,
+  compassTilt,
+  facingCameraPose,
+  isFacing,
+  northUpCameraPose,
+};
 export type { DialPoint };
