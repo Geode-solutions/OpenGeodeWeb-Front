@@ -10,7 +10,7 @@ type AllowedObjectMap = Record<string, AllowedObject>;
 interface AllowedObjectsResponse {
   readonly allowed_objects: AllowedObjectMap;
   // One type per content of the file, empty when the user has to choose
-  readonly objects_to_load: readonly string[];
+  readonly objects_to_load: readonly GeodeObjectType[];
 }
 
 function getFileExtension(filename: string): string {
@@ -99,8 +99,7 @@ function resolveAllowedObjectsPerFile(
     return {
       filename,
       candidates: sortCandidates(response?.allowed_objects ?? {}),
-      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the back only answers with its own object types
-      selectedGeodeObjects: [...(response?.objects_to_load ?? [])] as GeodeObjectType[],
+      selectedGeodeObjects: [...(response?.objects_to_load ?? [])],
     };
   });
 }

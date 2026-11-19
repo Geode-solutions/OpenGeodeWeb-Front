@@ -65,12 +65,8 @@ onMounted(async () => {
 async function files_uploaded_event(value: UploadFile[]): Promise<void> {
   if (value.length > 0 && value[0]) {
     const schema = back_schemas.opengeodeweb_back.save_viewable_file;
-    const params = {
-      geode_object_type: "RasterImage2D",
-      filename: value[0].name,
-    };
     await backStore.request(
-      { schema, params },
+      { schema, params: { geode_object_type: "RasterImage2D", filename: value[0].name } },
       {
         response_function: (response) => {
           // A texture file holds a single image: the first imported object is the texture
