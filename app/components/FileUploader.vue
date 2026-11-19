@@ -125,15 +125,9 @@ watch(
       await upload_files();
     }
   },
-  { deep: true },
+  // Immediate so files given as props (e.g. drag & drop) go through the CSV configuration too
+  { deep: true, immediate: true },
 );
-
-if (files.length > 0) {
-  internal_files.value = files;
-  if (autoUpload) {
-    upload_files();
-  }
-}
 
 watch(
   () => files,
