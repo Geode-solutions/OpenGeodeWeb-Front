@@ -2,15 +2,18 @@
 // oxlint-disable eslint/sort-imports
 // Third party imports
 import * as components from "vuetify/components";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime";
 import { flushPromises } from "@vue/test-utils";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 
 // Local imports
 import { setupActivePinia, toHTTPMethod, vuetify } from "@ogw_tests/utils";
+import CsvPreviewer from "@ogw_front/components/csv-preview/CsvPreviewer.vue";
 import FileUploader from "@ogw_front/components/FileUploader.vue";
 import { useBackStore } from "@ogw_front/stores/back";
+
+vi.stubGlobal("visualViewport", new EventTarget());
 
 const FIRST_INDEX = 0;
 const SECOND_INDEX = 1;
@@ -70,6 +73,19 @@ describe("file uploader", () => {
       expect(
         wrapper.emitted<unknown[]>().files_uploaded?.[FIRST_INDEX]?.[FIRST_INDEX],
       ).toStrictEqual(files);
+    });
+
+    test("prop files with unconfigured csv opens the previewer instead of uploading", async () => {
+      const csv_files = [new File(["x,y,z\n1,2,3"], "points.csv")];
+      const wrapper = await mountSuspended(FileUploader, {
+        global: {
+          plugins: [vuetify, pinia],
+        },
+        props: { multiple: false, accept: "*.csv", files: csv_files, autoUpload: true },
+      });
+      await flushPromises();
+      expect(wrapper.emitted().files_uploaded).toBeUndefined();
+      expect(wrapper.findComponent(CsvPreviewer).exists()).toBe(true);
     });
   });
 });
