@@ -201,13 +201,7 @@ watch(
           @click:close="removeFile(index)"
         >
           <v-icon start size="18" :color="isCsv(file) && file.isConfigured ? 'success' : 'primary'">
-            {{
-              isCsv(file)
-                ? file.isConfigured
-                  ? "ph-file-text"
-                  : "ph-file-csv"
-                : "ph-file"
-            }}
+            {{ isCsv(file) ? (file.isConfigured ? "ph-file-text" : "ph-file-csv") : "ph-file" }}
           </v-icon>
           <span class="text-high-emphasis">{{ file.displayName || file.name }}</span>
 

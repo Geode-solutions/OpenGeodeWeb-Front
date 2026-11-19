@@ -83,9 +83,7 @@ watch(
           <ActionButton
             data-testid="sortObjectsButton"
             :tooltip="'Sort by ' + (sortType === 'name' ? 'ID' : 'Name')"
-            :icon="
-              sortType === 'name' ? 'ph-sort-ascending' : 'ph-list-numbers'
-            "
+            :icon="sortType === 'name' ? 'ph-sort-ascending' : 'ph-list-numbers'"
             variant="text"
             tooltipLocation="bottom"
             @click="emit('toggle-sort')"

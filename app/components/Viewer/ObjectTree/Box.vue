@@ -157,13 +157,7 @@ watch(
         <slot name="tooltip" />
       </v-tooltip>
       <v-spacer />
-      <v-btn
-        v-if="closable"
-        icon="ph-x"
-        variant="text"
-        size="x-small"
-        @click="emit('close')"
-      />
+      <v-btn v-if="closable" icon="ph-x" variant="text" size="x-small" @click="emit('close')" />
     </v-card-title>
     <v-divider />
     <v-card-text class="pa-0 flex-grow-1 overflow-hidden d-flex flex-column" style="min-height: 0">
