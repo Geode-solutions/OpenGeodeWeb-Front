@@ -1,4 +1,3 @@
-import CameraBookmarkIcon from "@ogw_front/assets/viewer_svgs/camera-bookmark.svg";
 import type { ViewToolbarTools } from "@ogw_front/composables/view_toolbar_tools";
 
 interface CameraOptionAction {
@@ -26,8 +25,7 @@ function panelOptions(tools: ViewToolbarTools): CameraOptionAction[] {
     {
       testId: "cameraManagerButton",
       tooltip: "Manage camera positions",
-      icon: CameraBookmarkIcon,
-      iconSize: 34,
+      icon: "ph-video-camera",
       action: (): void => {
         tools.toggleTool(tools.showCameraManager);
       },
