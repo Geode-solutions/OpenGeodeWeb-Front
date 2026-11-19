@@ -17,7 +17,7 @@ const emit = defineEmits<Emits>();
   <v-text-field
     :model-value="modelValue"
     @update:model-value="emit('update:modelValue', $event)"
-    prepend-inner-icon="mdi-magnify"
+    prepend-inner-icon="ph-magnifying-glass"
     :label="label"
     variant="outlined"
     density="compact"

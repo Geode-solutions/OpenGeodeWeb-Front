@@ -151,7 +151,7 @@ function registerTests({ test, loadTestDatas }: SuiteRuntime): void {
     await modelComponentsObjectTree
       .locator(".tree-row-wrapper", { hasText: "00000000-" })
       .nth(4)
-      .locator(".mdi-eye-off-outline")
+      .locator(".ph-eye-slash")
       .first()
       .click();
     await waitForActionSettled(window);

@@ -13,17 +13,17 @@ interface EcoMessage {
 
 const ecoMessages = computed<EcoMessage[]>(() => [
   {
-    icon: "mdi-leaf",
+    icon: "ph-leaf",
     title: "Why the wait?",
     message: "Your workspace starts on demand, no idle servers running 24/7.",
   },
   {
-    icon: "mdi-lightning-bolt-outline",
+    icon: "ph-lightning",
     title: "Lower carbon footprint",
     message: "On-demand computing uses up to 70% less energy than always-on servers.",
   },
   {
-    icon: "mdi-earth",
+    icon: "ph-globe-hemisphere-west",
     title: "Your choice matters",
     message: `By using ${appName}, you're part of a more sustainable way to work with data.`,
   },
@@ -93,7 +93,7 @@ onUnmounted(() => {
         v-for="(_, index) in ecoMessages"
         :key="index"
         size="10"
-        :icon="index === currentMessage ? 'mdi-circle' : 'mdi-circle-outline'"
+        :icon="index === currentMessage ? 'ph-fill ph-circle' : 'ph-circle'"
         :style="{ opacity: index <= currentMessage ? 1 : 0.25 }"
       />
     </v-row>

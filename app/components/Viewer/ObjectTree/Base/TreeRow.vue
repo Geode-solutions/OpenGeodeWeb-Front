@@ -64,7 +64,7 @@ function handleRowClick(event: MouseEvent): void {
       <v-icon
         v-if="item.isExpandable"
         :data-testid="item.isOpen ? 'collapseTreeRowButton' : 'expandTreeRowButton'"
-        :icon="item.isOpen ? 'mdi-menu-down' : 'mdi-menu-right'"
+        :icon="item.isOpen ? 'ph-caret-down' : 'ph-caret-right'"
         :class="item.isLeaf ? 'icon-placeholder' : 'me-1'"
         @click.stop="$emit('toggle-open', item.raw)"
       />
@@ -73,7 +73,7 @@ function handleRowClick(event: MouseEvent): void {
       <template v-if="selection.selectable">
         <v-btn
           v-if="isHorizonStack && item.isLeaf"
-          icon="mdi-layers-triple"
+          icon="ph-stack"
           variant="text"
           density="compact"
           class="flex-shrink-0"
@@ -92,10 +92,10 @@ function handleRowClick(event: MouseEvent): void {
           "
           :icon="
             getIndeterminate(item.raw)
-              ? 'mdi-eye-minus-outline'
+              ? 'ph-eye'
               : isSelected(item.raw)
-                ? 'mdi-eye'
-                : 'mdi-eye-off-outline'
+                ? 'ph-fill ph-eye'
+                : 'ph-eye-slash'
           "
           variant="text"
           density="compact"

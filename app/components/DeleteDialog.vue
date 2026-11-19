@@ -25,7 +25,7 @@ const emit = defineEmits<Emits>();
   <v-dialog :model-value="show" @update:model-value="emit('update:show', $event)" max-width="400">
     <GlassCard v-if="item" variant="panel" padding="pa-8">
       <v-card-title class="pb-2 text-h5 font-weight-bold d-flex align-center">
-        <v-icon icon="mdi-trash-can-outline" class="mr-3 text-h4" color="error"></v-icon>
+        <v-icon icon="ph-trash" class="mr-3 text-h4" color="error"></v-icon>
         Delete Item
       </v-card-title>
 
@@ -43,7 +43,7 @@ const emit = defineEmits<Emits>();
           @click="emit('update:show', false)"
           class="text-none rounded-lg"
         >
-          <v-icon start>mdi-close-circle-outline</v-icon>
+          <v-icon start>ph-x-circle</v-icon>
           Cancel
         </v-btn>
 
@@ -58,7 +58,7 @@ const emit = defineEmits<Emits>();
           class="text-none rounded-lg font-weight-bold"
           elevation="4"
         >
-          <v-icon start>mdi-trash-can-outline</v-icon>
+          <v-icon start>ph-trash</v-icon>
           Delete
         </v-btn>
       </v-card-actions>
@@ -66,7 +66,7 @@ const emit = defineEmits<Emits>();
 
     <GlassCard v-else variant="panel" padding="pa-8">
       <v-card-title class="pb-2 text-h5 font-weight-bold d-flex align-center">
-        <v-icon icon="mdi-alert-circle-outline" class="mr-3 text-h4" color="error"></v-icon>
+        <v-icon icon="ph-warning-circle" class="mr-3 text-h4" color="error"></v-icon>
         Delete Items
       </v-card-title>
 
@@ -82,7 +82,7 @@ const emit = defineEmits<Emits>();
           @click="emit('update:show', false)"
           class="text-none rounded-lg"
         >
-          <v-icon start>mdi-close-circle-outline</v-icon>
+          <v-icon start>ph-x-circle</v-icon>
           Cancel
         </v-btn>
 
@@ -97,7 +97,7 @@ const emit = defineEmits<Emits>();
           class="text-none rounded-lg font-weight-bold"
           elevation="4"
         >
-          <v-icon start>mdi-trash-can-outline</v-icon>
+          <v-icon start>ph-trash</v-icon>
           Delete All
         </v-btn>
       </v-card-actions>

@@ -61,7 +61,7 @@ const {
                   :width="fullscreen ? 140 : 120"
                   :height="fullscreen ? 140 : 120"
                 >
-                  <v-icon icon="mdi-cloud-upload" :size="fullscreen ? 80 : 64" />
+                  <v-icon icon="ph-cloud-arrow-up" :size="fullscreen ? 80 : 64" />
                 </v-sheet>
 
                 <v-sheet

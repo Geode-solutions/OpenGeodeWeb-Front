@@ -28,7 +28,7 @@ const backgroundColor = computed<RGBAColor>({
     :index="itemProps.index"
     :itemProps="itemProps"
     tooltip="Background"
-    btnIcon="mdi-image-area"
+    btnIcon="ph-image"
   >
     <template #options>
       <ViewerOptionsColorPicker v-model="backgroundColor" disabled-alpha />

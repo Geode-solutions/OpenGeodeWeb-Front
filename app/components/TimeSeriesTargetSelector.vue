@@ -66,7 +66,7 @@ await get_targets();
       data-testid="timeSeriesTarget"
       :title="target.name"
       :subtitle="target.geode_object_type"
-      prepend-icon="mdi-cube-outline"
+      prepend-icon="ph-cube"
       @click="select(target)"
     />
   </v-list>

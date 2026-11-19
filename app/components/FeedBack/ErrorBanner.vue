@@ -24,7 +24,7 @@ defineExpose({ reload });
           class="justify-right"
           v-tooltip:bottom="'We turn off our server automatically after 5 minutes of inactivity'"
         >
-          mdi-information-outline
+          ph-info
         </v-icon>
       </v-col>
       <v-col cols="auto" class="font-weight-bold">
@@ -42,7 +42,7 @@ defineExpose({ reload });
           class=".align-center"
           @click="feedbackStore.delete_server_error()"
         >
-          <v-icon icon="mdi-close" size="20" />
+          <v-icon icon="ph-x" size="20" />
         </v-btn>
       </v-col>
     </v-row>

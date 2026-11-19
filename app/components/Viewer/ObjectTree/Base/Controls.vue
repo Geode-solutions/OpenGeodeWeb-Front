@@ -49,7 +49,7 @@ watch(
         <ActionButton
           data-testid="searchObjectsButton"
           :tooltip="showSearch ? 'Hide search' : 'Show search'"
-          icon="mdi-magnify"
+          icon="ph-magnifying-glass"
           tooltipLocation="bottom"
           variant="text"
           @click="showSearch = !showSearch"
@@ -84,7 +84,7 @@ watch(
             data-testid="sortObjectsButton"
             :tooltip="'Sort by ' + (sortType === 'name' ? 'ID' : 'Name')"
             :icon="
-              sortType === 'name' ? 'mdi-sort-alphabetical-ascending' : 'mdi-sort-numeric-ascending'
+              sortType === 'name' ? 'ph-sort-ascending' : 'ph-list-numbers'
             "
             variant="text"
             tooltipLocation="bottom"
@@ -95,7 +95,7 @@ watch(
               <ActionButton
                 data-testid="filterObjectsButton"
                 tooltip="Filter options"
-                icon="mdi-filter-variant"
+                icon="ph-funnel-simple"
                 variant="text"
                 tooltipLocation="bottom"
                 v-bind="menuProps"
@@ -116,7 +116,7 @@ watch(
           <ActionButton
             data-testid="CollapseOrExpandAll"
             :tooltip="isCollapsed ? 'Expand All' : 'Collapse All'"
-            :icon="isCollapsed ? 'mdi-expand-all-outline' : 'mdi-collapse-all-outline'"
+            :icon="isCollapsed ? 'ph-arrows-out-line-vertical' : 'ph-arrows-in-line-vertical'"
             variant="text"
             tooltipLocation="bottom"
             @click="isCollapsed ? emit('expand-all') : emit('collapse-all')"

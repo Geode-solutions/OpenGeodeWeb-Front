@@ -15,7 +15,7 @@ const cssNoDataColor = computed<string>(() => {
     class="text-caption text-high-emphasis mt-1 d-flex align-center ga-1"
     data-testid="noDataInfo"
   >
-    <v-icon icon="mdi-information-outline" size="14" color="info" />
+    <v-icon icon="ph-info" size="14" color="info" />
     <span>Contains unmapped elements</span>
     <v-menu :close-on-content-click="false">
       <template #activator="{ props }">

@@ -98,8 +98,8 @@ onUnmounted(() => {
                     start
                     :icon="
                       store.status === Status.CONNECTED
-                        ? 'mdi-check-circle'
-                        : 'mdi-loading mdi-spin'
+                        ? 'ph-check-circle'
+                        : 'ph-circle-notch ogw-spin'
                     "
                   />
                   {{ store.$id.charAt(0).toUpperCase() + store.$id.slice(1) }}

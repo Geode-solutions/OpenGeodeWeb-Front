@@ -51,7 +51,7 @@ const emit = defineEmits<Emits>();
         height="64"
       >
         <v-icon
-          :icon="loading ? 'mdi-loading' : 'mdi-cloud-upload'"
+          :icon="loading ? 'ph-circle-notch' : 'ph-cloud-arrow-up'"
           size="32"
           :color="isHovering || isDragging ? 'rgb(var(--v-theme-on-primary))' : 'primary'"
           :class="{ rotating: loading }"

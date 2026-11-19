@@ -184,7 +184,7 @@ watch(
             @click="toggleMode"
             v-tooltip="'Swap mode (RGB / RGBA)'"
           >
-            <v-icon icon="mdi-swap-horizontal" size="16" />
+            <v-icon icon="ph-arrows-left-right" size="16" />
           </v-btn>
         </div>
 
@@ -198,7 +198,7 @@ watch(
           v-tooltip="'Copy to clipboard'"
         >
           <v-icon
-            :icon="copied ? 'mdi-check' : 'mdi-content-copy'"
+            :icon="copied ? 'ph-check' : 'ph-copy'"
             size="14"
             :color="copied ? 'success' : undefined"
           />

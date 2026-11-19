@@ -231,7 +231,7 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
     >
       <v-btn
         data-testid="toggleObjectsButton"
-        icon="mdi-file-tree-outline"
+        icon="ph-tree-structure"
         variant="text"
         :color="mainView ? 'primary' : undefined"
         class="mb-2"
@@ -250,7 +250,7 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
       >
         <ViewerObjectTreeBox
           :title="mainView?.title || 'Objects'"
-          mdi-icon="mdi-file-tree-outline"
+          font-icon="ph-tree-structure"
           :scroll-top="mainView?.scrollTop || 0"
           closable
           :border-radius="additionalViews.length > 0 ? '0' : `0 ${PANEL_RADIUS} ${PANEL_RADIUS} 0`"

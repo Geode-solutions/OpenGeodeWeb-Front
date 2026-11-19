@@ -22,11 +22,11 @@ function getModelComponentTypeTab(window: Page): Locator {
 
 async function collapseModelComponentsObjectTree(window: Page): Promise<void> {
   const modelComponentsObjectTree = getModelComponentsObjectTree(window);
-  await clickCollapseOrExpandAll(window, modelComponentsObjectTree, "mdi-collapse-all-outline");
+  await clickCollapseOrExpandAll(window, modelComponentsObjectTree, "ph-arrows-in-line-vertical");
 }
 async function expandModelComponentsObjectTree(window: Page): Promise<void> {
   const modelComponentsObjectTree = getModelComponentsObjectTree(window);
-  await clickCollapseOrExpandAll(window, modelComponentsObjectTree, "mdi-expand-all-outline");
+  await clickCollapseOrExpandAll(window, modelComponentsObjectTree, "ph-arrows-out-line-vertical");
 }
 
 async function collapseModelComponentsObjectTreeGroup(

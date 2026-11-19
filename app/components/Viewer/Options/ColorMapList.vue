@@ -130,7 +130,7 @@ watch(filteredPresets, drawAllCanvases);
       placeholder="Search presets..."
       density="compact"
       hide-details
-      prepend-inner-icon="mdi-magnify"
+      prepend-inner-icon="ph-magnifying-glass"
       variant="solo-filled"
       flat
       class="mb-3"

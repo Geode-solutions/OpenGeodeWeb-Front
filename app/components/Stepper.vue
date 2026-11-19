@@ -25,7 +25,7 @@ const { steps, current_step_index } = toRefs(state) as unknown as {
   <v-card-item class="flex-shrink-0 pa-0">
     <div class="px-8 pt-8 pb-4">
       <div class="d-flex align-center mb-2">
-        <v-icon icon="mdi-file-upload-outline" class="mr-3 title-text" size="32" />
+        <v-icon icon="ph-file-arrow-up" class="mr-3 title-text" size="32" />
         <h2 class="title-text">Import Data</h2>
       </div>
       <p class="text-medium-emphasis text-body-1">

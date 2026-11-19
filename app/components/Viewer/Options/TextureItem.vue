@@ -130,6 +130,6 @@ watch(textureId, (value) => {
     </v-badge>
   </v-col>
   <v-col v-if="textureName === '' || textureId === ''" cols="auto">
-    <v-icon size="20" icon="mdi-close-circle" v-tooltip:bottom="'Invalid texture'" />
+    <v-icon size="20" icon="ph-x-circle" v-tooltip:bottom="'Invalid texture'" />
   </v-col>
 </template>

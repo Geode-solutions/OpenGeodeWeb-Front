@@ -45,14 +45,14 @@ function runAction(feedback: (typeof feedbackStore.feedbacks)[number]): void {
             <br />
           </span>
           <template #activator="{ props }">
-            <v-icon v-bind="props" class="justify-right"> mdi-information-outline </v-icon>
+            <v-icon v-bind="props" class="justify-right"> ph-info </v-icon>
           </template>
         </v-tooltip>
         <v-tooltip v-else-if="feedback.type === 'success'" location="left">
-          <v-icon class="justify-right"> mdi-check-circle-outline </v-icon>
+          <v-icon class="justify-right"> ph-check-circle </v-icon>
         </v-tooltip>
         <v-tooltip v-else-if="feedback.type === 'warning'" location="left">
-          <v-icon class="justify-right"> mdi-alert-outline </v-icon>
+          <v-icon class="justify-right"> ph-warning </v-icon>
         </v-tooltip>
       </v-col>
       <v-col cols="9" class="text-no-wrap overflow-hidden">
@@ -81,7 +81,7 @@ function runAction(feedback: (typeof feedbackStore.feedbacks)[number]): void {
               data-testid="feedbackActionBtn"
               @click.stop="runAction(feedback)"
             >
-              <v-icon icon="mdi-pencil" size="20" />
+              <v-icon icon="ph-pencil-simple" size="20" />
             </v-btn>
           </template>
         </v-tooltip>
@@ -95,7 +95,7 @@ function runAction(feedback: (typeof feedbackStore.feedbacks)[number]): void {
           :color="feedback.type"
           @click.stop="feedbackStore.delete_feedback(feedback.id)"
         >
-          <v-icon icon="mdi-close" size="20" />
+          <v-icon icon="ph-x" size="20" />
         </v-btn>
       </v-col>
     </v-row>

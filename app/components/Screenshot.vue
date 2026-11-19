@@ -202,7 +202,7 @@ function handleClose(): void {
           >
             <v-btn
               value="file"
-              prepend-icon="mdi-file-download-outline"
+              prepend-icon="ph-file-arrow-down"
               size="small"
               data-testid="screenshotFileButton"
               class="text-caption text-none"
@@ -212,7 +212,7 @@ function handleClose(): void {
             <v-btn
               data-testid="screenshotClipboardButton"
               value="clipboard"
-              prepend-icon="mdi-content-copy"
+              prepend-icon="ph-copy"
               size="small"
               class="text-caption text-none"
             >
@@ -286,7 +286,7 @@ function handleClose(): void {
           />
         </v-col>
         <span class="text-caption">px</span>
-        <v-icon icon="mdi-lock" size="small" class="ml-1" title="Aspect ratio locked to the view" />
+        <v-icon icon="ph-lock" size="small" class="ml-1" title="Aspect ratio locked to the view" />
       </v-row>
 
       <v-row dense class="flex-nowrap">

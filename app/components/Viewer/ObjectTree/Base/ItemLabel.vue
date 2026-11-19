@@ -150,7 +150,7 @@ async function copyToClipboard(text: string, label: string): Promise<void> {
             style="width: 18px; height: 18px; min-width: 18px; min-height: 18px"
             @click.stop="copyToClipboard(actualItem.geode_id, 'ID')"
           >
-            <v-icon size="12">mdi-content-copy</v-icon>
+            <v-icon size="12">ph-copy</v-icon>
           </v-btn>
         </span>
         <span v-if="actualItem.title" class="text-caption d-flex align-center">
@@ -165,7 +165,7 @@ async function copyToClipboard(text: string, label: string): Promise<void> {
             style="width: 18px; height: 18px; min-width: 18px; min-height: 18px"
             @click.stop="copyToClipboard(actualItem.title, 'Name')"
           >
-            <v-icon size="12">mdi-content-copy</v-icon>
+            <v-icon size="12">ph-copy</v-icon>
           </v-btn>
         </span>
         <span v-if="showCrs" class="text-caption d-flex align-center">
@@ -181,7 +181,7 @@ async function copyToClipboard(text: string, label: string): Promise<void> {
             style="width: 18px; height: 18px; min-width: 18px; min-height: 18px"
             @click.stop="crsStore.requestCrsEdit(actualItem.id)"
           >
-            <v-icon size="12">mdi-pencil</v-icon>
+            <v-icon size="12">ph-pencil-simple</v-icon>
           </v-btn>
         </span>
         <span v-if="actualItem.is_active !== undefined" class="text-caption d-flex align-center">
@@ -200,7 +200,7 @@ async function copyToClipboard(text: string, label: string): Promise<void> {
         <v-icon
           v-bind="warningProps"
           data-testid="crsMismatchIcon"
-          icon="mdi-alert"
+          icon="ph-warning"
           color="warning"
           size="14"
           class="ml-1 flex-shrink-0"

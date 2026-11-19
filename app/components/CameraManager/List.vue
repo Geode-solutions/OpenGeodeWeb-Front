@@ -57,7 +57,7 @@ async function saveRename(): void {
           :data-testid="`restoreCameraPosition${position.name}Button`"
           @click="restorePosition(position.id!)"
         >
-          <v-icon size="14">mdi-play</v-icon>
+          <v-icon size="14">ph-play</v-icon>
           <v-tooltip activator="parent" location="top">Restore</v-tooltip>
         </v-btn>
       </template>
@@ -86,7 +86,7 @@ async function saveRename(): void {
             class="text-medium-emphasis"
             @click="startEditing(position)"
           >
-            <v-icon size="14">mdi-pencil</v-icon>
+            <v-icon size="14">ph-pencil-simple</v-icon>
             <v-tooltip activator="parent" location="top">Rename</v-tooltip>
           </v-btn>
           <v-btn
@@ -96,7 +96,7 @@ async function saveRename(): void {
             color="error"
             @click="deletePosition(position.id!)"
           >
-            <v-icon size="14">mdi-delete</v-icon>
+            <v-icon size="14">ph-trash</v-icon>
             <v-tooltip activator="parent" location="top">Delete</v-tooltip>
           </v-btn>
         </div>
@@ -104,7 +104,7 @@ async function saveRename(): void {
     </v-list-item>
   </v-list>
   <div v-else class="text-center text-medium-emphasis py-4 italic text-caption">
-    <v-icon size="32" class="mb-1 d-block mx-auto opacity-20">mdi-camera-off</v-icon>
+    <v-icon size="32" class="mb-1 d-block mx-auto opacity-20">ph-camera-slash</v-icon>
     No saved positions yet.
   </div>
 </template>

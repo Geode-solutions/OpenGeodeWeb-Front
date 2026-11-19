@@ -218,12 +218,12 @@ function onConfirm(): void {
     <ChromeTheme>
       <v-card class="glass-ui rounded-xl overflow-hidden border-opacity-10">
         <v-toolbar color="transparent" flat class="px-4">
-          <v-icon icon="mdi-file-table" size="32" color="primary" class="ml-1" />
+          <v-icon icon="ph-file-csv" size="32" color="primary" class="ml-1" />
           <v-toolbar-title class="text-h6 font-weight-bold">
             CSV Previewer & Configuration
           </v-toolbar-title>
           <v-spacer />
-          <v-btn icon="mdi-close" variant="text" @click="emit('update:modelValue', false)" />
+          <v-btn icon="ph-x" variant="text" @click="emit('update:modelValue', false)" />
         </v-toolbar>
 
         <v-divider class="border-opacity-10" />

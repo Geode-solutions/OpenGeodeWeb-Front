@@ -7,7 +7,7 @@ interface Props {
   title: string;
   closable?: boolean;
   icon?: string;
-  mdiIcon?: string;
+  fontIcon?: string;
   scrollTop?: number;
   borderRadius?: string;
   borderLeft?: boolean;
@@ -19,7 +19,7 @@ const {
   title,
   closable = false,
   icon = "",
-  mdiIcon = "",
+  fontIcon = "",
   scrollTop = 0,
   borderRadius = "var(--ogw-viewer-panel-radius, 16px)",
   borderLeft = true,
@@ -133,8 +133,8 @@ watch(
           align-items: center;
         "
       />
-      <v-icon v-else-if="mdiIcon" size="24" class="mr-2">{{ mdiIcon }}</v-icon>
-      <v-icon v-else-if="closable" size="24" class="mr-2">mdi-drag-variant</v-icon>
+      <v-icon v-else-if="fontIcon" size="24" class="mr-2">{{ fontIcon }}</v-icon>
+      <v-icon v-else-if="closable" size="24" class="mr-2">ph-dots-six-vertical</v-icon>
       <v-tooltip :disabled="!slots.tooltip" location="bottom start" open-delay="400">
         <template #activator="{ props: tooltipProps }">
           <span
@@ -159,7 +159,7 @@ watch(
       <v-spacer />
       <v-btn
         v-if="closable"
-        icon="mdi-close"
+        icon="ph-x"
         variant="text"
         size="x-small"
         @click="emit('close')"

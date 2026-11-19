@@ -89,7 +89,7 @@ function onCenterClick(event: MouseEvent): void {
     @mouseup="onMouseUp"
     @click.stop="onCenterClick"
   >
-    <v-icon icon="mdi-information-outline" size="28" color="primary" style="pointer-events: none" />
+    <v-icon icon="ph-info" size="28" color="primary" style="pointer-events: none" />
   </v-btn>
 </template>
 

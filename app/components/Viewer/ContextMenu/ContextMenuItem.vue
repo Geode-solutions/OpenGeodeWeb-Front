@@ -26,7 +26,7 @@ interface Props {
   index: number;
   itemProps: ItemProps;
   tooltip: string;
-  // An image, or an mdi icon name
+  // An image, or an icon name of the app icon set (ph-...)
   btnImage?: string;
   btnIcon?: string;
 }

@@ -49,7 +49,7 @@ function getColumnClass(key: string): string {
 <template>
   <div class="d-flex flex-column bg-inset overflow-hidden h-100">
     <div class="pa-4 d-flex align-center border-b border-opacity-10">
-      <v-icon icon="mdi-table-eye" size="small" class="mr-2 opacity-60" />
+      <v-icon icon="ph-table" size="small" class="mr-2 opacity-60" />
       <span class="text-subtitle-2 font-weight-medium opacity-80">
         Live Preview (First 100 rows)
       </span>
@@ -80,7 +80,7 @@ function getColumnClass(key: string): string {
 
       <template #no-data>
         <div class="d-flex flex-column align-center justify-center h-100 py-12 opacity-40">
-          <v-icon size="64" icon="mdi-table-off" />
+          <v-icon size="64" icon="ph-table" />
           <div class="text-h6 mt-2">No preview available</div>
           <div class="text-caption">Check your parser settings</div>
         </div>

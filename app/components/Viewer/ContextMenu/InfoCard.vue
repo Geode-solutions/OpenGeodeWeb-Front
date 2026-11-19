@@ -174,7 +174,7 @@ const liveCrs = computed(() => liveItem.value?.crs ?? metaData.crs);
               {{ isCopied(metaData.data_id) ? "COPIED!" : formattedId }}
             </span>
             <v-icon
-              :icon="isCopied(metaData.data_id) ? 'mdi-check' : 'mdi-content-copy'"
+              :icon="isCopied(metaData.data_id) ? 'ph-check' : 'ph-copy'"
               size="10"
               :color="isCopied(metaData.data_id) ? 'success' : undefined"
               class="ml-1"
@@ -191,7 +191,7 @@ const liveCrs = computed(() => liveItem.value?.crs ?? metaData.crs);
             <v-btn
               v-if="crsStore.crsEditEnabled"
               data-testid="infoEditCrsBtn"
-              icon="mdi-pencil"
+              icon="ph-pencil-simple"
               variant="text"
               density="compact"
               size="x-small"
@@ -223,7 +223,7 @@ const liveCrs = computed(() => liveItem.value?.crs ?? metaData.crs);
                 {{ isCopied(componentItem.id) ? "COPIED!" : formatId(componentItem.id) }}
               </span>
               <v-icon
-                :icon="isCopied(componentItem.id) ? 'mdi-check' : 'mdi-content-copy'"
+                :icon="isCopied(componentItem.id) ? 'ph-check' : 'ph-copy'"
                 size="10"
                 :color="isCopied(componentItem.id) ? 'success' : undefined"
                 class="ml-1"
