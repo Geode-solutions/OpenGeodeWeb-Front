@@ -1,6 +1,6 @@
 // oxlint-disable eslint/max-lines
 // Third party imports
-import type { CRSList } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
+import type { CRS } from "@geode/opengeodeweb-back/schema_types";
 import type { Table } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
@@ -29,7 +29,7 @@ interface DataItem extends DataIdentified, GeodeIdentified, GeodeObjectTyped, Vi
   created_at: string;
   is_viewable?: boolean;
   binary_light_viewable?: string;
-  crs?: CRSList;
+  crs?: CRS;
 }
 
 // What the CRS features read of a data: light to copy on each change
@@ -49,7 +49,7 @@ interface NewDataItem extends DataIdentified, GeodeIdentified, GeodeObjectTyped,
   name?: string;
   is_viewable?: boolean;
   binary_light_viewable?: string;
-  crs?: CRSList;
+  crs?: CRS;
   // Set on saved data: kept by the project snapshot
   created_at?: string;
   mesh_components?: ModelComponentInput[];
