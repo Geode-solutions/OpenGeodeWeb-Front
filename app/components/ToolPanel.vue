@@ -78,7 +78,8 @@ function close(): void {
 
 <style scoped>
 .tool-panel {
-  z-index: 1;
+  /* Above the orientation overlay (Viewer/OrientationOverlay.vue, z-index 1), which comes later in the viewer */
+  z-index: 2;
   top: 90px;
   right: 70px;
 }
