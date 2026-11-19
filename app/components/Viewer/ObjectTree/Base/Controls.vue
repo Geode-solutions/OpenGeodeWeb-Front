@@ -40,7 +40,7 @@ watch(
 </script>
 
 <template>
-  <v-row dense align="center" class="pa-1 py-0">
+  <v-row density="compact" align="center" class="pa-1 py-0">
     <v-col cols="12">
       <div
         class="controls-capsule d-flex align-center rounded-pill px-1 overflow-hidden"

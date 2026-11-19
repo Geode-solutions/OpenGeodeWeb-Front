@@ -10,7 +10,7 @@ const activeTab = defineModel<string>({ required: true });
 </script>
 
 <template>
-  <v-row v-if="tabs.length > 0" justify="center" dense class="mb-2">
+  <v-row v-if="tabs.length > 0" justify="center" density="compact" class="mb-2">
     <v-col cols="12" class="py-0 d-flex justify-center">
       <v-btn-toggle
         v-model="activeTab"

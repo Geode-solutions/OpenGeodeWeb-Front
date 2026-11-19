@@ -118,7 +118,6 @@ watch(textureId, (value) => {
         :autoUpload="true"
         :multiple="true"
         :mini="true"
-        class="mt-2"
       />
     </v-badge>
   </v-col>

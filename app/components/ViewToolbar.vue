@@ -55,7 +55,7 @@ onKeyStroke("Escape", () => {
 
 <template>
   <v-container :class="[$style.floatToolbar, 'pa-0', 'view-toolbar']" width="auto">
-    <v-row v-for="camera_option in camera_options" :key="camera_option.testId" dense>
+    <v-row v-for="camera_option in camera_options" :key="camera_option.testId" density="compact">
       <v-col>
         <v-menu
           v-if="camera_option.menu && !camera_option.action"
@@ -75,7 +75,7 @@ onKeyStroke("Escape", () => {
             />
           </template>
           <v-card class="pa-1 mr-2" elevation="4" rounded="pill">
-            <v-row dense>
+            <v-row density="compact">
               <v-col v-for="item in camera_option.menu" :key="item.title">
                 <ActionButton
                   :data-testid="item.testId"

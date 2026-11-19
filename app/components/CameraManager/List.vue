@@ -45,7 +45,7 @@ async function saveRename(): void {
       :key="position.id"
       class="rounded-lg mb-1 px-2"
       :active="editingId === position.id"
-      active-color="primary"
+      color="primary"
     >
       <template #prepend>
         <v-btn

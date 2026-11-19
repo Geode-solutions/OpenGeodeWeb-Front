@@ -25,7 +25,7 @@ async function saveCurrentPosition(): void {
 
 <template>
   <v-container class="pa-3 pb-1 bg-surface-variant-lighten-5">
-    <v-row dense>
+    <v-row density="compact">
       <v-col cols="12">
         <v-text-field
           v-model="newPositionName"
