@@ -63,7 +63,7 @@ function handleUpdate(val: boolean): void {
         >
           <template #prepend>
             <v-img
-              v-if="geodeObjectImage(item.geode_object_type)"
+              v-if="item.geode_object_type"
               :src="geodeObjectImage(item.geode_object_type)"
               height="24"
               width="24"

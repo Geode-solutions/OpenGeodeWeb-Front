@@ -58,16 +58,8 @@ const geodeObjectImages: Record<GeodeObjectType, string> = {
   VertexSet,
 };
 
-function isGeodeObjectType(type: string): type is GeodeObjectType {
-  return Object.hasOwn(geodeObjectImages, type);
-}
-
-// Icon of a geode object type, undefined when it is not one (e.g. a type the back added since)
-function geodeObjectImage(type: string | undefined): string | undefined {
-  if (type === undefined || !isGeodeObjectType(type)) {
-    return undefined;
-  }
-  return geodeObjectImages[type];
+function geodeObjectImage(geodeObjectType: GeodeObjectType): string {
+  return geodeObjectImages[geodeObjectType];
 }
 
 export { geodeObjectImage };

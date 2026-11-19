@@ -222,7 +222,7 @@ await getAllowedGeodeObjects();
       Choose the data type for: {{ pendingFilenames.join(", ") }}
     </v-col>
     <v-col v-for="(value, key) in allowedGeodeObjects" :key="key" cols="3" md="4">
-      <v-tooltip :text="geodeObjectTooltip(key, Boolean(value['is_loadable']))" location="bottom">
+      <v-tooltip :text="geodeObjectTooltip(key, Boolean(value?.is_loadable))" location="bottom">
         <template v-slot:activator="{ props }">
           <span v-bind="props">
             <v-card
@@ -230,14 +230,14 @@ await getAllowedGeodeObjects();
               class="card ma-2"
               hover
               rounded
-              @click="setGeodeObject(key as GeodeObjectType)"
-              :disabled="!value['is_loadable']"
-              :elevation="value['is_loadable'] ? 5 : 3"
+              @click="setGeodeObject(key)"
+              :disabled="!value?.is_loadable"
+              :elevation="value?.is_loadable ? 5 : 3"
             >
               <v-img
                 :src="geodeObjectImage(key)"
                 cover
-                :class="!value['is_loadable'] ? 'disabled' : undefined"
+                :class="!value?.is_loadable ? 'disabled' : undefined"
               />
             </v-card>
           </span>

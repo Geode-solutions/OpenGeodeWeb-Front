@@ -285,7 +285,7 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
           >
             <ViewerObjectTreeBox
               :title="view.title"
-              :icon="geodeObjectImage(view.geode_object_type)"
+              :icon="view.geode_object_type ? geodeObjectImage(view.geode_object_type) : undefined"
               :scroll-top="view.scrollTop"
               closable
               :border-radius="`0 ${index === 0 ? '16px' : '0'} ${index === additionalViews.length - 1 ? '16px' : '0'} 0`"

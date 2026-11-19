@@ -5,7 +5,7 @@ interface AllowedObject {
   readonly object_priority?: number;
   readonly loadable_family?: string;
 }
-type AllowedObjectMap = Record<string, AllowedObject>;
+type AllowedObjectMap = Partial<Record<GeodeObjectType, AllowedObject>>;
 // Mirrors the allowed_objects route response
 interface AllowedObjectsResponse {
   readonly allowed_objects: AllowedObjectMap;
@@ -17,7 +17,13 @@ function getFileExtension(filename: string): string {
   return filename.slice(filename.lastIndexOf(".") + 1);
 }
 
-function getObject(objectMap: AllowedObjectMap, key: string): AllowedObject {
+// The types of a map of allowed objects
+function allowedObjectTypes(objectMap: AllowedObjectMap): GeodeObjectType[] {
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- Object.keys loses the key type of the map
+  return Object.keys(objectMap) as GeodeObjectType[];
+}
+
+function getObject(objectMap: AllowedObjectMap, key: GeodeObjectType): AllowedObject {
   const object = objectMap[key];
   if (!object) {
     throw new Error(`Unknown geode object key: ${key}`);
@@ -26,14 +32,14 @@ function getObject(objectMap: AllowedObjectMap, key: string): AllowedObject {
 }
 
 function intersectAllowedObjects(allowedObjectsList: readonly AllowedObjectMap[]): {
-  commonKeys: string[];
-  allKeys: string[];
+  commonKeys: GeodeObjectType[];
+  allKeys: GeodeObjectType[];
   mergedAllowedObjects: AllowedObjectMap;
 } {
-  const allKeys = [...new Set(allowedObjectsList.flatMap((object) => Object.keys(object)))];
+  const allKeys = [...new Set(allowedObjectsList.flatMap((object) => allowedObjectTypes(object)))];
   const commonKeys = allKeys.filter((key) => allowedObjectsList.every((object) => key in object));
 
-  const mergedEntries = commonKeys.map((key): [string, AllowedObject] => {
+  const mergedEntries = commonKeys.map((key): [GeodeObjectType, AllowedObject] => {
     const loadScores = allowedObjectsList.map((object) => getObject(object, key).is_loadable);
     const priorities = allowedObjectsList
       .map((object) => getObject(object, key).object_priority)
@@ -71,13 +77,13 @@ function resolveAllowedObjects(
 interface FileAllowedObjects {
   readonly filename: string;
   // Loadable types only, sorted by best is_loadable then best object_priority
-  readonly candidates: string[];
+  readonly candidates: GeodeObjectType[];
   // Types the backend selected to load every content of the file, empty when the user has to choose
   readonly selectedGeodeObjects: GeodeObjectType[];
 }
 
-function sortCandidates(objectMap: AllowedObjectMap): string[] {
-  return Object.keys(objectMap)
+function sortCandidates(objectMap: AllowedObjectMap): GeodeObjectType[] {
+  return allowedObjectTypes(objectMap)
     .filter((key) => getObject(objectMap, key).is_loadable > 0)
     .toSorted((keyA, keyB) => {
       const objectA = getObject(objectMap, keyA);

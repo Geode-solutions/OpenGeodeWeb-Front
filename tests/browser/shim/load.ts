@@ -24,8 +24,7 @@ async function geodeObjectType(filename: string): Promise<GeodeObjectType> {
   if (selectedGeodeObject === undefined) {
     throw new Error(`No geode object type could be chosen for ${filename}`);
   }
-  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the back only answers with its own object types
-  return selectedGeodeObject as GeodeObjectType;
+  return selectedGeodeObject;
 }
 
 async function loadTestDatas(
