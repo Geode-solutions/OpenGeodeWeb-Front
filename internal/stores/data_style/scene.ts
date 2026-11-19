@@ -1,5 +1,5 @@
+import type { ColorRGB, ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
 import type { SceneFontFamily, SceneOrientationWidget, SceneStyle } from "./types";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
@@ -14,16 +14,15 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const text_style_schema = viewer_schemas.opengeodeweb_viewer.viewer.set_text_style;
 const orientation_widget_schema = viewer_schemas.opengeodeweb_viewer.viewer.set_orientation_widget;
 
-// oxlint-disable-next-line id-length -- the viewer schema requires { r, g, b }
-function toViewerColor(color: RGBAColor): { r: number; g: number; b: number } {
-  // oxlint-disable-next-line id-length -- the viewer schema requires { r, g, b }
-  return { r: color.red, g: color.green, b: color.blue };
+// The scene colors of the viewer have no alpha (the text one takes it as its opacity)
+function toViewerColor({ red, green, blue }: ColorRGBA): ColorRGB {
+  return { red, green, blue };
 }
 
 // oxlint-disable-next-line max-lines-per-function
 export function useSceneStyle(): {
-  setSceneBackgroundColor: (color: RGBAColor) => Promise<void>;
-  setSceneTextColor: (color: RGBAColor) => Promise<unknown>;
+  setSceneBackgroundColor: (color: ColorRGBA) => Promise<void>;
+  setSceneTextColor: (color: ColorRGBA) => Promise<unknown>;
   setSceneFontFamily: (font_family: SceneFontFamily) => Promise<unknown>;
   setSceneOrientationWidget: (marker: SceneOrientationWidget) => Promise<unknown>;
   applySceneStyle: () => Promise<void>;
@@ -73,12 +72,12 @@ export function useSceneStyle(): {
     return result;
   }
 
-  async function setSceneBackgroundColor(color: RGBAColor): Promise<void> {
+  async function setSceneBackgroundColor(color: ColorRGBA): Promise<void> {
     await hybridViewerStore.setBackgroundColor(toViewerColor(color));
     await saveSceneStyle({ background_color: color });
   }
 
-  async function setSceneTextColor(color: RGBAColor): Promise<unknown> {
+  async function setSceneTextColor(color: ColorRGBA): Promise<unknown> {
     const result = await requestTextStyle({ ...sceneStyle.value.text, color });
     return result;
   }

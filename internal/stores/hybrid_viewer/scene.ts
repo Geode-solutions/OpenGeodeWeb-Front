@@ -18,7 +18,7 @@ import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLP
 async function setBackgroundColor(color: ViewerSetBackgroundColorParams["color"]): Promise<void> {
   const { genericRenderWindow, remoteRender } = useHybridViewerCore();
   const renderer = requireRenderWindow(genericRenderWindow).getRenderer();
-  renderer.setBackground([color.r / RGB_MAX, color.g / RGB_MAX, color.b / RGB_MAX]);
+  renderer.setBackground([color.red / RGB_MAX, color.green / RGB_MAX, color.blue / RGB_MAX]);
   const renderWindow = requireRenderWindow(genericRenderWindow).getRenderWindow();
   renderWindow.render();
   const viewerStore = useViewerStore();

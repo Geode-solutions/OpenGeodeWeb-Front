@@ -1,9 +1,6 @@
-interface RGBAColor {
-  red: number;
-  green: number;
-  blue: number;
-  alpha: number;
-}
+import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
+
+type RGBAColor = ColorRGBA;
 
 interface AttributeConfig {
   name: string | undefined;
