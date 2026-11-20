@@ -60,6 +60,32 @@ async function hideViewerMarker(
   }
 }
 
+interface ViewerMarkerRequest {
+  schema: typeof viewer_schemas.opengeodeweb_viewer.viewer.set_orientation_widget;
+  params: { marker: ViewerOrientationMarker };
+}
+
+// The viewer renders the scene screenshots, without the front overlay: with the overlay on, the VTK marker of the
+// User's choice is drawn for the time of the capture, then hidden again (also when the capture fails)
+async function withViewerMarker<Result>(
+  marker: SceneOrientationWidget,
+  request: (args: ViewerMarkerRequest) => Promise<unknown>,
+  capture: () => Promise<Result>,
+): Promise<Result> {
+  if (!isOrientationOverlayEnabled()) {
+    return capture();
+  }
+  await request({
+    schema: viewer_schemas.opengeodeweb_viewer.viewer.set_orientation_widget,
+    params: { marker },
+  });
+  try {
+    return await capture();
+  } finally {
+    await hideViewerMarker(request);
+  }
+}
+
 export {
   NO_VIEWER_MARKER,
   hideViewerMarker,
@@ -67,5 +93,6 @@ export {
   isOrientationOverlayEnabled,
   useOrientationOverlay,
   viewerOrientationMarker,
+  withViewerMarker,
 };
 export type { ViewerOrientationMarker };

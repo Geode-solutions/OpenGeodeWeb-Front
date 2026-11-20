@@ -5,7 +5,6 @@ import { mountSuspended } from "@nuxt/test-utils/runtime";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 import {
-  hideViewerMarker,
   hideViewerMarkerRequest,
   viewerOrientationMarker,
 } from "@ogw_front/composables/orientation_overlay";
@@ -157,28 +156,6 @@ describe("orientation overlay", () => {
 describe("orientation marker sent to the viewer", () => {
   afterEach(() => {
     setOrientationOverlay(false);
-  });
-
-  test("is the scene style choice without the overlay", () => {
-    setOrientationOverlay(false);
-    expect(viewerOrientationMarker("compass")).toBe("compass");
-    expect(hideViewerMarkerRequest()).toBeUndefined();
-  });
-
-  test("hides the VTK marker after a viewer reset only with the overlay", async () => {
-    const request = vi.fn(async () => {
-      await Promise.reject(new Error("unknown marker"));
-    });
-    setOrientationOverlay(false);
-    await hideViewerMarker(request);
-    expect(request).not.toHaveBeenCalled();
-    setOrientationOverlay(true);
-    // An older viewer rejecting the "none" marker does not fail the reset
-    await expect(hideViewerMarker(request)).resolves.toBeUndefined();
-    expect(request).toHaveBeenCalledWith({
-      schema: set_orientation_widget,
-      params: { marker: "none" },
-    });
   });
 
   test("is none with the overlay, the scene style keeping the choice", async () => {

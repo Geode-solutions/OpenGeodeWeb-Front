@@ -10,8 +10,10 @@ import viewer_schemas, {
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import fileDownload from "js-file-download";
 import { useClipboardItems } from "@vueuse/core";
+import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useViewerStore } from "@ogw_front/stores/viewer";
+import { withViewerMarker } from "@ogw_front/composables/orientation_overlay";
 
 const DEFAULT_PANEL_WIDTH = 260;
 const EXTENSION_SELECT_WIDTH = 80;
@@ -68,6 +70,7 @@ async function deliverScreenshot(blob: Blob | Uint8Array, current_filename: stri
 
 async function takeSceneScreenshot(current_filename: string): Promise<void> {
   const viewerStore = useViewerStore();
+  const dataStyleStore = useDataStyleStore();
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.take_screenshot;
   const params = {
     filename: current_filename,
@@ -75,16 +78,23 @@ async function takeSceneScreenshot(current_filename: string): Promise<void> {
     include_background: include_background.value,
     ...screenshot_size.value,
   };
-  await viewerStore.request(
-    {
-      schema,
-      params,
-    },
-    {
-      // `blob` is the image file content, received as binary (Uint8Array) through wslink
-      response_function: async ({ blob }) => {
-        await deliverScreenshot(blob, current_filename);
-      },
+  // The front orientation overlay is not part of the viewer image: the viewer draws its marker for the capture
+  await withViewerMarker(
+    dataStyleStore.sceneStyle.orientation_widget,
+    (args) => viewerStore.request(args),
+    async () => {
+      await viewerStore.request(
+        {
+          schema,
+          params,
+        },
+        {
+          // `blob` is the image file content, received as binary (Uint8Array) through wslink
+          response_function: async ({ blob }) => {
+            await deliverScreenshot(blob, current_filename);
+          },
+        },
+      );
     },
   );
 }
