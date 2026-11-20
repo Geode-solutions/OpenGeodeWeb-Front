@@ -265,7 +265,7 @@ function getLeafViewerIds(item: CollectionTreeItem): number[] {
       <template #append="{ item }">
         <v-btn
           v-if="getLeafViewerIds(item as unknown as CollectionTreeItem).length > 0"
-          icon="mdi-target"
+          icon="ph-target"
           size="medium"
           variant="text"
           v-tooltip="'Focus camera on object'"

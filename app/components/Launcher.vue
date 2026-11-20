@@ -50,7 +50,7 @@ function cloudCreateBackend(): Promise<void> {
           class="load-btn"
           text="Load the app"
           size="x-large"
-          color="white"
+          color="var(--ogw-launcher-button, white)"
           @click="cloudCreateBackend"
         />
       </VCol>

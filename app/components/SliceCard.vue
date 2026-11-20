@@ -32,7 +32,6 @@ const emit = defineEmits<Emits>();
           :max="maxIndex"
           :step="1"
           color="primary"
-          track-color="grey-lighten-2"
           density="compact"
           hide-details
         />
@@ -40,7 +39,7 @@ const emit = defineEmits<Emits>();
       <v-col cols="auto">
         <v-btn
           data-testid="removeSliceButton"
-          icon="mdi-trash-can-outline"
+          icon="ph-trash"
           size="x-small"
           variant="text"
           color="error"

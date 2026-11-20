@@ -8,12 +8,19 @@ import type { DataId } from "@ogw_front/types/identifiers";
 import type { Visibility } from "@ogw_front/types/style";
 import { base64ToArrayBuffer } from "./base64";
 import { getCameraOptions } from "./camera_animation";
+import { getDefaultSceneStyle } from "@ogw_front/utils/default_styles";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
 import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper";
 import type vtkPolyData from "@kitware/vtk.js/Common/DataModel/PolyData";
 import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLPolyDataReader";
+
+// The local renderer shows while the camera moves: it starts on the scene background the viewer gets after a reset
+function localBackgroundColor(): [number, number, number] {
+  const { red, green, blue } = getDefaultSceneStyle().background_color;
+  return [red / RGB_MAX, green / RGB_MAX, blue / RGB_MAX];
+}
 
 async function setBackgroundColor(color: ViewerSetBackgroundColorParams["color"]): Promise<void> {
   const { genericRenderWindow, remoteRender } = useHybridViewerCore();
@@ -174,4 +181,4 @@ const useHybridViewerScene = createSharedComposable(() => {
   };
 });
 
-export { followZScaling, useHybridViewerScene };
+export { followZScaling, localBackgroundColor, useHybridViewerScene };

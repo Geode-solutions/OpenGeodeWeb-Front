@@ -7,7 +7,7 @@ const visibility = defineModel<boolean>();
 <template>
   <v-row class="pa-0 px-2" align="center" no-gutters>
     <v-col cols="auto" class="mr-2">
-      <v-icon size="18" icon="mdi-eye" v-tooltip:left="'Visibility'" />
+      <v-icon size="18" icon="ph-fill ph-eye" v-tooltip:left="'Visibility'" />
     </v-col>
     <v-col cols="auto">
       <BasicSwitch v-model="visibility" />

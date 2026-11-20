@@ -215,7 +215,7 @@ watch(
   <v-divider class="my-2 mx-2" />
   <v-row justify="center" align="center" no-gutters class="px-2">
     <v-col cols="auto" class="mr-2">
-      <v-icon size="18" icon="mdi-format-color-fill" v-tooltip:left="'Coloring'" />
+      <v-icon size="18" icon="ph-paint-bucket" v-tooltip:left="'Coloring'" />
     </v-col>
     <v-col>
       <v-select

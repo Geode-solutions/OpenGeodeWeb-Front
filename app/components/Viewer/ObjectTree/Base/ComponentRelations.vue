@@ -53,7 +53,7 @@ const rows = computed<{ label: string; summary: string; testId: string }[]>(() =
 <template>
   <div v-if="rows.length > 0" class="d-flex flex-column ga-1">
     <span v-for="row in rows" :key="row.label" class="text-caption d-flex align-center">
-      <strong class="text-white mr-1">{{ row.label }}:</strong>
+      <strong class="mr-1">{{ row.label }}:</strong>
       <span :data-testid="`relations-${row.testId}`">{{ row.summary }}</span>
     </span>
   </div>

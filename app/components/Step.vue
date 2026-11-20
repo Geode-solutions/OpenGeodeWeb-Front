@@ -59,7 +59,7 @@ const sortedChips = computed<string[]>(() => {
         <p
           tag="h3"
           class="text-subtitle-1 font-weight-bold mb-0 transition-swing"
-          :class="current_step_index === stepIndex ? 'text-primary' : 'text-grey-darken-1'"
+          :class="current_step_index === stepIndex ? 'text-primary' : 'text-medium-emphasis'"
         >
           {{ steps[stepIndex]!.step_title }}
         </p>

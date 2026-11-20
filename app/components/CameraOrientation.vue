@@ -193,7 +193,11 @@ watch(hoveredFace, (newFace, oldFace) => {
       class="pa-0 overflow-hidden position-relative"
       style="
         height: 220px;
-        background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05), transparent 70%);
+        background: radial-gradient(
+          circle at center,
+          rgba(var(--v-theme-on-surface), 0.05),
+          transparent 70%
+        );
       "
     >
       <svg class="position-absolute fill-height w-100" style="pointer-events: none">
@@ -204,10 +208,11 @@ watch(hoveredFace, (newFace, oldFace) => {
           y1="50%"
           :x2="orientation.position.left"
           :y2="orientation.position.top"
-          :stroke="hoveredFace === orientation.face ? 'white' : 'rgba(255,255,255,0.1)'"
+          stroke="currentColor"
+          :stroke-opacity="hoveredFace === orientation.face ? 1 : 0.1"
           :stroke-width="hoveredFace === orientation.face ? 2 : 1"
           class="transition-all"
-          style="filter: drop-shadow(0 0 3px white)"
+          style="filter: drop-shadow(0 0 3px currentColor)"
         />
       </svg>
 
@@ -272,15 +277,15 @@ watch(hoveredFace, (newFace, oldFace) => {
 <style scoped>
 .satellite-node {
   transform: translate(-50%, -50%);
-  background: rgba(0, 0, 0, 0.2) !important;
+  background: rgba(var(--v-theme-background), 0.4) !important;
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity)) !important;
   transition: all 0.2s ease;
 }
 .satellite-node:hover {
   transform: translate(-50%, -50%) scale(1.1);
-  border-color: white !important;
-  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgb(var(--v-theme-primary)) !important;
+  background: rgba(var(--v-theme-primary), 0.12) !important;
 }
 .transition-all {
   transition: all 0.4s ease;

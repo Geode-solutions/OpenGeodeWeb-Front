@@ -3,7 +3,10 @@ import {
   useHybridViewerViewport,
 } from "@ogw_internal/stores/hybrid_viewer/viewport";
 import { applySnapshot, useHybridViewerCamera } from "@ogw_internal/stores/hybrid_viewer/camera";
-import { BACKGROUND_COLOR } from "@ogw_internal/stores/hybrid_viewer/constants";
+import {
+  localBackgroundColor,
+  useHybridViewerScene,
+} from "@ogw_internal/stores/hybrid_viewer/scene";
 import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types";
 import { getCameraOptions } from "@ogw_internal/stores/hybrid_viewer/camera_animation";
 import { useHybridViewerBrightness } from "@ogw_internal/stores/hybrid_viewer/brightness";
@@ -11,7 +14,6 @@ import { useHybridViewerCore } from "@ogw_internal/stores/hybrid_viewer/core";
 import { useHybridViewerFilters } from "@ogw_internal/stores/hybrid_viewer/filters";
 import { useHybridViewerHighlight } from "@ogw_internal/stores/hybrid_viewer/highlight";
 import { useHybridViewerRuler } from "@ogw_internal/stores/hybrid_viewer/ruler";
-import { useHybridViewerScene } from "@ogw_internal/stores/hybrid_viewer/scene";
 import { useHybridViewerZoomBox } from "@ogw_internal/stores/hybrid_viewer/zoom_box";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 
@@ -58,7 +60,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     }
     status.value = Status.CREATING;
     genericRenderWindow.value = vtkGenericRenderWindow({
-      background: BACKGROUND_COLOR,
+      background: localBackgroundColor(),
       listenWindowResize: false,
     });
     const webGLRenderWindow =

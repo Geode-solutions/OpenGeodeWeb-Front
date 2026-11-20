@@ -1,4 +1,3 @@
-import CameraBookmarkIcon from "@ogw_front/assets/viewer_svgs/camera-bookmark.svg";
 import type { ViewToolbarTools } from "@ogw_front/composables/view_toolbar_tools";
 
 interface CameraOptionAction {
@@ -18,7 +17,7 @@ function panelOptions(tools: ViewToolbarTools): CameraOptionAction[] {
     {
       testId: "cameraOrientationButton",
       tooltip: "Camera orientation",
-      icon: "mdi-rotate-3d",
+      icon: "ph-arrows-clockwise",
       action: (): void => {
         tools.toggleTool(tools.showCameraOrientation);
       },
@@ -26,8 +25,7 @@ function panelOptions(tools: ViewToolbarTools): CameraOptionAction[] {
     {
       testId: "cameraManagerButton",
       tooltip: "Manage camera positions",
-      icon: CameraBookmarkIcon,
-      iconSize: 34,
+      icon: "ph-video-camera",
       action: (): void => {
         tools.toggleTool(tools.showCameraManager);
       },
@@ -35,7 +33,7 @@ function panelOptions(tools: ViewToolbarTools): CameraOptionAction[] {
     {
       testId: "screenshotButton",
       tooltip: "Take a screenshot",
-      icon: "mdi-camera",
+      icon: "ph-camera",
       action: (): void => {
         tools.toggleTool(tools.showScreenshot);
       },
@@ -49,7 +47,7 @@ function controlOptions(tools: ViewToolbarTools): CameraOptionAction[] {
     {
       testId: "zScalingButton",
       tooltip: "Z Scaling Control",
-      icon: "mdi-sort",
+      icon: "ph-arrows-down-up",
       action: (): void => {
         tools.toggleTool(tools.showZScaling);
       },
@@ -57,7 +55,7 @@ function controlOptions(tools: ViewToolbarTools): CameraOptionAction[] {
     {
       testId: "clippingPlanesButton",
       tooltip: "Clipping Planes",
-      icon: "mdi-content-cut",
+      icon: "ph-scissors",
       color: tools.showClippingPlanes.value ? "primary" : undefined,
       action: (): void => {
         tools.toggleTool(tools.showClippingPlanes);
@@ -72,7 +70,7 @@ function filterOptions(tools: ViewToolbarTools): CameraOptionAction[] {
     {
       testId: "shrinkFilterButton",
       tooltip: "Shrink Filter",
-      icon: "mdi-arrow-collapse-all",
+      icon: "ph-arrows-in",
       color: tools.showShrinkFilter.value ? "primary" : undefined,
       action: (): void => {
         tools.toggleTool(tools.showShrinkFilter);
@@ -81,7 +79,7 @@ function filterOptions(tools: ViewToolbarTools): CameraOptionAction[] {
     {
       testId: "explodeFilterButton",
       tooltip: "Exploded View",
-      icon: "mdi-arrow-expand-all",
+      icon: "ph-arrows-out",
       color: tools.showExplodeFilter.value ? "primary" : undefined,
       action: (): void => {
         tools.toggleTool(tools.showExplodeFilter);
@@ -90,7 +88,7 @@ function filterOptions(tools: ViewToolbarTools): CameraOptionAction[] {
     {
       testId: "thresholdFilterButton",
       tooltip: "Threshold Filter",
-      icon: "mdi-filter-variant",
+      icon: "ph-funnel-simple",
       color: tools.showThresholdFilter.value ? "primary" : undefined,
       action: (): void => {
         tools.toggleTool(tools.showThresholdFilter);
@@ -103,7 +101,7 @@ function rulerOption(tools: ViewToolbarTools): CameraOptionAction {
   return {
     testId: "rulerButton",
     tooltip: "Ruler",
-    icon: "mdi-ruler",
+    icon: "ph-ruler",
     color: tools.showRuler.value ? "primary" : undefined,
     action: (): void => {
       tools.toggleTool(tools.showRuler);

@@ -48,7 +48,7 @@ function handleUpdate(val: boolean): void {
       <v-card-title
         class="d-flex align-center py-2 px-3 text-caption text-uppercase font-weight-black text-medium-emphasis"
       >
-        <v-icon icon="mdi-layers-triple" size="small" class="mr-2" color="secondary" />
+        <v-icon icon="ph-stack" size="small" class="mr-2" color="secondary" />
         Overlapping objects
       </v-card-title>
 
@@ -69,12 +69,15 @@ function handleUpdate(val: boolean): void {
               width="24"
               max-width="24"
               class="mr-3"
-              style="object-fit: contain; filter: brightness(0) invert(1)"
+              style="
+                object-fit: contain;
+                filter: var(--ogw-mono-icon-filter, brightness(0) invert(1));
+              "
             />
-            <v-icon v-else icon="mdi-cube-outline" size="24" color="white" class="mr-3" />
+            <v-icon v-else icon="ph-cube" size="24" class="mr-3" />
           </template>
 
-          <v-list-item-title class="font-weight-bold text-body-2 text-truncate text-white">
+          <v-list-item-title class="font-weight-bold text-body-2 text-truncate">
             {{ item.name }}
           </v-list-item-title>
           <v-list-item-subtitle

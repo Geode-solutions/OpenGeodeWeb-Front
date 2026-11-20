@@ -32,7 +32,7 @@ defineOptions({ inheritAttrs: false });
     >
       {{ label }} &middot; Esc to stop
       <v-divider vertical class="mx-2 my-1" opacity="0.3" />
-      <v-icon icon="mdi-close" size="small" />
+      <v-icon icon="ph-x" size="small" />
     </v-chip>
   </div>
 </template>

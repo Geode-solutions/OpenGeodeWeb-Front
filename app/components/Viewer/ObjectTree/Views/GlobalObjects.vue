@@ -271,7 +271,7 @@ function expandAll(): void {
           <v-btn
             v-if="item.viewer_object_type"
             data-testid="focusObjectButton"
-            icon="mdi-target"
+            icon="ph-target"
             size="medium"
             variant="text"
             v-tooltip="'Focus camera on object'"
@@ -299,7 +299,7 @@ function expandAll(): void {
               )
             "
           >
-            <v-icon size="18">mdi-magnify-expand</v-icon>
+            <v-icon size="18">ph-magnifying-glass-plus</v-icon>
           </v-btn>
         </template>
       </template>
