@@ -264,7 +264,8 @@ svg {
 }
 
 .backdrop {
-  fill: rgba(232, 238, 240, 0.55);
+  /* Same tone as the strata: light under a dark ink, dark under a light ink */
+  fill: color-mix(in srgb, var(--globe-strata) 55%, transparent);
   opacity: 0;
   transition: opacity 0.2s ease;
 }
