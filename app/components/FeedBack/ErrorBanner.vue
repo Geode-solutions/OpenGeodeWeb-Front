@@ -31,7 +31,7 @@ defineExpose({ reload });
         Server timed out due to inactivity, please reload this page or click here:
       </v-col>
       <v-col class="align-items" cols="auto">
-        <v-btn color="primary" variant="flat" density="compact" @click="reload()"> Reload </v-btn>
+        <v-btn color="accent" variant="flat" density="compact" @click="reload()"> Reload </v-btn>
       </v-col>
       <v-spacer />
       <v-col cols="auto">
