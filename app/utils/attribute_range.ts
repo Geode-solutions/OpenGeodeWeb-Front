@@ -1,4 +1,4 @@
-import type { AttributeName } from "@ogw_front/types/attribute";
+import type { AttributeName } from "@geode/opengeodeweb-viewer/schema_types";
 import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
 import { useBackStore } from "@ogw_front/stores/back";
 

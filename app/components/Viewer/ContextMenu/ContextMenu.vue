@@ -114,7 +114,7 @@ useEventListener(globalThis, "mouseup", (event: MouseEvent) => {
 
 const menu_items = shallowRef<Component[]>([]);
 watch(
-  () => [meta_data.value.viewer_object_type, meta_data.value.geode_object_type],
+  () => [meta_data.value.viewer_object_type, meta_data.value.geode_object_type] as const,
   ([viewer_object_type, geode_object_type]) => {
     menu_items.value = menuStore.getMenuItems(viewer_object_type, geode_object_type);
   },

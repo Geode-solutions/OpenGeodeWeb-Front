@@ -1,10 +1,10 @@
 import { type MapStyle, sortedMaps } from "@ogw_front/utils/basemap_tree";
 import back_schemas, {
   type BasemapBuildResponse,
-  type CRSList,
 } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { ignoreError, useBasemapViewer } from "./viewer.js";
 import type { BasemapLayers } from "./layers.js";
+import type { CRS } from "@geode/opengeodeweb-back/schema_types";
 import type { Extent } from "./extent.js";
 import type { Ref } from "vue";
 import { useBackStore } from "@ogw_front/stores/back";
@@ -73,7 +73,7 @@ function useBasemapBuilds(
     await hybridViewerStore.remoteRender();
   }
 
-  async function display(build: number, extent: Extent, crs: CRSList): Promise<void> {
+  async function display(build: number, extent: Extent, crs: CRS): Promise<void> {
     const response = await backStore.request({
       schema: back_schemas.opengeodeweb_back.basemap.build,
       params: { maps: [...maps.value], crs, ...extent },

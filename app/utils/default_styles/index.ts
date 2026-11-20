@@ -1,5 +1,4 @@
 import {
-  type RGBAColor,
   SCENE_DEFAULT_BACKGROUND_COLOR,
   SCENE_DEFAULT_FONT_FAMILY,
   SCENE_DEFAULT_ORIENTATION_WIDGET,
@@ -21,6 +20,7 @@ import {
   solidDefaultStyle,
   surfaceDefaultStyle,
 } from "./meshes";
+import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
 import type { SceneStyle } from "@ogw_internal/stores/data_style/types";
 
 function default_styles(): Record<string, unknown> {
@@ -59,8 +59,8 @@ function getDefaultStyle(type: string): unknown {
 }
 
 interface SceneColors {
-  background?: RGBAColor;
-  text?: RGBAColor;
+  background?: ColorRGBA;
+  text?: ColorRGBA;
 }
 
 // The app's own scene colors (`ogwFront.sceneColors` in app.config.ts), set at startup by plugins/scene_colors.ts.

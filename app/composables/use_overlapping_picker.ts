@@ -1,31 +1,33 @@
 import { ref } from "vue";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
+import { type DataItem, useDataStore } from "@ogw_front/stores/data";
 import type {
-  DataIdentified,
   GeodeObjectType,
   ViewerObjectType,
-} from "@ogw_front/types/identifiers";
-import { type DataItem, useDataStore } from "@ogw_front/stores/data";
+} from "@geode/opengeodeweb-microservice/data_types";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { DataIdentified } from "@ogw_front/types/identifiers";
+import type { ViewerId } from "@geode/opengeodeweb-viewer/schema_types";
 import { computeMenuPosition } from "@ogw_front/composables/overlapping_picker_menu";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 interface PickedItem {
-  id: string;
-  viewer_id: number | undefined;
+  id: DataId;
+  viewer_id: ViewerId | undefined;
 }
 
 interface ProposedItem extends DataIdentified {
-  viewer_id: number | undefined;
+  viewer_id: ViewerId | undefined;
   name: string;
   viewer_object_type: ViewerObjectType | undefined;
   geode_object_type: GeodeObjectType | undefined;
 }
 
 interface ViewerIdResult {
-  id: string | undefined;
-  viewer_id: number | undefined;
+  id: DataId | undefined;
+  viewer_id: ViewerId | undefined;
   // True when objects were under the cursor but the user closed the picker without choosing
   dismissed?: boolean;
 }

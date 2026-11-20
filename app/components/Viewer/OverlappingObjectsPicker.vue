@@ -2,7 +2,7 @@
 import GlassCard from "@ogw_front/components/GlassCard.vue";
 import type { ProposedItem } from "@ogw_front/composables/use_overlapping_picker";
 import { formatListId } from "@ogw_front/utils/name_cleaner";
-import { geode_objects } from "@ogw_front/assets/geode_objects";
+import { geodeObjectImage } from "@ogw_front/assets/geode_objects";
 
 interface Props {
   displayIntermediate: boolean;
@@ -63,8 +63,8 @@ function handleUpdate(val: boolean): void {
         >
           <template #prepend>
             <v-img
-              v-if="geode_objects[item.geode_object_type ?? '']?.image"
-              :src="geode_objects[item.geode_object_type ?? '']?.image"
+              v-if="item.geode_object_type"
+              :src="geodeObjectImage(item.geode_object_type)"
               height="24"
               width="24"
               max-width="24"

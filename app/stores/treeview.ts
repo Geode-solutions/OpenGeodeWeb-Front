@@ -4,15 +4,16 @@ import { consola } from "consola";
 // oxlint-disable eslint/sort-imports, eslint/max-lines
 import { defineStore } from "pinia";
 
+import type { DataId, GeodeId } from "@geode/opengeodeweb-microservice/schema_types";
 import type {
-  DataId,
-  GeodeId,
   GeodeIdentified,
-  GeodeObjectType,
   GeodeObjectTyped,
-  ViewerObjectType,
   ViewerObjectTyped,
 } from "@ogw_front/types/identifiers";
+import type {
+  GeodeObjectType,
+  ViewerObjectType,
+} from "@geode/opengeodeweb-microservice/data_types";
 import type { TreeGroup, TreeNode } from "@ogw_front/types/tree";
 import { ref, watch } from "vue";
 import { getTable } from "@ogw_internal/database/database";

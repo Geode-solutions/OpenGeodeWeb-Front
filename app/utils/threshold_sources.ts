@@ -4,7 +4,7 @@ import {
   MODEL_COMPONENT_KINDS,
 } from "@ogw_front/utils/attributes";
 import type { AttributeSource } from "@ogw_front/utils/threshold";
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import { attributeSchemas } from "@ogw_front/composables/attribute_coloring_style";
 import type { useDataStore } from "@ogw_front/stores/data";
 

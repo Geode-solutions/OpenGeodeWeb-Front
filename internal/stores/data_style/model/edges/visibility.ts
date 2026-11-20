@@ -6,7 +6,7 @@ import {
   useModelComponentEdgesStyle,
 } from "@ogw_internal/stores/data_style/model/edges/component";
 import type { ModelId } from "@ogw_front/types/identifiers";
-import type { Visibility } from "@ogw_front/types/style";
+import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import { useModelEdgesCommonStyle } from "./common";
 import { useModelEdgesWidthStyle } from "./width";
 import { useViewerStore } from "@ogw_front/stores/viewer";

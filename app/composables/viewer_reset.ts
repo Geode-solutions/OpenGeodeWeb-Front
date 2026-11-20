@@ -1,4 +1,4 @@
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { ColorRGB, ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
 import type { ViewerRequest } from "@ogw_front/stores/viewer_helpers/request";
 // Third party imports
 import { consola } from "consola";
@@ -11,10 +11,9 @@ import {
   resetOrientationMarkerVisibility,
 } from "@ogw_front/composables/orientation_overlay";
 
-// oxlint-disable-next-line id-length -- the viewer schema requires { r, g, b }
-function toViewerColor(color: RGBAColor): { r: number; g: number; b: number } {
-  // oxlint-disable-next-line id-length -- the viewer schema requires { r, g, b }
-  return { r: color.red, g: color.green, b: color.blue };
+// The scene colors of the viewer have no alpha (the text one takes it as its opacity)
+function toViewerColor({ red, green, blue }: ColorRGBA): ColorRGB {
+  return { red, green, blue };
 }
 
 // A reset viewer draws its own scene colors: give it the app's (`ogwFront.sceneColors`), which the default

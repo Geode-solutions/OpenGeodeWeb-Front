@@ -2,7 +2,7 @@
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
 import type { SceneFontFamily } from "@ogw_internal/stores/data_style/types";
 import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -23,7 +23,7 @@ const FONT_FAMILIES: { title: string; value: SceneFontFamily }[] = [
   { title: "Times", value: "times" },
 ];
 
-const textColor = computed<RGBAColor>({
+const textColor = computed<ColorRGBA>({
   get: () => dataStyleStore.sceneStyle.text.color,
   set: async (color) => {
     await dataStyleStore.setSceneTextColor(color);

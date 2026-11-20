@@ -41,13 +41,11 @@ describe("after a viewer reset", () => {
     expect(schemas).toStrictEqual([set_background_color, set_text_style, set_orientation_widget]);
     expect(request).toHaveBeenCalledWith({
       schema: set_background_color,
-      // oxlint-disable-next-line id-length -- the viewer schema requires { r, g, b }
-      params: { color: { r: 160, g: 180, b: 187 } },
+      params: { color: { red: 160, green: 180, blue: 187 } },
     });
     expect(request).toHaveBeenCalledWith({
       schema: set_text_style,
-      // oxlint-disable-next-line id-length -- the viewer schema requires { r, g, b }
-      params: { color: { r: 31, g: 46, b: 51 }, font_family: "arial", opacity: 1 },
+      params: { color: { red: 31, green: 46, blue: 51 }, font_family: "arial", opacity: 1 },
     });
   });
 

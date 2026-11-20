@@ -6,6 +6,7 @@ import path from "node:path";
 
 // Third party imports
 import { afterAll, beforeAll, expect, vi } from "vitest";
+import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import { consola } from "consola";
 
 // Local imports
@@ -65,7 +66,7 @@ async function runMicroservices(): Promise<{ projectFolderPath: string }> {
 
 async function setupIntegrationTests(
   file_name: string,
-  geode_object: string,
+  geode_object: GeodeObjectType,
 ): Promise<{ id: string; projectFolderPath: string }> {
   setupActivePinia();
   const viewerStore = useViewerStore();

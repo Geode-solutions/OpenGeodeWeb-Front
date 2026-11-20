@@ -1,12 +1,9 @@
 <script setup lang="ts">
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 
-import type {
-  DataIdentified,
-  GeodeObjectType,
-  GeodeObjectTyped,
-} from "@ogw_front/types/identifiers";
+import type { DataIdentified, GeodeObjectTyped } from "@ogw_front/types/identifiers";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
+import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStore } from "@ogw_front/stores/data";
 

@@ -1,11 +1,7 @@
 // oxlint-disable eslint/max-lines
 import type {
   AttributeColorMap,
-  AttributeItem,
-  AttributeName,
   AttributeRange,
-  AttributeRangeMaximum,
-  AttributeRangeMinimum,
   AttributeTimeStep,
 } from "@ogw_front/types/attribute";
 import type {
@@ -14,8 +10,15 @@ import type {
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
-import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type {
+  AttributeItem,
+  AttributeName,
+  AttributeRangeMaximum,
+  AttributeRangeMinimum,
+  ColorRGBA,
+} from "@geode/opengeodeweb-viewer/schema_types";
 import type { LineId, ModelId } from "@ogw_front/types/identifiers";
+import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
@@ -83,11 +86,11 @@ interface UseModelLinesVertexAttributeReturn {
     lineIds: LineId[],
     colorMap: AttributeColorMap | undefined,
   ) => Promise<unknown>;
-  modelLinesVertexAttributeNoDataColor: (modelId: ModelId, lineId?: LineId) => RGBAColor;
+  modelLinesVertexAttributeNoDataColor: (modelId: ModelId, lineId?: LineId) => ColorRGBA;
   setModelLinesVertexAttributeNoDataColor: (
     modelId: ModelId,
     lineIds: LineId[],
-    no_data_color: RGBAColor,
+    no_data_color: ColorRGBA,
   ) => Promise<unknown>;
 }
 
@@ -172,7 +175,7 @@ function useModelLinesVertexAttributeGetters(
     const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineId, name, item);
     return storedConfig.colorMap;
   }
-  function modelLinesVertexAttributeNoDataColor(modelId: ModelId, lineId?: LineId): RGBAColor {
+  function modelLinesVertexAttributeNoDataColor(modelId: ModelId, lineId?: LineId): ColorRGBA {
     const name = modelLinesVertexAttributeName(modelId, lineId);
     const item = modelLinesVertexAttributeItem(modelId, lineId);
     const storedConfig = modelLinesVertexAttributeStoredConfig(modelId, lineId, name, item);
@@ -396,7 +399,7 @@ function useModelLinesVertexAttribute(): UseModelLinesVertexAttributeReturn {
   async function setModelLinesVertexAttributeNoDataColor(
     modelId: ModelId,
     lineIds: LineId[],
-    no_data_color: RGBAColor,
+    no_data_color: ColorRGBA,
   ): Promise<unknown> {
     const name = modelLinesVertexAttributeName(modelId, lineIds[0]);
     const item = modelLinesVertexAttributeItem(modelId, lineIds[0]);

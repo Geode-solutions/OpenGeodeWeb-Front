@@ -1,11 +1,11 @@
 import type {
-  AttributeColorMap,
   AttributeItem,
   AttributeName,
   AttributeRangeMaximum,
   AttributeRangeMinimum,
-} from "@ogw_front/types/attribute";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+  ColorRGBA,
+} from "@geode/opengeodeweb-viewer/schema_types";
+import type { AttributeColorMap } from "@ogw_front/types/attribute";
 
 // The same fields while the user has not chosen them yet
 type Undefinable<Fields> = { [Field in keyof Fields]: Fields[Field] | undefined };
@@ -28,7 +28,7 @@ interface AttributeColorMapped {
 // What is kept of an attribute coloring when another attribute is picked
 interface AttributeStoredConfig
   extends Undefinable<AttributeBounds>, Undefinable<AttributeColorMapped> {
-  no_data_color: RGBAColor;
+  no_data_color: ColorRGBA;
 }
 
 // The input of an attribute coloring while the user has not chosen all of it yet
@@ -37,11 +37,11 @@ interface AttributeInput
     Undefinable<AttributeSelection>,
     Undefinable<AttributeBounds>,
     Undefinable<AttributeColorMapped> {
-  no_data_color?: RGBAColor;
+  no_data_color?: ColorRGBA;
 }
 
 interface ValidAttributeInput extends AttributeSelection, AttributeBounds, AttributeColorMapped {
-  no_data_color?: RGBAColor;
+  no_data_color?: ColorRGBA;
 }
 
 interface AttributeState extends Partial<AttributeSelection> {

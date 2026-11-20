@@ -1,14 +1,22 @@
 import type {
-  DataIdentified,
   GeodeObjectType,
-  GeodeObjectTyped,
   ViewerObjectType,
-  ViewerObjectTyped,
-} from "@ogw_front/types/identifiers";
+} from "@geode/opengeodeweb-microservice/data_types";
 import { type MenuItems, menusData } from "./menu_helpers/menus_data.js";
+import type { DataIdentified } from "@ogw_front/types/identifiers";
 
-interface MenuMetaData
-  extends Partial<DataIdentified>, Partial<GeodeObjectTyped>, Partial<ViewerObjectTyped> {
+// What the menus of an entry are chosen by: its viewer_object_type and geode_object_type, or keys when it is not a data
+type MenuViewerObjectType =
+  | ViewerObjectType
+  | "scene"
+  | "basemap"
+  | "model_component"
+  | "model_component_type";
+type MenuObjectType = GeodeObjectType | "scene" | "Basemap" | "Map" | "component" | "type";
+
+interface MenuMetaData extends Partial<DataIdentified> {
+  viewer_object_type?: MenuViewerObjectType;
+  geode_object_type?: MenuObjectType;
   targetIds?: string[];
   [key: string]: unknown;
 }
@@ -44,14 +52,12 @@ export const useMenuStore = defineStore("menu", () => {
   );
 
   function getMenuItems(
-    viewerObjectType: ViewerObjectType | undefined,
-    geodeObjectType: GeodeObjectType | undefined,
+    viewerObjectType: MenuViewerObjectType | undefined,
+    geodeObjectType: MenuObjectType | undefined,
   ): MenuItems {
     if (
       viewerObjectType === undefined ||
-      viewerObjectType === "" ||
       geodeObjectType === undefined ||
-      geodeObjectType === "" ||
       !menus.value[viewerObjectType]
     ) {
       return [];
@@ -138,4 +144,4 @@ export const useMenuStore = defineStore("menu", () => {
   };
 });
 
-export type { MenuMetaData };
+export type { MenuMetaData, MenuViewerObjectType };

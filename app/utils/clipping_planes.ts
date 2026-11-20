@@ -1,4 +1,4 @@
-import type { Opacity } from "@ogw_front/types/style";
+import type { Opacity } from "@geode/opengeodeweb-viewer/schema_types";
 
 const AXIS_SCALE = 0.45;
 const SIZE_RATIO = 0.1;

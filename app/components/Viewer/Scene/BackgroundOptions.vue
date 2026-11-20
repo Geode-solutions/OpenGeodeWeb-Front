@@ -2,7 +2,7 @@
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
 import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 
@@ -14,7 +14,7 @@ const { itemProps } = defineProps<Props>();
 
 const dataStyleStore = useDataStyleStore();
 
-const backgroundColor = computed<RGBAColor>({
+const backgroundColor = computed<ColorRGBA>({
   get: () => dataStyleStore.sceneStyle.background_color,
   set: async (color) => {
     await dataStyleStore.setSceneBackgroundColor(color);

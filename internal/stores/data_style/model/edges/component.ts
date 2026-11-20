@@ -1,12 +1,14 @@
 // oxlint-disable eslint/max-lines
+import type { AttributeColorMap, AttributeRange } from "@ogw_front/types/attribute";
 import type {
-  AttributeColorMap,
   AttributeItem,
   AttributeName,
-  AttributeRange,
   AttributeRangeMaximum,
   AttributeRangeMinimum,
-} from "@ogw_front/types/attribute";
+  ColorRGBA,
+  EdgeWidth,
+  Visibility,
+} from "@geode/opengeodeweb-viewer/schema_types";
 import type {
   AttributeState,
   AttributeStoredConfig,
@@ -15,9 +17,7 @@ import {
   EDGES_DEFAULT_COLOR,
   EDGES_DEFAULT_VISIBILITY,
   EDGES_DEFAULT_WIDTH,
-  type RGBAColor,
 } from "@ogw_front/utils/default_styles/constants";
-import type { Visibility, Width } from "@ogw_front/types/style";
 import type { ModelId } from "@ogw_front/types/identifiers";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
@@ -50,10 +50,10 @@ type EdgesRequestSchema =
 
 interface EdgesStyle {
   visibility?: Visibility;
-  width?: Width;
+  width?: EdgeWidth;
   coloring?: {
     active?: string;
-    constant?: RGBAColor;
+    constant?: ColorRGBA;
     vertex?: AttributeState;
   };
 }
@@ -100,11 +100,11 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
     return edgesStyle(modelId, componentId).visibility ?? EDGES_DEFAULT_VISIBILITY;
   }
 
-  function edgesWidth(modelId: ModelId, componentId?: string): Width {
+  function edgesWidth(modelId: ModelId, componentId?: string): EdgeWidth {
     return edgesStyle(modelId, componentId).width ?? EDGES_DEFAULT_WIDTH;
   }
 
-  function edgesColor(modelId: ModelId, componentId?: string): RGBAColor {
+  function edgesColor(modelId: ModelId, componentId?: string): ColorRGBA {
     return edgesStyle(modelId, componentId).coloring?.constant ?? EDGES_DEFAULT_COLOR;
   }
 
@@ -150,7 +150,7 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
     return storedConfig(modelId, componentId).colorMap;
   }
 
-  function vertexAttributeNoDataColor(modelId: ModelId, componentId?: string): RGBAColor {
+  function vertexAttributeNoDataColor(modelId: ModelId, componentId?: string): ColorRGBA {
     return storedConfig(modelId, componentId).no_data_color;
   }
 
@@ -213,7 +213,7 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
   async function setWidth(
     modelId: ModelId,
     componentIds: string[],
-    width: Width,
+    width: EdgeWidth,
   ): Promise<unknown> {
     const result = await requestEdges(modelId, componentIds, schemas.width, {
       width,
@@ -225,7 +225,7 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
   async function setColor(
     modelId: ModelId,
     componentIds: string[],
-    color: RGBAColor,
+    color: ColorRGBA,
   ): Promise<unknown> {
     const result = await requestEdges(modelId, componentIds, schemas.color, {
       color,
@@ -340,7 +340,7 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
   async function setVertexAttributeNoDataColor(
     modelId: ModelId,
     componentIds: string[],
-    no_data_color: RGBAColor,
+    no_data_color: ColorRGBA,
   ): Promise<unknown> {
     await mutateStoredConfig(modelId, componentIds, { no_data_color });
     const result = await applyVertexAttribute(modelId, componentIds);

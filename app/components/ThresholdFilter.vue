@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Threshold, ThresholdAttribute } from "@ogw_internal/stores/hybrid_viewer/filters";
 import type { AttributeSource } from "@ogw_front/utils/threshold";
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import ThresholdCard from "@ogw_front/components/ThresholdCard.vue";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import { fetchSources } from "@ogw_front/utils/threshold_sources";

@@ -14,9 +14,13 @@ import {
   POLYGONS_DEFAULT_VISIBILITY,
   POLYHEDRA_DEFAULT_COLOR,
   POLYHEDRA_DEFAULT_VISIBILITY,
-  type RGBAColor,
 } from "./constants";
-import type { Size, Visibility, Width } from "@ogw_front/types/style";
+import type {
+  ColorRGBA,
+  EdgeWidth,
+  PointSize,
+  Visibility,
+} from "@geode/opengeodeweb-viewer/schema_types";
 import type { MeshApplyTexturesParams } from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 function emptyAttributeConfig(): AttributeConfig {
@@ -44,13 +48,13 @@ interface MeshPolyhedraColoring extends ComponentColoring {
 interface MeshPointsStyle {
   visibility: Visibility;
   coloring: ComponentColoring;
-  size: Size;
+  size: PointSize;
 }
 
 interface MeshEdgesStyle {
   visibility: Visibility;
   coloring: MeshEdgesColoring;
-  width: Width;
+  width: EdgeWidth;
 }
 
 interface MeshCellsStyle {
@@ -70,8 +74,8 @@ interface MeshPolyhedraStyle {
 
 function meshPointsDefaultStyle(
   visibility: Visibility = POINTS_DEFAULT_VISIBILITY,
-  size: Size = POINTS_DEFAULT_SIZE,
-  constant: RGBAColor = POINTS_DEFAULT_COLOR,
+  size: PointSize = POINTS_DEFAULT_SIZE,
+  constant: ColorRGBA = POINTS_DEFAULT_COLOR,
 ): MeshPointsStyle {
   return {
     visibility,
@@ -86,8 +90,8 @@ function meshPointsDefaultStyle(
 
 function meshEdgesDefaultStyle(
   visibility: Visibility = EDGES_DEFAULT_VISIBILITY,
-  width: Width = EDGES_DEFAULT_WIDTH,
-  constant: RGBAColor = EDGES_DEFAULT_COLOR,
+  width: EdgeWidth = EDGES_DEFAULT_WIDTH,
+  constant: ColorRGBA = EDGES_DEFAULT_COLOR,
 ): MeshEdgesStyle {
   return {
     visibility,
@@ -103,7 +107,7 @@ function meshEdgesDefaultStyle(
 
 function meshCellsDefaultStyle(
   visibility: Visibility = CELLS_DEFAULT_VISIBILITY,
-  constant: RGBAColor = CELLS_DEFAULT_COLOR,
+  constant: ColorRGBA = CELLS_DEFAULT_COLOR,
 ): MeshCellsStyle {
   return {
     visibility,
@@ -119,7 +123,7 @@ function meshCellsDefaultStyle(
 
 function meshPolygonsDefaultStyle(
   visibility: Visibility = POLYGONS_DEFAULT_VISIBILITY,
-  constant: RGBAColor = POLYGONS_DEFAULT_COLOR,
+  constant: ColorRGBA = POLYGONS_DEFAULT_COLOR,
 ): MeshPolygonsStyle {
   return {
     visibility,
@@ -135,7 +139,7 @@ function meshPolygonsDefaultStyle(
 
 function meshPolyhedraDefaultStyle(
   visibility: Visibility = POLYHEDRA_DEFAULT_VISIBILITY,
-  constant: RGBAColor = POLYHEDRA_DEFAULT_COLOR,
+  constant: ColorRGBA = POLYHEDRA_DEFAULT_COLOR,
 ): MeshPolyhedraStyle {
   return {
     visibility,

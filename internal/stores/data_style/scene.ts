@@ -1,5 +1,5 @@
 import type { SceneFontFamily, SceneOrientationWidget, SceneStyle } from "./types";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
@@ -22,8 +22,8 @@ const orientation_widget_schema = viewer_schemas.opengeodeweb_viewer.viewer.set_
 
 // oxlint-disable-next-line max-lines-per-function
 export function useSceneStyle(): {
-  setSceneBackgroundColor: (color: RGBAColor) => Promise<void>;
-  setSceneTextColor: (color: RGBAColor) => Promise<unknown>;
+  setSceneBackgroundColor: (color: ColorRGBA) => Promise<void>;
+  setSceneTextColor: (color: ColorRGBA) => Promise<unknown>;
   setSceneFontFamily: (font_family: SceneFontFamily) => Promise<unknown>;
   setSceneOrientationWidget: (marker: SceneOrientationWidget) => Promise<unknown>;
   applySceneStyle: () => Promise<void>;
@@ -85,12 +85,12 @@ export function useSceneStyle(): {
     }
   }
 
-  async function setSceneBackgroundColor(color: RGBAColor): Promise<void> {
+  async function setSceneBackgroundColor(color: ColorRGBA): Promise<void> {
     await hybridViewerStore.setBackgroundColor(toViewerColor(color));
     await saveSceneStyle({ background_color: color });
   }
 
-  async function setSceneTextColor(color: RGBAColor): Promise<unknown> {
+  async function setSceneTextColor(color: ColorRGBA): Promise<unknown> {
     const result = await requestTextStyle({ ...sceneStyle.value.text, color });
     return result;
   }

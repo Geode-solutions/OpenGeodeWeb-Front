@@ -1,5 +1,5 @@
 import type { CornerId, ModelId } from "@ogw_front/types/identifiers";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
 import type { ValidAttributeInput } from "@ogw_internal/stores/data_style/attribute_types";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -9,7 +9,7 @@ import { useModelCornersVertexAttribute } from "./vertex";
 import { useModelCornersVisibility } from "./visibility";
 
 interface ColorGroup {
-  color: RGBAColor | undefined;
+  color: ColorRGBA | undefined;
   corners_ids: CornerId[];
 }
 

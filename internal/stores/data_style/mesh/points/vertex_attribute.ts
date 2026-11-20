@@ -1,18 +1,20 @@
 import type {
   AttributeColorMap,
-  AttributeItem,
-  AttributeName,
   AttributeRange,
-  AttributeRangeMaximum,
-  AttributeRangeMinimum,
   AttributeTimeStep,
 } from "@ogw_front/types/attribute";
+import type {
+  AttributeItem,
+  AttributeName,
+  AttributeRangeMaximum,
+  AttributeRangeMinimum,
+  ColorRGBA,
+} from "@geode/opengeodeweb-viewer/schema_types";
 import type {
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
 import type { MeshId } from "@ogw_front/types/identifiers";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 interface UseMeshPointsVertexAttributeStyleReturn {
   meshPointsVertexAttributeName: (meshId: MeshId) => AttributeName | undefined;
@@ -41,10 +43,10 @@ interface UseMeshPointsVertexAttributeStyleReturn {
     meshId: MeshId,
     colorMap: AttributeColorMap | undefined,
   ) => Promise<unknown>;
-  meshPointsVertexAttributeNoDataColor: (meshId: MeshId) => RGBAColor;
+  meshPointsVertexAttributeNoDataColor: (meshId: MeshId) => ColorRGBA;
   setMeshPointsVertexAttributeNoDataColor: (
     meshId: MeshId,
-    no_data_color: RGBAColor,
+    no_data_color: ColorRGBA,
   ) => Promise<unknown>;
 }
 export type { UseMeshPointsVertexAttributeStyleReturn };

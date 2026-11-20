@@ -3,7 +3,7 @@ import GlobalObjects from "@ogw_front/components/Viewer/ObjectTree/Views/GlobalO
 import ModelTree from "@ogw_front/components/Viewer/ObjectTree/Views/ModelTree.vue";
 import type { TreeMenuPayload } from "@ogw_front/utils/treeview";
 import ViewerObjectTreeBox from "@ogw_front/components/Viewer/ObjectTree/Box.vue";
-import { geode_objects } from "@ogw_front/assets/geode_objects";
+import { geodeObjectImage } from "@ogw_front/assets/geode_objects";
 import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
 import { useModelHeaderHover } from "@ogw_front/composables/model_header_hover";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
@@ -287,7 +287,7 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
           >
             <ViewerObjectTreeBox
               :title="view.title"
-              :icon="geode_objects[view.geode_object_type ?? '']?.image"
+              :icon="view.geode_object_type ? geodeObjectImage(view.geode_object_type) : undefined"
               :scroll-top="view.scrollTop"
               closable
               :border-radius="`0 ${index === 0 ? PANEL_RADIUS : '0'} ${index === additionalViews.length - 1 ? PANEL_RADIUS : '0'} 0`"

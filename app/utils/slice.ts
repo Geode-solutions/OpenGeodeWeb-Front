@@ -1,4 +1,5 @@
-import type { DataIdentified, GeodeObjectType } from "@ogw_front/types/identifiers";
+import type { DataIdentified } from "@ogw_front/types/identifiers";
+import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 
 const GRID_TYPES = new Set([
   "RegularGrid2D",

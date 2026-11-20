@@ -5,7 +5,7 @@ import { matchExpectedFiles, uploadPath } from "@ogw_front/utils/upload_path";
 import DragAndDrop from "@ogw_front/components/DragAndDrop.vue";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
 import FileUploader from "@ogw_front/components/FileUploader.vue";
-import type { GeodeObjectType } from "@ogw_front/types/identifiers";
+import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
