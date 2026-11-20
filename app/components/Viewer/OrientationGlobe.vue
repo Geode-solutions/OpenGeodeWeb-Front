@@ -46,7 +46,9 @@ const ink = computed(() => dataStyleStore.sceneStyle.text.color);
 const isLightInk = computed(() => {
   const { red, green, blue } = ink.value;
   const luminance =
-    (LUMINANCE_WEIGHTS.red * red + LUMINANCE_WEIGHTS.green * green + LUMINANCE_WEIGHTS.blue * blue) /
+    (LUMINANCE_WEIGHTS.red * red +
+      LUMINANCE_WEIGHTS.green * green +
+      LUMINANCE_WEIGHTS.blue * blue) /
     MAX_CHANNEL;
   return luminance > LIGHT_INK_LUMINANCE;
 });

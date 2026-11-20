@@ -218,58 +218,58 @@ function onConfirm(): void {
     max-width="1200px"
     :theme="chromeTheme"
   >
-      <v-card class="glass-ui rounded-xl overflow-hidden border-opacity-10">
-        <v-toolbar color="transparent" flat class="px-4">
-          <v-icon icon="ph-file-csv" size="32" color="primary" class="ml-1" />
-          <v-toolbar-title class="text-h6 font-weight-bold">
-            CSV Previewer & Configuration
-          </v-toolbar-title>
-          <v-spacer />
-          <v-btn icon="ph-x" variant="text" @click="emit('update:modelValue', false)" />
-        </v-toolbar>
+    <v-card class="glass-ui rounded-xl overflow-hidden border-opacity-10">
+      <v-toolbar color="transparent" flat class="px-4">
+        <v-icon icon="ph-file-csv" size="32" color="primary" class="ml-1" />
+        <v-toolbar-title class="text-h6 font-weight-bold">
+          CSV Previewer & Configuration
+        </v-toolbar-title>
+        <v-spacer />
+        <v-btn icon="ph-x" variant="text" @click="emit('update:modelValue', false)" />
+      </v-toolbar>
 
-        <v-divider class="border-opacity-10" />
+      <v-divider class="border-opacity-10" />
 
-        <div class="previewer-grid">
-          <CsvSettings
-            v-model:separator="separator"
-            v-model:header-row="headerRow"
-            v-model:first-row="firstRow"
-            v-model:x-column="xColumn"
-            v-model:y-column="yColumn"
-            v-model:z-column="zColumn"
-            :headers="previewHeaders"
-          />
+      <div class="previewer-grid">
+        <CsvSettings
+          v-model:separator="separator"
+          v-model:header-row="headerRow"
+          v-model:first-row="firstRow"
+          v-model:x-column="xColumn"
+          v-model:y-column="yColumn"
+          v-model:z-column="zColumn"
+          :headers="previewHeaders"
+        />
 
-          <CsvTable
-            :headers="previewHeaders"
-            :rows="previewRows"
-            :loading="loading"
-            :coordinates="{ x: xColumn, y: yColumn, z: zColumn }"
-            :separator="separator"
-            :header-row="headerRow"
-            :first-row="firstRow"
-          />
-        </div>
+        <CsvTable
+          :headers="previewHeaders"
+          :rows="previewRows"
+          :loading="loading"
+          :coordinates="{ x: xColumn, y: yColumn, z: zColumn }"
+          :separator="separator"
+          :header-row="headerRow"
+          :first-row="firstRow"
+        />
+      </div>
 
-        <v-divider class="border-opacity-10" />
+      <v-divider class="border-opacity-10" />
 
-        <v-card-actions class="pa-4 bg-subtle">
-          <v-spacer />
-          <v-btn variant="text" class="text-none px-6" @click="emit('update:modelValue', false)">
-            Cancel
-          </v-btn>
-          <v-btn
-            variant="flat"
-            color="primary"
-            class="text-none px-8 rounded-lg font-weight-bold"
-            @click="onConfirm"
-            :disabled="!previewHeaders.length || !isFormValid"
-          >
-            Confirm
-          </v-btn>
-        </v-card-actions>
-      </v-card>
+      <v-card-actions class="pa-4 bg-subtle">
+        <v-spacer />
+        <v-btn variant="text" class="text-none px-6" @click="emit('update:modelValue', false)">
+          Cancel
+        </v-btn>
+        <v-btn
+          variant="flat"
+          color="primary"
+          class="text-none px-8 rounded-lg font-weight-bold"
+          @click="onConfirm"
+          :disabled="!previewHeaders.length || !isFormValid"
+        >
+          Confirm
+        </v-btn>
+      </v-card-actions>
+    </v-card>
   </v-dialog>
 </template>
 
