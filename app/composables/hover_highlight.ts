@@ -1,5 +1,6 @@
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { ParamsOf } from "@ogw_shared/utils/types";
+import type { ViewerObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import { consola } from "consola";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -7,8 +8,7 @@ import vtk_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_sc
 
 const HOVER_DELAY = 200;
 
-type HighlightType = "mesh" | "model";
-type HighlightSchema = (typeof vtk_schemas)["opengeodeweb_viewer"][HighlightType]["highlight"];
+type HighlightSchema = (typeof vtk_schemas)["opengeodeweb_viewer"][ViewerObjectType]["highlight"];
 type BlockIdsProvider = readonly number[] | (() => readonly number[] | Promise<readonly number[]>);
 
 // Every live instance, so a highlight can be released from outside the component that started it
@@ -34,12 +34,12 @@ function useHoverhighlight(): {
   // Item hovered last, whose highlight may still be pending
   let currentId: DataId | undefined = undefined;
   // Item the viewer was asked to highlight, the only one to unhighlight
-  let highlighted: { dataId: DataId; type: HighlightType } | undefined = undefined;
+  let highlighted: { dataId: DataId; type: ViewerObjectType } | undefined = undefined;
 
   function onHoverEnter(
     dataId: DataId,
     block_ids_provider: BlockIdsProvider = [],
-    type: HighlightType = "model",
+    type: ViewerObjectType = "model",
     immediate = false,
   ): void {
     if (timer) {
@@ -106,7 +106,7 @@ function useHoverhighlight(): {
   }
 
   async function unhighlightAction(
-    type: HighlightType,
+    type: ViewerObjectType,
     dataId: DataId,
     request: {
       schema: HighlightSchema;
