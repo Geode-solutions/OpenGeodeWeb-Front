@@ -24,7 +24,7 @@
     "tests/browser/helpers",
     "tests/browser/suites",
     "tests/browser/data",
-    "tests/phosphor_glyphs.ts",
+    "tests/unit/helpers/phosphor_glyphs.ts",
     ".build",
     "nuxt.config.ts",
     "opengeodeweb_front_schemas.json",

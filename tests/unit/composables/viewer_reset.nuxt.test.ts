@@ -8,6 +8,8 @@ import {
 } from "@ogw_front/composables/orientation_overlay";
 import { afterViewerReset } from "@ogw_front/composables/viewer_reset";
 import { mockAs } from "@ogw_tests/utils";
+import { recordRequests } from "@ogw_tests/unit/helpers/viewer_requests";
+import { setOrientationOverlay } from "@ogw_tests/unit/helpers/orientation_overlay";
 import { setSceneColors } from "@ogw_front/utils/default_styles";
 
 vi.setConfig({ testTimeout: 10_000 });
@@ -18,22 +20,6 @@ const { set_background_color, set_orientation_widget, set_text_style } =
   viewer_schemas.opengeodeweb_viewer.viewer;
 const BRAND_BACKGROUND = { red: 160, green: 180, blue: 187, alpha: 1 };
 const BRAND_TEXT = { red: 31, green: 46, blue: 51, alpha: 1 };
-
-function setOrientationOverlay(enabled: boolean): void {
-  // The resolved app config type holds the layer's literal default
-  Object.assign(useAppConfig().ogwFront, { orientationOverlay: enabled });
-}
-
-function recordRequests(): { request: ViewerRequest; schemas: unknown[] } {
-  const schemas: unknown[] = [];
-  const request = mockAs<ViewerRequest>(
-    vi.fn(async (args: { schema: unknown }) => {
-      schemas.push(args.schema);
-      await Promise.resolve();
-    }),
-  );
-  return { request, schemas };
-}
 
 describe("after a viewer reset", () => {
   afterEach(() => {

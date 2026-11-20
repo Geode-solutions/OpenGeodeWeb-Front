@@ -13,7 +13,11 @@ import {
   phosphorIconClass,
   phosphorIconOptions,
 } from "@ogw_front/utils/phosphor_icons";
-import { PHOSPHOR_GLYPHS, iconNames, missingPhosphorIcons } from "@ogw_tests/phosphor_glyphs";
+import {
+  PHOSPHOR_GLYPHS,
+  iconNames,
+  missingPhosphorIcons,
+} from "@ogw_tests/unit/helpers/phosphor_glyphs";
 
 vi.setConfig({ testTimeout: 10_000 });
 

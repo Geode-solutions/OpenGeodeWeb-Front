@@ -8,15 +8,11 @@ import {
   viewerOrientationMarker,
   withViewerMarker,
 } from "@ogw_front/composables/orientation_overlay";
+import { setOrientationOverlay } from "@ogw_tests/unit/helpers/orientation_overlay";
 
 vi.setConfig({ testTimeout: 10_000 });
 
 const { set_orientation_widget } = viewer_schemas.opengeodeweb_viewer.viewer;
-
-function setOrientationOverlay(enabled: boolean): void {
-  // The resolved app config type holds the layer's literal default
-  Object.assign(useAppConfig().ogwFront, { orientationOverlay: enabled });
-}
 
 describe("orientation marker sent to the viewer", () => {
   afterEach(() => {

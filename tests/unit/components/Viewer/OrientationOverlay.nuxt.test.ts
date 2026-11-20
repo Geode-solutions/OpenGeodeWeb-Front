@@ -1,18 +1,22 @@
 // oxlint-disable vitest/require-mock-type-parameters
 import { afterEach, describe, expect, test, vi } from "vitest";
-import type { VueWrapper } from "@vue/test-utils";
-import { mountSuspended } from "@nuxt/test-utils/runtime";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
+import {
+  CAMERA_DISTANCE,
+  CAMERA_HEIGHT,
+  countElements,
+  mountOrientationOverlay,
+  setOrientationOverlay,
+} from "@ogw_tests/unit/helpers/orientation_overlay";
 import {
   hideViewerMarkerRequest,
   resetOrientationMarkerVisibility,
   setOrientationMarkerVisibility,
   viewerOrientationMarker,
 } from "@ogw_front/composables/orientation_overlay";
-import { mockAs, setupActivePinia, vuetify } from "@ogw_tests/utils";
+import { mockAs, setupActivePinia } from "@ogw_tests/utils";
 import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types";
-import OrientationOverlay from "@ogw_front/components/Viewer/OrientationOverlay.vue";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -20,43 +24,10 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 
 vi.setConfig({ testTimeout: 10_000 });
 
-const DISTANCE = 10;
-const HEIGHT = 5;
-const VIEW_ANGLE = 30;
 const OVERLAY = '[data-testid="orientationOverlay"]';
 const AXES = '[data-testid="orientationGlobe"]';
 const COMPASS = '[data-testid="orientationCompass"]';
 const { set_orientation_widget } = viewer_schemas.opengeodeweb_viewer.viewer;
-
-function setOrientationOverlay(enabled: boolean): void {
-  // The resolved app config type holds the layer's literal default
-  Object.assign(useAppConfig().ogwFront, { orientationOverlay: enabled });
-}
-
-// Camera looking east from the west of the scene, a bit above it
-function setCamera(): void {
-  Object.assign(useHybridViewerStore().camera_options, {
-    position: [-DISTANCE, 0, HEIGHT],
-    focal_point: [0, 0, 0],
-    view_up: [0, 0, 1],
-    view_angle: VIEW_ANGLE,
-    clipping_range: [1, DISTANCE * DISTANCE],
-    distance: Math.hypot(DISTANCE, HEIGHT),
-  });
-}
-
-async function mountOverlay(): Promise<VueWrapper> {
-  const pinia = setupActivePinia();
-  setCamera();
-  const wrapper = await mountSuspended(OrientationOverlay, {
-    global: { plugins: [vuetify, pinia] },
-  });
-  return wrapper;
-}
-
-function count(wrapper: VueWrapper, selector: string): number {
-  return wrapper.findAll(selector).length;
-}
 
 describe("orientation overlay", () => {
   afterEach(() => {
@@ -66,16 +37,16 @@ describe("orientation overlay", () => {
 
   test("renders nothing when the app keeps the VTK marker", async () => {
     setOrientationOverlay(false);
-    const wrapper = await mountOverlay();
-    expect(count(wrapper, OVERLAY)).toBe(0);
+    const wrapper = await mountOrientationOverlay();
+    expect(countElements(wrapper, OVERLAY)).toBe(0);
   });
 
   test("renders the axes globe, whose labels align the camera", async () => {
     setOrientationOverlay(true);
-    const wrapper = await mountOverlay();
-    expect(count(wrapper, OVERLAY)).toBe(1);
-    expect(count(wrapper, AXES)).toBe(1);
-    expect(count(wrapper, COMPASS)).toBe(0);
+    const wrapper = await mountOrientationOverlay();
+    expect(countElements(wrapper, OVERLAY)).toBe(1);
+    expect(countElements(wrapper, AXES)).toBe(1);
+    expect(countElements(wrapper, COMPASS)).toBe(0);
     const hybridViewerStore = useHybridViewerStore();
     hybridViewerStore.setCameraOrientation = mockAs<typeof hybridViewerStore.setCameraOrientation>(
       vi.fn(),
@@ -89,7 +60,7 @@ describe("orientation overlay", () => {
 
   test("hides with the orientation marker, the viewer keeping the visibility", async () => {
     setOrientationOverlay(true);
-    const wrapper = await mountOverlay();
+    const wrapper = await mountOrientationOverlay();
     const request = vi.fn(async () => {
       await Promise.resolve();
     });
@@ -99,16 +70,16 @@ describe("orientation overlay", () => {
       schema: viewer_schemas.opengeodeweb_viewer.viewer.axes,
       params: { visibility: false },
     });
-    expect(count(wrapper, OVERLAY)).toBe(0);
+    expect(countElements(wrapper, OVERLAY)).toBe(0);
     // A viewer reset shows its marker again
     resetOrientationMarkerVisibility();
     await wrapper.vm.$nextTick();
-    expect(count(wrapper, OVERLAY)).toBe(1);
+    expect(countElements(wrapper, OVERLAY)).toBe(1);
   });
 
   test("draws the axes globe in the scene text color", async () => {
     setOrientationOverlay(true);
-    const wrapper = await mountOverlay();
+    const wrapper = await mountOrientationOverlay();
     const { sceneStyle } = useDataStyleStore();
     useDataStyleState().sceneStyle.value = {
       ...sceneStyle,
@@ -123,27 +94,27 @@ describe("orientation overlay", () => {
 
   test("renders the compass dial, which turns the camera to the north", async () => {
     setOrientationOverlay(true);
-    const wrapper = await mountOverlay();
+    const wrapper = await mountOrientationOverlay();
     useDataStyleState().sceneStyle.value = {
       ...useDataStyleStore().sceneStyle,
       orientation_widget: "compass",
     };
     await wrapper.vm.$nextTick();
-    expect(count(wrapper, AXES)).toBe(0);
+    expect(countElements(wrapper, AXES)).toBe(0);
     const setCameraMock = vi.fn<(options: CameraOptions) => void>();
     const hybridViewerStore = useHybridViewerStore();
     hybridViewerStore.setCamera = setCameraMock;
-    expect(count(wrapper, COMPASS)).toBe(1);
+    expect(countElements(wrapper, COMPASS)).toBe(1);
     await wrapper.get(COMPASS).trigger("click");
     const target = setCameraMock.mock.calls[0]?.[0];
     expect(target?.position[0]).toBeCloseTo(0);
-    expect(target?.position[1]).toBeCloseTo(-DISTANCE);
-    expect(target?.position[2]).toBeCloseTo(HEIGHT);
+    expect(target?.position[1]).toBeCloseTo(-CAMERA_DISTANCE);
+    expect(target?.position[2]).toBeCloseTo(CAMERA_HEIGHT);
   });
 
   test("a compass letter turns the camera towards its direction", async () => {
     setOrientationOverlay(true);
-    const wrapper = await mountOverlay();
+    const wrapper = await mountOrientationOverlay();
     useDataStyleState().sceneStyle.value = {
       ...useDataStyleStore().sceneStyle,
       orientation_widget: "compass",
@@ -155,13 +126,13 @@ describe("orientation overlay", () => {
     await wrapper.get('[data-testid="orientationCompass-S"]').trigger("click");
     const target = setCameraMock.mock.calls[0]?.[0];
     expect(target?.position[0]).toBeCloseTo(0);
-    expect(target?.position[1]).toBeCloseTo(DISTANCE);
-    expect(target?.position[2]).toBeCloseTo(HEIGHT);
+    expect(target?.position[1]).toBeCloseTo(CAMERA_DISTANCE);
+    expect(target?.position[2]).toBeCloseTo(CAMERA_HEIGHT);
   });
 
   test("a compass click towards the direction already faced does not call the viewer", async () => {
     setOrientationOverlay(true);
-    const wrapper = await mountOverlay();
+    const wrapper = await mountOrientationOverlay();
     useDataStyleState().sceneStyle.value = {
       ...useDataStyleStore().sceneStyle,
       orientation_widget: "compass",
