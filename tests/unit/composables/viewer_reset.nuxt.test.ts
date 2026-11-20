@@ -2,6 +2,10 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
+import {
+  setOrientationMarkerVisibility,
+  useOrientationMarkerVisible,
+} from "@ogw_front/composables/orientation_overlay";
 import { afterViewerReset } from "@ogw_front/composables/viewer_reset";
 import { mockAs } from "@ogw_tests/utils";
 import { setSceneColors } from "@ogw_front/utils/default_styles";
@@ -59,5 +63,13 @@ describe("after a viewer reset", () => {
       // oxlint-disable-next-line id-length -- the viewer schema requires { r, g, b }
       params: { color: { r: 31, g: 46, b: 51 }, font_family: "arial", opacity: 1 },
     });
+  });
+
+  test("shows the orientation marker again", async () => {
+    const { request } = recordRequests();
+    await setOrientationMarkerVisibility(false, request);
+    expect(useOrientationMarkerVisible().value).toBe(false);
+    await afterViewerReset(request);
+    expect(useOrientationMarkerVisible().value).toBe(true);
   });
 });

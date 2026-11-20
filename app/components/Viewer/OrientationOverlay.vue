@@ -1,15 +1,19 @@
 <script setup lang="ts">
+import {
+  useOrientationMarkerVisible,
+  useOrientationOverlay,
+} from "@ogw_front/composables/orientation_overlay";
 import ChromeTheme from "@ogw_front/components/ChromeTheme.vue";
 import OrientationCompass from "@ogw_front/components/Viewer/OrientationCompass.vue";
 import OrientationGlobe from "@ogw_front/components/Viewer/OrientationGlobe.vue";
 import { toCameraPose } from "@ogw_front/utils/orientation_gizmo";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import { useOrientationOverlay } from "@ogw_front/composables/orientation_overlay";
 
 // Orientation marker drawn by the front in the bottom right corner of the viewer, where the viewer
 // Draws its VTK marker otherwise. Opt-in: see `ogwFront.orientationOverlay` in app.config.ts.
 const enabled = useOrientationOverlay();
+const markerVisible = useOrientationMarkerVisible();
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
@@ -18,7 +22,7 @@ const marker = computed(() => dataStyleStore.sceneStyle.orientation_widget);
 </script>
 
 <template>
-  <ChromeTheme v-if="enabled && hasCamera">
+  <ChromeTheme v-if="enabled && markerVisible && hasCamera">
     <div class="orientation-overlay" data-testid="orientationOverlay">
       <OrientationCompass v-if="marker === 'compass'" />
       <OrientationGlobe v-else />

@@ -5,7 +5,10 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed
 
 // Local imports
 import { getDefaultSceneStyle, getSceneColors } from "@ogw_front/utils/default_styles";
-import { hideViewerMarker } from "@ogw_front/composables/orientation_overlay";
+import {
+  hideViewerMarker,
+  resetOrientationMarkerVisibility,
+} from "@ogw_front/composables/orientation_overlay";
 
 // oxlint-disable-next-line id-length -- the viewer schema requires { r, g, b }
 function toViewerColor(color: RGBAColor): { r: number; g: number; b: number } {
@@ -38,6 +41,7 @@ async function applyAppSceneColors(request: ViewerRequest): Promise<void> {
 
 // To call after each viewer reset (reset_visualization), which brings back the viewer's own scene
 async function afterViewerReset(request: ViewerRequest): Promise<void> {
+  resetOrientationMarkerVisibility();
   await applyAppSceneColors(request);
   await hideViewerMarker(request);
 }

@@ -6,6 +6,8 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed
 
 import {
   hideViewerMarkerRequest,
+  resetOrientationMarkerVisibility,
+  setOrientationMarkerVisibility,
   viewerOrientationMarker,
 } from "@ogw_front/composables/orientation_overlay";
 import { mockAs, setupActivePinia, vuetify } from "@ogw_tests/utils";
@@ -59,6 +61,7 @@ function count(wrapper: VueWrapper, selector: string): number {
 describe("orientation overlay", () => {
   afterEach(() => {
     setOrientationOverlay(false);
+    resetOrientationMarkerVisibility();
   });
 
   test("renders nothing when the app keeps the VTK marker", async () => {
@@ -82,6 +85,25 @@ describe("orientation overlay", () => {
     expect(hybridViewerStore.setCameraOrientation).not.toHaveBeenCalled();
     await wrapper.get('[data-testid="orientationGlobe-xplus"]').trigger("click");
     expect(hybridViewerStore.setCameraOrientation).toHaveBeenCalledWith("xplus");
+  });
+
+  test("hides with the orientation marker, the viewer keeping the visibility", async () => {
+    setOrientationOverlay(true);
+    const wrapper = await mountOverlay();
+    const request = vi.fn(async () => {
+      await Promise.resolve();
+    });
+    await setOrientationMarkerVisibility(false, request);
+    await wrapper.vm.$nextTick();
+    expect(request).toHaveBeenCalledWith({
+      schema: viewer_schemas.opengeodeweb_viewer.viewer.axes,
+      params: { visibility: false },
+    });
+    expect(count(wrapper, OVERLAY)).toBe(0);
+    // A viewer reset shows its marker again
+    resetOrientationMarkerVisibility();
+    await wrapper.vm.$nextTick();
+    expect(count(wrapper, OVERLAY)).toBe(1);
   });
 
   test("draws the axes globe in the scene text color", async () => {

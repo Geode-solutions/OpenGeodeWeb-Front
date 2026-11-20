@@ -1,4 +1,4 @@
-import type { ComputedRef } from "vue";
+import type { ComputedRef, Ref } from "vue";
 import type { SceneOrientationWidget } from "@ogw_internal/stores/data_style/types";
 import { consola } from "consola";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
@@ -63,6 +63,35 @@ async function hideViewerMarker(
   }
 }
 
+interface AxesVisibilityRequest {
+  schema: typeof viewer_schemas.opengeodeweb_viewer.viewer.axes;
+  params: { visibility: boolean };
+}
+
+// Whether the orientation marker shows. A viewer reset shows it again
+const orientationMarkerVisible = ref(true);
+
+function useOrientationMarkerVisible(): Readonly<Ref<boolean>> {
+  return readonly(orientationMarkerVisible);
+}
+
+// The viewer keeps the visibility for its own marker (scene screenshots), the overlay follows it
+async function setOrientationMarkerVisibility(
+  visibility: boolean,
+  request: (args: AxesVisibilityRequest) => Promise<unknown>,
+): Promise<void> {
+  await request({
+    schema: viewer_schemas.opengeodeweb_viewer.viewer.axes,
+    params: { visibility },
+  });
+  orientationMarkerVisible.value = visibility;
+}
+
+// To call after each viewer reset, which shows the VTK marker again
+function resetOrientationMarkerVisibility(): void {
+  orientationMarkerVisible.value = true;
+}
+
 interface ViewerMarkerRequest {
   schema: typeof viewer_schemas.opengeodeweb_viewer.viewer.set_orientation_widget;
   params: { marker: ViewerOrientationMarker };
@@ -94,6 +123,9 @@ export {
   hideViewerMarker,
   hideViewerMarkerRequest,
   isOrientationOverlayEnabled,
+  resetOrientationMarkerVisibility,
+  setOrientationMarkerVisibility,
+  useOrientationMarkerVisible,
   useOrientationOverlay,
   viewerOrientationMarker,
   withViewerMarker,
