@@ -10,6 +10,7 @@ import {
 import { cameraViewBasis, toCameraPose } from "@ogw_front/utils/orientation_gizmo";
 import { compassHeading } from "@ogw_front/utils/orientation_compass";
 import { strataPixels } from "@ogw_front/utils/orientation_strata";
+import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 // Orientation globe: a sphere crossed by horizontal strata (the "round shape & lines" of the Geode
@@ -26,13 +27,34 @@ const BACKDROP_RADIUS = RADIUS + BACKDROP_MARGIN;
 const FADE_START_DEPTH = -0.3;
 const FADE_RANGE = 0.7;
 const AWAY_OPACITY = 0.45;
-// Light stratum color: Bleu Fumée tint, on the viewer background
-const STRATA_COLOR = "#E8EEF0";
+// Strata in a Bleu Fumée tint under a dark ink, in the brand ink under a light one
+const LIGHT_STRATA_COLOR = "#E8EEF0";
+const DARK_STRATA_COLOR = "#1F2E33";
+// Over this relative luminance, the ink is light and the strata turn dark
+const LIGHT_INK_LUMINANCE = 0.5;
+const LUMINANCE_WEIGHTS = { red: 0.2126, green: 0.7152, blue: 0.0722 } as const;
+const MAX_CHANNEL = 255;
 const AXIS_COLORS = { x: "#D9553B", y: "#3F8F63", z: "#3567B5" } as const;
-const INK = "#1F2E33";
 const ORANGE = "#F48830";
 
 const hybridViewerStore = useHybridViewerStore();
+const dataStyleStore = useDataStyleStore();
+
+// The ink (sphere, strata rings, center, readout) takes the scene text color, as the VTK marker did: it stays
+// Readable on the background the user picked, like the grid scale and ruler labels
+const ink = computed(() => dataStyleStore.sceneStyle.text.color);
+const isLightInk = computed(() => {
+  const { red, green, blue } = ink.value;
+  const luminance =
+    (LUMINANCE_WEIGHTS.red * red + LUMINANCE_WEIGHTS.green * green + LUMINANCE_WEIGHTS.blue * blue) /
+    MAX_CHANNEL;
+  return luminance > LIGHT_INK_LUMINANCE;
+});
+const strataColor = computed(() => (isLightInk.value ? DARK_STRATA_COLOR : LIGHT_STRATA_COLOR));
+const inkStyle = computed(() => ({
+  "--globe-ink": `${ink.value.red}, ${ink.value.green}, ${ink.value.blue}`,
+  "--globe-strata": strataColor.value,
+}));
 // The strata are drawn off the DOM and shown as an SVG image: the viewer keeps a single <canvas>, the
 // VTK one, which the viewer tests locate
 let strataCanvas: HTMLCanvasElement | undefined = undefined;
@@ -103,7 +125,7 @@ function drawStrata(): void {
   canvas.width = side;
   canvas.height = side;
   const image = context.createImageData(side, side);
-  image.data.set(strataPixels(basis.value, side, STRATA_COLOR));
+  image.data.set(strataPixels(basis.value, side, strataColor.value));
   context.putImageData(image, 0, 0);
   strataImage.value = canvas.toDataURL();
 }
@@ -121,7 +143,7 @@ function scheduleStrata(): void {
 }
 
 drawStrata();
-watch(basis, scheduleStrata);
+watch([basis, strataColor], scheduleStrata);
 onBeforeUnmount(() => {
   if (strataFrame !== undefined) {
     cancelAnimationFrame(strataFrame);
@@ -130,7 +152,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="orientation-globe" data-testid="orientationGlobe">
+  <div class="orientation-globe" data-testid="orientationGlobe" :style="inkStyle">
     <div class="globe-stage">
       <svg
         :width="SIZE"
@@ -221,7 +243,7 @@ onBeforeUnmount(() => {
   flex-direction: column;
   align-items: center;
   font-family: var(--v-font-heading, inherit);
-  color: v-bind(INK);
+  color: rgb(var(--globe-ink));
 }
 
 .globe-stage {
@@ -255,30 +277,30 @@ svg {
 }
 
 .sphere {
-  fill: rgba(232, 238, 240, 0.18);
-  stroke: rgba(31, 46, 51, 0.6);
+  fill: color-mix(in srgb, var(--globe-strata) 18%, transparent);
+  stroke: rgba(var(--globe-ink), 0.6);
   stroke-width: 1.25px;
 }
 
 .ring-back {
   fill: none;
-  stroke: rgba(31, 46, 51, 0.14);
+  stroke: rgba(var(--globe-ink), 0.14);
   stroke-width: 1px;
 }
 
 .ring-back.equator {
-  stroke: rgba(31, 46, 51, 0.22);
+  stroke: rgba(var(--globe-ink), 0.22);
 }
 
 .ring-front {
   fill: none;
-  stroke: rgba(31, 46, 51, 0.38);
+  stroke: rgba(var(--globe-ink), 0.38);
   stroke-width: 1px;
   stroke-linecap: round;
 }
 
 .ring-front.equator {
-  stroke: rgba(31, 46, 51, 0.7);
+  stroke: rgba(var(--globe-ink), 0.7);
   stroke-width: 1.4px;
 }
 
@@ -290,7 +312,7 @@ svg {
 }
 
 .center {
-  fill: v-bind(INK);
+  fill: rgb(var(--globe-ink));
   pointer-events: none;
 }
 

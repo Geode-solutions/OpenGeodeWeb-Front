@@ -85,6 +85,21 @@ describe("orientation overlay", () => {
     expect(hybridViewerStore.setCameraOrientation).toHaveBeenCalledWith("xplus");
   });
 
+  test("draws the axes globe in the scene text color", async () => {
+    setOrientationOverlay(true);
+    const wrapper = await mountOverlay();
+    const { sceneStyle } = useDataStyleStore();
+    useDataStyleState().sceneStyle.value = {
+      ...sceneStyle,
+      text: { ...sceneStyle.text, color: { red: 255, green: 255, blue: 255, alpha: 1 } },
+    };
+    await wrapper.vm.$nextTick();
+    const globeStyle = wrapper.get(AXES).attributes("style");
+    expect(globeStyle).toContain("--globe-ink: 255, 255, 255");
+    // A light ink gets the dark strata, so the globe stays readable on a dark background
+    expect(globeStyle).toContain("--globe-strata: #1F2E33");
+  });
+
   test("renders the compass dial, which turns the camera to the north", async () => {
     setOrientationOverlay(true);
     const wrapper = await mountOverlay();
