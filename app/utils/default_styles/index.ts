@@ -71,6 +71,10 @@ function setSceneColors(colors: SceneColors): void {
   appSceneColors = colors;
 }
 
+function getSceneColors(): Readonly<SceneColors> {
+  return appSceneColors;
+}
+
 function getDefaultSceneStyle(): SceneStyle {
   const background = appSceneColors.background ?? SCENE_DEFAULT_BACKGROUND_COLOR;
   const text = appSceneColors.text ?? SCENE_DEFAULT_TEXT_COLOR;
@@ -90,5 +94,5 @@ export {
   MODEL_DEFAULT_ACTIVE_COLORING,
   DEFAULT_NO_DATA_COLOR,
 } from "./constants";
-export { getDefaultSceneStyle, getDefaultStyle, setSceneColors };
+export { getDefaultSceneStyle, getDefaultStyle, getSceneColors, setSceneColors };
 export type { SceneColors };

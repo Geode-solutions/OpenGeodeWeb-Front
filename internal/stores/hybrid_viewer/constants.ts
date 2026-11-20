@@ -2,8 +2,6 @@ const RGB_MAX = 255;
 const BACKGROUND_GREY_VALUE = 180;
 const ACTOR_DARK_VALUE = 20;
 
-const bgVal = BACKGROUND_GREY_VALUE / RGB_MAX;
-const BACKGROUND_COLOR: [number, number, number] = [bgVal, bgVal, bgVal];
 const actVal = ACTOR_DARK_VALUE / RGB_MAX;
 const ACTOR_COLOR: [number, number, number] = [actVal, actVal, actVal];
 const HOVER_TIMEOUT_MS = 500;
@@ -12,7 +10,6 @@ const HOVER_DEBOUNCE_MS = 50;
 
 export {
   ACTOR_COLOR,
-  BACKGROUND_COLOR,
   BACKGROUND_GREY_VALUE,
   HOVER_DEBOUNCE_MS,
   HOVER_TIMEOUT_MS,

@@ -6,6 +6,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed
 // Local imports
 import { getDefaultSceneStyle } from "@ogw_front/utils/default_styles";
 import { getTable } from "@ogw_internal/database/database";
+import { toViewerColor } from "@ogw_front/composables/viewer_reset";
 import { useDataStyleState } from "./state";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -14,12 +15,6 @@ import { viewerOrientationMarker } from "@ogw_front/composables/orientation_over
 // Local constants
 const text_style_schema = viewer_schemas.opengeodeweb_viewer.viewer.set_text_style;
 const orientation_widget_schema = viewer_schemas.opengeodeweb_viewer.viewer.set_orientation_widget;
-
-// oxlint-disable-next-line id-length -- the viewer schema requires { r, g, b }
-function toViewerColor(color: RGBAColor): { r: number; g: number; b: number } {
-  // oxlint-disable-next-line id-length -- the viewer schema requires { r, g, b }
-  return { r: color.red, g: color.green, b: color.blue };
-}
 
 // oxlint-disable-next-line max-lines-per-function
 export function useSceneStyle(): {
