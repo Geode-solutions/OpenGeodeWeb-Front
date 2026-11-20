@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // oxlint-disable id-length since vuetify require { r,g,b} format to work
 import { formatColorString, parseColorString } from "@ogw_front/utils/color_picker";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
 import { useCopyToClipboard } from "@ogw_front/composables/copy_to_clipboard";
 
 interface Props {
@@ -13,13 +13,13 @@ const { disabledAlpha = false } = defineProps<Props>();
 const colorPickerWrapperRef = useTemplateRef<HTMLElement>("colorPickerWrapperRef");
 const { pressed } = useMousePressed({ target: colorPickerWrapperRef });
 
-const model = defineModel<RGBAColor>();
+const model = defineModel<ColorRGBA>();
 const { copy, copied } = useCopyToClipboard();
 
 const currentMode = ref(disabledAlpha ? "rgb" : "rgba");
 const colorInputText = ref("");
 
-const initialColor = model.value as RGBAColor;
+const initialColor = model.value as ColorRGBA;
 const vuetifyColor = ref({
   r: initialColor.red,
   g: initialColor.green,

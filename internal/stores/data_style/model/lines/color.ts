@@ -1,5 +1,5 @@
 import type { LineId, ModelId } from "@ogw_front/types/identifiers";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -15,12 +15,12 @@ export function useModelLinesColor(): {
   setModelLinesColor: (
     modelId: ModelId,
     lines_ids: LineId[],
-    color: RGBAColor | undefined,
+    color: ColorRGBA | undefined,
     activeColoring?: string,
     collectionId?: string,
   ) => Promise<unknown>;
   modelLineColoring: (modelId: ModelId, line_id?: LineId) => StyleValues;
-  modelLineColor: (modelId: ModelId, line_id?: LineId) => RGBAColor | undefined;
+  modelLineColor: (modelId: ModelId, line_id?: LineId) => ColorRGBA | undefined;
   modelLineActiveColoring: (modelId: ModelId, line_id?: LineId) => unknown;
   setModelLinesActiveColoring: (
     modelId: ModelId,
@@ -40,15 +40,15 @@ export function useModelLinesColor(): {
     return modelLinesCommonStyle.modelLineStyle(modelId, line_id).coloring as StyleValues;
   }
 
-  function modelLineColor(modelId: ModelId, line_id?: LineId): RGBAColor | undefined {
+  function modelLineColor(modelId: ModelId, line_id?: LineId): ColorRGBA | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.constant shape is defined by the data style schema.
-    return modelLineColoring(modelId, line_id).constant as RGBAColor | undefined;
+    return modelLineColoring(modelId, line_id).constant as ColorRGBA | undefined;
   }
 
   async function setModelLinesColor(
     modelId: ModelId,
     lines_ids: LineId[],
-    color: RGBAColor | undefined,
+    color: ColorRGBA | undefined,
     activeColoring = "constant",
     collectionId?: string,
   ): Promise<unknown> {

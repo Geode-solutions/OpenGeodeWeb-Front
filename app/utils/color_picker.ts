@@ -1,4 +1,4 @@
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
 
 const RGB_MAX = 255;
 const PERCENT_MAX = 100;
@@ -24,7 +24,7 @@ function parseAlpha(alphaText: string | undefined): number {
   return Math.min(1, Math.max(0, roundedAlpha));
 }
 
-function parseColorString(colorText: string): RGBAColor | undefined {
+function parseColorString(colorText: string): ColorRGBA | undefined {
   if (colorText === "") {
     return undefined;
   }
@@ -47,7 +47,7 @@ function parseColorString(colorText: string): RGBAColor | undefined {
   return { red, green, blue, alpha };
 }
 
-function formatColorString(color: RGBAColor, mode: string): string {
+function formatColorString(color: ColorRGBA, mode: string): string {
   const { red, green, blue, alpha } = color;
   const roundRed = Math.round(red);
   const roundGreen = Math.round(green);

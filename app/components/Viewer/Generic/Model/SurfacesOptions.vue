@@ -3,11 +3,11 @@
 import type {
   AttributeItem,
   AttributeName,
+  ColorRGBA,
   Visibility,
 } from "@geode/opengeodeweb-viewer/schema_types";
 import type { AttributeRange, AttributeTimeStep } from "@ogw_front/types/attribute";
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { SurfaceId } from "@ogw_front/types/identifiers";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
@@ -68,17 +68,17 @@ const surfaceVisibility = computed<Visibility>({
 });
 
 // Color
-const surfacesColor = computed<RGBAColor | undefined>({
+const surfacesColor = computed<ColorRGBA | undefined>({
   get: () =>
-    dataStyleStore.modelSurfaceColor(modelId, referenceSurfaceId.value) as RGBAColor | undefined,
+    dataStyleStore.modelSurfaceColor(modelId, referenceSurfaceId.value) as ColorRGBA | undefined,
   set: async (color) => {
     await dataStyleStore.setModelSurfacesColor(modelId, targetSurfaceIds, color);
     hybridViewerStore.remoteRender();
   },
 });
 
-const surfaceColor = computed<RGBAColor | undefined>({
-  get: () => dataStyleStore.modelSurfaceColor(modelId, surfaceId) as RGBAColor | undefined,
+const surfaceColor = computed<ColorRGBA | undefined>({
+  get: () => dataStyleStore.modelSurfaceColor(modelId, surfaceId) as ColorRGBA | undefined,
   set: async (color) => {
     if (surfaceId === undefined) {
       return;
@@ -178,7 +178,7 @@ const surfacesVertexAttributeRange = computed<AttributeRange>({
   },
 });
 
-const surfacesVertexAttributeColorMap = computed<Map<string, RGBAColor> | undefined>({
+const surfacesVertexAttributeColorMap = computed<Map<string, ColorRGBA> | undefined>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeColorMap(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesVertexAttributeColorMap(
@@ -190,7 +190,7 @@ const surfacesVertexAttributeColorMap = computed<Map<string, RGBAColor> | undefi
   },
 });
 
-const surfacesVertexAttributeNoDataColor = computed<RGBAColor>({
+const surfacesVertexAttributeNoDataColor = computed<ColorRGBA>({
   get: () =>
     dataStyleStore.modelSurfacesVertexAttributeNoDataColor(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
@@ -255,7 +255,7 @@ const surfacesPolygonAttributeRange = computed<AttributeRange>({
   },
 });
 
-const surfacesPolygonAttributeColorMap = computed<Map<string, RGBAColor> | undefined>({
+const surfacesPolygonAttributeColorMap = computed<Map<string, ColorRGBA> | undefined>({
   get: () =>
     dataStyleStore.modelSurfacesPolygonAttributeColorMap(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
@@ -268,7 +268,7 @@ const surfacesPolygonAttributeColorMap = computed<Map<string, RGBAColor> | undef
   },
 });
 
-const surfacesPolygonAttributeNoDataColor = computed<RGBAColor>({
+const surfacesPolygonAttributeNoDataColor = computed<ColorRGBA>({
   get: () =>
     dataStyleStore.modelSurfacesPolygonAttributeNoDataColor(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
@@ -332,7 +332,7 @@ const vertexAttributeRange = computed<AttributeRange>({
   },
 });
 
-const vertexAttributeColorMap = computed<Map<string, RGBAColor> | undefined>({
+const vertexAttributeColorMap = computed<Map<string, ColorRGBA> | undefined>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeColorMap(modelId, surfaceId),
   set: async (newValue) => {
     if (surfaceId === undefined) {
@@ -343,7 +343,7 @@ const vertexAttributeColorMap = computed<Map<string, RGBAColor> | undefined>({
   },
 });
 
-const vertexAttributeNoDataColor = computed<RGBAColor>({
+const vertexAttributeNoDataColor = computed<ColorRGBA>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeNoDataColor(modelId, surfaceId),
   set: async (newValue) => {
     if (surfaceId === undefined) {
@@ -404,7 +404,7 @@ const polygonAttributeRange = computed<AttributeRange>({
   },
 });
 
-const polygonAttributeColorMap = computed<Map<string, RGBAColor> | undefined>({
+const polygonAttributeColorMap = computed<Map<string, ColorRGBA> | undefined>({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeColorMap(modelId, surfaceId),
   set: async (newValue) => {
     if (surfaceId === undefined) {
@@ -415,7 +415,7 @@ const polygonAttributeColorMap = computed<Map<string, RGBAColor> | undefined>({
   },
 });
 
-const polygonAttributeNoDataColor = computed<RGBAColor>({
+const polygonAttributeNoDataColor = computed<ColorRGBA>({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeNoDataColor(modelId, surfaceId),
   set: async (newValue) => {
     if (surfaceId === undefined) {

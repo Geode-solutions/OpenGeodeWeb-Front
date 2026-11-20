@@ -3,12 +3,12 @@
 import type {
   AttributeItem,
   AttributeName,
+  ColorRGBA,
   Visibility,
 } from "@geode/opengeodeweb-viewer/schema_types";
 import type { AttributeRange, AttributeTimeStep } from "@ogw_front/types/attribute";
 import type { BlockId } from "@ogw_front/types/identifiers";
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
@@ -66,17 +66,17 @@ const blockVisibility = computed<Visibility | undefined>({
 });
 
 // Color
-const blocksColor = computed<RGBAColor | undefined>({
+const blocksColor = computed<ColorRGBA | undefined>({
   get: () =>
-    dataStyleStore.modelBlockColor(modelId, referenceBlockId.value) as RGBAColor | undefined,
+    dataStyleStore.modelBlockColor(modelId, referenceBlockId.value) as ColorRGBA | undefined,
   set: async (color) => {
     await dataStyleStore.setModelBlocksColor(modelId, targetBlockIds, color);
     hybridViewerStore.remoteRender();
   },
 });
 
-const blockColor = computed<RGBAColor | undefined>({
-  get: () => dataStyleStore.modelBlockColor(modelId, blockId) as RGBAColor | undefined,
+const blockColor = computed<ColorRGBA | undefined>({
+  get: () => dataStyleStore.modelBlockColor(modelId, blockId) as ColorRGBA | undefined,
   set: async (color) => {
     if (blockId === undefined) {
       return;
@@ -170,7 +170,7 @@ const blocksVertexAttributeRange = computed<AttributeRange>({
   },
 });
 
-const blocksVertexAttributeColorMap = computed<Map<string, RGBAColor> | undefined>({
+const blocksVertexAttributeColorMap = computed<Map<string, ColorRGBA> | undefined>({
   get: () => dataStyleStore.modelBlocksVertexAttributeColorMap(modelId, referenceBlockId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksVertexAttributeColorMap(modelId, targetBlockIds, newValue);
@@ -178,7 +178,7 @@ const blocksVertexAttributeColorMap = computed<Map<string, RGBAColor> | undefine
   },
 });
 
-const blocksVertexAttributeNoDataColor = computed<RGBAColor>({
+const blocksVertexAttributeNoDataColor = computed<ColorRGBA>({
   get: () => dataStyleStore.modelBlocksVertexAttributeNoDataColor(modelId, referenceBlockId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksVertexAttributeNoDataColor(
@@ -257,7 +257,7 @@ const blocksPolyhedronAttributeRange = computed<AttributeRange>({
   },
 });
 
-const blocksPolyhedronAttributeColorMap = computed<Map<string, RGBAColor> | undefined>({
+const blocksPolyhedronAttributeColorMap = computed<Map<string, ColorRGBA> | undefined>({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeColorMap(modelId, referenceBlockId.value),
   set: async (newValue) => {
     const applied = await dataStyleStore.setModelBlocksPolyhedronAttributeColorMap(
@@ -271,7 +271,7 @@ const blocksPolyhedronAttributeColorMap = computed<Map<string, RGBAColor> | unde
   },
 });
 
-const blocksPolyhedronAttributeNoDataColor = computed<RGBAColor>({
+const blocksPolyhedronAttributeNoDataColor = computed<ColorRGBA>({
   get: () =>
     dataStyleStore.modelBlocksPolyhedronAttributeNoDataColor(modelId, referenceBlockId.value),
   set: async (newValue) => {
@@ -332,7 +332,7 @@ const vertexAttributeRange = computed<AttributeRange>({
   },
 });
 
-const vertexAttributeColorMap = computed<Map<string, RGBAColor> | undefined>({
+const vertexAttributeColorMap = computed<Map<string, ColorRGBA> | undefined>({
   get: () => dataStyleStore.modelBlocksVertexAttributeColorMap(modelId, blockId),
   set: async (newValue) => {
     if (blockId === undefined) {
@@ -343,7 +343,7 @@ const vertexAttributeColorMap = computed<Map<string, RGBAColor> | undefined>({
   },
 });
 
-const vertexAttributeNoDataColor = computed<RGBAColor>({
+const vertexAttributeNoDataColor = computed<ColorRGBA>({
   get: () => dataStyleStore.modelBlocksVertexAttributeNoDataColor(modelId, blockId),
   set: async (newValue) => {
     if (blockId === undefined) {
@@ -424,7 +424,7 @@ const polyhedronAttributeRange = computed<AttributeRange>({
   },
 });
 
-const polyhedronAttributeColorMap = computed<Map<string, RGBAColor> | undefined>({
+const polyhedronAttributeColorMap = computed<Map<string, ColorRGBA> | undefined>({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeColorMap(modelId, blockId),
   set: async (newValue) => {
     if (blockId === undefined) {
@@ -441,7 +441,7 @@ const polyhedronAttributeColorMap = computed<Map<string, RGBAColor> | undefined>
   },
 });
 
-const polyhedronAttributeNoDataColor = computed<RGBAColor>({
+const polyhedronAttributeNoDataColor = computed<ColorRGBA>({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeNoDataColor(modelId, blockId),
   set: async (newValue) => {
     if (blockId === undefined) {

@@ -8,13 +8,13 @@ import type {
   AttributeName,
   AttributeRangeMaximum,
   AttributeRangeMinimum,
+  ColorRGBA,
 } from "@geode/opengeodeweb-viewer/schema_types";
 import type {
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
 import type { MeshId } from "@ogw_front/types/identifiers";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 interface UseMeshPolyhedraVertexAttributeStyleReturn {
   meshPolyhedraVertexAttributeName: (meshId: MeshId) => AttributeName | undefined;
@@ -43,10 +43,10 @@ interface UseMeshPolyhedraVertexAttributeStyleReturn {
     meshId: MeshId,
     colorMap: AttributeColorMap | undefined,
   ) => Promise<unknown>;
-  meshPolyhedraVertexAttributeNoDataColor: (meshId: MeshId) => RGBAColor;
+  meshPolyhedraVertexAttributeNoDataColor: (meshId: MeshId) => ColorRGBA;
   setMeshPolyhedraVertexAttributeNoDataColor: (
     meshId: MeshId,
-    no_data_color: RGBAColor,
+    no_data_color: ColorRGBA,
   ) => Promise<unknown>;
 }
 export type { UseMeshPolyhedraVertexAttributeStyleReturn };

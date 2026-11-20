@@ -1,5 +1,5 @@
 import type { BlockId, ModelId } from "@ogw_front/types/identifiers";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -13,11 +13,11 @@ const schema = viewer_schemas.opengeodeweb_viewer.model.blocks.color;
 
 export function useModelBlocksColor(): {
   modelBlockColoring: (modelId: ModelId, block_id?: BlockId) => StyleValues;
-  modelBlockColor: (modelId: ModelId, block_id?: BlockId) => RGBAColor | undefined;
+  modelBlockColor: (modelId: ModelId, block_id?: BlockId) => ColorRGBA | undefined;
   setModelBlocksColor: (
     modelId: ModelId,
     blocks_ids: BlockId[],
-    color: RGBAColor | undefined,
+    color: ColorRGBA | undefined,
     activeColoring?: string,
     collectionId?: string,
   ) => Promise<unknown>;
@@ -40,15 +40,15 @@ export function useModelBlocksColor(): {
     return modelBlocksCommonStyle.modelBlockStyle(modelId, block_id).coloring as StyleValues;
   }
 
-  function modelBlockColor(modelId: ModelId, block_id?: BlockId): RGBAColor | undefined {
+  function modelBlockColor(modelId: ModelId, block_id?: BlockId): ColorRGBA | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.constant shape is defined by the data style schema.
-    return modelBlockColoring(modelId, block_id).constant as RGBAColor | undefined;
+    return modelBlockColoring(modelId, block_id).constant as ColorRGBA | undefined;
   }
 
   async function setModelBlocksColor(
     modelId: ModelId,
     blocks_ids: BlockId[],
-    color: RGBAColor | undefined,
+    color: ColorRGBA | undefined,
     activeColoring = "constant",
     collectionId?: string,
   ): Promise<unknown> {

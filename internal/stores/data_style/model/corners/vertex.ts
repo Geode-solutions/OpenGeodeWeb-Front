@@ -15,9 +15,10 @@ import type {
   AttributeName,
   AttributeRangeMaximum,
   AttributeRangeMinimum,
+  ColorRGBA,
 } from "@geode/opengeodeweb-viewer/schema_types";
 import type { CornerId, ModelId } from "@ogw_front/types/identifiers";
-import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
@@ -78,8 +79,8 @@ interface ModelCornersVertexAttributeApi {
     maximum: AttributeRangeMaximum,
   ) => Promise<void>;
   setModelCornersVertexAttributeColorMap: IdsFn<string | undefined>;
-  modelCornersVertexAttributeNoDataColor: (modelId: ModelId, cornerId?: CornerId) => RGBAColor;
-  setModelCornersVertexAttributeNoDataColor: IdsFn<RGBAColor>;
+  modelCornersVertexAttributeNoDataColor: (modelId: ModelId, cornerId?: CornerId) => ColorRGBA;
+  setModelCornersVertexAttributeNoDataColor: IdsFn<ColorRGBA>;
 }
 
 type ModelCornersVertexAttributeGetters = Pick<
@@ -169,7 +170,7 @@ function useModelCornersVertexAttributeGetters(
   function modelCornersVertexAttributeNoDataColor(
     modelId: ModelId,
     cornerId?: CornerId,
-  ): RGBAColor {
+  ): ColorRGBA {
     const name = modelCornersVertexAttributeName(modelId, cornerId);
     const item = modelCornersVertexAttributeItem(modelId, cornerId);
     return modelCornersVertexAttributeStoredConfig(modelId, cornerId, name, item).no_data_color;
@@ -378,7 +379,7 @@ function useModelCornersVertexAttribute(): ModelCornersVertexAttributeApi {
   async function setModelCornersVertexAttributeNoDataColor(
     modelId: ModelId,
     cornerIds: CornerId[],
-    no_data_color: RGBAColor,
+    no_data_color: ColorRGBA,
   ): Promise<void> {
     const name = modelCornersVertexAttributeName(modelId, cornerIds[0]);
     const item = modelCornersVertexAttributeItem(modelId, cornerIds[0]);

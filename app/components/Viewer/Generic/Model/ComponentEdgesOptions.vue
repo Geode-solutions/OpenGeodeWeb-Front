@@ -2,11 +2,11 @@
 import type {
   AttributeItem,
   AttributeName,
+  ColorRGBA,
   EdgeWidth,
   Visibility,
 } from "@geode/opengeodeweb-viewer/schema_types";
 import type { AttributeColorMap } from "@ogw_front/types/attribute";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import ViewerOptionsWidthSlider from "@ogw_front/components/Viewer/Options/Sliders/Width.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
@@ -123,7 +123,7 @@ const activeColoring = computed<string | undefined>({
   },
 });
 
-const color = computed<RGBAColor | undefined>({
+const color = computed<ColorRGBA | undefined>({
   get: () => edgesStyle.value?.color(modelId, referenceComponentId),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -176,7 +176,7 @@ const vertexAttributeColorMap = computed<AttributeColorMap | undefined>({
   },
 });
 
-const vertexAttributeNoDataColor = computed<RGBAColor | undefined>({
+const vertexAttributeNoDataColor = computed<ColorRGBA | undefined>({
   get: () => edgesStyle.value?.vertexAttributeNoDataColor(modelId, referenceComponentId),
   set: async (newValue) => {
     if (newValue === undefined) {

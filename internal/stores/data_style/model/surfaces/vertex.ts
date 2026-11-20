@@ -15,9 +15,10 @@ import type {
   AttributeName,
   AttributeRangeMaximum,
   AttributeRangeMinimum,
+  ColorRGBA,
 } from "@geode/opengeodeweb-viewer/schema_types";
-import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { ModelId, SurfaceId } from "@ogw_front/types/identifiers";
+import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
@@ -89,11 +90,11 @@ interface UseModelSurfacesVertexAttributeReturn {
     surfaceIds: SurfaceId[],
     colorMap: AttributeColorMap | undefined,
   ) => Promise<unknown>;
-  modelSurfacesVertexAttributeNoDataColor: (modelId: ModelId, surfaceId?: SurfaceId) => RGBAColor;
+  modelSurfacesVertexAttributeNoDataColor: (modelId: ModelId, surfaceId?: SurfaceId) => ColorRGBA;
   setModelSurfacesVertexAttributeNoDataColor: (
     modelId: ModelId,
     surfaceIds: SurfaceId[],
-    no_data_color: RGBAColor,
+    no_data_color: ColorRGBA,
   ) => Promise<unknown>;
 }
 
@@ -189,7 +190,7 @@ function useModelSurfacesVertexAttributeGetters(
   function modelSurfacesVertexAttributeNoDataColor(
     modelId: ModelId,
     surfaceId?: SurfaceId,
-  ): RGBAColor {
+  ): ColorRGBA {
     const name = modelSurfacesVertexAttributeName(modelId, surfaceId);
     const item = modelSurfacesVertexAttributeItem(modelId, surfaceId);
     const storedConfig = modelSurfacesVertexAttributeStoredConfig(modelId, surfaceId, name, item);
@@ -409,7 +410,7 @@ function useModelSurfacesVertexAttribute(): UseModelSurfacesVertexAttributeRetur
   async function setModelSurfacesVertexAttributeNoDataColor(
     modelId: ModelId,
     surfaceIds: SurfaceId[],
-    no_data_color: RGBAColor,
+    no_data_color: ColorRGBA,
   ): Promise<unknown> {
     const name = modelSurfacesVertexAttributeName(modelId, surfaceIds[0]);
     const item = modelSurfacesVertexAttributeItem(modelId, surfaceIds[0]);

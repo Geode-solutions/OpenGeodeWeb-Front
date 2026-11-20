@@ -1,11 +1,14 @@
 import type { AttributeColorMap, AttributeRange } from "@ogw_front/types/attribute";
-import type { AttributeItem, AttributeName } from "@geode/opengeodeweb-viewer/schema_types";
+import type {
+  AttributeItem,
+  AttributeName,
+  ColorRGBA,
+} from "@geode/opengeodeweb-viewer/schema_types";
 import type {
   AttributeState,
   AttributeStoredConfig,
 } from "@ogw_internal/stores/data_style/attribute_types";
 import type { MeshId } from "@ogw_front/types/identifiers";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 
 // Local imports
@@ -85,7 +88,7 @@ function useMeshPolygonsPolygonAttributeConfig(): UseMeshPolygonsPolygonAttribut
 interface UseMeshPolygonsPolygonAttributeConfigValuesReturn {
   meshPolygonsPolygonAttributeRange: (meshId: MeshId) => AttributeRange;
   meshPolygonsPolygonAttributeColorMap: (meshId: MeshId) => AttributeColorMap | undefined;
-  meshPolygonsPolygonAttributeNoDataColor: (meshId: MeshId) => RGBAColor;
+  meshPolygonsPolygonAttributeNoDataColor: (meshId: MeshId) => ColorRGBA;
 }
 
 function useMeshPolygonsPolygonAttributeConfigValues(): UseMeshPolygonsPolygonAttributeConfigValuesReturn {
@@ -106,7 +109,7 @@ function useMeshPolygonsPolygonAttributeConfigValues(): UseMeshPolygonsPolygonAt
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(meshId, name, item);
     return storedConfig.colorMap;
   }
-  function meshPolygonsPolygonAttributeNoDataColor(meshId: MeshId): RGBAColor {
+  function meshPolygonsPolygonAttributeNoDataColor(meshId: MeshId): ColorRGBA {
     const name = meshPolygonsPolygonAttributeName(meshId);
     const item = meshPolygonsPolygonAttributeItem(meshId);
     const storedConfig = meshPolygonsPolygonAttributeStoredConfig(meshId, name, item);

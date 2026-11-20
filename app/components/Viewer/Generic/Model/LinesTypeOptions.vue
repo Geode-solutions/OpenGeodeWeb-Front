@@ -2,12 +2,12 @@
 import type {
   AttributeItem,
   AttributeName,
+  ColorRGBA,
   Visibility,
 } from "@geode/opengeodeweb-viewer/schema_types";
 import type { AttributeRange, AttributeTimeStep } from "@ogw_front/types/attribute";
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import { MODEL_LINE_COLORING } from "@ogw_front/utils/model_component_coloring";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -49,8 +49,8 @@ const linesVisibility = computed<Visibility>({
 });
 
 // Color
-const linesColor = computed<RGBAColor | undefined>({
-  get: () => dataStyleStore.modelLineColor(modelId, referenceLineId.value) as RGBAColor | undefined,
+const linesColor = computed<ColorRGBA | undefined>({
+  get: () => dataStyleStore.modelLineColor(modelId, referenceLineId.value) as ColorRGBA | undefined,
   set: async (color) => {
     await dataStyleStore.setModelLinesColor(modelId, targetLineIds, color);
     hybridViewerStore.remoteRender();
@@ -138,7 +138,7 @@ const linesVertexAttributeColorMap = computed<RGBAColorMap | undefined>({
   },
 });
 
-const linesVertexAttributeNoDataColor = computed<RGBAColor>({
+const linesVertexAttributeNoDataColor = computed<ColorRGBA>({
   get: () => dataStyleStore.modelLinesVertexAttributeNoDataColor(modelId, referenceLineId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesVertexAttributeNoDataColor(modelId, targetLineIds, newValue);
@@ -188,7 +188,7 @@ const linesEdgeAttributeRange = computed<AttributeRange>({
   },
 });
 
-const linesEdgeAttributeColorMap = computed<Map<string, RGBAColor> | undefined>({
+const linesEdgeAttributeColorMap = computed<Map<string, ColorRGBA> | undefined>({
   get: () => dataStyleStore.modelLinesEdgeAttributeColorMap(modelId, referenceLineId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesEdgeAttributeColorMap(modelId, targetLineIds, newValue);
@@ -196,7 +196,7 @@ const linesEdgeAttributeColorMap = computed<Map<string, RGBAColor> | undefined>(
   },
 });
 
-const linesEdgeAttributeNoDataColor = computed<RGBAColor>({
+const linesEdgeAttributeNoDataColor = computed<ColorRGBA>({
   get: () => dataStyleStore.modelLinesEdgeAttributeNoDataColor(modelId, referenceLineId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesEdgeAttributeNoDataColor(modelId, targetLineIds, newValue);

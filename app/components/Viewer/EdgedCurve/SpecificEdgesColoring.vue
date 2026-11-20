@@ -7,6 +7,7 @@ import type {
 import type {
   AttributeItem,
   AttributeName,
+  ColorRGBA,
   Opacity,
 } from "@geode/opengeodeweb-viewer/schema_types";
 import {
@@ -16,7 +17,6 @@ import {
 } from "@ogw_front/composables/batch_style";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { MeshId } from "@ogw_front/types/identifiers";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import { useBatchStyleModel } from "@ogw_front/composables/batch_style_model";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -41,9 +41,9 @@ const coloring_style_key = computed<string>({
     hybridViewerStore.remoteRender();
   },
 });
-const color = useBatchStyleModel<RGBAColor>(
+const color = useBatchStyleModel<ColorRGBA>(
   () => dataId,
-  (meshId) => dataStyleStore.meshEdgesColor(meshId) as RGBAColor | undefined,
+  (meshId) => dataStyleStore.meshEdgesColor(meshId) as ColorRGBA | undefined,
   (meshId, value) => dataStyleStore.setMeshEdgesColor(meshId, value),
 );
 const opacity = useBatchStyleModel<Opacity>(
@@ -107,7 +107,7 @@ const vertex_attribute_color_map = computed<AttributeColorMap | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_no_data_color = computed<RGBAColor>({
+const vertex_attribute_no_data_color = computed<ColorRGBA>({
   get: () => dataStyleStore.meshEdgesVertexAttributeNoDataColor(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>
@@ -172,7 +172,7 @@ const edge_attribute_color_map = computed<AttributeColorMap | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
-const edge_attribute_no_data_color = computed<RGBAColor>({
+const edge_attribute_no_data_color = computed<ColorRGBA>({
   get: () => dataStyleStore.meshEdgesEdgeAttributeNoDataColor(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>

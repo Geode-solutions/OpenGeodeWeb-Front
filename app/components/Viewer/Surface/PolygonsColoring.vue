@@ -2,6 +2,7 @@
 import type {
   AttributeItem,
   AttributeName,
+  ColorRGBA,
   Opacity,
 } from "@geode/opengeodeweb-viewer/schema_types";
 import type { AttributeRange, AttributeTimeStep } from "@ogw_front/types/attribute";
@@ -12,7 +13,6 @@ import {
 } from "@ogw_front/composables/batch_style";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { MeshId } from "@ogw_front/types/identifiers";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { Texture } from "@ogw_front/types/texture";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import { useBatchStyleModel } from "@ogw_front/composables/batch_style_model";
@@ -38,9 +38,9 @@ const coloring_style_key = computed<string>({
     hybridViewerStore.remoteRender();
   },
 });
-const color = useBatchStyleModel<RGBAColor>(
+const color = useBatchStyleModel<ColorRGBA>(
   () => dataId,
-  (meshId) => dataStyleStore.meshPolygonsColor(meshId) as RGBAColor | undefined,
+  (meshId) => dataStyleStore.meshPolygonsColor(meshId) as ColorRGBA | undefined,
   (meshId, value) => dataStyleStore.setMeshPolygonsColor(meshId, value),
 );
 const opacity = useBatchStyleModel<Opacity>(
@@ -100,7 +100,7 @@ const vertex_attribute_range = computed<AttributeRange>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_color_map = computed<Map<string, RGBAColor> | undefined>({
+const vertex_attribute_color_map = computed<Map<string, ColorRGBA> | undefined>({
   get: () => dataStyleStore.meshPolygonsVertexAttributeColorMap(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>
@@ -109,7 +109,7 @@ const vertex_attribute_color_map = computed<Map<string, RGBAColor> | undefined>(
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_no_data_color = computed<RGBAColor>({
+const vertex_attribute_no_data_color = computed<ColorRGBA>({
   get: () => dataStyleStore.meshPolygonsVertexAttributeNoDataColor(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>
@@ -167,7 +167,7 @@ const polygon_attribute_range = computed<AttributeRange>({
     hybridViewerStore.remoteRender();
   },
 });
-const polygon_attribute_color_map = computed<Map<string, RGBAColor> | undefined>({
+const polygon_attribute_color_map = computed<Map<string, ColorRGBA> | undefined>({
   get: () => dataStyleStore.meshPolygonsPolygonAttributeColorMap(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>
@@ -176,7 +176,7 @@ const polygon_attribute_color_map = computed<Map<string, RGBAColor> | undefined>
     hybridViewerStore.remoteRender();
   },
 });
-const polygon_attribute_no_data_color = computed<RGBAColor>({
+const polygon_attribute_no_data_color = computed<ColorRGBA>({
   get: () => dataStyleStore.meshPolygonsPolygonAttributeNoDataColor(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>

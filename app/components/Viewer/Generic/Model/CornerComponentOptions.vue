@@ -2,12 +2,12 @@
 import type {
   AttributeItem,
   AttributeName,
+  ColorRGBA,
   Visibility,
 } from "@geode/opengeodeweb-viewer/schema_types";
 import type { AttributeRange, AttributeTimeStep } from "@ogw_front/types/attribute";
 import type { CornerId } from "@ogw_front/types/identifiers";
 import { MODEL_VERTEX_COLORING } from "@ogw_front/utils/model_component_coloring";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -37,8 +37,8 @@ const cornerVisibility = computed<Visibility | undefined>({
   },
 });
 
-const cornerColor = computed<RGBAColor | undefined>({
-  get: () => dataStyleStore.modelCornerColor(modelId, cornerId) as RGBAColor | undefined,
+const cornerColor = computed<ColorRGBA | undefined>({
+  get: () => dataStyleStore.modelCornerColor(modelId, cornerId) as ColorRGBA | undefined,
   set: async (color) => {
     if (cornerId === undefined) {
       return;
@@ -116,7 +116,7 @@ const vertexAttributeColorMap = computed<ColorMap | undefined>({
   },
 });
 
-const vertexAttributeNoDataColor = computed<RGBAColor>({
+const vertexAttributeNoDataColor = computed<ColorRGBA>({
   get: () => dataStyleStore.modelCornersVertexAttributeNoDataColor(modelId, cornerId),
   set: async (newValue) => {
     if (cornerId === undefined) {

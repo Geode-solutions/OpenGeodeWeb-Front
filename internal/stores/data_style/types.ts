@@ -1,6 +1,5 @@
+import type { ColorRGBA, Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import type { DataIdentified } from "@ogw_front/types/identifiers";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
-import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 
 type StyleValues = Record<string, unknown>;
 
@@ -36,9 +35,9 @@ type SceneOrientationWidget = "axes" | "compass";
 
 interface SceneStyle {
   id: "scene";
-  background_color: RGBAColor;
+  background_color: ColorRGBA;
   text: {
-    color: RGBAColor;
+    color: ColorRGBA;
     font_family: SceneFontFamily;
   };
   orientation_widget: SceneOrientationWidget;

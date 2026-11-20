@@ -5,6 +5,7 @@ import type {
   AttributeName,
   AttributeRangeMaximum,
   AttributeRangeMinimum,
+  ColorRGBA,
   PointSize,
   Visibility,
 } from "@geode/opengeodeweb-viewer/schema_types";
@@ -16,7 +17,6 @@ import {
   POINTS_DEFAULT_COLOR,
   POINTS_DEFAULT_SIZE,
   POINTS_DEFAULT_VISIBILITY,
-  type RGBAColor,
 } from "@ogw_front/utils/default_styles/constants";
 import type { ModelId } from "@ogw_front/types/identifiers";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
@@ -54,7 +54,7 @@ interface PointsStyle {
   size?: PointSize;
   coloring?: {
     active?: string;
-    constant?: RGBAColor;
+    constant?: ColorRGBA;
     vertex?: AttributeState;
   };
 }
@@ -107,7 +107,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
     return pointsStyle(modelId, componentId).size ?? POINTS_DEFAULT_SIZE;
   }
 
-  function pointsColor(modelId: ModelId, componentId?: string): RGBAColor {
+  function pointsColor(modelId: ModelId, componentId?: string): ColorRGBA {
     return pointsStyle(modelId, componentId).coloring?.constant ?? POINTS_DEFAULT_COLOR;
   }
 
@@ -153,7 +153,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
     return storedConfig(modelId, componentId).colorMap;
   }
 
-  function vertexAttributeNoDataColor(modelId: ModelId, componentId?: string): RGBAColor {
+  function vertexAttributeNoDataColor(modelId: ModelId, componentId?: string): ColorRGBA {
     return storedConfig(modelId, componentId).no_data_color;
   }
 
@@ -228,7 +228,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
   async function setColor(
     modelId: ModelId,
     componentIds: string[],
-    color: RGBAColor,
+    color: ColorRGBA,
   ): Promise<unknown> {
     const result = await requestPoints(modelId, componentIds, schemas.color, {
       color,
@@ -343,7 +343,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
   async function setVertexAttributeNoDataColor(
     modelId: ModelId,
     componentIds: string[],
-    no_data_color: RGBAColor,
+    no_data_color: ColorRGBA,
   ): Promise<unknown> {
     await mutateStoredConfig(modelId, componentIds, { no_data_color });
     const result = await applyVertexAttribute(modelId, componentIds);

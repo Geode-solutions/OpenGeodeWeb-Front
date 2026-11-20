@@ -1,3 +1,4 @@
+import type { ColorRGBA, Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import {
   type ComponentStyleUpdate,
   useModelComponentStyleMutations,
@@ -6,9 +7,7 @@ import {
 } from "./common_mutations";
 import type { ModelId } from "@ogw_front/types/identifiers";
 import type { ParamsOf } from "@ogw_shared/utils/types.js";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
-import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import type viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
@@ -49,7 +48,7 @@ interface UseModelCommonStyleReturn {
   setModelTypeColor: (
     modelId: ModelId,
     component_ids: string[],
-    color: RGBAColor | undefined,
+    color: ColorRGBA | undefined,
     schema: ModelColorSchema,
     activeColoring?: string,
     collectionId?: string,
@@ -72,7 +71,7 @@ export function useModelCommonStyle(): UseModelCommonStyleReturn {
   async function setModelTypeColor(
     modelId: ModelId,
     component_ids: string[],
-    color: RGBAColor | undefined,
+    color: ColorRGBA | undefined,
     schema: ModelColorSchema,
     activeColoring = "constant",
     collectionId?: string,

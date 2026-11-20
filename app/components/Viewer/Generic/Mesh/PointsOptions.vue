@@ -7,6 +7,7 @@ import type {
 import type {
   AttributeItem,
   AttributeName,
+  ColorRGBA,
   Opacity,
   PointSize,
   Visibility,
@@ -20,7 +21,6 @@ import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import type { MeshId } from "@ogw_front/types/identifiers";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import ViewerOptionsSizeSlider from "@ogw_front/components/Viewer/Options/Sliders/Size.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
@@ -68,8 +68,8 @@ const coloring_style_key = computed<string>({
     hybridViewerStore.remoteRender();
   },
 });
-const color = computed<RGBAColor | undefined>({
-  get: () => dataStyleStore.meshPointsColor(dataId.value) as RGBAColor | undefined,
+const color = computed<ColorRGBA | undefined>({
+  get: () => dataStyleStore.meshPointsColor(dataId.value) as ColorRGBA | undefined,
   set: async (newValue) => {
     if (newValue === undefined) {
       return;
@@ -148,7 +148,7 @@ const vertex_attribute_color_map = computed<AttributeColorMap | undefined>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_no_data_color = computed<RGBAColor>({
+const vertex_attribute_no_data_color = computed<ColorRGBA>({
   get: () => dataStyleStore.meshPointsVertexAttributeNoDataColor(dataId.value),
   set: async (newValue) => {
     await applyBatchStyle(dataId.value, (meshId: MeshId) =>
