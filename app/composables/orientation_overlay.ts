@@ -1,5 +1,6 @@
 import type { ComputedRef } from "vue";
 import type { SceneOrientationWidget } from "@ogw_internal/stores/data_style/types";
+import { consola } from "consola";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Marker value hiding the VTK orientation marker of the viewer
@@ -55,8 +56,10 @@ async function hideViewerMarker(
   }
   try {
     await request(hideMarker);
-  } catch {
-    // A viewer without the "none" marker keeps drawing its own: not a reason to fail the reset
+  } catch (error) {
+    // A viewer without the "none" marker keeps drawing its own: not a reason to fail the reset, but both markers
+    // Then show, so it is reported
+    consola.warn("[OrientationOverlay] The viewer kept its orientation marker:", error);
   }
 }
 
