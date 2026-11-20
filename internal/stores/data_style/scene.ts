@@ -4,13 +4,17 @@ import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
+import {
+  NO_VIEWER_MARKER,
+  viewerOrientationMarker,
+} from "@ogw_front/composables/orientation_overlay";
+import { consola } from "consola";
 import { getDefaultSceneStyle } from "@ogw_front/utils/default_styles";
 import { getTable } from "@ogw_internal/database/database";
 import { toViewerColor } from "@ogw_front/composables/viewer_reset";
 import { useDataStyleState } from "./state";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
-import { viewerOrientationMarker } from "@ogw_front/composables/orientation_overlay";
 
 // Local constants
 const text_style_schema = viewer_schemas.opengeodeweb_viewer.viewer.set_text_style;
@@ -58,16 +62,27 @@ export function useSceneStyle(): {
   }
 
   async function requestOrientationWidget(marker: SceneOrientationWidget): Promise<unknown> {
-    const result = await viewerStore.request(
-      // With the front overlay, the viewer hides its marker while the scene style keeps the choice
-      { schema: orientation_widget_schema, params: { marker: viewerOrientationMarker(marker) } },
-      {
-        response_function: async () => {
-          await saveSceneStyle({ orientation_widget: marker });
+    // With the front overlay, the viewer hides its marker while the scene style keeps the choice
+    const viewerMarker = viewerOrientationMarker(marker);
+    try {
+      const result = await viewerStore.request(
+        { schema: orientation_widget_schema, params: { marker: viewerMarker } },
+        {
+          response_function: async () => {
+            await saveSceneStyle({ orientation_widget: marker });
+          },
         },
-      },
-    );
-    return result;
+      );
+      return result;
+    } catch (error) {
+      if (viewerMarker !== NO_VIEWER_MARKER) {
+        throw error;
+      }
+      // A viewer without the "none" marker keeps its own: the overlay still follows the user's choice
+      consola.warn("[OrientationOverlay] The viewer kept its orientation marker:", error);
+      await saveSceneStyle({ orientation_widget: marker });
+      return undefined;
+    }
   }
 
   async function setSceneBackgroundColor(color: RGBAColor): Promise<void> {

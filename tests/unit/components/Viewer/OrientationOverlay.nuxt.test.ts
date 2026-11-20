@@ -203,4 +203,19 @@ describe("orientation marker sent to the viewer", () => {
     );
     expect(dataStyleStore.sceneStyle.orientation_widget).toBe("compass");
   });
+
+  test("keeps the choice when the viewer has no none marker", async () => {
+    setupActivePinia();
+    setOrientationOverlay(true);
+    const viewerStore = useViewerStore();
+    viewerStore.request = mockAs<typeof viewerStore.request>(
+      vi.fn(async () => {
+        await Promise.reject(new Error("unknown marker"));
+      }),
+    );
+    const dataStyleStore = useDataStyleStore();
+    // A project restore with an older viewer does not fail on the marker
+    await expect(dataStyleStore.setSceneOrientationWidget("compass")).resolves.toBeUndefined();
+    expect(dataStyleStore.sceneStyle.orientation_widget).toBe("compass");
+  });
 });
