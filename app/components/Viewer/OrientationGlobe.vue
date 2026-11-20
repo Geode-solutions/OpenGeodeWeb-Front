@@ -108,7 +108,25 @@ function drawStrata(): void {
   strataImage.value = canvas.toDataURL();
 }
 
-watch(basis, drawStrata, { immediate: true });
+// The camera changes on every step of a rotation or an animation: the strata are drawn at most once per frame
+let strataFrame: number | undefined = undefined;
+function scheduleStrata(): void {
+  if (strataFrame !== undefined) {
+    return;
+  }
+  strataFrame = requestAnimationFrame(() => {
+    strataFrame = undefined;
+    drawStrata();
+  });
+}
+
+drawStrata();
+watch(basis, scheduleStrata);
+onBeforeUnmount(() => {
+  if (strataFrame !== undefined) {
+    cancelAnimationFrame(strataFrame);
+  }
+});
 </script>
 
 <template>
@@ -122,6 +140,7 @@ watch(basis, drawStrata, { immediate: true });
         role="group"
         aria-label="Orientation axes"
       >
+        <circle class="backdrop" :r="BACKDROP_RADIUS" />
         <image
           v-if="strataImage"
           class="globe-strata"
@@ -132,7 +151,6 @@ watch(basis, drawStrata, { immediate: true });
           :height="2 * RADIUS"
           aria-hidden="true"
         />
-        <circle class="backdrop" :r="BACKDROP_RADIUS" />
         <!-- Catches the pointer so a click on the globe neither moves the camera nor reaches the viewer -->
         <g class="globe-body" data-testid="orientationGlobe-body">
           <circle class="sphere" :r="RADIUS" />
