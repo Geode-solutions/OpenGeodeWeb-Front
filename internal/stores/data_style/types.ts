@@ -1,6 +1,6 @@
 import type { DataIdentified } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
-import type { Visibility } from "@ogw_front/types/style";
+import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 
 type StyleValues = Record<string, unknown>;
 

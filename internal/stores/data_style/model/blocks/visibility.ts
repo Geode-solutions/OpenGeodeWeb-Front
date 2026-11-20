@@ -1,5 +1,5 @@
 import type { BlockId, ModelId } from "@ogw_front/types/identifiers";
-import type { Visibility } from "@ogw_front/types/style";
+import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import { useModelBlocksCommonStyle } from "./common";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";

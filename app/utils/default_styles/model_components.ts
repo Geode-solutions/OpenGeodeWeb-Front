@@ -19,7 +19,7 @@ import {
   SURFACES_DEFAULT_COLOR,
   SURFACES_DEFAULT_VISIBILITY,
 } from "./constants";
-import type { Size, Visibility, Width } from "@ogw_front/types/style";
+import type { EdgeWidth, PointSize, Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 
 function emptyAttributeConfig(): AttributeConfig {
   return { name: undefined, storedConfigs: {} };
@@ -59,12 +59,12 @@ interface ModelBlocksStyle {
 
 interface ModelPointsStyle {
   visibility: Visibility;
-  size: Size;
+  size: PointSize;
 }
 
 interface ModelEdgesStyle {
   visibility: Visibility;
-  width: Width;
+  width: EdgeWidth;
 }
 
 function modelCornersDefaultStyle(
@@ -128,14 +128,14 @@ function modelBlocksDefaultStyle(
 
 function modelPointsDefaultStyle(
   visibility: Visibility = POINTS_DEFAULT_VISIBILITY,
-  size: Size = POINTS_DEFAULT_SIZE,
+  size: PointSize = POINTS_DEFAULT_SIZE,
 ): ModelPointsStyle {
   return { visibility, size };
 }
 
 function modelEdgesDefaultStyle(
   visibility: Visibility = EDGES_DEFAULT_VISIBILITY,
-  width: Width = EDGES_DEFAULT_WIDTH,
+  width: EdgeWidth = EDGES_DEFAULT_WIDTH,
 ): ModelEdgesStyle {
   return { visibility, width };
 }

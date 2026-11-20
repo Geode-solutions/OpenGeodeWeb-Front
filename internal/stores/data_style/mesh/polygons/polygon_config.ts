@@ -1,9 +1,5 @@
-import type {
-  AttributeColorMap,
-  AttributeItem,
-  AttributeName,
-  AttributeRange,
-} from "@ogw_front/types/attribute";
+import type { AttributeColorMap, AttributeRange } from "@ogw_front/types/attribute";
+import type { AttributeItem, AttributeName } from "@geode/opengeodeweb-viewer/schema_types";
 import type {
   AttributeState,
   AttributeStoredConfig,

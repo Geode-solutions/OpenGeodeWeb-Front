@@ -4,8 +4,8 @@ import { requireRenderWindow, useHybridViewerCore } from "./core";
 import viewer_schemas, {
   type ViewerSetBackgroundColorParams,
 } from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
-import type { DataId } from "@ogw_front/types/identifiers";
-import type { Visibility } from "@ogw_front/types/style";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import { base64ToArrayBuffer } from "./base64";
 import { getCameraOptions } from "./camera_animation";
 import { useDataStore } from "@ogw_front/stores/data";

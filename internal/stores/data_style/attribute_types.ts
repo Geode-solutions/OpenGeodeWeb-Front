@@ -1,10 +1,10 @@
 import type {
-  AttributeColorMap,
   AttributeItem,
   AttributeName,
   AttributeRangeMaximum,
   AttributeRangeMinimum,
-} from "@ogw_front/types/attribute";
+} from "@geode/opengeodeweb-viewer/schema_types";
+import type { AttributeColorMap } from "@ogw_front/types/attribute";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 
 // The same fields while the user has not chosen them yet

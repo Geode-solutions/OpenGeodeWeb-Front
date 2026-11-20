@@ -5,7 +5,7 @@ import {
   buildColoringStyles,
   resolveAttributeSchemas,
 } from "@ogw_front/utils/coloring_styles";
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { RangesPerData } from "@ogw_front/composables/batch_style";
 import type { Texture } from "@ogw_front/types/texture";

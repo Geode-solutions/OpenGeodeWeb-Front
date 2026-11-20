@@ -1,5 +1,5 @@
 import { type MaybeRefOrGetter, type WritableComputedRef, computed, toValue } from "vue";
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 

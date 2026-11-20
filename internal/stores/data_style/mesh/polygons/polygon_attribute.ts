@@ -1,12 +1,14 @@
 import type {
   AttributeColorMap,
-  AttributeItem,
-  AttributeName,
   AttributeRange,
-  AttributeRangeMaximum,
-  AttributeRangeMinimum,
   AttributeTimeStep,
 } from "@ogw_front/types/attribute";
+import type {
+  AttributeItem,
+  AttributeName,
+  AttributeRangeMaximum,
+  AttributeRangeMinimum,
+} from "@geode/opengeodeweb-viewer/schema_types";
 import type {
   AttributeStoredConfig,
   ValidAttributeInput,

@@ -1,11 +1,7 @@
 // oxlint-disable eslint/max-lines
 import type {
   AttributeColorMap,
-  AttributeItem,
-  AttributeName,
   AttributeRange,
-  AttributeRangeMaximum,
-  AttributeRangeMinimum,
   AttributeTimeStep,
 } from "@ogw_front/types/attribute";
 import type {
@@ -14,6 +10,12 @@ import type {
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
+import type {
+  AttributeItem,
+  AttributeName,
+  AttributeRangeMaximum,
+  AttributeRangeMinimum,
+} from "@geode/opengeodeweb-viewer/schema_types";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { ModelId, SurfaceId } from "@ogw_front/types/identifiers";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";

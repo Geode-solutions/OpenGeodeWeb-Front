@@ -1,12 +1,13 @@
 // oxlint-disable eslint/max-lines
+import type { AttributeColorMap, AttributeRange } from "@ogw_front/types/attribute";
 import type {
-  AttributeColorMap,
   AttributeItem,
   AttributeName,
-  AttributeRange,
   AttributeRangeMaximum,
   AttributeRangeMinimum,
-} from "@ogw_front/types/attribute";
+  PointSize,
+  Visibility,
+} from "@geode/opengeodeweb-viewer/schema_types";
 import type {
   AttributeState,
   AttributeStoredConfig,
@@ -17,7 +18,6 @@ import {
   POINTS_DEFAULT_VISIBILITY,
   type RGBAColor,
 } from "@ogw_front/utils/default_styles/constants";
-import type { Size, Visibility } from "@ogw_front/types/style";
 import type { ModelId } from "@ogw_front/types/identifiers";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
@@ -51,7 +51,7 @@ type PointsRequestSchema =
 
 interface PointsStyle {
   visibility?: Visibility;
-  size?: Size;
+  size?: PointSize;
   coloring?: {
     active?: string;
     constant?: RGBAColor;
@@ -103,7 +103,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
     return pointsStyle(modelId, componentId).visibility ?? POINTS_DEFAULT_VISIBILITY;
   }
 
-  function pointsSize(modelId: ModelId, componentId?: string): Size {
+  function pointsSize(modelId: ModelId, componentId?: string): PointSize {
     return pointsStyle(modelId, componentId).size ?? POINTS_DEFAULT_SIZE;
   }
 
@@ -213,7 +213,11 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
     return result;
   }
 
-  async function setSize(modelId: ModelId, componentIds: string[], size: Size): Promise<unknown> {
+  async function setSize(
+    modelId: ModelId,
+    componentIds: string[],
+    size: PointSize,
+  ): Promise<unknown> {
     const result = await requestPoints(modelId, componentIds, schemas.size, {
       size,
       style: { size },

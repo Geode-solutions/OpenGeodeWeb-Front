@@ -3,14 +3,13 @@
 import type {
   AttributeItem,
   AttributeName,
-  AttributeRange,
-  AttributeTimeStep,
-} from "@ogw_front/types/attribute";
+  Visibility,
+} from "@geode/opengeodeweb-viewer/schema_types";
+import type { AttributeRange, AttributeTimeStep } from "@ogw_front/types/attribute";
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { SurfaceId } from "@ogw_front/types/identifiers";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
-import type { Visibility } from "@ogw_front/types/style";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";

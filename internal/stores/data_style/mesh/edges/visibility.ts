@@ -2,7 +2,7 @@
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 import type { MeshId } from "@ogw_front/types/identifiers";
-import type { Visibility } from "@ogw_front/types/style";
+import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import { useMeshEdgesCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 

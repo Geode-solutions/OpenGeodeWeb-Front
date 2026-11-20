@@ -1,4 +1,4 @@
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { ParamsOf } from "@ogw_shared/utils/types";
 import { consola } from "consola";
 import { useDataStore } from "@ogw_front/stores/data";

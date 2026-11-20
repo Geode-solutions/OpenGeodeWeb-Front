@@ -1,6 +1,6 @@
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
-import type { Visibility } from "@ogw_front/types/style";
+import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 

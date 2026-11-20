@@ -1,6 +1,11 @@
 <script setup lang="ts">
-import type { AttributeColorMap, AttributeItem, AttributeName } from "@ogw_front/types/attribute";
-import type { Visibility, Width } from "@ogw_front/types/style";
+import type {
+  AttributeItem,
+  AttributeName,
+  EdgeWidth,
+  Visibility,
+} from "@geode/opengeodeweb-viewer/schema_types";
+import type { AttributeColorMap } from "@ogw_front/types/attribute";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import ViewerOptionsWidthSlider from "@ogw_front/components/Viewer/Options/Sliders/Width.vue";
@@ -98,7 +103,7 @@ const visibility = computed<Visibility | undefined>({
   },
 });
 
-const width = computed<Width | undefined>({
+const width = computed<EdgeWidth | undefined>({
   get: () => edgesStyle.value?.width(modelId, referenceComponentId),
   set: async (newValue) => {
     if (newValue === undefined) {

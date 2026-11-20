@@ -5,10 +5,10 @@ import type {
   ObjectStyle,
   SceneStyle,
 } from "@ogw_internal/stores/data_style/types";
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import type { Table } from "dexie";
-import type { Visibility } from "@ogw_front/types/style";
+import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import { database } from "@ogw_internal/database/database.js";
 import { getDefaultStyle } from "@ogw_front/utils/default_styles";
 import { useAttributeTimeStepStyle } from "@ogw_internal/stores/data_style/time_step";

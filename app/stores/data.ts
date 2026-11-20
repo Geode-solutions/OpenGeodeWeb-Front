@@ -6,10 +6,9 @@ import { useObservable } from "@vueuse/rxjs";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
+import type { DataId, GeodeId } from "@geode/opengeodeweb-microservice/schema_types";
 import type {
-  DataId,
   DataIdentified,
-  GeodeId,
   GeodeIdentified,
   GeodeObjectTyped,
   ModelId,

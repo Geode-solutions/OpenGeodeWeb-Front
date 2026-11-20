@@ -8,7 +8,7 @@ import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import type { MeshId } from "@ogw_front/types/identifiers";
-import type { Opacity } from "@ogw_front/types/style";
+import type { Opacity } from "@geode/opengeodeweb-viewer/schema_types";
 import PointSetPoints from "@ogw_front/assets/viewer_svgs/point_set_points.svg";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";

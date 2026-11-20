@@ -1,4 +1,5 @@
-import type { DataId, DataIdentified } from "@ogw_front/types/identifiers";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { DataIdentified } from "@ogw_front/types/identifiers";
 
 // Temporary: the back-end, the viewer and the projects saved before data_id existed still name the data id `id`
 type LegacyDataId<Row extends DataIdentified> = Omit<Row, "data_id"> & { id: DataId };

@@ -2,16 +2,16 @@
 import type {
   AttributeItem,
   AttributeName,
-  AttributeRange,
-  AttributeTimeStep,
-} from "@ogw_front/types/attribute";
-import type { DataId, MeshId } from "@ogw_front/types/identifiers";
+  Opacity,
+} from "@geode/opengeodeweb-viewer/schema_types";
+import type { AttributeRange, AttributeTimeStep } from "@ogw_front/types/attribute";
 import {
   type RangesPerData,
   applyRangesPerData,
   useBatchStyle,
 } from "@ogw_front/composables/batch_style";
-import type { Opacity } from "@ogw_front/types/style";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { Texture } from "@ogw_front/types/texture";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";

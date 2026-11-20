@@ -4,9 +4,8 @@ import { consola } from "consola";
 // oxlint-disable eslint/sort-imports, eslint/max-lines
 import { defineStore } from "pinia";
 
+import type { DataId, GeodeId } from "@geode/opengeodeweb-microservice/schema_types";
 import type {
-  DataId,
-  GeodeId,
   GeodeIdentified,
   GeodeObjectTyped,
   ViewerObjectTyped,

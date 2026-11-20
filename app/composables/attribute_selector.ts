@@ -1,6 +1,6 @@
 import type { AttributeRangeInfo, AttributeSchemas } from "@ogw_front/utils/attribute_range";
 import type { AttributeTimeStep, ValidAttributeRange } from "@ogw_front/types/attribute";
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import { getAttributeRange } from "@ogw_front/utils/attributes";
 
 // The minimum and maximum of an attribute range: each one is clamped by the other

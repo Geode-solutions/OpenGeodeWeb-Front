@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import type {
   AttributeColorMap,
-  AttributeItem,
-  AttributeName,
   AttributeRange,
   AttributeTimeStep,
 } from "@ogw_front/types/attribute";
-import type { Opacity, Size, Visibility } from "@ogw_front/types/style";
+import type {
+  AttributeItem,
+  AttributeName,
+  Opacity,
+  PointSize,
+  Visibility,
+} from "@geode/opengeodeweb-viewer/schema_types";
 import {
   type RangesPerData,
   applyRangesPerData,
@@ -46,7 +50,7 @@ const visibility = computed<Visibility>({
     hybridViewerStore.remoteRender();
   },
 });
-const size = computed<Size>({
+const size = computed<PointSize>({
   get: () => dataStyleStore.meshPointsSize(dataId.value),
   set: async (newValue) => {
     await applyBatchStyle(dataId.value, (meshId: MeshId) =>

@@ -1,10 +1,9 @@
+import type { AttributeColorMap, AttributeRange } from "@ogw_front/types/attribute";
 import type {
-  AttributeColorMap,
   AttributeName,
-  AttributeRange,
   AttributeRangeMaximum,
   AttributeRangeMinimum,
-} from "@ogw_front/types/attribute";
+} from "@geode/opengeodeweb-viewer/schema_types";
 import type { ModelId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // oxlint-disable eslint/max-lines

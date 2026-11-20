@@ -10,7 +10,7 @@ import ModelCardTabs from "./ModelCardTabs.vue";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import SurfacesOptions from "./SurfacesOptions.vue";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
-import type { Visibility } from "@ogw_front/types/style";
+import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";

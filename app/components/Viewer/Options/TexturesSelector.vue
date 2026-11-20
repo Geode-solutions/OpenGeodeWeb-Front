@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { Texture } from "@ogw_front/types/texture";
 import ViewerOptionsTextureItem from "@ogw_front/components/Viewer/Options/TextureItem.vue";
 

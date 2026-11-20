@@ -6,8 +6,8 @@ import {
   EDGES_COMPONENT_TYPES,
   useModelComponentEdgesStyle,
 } from "@ogw_internal/stores/data_style/model/edges/component";
+import type { EdgeWidth } from "@geode/opengeodeweb-viewer/schema_types";
 import type { ModelId } from "@ogw_front/types/identifiers";
-import type { Width } from "@ogw_front/types/style";
 import { useModelEdgesCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -15,8 +15,8 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const schema = viewer_schemas.opengeodeweb_viewer.model.edges.width;
 
 export function useModelEdgesWidthStyle(): {
-  modelEdgesWidth: (modelId: ModelId) => Width | undefined;
-  setModelEdgesWidth: (modelId: ModelId, width: Width) => Promise<unknown>;
+  modelEdgesWidth: (modelId: ModelId) => EdgeWidth | undefined;
+  setModelEdgesWidth: (modelId: ModelId, width: EdgeWidth) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const modelEdgesCommonStyle = useModelEdgesCommonStyle();
@@ -24,12 +24,12 @@ export function useModelEdgesWidthStyle(): {
     useModelComponentEdgesStyle(type),
   );
 
-  function modelEdgesWidth(modelId: ModelId): Width | undefined {
+  function modelEdgesWidth(modelId: ModelId): EdgeWidth | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- edges style values are dynamically typed at runtime.
-    return modelEdgesCommonStyle.modelEdgesStyle(modelId).width as Width | undefined;
+    return modelEdgesCommonStyle.modelEdgesStyle(modelId).width as EdgeWidth | undefined;
   }
 
-  async function setModelEdgesWidth(modelId: ModelId, width: Width): Promise<unknown> {
+  async function setModelEdgesWidth(modelId: ModelId, width: EdgeWidth): Promise<unknown> {
     const params = { id: modelId, width };
     const result = await viewerStore.request(
       {

@@ -1,7 +1,7 @@
 import type { AttributeTimeStep } from "@ogw_front/types/attribute";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
-import type { Visibility } from "@ogw_front/types/style";
+import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 
 // Local imports
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";

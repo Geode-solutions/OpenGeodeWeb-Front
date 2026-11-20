@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import FileUploader from "@ogw_front/components/FileUploader.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { intersectBy } from "@ogw_front/utils/attributes";

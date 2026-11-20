@@ -1,13 +1,8 @@
+import type { DataId, GeodeId } from "@geode/opengeodeweb-microservice/schema_types";
 import type {
   GeodeObjectType,
   ViewerObjectType,
 } from "@geode/opengeodeweb-microservice/data_types";
-
-// Id given by OpenGeode to an object (a uuid): the same data loaded twice has the same geode_id
-type GeodeId = string;
-
-// Id of a data loaded in the app, unique even when the same data is loaded twice (see GeodeId)
-type DataId = string;
 
 // Id of a component of a model (a corner, a line, a surface or a block): its geode_id
 type ModelComponentId = GeodeId;
@@ -54,9 +49,7 @@ interface ModelIdentified {
 export type {
   BlockId,
   CornerId,
-  DataId,
   DataIdentified,
-  GeodeId,
   GeodeIdentified,
   GeodeObjectTyped,
   LineId,

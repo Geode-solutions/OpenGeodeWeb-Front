@@ -1,17 +1,16 @@
+import type { AttributeColorMap, AttributeTimeStep } from "@ogw_front/types/attribute";
 import type {
-  AttributeColorMap,
   AttributeItem,
   AttributeName,
   AttributeRangeMaximum,
   AttributeRangeMinimum,
-  AttributeTimeStep,
-} from "@ogw_front/types/attribute";
+} from "@geode/opengeodeweb-viewer/schema_types";
 import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { ValidAttributeInput } from "@ogw_internal/stores/data_style/attribute_types";
-import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
+import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
