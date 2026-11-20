@@ -7,17 +7,18 @@ import type {
   ViewerObjectType,
 } from "@geode/opengeodeweb-microservice/data_types";
 import type { DataIdentified } from "@ogw_front/types/identifiers";
+import type { ViewerId } from "@geode/opengeodeweb-viewer/schema_types";
 import { computeMenuPosition } from "@ogw_front/composables/overlapping_picker_menu";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 interface PickedItem {
   id: string;
-  viewer_id: number | undefined;
+  viewer_id: ViewerId | undefined;
 }
 
 interface ProposedItem extends DataIdentified {
-  viewer_id: number | undefined;
+  viewer_id: ViewerId | undefined;
   name: string;
   viewer_object_type: ViewerObjectType | undefined;
   geode_object_type: GeodeObjectType | undefined;
@@ -25,7 +26,7 @@ interface ProposedItem extends DataIdentified {
 
 interface ViewerIdResult {
   id: string | undefined;
-  viewer_id: number | undefined;
+  viewer_id: ViewerId | undefined;
   // True when objects were under the cursor but the user closed the picker without choosing
   dismissed?: boolean;
 }

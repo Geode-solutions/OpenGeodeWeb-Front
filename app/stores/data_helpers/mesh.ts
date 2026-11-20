@@ -1,6 +1,7 @@
 import type { DataIdentified, GeodeIdentified, ModelId } from "@ogw_front/types/identifiers";
 import type { ReadonlyTreeGroup } from "@ogw_front/types/tree";
 import type { Table } from "dexie";
+import type { ViewerId } from "@geode/opengeodeweb-viewer/schema_types";
 import { database } from "@ogw_internal/database/database.js";
 import { liveObservable } from "@ogw_front/utils/live_observable";
 import { useObservable } from "@vueuse/rxjs";
@@ -16,7 +17,7 @@ interface FormattedComponent extends Readonly<GeodeIdentified> {
   readonly id: string;
   readonly title: string;
   readonly category: string;
-  readonly viewer_id: number;
+  readonly viewer_id: ViewerId;
   readonly is_active: boolean;
 }
 
