@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useToggle } from "@vueuse/core";
 
-import ChromeTheme from "@ogw_front/components/ChromeTheme.vue";
+import { useChromeTheme } from "@ogw_front/composables/chrome_theme";
 
 import CsvSettings from "./CsvSettings.vue";
 import CsvTable from "./CsvTable.vue";
@@ -28,6 +28,8 @@ interface Props {
 }
 
 const { file, modelValue = false } = defineProps<Props>();
+// The dialog takes the chrome theme itself: a wrapper would break the Vuetify dialog > card sizing rules
+const chromeTheme = useChromeTheme();
 
 const MAX_CONTENT_SLICE = 1000;
 const MAX_LINES_FOR_DETECTION = 5;
@@ -214,8 +216,8 @@ function onConfirm(): void {
     :model-value="modelValue"
     @update:model-value="emit('update:modelValue', $event)"
     max-width="1200px"
+    :theme="chromeTheme"
   >
-    <ChromeTheme>
       <v-card class="glass-ui rounded-xl overflow-hidden border-opacity-10">
         <v-toolbar color="transparent" flat class="px-4">
           <v-icon icon="ph-file-csv" size="32" color="primary" class="ml-1" />
@@ -268,7 +270,6 @@ function onConfirm(): void {
           </v-btn>
         </v-card-actions>
       </v-card>
-    </ChromeTheme>
   </v-dialog>
 </template>
 
