@@ -17,7 +17,7 @@ const label = computed<string>(() =>
     class="project-crs text-none"
     size="small"
     variant="tonal"
-    prepend-icon="mdi-earth"
+    prepend-icon="ph-globe-hemisphere-west"
     :disabled="!crsStore.crsEditEnabled"
     v-tooltip="formatCrs(crsStore.projectCrs)"
     @click="crsStore.requestProjectCrsEdit()"

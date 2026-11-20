@@ -5,7 +5,7 @@ const opacity = defineModel<number>();
 <template>
   <v-row align="center" no-gutters class="px-2">
     <v-col cols="auto" class="mr-2">
-      <v-icon size="18" icon="mdi-circle-opacity" v-tooltip:left="'Opacity'" />
+      <v-icon size="18" icon="ph-drop-half" v-tooltip:left="'Opacity'" />
     </v-col>
     <v-col>
       <v-slider

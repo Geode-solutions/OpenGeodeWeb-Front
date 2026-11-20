@@ -288,7 +288,7 @@ onBeforeUnmount(cleanupLocalWidget);
                 size="x-small"
                 variant="tonal"
                 color="primary"
-                icon="mdi-plus"
+                icon="ph-plus"
                 @click="addSlice"
               />
             </v-col>
@@ -314,7 +314,7 @@ onBeforeUnmount(cleanupLocalWidget);
               size="x-small"
               variant="tonal"
               color="primary"
-              icon="mdi-plus"
+              icon="ph-plus"
               @click="addPlane"
             />
           </v-col>

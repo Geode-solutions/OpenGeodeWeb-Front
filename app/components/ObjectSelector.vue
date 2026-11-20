@@ -203,7 +203,7 @@ await getAllowedGeodeObjects();
       </v-chip>
     </v-row>
     <v-row v-if="skippedFiles.length" align="center">
-      <v-icon color="warning" icon="mdi-file-alert-outline" class="ma-1" />
+      <v-icon color="warning" icon="ph-file-x" class="ma-1" />
       <p class="pa-1">Not supported, will be skipped:</p>
       <v-chip v-for="filename in skippedFiles" :key="filename" class="ma-1" size="small">
         {{ filename }}

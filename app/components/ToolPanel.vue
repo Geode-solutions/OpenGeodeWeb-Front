@@ -57,13 +57,7 @@ function close(): void {
     <template #actions>
       <slot name="actions">
         <v-card-actions class="justify-center pb-3 pt-0" style="gap: 8px">
-          <v-btn
-            variant="text"
-            size="small"
-            color="white"
-            class="text-caption text-none"
-            @click="close"
-          >
+          <v-btn variant="text" size="small" class="text-caption text-none" @click="close">
             {{ closeLabel }}
           </v-btn>
           <v-btn
@@ -71,7 +65,6 @@ function close(): void {
             data-testid="toolPanelActionButton"
             variant="outlined"
             size="small"
-            color="white"
             class="text-caption text-none"
             @click="emit('action')"
           >
@@ -85,7 +78,8 @@ function close(): void {
 
 <style scoped>
 .tool-panel {
-  z-index: 1;
+  /* Above the orientation overlay (Viewer/OrientationOverlay.vue, z-index 1), which comes later in the viewer */
+  z-index: 2;
   top: 90px;
   right: 70px;
 }

@@ -41,7 +41,7 @@ function update_value_event($event: { key: keyof Texture; value: string }, index
     <v-col cols="1" class="pa-0">
       <v-icon
         v-if="internal_textures.length > 1"
-        icon="mdi-minus"
+        icon="ph-minus"
         size="20"
         v-tooltip:bottom="'Remove texture'"
         @click="internal_textures.splice(index, 1)"
@@ -59,7 +59,7 @@ function update_value_event($event: { key: keyof Texture; value: string }, index
     <v-col cols="3">
       <v-icon
         v-if="internal_textures.length < 4"
-        icon="mdi-plus"
+        icon="ph-plus"
         v-tooltip:bottom="'Add a texture'"
         size="20"
         @click="internal_textures.push({ texture_name: '', id: '' })"

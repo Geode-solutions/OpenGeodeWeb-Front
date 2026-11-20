@@ -130,7 +130,7 @@ defineExpose({ get_viewer_id });
       data-testid="pickingActiveChip"
       label="Picking active — click in the viewer"
       color="secondary"
-      icon="mdi-crosshairs-gps"
+      icon="ph-gps-fix"
       @close="viewerStore.toggle_picking_mode(false)"
     />
     <ToolActiveChip
@@ -147,7 +147,7 @@ defineExpose({ get_viewer_id });
       data-testid="rulerActiveChip"
       :label="`Ruler — click to set point ${hybridViewerStore.ruler_awaiting_point}`"
       color="secondary"
-      icon="mdi-ruler"
+      icon="ph-ruler"
       @close="hybridViewerStore.clearRuler()"
     />
     <ToolActiveChip

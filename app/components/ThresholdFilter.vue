@@ -140,7 +140,7 @@ watch(show, (visible) => {
               size="x-small"
               variant="tonal"
               color="primary"
-              icon="mdi-plus"
+              icon="ph-plus"
               @click="addThreshold"
             />
           </v-col>

@@ -46,7 +46,7 @@ const fontFamily = computed<SceneFontFamily>({
     :index="itemProps.index"
     :itemProps="itemProps"
     tooltip="Text"
-    btnIcon="mdi-format-text"
+    btnIcon="ph-text-aa"
   >
     <template #options>
       <v-select

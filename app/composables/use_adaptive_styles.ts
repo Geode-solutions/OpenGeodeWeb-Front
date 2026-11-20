@@ -1,6 +1,7 @@
 import type { MaybeComputedElementRef } from "@vueuse/core";
 import { consola } from "consola";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import { useTheme } from "vuetify";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const LUMINANCE_THRESHOLD = 0.65;
@@ -14,6 +15,8 @@ const MAX_OPACITY = 0.5;
 
 const MIN_BOOST = 1;
 const MAX_BOOST = 1.2;
+// On a dark theme the glass carries light text: the backdrop is dimmed instead of boosted
+const MIN_DIM = 0.8;
 const ADAPTIVE_REFRESH_RATE = 150;
 
 // `target` is intentionally duck-typed: callers pass either a coordinates source (a plain object, a Ref/ComputedRef of one, or a getter function returning one) or an element ref/template ref destined for vueuse's useElementBounding - see call sites in Viewer/ContextMenu and Viewer/ObjectTree components.
@@ -58,16 +61,49 @@ function getValue(val: unknown): number {
   return typeof val === "number" ? val : 0;
 }
 
+// How much the glass has to cover its backdrop to keep the text readable: dark text (light theme)
+// Needs it over a dark backdrop, light text (dark theme) over a bright one. Same curve both ways.
+function contrastFactor(brightness: number, isDark: boolean): number {
+  const backdrop = isDark ? 1 - brightness : brightness;
+  const normalized = Math.min(1, backdrop / LUMINANCE_THRESHOLD);
+  return (1 - normalized) ** ADAPTIVE_EXPONENT;
+}
+
+interface GlassStyles {
+  "--adaptive-blur": string;
+  "--adaptive-opacity": number;
+  "--adaptive-brightness": number;
+}
+
+function useGlassStyles(
+  brightness: Ref<number>,
+  options: AdaptiveStylesOptions,
+): ComputedRef<GlassStyles> {
+  const theme = useTheme();
+  return computed(() => {
+    const isDark = theme.current.value.dark;
+    const factor = contrastFactor(brightness.value, isDark);
+    const blur = MIN_BLUR + factor * (MAX_BLUR - MIN_BLUR);
+    const minOpacity = options.minOpacity ?? MIN_OPACITY;
+    const maxOpacity = options.maxOpacity ?? MAX_OPACITY;
+    const opacity = minOpacity + factor * (maxOpacity - minOpacity);
+    const brightnessBoost = isDark
+      ? MIN_BOOST - factor * (MIN_BOOST - MIN_DIM)
+      : MIN_BOOST + factor * (MAX_BOOST - MIN_BOOST);
+    return {
+      "--adaptive-blur": `${blur}px`,
+      "--adaptive-opacity": opacity,
+      "--adaptive-brightness": brightnessBoost,
+    };
+  });
+}
+
 // oxlint-disable max-lines-per-function
 export function useAdaptiveStyles(
   target: AdaptiveStylesTarget,
   options: AdaptiveStylesOptions = {},
 ): {
-  adaptiveStyles: ComputedRef<{
-    "--adaptive-blur": string;
-    "--adaptive-opacity": number;
-    "--adaptive-brightness": number;
-  }>;
+  adaptiveStyles: ComputedRef<GlassStyles>;
   brightness: Ref<number>;
 } {
   const hybridViewerStore = useHybridViewerStore();
@@ -164,22 +200,7 @@ export function useAdaptiveStyles(
 
   watch(() => treeviewStore.opened_views, forceRefresh, { deep: true });
 
-  const adaptiveStyles = computed(() => {
-    const normalized = Math.min(1, brightness.value / LUMINANCE_THRESHOLD);
-    const darkFactor = (1 - normalized) ** ADAPTIVE_EXPONENT;
-
-    const blur = MIN_BLUR + darkFactor * (MAX_BLUR - MIN_BLUR);
-    const minOpacity = options.minOpacity ?? MIN_OPACITY;
-    const maxOpacity = options.maxOpacity ?? MAX_OPACITY;
-    const opacity = minOpacity + darkFactor * (maxOpacity - minOpacity);
-    const brightnessBoost = MIN_BOOST + darkFactor * (MAX_BOOST - MIN_BOOST);
-
-    return {
-      "--adaptive-blur": `${blur}px`,
-      "--adaptive-opacity": opacity,
-      "--adaptive-brightness": brightnessBoost,
-    };
-  });
+  const adaptiveStyles = useGlassStyles(brightness, options);
 
   return {
     adaptiveStyles,

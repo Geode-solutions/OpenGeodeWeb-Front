@@ -20,6 +20,7 @@ import {
   solidDefaultStyle,
   surfaceDefaultStyle,
 } from "./meshes";
+import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
 import type { SceneStyle } from "@ogw_internal/stores/data_style/types";
 
 function default_styles(): Record<string, unknown> {
@@ -57,11 +58,30 @@ function getDefaultStyle(type: string): unknown {
   return styles[type];
 }
 
+interface SceneColors {
+  background?: ColorRGBA;
+  text?: ColorRGBA;
+}
+
+// The app's own scene colors (`ogwFront.sceneColors` in app.config.ts), set at startup by plugins/scene_colors.ts.
+// They only shape a new or reset scene style: a saved scene style, or a color the user picked, is kept as is.
+let appSceneColors: SceneColors = {};
+
+function setSceneColors(colors: SceneColors): void {
+  appSceneColors = colors;
+}
+
+function getSceneColors(): Readonly<SceneColors> {
+  return appSceneColors;
+}
+
 function getDefaultSceneStyle(): SceneStyle {
+  const background = appSceneColors.background ?? SCENE_DEFAULT_BACKGROUND_COLOR;
+  const text = appSceneColors.text ?? SCENE_DEFAULT_TEXT_COLOR;
   return {
     id: "scene",
-    background_color: { ...SCENE_DEFAULT_BACKGROUND_COLOR },
-    text: { color: { ...SCENE_DEFAULT_TEXT_COLOR }, font_family: SCENE_DEFAULT_FONT_FAMILY },
+    background_color: { ...background },
+    text: { color: { ...text }, font_family: SCENE_DEFAULT_FONT_FAMILY },
     orientation_widget: SCENE_DEFAULT_ORIENTATION_WIDGET,
   };
 }
@@ -74,4 +94,5 @@ export {
   MODEL_DEFAULT_ACTIVE_COLORING,
   DEFAULT_NO_DATA_COLOR,
 } from "./constants";
-export { getDefaultSceneStyle, getDefaultStyle };
+export { getDefaultSceneStyle, getDefaultStyle, getSceneColors, setSceneColors };
+export type { SceneColors };

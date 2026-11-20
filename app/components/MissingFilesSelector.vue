@@ -239,7 +239,7 @@ await missing_files();
         </v-row>
         <v-row v-if="missing.mandatory_files.length" align="center">
           <v-col cols="auto" class="pa-0">
-            <v-icon color="warning" icon="mdi-file-document-alert-outline" />
+            <v-icon color="warning" icon="ph-file-dashed" />
           </v-col>
           <p class="pa-1">Mandatory files:</p>
           <v-col v-for="mandatory_file in missing.mandatory_files" cols="auto" class="pa-0">
@@ -248,7 +248,7 @@ await missing_files();
         </v-row>
         <v-row v-if="missing.additional_files.length" align="center">
           <v-col cols="auto" class="pa-0">
-            <v-icon color="accent" icon="mdi-file-document-plus-outline" />
+            <v-icon color="accent" icon="ph-file-plus" />
           </v-col>
           <p class="pa-1">Additional files:</p>
           <v-col v-for="additional_file in missing.additional_files" cols="auto" class="pa-0">
@@ -259,7 +259,7 @@ await missing_files();
     </template>
     <v-row v-else-if="mandatory_files.length" align="center">
       <v-col cols="auto" class="pa-0">
-        <v-icon color="warning" icon="mdi-file-document-alert-outline" />
+        <v-icon color="warning" icon="ph-file-dashed" />
       </v-col>
       <p class="pa-1">Mandatory files:</p>
       <v-col v-for="mandatory_file in mandatory_files" cols="auto" class="pa-0">
@@ -268,7 +268,7 @@ await missing_files();
     </v-row>
     <v-row v-if="!(checked_filenames.length > 1) && additional_files.length" align="center">
       <v-col cols="auto" class="pa-0">
-        <v-icon color="accent" icon="mdi-file-document-plus-outline" />
+        <v-icon color="accent" icon="ph-file-plus" />
       </v-col>
       <p class="pa-1">Additional files:</p>
       <v-col v-for="additional_file in additional_files" cols="auto" class="pa-0">

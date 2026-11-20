@@ -73,8 +73,8 @@ onMounted(async () => {
   <v-text-field
     v-model="search"
     data-testid="crsSearchInput"
-    :append-icon="compact ? undefined : 'mdi-magnify'"
-    :prepend-inner-icon="compact ? 'mdi-magnify' : undefined"
+    :append-icon="compact ? undefined : 'ph-magnifying-glass'"
+    :prepend-inner-icon="compact ? 'ph-magnifying-glass' : undefined"
     label="Search"
     single-line
     hide-details

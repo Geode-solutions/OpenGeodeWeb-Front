@@ -1,4 +1,5 @@
-import { BACKGROUND_GREY_VALUE, RGB_MAX } from "./constants";
+import { RGB_MAX } from "./constants";
+import { getDefaultSceneStyle } from "@ogw_front/utils/default_styles";
 import { useHybridViewerCore } from "./core";
 
 const RGBA_CHANNELS = 4;
@@ -66,11 +67,17 @@ function sampleMinBrightness(
   return minBrightness;
 }
 
+// Brightness of the scene background a reset viewer draws, for as long as no viewer image can be sampled
+function defaultBackgroundBrightness(): number {
+  const { red, green, blue } = getDefaultSceneStyle().background_color;
+  return (red + green + blue) / (3 * RGB_MAX);
+}
+
 function computeAverageBrightness(rect: Rect, options: BrightnessOptions): number {
   const { latestImage, offscreenCtx, offscreenCanvas } = options;
   const { genericRenderWindow } = useHybridViewerCore();
   if (!latestImage || !offscreenCtx || !offscreenCanvas || !genericRenderWindow.value) {
-    return BACKGROUND_GREY_VALUE / RGB_MAX;
+    return defaultBackgroundBrightness();
   }
   // oxlint-disable-next-line no-unsafe-assignment -- vtk.js has no types for getApiSpecificRenderWindow(); narrowed below.
   const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
@@ -80,21 +87,21 @@ function computeAverageBrightness(rect: Rect, options: BrightnessOptions): numbe
   };
   const canvas = apiSpecificRenderWindow.getCanvas();
   if (canvas === undefined || canvas === null) {
-    return BACKGROUND_GREY_VALUE / RGB_MAX;
+    return defaultBackgroundBrightness();
   }
   if (rect.width <= 0 || rect.height <= 0) {
-    return BACKGROUND_GREY_VALUE / RGB_MAX;
+    return defaultBackgroundBrightness();
   }
   const relRect = mapRect(rect, latestImage, canvas.getBoundingClientRect());
   if (relRect.relW <= 0 || relRect.relH <= 0) {
-    return BACKGROUND_GREY_VALUE / RGB_MAX;
+    return defaultBackgroundBrightness();
   }
   offscreenCanvas.width = SAMPLE_SIZE;
   offscreenCanvas.height = SAMPLE_SIZE;
   try {
     return sampleMinBrightness(offscreenCtx, latestImage, relRect);
   } catch {
-    return BACKGROUND_GREY_VALUE / RGB_MAX;
+    return defaultBackgroundBrightness();
   }
 }
 function createOffscreenCanvas(): HTMLCanvasElement | undefined {
@@ -127,4 +134,4 @@ function useHybridViewerBrightness(): {
     getAverageBrightness,
   };
 }
-export { computeAverageBrightness, useHybridViewerBrightness };
+export { computeAverageBrightness, defaultBackgroundBrightness, useHybridViewerBrightness };
