@@ -1,9 +1,10 @@
+import type { ChromeTheme } from "@ogw_front/composables/chrome_theme";
 import type { SceneColors } from "@ogw_front/utils/default_styles";
 
 declare module "nuxt/schema" {
   interface AppConfigInput {
     ogwFront?: {
-      chromeTheme?: string;
+      chromeTheme?: ChromeTheme;
       orientationOverlay?: boolean;
       // Colors ({ red, green, blue, alpha }) of a new or reset scene, see plugins/scene_colors.ts
       sceneColors?: SceneColors;
