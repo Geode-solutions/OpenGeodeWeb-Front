@@ -1,6 +1,7 @@
 import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import type { ViewerRequest } from "@ogw_front/stores/viewer_helpers/request";
 // Third party imports
+import { consola } from "consola";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
@@ -39,10 +40,15 @@ async function applyAppSceneColors(request: ViewerRequest): Promise<void> {
   }
 }
 
-// To call after each viewer reset (reset_visualization), which brings back the viewer's own scene
+// To call after each viewer reset (reset_visualization), which brings back the viewer's own scene. Neither
+// Step fails the reset: the viewer stays usable with its own colors, and the marker is hidden either way
 async function afterViewerReset(request: ViewerRequest): Promise<void> {
   resetOrientationMarkerVisibility();
-  await applyAppSceneColors(request);
+  try {
+    await applyAppSceneColors(request);
+  } catch (error) {
+    consola.warn("[SceneColors] The viewer kept its own scene colors:", error);
+  }
   await hideViewerMarker(request);
 }
 

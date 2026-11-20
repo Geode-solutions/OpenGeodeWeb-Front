@@ -65,6 +65,20 @@ describe("after a viewer reset", () => {
     });
   });
 
+  test("hides the marker even when the viewer rejects the scene colors", async () => {
+    setSceneColors({ background: BRAND_BACKGROUND });
+    setOrientationOverlay(true);
+    const request = vi
+      .fn<(args: { schema: unknown }) => Promise<unknown>>()
+      .mockRejectedValueOnce(new Error("timeout"))
+      .mockResolvedValue({});
+    await expect(afterViewerReset(mockAs<ViewerRequest>(request))).resolves.toBeUndefined();
+    expect(request.mock.calls.map(([args]) => args.schema)).toStrictEqual([
+      set_background_color,
+      set_orientation_widget,
+    ]);
+  });
+
   test("shows the orientation marker again", async () => {
     const { request } = recordRequests();
     await setOrientationMarkerVisibility(false, request);
