@@ -1,8 +1,12 @@
+import type { SceneColors } from "@ogw_front/utils/default_styles";
+
 declare module "nuxt/schema" {
   interface AppConfigInput {
     ogwFront?: {
       chromeTheme?: string;
       orientationOverlay?: boolean;
+      // Colors ({ red, green, blue, alpha }) of a new or reset scene, see plugins/scene_colors.ts
+      sceneColors?: SceneColors;
     };
   }
 }
@@ -17,5 +21,7 @@ export default defineAppConfig({
     // Draw the orientation marker (axes or compass) as a front overlay instead of the viewer's VTK
     // Marker, which is then hidden (see composables/orientation_overlay.ts).
     orientationOverlay: false,
+    // Colors of a new or reset scene, the OpenGeodeWeb ones when not set (see utils/default_styles)
+    sceneColors: {},
   },
 });
