@@ -108,6 +108,10 @@ export const useAppStore = defineStore("app", () => {
 
   const projectFolderPath = ref("");
 
+  function set_project_folder_path(path: string): void {
+    projectFolderPath.value = path;
+  }
+
   async function createProjectFolder(): Promise<unknown> {
     const { PROJECT } = useRuntimeConfig().public;
     const schema = opengeodeweb_front_schemas.api.local.app.project_folder_path;
@@ -149,6 +153,7 @@ export const useAppStore = defineStore("app", () => {
     request,
     upload,
     projectFolderPath,
+    set_project_folder_path,
     createProjectFolder,
     start_request,
     stop_request,

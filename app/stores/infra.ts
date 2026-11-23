@@ -1,52 +1,14 @@
 import { Status } from "@ogw_front/utils/status";
-import { appMode } from "@ogw_shared/app_mode";
-import { setAppBaseUrl } from "@ogw_shared/scripts";
-import { useCloudStore } from "@ogw_front/stores/cloud";
 
 const LOCALHOST = "localhost";
 const IPV4_LOOPBACK = "127.0.0.1";
-
-interface ElectronApi {
-  electronAPI: {
-    project_folder_path: (args: { projectFolderPath: string }) => void;
-  };
-}
-
-declare global {
-  // oxlint-disable-next-line no-var -- required for global augmentation
-  var electronAPI: ElectronApi["electronAPI"];
-}
-
-async function launchLocalServices(
-  currentMode: string,
-  microservices: readonly Microservice[],
-): Promise<void> {
-  const { useAppStore } = await import("@ogw_front/stores/app");
-  const appStore = useAppStore();
-  await appStore.createProjectFolder();
-  if (currentMode === appMode.DESKTOP) {
-    globalThis.electronAPI.project_folder_path({
-      projectFolderPath: appStore.projectFolderPath,
-    });
-  }
-  await setAppBaseUrl(appStore.base_url);
-  const microservices_with_launch = microservices.filter((store: Microservice) => store.launch);
-  const launch_promises = microservices_with_launch.map(async (store: Microservice) => {
-    const result = await store.launch?.({
-      projectFolderPath: appStore.projectFolderPath,
-    });
-    return result;
-  });
-  const { registerRunningExtensions } = await import("@ogw_front/utils/extension");
-  launch_promises.push(registerRunningExtensions());
-  await Promise.all(launch_promises);
-}
 
 export const useInfraStore = defineStore(
   "infra",
   // oxlint-disable-next-line max-lines-per-function
   () => {
     const app_mode = ref(useRuntimeConfig().public.MODE);
+    // Set by the backend lifecycle (utils/backend_lifecycle.ts), which creates the backend
     const status = ref(Status.NOT_CREATED);
     const microservices = ref<Microservice[]>([]);
     const domain_name = ref(globalThis.location.hostname);
@@ -85,31 +47,12 @@ export const useInfraStore = defineStore(
       );
     }
 
-    async function create_backend(authToken?: string): Promise<undefined> {
-      if (status.value === Status.CREATED) {
-        return undefined;
-      }
-      await navigator.locks.request("infra.create_backend", async () => {
-        if (status.value === Status.CREATED) {
-          return;
-        }
-        status.value = Status.CREATING;
-        if (app_mode.value === appMode.CLOUD) {
-          const cloudStore = useCloudStore();
-          try {
-            await cloudStore.start(authToken);
-          } catch (error) {
-            // Back to the "Load the app" button so the user is not stuck on the loading screen.
-            status.value = Status.NOT_CREATED;
-            throw error;
-          }
-        } else {
-          await launchLocalServices(app_mode.value, microservices.value);
-        }
-        status.value = Status.CREATED;
-        await create_connection();
-      });
-      return undefined;
+    function set_status(value: string): void {
+      status.value = value;
+    }
+
+    function set_domain_name(value: string): void {
+      domain_name.value = value;
     }
 
     return {
@@ -122,7 +65,8 @@ export const useInfraStore = defineStore(
       microservice_domain_name,
       register_microservice,
       unregister_microservice,
-      create_backend,
+      set_status,
+      set_domain_name,
       create_connection,
     };
   },
