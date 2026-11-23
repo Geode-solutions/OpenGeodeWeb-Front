@@ -141,6 +141,22 @@ describe("project crs", () => {
     ]);
   });
 
+  test("data in the horizontal part of a compound project crs are in the project crs", () => {
+    const nztm = { authority: "EPSG", code: "2193", name: "NZGD2000 / NZTM 2000" };
+    const nztmNzvd = { authority: "EPSG", code: "2193+7839", name: "NZTM 2000 + NZVD2016 height" };
+    mockItems(
+      mockAs<DataItem[]>([
+        { data_id: "model", created_at: "1", crs: nztmNzvd },
+        { data_id: "map", created_at: "2", crs: nztm },
+      ]),
+    );
+    const crsStore = useCrsStore();
+    crsStore.setProjectCrs(nztmNzvd);
+    // Heights are a label of each data: they do not set them apart from the project
+    expect(crsStore.mismatchedCrs.size).toBe(0);
+    expect(crsStore.projectCrs).toStrictEqual(nztmNzvd);
+  });
+
   test("is exported and imported with the project", () => {
     mockItems(mockAs<DataItem[]>([{ data_id: "a", created_at: "1", crs: LAMBERT }]));
     const crsStore = useCrsStore();

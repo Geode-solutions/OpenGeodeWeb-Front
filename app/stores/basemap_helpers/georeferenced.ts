@@ -1,6 +1,5 @@
 import { type Extent, boxesExtent } from "./extent.js";
 import type { ComputedRef } from "vue";
-import { sameCrs } from "@ogw_front/utils/crs";
 import { useCrsStore } from "@ogw_front/stores/crs";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
@@ -21,7 +20,7 @@ function useGeoreferenced(): Georeferenced {
 
   function georeferencedIds(): string[] {
     return crsStore.crsItems
-      .filter((item) => sameCrs(item.crs, crsStore.projectCrs))
+      .filter((item) => crsStore.sameProjectCrs(item.crs, crsStore.projectCrs))
       .map((item) => item.data_id);
   }
 

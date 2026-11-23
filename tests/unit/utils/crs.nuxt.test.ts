@@ -1,5 +1,12 @@
 import { describe, expect, test, vi } from "vitest";
-import { formatCrs, formatCrsCode, oldestCrs, sameCrs, sameCrsState } from "@ogw_front/utils/crs";
+import {
+  formatCrs,
+  formatCrsCode,
+  oldestCrs,
+  sameCrs,
+  sameCrsState,
+  sameHorizontalCrs,
+} from "@ogw_front/utils/crs";
 import type { DataItem } from "@ogw_front/stores/data";
 import { mockAs } from "@ogw_tests/utils";
 
@@ -33,6 +40,27 @@ describe("same crs", () => {
     expect(sameCrs(LAMBERT, UTM)).toBe(false);
     expect(sameCrs(LAMBERT, undefined)).toBe(false);
     expect(sameCrs(undefined, undefined)).toBe(false);
+  });
+});
+
+const NZTM = { authority: "EPSG", code: "2193", name: "NZGD2000 / NZTM 2000" };
+const NZTM_NZVD = { authority: "EPSG", code: "2193+7839", name: "NZTM 2000 + NZVD2016 height" };
+const LAMBERT_NGF = {
+  authority: "EPSG",
+  code: "5698",
+  name: "RGF93 v1 / Lambert-93 + NGF-IGN69 height",
+};
+
+describe("same horizontal crs", () => {
+  test("a compound code is in the crs of its horizontal part, even before the list loads", () => {
+    expect(sameHorizontalCrs(NZTM, NZTM_NZVD)).toBe(true);
+    expect(sameHorizontalCrs(LAMBERT, NZTM_NZVD)).toBe(false);
+    expect(sameHorizontalCrs(undefined, NZTM)).toBe(false);
+  });
+
+  test("a registered compound crs is in the crs of its horizontal part", () => {
+    expect(sameHorizontalCrs(LAMBERT, LAMBERT_NGF, { "EPSG:5698": "EPSG:2154" })).toBe(true);
+    expect(sameHorizontalCrs(LAMBERT, LAMBERT_NGF)).toBe(false);
   });
 });
 

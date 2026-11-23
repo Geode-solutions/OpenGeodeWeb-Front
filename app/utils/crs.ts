@@ -21,6 +21,27 @@ function sameCrs(left: CRS | undefined, right: CRS | undefined): boolean {
   );
 }
 
+// The X/Y part of a CRS: "A" for a compound "A+B" code, the horizontal part of a registered
+// Compound CRS given by the back (e.g. "EPSG:5698" -> "EPSG:2154"), the CRS itself otherwise
+function horizontalCode(crs: CRS, horizontalParts: Record<string, string> = {}): string {
+  const key = `${crs.authority}:${crs.code}`;
+  const [horizontal = crs.code] = crs.code.split("+");
+  return horizontalParts[key] ?? `${crs.authority}:${horizontal}`;
+}
+
+// Heights are a label of each data: two CRS place X and Y the same when their horizontal parts do
+function sameHorizontalCrs(
+  left: CRS | undefined,
+  right: CRS | undefined,
+  horizontalParts: Record<string, string> = {},
+): boolean {
+  return (
+    left !== undefined &&
+    right !== undefined &&
+    horizontalCode(left, horizontalParts) === horizontalCode(right, horizontalParts)
+  );
+}
+
 // Same CRS, or both still in local coordinates
 function sameCrsState(left: CRS | undefined, right: CRS | undefined): boolean {
   return (left === undefined && right === undefined) || sameCrs(left, right);
@@ -38,4 +59,12 @@ function oldestCrs(
     ?.crs;
 }
 
-export { formatCrs, formatCrsCode, oldestCrs, sameCrs, sameCrsState };
+export {
+  formatCrs,
+  formatCrsCode,
+  horizontalCode,
+  oldestCrs,
+  sameCrs,
+  sameCrsState,
+  sameHorizontalCrs,
+};

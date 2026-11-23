@@ -1,4 +1,4 @@
-import { oldestCrs, sameCrs } from "@ogw_front/utils/crs";
+import { oldestCrs, sameHorizontalCrs } from "@ogw_front/utils/crs";
 import type { CRS } from "@geode/opengeodeweb-back/schema_types";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
@@ -18,6 +18,15 @@ export const useCrsStore = defineStore("crs", () => {
   const crsItems = dataStore.refCrsItems();
   const projectCrs = ref<CRS | undefined>(undefined);
   const projectCrsEditRequest = ref(false);
+  // From the geographic list: the heights a CRS can take, and the X/Y part of compound CRS
+  const verticalList = shallowRef<CRS[]>([]);
+  const compoundable = shallowRef<string[]>([]);
+  const horizontalParts = shallowRef<Record<string, string>>({});
+
+  // Heights are a label of each data: the project compares the X/Y part only
+  function sameProjectCrs(left: CRS | undefined, right: CRS | undefined): boolean {
+    return sameHorizontalCrs(left, right, horizontalParts.value);
+  }
 
   // The project follows its data: once every georeferenced data is in one CRS, it is the project
   // CRS. Data already mixed before any project CRS: the oldest one is the reference
@@ -28,13 +37,13 @@ export const useCrsStore = defineStore("crs", () => {
       if (first === undefined) {
         return undefined;
       }
-      if (georeferenced.every((item) => sameCrs(item.crs, first.crs))) {
+      if (georeferenced.every((item) => sameProjectCrs(item.crs, first.crs))) {
         return first.crs;
       }
       return projectCrs.value ?? oldestCrs(georeferenced);
     },
     (reference) => {
-      if (reference !== undefined && !sameCrs(reference, projectCrs.value)) {
+      if (reference !== undefined && !sameProjectCrs(reference, projectCrs.value)) {
         projectCrs.value = reference;
       }
     },
@@ -46,7 +55,7 @@ export const useCrsStore = defineStore("crs", () => {
     const project = projectCrs.value;
     const mismatched = new Map<string, CRS | undefined>();
     for (const item of crsItems.value) {
-      if (project !== undefined && !sameCrs(item.crs, project)) {
+      if (project !== undefined && !sameProjectCrs(item.crs, project)) {
         mismatched.set(item.data_id, item.crs);
       }
     }
@@ -60,6 +69,9 @@ export const useCrsStore = defineStore("crs", () => {
         params: { geode_object_type: geodeObjectType },
       });
       if (response?.crs_list !== undefined) {
+        verticalList.value = response.vertical_list;
+        compoundable.value = response.compoundable;
+        horizontalParts.value = response.horizontal_parts;
         return response.crs_list;
       }
     } catch {
@@ -119,6 +131,10 @@ export const useCrsStore = defineStore("crs", () => {
   return {
     crsItems,
     geographicList,
+    verticalList,
+    compoundable,
+    horizontalParts,
+    sameProjectCrs,
     crsEditEnabled,
     enableCrsEdit,
     crsEditRequest,
