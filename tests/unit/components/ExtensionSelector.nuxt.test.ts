@@ -52,7 +52,7 @@ describe("extension selector", () => {
       global: {
         plugins: [vuetify, pinia],
       },
-      props: { geode_object_type: "BRep", filenames: ["test.toto"] },
+      props: { geodeObjectType: "BRep", filenames: ["test.toto"] },
     });
     await nextTick();
     expect(wrapper.exists()).toBe(true);

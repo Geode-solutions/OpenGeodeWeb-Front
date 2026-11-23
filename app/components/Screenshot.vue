@@ -200,7 +200,7 @@ function handleClose(): void {
     @action="takeScreenshot"
   >
     <v-container class="pa-3 py-1">
-      <v-row justify="center" dense>
+      <v-row justify="center" density="compact">
         <v-col cols="12" class="py-0 d-flex justify-center">
           <v-btn-toggle
             v-model="screenshot_type"
@@ -232,7 +232,7 @@ function handleClose(): void {
         </v-col>
       </v-row>
 
-      <v-row dense v-if="screenshot_type === 'file'" class="flex-nowrap">
+      <v-row density="compact" v-if="screenshot_type === 'file'" class="flex-nowrap">
         <v-col class="py-1">
           <v-text-field
             data-testid="screenshotFileNameInput"
@@ -259,7 +259,7 @@ function handleClose(): void {
         </v-col>
       </v-row>
 
-      <v-row dense class="flex-nowrap align-center">
+      <v-row density="compact" class="flex-nowrap align-center">
         <v-col class="py-1">
           <v-number-input
             data-testid="screenshotWidthInput"
@@ -299,7 +299,7 @@ function handleClose(): void {
         <v-icon icon="ph-lock" size="small" class="ml-1" title="Aspect ratio locked to the view" />
       </v-row>
 
-      <v-row dense class="flex-nowrap">
+      <v-row density="compact" class="flex-nowrap">
         <v-col class="py-0">
           <v-switch
             data-testid="screenshotIncludeUiSwitch"

@@ -71,7 +71,10 @@ const helpersDirnamePlugin = {
 // oxlint-disable-next-line import/no-default-export
 export default defineConfig({
   test: {
-    setupFiles: [path.resolve(__dirname, "./setup_indexeddb.ts")],
+    setupFiles: [
+      path.resolve(__dirname, "./setup_indexeddb.ts"),
+      path.resolve(__dirname, "./fail_on_vue_warnings.ts"),
+    ],
     projects: [
       // oxlint-disable-next-line no-top-level-await
       await defineVitestProject({
@@ -82,7 +85,10 @@ export default defineConfig({
           environment: "nuxt",
           alias: aliases,
           testTimeout: TIMEOUTS.unit,
-          setupFiles: [path.resolve(__dirname, "./setup_indexeddb.ts")],
+          setupFiles: [
+            path.resolve(__dirname, "./setup_indexeddb.ts"),
+            path.resolve(__dirname, "./fail_on_vue_warnings.ts"),
+          ],
           server: {
             deps: {
               inline: ["vuetify"],
@@ -101,7 +107,10 @@ export default defineConfig({
           alias: aliases,
           maxWorkers,
           testTimeout: TIMEOUTS.integration,
-          setupFiles: [path.resolve(__dirname, "./setup_indexeddb.ts")],
+          setupFiles: [
+            path.resolve(__dirname, "./setup_indexeddb.ts"),
+            path.resolve(__dirname, "./fail_on_vue_warnings.ts"),
+          ],
           server: {
             deps: {
               inline: ["vuetify"],
