@@ -24,13 +24,53 @@ function crs_key(crs: CRS): string {
   return `${crs.authority}:${crs.code}`;
 }
 
+// The row picked in the table, and the optional heights that complete it
+const horizontal_crs = ref<CRS | undefined>(undefined);
+const heights_crs = ref<CRS | undefined>(undefined);
+
+// Projected and geographic 2D CRS have no heights: only these take a vertical CRS
+const heights_enabled = computed(
+  () =>
+    horizontal_crs.value !== undefined &&
+    crsStore.compoundable.includes(crs_key(horizontal_crs.value)),
+);
+
+function heights_title(crs: CRS): string {
+  return `${crs.name} (${crs_key(crs)})`;
+}
+
+// "A+B": EPSG has no single code for most projected + height pairs
+function emit_selection(): void {
+  const horizontal = horizontal_crs.value;
+  const heights = heights_crs.value;
+  if (horizontal === undefined || heights === undefined) {
+    selectedCrs.value = horizontal;
+    return;
+  }
+  selectedCrs.value = {
+    authority: horizontal.authority,
+    code: `${horizontal.code}+${heights.code}`,
+    name: `${horizontal.name} + ${heights.name}`,
+  };
+}
+
 // A click on the row selects it: no checkbox column. Enter does the same once the row is focused
 function select_crs(crs: CRS): void {
-  selectedCrs.value = crs;
+  horizontal_crs.value = crs;
+  if (!heights_enabled.value) {
+    heights_crs.value = undefined;
+  }
+  emit_selection();
+}
+
+function select_heights(crs: CRS | undefined | null): void {
+  heights_crs.value = crs ?? undefined;
+  emit_selection();
 }
 
 function row_props({ item }: { item: CRS }): Record<string, unknown> {
-  const selected = selectedCrs.value !== undefined && crs_key(item) === crs_key(selectedCrs.value);
+  const selected =
+    horizontal_crs.value !== undefined && crs_key(item) === crs_key(horizontal_crs.value);
   return {
     class: ["crs-row", { "bg-primary": selected }],
     tabindex: 0,
@@ -111,6 +151,25 @@ onMounted(async () => {
       </v-tooltip>
     </template>
   </v-data-table>
+  <v-autocomplete
+    data-testid="crsHeightsInput"
+    :model-value="heights_crs"
+    :items="crsStore.verticalList"
+    :item-title="heights_title"
+    :item-value="crs_key"
+    return-object
+    clearable
+    :disabled="!heights_enabled"
+    label="Heights (optional)"
+    :hint="
+      horizontal_crs !== undefined && !heights_enabled ? 'This CRS already includes heights' : ''
+    "
+    persistent-hint
+    :prepend-inner-icon="compact ? undefined : 'ph-arrows-vertical'"
+    density="compact"
+    class="mt-2"
+    @update:model-value="select_heights"
+  ></v-autocomplete>
 </template>
 
 <style scoped>

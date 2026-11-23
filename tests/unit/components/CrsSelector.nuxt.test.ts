@@ -129,6 +129,45 @@ describe("crs selector", () => {
     expect(wrapper.find("tbody tr").classes()).toContain("bg-primary");
   });
 
+  test("composes the selected crs with optional heights", async () => {
+    const nztm = { authority: "EPSG", code: "2193", name: "NZGD2000 / NZTM 2000" };
+    const nzgdNzvd = { authority: "EPSG", code: "9528", name: "NZGD2000 + NZVD2016 height" };
+    const nzvd = { authority: "EPSG", code: "7839", name: "NZVD2016 height" };
+    const crsStore = useCrsStore();
+    crsStore.geographicList = mockAs<typeof crsStore.geographicList>(
+      vi.fn().mockResolvedValue([nztm, nzgdNzvd]),
+    );
+    crsStore.verticalList = [nzvd];
+    crsStore.compoundable = ["EPSG:2193"];
+
+    const wrapper = await mountSuspended(CrsSelector, {
+      global: { plugins: [vuetify, pinia] },
+      props: { geodeObjectType: "BRep" },
+    });
+    await wrapper.vm.$nextTick();
+    const heights = wrapper.findComponent('[data-testid="crsHeightsInput"]');
+    // Nothing to complete before a crs without heights is selected
+    expect(heights.props("disabled")).toBe(true);
+
+    await wrapper.findAll("tbody tr")[FIRST_INDEX]?.trigger("click");
+    expect(heights.props("disabled")).toBe(false);
+    heights.vm.$emit("update:modelValue", nzvd);
+    await wrapper.vm.$nextTick();
+    const emitted = wrapper.emitted<unknown[]>()["update:modelValue"] ?? [];
+    expect(emitted.at(-1)?.[FIRST_INDEX]).toStrictEqual({
+      authority: "EPSG",
+      code: "2193+7839",
+      name: "NZGD2000 / NZTM 2000 + NZVD2016 height",
+    });
+
+    // A crs that already has heights: the heights are cleared
+    await wrapper.findAll("tbody tr")[ESRI_INDEX]?.trigger("click");
+    expect(emitted.at(-1)?.[FIRST_INDEX]).toStrictEqual(nzgdNzvd);
+    // Vuetify shows an empty value as null
+    expect(heights.props("modelValue")).toBeNull();
+    expect(heights.props("disabled")).toBe(true);
+  });
+
   test("does not offer to show all the crs at once", async () => {
     const crsStore = useCrsStore();
     crsStore.geographicList = mockAs<typeof crsStore.geographicList>(vi.fn().mockResolvedValue([]));
