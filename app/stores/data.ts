@@ -152,40 +152,21 @@ export const useDataStore = defineStore("data", () => {
       },
     );
   }
-  // The CRS features only need these fields: the geometry stays out of the copies made on each change
-  function refCrsItems(): Ref<CrsItem[]> {
-    return useObservable(
-      liveObservable(async () => {
-        const items = await data_db.toArray();
-        return items.map(({ data_id, name, crs, created_at }) => ({
-          data_id,
-          name,
-          crs,
-          created_at,
-        }));
-      }),
-      { initialValue: [] as CrsItem[] },
-    );
-  }
-
-  function refAllItems(): Ref<DataItem[]> {
-    return useObservable(
-      liveObservable(async () => {
-        const items = await data_db.toArray();
-        return items;
-      }),
-      {
-        initialValue: [] as DataItem[],
-      },
-    );
-  }
+  // A single live query of the data table, shared by every reader
+  const liveItems = useObservable(
+    liveObservable(async () => {
+      const all_items = await data_db.toArray();
+      return all_items;
+    }),
+    { initialValue: [] as DataItem[] },
+  );
+  const items = computed(() => liveItems.value);
   function isRegistered(dataId: DataId): boolean {
     return registeredIds.has(dataId);
   }
-  function refRegisteredItems(): ComputedRef<DataItem[]> {
-    const items = refAllItems();
-    return computed(() => items.value.filter((data_item) => isRegistered(data_item.data_id)));
-  }
+  const registeredItems = computed(() =>
+    items.value.filter((data_item) => isRegistered(data_item.data_id)),
+  );
   async function meshComponentType(
     modelId: ModelId,
     geode_id: GeodeId,
@@ -368,13 +349,10 @@ export const useDataStore = defineStore("data", () => {
     modelComponents: ModelComponentRecord[];
     modelComponentsRelations: ModelComponentRelationRecord[];
   }> {
-    const items = await data_db.toArray();
-    const modelComponents = await model_components_db.toArray();
-    const modelComponentsRelations = await model_components_relation_db.toArray();
     return {
-      items,
-      modelComponents,
-      modelComponentsRelations,
+      items: await data_db.toArray(),
+      modelComponents: await model_components_db.toArray(),
+      modelComponentsRelations: await model_components_relation_db.toArray(),
     };
   }
 
@@ -410,9 +388,8 @@ export const useDataStore = defineStore("data", () => {
     );
   }
   return {
-    refAllItems,
-    refCrsItems,
-    refRegisteredItems,
+    items,
+    registeredItems,
     isRegistered,
     item,
     allItems,

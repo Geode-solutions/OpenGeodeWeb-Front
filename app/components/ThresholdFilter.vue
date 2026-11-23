@@ -30,7 +30,7 @@ const thresholds = computed<Threshold[]>(() => {
 });
 const cards = useTemplateRef("cards");
 
-const allItems = dataStore.refAllItems();
+const allItems = computed(() => dataStore.items);
 const availableDatasets = computed<{ title: string; value: string }[]>(() =>
   allItems.value.map((item) => ({
     title: item.name || item.data_id,

@@ -55,7 +55,7 @@ export function useOverlappingPicker(): UseOverlappingPickerReturn {
   const dataStore = useDataStore();
   const dataStyleStore = useDataStyleStore();
   const viewerStore = useViewerStore();
-  const dataItems = dataStore.refAllItems();
+  const dataItems = computed(() => dataStore.items);
 
   const displayIntermediate = ref(false);
   const intermediateItems = ref<ProposedItem[]>([]);

@@ -1,10 +1,10 @@
+import { type CrsItem, useDataStore } from "@ogw_front/stores/data";
 import { oldestCrs, sameCrs } from "@ogw_front/utils/crs";
 import type { CRS } from "@geode/opengeodeweb-back/schema_types";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { useBackStore } from "@ogw_front/stores/back";
-import { useDataStore } from "@ogw_front/stores/data";
 
 // Session cache of the available CRS, the project CRS, and the channel the shared components use to ask the host app for a CRS edit
 // oxlint-disable-next-line max-lines-per-function, max-statements
@@ -15,7 +15,7 @@ export const useCrsStore = defineStore("crs", () => {
   const crsEditEnabled = ref(false);
   const crsEditRequest = ref<string | undefined>(undefined);
   const dataStore = useDataStore();
-  const crsItems = dataStore.refCrsItems();
+  const crsItems = computed<CrsItem[]>(() => dataStore.items);
   const projectCrs = ref<CRS | undefined>(undefined);
   const projectCrsEditRequest = ref(false);
 

@@ -5,10 +5,9 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { mockAs, setupActivePinia, vuetify } from "@ogw_tests/utils";
 import GlobalObjects from "@ogw_front/components/Viewer/ObjectTree/Views/GlobalObjects.vue";
 import { mountSuspended } from "@nuxt/test-utils/runtime";
-import { ref } from "vue";
+import { setDataItems } from "@ogw_tests/unit/stores/data_helpers";
 import { useBasemapStore } from "@ogw_front/stores/basemap";
 import { useCrsStore } from "@ogw_front/stores/crs";
-import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
@@ -30,13 +29,12 @@ const TREE_STUB = {
 
 async function mountTree(withCrs: boolean): Promise<VueWrapper> {
   const pinia = setupActivePinia();
-  const dataStore = useDataStore();
   // A data in the project CRS: the basemap has something to lie under
   const items: { id: string; created_at: string; crs: typeof LAMBERT }[] = [];
   if (withCrs) {
     items.push({ id: "a", created_at: "1", crs: LAMBERT });
   }
-  dataStore.refCrsItems = mockAs<typeof dataStore.refCrsItems>(() => ref(items));
+  setDataItems(items);
   useCrsStore();
   // Calls through: without displayed data, a build only clears the basemap
   vi.spyOn(useBasemapStore(), "setMaps");
