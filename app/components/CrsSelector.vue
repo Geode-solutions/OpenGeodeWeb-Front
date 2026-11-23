@@ -68,6 +68,11 @@ function select_heights(crs: CRS | undefined | null): void {
   emit_selection();
 }
 
+// Vuetify passes the click event first, then the clicked row
+function on_row_click(_event: Event, { item }: { item: CRS }): void {
+  select_crs(item);
+}
+
 function row_props({ item }: { item: CRS }): Record<string, unknown> {
   const selected =
     horizontal_crs.value !== undefined && crs_key(item) === crs_key(horizontal_crs.value);
@@ -141,7 +146,7 @@ onMounted(async () => {
     :search="search"
     :loading="data_table_loading"
     loading-text="Loading... Please wait"
-    @click:row="(_event: Event, { item }: { item: CRS }) => select_crs(item)"
+    @click:row="on_row_click"
   >
     <template v-if="compact" #[`item.name`]="{ value }">
       <v-tooltip :text="value" location="top">

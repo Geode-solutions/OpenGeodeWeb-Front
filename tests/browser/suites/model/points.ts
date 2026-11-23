@@ -6,9 +6,9 @@
 import { brepGeodeObjectType, defaultDataName } from "#browser_helpers/constants";
 import { closeAllMenus, moveMouseOutOfTheWay } from "#browser_helpers/app_interaction";
 import {
+  closeObjectsTree,
   expandMainObjectTree,
   openDataContextMenu,
-  toggleObjectsTree,
 } from "#browser_helpers/object_trees/main_object_tree";
 import {
   expandMeshComponentType,
@@ -89,7 +89,7 @@ function registerTests({ test, loadTestDatas }: SuiteRuntime): void {
 
   test("picked block points vertex attribute", async ({ window }) => {
     await closeAllMenus(window);
-    await toggleObjectsTree(window);
+    await closeObjectsTree(window);
     const hybridViewerCanvas = getHybridViewerCanvas(window);
     const box = await getHybridViewerCanvasBoundingBox(hybridViewerCanvas);
     await viewerContextMenu(window, box.width / 2, box.height / 2);

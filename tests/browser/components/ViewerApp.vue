@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import FeedBackSnackers from "@ogw_front/components/FeedBack/Snackers.vue";
 import HybridRenderingView from "@ogw_front/components/HybridRenderingView.vue";
+import MicroservicesBusyIndicator from "@ogw_front/components/MicroservicesBusyIndicator.vue";
 import ViewerUI from "@ogw_front/components/Viewer/Ui.vue";
-import { useInfraStore } from "@ogw_front/stores/infra";
 import { useMenuStore } from "@ogw_front/stores/menu";
 import { useViewerContextMenu } from "@ogw_front/composables/viewer_context_menu";
 
 // The viewer as an app built on this layer hosts it: the right click opens the circular menu
-const infraStore = useInfraStore();
 const menuStore = useMenuStore();
 const cardContainer = useTemplateRef("cardContainer");
 const viewerUI = useTemplateRef("viewerUI");
@@ -41,14 +40,7 @@ const { containerWidth, containerHeight, openTreeMenu, openViewerMenu } = useVie
         </HybridRenderingView>
       </div>
     </v-main>
-    <v-progress-linear
-      v-if="infraStore.microservices_busy"
-      data-testid="microservicesBusyIndicator"
-      indeterminate
-      color="white"
-      class="position-fixed top-0"
-      style="z-index: 4"
-    />
+    <MicroservicesBusyIndicator />
     <FeedBackSnackers />
   </v-app>
 </template>
