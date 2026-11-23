@@ -11,14 +11,14 @@ import {
   vertexAttributeType,
 } from "#browser_helpers/constants";
 import {
+  closeObjectsTree,
+  expandMainObjectTree,
+  getMainObjectTree,
+} from "#browser_helpers/object_trees/main_object_tree";
+import {
   expandGeodeObjectTypeInTree,
   hideObjectInTree,
 } from "#browser_helpers/object_trees/common";
-import {
-  expandMainObjectTree,
-  getMainObjectTree,
-  toggleObjectsTree,
-} from "#browser_helpers/object_trees/main_object_tree";
 import {
   openModelComponentContextMenu,
   openModelComponentsTree,
@@ -67,7 +67,7 @@ function registerTests({ test, loadTestDatas }: SuiteRuntime): void {
     await resetCamera(window);
     await openModelComponentsTree(window, structuralModelGeodeObjectType, defaultDataName);
     await resetCamera(window);
-    await toggleObjectsTree(window);
+    await closeObjectsTree(window);
     await moveMouseOutOfTheWay(window);
   });
 

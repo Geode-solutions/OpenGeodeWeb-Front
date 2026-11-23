@@ -11,6 +11,10 @@ import {
 } from "#browser_helpers/constants";
 import { closeAllMenus, moveMouseOutOfTheWay } from "#browser_helpers/app_interaction";
 import {
+  closeObjectsTree,
+  expandMainObjectTree,
+} from "#browser_helpers/object_trees/main_object_tree";
+import {
   copyModelPolygonsColor,
   pasteModelPolygonsColorInput,
   setModelColor,
@@ -20,10 +24,6 @@ import {
   setModelPolygonsVertexAttribute,
   setModelPolygonsVertexAttributeNoDataColor,
 } from "#browser_helpers/data/index";
-import {
-  expandMainObjectTree,
-  toggleObjectsTree,
-} from "#browser_helpers/object_trees/main_object_tree";
 import {
   expandMeshComponentType,
   getModelComponentsObjectTree,
@@ -104,7 +104,7 @@ function registerTests({ test, loadTestDatas }: SuiteRuntime): void {
   });
 
   test("toggle object tree main", async ({ window }) => {
-    await toggleObjectsTree(window);
+    await closeObjectsTree(window);
   });
 
   test("surfaces vertex attribute one surface ", async ({ window }) => {
