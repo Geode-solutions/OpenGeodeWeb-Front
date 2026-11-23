@@ -69,38 +69,64 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     );
   }
 
-  async function setVisibility(dataId: DataId, visibility: Visibility): Promise<unknown> {
-    const item = await dataStore.item(dataId);
+  // Runs the mesh or the model implementation for a data, or `notViewable` for a data the viewer
+  // Does not show. An unknown viewer_object_type throws, unless `unknownType` handles it
+  async function forViewerType<Result>(
+    dataId: DataId,
+    handlers: {
+      mesh: (id: DataId) => Promise<Result>;
+      model: (id: DataId) => Promise<Result>;
+      notViewable: (id: DataId) => Promise<Result> | Result;
+      unknownType?: (id: DataId) => Result;
+    },
+  ): Promise<Result> {
+    const { viewer_object_type } = await dataStore.item(dataId);
     if (!(await dataStore.fetchIsViewable(dataId))) {
-      return dataStyleState.mutateStyle(dataId, { visibility });
+      const result = await handlers.notViewable(dataId);
+      return result;
     }
-
-    const { viewer_object_type } = item;
-
     if (viewer_object_type === "mesh") {
-      return meshStyleStore.setMeshVisibility(dataId, visibility);
+      const result = await handlers.mesh(dataId);
+      return result;
     }
     if (viewer_object_type === "model") {
-      return modelStyleStore.setModelVisibility(dataId, visibility);
+      const result = await handlers.model(dataId);
+      return result;
     }
-    throw new Error("Unknown viewer_object_type");
+    if (handlers.unknownType) {
+      return handlers.unknownType(dataId);
+    }
+    throw new Error(`Unknown viewer_object_type: ${String(viewer_object_type)}`);
+  }
+
+  // A data the viewer does not show only keeps its visibility in its style
+  async function setVisibility(dataId: DataId, visibility: Visibility): Promise<unknown> {
+    const result = await forViewerType<unknown>(dataId, {
+      mesh: async (id) => {
+        const mesh_result = await meshStyleStore.setMeshVisibility(id, visibility);
+        return mesh_result;
+      },
+      model: async (id) => {
+        const model_result = await modelStyleStore.setModelVisibility(id, visibility);
+        return model_result;
+      },
+      notViewable: async (id) => {
+        const style_result = await dataStyleState.mutateStyle(id, { visibility });
+        return style_result;
+      },
+    });
+    return result;
   }
 
   async function applyDefaultStyle(dataId: DataId): Promise<unknown[]> {
-    const item = await dataStore.item(dataId);
-    if (!(await dataStore.fetchIsViewable(dataId))) {
-      throw new Error(`applyDefaultStyle called for non-viewable item: ${dataId}`);
-    }
-
-    const { viewer_object_type } = item;
-
-    if (viewer_object_type === "mesh") {
-      return meshStyleStore.applyMeshStyle(dataId);
-    }
-    if (viewer_object_type === "model") {
-      return modelStyleStore.applyModelStyle(dataId);
-    }
-    throw new Error(`Unknown viewer_object_type: ${String(viewer_object_type)}`);
+    const result = await forViewerType(dataId, {
+      mesh: meshStyleStore.applyMeshStyle,
+      model: modelStyleStore.applyModelStyle,
+      notViewable: () => {
+        throw new Error(`applyDefaultStyle called for non-viewable item: ${dataId}`);
+      },
+    });
+    return result;
   }
 
   function exportStores(): DataStyleSnapshot {
@@ -149,17 +175,14 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
   async function applyAllStylesFromState(): Promise<void> {
     const ids = Object.keys(dataStyleState.styles.value);
+    // Restores what can be shown: a non viewable data or an unknown type is skipped
     const promises = ids.map(async (dataId) => {
-      const meta = await dataStore.item(dataId);
-      if (!(await dataStore.fetchIsViewable(dataId))) {
-        return;
-      }
-      const viewerObjectType = meta.viewer_object_type;
-      if (viewerObjectType === "mesh") {
-        await meshStyleStore.applyMeshStyle(dataId);
-      } else if (viewerObjectType === "model") {
-        await modelStyleStore.applyModelStyle(dataId);
-      }
+      await forViewerType<unknown>(dataId, {
+        mesh: meshStyleStore.applyMeshStyle,
+        model: modelStyleStore.applyModelStyle,
+        notViewable: () => undefined,
+        unknownType: () => undefined,
+      });
     });
     await Promise.all(promises);
     await sceneStyleStore.applySceneStyle();
