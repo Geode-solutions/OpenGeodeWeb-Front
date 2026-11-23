@@ -42,80 +42,96 @@ async function launchLocalServices(
   await Promise.all(launch_promises);
 }
 
-export const useInfraStore = defineStore("infra", {
-  state: () => ({
-    app_mode: useRuntimeConfig().public.MODE,
-    status: Status.NOT_CREATED,
-    microservices: [] as Microservice[],
-    domain_name: globalThis.location.hostname,
-  }),
-  getters: {
-    microservices_connected(): boolean {
-      return this.microservices.every((store: Microservice) => store.status === Status.CONNECTED);
-    },
-    microservices_busy(): boolean {
-      return this.microservices.some((store: Microservice) => store.is_busy === true);
-    },
+export const useInfraStore = defineStore(
+  "infra",
+  // oxlint-disable-next-line max-lines-per-function
+  () => {
+    const app_mode = ref(useRuntimeConfig().public.MODE);
+    const status = ref(Status.NOT_CREATED);
+    const microservices = ref<Microservice[]>([]);
+    const domain_name = ref(globalThis.location.hostname);
+
+    const microservices_connected = computed(() =>
+      microservices.value.every((store: Microservice) => store.status === Status.CONNECTED),
+    );
+    const microservices_busy = computed(() =>
+      microservices.value.some((store: Microservice) => store.is_busy === true),
+    );
     // The local Flask microservices (Werkzeug) only listen on IPv4. With "localhost", browsers try ::1 first.
     // Windows is slow to refuse it: every request to them would pay that delay.
     // The page host stays in domain_name: the app store must remain same-origin (its API has no CORS).
-    microservice_domain_name(): string {
-      return this.domain_name === LOCALHOST ? IPV4_LOOPBACK : this.domain_name;
-    },
-  },
-  actions: {
-    register_microservice(store: Microservice) {
-      const store_name = store.$id;
+    const microservice_domain_name = computed(() =>
+      domain_name.value === LOCALHOST ? IPV4_LOOPBACK : domain_name.value,
+    );
 
-      if (
-        !this.microservices.some((microservice: Microservice) => microservice.$id === store_name)
-      ) {
-        this.microservices.push(store);
+    function register_microservice(store: Microservice): void {
+      const store_name = store.$id;
+      if (!microservices.value.some((microservice) => microservice.$id === store_name)) {
+        microservices.value.push(store);
       }
-    },
-    unregister_microservice(microserviceId: string) {
-      this.microservices = this.microservices.filter(
-        (microservice: Microservice) => microservice.$id !== microserviceId,
+    }
+
+    function unregister_microservice(microserviceId: string): void {
+      microservices.value = microservices.value.filter(
+        (microservice) => microservice.$id !== microserviceId,
       );
-    },
-    async create_backend(authToken?: string) {
-      if (this.status === Status.CREATED) {
+    }
+
+    async function create_connection(): Promise<void> {
+      await Promise.all(
+        microservices.value.map(async (store: Microservice) => {
+          await store.connect();
+        }),
+      );
+    }
+
+    async function create_backend(authToken?: string): Promise<undefined> {
+      if (status.value === Status.CREATED) {
         return undefined;
       }
       await navigator.locks.request("infra.create_backend", async () => {
-        if (this.status === Status.CREATED) {
+        if (status.value === Status.CREATED) {
           return;
         }
-        this.status = Status.CREATING;
-        if (this.app_mode === appMode.CLOUD) {
+        status.value = Status.CREATING;
+        if (app_mode.value === appMode.CLOUD) {
           const cloudStore = useCloudStore();
           try {
             await cloudStore.start(authToken);
           } catch (error) {
             // Back to the "Load the app" button so the user is not stuck on the loading screen.
-            this.status = Status.NOT_CREATED;
+            status.value = Status.NOT_CREATED;
             throw error;
           }
         } else {
-          await launchLocalServices(this.app_mode, this.microservices);
+          await launchLocalServices(app_mode.value, microservices.value);
         }
-        this.status = Status.CREATED;
-        return this.create_connection();
+        status.value = Status.CREATED;
+        await create_connection();
       });
       return undefined;
-    },
-    async create_connection() {
-      await Promise.all(
-        this.microservices.map(async (store: Microservice) => {
-          await store.connect();
-        }),
-      );
+    }
+
+    return {
+      app_mode,
+      status,
+      microservices,
+      domain_name,
+      microservices_connected,
+      microservices_busy,
+      microservice_domain_name,
+      register_microservice,
+      unregister_microservice,
+      create_backend,
+      create_connection,
+    };
+  },
+  {
+    share: {
+      omit: ["microservices"],
     },
   },
-  share: {
-    omit: ["microservices"],
-  },
-});
+);
 
 export interface Microservice {
   $id: string;

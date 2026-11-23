@@ -7,17 +7,11 @@ import { registerEndpoint } from "@nuxt/test-utils/runtime";
 // Local imports
 import { setupActivePinia, toHTTPMethod } from "@ogw_tests/utils";
 import { useBackStore } from "@ogw_front/stores/back";
-import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 const FIRST_INDEX = 0;
 const TIMEOUT = 5000;
 
 describe("backStore.request()", () => {
-  setupActivePinia();
-  const backStore = useBackStore();
-  const feedbackStore = useFeedbackStore();
-  (backStore as { base_url: string }).base_url = "";
-
   const schema = {
     $id: "/test",
     type: "object",
@@ -31,10 +25,10 @@ describe("backStore.request()", () => {
     additionalProperties: false,
   };
 
+  // A fresh pinia per test: setup stores have no $reset
   beforeEach(() => {
-    feedbackStore.$reset();
-    backStore.$reset();
-    (backStore as { base_url: string }).base_url = "";
+    setupActivePinia();
+    (useBackStore() as { base_url: string }).base_url = "";
   });
 
   test(
@@ -53,7 +47,7 @@ describe("backStore.request()", () => {
         additionalProperties: false,
       };
       const params = { test: "hello" };
-      await expect(backStore.request({ schema: invalid_schema, params })).rejects.toThrow(
+      await expect(useBackStore().request({ schema: invalid_schema, params })).rejects.toThrow(
         "data/test must be number",
       );
     },
@@ -63,7 +57,7 @@ describe("backStore.request()", () => {
   test(
     "invalid params",
     async () => {
-      await expect(backStore.request({ schema })).rejects.toThrow(
+      await expect(useBackStore().request({ schema })).rejects.toThrow(
         "data must have required property 'test'",
       );
     },
@@ -84,7 +78,7 @@ describe("backStore.request()", () => {
         method: toHTTPMethod(schema.methods[FIRST_INDEX]),
         handler: () => ({ result: "success" }),
       });
-      await backStore.request({ schema, params }, callbacks);
+      await useBackStore().request({ schema, params }, callbacks);
       expect(errorCalled).toBe(false);
     },
     TIMEOUT,

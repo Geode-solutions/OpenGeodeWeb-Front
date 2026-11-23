@@ -20,100 +20,54 @@ import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_f
 const MILLISECONDS_IN_SECOND = 1000;
 const DEFAULT_PING_INTERVAL_SECONDS = 10;
 
-export const useBackStore = defineStore("back", {
-  state: () => ({
-    default_local_port: "5000",
-    request_counter: 0,
-    status: Status.NOT_CONNECTED,
-    version: "0.0.0",
-  }),
-  getters: {
-    protocol(): string {
-      return getRestApiProtocol();
-    },
-    port(): string {
-      return getRestApiPort(this.default_local_port);
-    },
-    base_url(): string {
-      return this.base_url_for(useInfraStore().microservice_domain_name);
-    },
-    base_url_for(): (domain_name: string) => string {
-      return (domain_name: string) => {
-        let back_url = `${this.protocol}://${domain_name}:${this.port}`;
-        if (isCloudMode()) {
-          back_url += `/geode`;
-        }
-        return back_url;
-      };
-    },
-    is_busy(): boolean {
-      return this.request_counter > 0;
-    },
-  },
-  actions: {
-    set_ping() {
-      // oxlint-disable-next-line typescript/no-floating-promises
-      this.ping();
-      setInterval(() => {
-        // oxlint-disable-next-line typescript/no-floating-promises
-        this.ping();
-      }, DEFAULT_PING_INTERVAL_SECONDS * MILLISECONDS_IN_SECOND);
-    },
-    async ping() {
-      const feedbackStore = useFeedbackStore();
-      const schema = back_schemas.opengeodeweb_back.ping;
-      const result = await this.request(
-        { schema },
-        {
-          request_error_function: () => {
-            feedbackStore.$patch({ server_error: true });
-            this.status = Status.NOT_CONNECTED;
-          },
-          response_function: () => {
-            feedbackStore.$patch({ server_error: false });
-            this.status = Status.CONNECTED;
-          },
-          response_error_function: () => {
-            feedbackStore.$patch({ server_error: true });
-            this.status = Status.NOT_CONNECTED;
-          },
-        },
-      );
-      return result;
-    },
-    start_request() {
-      this.request_counter += 1;
-    },
-    stop_request() {
-      this.request_counter -= 1;
-    },
-    async launch(args: { projectFolderPath: string }) {
-      const appStore = useAppStore();
-      const { COMMAND_BACK, NUXT_ROOT_PATH } = useRuntimeConfig().public;
-      const schema = opengeodeweb_front_schemas.api.local.app.run_back;
-      const params = { COMMAND_BACK, NUXT_ROOT_PATH, args };
+export const useBackStore = defineStore(
+  "back",
+  // oxlint-disable-next-line max-lines-per-function, max-statements
+  () => {
+    const default_local_port = ref("5000");
+    const request_counter = ref(0);
+    const status = ref(Status.NOT_CONNECTED);
+    const version = ref("0.0.0");
 
-      const result = await appStore.request(
-        { schema, params },
-        {
-          response_function: (response) => {
-            this.default_local_port = String(response.port);
-          },
-        },
-      );
-      return result;
-    },
-    async connect(): Promise<void> {
-      this.set_ping();
-      await Promise.resolve();
-    },
-    async request<Schema extends JsonRpcSchema>(
+    const protocol = computed(() => getRestApiProtocol());
+    const port = computed(() => getRestApiPort(default_local_port.value));
+
+    function base_url_for(domain_name: string): string {
+      let back_url = `${protocol.value}://${domain_name}:${port.value}`;
+      if (isCloudMode()) {
+        back_url += `/geode`;
+      }
+      return back_url;
+    }
+
+    // The infra store is read lazily: this store can be created before the Nuxt app context
+    const base_url = computed(() => base_url_for(useInfraStore().microservice_domain_name));
+    const is_busy = computed(() => request_counter.value > 0);
+
+    function start_request(): void {
+      request_counter.value += 1;
+    }
+
+    function stop_request(): void {
+      request_counter.value -= 1;
+    }
+
+    function microservice(): {
+      $id: string;
+      base_url: string;
+      start_request: () => void;
+      stop_request: () => void;
+    } {
+      return { $id: "back", base_url: base_url.value, start_request, stop_request };
+    }
+
+    async function request<Schema extends JsonRpcSchema>(
       { schema, params }: { schema: Schema; params?: ParamsOf<Schema> },
       callbacks: RequestHandlers<ResponseOf<Schema>> = {},
     ): Promise<ResponseOf<Schema>> {
       const rpc_schema: JsonRpcSchema = schema;
       const result = await api_fetch(
-        this,
+        microservice(),
         // The back store is only ever used with HTTP ("front"/"back") schemas,
         // Which always carry `methods`; the wider JsonRpcSchema param above is
         // Kept as-is to match this action's public signature.
@@ -136,42 +90,105 @@ export const useBackStore = defineStore("back", {
       );
       // oxlint-disable-next-line typescript/no-unsafe-type-assertion
       return result as ResponseOf<Schema>;
-    },
-    async upload(file: File, callbacks: RequestHandlers = {}) {
-      const schema = back_schemas.opengeodeweb_back.upload_file;
-      const result = await upload_file(
-        this,
+    }
+
+    async function ping(): Promise<unknown> {
+      const feedbackStore = useFeedbackStore();
+      const schema = back_schemas.opengeodeweb_back.ping;
+      function onError(): void {
+        feedbackStore.$patch({ server_error: true });
+        status.value = Status.NOT_CONNECTED;
+      }
+      const result = await request(
+        { schema },
         {
-          schema,
-          file,
+          request_error_function: onError,
+          response_function: () => {
+            feedbackStore.$patch({ server_error: false });
+            status.value = Status.CONNECTED;
+          },
+          response_error_function: onError,
         },
+      );
+      return result;
+    }
+
+    function set_ping(): void {
+      void ping();
+      setInterval(() => {
+        void ping();
+      }, DEFAULT_PING_INTERVAL_SECONDS * MILLISECONDS_IN_SECOND);
+    }
+
+    async function launch(args: { projectFolderPath: string }): Promise<unknown> {
+      const appStore = useAppStore();
+      const { COMMAND_BACK, NUXT_ROOT_PATH } = useRuntimeConfig().public;
+      const schema = opengeodeweb_front_schemas.api.local.app.run_back;
+      const params = { COMMAND_BACK, NUXT_ROOT_PATH, args };
+
+      const result = await appStore.request(
+        { schema, params },
         {
-          ...callbacks,
-          response_function: async (response: unknown) => {
-            if (callbacks.response_function) {
-              await callbacks.response_function(response);
-            }
+          response_function: (response) => {
+            default_local_port.value = String(response.port);
           },
         },
       );
       return result;
-    },
-    async get_version(schema: MicroserviceVersionSchema | undefined) {
+    }
+
+    async function connect(): Promise<void> {
+      set_ping();
+      await Promise.resolve();
+    }
+
+    async function upload(file: File, callbacks: RequestHandlers = {}): Promise<unknown> {
+      const schema = back_schemas.opengeodeweb_back.upload_file;
+      const result = await upload_file(microservice(), { schema, file }, callbacks);
+      return result;
+    }
+
+    async function get_version(
+      schema: MicroserviceVersionSchema | undefined,
+    ): Promise<{ microservice_version: string } | undefined> {
       if (!schema) {
         return undefined;
       }
-      const result = await this.request(
+      const result = await request(
         { schema },
         {
           response_function: ({ microservice_version }) => {
-            this.version = microservice_version;
+            version.value = microservice_version;
           },
         },
       );
       return result;
+    }
+
+    return {
+      default_local_port,
+      request_counter,
+      status,
+      version,
+      protocol,
+      port,
+      base_url,
+      base_url_for,
+      is_busy,
+      set_ping,
+      ping,
+      start_request,
+      stop_request,
+      launch,
+      connect,
+      request,
+      upload,
+      get_version,
+    };
+  },
+  {
+    share: {
+      omit: ["status"],
     },
   },
-  share: {
-    omit: ["status"],
-  },
-});
+);
