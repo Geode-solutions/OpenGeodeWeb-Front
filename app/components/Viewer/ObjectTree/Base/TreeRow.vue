@@ -5,9 +5,6 @@ import type {
   SelectionConfig,
   TreeItem,
 } from "@ogw_front/composables/virtual_tree";
-import { useDataStore } from "@ogw_front/stores/data";
-
-const dataStore = useDataStore();
 
 interface Props {
   item: DisplayItem;
@@ -15,9 +12,12 @@ interface Props {
   selection: SelectionConfig;
   isSelected: (item: TreeItem) => boolean;
   getIndeterminate: (item: TreeItem) => boolean;
+  // Given by the view: it knows which data a row stands for
+  isRowViewable: (item: DisplayItem) => boolean;
 }
 
-const { item, itemProps, selection, isSelected, getIndeterminate } = defineProps<Props>();
+const { item, itemProps, selection, isSelected, getIndeterminate, isRowViewable } =
+  defineProps<Props>();
 
 interface Emits {
   "toggle-open": [item: TreeItem];
@@ -34,10 +34,8 @@ function triggerHorizonStackModal(rawItem: unknown): void {
   globalThis.dispatchEvent(new CustomEvent("open-horizon-stack-modal", { detail: rawItem }));
 }
 const isHorizonStack = computed<boolean>(() => item.raw.geode_object_type === "HorizonStack3D");
-const isViewable = computed<boolean>(() => dataStore.isItemViewable(item.raw));
-const showEyeButton = computed<boolean>(
-  () => !isHorizonStack.value && item.raw.title !== "HorizonStack3D" && isViewable.value,
-);
+// A horizon stack row opens its modal instead of toggling a visibility
+const showEyeButton = computed<boolean>(() => !isHorizonStack.value && isRowViewable(item));
 
 function handleRowClick(event: MouseEvent): void {
   if (isHorizonStack.value) {

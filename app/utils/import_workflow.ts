@@ -32,7 +32,7 @@ async function importDataItem(item: NewDataItem): Promise<string> {
   }
   const addDataTask = dataStore.addItem(item);
   const registerTask = addDataTask.then(async () => {
-    if (!(await dataStore.isItemViewable(item))) {
+    if (!(await dataStore.fetchIsViewable(item.data_id))) {
       return undefined;
     }
     return dataStore.registerObject(item.data_id, item.name ?? item.data_id);
@@ -52,14 +52,14 @@ async function importDataItem(item: NewDataItem): Promise<string> {
   );
   const addDataStyleTask = dataStyleStore.addDataStyle(item.data_id, item.geode_object_type);
   const addViewerTask = addDataTask.then(async () => {
-    if (!(await dataStore.isItemViewable(item))) {
+    if (!(await dataStore.fetchIsViewable(item.data_id))) {
       return undefined;
     }
     return hybridViewerStore.addItem(item.data_id);
   });
   const applyStyleTask = Promise.all([registerTask, addDataComponentsTask, addDataStyleTask]).then(
     async () => {
-      if (await dataStore.isItemViewable(item)) {
+      if (await dataStore.fetchIsViewable(item.data_id)) {
         return dataStyleStore.applyDefaultStyle(item.data_id);
       }
       return undefined;

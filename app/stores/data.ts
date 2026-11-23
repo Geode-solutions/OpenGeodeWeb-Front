@@ -56,43 +56,23 @@ interface NewDataItem extends DataIdentified, GeodeIdentified, GeodeObjectTyped,
   nb_vertices?: number;
 }
 
-interface ViewableItemLike extends Partial<GeodeObjectTyped> {
-  is_viewable?: boolean;
-  binary_light_viewable?: string;
-  data_id?: DataId;
-  title?: string;
-}
-
 const viewer_generic_schemas = viewer_schemas.opengeodeweb_viewer.generic;
 // The database's table map is dynamically assembled at runtime (see internal/database/database.ts), so its exported type is a loose `{}`; cast it to the shape it actually has at runtime rather than widening every call site.
 type DatabaseTables = Record<string, unknown>;
 // oxlint-disable-next-line no-unsafe-type-assertion -- see comment above.
 const typedDatabase = database as unknown as DatabaseTables;
-function checkItemViewable(item: ViewableItemLike | undefined | null): boolean {
-  if (!item || typeof item !== "object") {
+// A missing data is not viewable. Data imported before `is_viewable` existed fall back on their viewable file
+function isDataItemViewable(data_item: DataItem | undefined): boolean {
+  if (data_item === undefined) {
     return false;
   }
-  if (item.is_viewable !== undefined) {
-    return item.is_viewable;
+  if (data_item.is_viewable !== undefined) {
+    return data_item.is_viewable;
   }
-  if (item.binary_light_viewable !== undefined) {
-    return item.binary_light_viewable !== "not_viewable";
+  if (data_item.binary_light_viewable !== undefined) {
+    return data_item.binary_light_viewable !== "not_viewable";
   }
-  if (
-    item.geode_object_type === "HorizonStack3D" ||
-    item.data_id === "HorizonStack3D" ||
-    item.title === "HorizonStack3D"
-  ) {
-    return false;
-  }
-  return true;
-}
-function isItemViewable(itemOrId: string | ViewableItemLike): boolean | Promise<boolean> {
-  if (typeof itemOrId === "string") {
-    // oxlint-disable-next-line no-unsafe-type-assertion -- database's table map is dynamically typed at runtime; see comment above.
-    return (typedDatabase.data as Table<DataItem, string>).get(itemOrId).then(checkItemViewable);
-  }
-  return checkItemViewable(itemOrId);
+  return data_item.geode_object_type !== "HorizonStack3D";
 }
 
 // oxlint-disable-next-line max-lines-per-function, max-statements
@@ -167,6 +147,18 @@ export const useDataStore = defineStore("data", () => {
   const registeredItems = computed(() =>
     items.value.filter((data_item) => isRegistered(data_item.data_id)),
   );
+  const itemsById = computed(
+    () => new Map(items.value.map((data_item) => [data_item.data_id, data_item])),
+  );
+  // From the live items: reactive, for the data already shown
+  function isViewable(dataId: DataId): boolean {
+    return isDataItemViewable(itemsById.value.get(dataId));
+  }
+  // From the database: for code right after a write, which the live items may not show yet
+  async function fetchIsViewable(dataId: DataId): Promise<boolean> {
+    const data_item = await data_db.get(dataId);
+    return isDataItemViewable(data_item);
+  }
   async function meshComponentType(
     modelId: ModelId,
     geode_id: GeodeId,
@@ -413,7 +405,8 @@ export const useDataStore = defineStore("data", () => {
     item,
     allItems,
     refItem,
-    isItemViewable,
+    isViewable,
+    fetchIsViewable,
     meshComponentType,
     registerObject,
     deregisterObject,

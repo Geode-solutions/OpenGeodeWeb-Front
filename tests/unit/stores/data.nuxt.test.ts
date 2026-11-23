@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // Local imports
 import { type ModelComponentInput, useDataStore } from "@ogw_front/stores/data";
+import { setDataItems } from "@ogw_tests/unit/stores/data_helpers";
 import { setupActivePinia } from "@ogw_tests/utils";
 
 const DATA_ID_LENGTH = 32;
@@ -151,38 +152,48 @@ describe("useDataStore - collections", () => {
     expect(relations.line1?.internals).toStrictEqual([]);
   });
 
-  describe("isItemViewable", () => {
-    test("correctly identifies viewable and HorizonStack3D items", () => {
-      const dataStore = useDataStore();
-
-      // Standard viewable item (BRep)
-      expect(
-        dataStore.isItemViewable({ data_id: "1", title: "BRep 1", geode_object_type: "BRep" }),
-      ).toBe(true);
-
-      // Group node for viewable type
-      expect(dataStore.isItemViewable({ data_id: "BRep", title: "BRep" })).toBe(true);
-
-      // HorizonStack3D leaf item
-      expect(
-        dataStore.isItemViewable({
-          data_id: "2",
-          title: "HS 1",
-          geode_object_type: "HorizonStack3D",
-        }),
-      ).toBe(false);
-
-      // HorizonStack3D group node
-      expect(dataStore.isItemViewable({ data_id: "HorizonStack3D", title: "HorizonStack3D" })).toBe(
-        false,
-      );
+  describe("isViewable", () => {
+    // A testing pinia per test: its getters can be overridden by setDataItems
+    beforeEach(() => {
+      setupActivePinia();
     });
 
-    test("respects explicit is_viewable overrides", () => {
+    test("follows is_viewable, then the viewable file, then the object type", () => {
       const dataStore = useDataStore();
+      setDataItems([
+        { data_id: "flagged", geode_object_type: "BRep", is_viewable: false },
+        { data_id: "brep", geode_object_type: "BRep" },
+        { data_id: "no_file", geode_object_type: "BRep", binary_light_viewable: "not_viewable" },
+        { data_id: "stack", geode_object_type: "HorizonStack3D" },
+      ]);
 
-      expect(dataStore.isItemViewable({ is_viewable: false })).toBe(false);
-      expect(dataStore.isItemViewable({ is_viewable: true })).toBe(true);
+      expect(dataStore.isViewable("flagged")).toBe(false);
+      expect(dataStore.isViewable("brep")).toBe(true);
+      expect(dataStore.isViewable("no_file")).toBe(false);
+      expect(dataStore.isViewable("stack")).toBe(false);
+    });
+
+    test("a missing data is not viewable", () => {
+      const dataStore = useDataStore();
+      setDataItems([]);
+
+      expect(dataStore.isViewable("missing")).toBe(false);
+    });
+  });
+
+  describe("fetchIsViewable", () => {
+    test("reads a data just written, before the live items show it", async () => {
+      const dataStore = useDataStore();
+      await dataStore.addItem({
+        data_id: "written",
+        geode_id: "written",
+        viewer_object_type: "mesh",
+        geode_object_type: "PointSet3D",
+        is_viewable: true,
+      });
+
+      await expect(dataStore.fetchIsViewable("written")).resolves.toBe(true);
+      await expect(dataStore.fetchIsViewable("missing")).resolves.toBe(false);
     });
   });
 });

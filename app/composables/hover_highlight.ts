@@ -55,7 +55,7 @@ function useHoverhighlight(): {
     async function highlightAction(): Promise<void> {
       currentId = dataId;
 
-      if (!(await dataStore.isItemViewable(dataId))) {
+      if (!dataStore.isViewable(dataId)) {
         return;
       }
 

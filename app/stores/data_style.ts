@@ -71,7 +71,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
   async function setVisibility(dataId: DataId, visibility: Visibility): Promise<unknown> {
     const item = await dataStore.item(dataId);
-    if (!(await dataStore.isItemViewable(item))) {
+    if (!(await dataStore.fetchIsViewable(dataId))) {
       return dataStyleState.mutateStyle(dataId, { visibility });
     }
 
@@ -88,7 +88,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
   async function applyDefaultStyle(dataId: DataId): Promise<unknown[]> {
     const item = await dataStore.item(dataId);
-    if (!(await dataStore.isItemViewable(item))) {
+    if (!(await dataStore.fetchIsViewable(dataId))) {
       throw new Error(`applyDefaultStyle called for non-viewable item: ${dataId}`);
     }
 
@@ -151,7 +151,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     const ids = Object.keys(dataStyleState.styles.value);
     const promises = ids.map(async (dataId) => {
       const meta = await dataStore.item(dataId);
-      if (!(await dataStore.isItemViewable(meta))) {
+      if (!(await dataStore.fetchIsViewable(dataId))) {
         return;
       }
       const viewerObjectType = meta.viewer_object_type;

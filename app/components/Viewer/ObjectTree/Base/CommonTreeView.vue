@@ -22,6 +22,8 @@ interface Props {
   options?: Record<string, unknown>;
   // Row tinted from outside the tree, e.g. while its model tree header is hovered
   linked?: { id: unknown; color: string };
+  // Whether a row shows its visibility toggle: the view knows which data a row stands for
+  isRowViewable: (item: DisplayItem) => boolean;
 }
 
 const {
@@ -32,6 +34,7 @@ const {
   scrollTop = 0,
   options = {},
   linked = undefined,
+  isRowViewable,
 } = defineProps<Props>();
 
 const treeWrapper = ref<HTMLDivElement | undefined>(undefined);
@@ -196,6 +199,7 @@ const { handleKeyDown } = useTreeKeyboardNav(
       :selection="actualSelection"
       :is-selected="isSelected"
       :get-indeterminate="getIndeterminate"
+      :is-row-viewable="isRowViewable"
       @toggle-open="toggleOpen"
       @toggle-select="toggleSelect"
     >
@@ -248,6 +252,7 @@ const { handleKeyDown } = useTreeKeyboardNav(
             :selection="actualSelection"
             :is-selected="isSelected"
             :get-indeterminate="getIndeterminate"
+      :is-row-viewable="isRowViewable"
             @toggle-open="toggleOpen"
             @toggle-select="toggleSelect"
             @hover-eye-enter="emit('hover:leave', { item })"

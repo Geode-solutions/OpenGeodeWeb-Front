@@ -59,6 +59,19 @@ const {
   applySearchFilter,
 } = useTreeFilter(() => treeviewStore.items, { recursiveSort: true });
 
+// A data row follows its data. The basemap rows and the groups of data types always show their
+// Toggle, except the group of horizon stacks, which open their own modal
+function isRowViewable(row: DisplayItem): boolean {
+  const { id, title } = row.raw;
+  if (typeof id !== "string" || isBasemapId(id)) {
+    return true;
+  }
+  if (row.isLeaf) {
+    return dataStore.isViewable(id);
+  }
+  return title !== "HorizonStack3D";
+}
+
 // The basemap category comes first, out of the data sort and filters
 const displayedItems = computed(() => {
   if (!basemapStore.available) {
@@ -248,6 +261,7 @@ function expandAll(): void {
       }"
       :scroll-top="mainView?.scrollTop || 0"
       :linked="linkedRow"
+      :is-row-viewable="isRowViewable"
       class="transparent-treeview virtual-tree-height"
       @update:selected="(val) => onUpdateSelection(val as string[])"
       @update:scroll-top="treeviewStore.setScrollTop(mainView?.id ?? '', $event)"

@@ -111,22 +111,13 @@ export function useOverlappingPicker(): UseOverlappingPickerReturn {
     }
   }
 
-  async function getViewableIds(): Promise<string[]> {
+  function getViewableIds(): string[] {
     const activeIds = new Set(dataItems.value.map((i: DataItem) => i.data_id));
     const visibleStyleIds = Object.keys(dataStyleStore.styles).filter(
       (styleId) => activeIds.has(styleId) && dataStyleStore.objectVisibility(styleId) === true,
     );
 
-    const viewableChecks = await Promise.all(
-      visibleStyleIds.map(async (styleId) => {
-        try {
-          return (await dataStore.isItemViewable(styleId)) ? styleId : undefined;
-        } catch {
-          return undefined;
-        }
-      }),
-    );
-    return viewableChecks.filter((id): id is string => Boolean(id));
+    return visibleStyleIds.filter((styleId) => dataStore.isViewable(styleId));
   }
 
   function showIntermediateMenu(
@@ -140,7 +131,7 @@ export function useOverlappingPicker(): UseOverlappingPickerReturn {
   }
 
   async function get_viewer_id(params: GetViewerIdParams): Promise<ViewerIdResult> {
-    const ids = await getViewableIds();
+    const ids = getViewableIds();
 
     const schema = viewer_schemas.opengeodeweb_viewer.viewer.picked_ids;
     const { array_ids, viewer_id } = await viewerStore.request({
