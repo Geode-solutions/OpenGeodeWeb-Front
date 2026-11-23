@@ -6,17 +6,11 @@ import {
 } from "./app_helpers/registry.js";
 import { getRestApiPort, getRestApiProtocol, isCloudMode } from "@ogw_front/utils/stores.js";
 import { Status } from "@ogw_front/utils/status";
-import { api_fetch } from "@ogw_internal/utils/api_fetch.js";
-import { upload_file } from "@ogw_internal/utils/upload_file.js";
 import { useAppExtensions } from "./app_helpers/extension.js";
+import { useHttpTransport } from "@ogw_internal/stores/microservice";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
-import type {
-  JsonRpcSchema,
-  ParamsOf,
-  RequestHandlers,
-  ResponseOf,
-} from "@ogw_shared/utils/types.js";
+import type { RequestHandlers } from "@ogw_shared/utils/types.js";
 import type { StateTree } from "pinia";
 
 import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_typed_schemas.js";
@@ -100,58 +94,14 @@ export const useAppStore = defineStore("app", () => {
     getExtensionEnabled,
   } = useAppExtensions();
 
-  const request_counter = ref(0);
-  function start_request(): void {
-    request_counter.value += 1;
-  }
-  function stop_request(): void {
-    request_counter.value -= 1;
-  }
-  const is_busy = computed(() => request_counter.value > 0);
+  const transport = useHttpTransport("app", base_url);
+  const { request, request_counter, is_busy, start_request, stop_request } = transport;
 
   async function upload(file: Readonly<File>, callbacks: RequestHandlers = {}): Promise<unknown> {
     const schema = opengeodeweb_front_schemas.api.local.extensions.upload;
     const { PROJECT: projectName } = useRuntimeConfig().public;
-    const params = { projectName };
-    const result = await upload_file(
-      { $id: "app", base_url: base_url.value, start_request, stop_request },
-      { schema, file, params },
-      {
-        ...callbacks,
-        response_function: async (response: unknown) => {
-          if (callbacks.response_function) {
-            await callbacks.response_function(response);
-          }
-        },
-      },
-    );
+    const result = await transport.upload({ schema, file, params: { projectName } }, callbacks);
     return result;
-  }
-
-  // The response type comes from the schema's generated `response` type, asserted at the single `as ResponseOf<Schema>` boundary below: the server checks its responses against that schema outside production.
-  // oxlint-disable-next-line unicorn/consistent-function-scoping
-  async function request<Schema extends JsonRpcSchema>(
-    { schema, params }: { schema: Schema; params?: ParamsOf<Schema> },
-    callbacks: RequestHandlers<ResponseOf<Schema>> = {},
-  ): Promise<ResponseOf<Schema>> {
-    const rpc_schema: JsonRpcSchema = schema;
-    const result = await api_fetch(
-      { $id: "app", base_url: base_url.value, start_request, stop_request },
-      // The app store is only ever used with HTTP ("front") schemas, which always carry `methods`; the wider JsonRpcSchema param above is kept as-is to match this action's public signature (e.g. relayed from get_version-style callers that only know about the shared, looser schema shape).
-      // oxlint-disable-next-line no-unsafe-type-assertion -- narrowing optional `methods` to required is safe here; see comment above.
-      { schema: rpc_schema as JsonRpcSchema & { methods: string[] }, params: params ?? {} },
-      {
-        ...callbacks,
-        response_function: async (response: unknown) => {
-          if (callbacks.response_function) {
-            // oxlint-disable-next-line no-unsafe-type-assertion -- this is the trusted API boundary; see comment above.
-            await callbacks.response_function(response as ResponseOf<Schema>);
-          }
-        },
-      },
-    );
-    // oxlint-disable-next-line no-unsafe-type-assertion -- this is the trusted API boundary; see comment above.
-    return result as ResponseOf<Schema>;
   }
 
   const projectFolderPath = ref("");

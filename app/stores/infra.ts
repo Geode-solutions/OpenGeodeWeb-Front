@@ -138,5 +138,5 @@ export interface Microservice {
   status?: string;
   is_busy?: boolean;
   launch?: (params: { projectFolderPath: string }) => Promise<unknown>;
-  connect: () => Promise<void>;
+  connect: () => void | Promise<void>;
 }
