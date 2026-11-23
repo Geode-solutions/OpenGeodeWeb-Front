@@ -5,9 +5,9 @@ import {
   importRegisteredStores,
 } from "./app_helpers/registry.js";
 import { getRestApiPort, getRestApiProtocol, isCloudMode } from "@ogw_front/utils/stores.js";
+import { useHttpTransport, useRequestCounter } from "@ogw_internal/stores/microservice";
 import { Status } from "@ogw_front/utils/status";
 import { useAppExtensions } from "./app_helpers/extension.js";
-import { useHttpTransport } from "@ogw_internal/stores/microservice";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
 import type { RequestHandlers } from "@ogw_shared/utils/types.js";
@@ -94,8 +94,10 @@ export const useAppStore = defineStore("app", () => {
     getExtensionEnabled,
   } = useAppExtensions();
 
-  const transport = useHttpTransport("app", base_url);
-  const { request, request_counter, is_busy, start_request, stop_request } = transport;
+  const counter = useRequestCounter();
+  const { request_counter, is_busy, start_request, stop_request } = counter;
+  const transport = useHttpTransport("app", base_url, counter);
+  const { request } = transport;
 
   async function upload(file: Readonly<File>, callbacks: RequestHandlers = {}): Promise<unknown> {
     const schema = opengeodeweb_front_schemas.api.local.extensions.upload;

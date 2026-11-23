@@ -45,7 +45,10 @@ interface HttpUploadArgs {
   params?: Record<string, string>;
 }
 
-interface HttpTransport extends RequestCounter {
+// What a transport needs of the counter: it only reports when a request starts and stops
+type RequestTracker = Pick<RequestCounter, "start_request" | "stop_request">;
+
+interface HttpTransport {
   request: HttpRequest;
   upload: (args: HttpUploadArgs, callbacks?: RequestHandlers) => Promise<unknown>;
 }
@@ -78,16 +81,13 @@ function useRequestCounter(): RequestCounter {
 }
 
 // `base_url` is read on each request: pass the store's ref, not a copy of its value
-function useHttpTransport(id: string, base_url: MaybeRefOrGetter<string>): HttpTransport {
-  const counter = useRequestCounter();
-
+function useHttpTransport(
+  id: string,
+  base_url: MaybeRefOrGetter<string>,
+  { start_request, stop_request }: RequestTracker,
+): HttpTransport {
   function microservice(): Microservice {
-    return {
-      $id: id,
-      base_url: toValue(base_url),
-      start_request: counter.start_request,
-      stop_request: counter.stop_request,
-    };
+    return { $id: id, base_url: toValue(base_url), start_request, stop_request };
   }
 
   async function request<Schema extends JsonRpcSchema>(
@@ -126,7 +126,7 @@ function useHttpTransport(id: string, base_url: MaybeRefOrGetter<string>): HttpT
     return result;
   }
 
-  return { ...counter, request, upload };
+  return { request, upload };
 }
 
 // Calling start again restarts the loop: there is never more than one timer
@@ -183,4 +183,4 @@ function useMicroserviceVersion(request: VersionRequest): {
 }
 
 export { useHttpTransport, useMicroserviceVersion, usePing, useRequestCounter };
-export type { HttpRequest, HttpRequestCallbacks, HttpTransport, RequestCounter };
+export type { HttpRequest, HttpRequestCallbacks, HttpTransport, RequestCounter, RequestTracker };

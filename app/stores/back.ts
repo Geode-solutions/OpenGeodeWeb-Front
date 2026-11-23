@@ -3,6 +3,7 @@ import {
   useHttpTransport,
   useMicroserviceVersion,
   usePing,
+  useRequestCounter,
 } from "@ogw_internal/stores/microservice";
 import type { RequestHandlers } from "@ogw_shared/utils/types.js";
 import { Status } from "@ogw_front/utils/status";
@@ -33,7 +34,9 @@ export const useBackStore = defineStore(
     // The infra store is read lazily: this store can be created before the Nuxt app context
     const base_url = computed(() => base_url_for(useInfraStore().microservice_domain_name));
 
-    const transport = useHttpTransport("back", base_url);
+    const counter = useRequestCounter();
+    const { request_counter, is_busy, start_request, stop_request } = counter;
+    const transport = useHttpTransport("back", base_url, counter);
     const { request } = transport;
     const { version, get_version } = useMicroserviceVersion(request);
 
@@ -92,19 +95,19 @@ export const useBackStore = defineStore(
 
     return {
       default_local_port,
-      request_counter: transport.request_counter,
+      request_counter,
       status,
       version,
       protocol,
       port,
       base_url,
       base_url_for,
-      is_busy: transport.is_busy,
+      is_busy,
       ping,
       start_ping,
       stop_ping,
-      start_request: transport.start_request,
-      stop_request: transport.stop_request,
+      start_request,
+      stop_request,
       launch,
       connect,
       request,
