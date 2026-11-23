@@ -37,21 +37,25 @@ export const useBackStore = defineStore(
     const { request } = transport;
     const { version, get_version } = useMicroserviceVersion(request);
 
+    // The status and the server error banner always change together
+    function set_connected(connected: boolean): void {
+      useFeedbackStore().set_server_error(!connected);
+      status.value = connected ? Status.CONNECTED : Status.NOT_CONNECTED;
+    }
+
     async function ping(): Promise<unknown> {
-      const feedbackStore = useFeedbackStore();
-      function onError(): void {
-        feedbackStore.$patch({ server_error: true });
-        status.value = Status.NOT_CONNECTED;
-      }
       const result = await request(
         { schema: back_schemas.opengeodeweb_back.ping },
         {
-          request_error_function: onError,
-          response_function: () => {
-            feedbackStore.$patch({ server_error: false });
-            status.value = Status.CONNECTED;
+          request_error_function: () => {
+            set_connected(false);
           },
-          response_error_function: onError,
+          response_function: () => {
+            set_connected(true);
+          },
+          response_error_function: () => {
+            set_connected(false);
+          },
         },
       );
       return result;

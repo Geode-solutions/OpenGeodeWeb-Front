@@ -15,12 +15,17 @@ export const useCloudStore = defineStore(
   () => {
     const status = ref(Status.NOT_CONNECTED);
 
+    // The status and the server error banner always change together
+    function set_connected(connected: boolean): void {
+      useFeedbackStore().set_server_error(!connected);
+      status.value = connected ? Status.CONNECTED : Status.NOT_CONNECTED;
+    }
+
     async function on_connected(url: string): Promise<void> {
       const { useAppStore } = await import("./app");
       const { useInfraStore } = await import("./infra");
       const appStore = useAppStore();
-      useFeedbackStore().$patch({ server_error: false });
-      status.value = Status.CONNECTED;
+      set_connected(true);
       useInfraStore().$patch({
         domain_name: url,
       });
@@ -36,20 +41,19 @@ export const useCloudStore = defineStore(
       const { PROJECT, BRANCH } = useRuntimeConfig().public;
       const params = { project: PROJECT, branch: BRANCH };
       const headers = { Authorization: `Bearer ${authToken}` };
-      const feedbackStore = useFeedbackStore();
       const APIStore = useAPIStore();
-      function onError(): void {
-        feedbackStore.$patch({ server_error: true });
-        status.value = Status.NOT_CONNECTED;
-      }
       const result = await APIStore.request(
         { schema: run_cloud_schema, params, headers },
         {
-          request_error_function: onError,
+          request_error_function: () => {
+            set_connected(false);
+          },
           response_function: async ({ url }) => {
             await on_connected(url);
           },
-          response_error_function: onError,
+          response_error_function: () => {
+            set_connected(false);
+          },
         },
       );
       return result;
@@ -75,8 +79,7 @@ export const useCloudStore = defineStore(
           { schema: back_schemas.opengeodeweb_back.ping },
         );
       } catch (error) {
-        useFeedbackStore().$patch({ server_error: true });
-        status.value = Status.NOT_CONNECTED;
+        set_connected(false);
         throw error;
       }
       await on_connected(host);

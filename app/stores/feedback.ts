@@ -51,8 +51,12 @@ export const useFeedbackStore = defineStore("feedback", () => {
     push_feedback({ type: "warning", description, ...(action !== undefined && { action }) });
   }
 
+  function set_server_error(value: boolean): void {
+    server_error.value = value;
+  }
+
   function delete_server_error(): void {
-    server_error.value = false;
+    set_server_error(false);
   }
 
   return {
@@ -63,6 +67,7 @@ export const useFeedbackStore = defineStore("feedback", () => {
     add_success,
     add_warning,
     delete_feedback,
+    set_server_error,
     delete_server_error,
   };
 });
