@@ -154,4 +154,14 @@ function getTable<TRow>(tableName: string): Table<TRow, string> {
   return liveTable<TRow>(tableName);
 }
 
-export { Database, database, getTable };
+// Runs `scope` in one read-write transaction over `tables`: its writes all apply, or none do.
+// Only database calls may be awaited inside `scope`, or Dexie commits the transaction early.
+async function writeTransaction<Result>(
+  tables: readonly Table[],
+  scope: () => Promise<Result>,
+): Promise<Result> {
+  const result = await currentInstance().transaction("rw", [...tables], scope);
+  return result;
+}
+
+export { Database, database, getTable, writeTransaction };

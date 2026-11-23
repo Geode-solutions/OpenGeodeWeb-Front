@@ -17,7 +17,7 @@ import type {
 import { type LegacyDataId, fromLegacyDataId } from "@ogw_front/utils/legacy_data_id";
 import { type ModelComponentRecord, useDataMesh } from "./data_helpers/mesh.js";
 import { type ModelComponentRelationRecord, useDataRelations } from "./data_helpers/relations.js";
-import { database } from "@ogw_internal/database/database.js";
+import { database, writeTransaction } from "@ogw_internal/database/database.js";
 import { liveObservable } from "@ogw_front/utils/live_observable";
 import { useDataCollections } from "./data_helpers/collections.js";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -313,13 +313,21 @@ export const useDataStore = defineStore("data", () => {
     return components;
   }
   async function deleteModelComponents(modelId: ModelId): Promise<void> {
-    await model_components_db.where("data_id").equals(modelId).delete();
-    await model_components_relation_db.where("data_id").equals(modelId).delete();
+    await writeTransaction([model_components_db, model_components_relation_db], async () => {
+      await model_components_db.where("data_id").equals(modelId).delete();
+      await model_components_relation_db.where("data_id").equals(modelId).delete();
+    });
   }
 
+  // A data is deleted with its components and their relations, or not at all
   async function deleteItem(dataId: DataId): Promise<void> {
-    await data_db.delete(dataId);
-    await deleteModelComponents(dataId);
+    await writeTransaction(
+      [data_db, model_components_db, model_components_relation_db],
+      async () => {
+        await data_db.delete(dataId);
+        await deleteModelComponents(dataId);
+      },
+    );
   }
 
   async function updateItem(dataId: DataId, changes: Partial<DataItem>): Promise<void> {
@@ -358,9 +366,14 @@ export const useDataStore = defineStore("data", () => {
 
   async function clear(): Promise<void> {
     registeredIds.clear();
-    await data_db.clear();
-    await model_components_db.clear();
-    await model_components_relation_db.clear();
+    await writeTransaction(
+      [data_db, model_components_db, model_components_relation_db],
+      async () => {
+        await data_db.clear();
+        await model_components_db.clear();
+        await model_components_relation_db.clear();
+      },
+    );
   }
 
   // Dexie's bulkPut expects mutable arrays, so this snapshot parameter can't deeply satisfy
@@ -375,16 +388,22 @@ export const useDataStore = defineStore("data", () => {
       | ModelComponentRelationRecord
     )[];
   }): Promise<void> {
-    await clear();
-    await model_components_db.bulkPut(
-      snapshot.modelComponents.map((component) =>
-        fromLegacyDataId<ModelComponentRecord>(component),
-      ),
-    );
-    await model_components_relation_db.bulkPut(
-      snapshot.modelComponentsRelations.map((relation) =>
-        fromLegacyDataId<ModelComponentRelationRecord>(relation),
-      ),
+    // The snapshot replaces the stored data as a whole: a failed import leaves the previous one
+    await writeTransaction(
+      [data_db, model_components_db, model_components_relation_db],
+      async () => {
+        await clear();
+        await model_components_db.bulkPut(
+          snapshot.modelComponents.map((component) =>
+            fromLegacyDataId<ModelComponentRecord>(component),
+          ),
+        );
+        await model_components_relation_db.bulkPut(
+          snapshot.modelComponentsRelations.map((relation) =>
+            fromLegacyDataId<ModelComponentRelationRecord>(relation),
+          ),
+        );
+      },
     );
   }
   return {

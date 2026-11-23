@@ -5,11 +5,11 @@ import type {
   ObjectStyle,
   SceneStyle,
 } from "@ogw_internal/stores/data_style/types";
+import { database, getTable, writeTransaction } from "@ogw_internal/database/database.js";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import type { Table } from "dexie";
 import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
-import { database } from "@ogw_internal/database/database.js";
 import { getDefaultStyle } from "@ogw_front/utils/default_styles";
 import { useAttributeTimeStepStyle } from "@ogw_internal/stores/data_style/time_step";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -22,7 +22,8 @@ interface DataStyleSnapshot {
   // Projects saved before data_id existed hold their styles with an `id`
   readonly styles: Record<string, LegacyDataId<ObjectStyle> | ObjectStyle>;
   readonly componentStyles: Record<string, ModelComponentStyle>;
-  readonly modelComponentTypeStyles: Record<string, ModelComponentTypeStyle>;
+  // Projects saved before the styles by component type (2026-04) have none
+  readonly modelComponentTypeStyles?: Record<string, ModelComponentTypeStyle>;
   readonly sceneStyle?: SceneStyle;
 }
 
@@ -115,37 +116,33 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   async function importStores(snapshot: DataStyleSnapshot): Promise<void> {
     const stylesSnapshot = snapshot.styles;
     const componentStylesSnapshot = snapshot.componentStyles;
-    const modelComponentTypeStylesSnapshot = snapshot.modelComponentTypeStyles;
+    const modelComponentTypeStylesSnapshot = snapshot.modelComponentTypeStyles ?? {};
 
-    await dataStyleState.clear();
-
-    const style_promises = Object.entries(stylesSnapshot).map(
+    const styles = Object.entries(stylesSnapshot).map(
       // oxlint-disable-next-line prefer-readonly-parameter-types -- same external ObjectStyle limitation as above.
-      async ([dataId, style]: readonly [string, LegacyDataId<ObjectStyle> | ObjectStyle]) => {
-        const key = await data_style_db.put(
-          structuredClone({ ...fromLegacyDataId<ObjectStyle>(style), data_id: dataId }),
-        );
-        return key;
-      },
+      ([dataId, style]: readonly [string, LegacyDataId<ObjectStyle> | ObjectStyle]) =>
+        structuredClone({ ...fromLegacyDataId<ObjectStyle>(style), data_id: dataId }),
     );
-    const component_style_promises = Object.values(componentStylesSnapshot).map(
-      async (style: ModelComponentStyle) => {
-        const key = await component_datastyle_db.put(structuredClone(style));
-        return key;
-      },
-    );
-    const model_component_type_style_promises = Object.values(modelComponentTypeStylesSnapshot).map(
-      async (style: ModelComponentTypeStyle) => {
-        const key = await model_component_type_datastyle_db.put(structuredClone(style));
-        return key;
-      },
+    const componentStyles = structuredClone(Object.values(componentStylesSnapshot));
+    const modelComponentTypeStyles = structuredClone(
+      Object.values(modelComponentTypeStylesSnapshot),
     );
 
-    await Promise.all([
-      ...style_promises,
-      ...component_style_promises,
-      ...model_component_type_style_promises,
-    ]);
+    // The snapshot replaces the stored styles as a whole: a failed import leaves the previous ones
+    await writeTransaction(
+      [
+        data_style_db,
+        component_datastyle_db,
+        model_component_type_datastyle_db,
+        getTable("scene_style"),
+      ],
+      async () => {
+        await dataStyleState.clear();
+        await data_style_db.bulkPut(styles);
+        await component_datastyle_db.bulkPut(componentStyles);
+        await model_component_type_datastyle_db.bulkPut(modelComponentTypeStyles);
+      },
+    );
     await dataStyleState.loadFromDatabase();
     await sceneStyleStore.importSceneStyle(snapshot.sceneStyle);
   }
