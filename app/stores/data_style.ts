@@ -1,4 +1,3 @@
-import type { DataId, GeodeObjectType } from "@ogw_front/types/identifiers";
 import { type LegacyDataId, fromLegacyDataId } from "@ogw_front/utils/legacy_data_id";
 import type {
   ModelComponentStyle,
@@ -6,8 +5,10 @@ import type {
   ObjectStyle,
   SceneStyle,
 } from "@ogw_internal/stores/data_style/types";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import type { Table } from "dexie";
-import type { Visibility } from "@ogw_front/types/style";
+import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import { database } from "@ogw_internal/database/database.js";
 import { getDefaultStyle } from "@ogw_front/utils/default_styles";
 import { useAttributeTimeStepStyle } from "@ogw_internal/stores/data_style/time_step";
@@ -73,15 +74,15 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
       return dataStyleState.mutateStyle(dataId, { visibility });
     }
 
-    const { viewer_type } = item;
+    const { viewer_object_type } = item;
 
-    if (viewer_type === "mesh") {
+    if (viewer_object_type === "mesh") {
       return meshStyleStore.setMeshVisibility(dataId, visibility);
     }
-    if (viewer_type === "model") {
+    if (viewer_object_type === "model") {
       return modelStyleStore.setModelVisibility(dataId, visibility);
     }
-    throw new Error("Unknown viewer_type");
+    throw new Error("Unknown viewer_object_type");
   }
 
   async function applyDefaultStyle(dataId: DataId): Promise<unknown[]> {
@@ -90,15 +91,15 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
       throw new Error(`applyDefaultStyle called for non-viewable item: ${dataId}`);
     }
 
-    const { viewer_type } = item;
+    const { viewer_object_type } = item;
 
-    if (viewer_type === "mesh") {
+    if (viewer_object_type === "mesh") {
       return meshStyleStore.applyMeshStyle(dataId);
     }
-    if (viewer_type === "model") {
+    if (viewer_object_type === "model") {
       return modelStyleStore.applyModelStyle(dataId);
     }
-    throw new Error(`Unknown viewer_type: ${viewer_type}`);
+    throw new Error(`Unknown viewer_object_type: ${String(viewer_object_type)}`);
   }
 
   function exportStores(): DataStyleSnapshot {
@@ -156,10 +157,10 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
       if (!(await dataStore.isItemViewable(meta))) {
         return;
       }
-      const viewerType = meta.viewer_type;
-      if (viewerType === "mesh") {
+      const viewerObjectType = meta.viewer_object_type;
+      if (viewerObjectType === "mesh") {
         await meshStyleStore.applyMeshStyle(dataId);
-      } else if (viewerType === "model") {
+      } else if (viewerObjectType === "model") {
         await modelStyleStore.applyModelStyle(dataId);
       }
     });

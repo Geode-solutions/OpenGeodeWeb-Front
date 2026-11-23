@@ -28,25 +28,25 @@ describe("treeview store actions", () => {
     const treeviewStore = useTreeviewStore();
     const testItems = [
       {
-        geode_object_type: "BRep",
+        geode_object_type: "BRep" as const,
         name: "test_brep.og_brep",
         id: "1",
         geode_id: "00000000-0000-0000-0000-000000000001",
-        viewer_type: "model",
+        viewer_object_type: "model" as const,
       },
       {
-        geode_object_type: "BRep",
+        geode_object_type: "BRep" as const,
         name: "test_brep_2.og_brep",
         id: "2",
         geode_id: "00000000-0000-0000-0000-000000000002",
-        viewer_type: "model",
+        viewer_object_type: "model" as const,
       },
       {
-        geode_object_type: "EdgedCurve2D",
+        geode_object_type: "EdgedCurve2D" as const,
         name: "test_edgedcurve.og_edc2d",
         id: "2",
         geode_id: "00000000-0000-0000-0000-000000000003",
-        viewer_type: "mesh",
+        viewer_object_type: "mesh" as const,
       },
     ];
 
@@ -56,7 +56,7 @@ describe("treeview store actions", () => {
         testItem.name,
         testItem.id,
         testItem.geode_id,
-        testItem.viewer_type,
+        testItem.viewer_object_type,
       );
       const itemsCopy = [...treeviewStore.items];
       expect(treeviewStore.items).toStrictEqual(itemsCopy.toSorted(sortByTitle));
@@ -71,5 +71,83 @@ describe("treeview store actions", () => {
     expect(children.map((child) => child.geode_id).toSorted()).toStrictEqual(
       testItems.map((testItem) => testItem.geode_id).toSorted(),
     );
+  });
+});
+
+function viewColor(id: string): string | undefined {
+  return useTreeviewStore().opened_views.find((view) => view.id === id)?.color;
+}
+
+describe("treeview store model tree link", () => {
+  beforeEach(() => {
+    setupActivePinia();
+  });
+
+  test("each opened model tree gets its own color", () => {
+    const treeviewStore = useTreeviewStore();
+    treeviewStore.displayAdditionalTree("a", "corbi", "BRep");
+    treeviewStore.displayAdditionalTree("b", "corbi", "BRep");
+    expect(viewColor("a")).toBeDefined();
+    expect(viewColor("b")).toBeDefined();
+    expect(viewColor("a")).not.toBe(viewColor("b"));
+  });
+
+  test("a color stays with its tree when another one closes", () => {
+    const treeviewStore = useTreeviewStore();
+    treeviewStore.displayAdditionalTree("a", "corbi", "BRep");
+    treeviewStore.displayAdditionalTree("b", "corbi", "BRep");
+    const colorB = viewColor("b");
+    treeviewStore.closeView("a");
+    expect(viewColor("b")).toBe(colorB);
+    // The freed color goes to the next tree, never the one still in use
+    treeviewStore.displayAdditionalTree("c", "other", "BRep");
+    expect(viewColor("c")).not.toBe(colorB);
+  });
+
+  test("model trees restored without a color get distinct ones", () => {
+    const treeviewStore = useTreeviewStore();
+    treeviewStore.importStores({
+      opened_views: [
+        { type: "object", id: "main", title: "Objects", scrollTop: 0, opened: [] },
+        { type: "component", id: "a", title: "corbi", scrollTop: 0, opened: [] },
+        { type: "component", id: "b", title: "corbi", scrollTop: 0, opened: [] },
+      ],
+    });
+    expect(viewColor("main")).toBeUndefined();
+    expect(viewColor("a")).toBeDefined();
+    expect(viewColor("b")).toBeDefined();
+    expect(viewColor("a")).not.toBe(viewColor("b"));
+  });
+
+  test("hovered model is shared and cleared", () => {
+    const treeviewStore = useTreeviewStore();
+    treeviewStore.setHoveredModel("a");
+    expect(treeviewStore.hoveredModelId).toBe("a");
+    treeviewStore.setHoveredModel(undefined);
+    expect(treeviewStore.hoveredModelId).toBeUndefined();
+  });
+
+  test("closing a hovered view clears the hovered model", () => {
+    const treeviewStore = useTreeviewStore();
+    treeviewStore.displayAdditionalTree("a", "corbi", "BRep");
+    treeviewStore.setHoveredModel("a");
+    treeviewStore.closeView("a");
+    expect(treeviewStore.hoveredModelId).toBeUndefined();
+  });
+
+  test("closing another view keeps the hovered model", () => {
+    const treeviewStore = useTreeviewStore();
+    treeviewStore.displayAdditionalTree("a", "corbi", "BRep");
+    treeviewStore.setHoveredModel("b");
+    treeviewStore.closeView("a");
+    expect(treeviewStore.hoveredModelId).toBe("b");
+  });
+
+  test("removing a hovered data clears the hovered model", () => {
+    const treeviewStore = useTreeviewStore();
+    treeviewStore.addItem("BRep", "corbi", "a", "geode-a", "model");
+    treeviewStore.setHoveredModel("a");
+    treeviewStore.removeItem("a");
+    expect(treeviewStore.hoveredModelId).toBeUndefined();
   });
 });

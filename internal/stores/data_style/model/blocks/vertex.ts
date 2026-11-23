@@ -1,11 +1,7 @@
 // oxlint-disable eslint/max-lines
 import type {
   AttributeColorMap,
-  AttributeItem,
-  AttributeName,
   AttributeRange,
-  AttributeRangeMaximum,
-  AttributeRangeMinimum,
   AttributeTimeStep,
 } from "@ogw_front/types/attribute";
 import type {
@@ -14,8 +10,15 @@ import type {
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
+import type {
+  AttributeItem,
+  AttributeName,
+  AttributeRangeMaximum,
+  AttributeRangeMinimum,
+  ColorRGBA,
+} from "@geode/opengeodeweb-viewer/schema_types";
 import type { BlockId, ModelId } from "@ogw_front/types/identifiers";
-import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
@@ -86,11 +89,11 @@ interface UseModelBlocksVertexAttributeReturn {
     blockIds: BlockId[],
     colorMap: AttributeColorMap | undefined,
   ) => Promise<unknown>;
-  modelBlocksVertexAttributeNoDataColor: (modelId: ModelId, blockId?: BlockId) => RGBAColor;
+  modelBlocksVertexAttributeNoDataColor: (modelId: ModelId, blockId?: BlockId) => ColorRGBA;
   setModelBlocksVertexAttributeNoDataColor: (
     modelId: ModelId,
     blockIds: BlockId[],
-    no_data_color: RGBAColor,
+    no_data_color: ColorRGBA,
   ) => Promise<unknown>;
 }
 
@@ -175,7 +178,7 @@ function useModelBlocksVertexAttributeGetters(
     const storedConfig = modelBlocksVertexAttributeStoredConfig(modelId, blockId, name, item);
     return storedConfig.colorMap;
   }
-  function modelBlocksVertexAttributeNoDataColor(modelId: ModelId, blockId?: BlockId): RGBAColor {
+  function modelBlocksVertexAttributeNoDataColor(modelId: ModelId, blockId?: BlockId): ColorRGBA {
     const name = modelBlocksVertexAttributeName(modelId, blockId);
     const item = modelBlocksVertexAttributeItem(modelId, blockId);
     const storedConfig = modelBlocksVertexAttributeStoredConfig(modelId, blockId, name, item);
@@ -401,7 +404,7 @@ function useModelBlocksVertexAttribute(): UseModelBlocksVertexAttributeReturn {
   async function setModelBlocksVertexAttributeNoDataColor(
     modelId: ModelId,
     blockIds: BlockId[],
-    no_data_color: RGBAColor,
+    no_data_color: ColorRGBA,
   ): Promise<unknown> {
     const name = modelBlocksVertexAttributeName(modelId, blockIds[0]);
     const item = modelBlocksVertexAttributeItem(modelId, blockIds[0]);

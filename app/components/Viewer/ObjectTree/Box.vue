@@ -7,26 +7,33 @@ interface Props {
   title: string;
   closable?: boolean;
   icon?: string;
-  mdiIcon?: string;
+  fontIcon?: string;
   scrollTop?: number;
   borderRadius?: string;
   borderLeft?: boolean;
+  // Ties the box to its row in the objects tree, highlighted while either is hovered
+  accent?: { color: string; highlighted: boolean };
 }
 
 const {
   title,
   closable = false,
   icon = "",
-  mdiIcon = "",
+  fontIcon = "",
   scrollTop = 0,
-  borderRadius = "16px",
+  borderRadius = "var(--ogw-viewer-panel-radius, 16px)",
   borderLeft = true,
+  accent = undefined,
 } = defineProps<Props>();
+
+const slots = useSlots();
 
 interface Emits {
   close: [];
   dragstart: [event: DragEvent];
   "update:scrollTop": [value: number];
+  "header-enter": [];
+  "header-leave": [];
 }
 
 const emit = defineEmits<Emits>();
@@ -97,13 +104,21 @@ watch(
     ref="treeview-box"
     variant="outlined"
     class="tree-box d-flex flex-column"
-    :style="[adaptiveStyles, { borderRadius, borderLeft: borderLeft ? undefined : 'none' }]"
+    :class="{ 'is-highlighted': accent?.highlighted }"
+    :style="[
+      adaptiveStyles,
+      { borderRadius, borderLeft: borderLeft ? undefined : 'none' },
+      accent ? { '--tree-box-accent': accent.color } : {},
+    ]"
   >
+    <div v-if="accent" data-testid="treeBoxAccent" class="tree-box-accent" />
     <v-card-title
       class="tree-box-header d-flex align-center"
       :class="{ 'cursor-grab': closable }"
       :draggable="closable"
       @dragstart="emit('dragstart', $event)"
+      @mouseenter="emit('header-enter')"
+      @mouseleave="emit('header-leave')"
     >
       <v-img
         v-if="icon"
@@ -112,32 +127,37 @@ watch(
         height="24"
         max-width="24"
         class="mr-2"
-        style="filter: brightness(0); display: flex; align-items: center"
-      />
-      <v-icon v-else-if="mdiIcon" size="24" class="mr-2">{{ mdiIcon }}</v-icon>
-      <v-icon v-else-if="closable" size="24" class="mr-2">mdi-drag-variant</v-icon>
-      <span
-        class="text-subtitle-2 font-weight-bold d-inline-flex align-center"
         style="
-          height: 24px;
-          line-height: 1;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          flex-shrink: 1;
-          min-width: 0;
+          filter: var(--ogw-mono-icon-filter, brightness(0));
+          display: flex;
+          align-items: center;
         "
-      >
-        {{ title }}
-      </span>
-      <v-spacer />
-      <v-btn
-        v-if="closable"
-        icon="mdi-close"
-        variant="text"
-        size="x-small"
-        @click="emit('close')"
       />
+      <v-icon v-else-if="fontIcon" size="24" class="mr-2">{{ fontIcon }}</v-icon>
+      <v-icon v-else-if="closable" size="24" class="mr-2">ph-dots-six-vertical</v-icon>
+      <v-tooltip :disabled="!slots.tooltip" location="bottom start" open-delay="400">
+        <template #activator="{ props: tooltipProps }">
+          <span
+            v-bind="tooltipProps"
+            data-testid="treeBoxTitle"
+            class="text-subtitle-2 font-weight-bold d-inline-flex align-center"
+            style="
+              height: 24px;
+              line-height: 1;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              flex-shrink: 1;
+              min-width: 0;
+            "
+          >
+            {{ title }}
+          </span>
+        </template>
+        <slot name="tooltip" />
+      </v-tooltip>
+      <v-spacer />
+      <v-btn v-if="closable" icon="ph-x" variant="text" size="x-small" @click="emit('close')" />
     </v-card-title>
     <v-divider />
     <v-card-text class="pa-0 flex-grow-1 overflow-hidden d-flex flex-column" style="min-height: 0">
@@ -158,8 +178,8 @@ watch(
   height: 100%;
   min-height: 0;
   background-color: transparent !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity)) !important;
+  box-shadow: 0 4px 15px rgba(var(--v-theme-on-surface), 0.05);
   position: relative;
   overflow: hidden;
   transition:
@@ -171,10 +191,11 @@ watch(
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, var(--adaptive-opacity));
+  /* Adaptive glass: apps can tint it (an "r, g, b" triplet) and change its blending, per theme */
+  background: rgba(var(--ogw-viewer-glass-tint, 255, 255, 255), var(--adaptive-opacity));
   backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
   -webkit-backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
-  mix-blend-mode: lighten;
+  mix-blend-mode: var(--ogw-viewer-glass-blend, lighten);
   z-index: 0;
   pointer-events: none;
   border-radius: inherit;
@@ -188,11 +209,33 @@ watch(
   z-index: 1;
 }
 
+.tree-box-accent {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: var(--tree-box-accent);
+  pointer-events: none;
+}
+
+.tree-box.is-highlighted {
+  border-color: var(--tree-box-accent) !important;
+  box-shadow:
+    inset 0 0 0 2px var(--tree-box-accent),
+    0 4px 15px rgba(var(--v-theme-on-surface), 0.05);
+}
+
+.tree-box.is-highlighted .tree-box-header {
+  background-color: color-mix(in srgb, var(--tree-box-accent) 18%, transparent);
+}
+
 .tree-box-header {
   height: 32px !important;
-  padding: 0 10px !important;
-  background-color: rgba(255, 255, 255, 0.05);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 0 var(--ogw-viewer-panel-padding, 10px) !important;
+  background-color: rgba(var(--v-theme-surface), 0.05);
+  border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.05);
   flex-shrink: 0;
   font-size: 0.875rem !important;
   line-height: 1.25rem !important;

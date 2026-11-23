@@ -4,9 +4,11 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schem
 import { consola } from "consola";
 
 // Local imports
-import type { DataId, GeodeObjectType, GeodeObjectTyped } from "@ogw_front/types/identifiers";
 import { type LegacyDataId, fromLegacyDataId } from "@ogw_front/utils/legacy_data_id";
 import { type NewDataItem, useDataStore } from "@ogw_front/stores/data";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
+import type { GeodeObjectTyped } from "@ogw_front/types/identifiers";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
@@ -37,7 +39,7 @@ async function importDataItem(item: NewDataItem): Promise<string> {
   });
   let addDataComponentsTask: Promise<string | undefined> = Promise.resolve(undefined);
   let addDataRelationsTask: Promise<string | undefined> = Promise.resolve(undefined);
-  if (item.viewer_type === "model") {
+  if (item.viewer_object_type === "model") {
     addDataComponentsTask = dataStore.addComponents(item);
     addDataRelationsTask = dataStore.addComponentRelations(item);
   }
@@ -46,7 +48,7 @@ async function importDataItem(item: NewDataItem): Promise<string> {
     item.name ?? item.data_id,
     item.data_id,
     item.geode_id,
-    item.viewer_type,
+    item.viewer_object_type,
   );
   const addDataStyleTask = dataStyleStore.addDataStyle(item.data_id, item.geode_object_type);
   const addViewerTask = addDataTask.then(async () => {

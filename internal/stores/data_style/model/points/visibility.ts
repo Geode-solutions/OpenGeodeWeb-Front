@@ -7,7 +7,7 @@ import {
   useModelComponentPointsStyle,
 } from "@ogw_internal/stores/data_style/model/points/component";
 import type { ModelId } from "@ogw_front/types/identifiers";
-import type { Visibility } from "@ogw_front/types/style";
+import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import { useModelPointsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 

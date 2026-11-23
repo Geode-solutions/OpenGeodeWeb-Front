@@ -2,7 +2,7 @@ import back_schemas, {
   type BasemapBuildResponse,
 } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import type { MapStyle } from "@ogw_front/utils/basemap_tree";
-import type { Opacity } from "@ogw_front/types/style";
+import type { Opacity } from "@geode/opengeodeweb-viewer/schema_types";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useViewerStore } from "@ogw_front/stores/viewer";

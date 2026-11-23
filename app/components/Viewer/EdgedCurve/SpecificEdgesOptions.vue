@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import type { EdgeWidth, Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
-import type { Visibility, Width } from "@ogw_front/types/style";
 import EdgedCurveEdges from "@ogw_front/assets/viewer_svgs/edged_curve_edges.svg";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import ViewerEdgedCurveSpecificEdgesColoring from "@ogw_front/components/Viewer/EdgedCurve/SpecificEdgesColoring.vue";
@@ -33,7 +33,7 @@ const visibility = computed<Visibility>({
     hybridViewerStore.remoteRender();
   },
 });
-const width = computed<Width>({
+const width = computed<EdgeWidth>({
   get: () => dataStyleStore.meshEdgesWidth(dataId.value),
   set: async (newValue) => {
     await applyBatchStyle(dataId.value, (meshId: MeshId) =>

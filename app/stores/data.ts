@@ -1,19 +1,18 @@
 // oxlint-disable eslint/max-lines
 // Third party imports
-import type { CRSList } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
+import type { CRS } from "@geode/opengeodeweb-back/schema_types";
 import type { Table } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
+import type { DataId, GeodeId } from "@geode/opengeodeweb-microservice/schema_types";
 import type {
-  DataId,
   DataIdentified,
-  GeodeId,
   GeodeIdentified,
   GeodeObjectTyped,
   ModelId,
-  ViewerTyped,
+  ViewerObjectTyped,
 } from "@ogw_front/types/identifiers";
 import { type LegacyDataId, fromLegacyDataId } from "@ogw_front/utils/legacy_data_id";
 import { type ModelComponentRecord, useDataMesh } from "./data_helpers/mesh.js";
@@ -23,13 +22,13 @@ import { liveObservable } from "@ogw_front/utils/live_observable";
 import { useDataCollections } from "./data_helpers/collections.js";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
-interface DataItem extends DataIdentified, GeodeIdentified, GeodeObjectTyped, ViewerTyped {
+interface DataItem extends DataIdentified, GeodeIdentified, GeodeObjectTyped, ViewerObjectTyped {
   name: string;
   visible: boolean;
   created_at: string;
   is_viewable?: boolean;
   binary_light_viewable?: string;
-  crs?: CRSList;
+  crs?: CRS;
 }
 
 // What the CRS features read of a data: light to copy on each change
@@ -45,11 +44,11 @@ interface ModelComponentInput extends GeodeIdentified {
   items?: string[];
 }
 
-interface NewDataItem extends DataIdentified, GeodeIdentified, GeodeObjectTyped, ViewerTyped {
+interface NewDataItem extends DataIdentified, GeodeIdentified, GeodeObjectTyped, ViewerObjectTyped {
   name?: string;
   is_viewable?: boolean;
   binary_light_viewable?: string;
-  crs?: CRSList;
+  crs?: CRS;
   // Set on saved data: kept by the project snapshot
   created_at?: string;
   mesh_components?: ModelComponentInput[];
@@ -127,7 +126,7 @@ export const useDataStore = defineStore("data", () => {
     formatedCollectionComponents,
     refFormatedCollectionComponents,
   } = useDataCollections();
-  const { getComponentRelations } = useDataRelations();
+  const { getComponentRelations, fetchAllComponentRelations } = useDataRelations();
   // Ids the viewer holds a pipeline for: an item is stored before it is registered, and non viewable items never are
   const registeredIds = reactive(new Set<string>());
   async function item(dataId: DataId): Promise<DataItem> {
@@ -230,7 +229,7 @@ export const useDataStore = defineStore("data", () => {
       data_id: new_item.data_id,
       geode_id: new_item.geode_id,
       name: new_item.name ?? new_item.data_id,
-      viewer_type: new_item.viewer_type,
+      viewer_object_type: new_item.viewer_object_type,
       geode_object_type: new_item.geode_object_type,
       visible: true,
       created_at: new Date().toISOString(),
@@ -450,6 +449,7 @@ export const useDataStore = defineStore("data", () => {
     formatedCollectionComponents,
     refFormatedCollectionComponents,
     getComponentRelations,
+    fetchAllComponentRelations,
   };
 });
 

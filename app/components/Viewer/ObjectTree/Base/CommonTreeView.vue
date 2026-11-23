@@ -20,6 +20,8 @@ interface Props {
   active?: unknown[];
   scrollTop?: number;
   options?: Record<string, unknown>;
+  // Row tinted from outside the tree, e.g. while its model tree header is hovered
+  linked?: { id: unknown; color: string };
 }
 
 const {
@@ -29,6 +31,7 @@ const {
   active = [],
   scrollTop = 0,
   options = {},
+  linked = undefined,
 } = defineProps<Props>();
 
 const treeWrapper = ref<HTMLDivElement | undefined>(undefined);
@@ -217,8 +220,14 @@ const { handleKeyDown } = useTreeKeyboardNav(
               'leaf-row': item.isLeaf,
               'is-focused': focusedIndex === index,
               'is-active': item.isActive,
+              'is-linked': linked !== undefined && item.raw[actualItemProps.value] === linked.id,
             },
           ]"
+          :style="
+            linked !== undefined && item.raw[actualItemProps.value] === linked.id
+              ? { '--row-link-color': linked.color }
+              : undefined
+          "
           class="pa-0"
           tabindex="-1"
           @mousedown.prevent
@@ -284,13 +293,13 @@ const { handleKeyDown } = useTreeKeyboardNav(
 .tree-row-wrapper {
   min-height: 28px !important;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: var(--ogw-viewer-row-radius, 4px);
   margin: 0 2px;
 }
 
 .tree-row-wrapper.is-focused {
-  background-color: rgba(0, 0, 0, 0.08) !important;
-  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.15);
+  background-color: rgba(var(--v-theme-on-surface), 0.08) !important;
+  box-shadow: inset 0 0 0 2px rgba(var(--v-theme-on-surface), 0.15);
 }
 
 .tree-row-wrapper.is-active {
@@ -312,8 +321,13 @@ const { handleKeyDown } = useTreeKeyboardNav(
   box-shadow: inset 0 0 0 2px rgba(var(--v-theme-primary), 0.6);
 }
 
+.tree-row-wrapper.is-linked {
+  background-color: color-mix(in srgb, var(--row-link-color) 22%, transparent) !important;
+  box-shadow: inset 0 0 0 2px var(--row-link-color);
+}
+
 .tree-row-wrapper:hover:not(.is-focused):not(.is-active) {
-  background-color: rgba(0, 0, 0, 0.04) !important;
+  background-color: rgba(var(--v-theme-on-surface), 0.04) !important;
 }
 
 :deep(.v-list-item__content) {

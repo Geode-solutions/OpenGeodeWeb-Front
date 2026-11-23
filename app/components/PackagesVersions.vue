@@ -49,9 +49,7 @@ await get_packages_versions();
         <br />
       </span>
       <template #activator="{ props }">
-        <v-icon v-bind="props" color="primary" class="justify-right">
-          mdi-information-outline
-        </v-icon>
+        <v-icon v-bind="props" color="primary" class="justify-right"> ph-info </v-icon>
       </template>
     </v-tooltip>
   </v-container>

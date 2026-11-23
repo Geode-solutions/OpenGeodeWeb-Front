@@ -1,5 +1,6 @@
-import type { AttributeName, AttributeTimeStep } from "@ogw_front/types/attribute";
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { AttributeName } from "@geode/opengeodeweb-viewer/schema_types";
+import type { AttributeTimeStep } from "@ogw_front/types/attribute";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import { attributeArrayName } from "@ogw_front/utils/attributes";
 import { useDataStyleState } from "./state";
 

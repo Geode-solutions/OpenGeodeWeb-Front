@@ -29,7 +29,7 @@ describe("useDataStore - collections", () => {
       data_id: dataId,
       geode_id: geodeId,
       name: "cube",
-      viewer_type: "model",
+      viewer_object_type: "model" as const,
       geode_object_type: "BRep",
     });
     const stored = await dataStore.item(dataId);
@@ -44,7 +44,7 @@ describe("useDataStore - collections", () => {
       data_id: dataId,
       geode_id: "01a08187-2c4c-7e64-85c5-52c3439f0627",
       name: "points",
-      viewer_type: "mesh",
+      viewer_object_type: "mesh" as const,
       geode_object_type: "PointSet3D",
       crs,
     });
@@ -65,8 +65,8 @@ describe("useDataStore - collections", () => {
     const model = {
       data_id: modelId,
       geode_id: modelId,
-      viewer_type: "model",
-      geode_object_type: "Section",
+      viewer_object_type: "model" as const,
+      geode_object_type: "Section" as const,
       mesh_components: [
         surface,
         line1,
@@ -103,6 +103,52 @@ describe("useDataStore - collections", () => {
 
     const faultRelations = await dataStore.getComponentRelations(modelId, "fault");
     expect(faultRelations).toStrictEqual({ boundaries: [], internals: [] });
+  });
+
+  test("fetchAllComponentRelations groups the relations of a model by parent", async () => {
+    const dataStore = useDataStore();
+    const modelId = "test_model_id";
+    const model = {
+      data_id: modelId,
+      geode_id: modelId,
+      viewer_object_type: "model" as const,
+      geode_object_type: "Section" as const,
+      mesh_components: [
+        {
+          ...component("surface", "Surface", 1),
+          boundaries: ["line1", "line2"],
+          internals: ["corner"],
+        },
+        { ...component("line1", "Line", 2), boundaries: ["corner"] },
+        component("line2", "Line", 3),
+        component("corner", "Corner", 4),
+      ],
+      collection_components: [{ ...component("fault", "Fault", 0), items: ["surface"] }],
+    };
+    await dataStore.addComponents(model);
+    await dataStore.addComponentRelations(model);
+    await dataStore.addComponents({ ...model, data_id: "other_model_id" });
+    await dataStore.addComponentRelations({
+      ...model,
+      data_id: "other_model_id",
+      mesh_components: [{ ...component("line2", "Line", 3), boundaries: ["corner"] }],
+    });
+
+    const relations = await dataStore.fetchAllComponentRelations(
+      modelId,
+      await dataStore.getAllMeshComponents(modelId),
+    );
+    // The collection link of the fault is not a boundary nor an internal relation
+    expect(Object.keys(relations).toSorted()).toStrictEqual(["line1", "surface"]);
+    expect(relations.surface?.boundaries.map((boundary) => boundary.id).toSorted()).toStrictEqual([
+      "line1",
+      "line2",
+    ]);
+    expect(relations.surface?.internals.map((internal) => internal.id)).toStrictEqual(["corner"]);
+    expect(relations.line1?.boundaries.map((boundary) => boundary.category)).toStrictEqual([
+      "Corner",
+    ]);
+    expect(relations.line1?.internals).toStrictEqual([]);
   });
 
   describe("isItemViewable", () => {

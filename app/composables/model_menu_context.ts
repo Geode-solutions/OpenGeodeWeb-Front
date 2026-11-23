@@ -1,10 +1,12 @@
 import { type ComputedRef, type Ref, computed, ref, watch } from "vue";
-import type { ModelId, ModelIdentified, ViewerTyped } from "@ogw_front/types/identifiers";
+import type { ModelId, ModelIdentified } from "@ogw_front/types/identifiers";
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
+import type { MenuViewerObjectType } from "@ogw_front/stores/menu";
 import { useDataStore } from "@ogw_front/stores/data";
 
-interface ModelMenuMetaData extends Partial<ViewerTyped>, Partial<ModelIdentified> {
+interface ModelMenuMetaData extends Partial<ModelIdentified> {
+  viewer_object_type?: MenuViewerObjectType;
   pickedComponentId?: string;
   modelComponentType?: string;
   targetComponentIds?: string[];
@@ -35,17 +37,22 @@ function useModelMenuContext(getItemProps: () => ModelMenuItemProps): ModelMenuC
   const componentType = ref<string | undefined>(undefined);
   const collections = ref<CollectionComponent[] | undefined>(undefined);
 
+  // A function so the check after an await is not narrowed by the one before it
+  function isComponentTypeMenu(): boolean {
+    return metaData.value.viewer_object_type === "model_component_type";
+  }
+
   watch(
     () => [
       modelId.value,
       componentId.value,
-      metaData.value.viewer_type,
+      metaData.value.viewer_object_type,
       metaData.value.modelComponentType,
     ],
     async () => {
       componentType.value = undefined;
       collections.value = undefined;
-      if (metaData.value.viewer_type === "model_component_type") {
+      if (isComponentTypeMenu()) {
         const { modelComponentType = "", targetComponentIds: ids = [] } = metaData.value;
         if (MESH_COMPONENT_TYPES.includes(modelComponentType)) {
           componentType.value = modelComponentType;
@@ -63,7 +70,7 @@ function useModelMenuContext(getItemProps: () => ModelMenuItemProps): ModelMenuC
         if (
           modelId.value === currentModelId &&
           componentId.value === currentCompId &&
-          metaData.value.viewer_type !== "model_component_type"
+          !isComponentTypeMenu()
         ) {
           componentType.value = type;
         }

@@ -171,7 +171,6 @@ watch(
         :max="factorRange.max"
         step="0.01"
         color="primary"
-        track-color="grey-lighten-2"
         density="compact"
         hide-details
         class="my-2 px-1"

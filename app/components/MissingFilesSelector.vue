@@ -5,7 +5,7 @@ import { matchExpectedFiles, uploadPath } from "@ogw_front/utils/upload_path";
 import DragAndDrop from "@ogw_front/components/DragAndDrop.vue";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
 import FileUploader from "@ogw_front/components/FileUploader.vue";
-import type { GeodeObjectType } from "@ogw_front/types/identifiers";
+import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
@@ -35,8 +35,8 @@ const emit = defineEmits<Emits>();
 
 interface Props {
   multiple: boolean;
-  // Filename -> geode object type, each file is checked with its own type (unused for time series)
-  geodeObjectTypes?: Record<string, GeodeObjectType>;
+  // Filename -> geode object types, each file is checked with each of its types (unused for time series)
+  geodeObjectTypes?: Record<string, GeodeObjectType[]>;
   filenames: string[];
   files?: UploadFile[];
   timeSeries?: boolean;
@@ -76,6 +76,7 @@ const can_skip = computed(
   () => missing_by_file.value.length > 0 && files_without_mandatory.value.length > 0,
 );
 const toggle_loading = useToggle(loading);
+const backStore = useBackStore();
 const uploading = ref<boolean>(false);
 
 function files_uploaded_event(value: UploadFile[]): void {
@@ -102,20 +103,29 @@ function reset_missing_state(): void {
   missing_by_file.value = [];
 }
 
-function request_file_plan(filename: string): Promise<FilePlan> {
+function request_type_plan(
+  filename: string,
+  geode_object_type: GeodeObjectType,
+): Promise<FilePlan> {
+  const params = { geode_object_type, filename };
+  return backStore.request({ schema, params });
+}
+
+// A file holding several contents is checked once per type, the missing files are merged
+async function request_file_plan(filename: string): Promise<FilePlan> {
   if (isCsvFile(filename)) {
-    return Promise.resolve({
-      has_missing_files: false,
-      mandatory_files: [],
-      additional_files: [],
-    });
+    return { has_missing_files: false, mandatory_files: [], additional_files: [] };
   }
-  const backStore = useBackStore();
   if (timeSeries) {
     return backStore.request({ schema: time_series_schema, params: { filename } });
   }
-  const params = { geode_object_type: geodeObjectTypes[filename] ?? "", filename };
-  return backStore.request({ schema, params });
+  const types = geodeObjectTypes[filename] ?? [];
+  const plans = await Promise.all(types.map((type) => request_type_plan(filename, type)));
+  return {
+    has_missing_files: plans.some((plan) => plan.has_missing_files),
+    mandatory_files: [...new Set(plans.flatMap((plan) => plan.mandatory_files))],
+    additional_files: [...new Set(plans.flatMap((plan) => plan.additional_files))],
+  };
 }
 
 function collect_file_plans(values: FilePlan[]): void {
@@ -186,7 +196,6 @@ async function upload_missing_from(
     useFeedbackStore().add_warning(`The selected folder does not contain: ${expected.join(", ")}`);
     return;
   }
-  const backStore = useBackStore();
   await Promise.all(found.map((file) => backStore.upload(file)));
   emit("update_values", { additional_files: [...uploaded, ...found] });
   await missing_files();
@@ -230,7 +239,7 @@ await missing_files();
         </v-row>
         <v-row v-if="missing.mandatory_files.length" align="center">
           <v-col cols="auto" class="pa-0">
-            <v-icon color="warning" icon="mdi-file-document-alert-outline" />
+            <v-icon color="warning" icon="ph-file-dashed" />
           </v-col>
           <p class="pa-1">Mandatory files:</p>
           <v-col v-for="mandatory_file in missing.mandatory_files" cols="auto" class="pa-0">
@@ -239,7 +248,7 @@ await missing_files();
         </v-row>
         <v-row v-if="missing.additional_files.length" align="center">
           <v-col cols="auto" class="pa-0">
-            <v-icon color="accent" icon="mdi-file-document-plus-outline" />
+            <v-icon color="accent" icon="ph-file-plus" />
           </v-col>
           <p class="pa-1">Additional files:</p>
           <v-col v-for="additional_file in missing.additional_files" cols="auto" class="pa-0">
@@ -250,7 +259,7 @@ await missing_files();
     </template>
     <v-row v-else-if="mandatory_files.length" align="center">
       <v-col cols="auto" class="pa-0">
-        <v-icon color="warning" icon="mdi-file-document-alert-outline" />
+        <v-icon color="warning" icon="ph-file-dashed" />
       </v-col>
       <p class="pa-1">Mandatory files:</p>
       <v-col v-for="mandatory_file in mandatory_files" cols="auto" class="pa-0">
@@ -259,7 +268,7 @@ await missing_files();
     </v-row>
     <v-row v-if="!(checked_filenames.length > 1) && additional_files.length" align="center">
       <v-col cols="auto" class="pa-0">
-        <v-icon color="accent" icon="mdi-file-document-plus-outline" />
+        <v-icon color="accent" icon="ph-file-plus" />
       </v-col>
       <p class="pa-1">Additional files:</p>
       <v-col v-for="additional_file in additional_files" cols="auto" class="pa-0">

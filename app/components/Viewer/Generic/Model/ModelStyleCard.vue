@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ColorRGBA, Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import {
   type ModelMenuItemProps,
   useModelMenuContext,
@@ -7,10 +8,8 @@ import BlocksOptions from "./BlocksOptions.vue";
 import CornersOptions from "./CornersOptions.vue";
 import LinesOptions from "./LinesOptions.vue";
 import ModelCardTabs from "./ModelCardTabs.vue";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import SurfacesOptions from "./SurfacesOptions.vue";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
-import type { Visibility } from "@ogw_front/types/style";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -51,8 +50,8 @@ const modelVisibility = computed<Visibility | undefined>({
   },
 });
 
-const modelComponentsColor = computed<RGBAColor | undefined>({
-  get: () => dataStyleStore.getModelColor(modelId.value) as RGBAColor | undefined,
+const modelComponentsColor = computed<ColorRGBA | undefined>({
+  get: () => dataStyleStore.getModelColor(modelId.value) as ColorRGBA | undefined,
   set: async (color) => {
     await applyBatchStyle(modelId.value, async (targetId: string) => {
       await dataStyleStore.mutateStyle(targetId, {

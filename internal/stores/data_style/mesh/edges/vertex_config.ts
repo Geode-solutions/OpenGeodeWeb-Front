@@ -1,15 +1,14 @@
+import type { AttributeColorMap, AttributeRange } from "@ogw_front/types/attribute";
 import type {
-  AttributeColorMap,
   AttributeItem,
   AttributeName,
-  AttributeRange,
-} from "@ogw_front/types/attribute";
+  ColorRGBA,
+} from "@geode/opengeodeweb-viewer/schema_types";
 import type {
   AttributeState,
   AttributeStoredConfig,
 } from "@ogw_internal/stores/data_style/attribute_types";
 import type { MeshId } from "@ogw_front/types/identifiers";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 
 // Local imports
@@ -86,7 +85,7 @@ function useMeshEdgesVertexAttributeConfig(): UseMeshEdgesVertexAttributeConfigR
 interface UseMeshEdgesVertexAttributeConfigValuesReturn {
   meshEdgesVertexAttributeRange: (meshId: MeshId) => AttributeRange;
   meshEdgesVertexAttributeColorMap: (meshId: MeshId) => AttributeColorMap | undefined;
-  meshEdgesVertexAttributeNoDataColor: (meshId: MeshId) => RGBAColor;
+  meshEdgesVertexAttributeNoDataColor: (meshId: MeshId) => ColorRGBA;
 }
 
 function useMeshEdgesVertexAttributeConfigValues(): UseMeshEdgesVertexAttributeConfigValuesReturn {
@@ -107,7 +106,7 @@ function useMeshEdgesVertexAttributeConfigValues(): UseMeshEdgesVertexAttributeC
     const storedConfig = meshEdgesVertexAttributeStoredConfig(meshId, name, item);
     return storedConfig.colorMap;
   }
-  function meshEdgesVertexAttributeNoDataColor(meshId: MeshId): RGBAColor {
+  function meshEdgesVertexAttributeNoDataColor(meshId: MeshId): ColorRGBA {
     const name = meshEdgesVertexAttributeName(meshId);
     const item = meshEdgesVertexAttributeItem(meshId);
     const storedConfig = meshEdgesVertexAttributeStoredConfig(meshId, name, item);

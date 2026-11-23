@@ -61,7 +61,7 @@ describe("missing files selector", () => {
       },
       props: {
         multiple: false,
-        geodeObjectTypes: { "fake_file.txt": "BRep" },
+        geodeObjectTypes: { "fake_file.txt": ["BRep"] },
         filenames: ["fake_file.txt"],
       },
     });
@@ -162,14 +162,14 @@ describe("missing files selector", () => {
       global: { plugins: [vuetify, pinia] },
       props: {
         multiple: true,
-        geodeObjectTypes: { "a.vtu": "SolidMesh3D", "b.og_brep": "BRep" },
+        geodeObjectTypes: { "a.vtu": ["TetrahedralSolid3D"], "b.og_brep": ["BRep"] },
         filenames: ["a.vtu", "b.og_brep", "file.toto"],
       },
     });
     await flushPromises();
 
     expect(request_mock.mock.calls.map(([request]) => request.params)).toStrictEqual([
-      { geode_object_type: "SolidMesh3D", filename: "a.vtu" },
+      { geode_object_type: "TetrahedralSolid3D", filename: "a.vtu" },
       { geode_object_type: "BRep", filename: "b.og_brep" },
     ]);
     expect(wrapper.text()).toContain("a.vtu");
@@ -180,5 +180,46 @@ describe("missing files selector", () => {
       skipped_files: ["a.vtu"],
     });
     expect(wrapper.emitted().increment_step).toHaveLength(EXPECTED_LENGTH);
+  });
+
+  test("per file: a file with several types is checked once per type", async () => {
+    const missing_by_type: Record<string, object> = {
+      TriangulatedSurface3D: {
+        has_missing_files: true,
+        mandatory_files: [],
+        additional_files: ["surface.txt"],
+      },
+      TetrahedralSolid3D: {
+        has_missing_files: true,
+        mandatory_files: ["solid.vtp"],
+        additional_files: ["surface.txt"],
+      },
+    };
+    const request_mock = vi.fn(
+      async ({ params }: { params: { filename: string; geode_object_type: string } }) => {
+        await Promise.resolve();
+        return missing_by_type[params.geode_object_type];
+      },
+    );
+    backStore.request = mockAs<typeof backStore.request>(request_mock);
+
+    const wrapper = await mountSuspended(MissingFilesSelector, {
+      global: { plugins: [vuetify, pinia] },
+      props: {
+        multiple: true,
+        geodeObjectTypes: { "mesh.vtu": ["TriangulatedSurface3D", "TetrahedralSolid3D"] },
+        filenames: ["mesh.vtu"],
+      },
+    });
+    await flushPromises();
+
+    expect(request_mock.mock.calls.map(([request]) => request.params)).toStrictEqual([
+      { geode_object_type: "TriangulatedSurface3D", filename: "mesh.vtu" },
+      { geode_object_type: "TetrahedralSolid3D", filename: "mesh.vtu" },
+    ]);
+    expect(wrapper.text()).toContain("solid.vtp");
+    // Shared by both types, listed once
+    expect(wrapper.text().split("surface.txt")).toHaveLength(2);
+    expect(wrapper.emitted().increment_step).toBeUndefined();
   });
 });

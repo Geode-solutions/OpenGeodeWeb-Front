@@ -1,5 +1,5 @@
 import type { BasemapSnapshot } from "@ogw_front/stores/basemap";
-import type { CRSList } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
+import type { CRS } from "@geode/opengeodeweb-back/schema_types";
 import type { CameraSnapshot } from "@ogw_internal/stores/hybrid_viewer/camera";
 import type { DataStyleSnapshot } from "@ogw_front/stores/data_style";
 import type { LegacyDataId } from "@ogw_front/utils/legacy_data_id";
@@ -23,7 +23,7 @@ interface ProjectSnapshot {
   data?: ProjectDataSnapshot;
   hybridViewer?: CameraSnapshot;
   dataStyle?: DataStyleSnapshot;
-  crs?: { projectCrs?: CRSList };
+  crs?: { projectCrs?: CRS };
   basemap?: BasemapSnapshot;
 }
 

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ChromeTheme from "@ogw_front/components/ChromeTheme.vue";
 import { Status } from "@ogw_front/utils/status";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
@@ -47,62 +48,69 @@ onUnmounted(() => {
 <template>
   <div v-bind="$attrs">
     <Teleport to="body">
-      <div
-        v-if="show"
-        class="transition-swing overflow-y-auto"
-        style="
-          position: fixed;
-          inset: 0;
-          width: 100vw;
-          height: 100vh;
-          background: rgba(0, 0, 0, 0.45);
-          backdrop-filter: blur(10px);
-          pointer-events: auto;
-          z-index: 3;
-        "
-      >
+      <ChromeTheme>
         <div
+          v-if="show"
+          class="ogw-loading transition-swing overflow-y-auto"
           style="
             position: fixed;
             inset: 0;
-            background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 0);
-            background-size: 40px 40px;
-            background-position: center;
-            pointer-events: none;
-            z-index: 0;
+            width: 100vw;
+            height: 100vh;
+            background: var(--ogw-loading-overlay, rgba(0, 0, 0, 0.45));
+            backdrop-filter: var(--ogw-loading-backdrop, blur(10px));
+            pointer-events: auto;
+            z-index: 3;
           "
-        />
-
-        <div class="d-flex align-center justify-center pa-6" style="min-height: 100%">
+        >
           <div
-            class="d-flex flex-column align-center text-center w-100"
-            style="max-width: 650px; gap: clamp(1rem, 4vh, 2rem)"
-          >
-            <LoadingHeader :logo="logo" />
-            <LoadingEcoMessages :app-name="appName" />
-            <LoadingProgress :progress="progress" />
+            style="
+              position: fixed;
+              inset: 0;
+              background-image: radial-gradient(
+                var(--ogw-loading-dots, rgba(255, 255, 255, 0.08)) 1px,
+                transparent 0
+              );
+              background-size: 40px 40px;
+              background-position: center;
+              pointer-events: none;
+              z-index: 0;
+            "
+          />
 
-            <div class="d-flex flex-wrap justify-center gap-4 w-100 mt-4">
-              <v-chip
-                v-for="store in extensionStores"
-                :key="store.$id"
-                :color="store.status === Status.CONNECTED ? 'success' : 'primary'"
-                variant="flat"
-              >
-                <v-icon
-                  start
-                  :icon="
-                    store.status === Status.CONNECTED ? 'mdi-check-circle' : 'mdi-loading mdi-spin'
-                  "
-                />
-                {{ store.$id.charAt(0).toUpperCase() + store.$id.slice(1) }}
-              </v-chip>
+          <div class="d-flex align-center justify-center pa-6" style="min-height: 100%">
+            <div
+              class="d-flex flex-column align-center text-center w-100"
+              style="max-width: 650px; gap: clamp(1rem, 4vh, 2rem)"
+            >
+              <LoadingHeader :logo="logo" />
+              <LoadingEcoMessages :app-name="appName" />
+              <LoadingProgress :progress="progress" />
+
+              <div class="d-flex flex-wrap justify-center gap-4 w-100 mt-4">
+                <v-chip
+                  v-for="store in extensionStores"
+                  :key="store.$id"
+                  :color="store.status === Status.CONNECTED ? 'success' : 'primary'"
+                  variant="flat"
+                >
+                  <v-icon
+                    start
+                    :icon="
+                      store.status === Status.CONNECTED
+                        ? 'ph-check-circle'
+                        : 'ph-circle-notch ogw-spin'
+                    "
+                  />
+                  {{ store.$id.charAt(0).toUpperCase() + store.$id.slice(1) }}
+                </v-chip>
+              </div>
+
+              <LoadingFooter />
             </div>
-
-            <LoadingFooter />
           </div>
         </div>
-      </div>
+      </ChromeTheme>
     </Teleport>
   </div>
 </template>

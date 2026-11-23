@@ -40,19 +40,18 @@ watch(
 </script>
 
 <template>
-  <v-row density="compact" align="center" class="pa-1 py-0">
+  <v-row density="compact" align="center" class="controls-row pa-1 py-0">
     <v-col cols="12">
       <div
-        class="controls-capsule d-flex align-center rounded-pill px-1 overflow-hidden"
+        class="controls-capsule d-flex align-center rounded-pill overflow-hidden"
         :class="{ 'is-expanded': showSearch }"
       >
         <ActionButton
           data-testid="searchObjectsButton"
           :tooltip="showSearch ? 'Hide search' : 'Show search'"
-          icon="mdi-magnify"
+          icon="ph-magnifying-glass"
           tooltipLocation="bottom"
           variant="text"
-          color="black"
           @click="showSearch = !showSearch"
         />
 
@@ -62,8 +61,6 @@ watch(
               data-testid="searchObjectsInput"
               :model-value="search"
               placeholder="Search objects..."
-              color="black"
-              base-color="black"
               variant="plain"
               density="compact"
               prepend-inner-icon=""
@@ -86,11 +83,8 @@ watch(
           <ActionButton
             data-testid="sortObjectsButton"
             :tooltip="'Sort by ' + (sortType === 'name' ? 'ID' : 'Name')"
-            :icon="
-              sortType === 'name' ? 'mdi-sort-alphabetical-ascending' : 'mdi-sort-numeric-ascending'
-            "
+            :icon="sortType === 'name' ? 'ph-sort-ascending' : 'ph-list-numbers'"
             variant="text"
-            color="black"
             tooltipLocation="bottom"
             @click="emit('toggle-sort')"
           />
@@ -99,9 +93,8 @@ watch(
               <ActionButton
                 data-testid="filterObjectsButton"
                 tooltip="Filter options"
-                icon="mdi-filter-variant"
+                icon="ph-funnel-simple"
                 variant="text"
-                color="black"
                 tooltipLocation="bottom"
                 v-bind="menuProps"
               />
@@ -121,9 +114,8 @@ watch(
           <ActionButton
             data-testid="CollapseOrExpandAll"
             :tooltip="isCollapsed ? 'Expand All' : 'Collapse All'"
-            :icon="isCollapsed ? 'mdi-expand-all-outline' : 'mdi-collapse-all-outline'"
+            :icon="isCollapsed ? 'ph-arrows-out-line-vertical' : 'ph-arrows-in-line-vertical'"
             variant="text"
-            color="black"
             tooltipLocation="bottom"
             @click="isCollapsed ? emit('expand-all') : emit('collapse-all')"
           />
@@ -134,8 +126,14 @@ watch(
 </template>
 
 <style scoped>
+/* Apps can line the first icon up with the panel header icon (fallbacks: the former look) */
+.controls-row {
+  padding-left: var(--ogw-viewer-controls-inset, 4px) !important;
+}
+
 .controls-capsule {
   height: 32px;
+  padding-inline: var(--ogw-viewer-controls-padding, 4px);
   border: 1px solid transparent;
   transition: all 0.3s ease;
   width: fit-content;
@@ -143,13 +141,13 @@ watch(
 
 .controls-capsule.is-expanded {
   width: 100%;
-  background-color: rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background-color: rgba(var(--v-theme-on-surface), 0.05);
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.08);
 }
 
 .controls-capsule:hover:not(.is-expanded) {
-  background-color: rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background-color: rgba(var(--v-theme-on-surface), 0.05);
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.08);
 }
 
 :deep(.v-field__input) {
@@ -158,6 +156,12 @@ watch(
   min-height: 32px !important;
   display: flex;
   align-items: center;
+}
+
+.controls-capsule :deep(.v-btn .v-icon) {
+  font-size: var(--ogw-viewer-controls-icon-size, 28px) !important;
+  width: var(--ogw-viewer-controls-icon-size, 28px) !important;
+  height: var(--ogw-viewer-controls-icon-size, 28px) !important;
 }
 
 :deep(.v-field__field) {

@@ -1,8 +1,8 @@
-// Id given by OpenGeode to an object (a uuid): the same data loaded twice has the same geode_id
-type GeodeId = string;
-
-// Id of a data loaded in the app, unique even when the same data is loaded twice (see GeodeId)
-type DataId = string;
+import type { DataId, GeodeId } from "@geode/opengeodeweb-microservice/schema_types";
+import type {
+  GeodeObjectType,
+  ViewerObjectType,
+} from "@geode/opengeodeweb-microservice/data_types";
 
 // Id of a component of a model (a corner, a line, a surface or a block): its geode_id
 type ModelComponentId = GeodeId;
@@ -25,12 +25,6 @@ type SurfaceId = ModelComponentId;
 // A block of a model, by its id in the model
 type BlockId = ModelComponentId;
 
-// Type of an OpenGeode object, as named by OpenGeode (BRep, TriangulatedSurface3D, ...)
-type GeodeObjectType = string;
-
-// What a data is displayed as in the viewer: mesh, model, or an entry of the menus (basemap, model_component, ...)
-type ViewerType = string;
-
 interface GeodeIdentified {
   geode_id: GeodeId;
 }
@@ -43,8 +37,8 @@ interface GeodeObjectTyped {
   geode_object_type: GeodeObjectType;
 }
 
-interface ViewerTyped {
-  viewer_type: ViewerType;
+interface ViewerObjectTyped {
+  viewer_object_type: ViewerObjectType;
 }
 
 // The data a model style or a model component applies to
@@ -55,11 +49,8 @@ interface ModelIdentified {
 export type {
   BlockId,
   CornerId,
-  DataId,
   DataIdentified,
-  GeodeId,
   GeodeIdentified,
-  GeodeObjectType,
   GeodeObjectTyped,
   LineId,
   MeshId,
@@ -67,6 +58,5 @@ export type {
   ModelId,
   ModelIdentified,
   SurfaceId,
-  ViewerType,
-  ViewerTyped,
+  ViewerObjectTyped,
 };

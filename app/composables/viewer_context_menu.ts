@@ -1,7 +1,9 @@
 import { type MenuMetaData, useMenuStore } from "@ogw_front/stores/menu";
 import type { Ref, ShallowRef } from "vue";
 import { BASEMAP_GROUP_ID } from "@ogw_front/utils/basemap_tree";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { TreeMenuPayload } from "@ogw_front/utils/treeview";
+import type { ViewerId } from "@geode/opengeodeweb-viewer/schema_types";
 import type { ViewerIdResult } from "@ogw_front/composables/use_overlapping_picker";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useElementSize } from "@vueuse/core";
@@ -17,7 +19,7 @@ interface MenuTarget {
 
 const SCENE_MENU_TARGET: MenuTarget = {
   id: "scene",
-  meta_data: { viewer_type: "scene", geode_object_type: "scene" },
+  meta_data: { viewer_object_type: "scene", geode_object_type: "scene" },
 };
 
 async function treeMenuTarget(
@@ -28,7 +30,7 @@ async function treeMenuTarget(
     return {
       id: payload.itemId,
       meta_data: {
-        viewer_type: "basemap",
+        viewer_object_type: "basemap",
         geode_object_type: payload.itemId === BASEMAP_GROUP_ID ? "Basemap" : "Map",
       },
     };
@@ -45,7 +47,7 @@ async function treeMenuTarget(
     return {
       id: payload.itemId,
       meta_data: {
-        viewer_type: "model_component",
+        viewer_object_type: "model_component",
         geode_object_type: "component",
         modelId: payload.modelId,
         pickedComponentId: payload.itemId,
@@ -56,7 +58,7 @@ async function treeMenuTarget(
     return {
       id: payload.itemId,
       meta_data: {
-        viewer_type: "model_component_type",
+        viewer_object_type: "model_component_type",
         geode_object_type: "type",
         modelId: payload.modelId,
         modelComponentType: payload.modelComponentType,
@@ -69,12 +71,12 @@ async function treeMenuTarget(
 
 async function viewerMenuTarget(
   dataStore: ReturnType<typeof useDataStore>,
-  pickedId: string,
-  viewer_id: number | undefined,
+  pickedId: DataId,
+  viewer_id: ViewerId | undefined,
 ): Promise<MenuTarget> {
   const item = await dataStore.item(pickedId);
   const meta_data: MenuMetaData = { ...item };
-  if (item.viewer_type === "model" && viewer_id !== undefined) {
+  if (item.viewer_object_type === "model" && viewer_id !== undefined) {
     const component = await dataStore.getComponentByViewerId(pickedId, viewer_id);
     if (component) {
       meta_data.pickedComponentId = component.geode_id;

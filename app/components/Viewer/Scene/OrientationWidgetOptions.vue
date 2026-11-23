@@ -30,7 +30,7 @@ const orientationWidget = computed<SceneOrientationWidget>({
     :index="itemProps.index"
     :itemProps="itemProps"
     tooltip="Orientation widget"
-    btnIcon="mdi-compass-outline"
+    btnIcon="ph-compass"
   >
     <template #options>
       <v-btn-toggle

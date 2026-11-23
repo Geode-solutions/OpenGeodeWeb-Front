@@ -69,7 +69,7 @@ function commitMaximum(): void {
       <v-btn
         data-testid="resetRangeButton"
         aria-label="Reset range"
-        icon="mdi-arrow-left-right"
+        icon="ph-arrows-horizontal"
         size="x-small"
         variant="text"
         @click="emit('reset')"

@@ -3,8 +3,9 @@ import GlobalObjects from "@ogw_front/components/Viewer/ObjectTree/Views/GlobalO
 import ModelTree from "@ogw_front/components/Viewer/ObjectTree/Views/ModelTree.vue";
 import type { TreeMenuPayload } from "@ogw_front/utils/treeview";
 import ViewerObjectTreeBox from "@ogw_front/components/Viewer/ObjectTree/Box.vue";
-import { geode_objects } from "@ogw_front/assets/geode_objects";
+import { geodeObjectImage } from "@ogw_front/assets/geode_objects";
 import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
+import { useModelHeaderHover } from "@ogw_front/composables/model_header_hover";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const WIDTH_MIN = 100;
@@ -15,6 +16,8 @@ const PERCENT_100 = 100;
 const TOTAL_PERCENT = 100;
 const MAX_PANEL_WIDTH_RATIO = 0.8;
 const AUTO_CLOSE_THRESHOLD = 80;
+// Apps can align the panels on their own shape system (fallbacks: the former look)
+const PANEL_RADIUS = "var(--ogw-viewer-panel-radius, 16px)";
 
 interface Props {
   containerWidth: number;
@@ -23,6 +26,7 @@ interface Props {
 const { containerWidth } = defineProps<Props>();
 
 const treeviewStore = useTreeviewStore();
+const { onModelHeaderEnter, onModelHeaderLeave } = useModelHeaderHover();
 
 interface Emits {
   "show-menu": [payload: TreeMenuPayload];
@@ -86,6 +90,16 @@ watch([maxWidth, (): number => additionalViews.value.length], ([newMax]): void =
     }
   }
 });
+
+function modelGeodeId(modelId: string): string | undefined {
+  for (const group of treeviewStore.items) {
+    const child = group.children.find((item) => item.id === modelId);
+    if (child) {
+      return child.geode_id;
+    }
+  }
+  return undefined;
+}
 
 function onDragStart(index: number): void {
   draggedIndex.value = index;
@@ -217,9 +231,9 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
     >
       <v-btn
         data-testid="toggleObjectsButton"
-        icon="mdi-file-tree-outline"
+        icon="ph-tree-structure"
         variant="text"
-        :color="mainView ? 'primary' : 'black'"
+        :color="mainView ? 'primary' : undefined"
         class="mb-2"
         v-tooltip="'Toggle Objects'"
         @click="treeviewStore.toggleView('main')"
@@ -236,10 +250,10 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
       >
         <ViewerObjectTreeBox
           :title="mainView?.title || 'Objects'"
-          mdi-icon="mdi-file-tree-outline"
+          font-icon="ph-tree-structure"
           :scroll-top="mainView?.scrollTop || 0"
           closable
-          :border-radius="additionalViews.length > 0 ? '0' : '0 16px 16px 0'"
+          :border-radius="additionalViews.length > 0 ? '0' : `0 ${PANEL_RADIUS} ${PANEL_RADIUS} 0`"
           :border-left="false"
           @close="treeviewStore.closeView('main')"
           @update:scroll-top="mainView && treeviewStore.setScrollTop(mainView.id, $event)"
@@ -273,15 +287,33 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
           >
             <ViewerObjectTreeBox
               :title="view.title"
-              :icon="geode_objects[view.geode_object_type ?? '']?.image"
+              :icon="view.geode_object_type ? geodeObjectImage(view.geode_object_type) : undefined"
               :scroll-top="view.scrollTop"
               closable
-              :border-radius="`0 ${index === 0 ? '16px' : '0'} ${index === additionalViews.length - 1 ? '16px' : '0'} 0`"
+              :border-radius="`0 ${index === 0 ? PANEL_RADIUS : '0'} ${index === additionalViews.length - 1 ? PANEL_RADIUS : '0'} 0`"
               :border-left="false"
+              :accent="
+                view.color
+                  ? { color: view.color, highlighted: treeviewStore.hoveredModelId === view.id }
+                  : undefined
+              "
               @close="treeviewStore.closeView(view.id)"
               @dragstart="onDragStart(index + 1)"
               @update:scroll-top="treeviewStore.setScrollTop(view.id, $event)"
+              @header-enter="onModelHeaderEnter(view.id)"
+              @header-leave="onModelHeaderLeave(view.id)"
             >
+              <template #tooltip>
+                <div data-testid="modelTreeTooltip" class="d-flex flex-column ga-1 text-caption">
+                  <span><strong class="mr-1">Name:</strong>{{ view.title }}</span>
+                  <span v-if="view.geode_object_type">
+                    <strong class="mr-1">Type:</strong>{{ view.geode_object_type }}
+                  </span>
+                  <span v-if="modelGeodeId(view.id)">
+                    <strong class="mr-1">ID:</strong>{{ modelGeodeId(view.id) }}
+                  </span>
+                </div>
+              </template>
               <ModelTree
                 data-testid="modelComponentsObjectTree"
                 :id="view.id"
@@ -316,19 +348,19 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
   position: absolute;
   z-index: 1;
   left: 0;
-  top: 8px;
-  height: calc(100% - 16px);
+  top: var(--ogw-viewer-panel-inset, 8px);
+  height: calc(100% - 2 * var(--ogw-viewer-panel-inset, 8px));
   pointer-events: auto;
 }
 
 .activity-bar {
   width: 48px;
   height: 100%;
-  border-radius: 16px 0 0 16px;
-  margin-left: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--ogw-viewer-panel-radius, 16px) 0 0 var(--ogw-viewer-panel-radius, 16px);
+  margin-left: var(--ogw-viewer-panel-inset, 10px);
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
   border-right: none;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 15px rgba(var(--v-theme-on-surface), 0.05);
   position: relative;
   overflow: hidden;
   transition:
@@ -338,18 +370,19 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
 }
 
 .activity-bar.is-closed {
-  border-radius: 16px;
-  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--ogw-viewer-panel-radius, 16px);
+  border-right: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
 }
 
 .activity-bar::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, var(--adaptive-opacity));
+  /* Adaptive glass: apps can tint it (an "r, g, b" triplet) and change its blending, per theme */
+  background: rgba(var(--ogw-viewer-glass-tint, 255, 255, 255), var(--adaptive-opacity));
   backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
   -webkit-backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
-  mix-blend-mode: lighten;
+  mix-blend-mode: var(--ogw-viewer-glass-blend, lighten);
   z-index: 0;
   pointer-events: none;
   border-radius: inherit;
@@ -400,14 +433,14 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
 }
 
 .view-wrapper.drag-over {
-  border: 2px dashed rgba(0, 0, 0, 0.2);
-  border-radius: 16px;
-  background-color: rgba(0, 0, 0, 0.02);
+  border: 2px dashed rgba(var(--v-theme-on-surface), 0.2);
+  border-radius: var(--ogw-viewer-panel-radius, 16px);
+  background-color: rgba(var(--v-theme-on-surface), 0.02);
 }
 
 .column-separator {
   width: 6px;
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(var(--v-theme-on-surface), 0.05);
   border-radius: 3px;
   margin: 0 2px;
   cursor: ew-resize;
@@ -415,7 +448,7 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
 }
 
 .column-separator:hover {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(var(--v-theme-on-surface), 0.2);
 }
 
 .column-separator::after {
@@ -425,7 +458,7 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
   bottom: 10%;
   left: 2px;
   width: 2px;
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(var(--v-theme-on-surface), 0.1);
   border-radius: 1px;
 }
 
@@ -444,13 +477,13 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
   left: 10%;
   right: 10%;
   height: 2px;
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(var(--v-theme-on-surface), 0.1);
   border-radius: 1px;
   transition: background-color 0.2s;
 }
 
 .v-split-resizer:hover::after {
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(var(--v-theme-on-surface), 0.4);
   height: 3px;
   top: 1.5px;
 }

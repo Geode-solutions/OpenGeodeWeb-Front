@@ -1,10 +1,11 @@
-import type { GeodeId, GeodeIdentified, ModelId } from "@ogw_front/types/identifiers";
+import type { GeodeIdentified, ModelId } from "@ogw_front/types/identifiers";
 import { HOVER_DEBOUNCE_MS, HOVER_TIMEOUT_MS } from "./constants";
 import type { HoverComponentInfo, HoverData } from "./vtk_types";
 import viewer_schemas, {
   type PickedFieldType,
   type ViewerHighlightResponse,
 } from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
+import type { GeodeId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { IndexableType } from "dexie";
 import { database } from "@ogw_internal/database/database.js";
 import { useHybridViewerCore } from "./core";

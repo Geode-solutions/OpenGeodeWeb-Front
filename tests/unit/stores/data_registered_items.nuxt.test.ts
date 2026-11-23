@@ -16,7 +16,7 @@ async function addItems(ids: string[]): Promise<void> {
       data_id: id,
       geode_id: id,
       name: id,
-      viewer_type: "mesh",
+      viewer_object_type: "mesh",
       geode_object_type: "PointSet3D",
     });
   }

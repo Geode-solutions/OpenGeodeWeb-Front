@@ -20,6 +20,7 @@ function useVirtualTree(
     value: "id",
     title: "title",
     children: "children",
+    details: "details",
     height: 28,
     ...props.value.itemProps,
   }));
@@ -49,6 +50,11 @@ function useVirtualTree(
   function getChildrenOf(item: TreeItem): TreeItem[] | undefined {
     const rawChildren = item[actualItemProps.value.children];
     return isTreeItemArray(rawChildren) ? rawChildren : undefined;
+  }
+
+  function getDetailsOf(item: TreeItem): TreeItem[] | undefined {
+    const rawDetails = item[actualItemProps.value.details];
+    return isTreeItemArray(rawDetails) ? rawDetails : undefined;
   }
 
   function getLeafChildrenIds(item: TreeItem): unknown[] {
@@ -124,7 +130,14 @@ function useVirtualTree(
     return allIds;
   }
 
-  const flattenContext = { props, actualItemProps, openedSet, activeSet, getChildrenOf };
+  const flattenContext = {
+    props,
+    actualItemProps,
+    openedSet,
+    activeSet,
+    getChildrenOf,
+    getDetailsOf,
+  };
   const displayItems = computed(() => flattenTree(flattenContext, props.value.items ?? []));
 
   watch(

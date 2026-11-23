@@ -30,7 +30,7 @@ function setup(): {
   const dataStore = useDataStore();
   const dataStyleStore = useDataStyleStore();
   const hybridViewerStore = useHybridViewerStore();
-  const request = vi.fn().mockResolvedValue({ id: "brep_id", viewer_type: "model" });
+  const request = vi.fn().mockResolvedValue({ id: "brep_id", viewer_object_type: "model" });
   const applyDefaultStyle = vi.fn().mockImplementation(() => {
     calls.push("style");
     return [];
@@ -118,7 +118,7 @@ describe("import workflow", () => {
   test("a failing file does not prevent the others from being imported", async () => {
     const { request, remoteRender } = setup();
     request.mockRejectedValueOnce(new Error("cannot load")).mockResolvedValueOnce({
-      data: [{ id: "model.og_brep", name: "model", viewer_type: "mesh" }],
+      data: [{ id: "model.og_brep", name: "model", viewer_object_type: "mesh" }],
     });
     const dataStore = useDataStore();
     dataStore.addItem = mockAs<typeof dataStore.addItem>(vi.fn().mockResolvedValue(undefined));
@@ -128,7 +128,7 @@ describe("import workflow", () => {
 
     await expect(
       importWorkflow([
-        { filename: "broken.vtu", geode_object_type: "SolidMesh3D" },
+        { filename: "broken.vtu", geode_object_type: "TetrahedralSolid3D" },
         { filename: "model.og_brep", geode_object_type: "BRep" },
       ]),
     ).rejects.toThrow("1 file(s) could not be imported");
@@ -143,11 +143,11 @@ describe("import workflow", () => {
     request
       .mockResolvedValueOnce({
         data: [
-          { id: "first_a", name: "a", viewer_type: "mesh" },
-          { id: "first_b", name: "b", viewer_type: "mesh" },
+          { id: "first_a", name: "a", viewer_object_type: "mesh" },
+          { id: "first_b", name: "b", viewer_object_type: "mesh" },
         ],
       })
-      .mockResolvedValueOnce({ data: [{ id: "second", name: "c", viewer_type: "mesh" }] });
+      .mockResolvedValueOnce({ data: [{ id: "second", name: "c", viewer_object_type: "mesh" }] });
     const dataStore = useDataStore();
     dataStore.addItem = mockAs<typeof dataStore.addItem>(vi.fn().mockResolvedValue(undefined));
     dataStore.isItemViewable = mockAs<typeof dataStore.isItemViewable>(
@@ -155,8 +155,8 @@ describe("import workflow", () => {
     );
 
     const ids = await importWorkflow([
-      { filename: "first.vtu", geode_object_type: "SolidMesh3D" },
-      { filename: "second.vtu", geode_object_type: "SolidMesh3D" },
+      { filename: "first.vtu", geode_object_type: "TetrahedralSolid3D" },
+      { filename: "second.vtu", geode_object_type: "TetrahedralSolid3D" },
     ]);
 
     expect(ids).toStrictEqual(["first_a", "first_b", "second"]);
@@ -170,8 +170,8 @@ describe("import file", () => {
     const { request } = setup();
     request.mockResolvedValueOnce({
       data: [
-        { id: "surface", name: "surface", viewer_type: "mesh" },
-        { id: "curve", name: "curve", viewer_type: "mesh" },
+        { id: "surface", name: "surface", viewer_object_type: "mesh" },
+        { id: "curve", name: "curve", viewer_object_type: "mesh" },
       ],
     });
     const dataStore = useDataStore();

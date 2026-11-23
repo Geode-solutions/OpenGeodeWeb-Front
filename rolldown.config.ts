@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { defineConfig } from "rolldown";
+import { viteImportGlobPlugin } from "rolldown/experimental";
 
 import package_json from "./package.json" with { type: "json" };
 
@@ -24,8 +25,37 @@ function collectTsFiles(dir: string): string[] {
 
 const ownPackageName = package_json.name;
 
+// The e2e helpers, shared with the apps built on this layer (their Playwright tests import the built files)
+const BROWSER_HELPERS_FOLDER = "tests/browser/helpers";
+// The viewer tests, run by these apps against their own UI (with the data of tests/browser/data)
+const BROWSER_SUITES_FOLDER = "tests/browser/suites";
+
+function collectAssets(dir: string): string[] {
+  return fs
+    .readdirSync(dir, { withFileTypes: true, recursive: true })
+    .filter((entry) => entry.isFile() && !entry.name.endsWith(".ts"))
+    .map((entry) => path.join(entry.parentPath, entry.name));
+}
+
+// The helpers read their files (the texture image) next to them, in the build too
+const helpersAssetsPlugin = {
+  name: "helpers-assets",
+  buildStart(this: {
+    emitFile: (file: { type: "asset"; fileName: string; source: Uint8Array }) => string;
+  }): void {
+    for (const asset of collectAssets(BROWSER_HELPERS_FOLDER)) {
+      this.emitFile({
+        type: "asset",
+        fileName: path.relative(".", asset).split(path.sep).join("/"),
+        source: fs.readFileSync(asset),
+      });
+    }
+  },
+};
+
 function isExternal(id: string): boolean {
-  if (id.startsWith(".") || path.isAbsolute(id)) {
+  // The e2e helpers import each other through the "imports" of package.json: bundled, as relative imports
+  if (id.startsWith(".") || path.isAbsolute(id) || id.startsWith("#browser_helpers/")) {
     return false;
   }
   if (id === ownPackageName || id.startsWith(`${ownPackageName}/`)) {
@@ -36,9 +66,16 @@ function isExternal(id: string): boolean {
 
 // oxlint-disable-next-line import/no-default-export
 export default defineConfig({
-  input: [...collectTsFiles("server/utils"), ...collectTsFiles("shared")],
+  input: [
+    ...collectTsFiles("server/utils"),
+    ...collectTsFiles("shared"),
+    ...collectTsFiles(BROWSER_HELPERS_FOLDER),
+    ...collectTsFiles(BROWSER_SUITES_FOLDER),
+  ],
   platform: "node",
   external: isExternal,
+  // The suites index collects the suite files with import.meta.glob
+  plugins: [helpersAssetsPlugin, viteImportGlobPlugin()],
   output: {
     dir: ".build",
     format: "esm",

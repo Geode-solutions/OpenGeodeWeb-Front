@@ -2,14 +2,13 @@
 import type {
   AttributeItem,
   AttributeName,
-  AttributeRange,
-  AttributeTimeStep,
-} from "@ogw_front/types/attribute";
+  ColorRGBA,
+  Visibility,
+} from "@geode/opengeodeweb-viewer/schema_types";
+import type { AttributeRange, AttributeTimeStep } from "@ogw_front/types/attribute";
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import { MODEL_VERTEX_COLORING } from "@ogw_front/utils/model_component_coloring";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
-import type { Visibility } from "@ogw_front/types/style";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -50,9 +49,9 @@ const cornersVisibility = computed<Visibility>({
 });
 
 // Color
-const cornersColor = computed<RGBAColor | undefined>({
+const cornersColor = computed<ColorRGBA | undefined>({
   get: () =>
-    dataStyleStore.modelCornerColor(modelId, referenceCornerId.value) as RGBAColor | undefined,
+    dataStyleStore.modelCornerColor(modelId, referenceCornerId.value) as ColorRGBA | undefined,
   set: async (color) => {
     await dataStyleStore.setModelCornersColor(modelId, targetCornerIds, color);
     hybridViewerStore.remoteRender();
@@ -142,7 +141,7 @@ const cornersVertexAttributeColorMap = computed<ColorMap | undefined>({
   },
 });
 
-const cornersVertexAttributeNoDataColor = computed<RGBAColor>({
+const cornersVertexAttributeNoDataColor = computed<ColorRGBA>({
   get: () =>
     dataStyleStore.modelCornersVertexAttributeNoDataColor(modelId, referenceCornerId.value),
   set: async (newValue) => {

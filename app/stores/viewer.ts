@@ -12,6 +12,7 @@ import {
   fetchViewerVersion,
   launchViewerMicroservice,
   pickWorldPosition,
+  showRenderingWarnings,
 } from "./viewer_helpers/actions.js";
 import {
   getWebsocketApiPort,
@@ -19,6 +20,7 @@ import {
   isCloudMode,
 } from "@ogw_front/utils/stores.js";
 import { Status } from "@ogw_front/utils/status";
+import { afterViewerReset } from "@ogw_front/composables/viewer_reset";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
 import type {
@@ -60,6 +62,8 @@ export const useViewerStore = defineStore(
     const request_counter = ref(0);
     const status = ref(Status.NOT_CONNECTED);
     const version = ref("0.0.0");
+    // The viewer warnings are shown once, not again on each reconnection
+    const rendering_warnings_shown = ref(false);
     const protocol = computed(() => getWebsocketApiProtocol());
     const port = computed(() => getWebsocketApiPort(default_local_port.value));
     const base_url = computed(() => {
@@ -132,10 +136,15 @@ export const useViewerStore = defineStore(
             schema,
             timeout,
           });
+          await afterViewerReset(request);
           status.value = Status.CONNECTED;
         } catch (error) {
           status.value = Status.NOT_CONNECTED;
           throw error;
+        }
+        if (!rendering_warnings_shown.value) {
+          rendering_warnings_shown.value = true;
+          void showRenderingWarnings(request);
         }
       });
     }

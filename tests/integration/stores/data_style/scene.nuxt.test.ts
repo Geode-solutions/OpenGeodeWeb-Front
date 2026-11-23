@@ -37,8 +37,7 @@ describe("scene style", () => {
     expect(spy).toHaveBeenCalledWith(
       {
         schema: viewer_viewer_schemas.set_text_style,
-        // oxlint-disable-next-line id-length -- the viewer schema requires { r, g, b }
-        params: { color: { r: RED, g: 0, b: 0 }, font_family: "arial", opacity: 1 },
+        params: { color: { red: RED, green: 0, blue: 0 }, font_family: "arial", opacity: 1 },
       },
       {
         // oxlint-disable-next-line no-unsafe-assignment -- expect.any(Function) is untyped by design, this is a vitest matcher not a real callback.
@@ -60,8 +59,7 @@ describe("scene style", () => {
     expect(spy).toHaveBeenLastCalledWith(
       {
         schema: viewer_viewer_schemas.set_text_style,
-        // oxlint-disable-next-line id-length -- the viewer schema requires { r, g, b }
-        params: { color: { r: 0, g: 0, b: BLUE }, font_family: "courier", opacity: HALF },
+        params: { color: { red: 0, green: 0, blue: BLUE }, font_family: "courier", opacity: HALF },
       },
       {
         // oxlint-disable-next-line no-unsafe-assignment -- expect.any(Function) is untyped by design, this is a vitest matcher not a real callback.

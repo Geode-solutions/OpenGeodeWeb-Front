@@ -20,7 +20,7 @@ function pickingOptions(
     {
       testId: "resetCameraButton",
       tooltip: "Reset camera",
-      icon: "mdi-cube-scan",
+      icon: "ph-cube-focus",
       action: (): void => {
         hybridViewerStore.resetCamera();
       },
@@ -28,7 +28,7 @@ function pickingOptions(
     {
       testId: "centerOnClickButton",
       tooltip: "Center on click",
-      icon: "mdi-crosshairs-question",
+      icon: "ph-crosshair-simple",
       color: hybridViewerStore.is_picking ? "primary" : undefined,
       action: (): void => {
         tools.toggleTool(tools.is_picking);
@@ -37,7 +37,7 @@ function pickingOptions(
     {
       testId: "zoomToBoxButton",
       tooltip: "Zoom to box",
-      icon: "mdi-magnify-scan",
+      icon: "ph-magnifying-glass-plus",
       color: hybridViewerStore.is_zoom_box_active ? "primary" : undefined,
       action: (): void => {
         tools.toggleTool(tools.is_zoom_box_active);
@@ -53,14 +53,14 @@ function hoverHighlightOption(
   return {
     testId: "highlightOnHoverButton",
     tooltip: "Highlight on hover",
-    icon: "mdi-cursor-default-click",
+    icon: "ph-cursor-click",
     color: hybridViewerStore.is_hover_highlight ? "primary" : undefined,
     action: hybridViewerStore.is_hover_highlight ? tools.stopHoverHighlight : undefined,
     menu: [
       {
         title: "Cells",
         testId: "highlightOnHoverCellsButton",
-        icon: "mdi-select-all",
+        icon: "ph-selection-all",
         action: (): void => {
           tools.toggleHoverHighlight("CELL");
         },
@@ -68,7 +68,7 @@ function hoverHighlightOption(
       {
         title: "Points",
         testId: "highlightOnHoverPointsButton",
-        icon: "mdi-select-drag",
+        icon: "ph-selection",
         action: (): void => {
           tools.toggleHoverHighlight("POINT");
         },
@@ -85,7 +85,7 @@ function gridScaleOption(
   return {
     testId: "gridScaleButton",
     tooltip: "Toggle grid scale",
-    icon: "mdi-ruler-square",
+    icon: "ph-grid-four",
     color: gridScale.value ? "primary" : undefined,
     action: (): void => {
       const schema = schemas.opengeodeweb_viewer.viewer.grid_scale;

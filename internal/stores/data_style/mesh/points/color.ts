@@ -1,5 +1,5 @@
+import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
 import type { MeshId } from "@ogw_front/types/identifiers";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
@@ -12,17 +12,17 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const schema = viewer_schemas.opengeodeweb_viewer.mesh.points.color;
 
 export function useMeshPointsColorStyle(): ReturnType<typeof useMeshPointsOpacityStyle> & {
-  meshPointsColor: (meshId: MeshId) => RGBAColor | undefined;
-  setMeshPointsColor: (meshId: MeshId, color: RGBAColor) => Promise<unknown>;
+  meshPointsColor: (meshId: MeshId) => ColorRGBA | undefined;
+  setMeshPointsColor: (meshId: MeshId, color: ColorRGBA) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const meshPointsCommonStyle = useMeshPointsCommonStyle();
 
-  function meshPointsColor(meshId: MeshId): RGBAColor | undefined {
+  function meshPointsColor(meshId: MeshId): ColorRGBA | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.constant shape is defined by the data style schema.
-    return meshPointsCommonStyle.meshPointsColoring(meshId).constant as RGBAColor | undefined;
+    return meshPointsCommonStyle.meshPointsColoring(meshId).constant as ColorRGBA | undefined;
   }
-  async function setMeshPointsColor(meshId: MeshId, color: RGBAColor): Promise<unknown> {
+  async function setMeshPointsColor(meshId: MeshId, color: ColorRGBA): Promise<unknown> {
     const params = { id: meshId, color };
     const result = await viewerStore.request(
       {

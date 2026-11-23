@@ -1,8 +1,8 @@
-import type { DataId, GeodeObjectType } from "@ogw_front/types/identifiers";
-import back_schemas, {
-  type CRSList,
-} from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { oldestCrs, sameCrs } from "@ogw_front/utils/crs";
+import type { CRS } from "@geode/opengeodeweb-back/schema_types";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
+import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStore } from "@ogw_front/stores/data";
 
@@ -11,12 +11,12 @@ import { useDataStore } from "@ogw_front/stores/data";
 export const useCrsStore = defineStore("crs", () => {
   const backStore = useBackStore();
   // OpenGeode geosciences lists the same geographic CRS for 2D and 3D data: one list for all types
-  let geographicListPromise: Promise<CRSList[]> | undefined = undefined;
+  let geographicListPromise: Promise<CRS[]> | undefined = undefined;
   const crsEditEnabled = ref(false);
   const crsEditRequest = ref<string | undefined>(undefined);
   const dataStore = useDataStore();
   const crsItems = dataStore.refCrsItems();
-  const projectCrs = ref<CRSList | undefined>(undefined);
+  const projectCrs = ref<CRS | undefined>(undefined);
   const projectCrsEditRequest = ref(false);
 
   // The project follows its data: once every georeferenced data is in one CRS, it is the project
@@ -44,7 +44,7 @@ export const useCrsStore = defineStore("crs", () => {
   // Data without CRS are listed too (value undefined): they could not follow the project
   const mismatchedCrs = computed(() => {
     const project = projectCrs.value;
-    const mismatched = new Map<string, CRSList | undefined>();
+    const mismatched = new Map<string, CRS | undefined>();
     for (const item of crsItems.value) {
       if (project !== undefined && !sameCrs(item.crs, project)) {
         mismatched.set(item.data_id, item.crs);
@@ -53,7 +53,7 @@ export const useCrsStore = defineStore("crs", () => {
     return mismatched;
   });
 
-  async function fetchGeographicList(geodeObjectType: GeodeObjectType): Promise<CRSList[]> {
+  async function fetchGeographicList(geodeObjectType: GeodeObjectType): Promise<CRS[]> {
     try {
       const response = await backStore.request({
         schema: back_schemas.opengeodeweb_back.crs.geographic_list,
@@ -70,7 +70,7 @@ export const useCrsStore = defineStore("crs", () => {
     return [];
   }
 
-  async function geographicList(geodeObjectType: GeodeObjectType): Promise<CRSList[]> {
+  async function geographicList(geodeObjectType: GeodeObjectType): Promise<CRS[]> {
     // The promise is cached, so dialogs opened together share a single request.
     // The back still checks each CRS against the list of the data dimension
     geographicListPromise ??= fetchGeographicList(geodeObjectType);
@@ -90,7 +90,7 @@ export const useCrsStore = defineStore("crs", () => {
     crsEditRequest.value = undefined;
   }
 
-  function setProjectCrs(crs: CRSList): void {
+  function setProjectCrs(crs: CRS): void {
     projectCrs.value = crs;
   }
 
@@ -107,12 +107,12 @@ export const useCrsStore = defineStore("crs", () => {
     projectCrs.value = undefined;
   }
 
-  function exportStores(): { projectCrs?: CRSList } {
+  function exportStores(): { projectCrs?: CRS } {
     return { projectCrs: projectCrs.value };
   }
 
   // Called once the project data is imported: a project saved without it falls back to its oldest data
-  function importStores(snapshot: { projectCrs?: CRSList } | undefined): void {
+  function importStores(snapshot: { projectCrs?: CRS } | undefined): void {
     projectCrs.value = snapshot?.projectCrs ?? oldestCrs(crsItems.value);
   }
 

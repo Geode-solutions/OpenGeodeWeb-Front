@@ -2,7 +2,7 @@ import { EASE_EXPONENT, applyCameraOptions, getImageStyle, toBounds } from "./ca
 import { animateCamera, computeAnimationDuration, getCameraOptions } from "./camera_animation";
 import { requireRenderWindow, useHybridViewerCore } from "./core";
 import type { CameraOptions } from "./vtk_types";
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import { animateCameraOrientation } from "./camera_orientation";
 import { useHybridViewerScene } from "./scene";
 import { useViewerStore } from "@ogw_front/stores/viewer";

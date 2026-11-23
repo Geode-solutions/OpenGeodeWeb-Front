@@ -80,7 +80,7 @@ const cleanName = computed<string>(() => {
   if (!meta) {
     return "Unnamed Object";
   }
-  if (componentName.value && meta.viewer_type === "model_component") {
+  if (componentName.value && meta.viewer_object_type === "model_component") {
     return componentName.value;
   }
   return asString(meta.name) ?? "Unnamed Object";
@@ -153,7 +153,7 @@ const liveCrs = computed(() => liveItem.value?.crs ?? metaData.crs);
       >
         <v-row no-gutters class="flex-column align-center">
           <v-col
-            class="text-subtitle-2 font-weight-bold text-truncate text-white w-100 pa-0"
+            class="text-subtitle-2 font-weight-bold text-truncate w-100 pa-0"
             cols="auto"
             style="line-height: 1.3"
           >
@@ -174,9 +174,9 @@ const liveCrs = computed(() => liveItem.value?.crs ?? metaData.crs);
               {{ isCopied(metaData.data_id) ? "COPIED!" : formattedId }}
             </span>
             <v-icon
-              :icon="isCopied(metaData.data_id) ? 'mdi-check' : 'mdi-content-copy'"
+              :icon="isCopied(metaData.data_id) ? 'ph-check' : 'ph-copy'"
               size="10"
-              :color="isCopied(metaData.data_id) ? 'success' : 'white'"
+              :color="isCopied(metaData.data_id) ? 'success' : undefined"
               class="ml-1"
             />
           </v-col>
@@ -191,11 +191,10 @@ const liveCrs = computed(() => liveItem.value?.crs ?? metaData.crs);
             <v-btn
               v-if="crsStore.crsEditEnabled"
               data-testid="infoEditCrsBtn"
-              icon="mdi-pencil"
+              icon="ph-pencil-simple"
               variant="text"
               density="compact"
               size="x-small"
-              color="white"
               class="ml-1"
               @click.stop="crsStore.requestCrsEdit(metaData.data_id)"
             />
@@ -204,7 +203,7 @@ const liveCrs = computed(() => liveItem.value?.crs ?? metaData.crs);
           <template v-if="componentItem">
             <v-divider class="w-100 my-2" opacity="0.2" />
             <v-col
-              class="text-subtitle-2 font-weight-bold text-truncate text-white w-100 pa-0"
+              class="text-subtitle-2 font-weight-bold text-truncate w-100 pa-0"
               cols="auto"
               style="line-height: 1.3"
             >
@@ -224,9 +223,9 @@ const liveCrs = computed(() => liveItem.value?.crs ?? metaData.crs);
                 {{ isCopied(componentItem.id) ? "COPIED!" : formatId(componentItem.id) }}
               </span>
               <v-icon
-                :icon="isCopied(componentItem.id) ? 'mdi-check' : 'mdi-content-copy'"
+                :icon="isCopied(componentItem.id) ? 'ph-check' : 'ph-copy'"
                 size="10"
-                :color="isCopied(componentItem.id) ? 'success' : 'white'"
+                :color="isCopied(componentItem.id) ? 'success' : undefined"
                 class="ml-1"
               />
             </v-col>
@@ -241,8 +240,8 @@ const liveCrs = computed(() => liveItem.value?.crs ?? metaData.crs);
 .id-badge-container {
   font-family: monospace;
   font-size: 0.6rem;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(var(--v-theme-on-surface), 0.06);
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
   border-radius: 4px;
   cursor: pointer;
   user-select: none;
@@ -251,8 +250,8 @@ const liveCrs = computed(() => liveItem.value?.crs ?? metaData.crs);
 }
 
 .id-badge-container:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(var(--v-theme-primary), 0.12);
+  border-color: rgba(var(--v-theme-primary), 0.35);
   opacity: 1;
   transform: scale(1.03);
 }
@@ -263,7 +262,7 @@ const liveCrs = computed(() => liveItem.value?.crs ?? metaData.crs);
 
 .id-text {
   letter-spacing: 0.5px;
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(var(--v-theme-on-surface), 0.85);
 }
 
 .object-name-popover {

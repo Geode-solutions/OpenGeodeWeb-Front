@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, useAttrs } from "vue";
 import { onKeyStroke } from "@vueuse/core";
+import { useChromeTheme } from "@ogw_front/composables/chrome_theme";
 
 interface Props {
   variant?: "panel" | "ui";
@@ -19,6 +20,7 @@ const {
 } = defineProps<Props>();
 
 const attrs = useAttrs();
+const chromeTheme = useChromeTheme();
 const isInteractive = computed<boolean>(() => Boolean(attrs.onClick));
 
 onKeyStroke("Escape", () => {
@@ -36,7 +38,7 @@ onKeyStroke("Escape", () => {
     @contextmenu.stop
     flat
     :ripple="isInteractive"
-    :theme="theme || (variant === 'panel' ? 'dark' : undefined)"
+    :theme="theme || (variant === 'panel' ? chromeTheme : undefined)"
     :class="[
       variant === 'panel' ? 'glass-panel' : 'glass-ui',
       'border-thin',
