@@ -50,10 +50,9 @@ describe("crs selector", () => {
       },
       props: { geodeObjectType: "BRep" },
     });
-    const td_wrapper = wrapper.find("td");
     await wrapper.vm.$nextTick();
-    const input = td_wrapper.find("input");
-    await input.trigger("click");
+    // A click on the row selects it: no checkbox column
+    await wrapper.find("tbody tr").trigger("click");
     expect(wrapper.emitted()).toHaveProperty("update:modelValue");
     expect(wrapper.emitted<unknown[]>()["update:modelValue"]).toHaveLength(EXPECTED_LENGTH);
     expect(
@@ -78,8 +77,7 @@ describe("crs selector", () => {
       props: { geodeObjectType: "BRep" },
     });
     await wrapper.vm.$nextTick();
-    const esri_input = wrapper.findAll("tbody tr")[ESRI_INDEX]?.find("input");
-    await esri_input?.trigger("click");
+    await wrapper.findAll("tbody tr")[ESRI_INDEX]?.trigger("click");
     expect(
       wrapper.emitted<unknown[]>()["update:modelValue"]?.[FIRST_INDEX]?.[FIRST_INDEX],
     ).toStrictEqual(crs_list[ESRI_INDEX]);
@@ -100,9 +98,35 @@ describe("crs selector", () => {
     });
     await wrapper.vm.$nextTick();
     const headers = wrapper.findAll("th").map((header) => header.text());
-    expect(headers).toStrictEqual(["", "Code", "Name"]);
+    expect(headers).toStrictEqual(["Code", "Name"]);
     const cells = wrapper.findAll("tbody td").map((cell) => cell.text());
-    expect(cells).toStrictEqual(["", "EPSG:2154", "RGF93 v1 / Lambert-93"]);
+    expect(cells).toStrictEqual(["EPSG:2154", "RGF93 v1 / Lambert-93"]);
+  });
+
+  test("selects a focused row with enter and highlights it", async () => {
+    const crs_list = [{ authority: "EPSG", code: "2154", name: "RGF93 v1 / Lambert-93" }];
+    const crsStore = useCrsStore();
+    crsStore.geographicList = mockAs<typeof crsStore.geographicList>(
+      vi.fn().mockResolvedValue(crs_list),
+    );
+
+    const wrapper = await mountSuspended(CrsSelector, {
+      global: {
+        plugins: [vuetify, pinia],
+      },
+      props: {
+        geodeObjectType: "BRep",
+        "onUpdate:modelValue": async (crs: unknown) => {
+          await wrapper.setProps({ modelValue: crs });
+        },
+      },
+    });
+    await wrapper.vm.$nextTick();
+    await wrapper.find("tbody tr").trigger("keydown", { key: "Enter" });
+    expect(
+      wrapper.emitted<unknown[]>()["update:modelValue"]?.[FIRST_INDEX]?.[FIRST_INDEX],
+    ).toStrictEqual(crs_list[FIRST_INDEX]);
+    expect(wrapper.find("tbody tr").classes()).toContain("bg-primary");
   });
 
   test("does not offer to show all the crs at once", async () => {

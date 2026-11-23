@@ -16,8 +16,6 @@ const search = ref<string>("");
 const data_table_loading = ref<boolean>(false);
 // Thousands of rows that are never mutated: no deep reactivity
 const crs_list = shallowRef<CRS[]>([]);
-// Keys of the selected rows: the item-value of the table, "AUTHORITY:CODE"
-const selected_crs = ref<string[]>([]);
 const toggle_loading = useToggle(data_table_loading);
 const crsStore = useCrsStore();
 
@@ -26,13 +24,29 @@ function crs_key(crs: CRS): string {
   return `${crs.authority}:${crs.code}`;
 }
 
-function get_selected_crs(key: string | undefined): CRS | undefined {
-  return crs_list.value.find((crs) => crs_key(crs) === key);
+// A click on the row selects it: no checkbox column. Enter does the same once the row is focused
+function select_crs(crs: CRS): void {
+  selectedCrs.value = crs;
 }
 
-watch(selected_crs, (new_value) => {
-  selectedCrs.value = get_selected_crs(new_value[0]);
-});
+// Vuetify passes the click event first, then the clicked row
+function on_row_click(_event: Event, { item }: { item: CRS }): void {
+  select_crs(item);
+}
+
+function row_props({ item }: { item: CRS }): Record<string, unknown> {
+  const selected = selectedCrs.value !== undefined && crs_key(item) === crs_key(selectedCrs.value);
+  return {
+    class: ["crs-row", { "bg-primary": selected }],
+    tabindex: 0,
+    "aria-selected": selected,
+    onKeydown: (event: KeyboardEvent) => {
+      if (event.key === "Enter") {
+        select_crs(item);
+      }
+    },
+  };
+}
 
 async function get_crs_table(): Promise<void> {
   toggle_loading();
@@ -80,7 +94,6 @@ onMounted(async () => {
     hide-details
   ></v-text-field>
   <v-data-table
-    v-model="selected_crs"
     :items-per-page="10"
     :items-per-page-options="items_per_page_options"
     :headers="headers"
@@ -89,11 +102,11 @@ onMounted(async () => {
     class="elevation-1"
     density="compact"
     fixed-header
-    select-strategy="single"
-    show-select
+    :row-props="row_props"
     :search="search"
     :loading="data_table_loading"
     loading-text="Loading... Please wait"
+    @click:row="on_row_click"
   >
     <template v-if="compact" #[`item.name`]="{ value }">
       <v-tooltip :text="value" location="top">
@@ -104,3 +117,9 @@ onMounted(async () => {
     </template>
   </v-data-table>
 </template>
+
+<style scoped>
+:deep(.crs-row) {
+  cursor: pointer;
+}
+</style>
