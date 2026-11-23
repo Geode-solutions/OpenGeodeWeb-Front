@@ -1,7 +1,6 @@
 // oxlint-disable eslint/max-lines
 // Third party imports
 import type { CRS } from "@geode/opengeodeweb-back/schema_types";
-import type { Table } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
@@ -17,7 +16,7 @@ import type {
 import { type LegacyDataId, fromLegacyDataId } from "@ogw_front/utils/legacy_data_id";
 import { type ModelComponentRecord, useDataMesh } from "./data_helpers/mesh.js";
 import { type ModelComponentRelationRecord, useDataRelations } from "./data_helpers/relations.js";
-import { database, writeTransaction } from "@ogw_internal/database/database.js";
+import { getTable, writeTransaction } from "@ogw_internal/database/database.js";
 import { liveObservable } from "@ogw_front/utils/live_observable";
 import { useDataCollections } from "./data_helpers/collections.js";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -57,10 +56,6 @@ interface NewDataItem extends DataIdentified, GeodeIdentified, GeodeObjectTyped,
 }
 
 const viewer_generic_schemas = viewer_schemas.opengeodeweb_viewer.generic;
-// The database's table map is dynamically assembled at runtime (see internal/database/database.ts), so its exported type is a loose `{}`; cast it to the shape it actually has at runtime rather than widening every call site.
-type DatabaseTables = Record<string, unknown>;
-// oxlint-disable-next-line no-unsafe-type-assertion -- see comment above.
-const typedDatabase = database as unknown as DatabaseTables;
 // A missing data is not viewable. Data imported before `is_viewable` existed fall back on their viewable file
 function isDataItemViewable(data_item: DataItem | undefined): boolean {
   if (data_item === undefined) {
@@ -78,15 +73,11 @@ function isDataItemViewable(data_item: DataItem | undefined): boolean {
 // oxlint-disable-next-line max-lines-per-function, max-statements
 export const useDataStore = defineStore("data", () => {
   const viewerStore = useViewerStore();
-  // oxlint-disable-next-line no-unsafe-type-assertion -- database's table map is dynamically typed at runtime; see comment above.
-  const data_db = typedDatabase.data as Table<DataItem, string>;
-  // oxlint-disable-next-line no-unsafe-type-assertion -- database's table map is dynamically typed at runtime; see comment above.
-  const model_components_db = typedDatabase.model_components as Table<ModelComponentRecord, string>;
-  // oxlint-disable-next-line no-unsafe-type-assertion -- database's table map is dynamically typed at runtime; see comment above.
-  const model_components_relation_db = typedDatabase.model_components_relation as Table<
-    ModelComponentRelationRecord,
-    string
-  >;
+  const data_db = getTable<DataItem>("data");
+  const model_components_db = getTable<ModelComponentRecord>("model_components");
+  const model_components_relation_db = getTable<ModelComponentRelationRecord>(
+    "model_components_relation",
+  );
   const {
     formatedMeshComponents,
     refFormatedMeshComponents,

@@ -3,14 +3,12 @@ import type {
   ModelComponentTypeStyle,
   StyleValues,
 } from "@ogw_internal/stores/data_style/types.js";
-import { database, writeTransaction } from "@ogw_internal/database/database";
+import { getTable, writeTransaction } from "@ogw_internal/database/database";
 import type { Table } from "dexie";
 import merge from "lodash/merge";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 
-// The underlying dexie tables use compound array keys ([id_model, id_component] /
-// [id_model, type]) but the shared `database` proxy types every table as
-// Table<Record<string, unknown>, string>. Cast locally to the real key shape.
+// The component style tables use compound keys: [id_model, id_component] and [id_model, type]
 type ComponentTable = Table<ModelComponentStyle, [string, string]>;
 type ComponentTypeTable = Table<ModelComponentTypeStyle, [string, string]>;
 
@@ -20,13 +18,11 @@ interface ComponentStyleUpdate {
 }
 
 function componentDatastyleTable(): ComponentTable {
-  // oxlint-disable-next-line no-unsafe-type-assertion -- compound-key table cast; see comment above.
-  return database.model_component_datastyle as unknown as ComponentTable;
+  return getTable<ModelComponentStyle, [string, string]>("model_component_datastyle");
 }
 
 function componentTypeDatastyleTable(): ComponentTypeTable {
-  // oxlint-disable-next-line no-unsafe-type-assertion -- compound-key table cast; see comment above.
-  return database.model_component_type_datastyle as unknown as ComponentTypeTable;
+  return getTable<ModelComponentTypeStyle, [string, string]>("model_component_type_datastyle");
 }
 
 interface UseModelComponentStyleMutationsReturn {

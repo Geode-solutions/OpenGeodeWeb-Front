@@ -5,10 +5,9 @@ import type {
   ObjectStyle,
   SceneStyle,
 } from "@ogw_internal/stores/data_style/types";
-import { database, getTable, writeTransaction } from "@ogw_internal/database/database.js";
+import { getTable, writeTransaction } from "@ogw_internal/database/database.js";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
-import type { Table } from "dexie";
 import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import { getDefaultStyle } from "@ogw_front/utils/default_styles";
 import { useAttributeTimeStepStyle } from "@ogw_internal/stores/data_style/time_step";
@@ -27,17 +26,6 @@ interface DataStyleSnapshot {
   readonly sceneStyle?: SceneStyle;
 }
 
-// The database's table map is dynamically assembled at runtime (see internal/database/database.ts), so its exported type is a loose `{}`; cast it to the shape it actually has at runtime rather than widening every call site.
-type DatabaseTables = Record<string, Table<Record<string, unknown>, string> | undefined>;
-
-// `noUncheckedIndexedAccess` sees these as possibly undefined even though they're always registered before this store is used; guard defensively rather than asserting.
-function requireTable<TableValue>(table: TableValue | undefined, name: string): TableValue {
-  if (table === undefined) {
-    throw new Error(`Database table not initialized: ${name}`);
-  }
-  return table;
-}
-
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
@@ -50,15 +38,12 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   const sceneStyleStore = useSceneStyle();
   const attributeTimeStepStyle = useAttributeTimeStepStyle();
   const dataStore = useDataStore();
-  // oxlint-disable-next-line no-unsafe-type-assertion -- the database Proxy is typed as `{}` at its export site; this cast documents its real runtime shape.
-  const typedDatabase = database as unknown as DatabaseTables;
-  const data_style_db = requireTable(typedDatabase.data_style, "data_style");
-  const model_component_type_datastyle_db = requireTable(
-    typedDatabase.model_component_type_datastyle,
+  const data_style_db = getTable<ObjectStyle>("data_style");
+  // Keyed by [id_model, type] and [id_model, id_component]
+  const model_component_type_datastyle_db = getTable<ModelComponentTypeStyle, [string, string]>(
     "model_component_type_datastyle",
   );
-  const component_datastyle_db = requireTable(
-    typedDatabase.model_component_datastyle,
+  const component_datastyle_db = getTable<ModelComponentStyle, [string, string]>(
     "model_component_datastyle",
   );
 

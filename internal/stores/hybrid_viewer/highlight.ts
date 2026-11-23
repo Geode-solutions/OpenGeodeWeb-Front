@@ -1,19 +1,20 @@
-import type { GeodeIdentified, ModelId } from "@ogw_front/types/identifiers";
 import { HOVER_DEBOUNCE_MS, HOVER_TIMEOUT_MS } from "./constants";
 import type { HoverComponentInfo, HoverData } from "./vtk_types";
 import viewer_schemas, {
   type PickedFieldType,
   type ViewerHighlightResponse,
 } from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
+import type { DataItem } from "@ogw_front/stores/data";
 import type { GeodeId } from "@geode/opengeodeweb-microservice/schema_types";
-import type { IndexableType } from "dexie";
-import { database } from "@ogw_internal/database/database.js";
+import type { ModelComponentRecord } from "@ogw_front/stores/data_helpers/mesh";
+import type { ModelId } from "@ogw_front/types/identifiers";
+import { getTable } from "@ogw_internal/database/database.js";
 import { useHybridViewerCore } from "./core";
 import { useHybridViewerScene } from "./scene";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 async function lookupModelName(modelId: ModelId): Promise<string | undefined> {
-  const modelRecord = (await database.data?.get(modelId)) as { name?: string } | undefined;
+  const modelRecord = await getTable<DataItem>("data").get(modelId);
   return modelRecord?.name;
 }
 
@@ -21,22 +22,20 @@ async function lookupComponentInfo(
   modelId: ModelId,
   geodeId: GeodeId | undefined,
 ): Promise<HoverComponentInfo | undefined> {
-  const modelComponentsTable = database.model_components;
-  if (geodeId === undefined || !modelComponentsTable) {
+  if (geodeId === undefined) {
     return undefined;
   }
-  const components = modelComponentsTable.where("[data_id+geode_id]");
-  const query = components.equals([modelId, geodeId] as IndexableType);
-  const component = (await query.first()) as
-    | (Partial<GeodeIdentified> & { name?: string; type?: string })
-    | undefined;
+  const component = await getTable<ModelComponentRecord>("model_components")
+    .where("[data_id+geode_id]")
+    .equals([modelId, geodeId])
+    .first();
   if (!component) {
     return undefined;
   }
   return {
-    name: component.name ?? "",
-    id: component.geode_id ?? "",
-    type: component.type ?? "",
+    name: component.name,
+    id: component.geode_id,
+    type: component.type,
   };
 }
 

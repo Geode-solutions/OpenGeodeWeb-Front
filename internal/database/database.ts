@@ -1,4 +1,4 @@
-import { Dexie, type Table } from "dexie";
+import { Dexie, type IndexableType, type Table } from "dexie";
 import { BaseDatabase } from "./base_database";
 import { ExtendedDatabase } from "./extended_database";
 
@@ -104,7 +104,7 @@ function currentInstance(): Dexie {
   return databaseContainer.instance;
 }
 
-function liveTable<TRow>(tableName: string): Table<TRow, string> {
+function liveTable<TRow, TKey extends IndexableType>(tableName: string): Table<TRow, TKey> {
   const handler: ProxyHandler<object> = {
     get(_target, prop: string | symbol): unknown {
       const table = currentInstance().table(tableName);
@@ -121,7 +121,7 @@ function liveTable<TRow>(tableName: string): Table<TRow, string> {
     },
   };
   // oxlint-disable-next-line no-unsafe-type-assertion -- the proxy forwards every access to a Dexie Table.
-  return new Proxy({}, handler) as Table<TRow, string>;
+  return new Proxy({}, handler) as Table<TRow, TKey>;
 }
 
 function isTableName(instance: Dexie, prop: string | symbol): prop is string {
@@ -149,9 +149,10 @@ const database = new Proxy<DatabaseTables>(
   },
 );
 
-// Callers cast to the row type they know a given table holds.
-function getTable<TRow>(tableName: string): Table<TRow, string> {
-  return liveTable<TRow>(tableName);
+// Callers give the row type, and the key type when it is not a string (an auto-incremented
+// Number, a compound [string, string]...), that they know a given table holds.
+function getTable<TRow, TKey extends IndexableType = string>(tableName: string): Table<TRow, TKey> {
+  return liveTable<TRow, TKey>(tableName);
 }
 
 // Runs `scope` in one read-write transaction over `tables`: its writes all apply, or none do.

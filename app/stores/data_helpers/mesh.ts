@@ -1,8 +1,7 @@
 import type { DataIdentified, GeodeIdentified, ModelId } from "@ogw_front/types/identifiers";
 import type { ReadonlyTreeGroup } from "@ogw_front/types/tree";
-import type { Table } from "dexie";
 import type { ViewerId } from "@geode/opengeodeweb-viewer/schema_types";
-import { database } from "@ogw_internal/database/database.js";
+import { getTable } from "@ogw_internal/database/database.js";
 import { liveObservable } from "@ogw_front/utils/live_observable";
 import { useObservable } from "@vueuse/rxjs";
 
@@ -47,11 +46,7 @@ function useDataMesh(): {
   getSurfacesGeodeIds: typeof getSurfacesGeodeIds;
   getBlocksGeodeIds: typeof getBlocksGeodeIds;
 } {
-  // oxlint-disable-next-line no-unsafe-type-assertion -- database's table map is dynamically typed at runtime.
-  const model_components_db = database.model_components as unknown as Table<
-    ModelComponentRecord,
-    string
-  >;
+  const model_components_db = getTable<ModelComponentRecord>("model_components");
 
   async function formatedMeshComponents(modelId: ModelId): Promise<FormattedComponentGroup[]> {
     const items = await model_components_db.where("data_id").equals(modelId).toArray();
