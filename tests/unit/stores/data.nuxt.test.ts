@@ -29,7 +29,7 @@ describe("useDataStore - collections", () => {
       data_id: dataId,
       geode_id: geodeId,
       name: "cube",
-      viewer_object_type: "model",
+      viewer_object_type: "model" as const,
       geode_object_type: "BRep",
     });
     const stored = await dataStore.item(dataId);
@@ -44,7 +44,7 @@ describe("useDataStore - collections", () => {
       data_id: dataId,
       geode_id: "01a08187-2c4c-7e64-85c5-52c3439f0627",
       name: "points",
-      viewer_object_type: "mesh",
+      viewer_object_type: "mesh" as const,
       geode_object_type: "PointSet3D",
       crs,
     });
@@ -65,8 +65,8 @@ describe("useDataStore - collections", () => {
     const model = {
       data_id: modelId,
       geode_id: modelId,
-      viewer_object_type: "model",
-      geode_object_type: "Section",
+      viewer_object_type: "model" as const,
+      geode_object_type: "Section" as const,
       mesh_components: [
         surface,
         line1,
@@ -111,8 +111,8 @@ describe("useDataStore - collections", () => {
     const model = {
       data_id: modelId,
       geode_id: modelId,
-      viewer_object_type: "model",
-      geode_object_type: "Section",
+      viewer_object_type: "model" as const,
+      geode_object_type: "Section" as const,
       mesh_components: [
         {
           ...component("surface", "Surface", 1),

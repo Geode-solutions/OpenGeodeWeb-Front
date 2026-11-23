@@ -293,13 +293,13 @@ const { handleKeyDown } = useTreeKeyboardNav(
 .tree-row-wrapper {
   min-height: 28px !important;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: var(--ogw-viewer-row-radius, 4px);
   margin: 0 2px;
 }
 
 .tree-row-wrapper.is-focused {
-  background-color: rgba(0, 0, 0, 0.08) !important;
-  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.15);
+  background-color: rgba(var(--v-theme-on-surface), 0.08) !important;
+  box-shadow: inset 0 0 0 2px rgba(var(--v-theme-on-surface), 0.15);
 }
 
 .tree-row-wrapper.is-active {
@@ -327,7 +327,7 @@ const { handleKeyDown } = useTreeKeyboardNav(
 }
 
 .tree-row-wrapper:hover:not(.is-focused):not(.is-active) {
-  background-color: rgba(0, 0, 0, 0.04) !important;
+  background-color: rgba(var(--v-theme-on-surface), 0.04) !important;
 }
 
 :deep(.v-list-item__content) {

@@ -54,7 +54,6 @@ const show = computed<boolean>({
         <v-btn
           variant="text"
           size="small"
-          color="white"
           class="text-caption text-none"
           data-testid="closeCameraManagerButton"
           @click="handleClose"

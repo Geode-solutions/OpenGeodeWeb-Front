@@ -44,7 +44,7 @@ watch([lutCanvas, selectedPresetName, (): number => min, (): number => max], dra
         class="d-flex flex-column"
         style="gap: 4px; cursor: pointer"
       >
-        <span class="text-caption text-white font-weight-medium">
+        <span class="text-caption font-weight-medium">
           {{ selectedPresetName }}
         </span>
         <canvas ref="lutCanvas" width="200" height="18" class="w-100 rounded-xs border-thin" />
@@ -61,6 +61,6 @@ watch([lutCanvas, selectedPresetName, (): number => min, (): number => max], dra
 
 <style scoped>
 .border-thin {
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity)) !important;
 }
 </style>

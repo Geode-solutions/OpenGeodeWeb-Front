@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { CRSList } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
-import type { GeodeObjectType } from "@ogw_front/types/identifiers";
+import type { CRS } from "@geode/opengeodeweb-back/schema_types";
+import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import { useCrsStore } from "@ogw_front/stores/crs";
 
 interface Props {
@@ -10,23 +10,23 @@ interface Props {
 }
 
 const { geodeObjectType, compact = false } = defineProps<Props>();
-const selectedCrs = defineModel<CRSList | undefined>();
+const selectedCrs = defineModel<CRS | undefined>();
 
 const search = ref<string>("");
 const data_table_loading = ref<boolean>(false);
 // Thousands of rows that are never mutated: no deep reactivity
-const crs_list = shallowRef<CRSList[]>([]);
+const crs_list = shallowRef<CRS[]>([]);
 // Keys of the selected rows: the item-value of the table, "AUTHORITY:CODE"
 const selected_crs = ref<string[]>([]);
 const toggle_loading = useToggle(data_table_loading);
 const crsStore = useCrsStore();
 
 // Codes are only unique within an authority (e.g. EPSG:4812 and ESRI:4812)
-function crs_key(crs: CRSList): string {
+function crs_key(crs: CRS): string {
   return `${crs.authority}:${crs.code}`;
 }
 
-function get_selected_crs(key: string | undefined): CRSList | undefined {
+function get_selected_crs(key: string | undefined): CRS | undefined {
   return crs_list.value.find((crs) => crs_key(crs) === key);
 }
 
@@ -73,8 +73,8 @@ onMounted(async () => {
   <v-text-field
     v-model="search"
     data-testid="crsSearchInput"
-    :append-icon="compact ? undefined : 'mdi-magnify'"
-    :prepend-inner-icon="compact ? 'mdi-magnify' : undefined"
+    :append-icon="compact ? undefined : 'ph-magnifying-glass'"
+    :prepend-inner-icon="compact ? 'ph-magnifying-glass' : undefined"
     label="Search"
     single-line
     hide-details

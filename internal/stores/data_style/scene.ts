@@ -1,11 +1,17 @@
 import type { SceneFontFamily, SceneOrientationWidget, SceneStyle } from "./types";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
+import {
+  NO_VIEWER_MARKER,
+  viewerOrientationMarker,
+} from "@ogw_front/composables/orientation_overlay";
+import { consola } from "consola";
 import { getDefaultSceneStyle } from "@ogw_front/utils/default_styles";
 import { getTable } from "@ogw_internal/database/database";
+import { toViewerColor } from "@ogw_front/composables/viewer_reset";
 import { useDataStyleState } from "./state";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -14,16 +20,10 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const text_style_schema = viewer_schemas.opengeodeweb_viewer.viewer.set_text_style;
 const orientation_widget_schema = viewer_schemas.opengeodeweb_viewer.viewer.set_orientation_widget;
 
-// oxlint-disable-next-line id-length -- the viewer schema requires { r, g, b }
-function toViewerColor(color: RGBAColor): { r: number; g: number; b: number } {
-  // oxlint-disable-next-line id-length -- the viewer schema requires { r, g, b }
-  return { r: color.red, g: color.green, b: color.blue };
-}
-
 // oxlint-disable-next-line max-lines-per-function
 export function useSceneStyle(): {
-  setSceneBackgroundColor: (color: RGBAColor) => Promise<void>;
-  setSceneTextColor: (color: RGBAColor) => Promise<unknown>;
+  setSceneBackgroundColor: (color: ColorRGBA) => Promise<void>;
+  setSceneTextColor: (color: ColorRGBA) => Promise<unknown>;
   setSceneFontFamily: (font_family: SceneFontFamily) => Promise<unknown>;
   setSceneOrientationWidget: (marker: SceneOrientationWidget) => Promise<unknown>;
   applySceneStyle: () => Promise<void>;
@@ -62,23 +62,35 @@ export function useSceneStyle(): {
   }
 
   async function requestOrientationWidget(marker: SceneOrientationWidget): Promise<unknown> {
-    const result = await viewerStore.request(
-      { schema: orientation_widget_schema, params: { marker } },
-      {
-        response_function: async () => {
-          await saveSceneStyle({ orientation_widget: marker });
+    // With the front overlay, the viewer hides its marker while the scene style keeps the choice
+    const viewerMarker = viewerOrientationMarker(marker);
+    try {
+      const result = await viewerStore.request(
+        { schema: orientation_widget_schema, params: { marker: viewerMarker } },
+        {
+          response_function: async () => {
+            await saveSceneStyle({ orientation_widget: marker });
+          },
         },
-      },
-    );
-    return result;
+      );
+      return result;
+    } catch (error) {
+      if (viewerMarker !== NO_VIEWER_MARKER) {
+        throw error;
+      }
+      // A viewer without the "none" marker keeps its own: the overlay still follows the user's choice
+      consola.warn("[OrientationOverlay] The viewer kept its orientation marker:", error);
+      await saveSceneStyle({ orientation_widget: marker });
+      return undefined;
+    }
   }
 
-  async function setSceneBackgroundColor(color: RGBAColor): Promise<void> {
+  async function setSceneBackgroundColor(color: ColorRGBA): Promise<void> {
     await hybridViewerStore.setBackgroundColor(toViewerColor(color));
     await saveSceneStyle({ background_color: color });
   }
 
-  async function setSceneTextColor(color: RGBAColor): Promise<unknown> {
+  async function setSceneTextColor(color: ColorRGBA): Promise<unknown> {
     const result = await requestTextStyle({ ...sceneStyle.value.text, color });
     return result;
   }

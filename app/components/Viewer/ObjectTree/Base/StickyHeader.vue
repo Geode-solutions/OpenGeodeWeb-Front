@@ -47,13 +47,13 @@ const emit = defineEmits<Emits>();
 .sticky-tree-header {
   flex-shrink: 0;
   background-color: transparent;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.05);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border-bottom: 2px solid rgba(var(--v-theme-on-surface), 0.05);
+  box-shadow: 0 2px 4px rgba(var(--v-theme-on-surface), 0.05);
   cursor: pointer;
   z-index: 2;
 }
 
 .sticky-tree-header:hover {
-  background-color: rgba(0, 0, 0, 0.04);
+  background-color: rgba(var(--v-theme-on-surface), 0.04);
 }
 </style>

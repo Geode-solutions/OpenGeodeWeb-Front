@@ -21,11 +21,11 @@ function getMainObjectTree(window: Page): Locator {
 
 async function collapseMainObjectTree(window: Page): Promise<void> {
   const mainObjectTree = getMainObjectTree(window);
-  await clickCollapseOrExpandAll(window, mainObjectTree, "mdi-collapse-all-outline");
+  await clickCollapseOrExpandAll(window, mainObjectTree, "ph-arrows-in-line-vertical");
 }
 async function expandMainObjectTree(window: Page): Promise<void> {
   const mainObjectTree = getMainObjectTree(window);
-  await clickCollapseOrExpandAll(window, mainObjectTree, "mdi-expand-all-outline");
+  await clickCollapseOrExpandAll(window, mainObjectTree, "ph-arrows-out-line-vertical");
 }
 
 async function collapseMainObjectTreeGroup(window: Page, groupName: string): Promise<void> {
@@ -85,7 +85,7 @@ async function focusObjectInTree(
   await expandGeodeObjectType(window, geodeObjectType);
   const mainObjectTree = getMainObjectTree(window);
   const row = await getTreeRowByTextAndParent(window, geodeObjectType, dataName, mainObjectTree);
-  await row.locator("button:has(.mdi-target)").click({ force: true });
+  await row.locator("button:has(.ph-target)").click({ force: true });
   await waitForActionSettled(window);
 }
 

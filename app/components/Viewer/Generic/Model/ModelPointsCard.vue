@@ -5,7 +5,7 @@ import {
 } from "@ogw_front/composables/model_menu_context";
 import ModelCardTabs from "./ModelCardTabs.vue";
 import ViewerGenericModelComponentPointsOptions from "@ogw_front/components/Viewer/Generic/Model/ComponentPointsOptions.vue";
-import type { Visibility } from "@ogw_front/types/style";
+import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStore } from "@ogw_front/stores/data";

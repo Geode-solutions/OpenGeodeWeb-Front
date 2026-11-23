@@ -2,8 +2,8 @@ import type { JsonRpcSchema, ParamsOf, ResponseOf } from "@ogw_shared/utils/type
 import viewer_schemas, {
   type ViewerClippingPlanesParams,
 } from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
-import type { AttributeName } from "@ogw_front/types/attribute";
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { AttributeName } from "@geode/opengeodeweb-viewer/schema_types";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { SliceAxis } from "@ogw_front/utils/slice";
 import { useHybridViewerCore } from "./core";
 import { useViewerStore } from "@ogw_front/stores/viewer";

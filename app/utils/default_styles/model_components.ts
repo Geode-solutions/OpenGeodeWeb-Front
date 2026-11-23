@@ -14,12 +14,16 @@ import {
   LINES_DEFAULT_VISIBILITY,
   POINTS_DEFAULT_SIZE,
   POINTS_DEFAULT_VISIBILITY,
-  type RGBAColor,
   SURFACES_DEFAULT_ACTIVE_COLORING,
   SURFACES_DEFAULT_COLOR,
   SURFACES_DEFAULT_VISIBILITY,
 } from "./constants";
-import type { Size, Visibility, Width } from "@ogw_front/types/style";
+import type {
+  ColorRGBA,
+  EdgeWidth,
+  PointSize,
+  Visibility,
+} from "@geode/opengeodeweb-viewer/schema_types";
 
 function emptyAttributeConfig(): AttributeConfig {
   return { name: undefined, storedConfigs: {} };
@@ -59,17 +63,17 @@ interface ModelBlocksStyle {
 
 interface ModelPointsStyle {
   visibility: Visibility;
-  size: Size;
+  size: PointSize;
 }
 
 interface ModelEdgesStyle {
   visibility: Visibility;
-  width: Width;
+  width: EdgeWidth;
 }
 
 function modelCornersDefaultStyle(
   visibility: Visibility = CORNERS_DEFAULT_VISIBILITY,
-  constant: RGBAColor = CORNERS_DEFAULT_COLOR,
+  constant: ColorRGBA = CORNERS_DEFAULT_COLOR,
 ): ModelCornersStyle {
   return {
     visibility,
@@ -83,7 +87,7 @@ function modelCornersDefaultStyle(
 
 function modelLinesDefaultStyle(
   visibility: Visibility = LINES_DEFAULT_VISIBILITY,
-  constant: RGBAColor = LINES_DEFAULT_COLOR,
+  constant: ColorRGBA = LINES_DEFAULT_COLOR,
 ): ModelLinesStyle {
   return {
     visibility,
@@ -98,7 +102,7 @@ function modelLinesDefaultStyle(
 
 function modelSurfacesDefaultStyle(
   visibility: Visibility = SURFACES_DEFAULT_VISIBILITY,
-  constant: RGBAColor = SURFACES_DEFAULT_COLOR,
+  constant: ColorRGBA = SURFACES_DEFAULT_COLOR,
 ): ModelSurfacesStyle {
   return {
     visibility,
@@ -113,7 +117,7 @@ function modelSurfacesDefaultStyle(
 
 function modelBlocksDefaultStyle(
   visibility: Visibility = BLOCKS_DEFAULT_VISIBILITY,
-  constant: RGBAColor = BLOCKS_DEFAULT_COLOR,
+  constant: ColorRGBA = BLOCKS_DEFAULT_COLOR,
 ): ModelBlocksStyle {
   return {
     visibility,
@@ -128,14 +132,14 @@ function modelBlocksDefaultStyle(
 
 function modelPointsDefaultStyle(
   visibility: Visibility = POINTS_DEFAULT_VISIBILITY,
-  size: Size = POINTS_DEFAULT_SIZE,
+  size: PointSize = POINTS_DEFAULT_SIZE,
 ): ModelPointsStyle {
   return { visibility, size };
 }
 
 function modelEdgesDefaultStyle(
   visibility: Visibility = EDGES_DEFAULT_VISIBILITY,
-  width: Width = EDGES_DEFAULT_WIDTH,
+  width: EdgeWidth = EDGES_DEFAULT_WIDTH,
 ): ModelEdgesStyle {
   return { visibility, width };
 }

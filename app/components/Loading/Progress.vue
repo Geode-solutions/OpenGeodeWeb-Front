@@ -8,18 +8,22 @@ const { progress } = defineProps<Props>();
 
 <template>
   <v-progress-linear
-    color="white"
+    color="on-background"
     height="10"
     indeterminate
     rounded
-    bg-color="white"
+    bg-color="on-background"
     bg-opacity="0.15"
     class="custom-progress-glow mt-4 mt-sm-8"
   />
 </template>
 
 <style scoped>
+.custom-progress-glow :deep(.v-progress-linear__indeterminate .v-progress-linear__indeterminate) {
+  background: var(--ogw-loading-progress, rgb(var(--v-theme-on-background))) !important;
+}
+
 .custom-progress-glow :deep(.v-progress-linear__indeterminate) {
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+  box-shadow: var(--ogw-loading-progress-glow, 0 0 15px rgba(255, 255, 255, 0.4));
 }
 </style>

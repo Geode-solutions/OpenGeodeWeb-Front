@@ -1,6 +1,6 @@
 import { type DataItem, useDataStore } from "@ogw_front/stores/data";
 import type { EffectScope, MaybeRefOrGetter, ShallowRef } from "vue";
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 
 // Live view of a data item whose id can change: tree labels are reused by the virtual list,
 // And the info card shows whichever object the menu was last opened on.

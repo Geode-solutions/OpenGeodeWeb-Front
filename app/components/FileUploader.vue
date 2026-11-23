@@ -125,15 +125,9 @@ watch(
       await upload_files();
     }
   },
-  { deep: true },
+  // Immediate so files given as props (e.g. drag & drop) go through the CSV configuration too
+  { deep: true, immediate: true },
 );
-
-if (files.length > 0) {
-  internal_files.value = files;
-  if (autoUpload) {
-    upload_files();
-  }
-}
 
 watch(
   () => files,
@@ -147,7 +141,7 @@ watch(
 <template>
   <template v-if="mini">
     <v-btn
-      icon="mdi-plus"
+      icon="ph-plus"
       variant="text"
       color="primary"
       :loading="loading"
@@ -178,19 +172,18 @@ watch(
 
   <v-card-text v-if="!mini && internal_files.length" class="mt-6 pa-0">
     <v-sheet class="d-flex align-center mb-4" color="transparent">
-      <v-icon icon="mdi-file-check" class="mr-3" color="primary" size="24" />
-      <span class="text-subtitle-1 font-weight-bold text-white"> Selected files </span>
-      <v-chip size="small" class="ml-3 bg-white-opacity-10" color="white" variant="flat">
+      <v-icon icon="ph-file-text" class="mr-3" color="primary" size="24" />
+      <span class="text-subtitle-1 font-weight-bold text-high-emphasis"> Selected files </span>
+      <v-chip size="small" class="ml-3" color="primary" variant="tonal">
         {{ internal_files.length }}
       </v-chip>
       <v-spacer />
       <v-btn
         v-if="multiple"
         variant="text"
-        color="white"
         size="small"
         class="text-none opacity-60"
-        prepend-icon="mdi-plus"
+        prepend-icon="ph-plus"
         @click="dragAndDropRef?.triggerFileDialog"
       >
         Add
@@ -202,28 +195,21 @@ watch(
         <v-chip
           closable
           size="default"
-          color="white"
           variant="outlined"
           class="font-weight-medium glass-ui border-opacity-10 px-4"
-          style="background: rgba(255, 255, 255, 0.05) !important"
+          style="background: rgba(var(--v-theme-on-surface), 0.05) !important"
           @click:close="removeFile(index)"
         >
           <v-icon start size="18" :color="isCsv(file) && file.isConfigured ? 'success' : 'primary'">
-            {{
-              isCsv(file)
-                ? file.isConfigured
-                  ? "mdi-file-check"
-                  : "mdi-file-table"
-                : "mdi-file-outline"
-            }}
+            {{ isCsv(file) ? (file.isConfigured ? "ph-file-text" : "ph-file-csv") : "ph-file" }}
           </v-icon>
-          <span class="text-white">{{ file.displayName || file.name }}</span>
+          <span class="text-high-emphasis">{{ file.displayName || file.name }}</span>
 
           <v-tooltip v-if="isCsv(file)" text="Configure CSV" location="bottom">
             <template #activator="{ props: tooltipProps }">
               <v-btn
                 v-bind="tooltipProps"
-                icon="mdi-cog"
+                icon="ph-gear"
                 variant="flat"
                 :color="file.isConfigured ? 'success' : 'primary'"
                 :class="['ml-2', { 'pulse-animation': !file.isConfigured }]"
@@ -232,13 +218,13 @@ watch(
                 density="compact"
                 @click.stop="openCsvPreviewer(file, index)"
               >
-                <v-icon size="14">mdi-cog</v-icon>
+                <v-icon size="14">ph-gear</v-icon>
               </v-btn>
             </template>
           </v-tooltip>
 
           <template #close>
-            <v-icon size="16" class="ml-2 opacity-60 hover-opacity-100">mdi-close-circle</v-icon>
+            <v-icon size="16" class="ml-2 opacity-60 hover-opacity-100">ph-x-circle</v-icon>
           </template>
         </v-chip>
       </template>
@@ -256,7 +242,7 @@ watch(
       block
       @click="upload_files"
     >
-      <v-icon start size="22">mdi-cloud-upload</v-icon>
+      <v-icon start size="22">ph-cloud-arrow-up</v-icon>
       Upload
       {{ internal_files.length }}
       file<span v-if="internal_files.length > 1">s</span>
@@ -273,7 +259,7 @@ watch(
 
 <style scoped>
 .glass-ui {
-  background: rgba(255, 255, 255, 0.05) !important;
+  background: rgba(var(--v-theme-on-surface), 0.05) !important;
   backdrop-filter: blur(10px);
 }
 .hover-opacity-100:hover {

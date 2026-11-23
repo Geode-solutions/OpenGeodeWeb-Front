@@ -31,7 +31,7 @@ const indeterminate = computed(() => new Set(cropped.value).size > 1);
     :index="itemProps.index"
     :itemProps="itemProps"
     :tooltip="tooltip"
-    btnIcon="mdi-panorama-outline"
+    btnIcon="ph-panorama"
   >
     <template #options>
       <v-switch

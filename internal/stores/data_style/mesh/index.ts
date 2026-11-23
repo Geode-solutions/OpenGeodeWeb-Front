@@ -1,7 +1,6 @@
+import type { ColorRGBA, Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import type { AttributeTimeStep } from "@ogw_front/types/attribute";
 import type { MeshId } from "@ogw_front/types/identifiers";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
-import type { Visibility } from "@ogw_front/types/style";
 
 // Local imports
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
@@ -17,8 +16,8 @@ import { whenDefined } from "@ogw_internal/stores/data_style/when_defined";
 export function useMeshStyle(): {
   meshVisibility: (meshId: MeshId) => Visibility | undefined;
   setMeshVisibility: (meshId: MeshId, visibility: Visibility) => Promise<unknown>;
-  meshColor: (meshId: MeshId) => RGBAColor | undefined;
-  setMeshColor: (meshId: MeshId, color: RGBAColor) => Promise<unknown>;
+  meshColor: (meshId: MeshId) => ColorRGBA | undefined;
+  setMeshColor: (meshId: MeshId, color: ColorRGBA) => Promise<unknown>;
   applyMeshStyle: (meshId: MeshId) => Promise<unknown[]>;
 } & ReturnType<typeof useMeshPointsStyle> &
   ReturnType<typeof useMeshEdgesStyle> &

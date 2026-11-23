@@ -1,4 +1,3 @@
-import type { DataId, GeodeObjectType } from "@ogw_front/types/identifiers";
 import { type LegacyDataId, fromLegacyDataId } from "@ogw_front/utils/legacy_data_id";
 import type {
   ModelComponentStyle,
@@ -6,8 +5,10 @@ import type {
   ObjectStyle,
   SceneStyle,
 } from "@ogw_internal/stores/data_style/types";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import type { Table } from "dexie";
-import type { Visibility } from "@ogw_front/types/style";
+import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import { database } from "@ogw_internal/database/database.js";
 import { getDefaultStyle } from "@ogw_front/utils/default_styles";
 import { useAttributeTimeStepStyle } from "@ogw_internal/stores/data_style/time_step";
@@ -98,7 +99,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     if (viewer_object_type === "model") {
       return modelStyleStore.applyModelStyle(dataId);
     }
-    throw new Error(`Unknown viewer_object_type: ${viewer_object_type}`);
+    throw new Error(`Unknown viewer_object_type: ${String(viewer_object_type)}`);
   }
 
   function exportStores(): DataStyleSnapshot {

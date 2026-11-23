@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Size, Visibility } from "@ogw_front/types/style";
+import type { EdgeWidth, Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
@@ -40,7 +40,7 @@ const visibility = computed<Visibility>({
     hybridViewerStore.remoteRender();
   },
 });
-const size = computed<Size>({
+const width = computed<EdgeWidth>({
   get: () => dataStyleStore.meshEdgesWidth(dataId.value),
   set: async (newValue) => {
     await applyBatchStyle(dataId.value, (meshId: MeshId) =>
@@ -70,7 +70,7 @@ const size = computed<Size>({
       </v-row>
       <template v-if="visibility">
         <v-divider class="my-2" />
-        <ViewerOptionsWidthSlider data-testid="meshEdgesWidthSlider" v-model="size" />
+        <ViewerOptionsWidthSlider data-testid="meshEdgesWidthSlider" v-model="width" />
         <ViewerGenericMeshEdgesColoring :data-id="dataId" :capabilities="capabilities" />
       </template>
     </template>

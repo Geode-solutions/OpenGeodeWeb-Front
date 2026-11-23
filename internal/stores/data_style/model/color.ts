@@ -1,12 +1,11 @@
+import type { AttributeColorMap, AttributeRange } from "@ogw_front/types/attribute";
 import type {
-  AttributeColorMap,
   AttributeName,
-  AttributeRange,
   AttributeRangeMaximum,
   AttributeRangeMinimum,
-} from "@ogw_front/types/attribute";
+  ColorRGBA,
+} from "@geode/opengeodeweb-viewer/schema_types";
 import type { ModelId } from "@ogw_front/types/identifiers";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // oxlint-disable eslint/max-lines
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { dispatchToComponentTypes } from "./visibility";
@@ -85,14 +84,14 @@ async function applyAttributeAccessors(
 
 // oxlint-disable-next-line max-lines-per-function
 function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
-  getModelColor: (modelId: ModelId) => RGBAColor | undefined;
+  getModelColor: (modelId: ModelId) => ColorRGBA | undefined;
   getModelActiveColoring: (modelId: ModelId) => unknown;
   getModelComponentColor: (modelId: ModelId, componentId: string) => unknown;
   getModelComponentEffectiveColor: (modelId: ModelId, componentId: string, type: string) => unknown;
   getModelComponentActiveColoring: (modelId: ModelId, componentId: string) => unknown;
   modelComponentTypeColor: (modelId: ModelId, type: string) => unknown;
   getModelComponentTypeActiveColoring: (modelId: ModelId, type: string) => unknown;
-  setModelComponentTypeColor: (modelId: ModelId, type: string, color: RGBAColor) => Promise<void>;
+  setModelComponentTypeColor: (modelId: ModelId, type: string, color: ColorRGBA) => Promise<void>;
   setModelComponentTypeActiveColoring: (
     modelId: ModelId,
     type: string,
@@ -106,7 +105,7 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
   setModelComponentsColor: (
     modelId: ModelId,
     componentIds: string[],
-    color: RGBAColor | undefined,
+    color: ColorRGBA | undefined,
     activeColoring?: string,
   ) => Promise<unknown[]>;
 } {
@@ -243,7 +242,7 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
   async function setModelComponentsColor(
     modelId: ModelId,
     componentIds: string[],
-    color: RGBAColor | undefined,
+    color: ColorRGBA | undefined,
     activeColoring = "constant",
   ): Promise<unknown[]> {
     await modelCommonStyle.mutateComponentStyles(modelId, componentIds, {
@@ -266,7 +265,7 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
   async function setModelComponentTypeColor(
     modelId: ModelId,
     type: string,
-    color: RGBAColor,
+    color: ColorRGBA,
   ): Promise<void> {
     await modelCommonStyle.mutateModelComponentTypeStyle(modelId, type, {
       coloring: {
@@ -337,10 +336,10 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
     }
     await applyAttributeAccessors(modelId, [componentId], componentId, attributeFunctions);
   }
-  function getModelColor(modelId: ModelId): RGBAColor | undefined {
+  function getModelColor(modelId: ModelId): ColorRGBA | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
     return (dataStyleState.getStyle(modelId).coloring as StyleValues).constant as
-      | RGBAColor
+      | ColorRGBA
       | undefined;
   }
   function getModelActiveColoring(modelId: ModelId): unknown {

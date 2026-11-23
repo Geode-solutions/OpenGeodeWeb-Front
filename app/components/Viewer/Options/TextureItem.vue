@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import FileUploader from "@ogw_front/components/FileUploader.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { intersectBy } from "@ogw_front/utils/attributes";
@@ -65,12 +65,8 @@ onMounted(async () => {
 async function files_uploaded_event(value: UploadFile[]): Promise<void> {
   if (value.length > 0 && value[0]) {
     const schema = back_schemas.opengeodeweb_back.save_viewable_file;
-    const params = {
-      geode_object_type: "RasterImage2D",
-      filename: value[0].name,
-    };
     await backStore.request(
-      { schema, params },
+      { schema, params: { geode_object_type: "RasterImage2D", filename: value[0].name } },
       {
         response_function: (response) => {
           // A texture file holds a single image: the first imported object is the texture
@@ -111,7 +107,14 @@ watch(textureId, (value) => {
     />
   </v-col>
   <v-col cols="auto" class="pa-1 d-flex justify-center align-center">
-    <v-badge :model-value="textureId !== ''" color="white" floating dot offset-x="10" offset-y="10">
+    <v-badge
+      :model-value="textureId !== ''"
+      color="primary"
+      floating
+      dot
+      offset-x="10"
+      offset-y="10"
+    >
       <FileUploader
         @files_uploaded="files_uploaded_event($event)"
         :accept="['image/png', 'image/jpeg', 'image/bmp']"
@@ -123,6 +126,6 @@ watch(textureId, (value) => {
     </v-badge>
   </v-col>
   <v-col v-if="textureName === '' || textureId === ''" cols="auto">
-    <v-icon size="20" icon="mdi-close-circle" v-tooltip:bottom="'Invalid texture'" />
+    <v-icon size="20" icon="ph-x-circle" v-tooltip:bottom="'Invalid texture'" />
   </v-col>
 </template>

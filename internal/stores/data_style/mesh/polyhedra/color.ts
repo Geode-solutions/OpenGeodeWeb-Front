@@ -1,5 +1,5 @@
+import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
 import type { MeshId } from "@ogw_front/types/identifiers";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
@@ -12,17 +12,17 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const schema = viewer_schemas.opengeodeweb_viewer.mesh.polyhedra.color;
 
 export function useMeshPolyhedraColorStyle(): ReturnType<typeof useMeshPolyhedraOpacityStyle> & {
-  meshPolyhedraColor: (meshId: MeshId) => RGBAColor | undefined;
-  setMeshPolyhedraColor: (meshId: MeshId, color: RGBAColor) => Promise<unknown>;
+  meshPolyhedraColor: (meshId: MeshId) => ColorRGBA | undefined;
+  setMeshPolyhedraColor: (meshId: MeshId, color: ColorRGBA) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const meshPolyhedraCommonStyle = useMeshPolyhedraCommonStyle();
 
-  function meshPolyhedraColor(meshId: MeshId): RGBAColor | undefined {
+  function meshPolyhedraColor(meshId: MeshId): ColorRGBA | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.constant shape is defined by the data style schema.
-    return meshPolyhedraCommonStyle.meshPolyhedraColoring(meshId).constant as RGBAColor | undefined;
+    return meshPolyhedraCommonStyle.meshPolyhedraColoring(meshId).constant as ColorRGBA | undefined;
   }
-  async function setMeshPolyhedraColor(meshId: MeshId, color: RGBAColor): Promise<unknown> {
+  async function setMeshPolyhedraColor(meshId: MeshId, color: ColorRGBA): Promise<unknown> {
     const params = { id: meshId, color };
     const result = await viewerStore.request(
       {

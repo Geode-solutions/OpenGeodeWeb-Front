@@ -7,7 +7,10 @@ import { createVuetify } from "vuetify";
 import { setActivePinia } from "pinia";
 import { vi } from "vitest";
 
-const vuetify = createVuetify({ components, directives });
+// Local imports
+import { phosphorIconOptions } from "@ogw_front/utils/phosphor_icons";
+
+const vuetify = createVuetify({ components, directives, icons: phosphorIconOptions() });
 
 function setupActivePinia(): ReturnType<typeof createTestingPinia> {
   const pinia = createTestingPinia({

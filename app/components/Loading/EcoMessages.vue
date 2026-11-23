@@ -13,17 +13,17 @@ interface EcoMessage {
 
 const ecoMessages = computed<EcoMessage[]>(() => [
   {
-    icon: "mdi-leaf",
+    icon: "ph-leaf",
     title: "Why the wait?",
     message: "Your workspace starts on demand, no idle servers running 24/7.",
   },
   {
-    icon: "mdi-lightning-bolt-outline",
+    icon: "ph-lightning",
     title: "Lower carbon footprint",
     message: "On-demand computing uses up to 70% less energy than always-on servers.",
   },
   {
-    icon: "mdi-earth",
+    icon: "ph-globe-hemisphere-west",
     title: "Your choice matters",
     message: `By using ${appName}, you're part of a more sustainable way to work with data.`,
   },
@@ -57,23 +57,30 @@ onUnmounted(() => {
         :key="currentMessage"
         rounded="lg"
         class="pa-4 pa-sm-6 border mx-auto"
-        color="rgba(255, 255, 255, 0.05)"
+        color="transparent"
         elevation="0"
-        style="border-color: rgba(255, 255, 255, 0.1) !important"
+        style="
+          background: var(--ogw-loading-card-bg, rgba(255, 255, 255, 0.05));
+          border-color: var(--ogw-loading-card-border, rgba(255, 255, 255, 0.1)) !important;
+        "
       >
         <v-card-title
-          class="d-flex align-center ga-3 pa-0 mb-2 mb-sm-3 text-body-1 text-sm-subtitle-1 font-weight-bold text-white text-wrap"
+          class="d-flex align-center ga-3 pa-0 mb-2 mb-sm-3 text-body-1 text-sm-subtitle-1 font-weight-bold text-high-emphasis text-wrap"
         >
           <v-icon
             :icon="currentEcoMessage.icon"
-            color="white"
             size="22"
-            style="filter: drop-shadow(0 0 6px rgba(var(--v-theme-primary), 0.6))"
+            style="
+              filter: var(
+                --ogw-loading-icon-glow,
+                drop-shadow(0 0 6px rgba(var(--v-theme-primary), 0.6))
+              );
+            "
           />
           {{ currentEcoMessage.title }}
         </v-card-title>
         <v-card-text
-          class="pa-0 text-body-2 text-white text-left"
+          class="pa-0 text-body-2 text-high-emphasis text-left"
           style="opacity: 0.85; line-height: 1.7"
         >
           {{ currentEcoMessage.message }}
@@ -86,8 +93,7 @@ onUnmounted(() => {
         v-for="(_, index) in ecoMessages"
         :key="index"
         size="10"
-        :color="index <= currentMessage ? 'white' : 'white'"
-        :icon="index === currentMessage ? 'mdi-circle' : 'mdi-circle-outline'"
+        :icon="index === currentMessage ? 'ph-fill ph-circle' : 'ph-circle'"
         :style="{ opacity: index <= currentMessage ? 1 : 0.25 }"
       />
     </v-row>

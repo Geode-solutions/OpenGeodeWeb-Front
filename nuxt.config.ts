@@ -115,7 +115,13 @@ export default defineNuxtConfig({
   },
 
   // ** Global CSS
-  css: ["vuetify/lib/styles/main.sass", path.resolve(__dirname, "app/assets/css/main.css")],
+  // Phosphor regular and fill weights, rendered through the icon set of app/plugins/phosphor_icons.ts
+  css: [
+    "vuetify/lib/styles/main.sass",
+    "@phosphor-icons/web/regular",
+    "@phosphor-icons/web/fill",
+    path.resolve(__dirname, "app/assets/css/main.css"),
+  ],
 
   // ** Build configuration
   build: {
@@ -131,6 +137,8 @@ export default defineNuxtConfig({
       },
     },
     vuetifyOptions: {
+      // The Phosphor icon set is registered by app/plugins/phosphor_icons.ts (no MDI font)
+      icons: false,
       defaults: {
         VTooltip: {
           openDelay: 500,

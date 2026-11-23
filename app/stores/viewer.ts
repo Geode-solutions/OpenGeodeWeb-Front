@@ -20,6 +20,7 @@ import {
   isCloudMode,
 } from "@ogw_front/utils/stores.js";
 import { Status } from "@ogw_front/utils/status";
+import { afterViewerReset } from "@ogw_front/composables/viewer_reset";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
 import type {
@@ -135,6 +136,7 @@ export const useViewerStore = defineStore(
             schema,
             timeout,
           });
+          await afterViewerReset(request);
           status.value = Status.CONNECTED;
         } catch (error) {
           status.value = Status.NOT_CONNECTED;

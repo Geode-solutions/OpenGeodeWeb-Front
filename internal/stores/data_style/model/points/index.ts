@@ -1,5 +1,5 @@
 // Local imports
-import type { Size, Visibility } from "@ogw_front/types/style";
+import type { PointSize, Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import type { ModelId } from "@ogw_front/types/identifiers";
 import { useModelPointsCommonStyle } from "./common";
 import { useModelPointsSizeStyle } from "./size";
@@ -31,7 +31,7 @@ export function useModelPointsStyle(): {
       ),
       whenDefined(
         // oxlint-disable-next-line no-unsafe-type-assertion -- points style values are dynamically typed at runtime.
-        style.size as Size | undefined,
+        style.size as PointSize | undefined,
         async (size) => {
           const applied = await modelPointsSizeStyle.setModelPointsSize(modelId, size);
           return applied;

@@ -1,4 +1,5 @@
-import type { AttributeName, AttributeTimeStep } from "@ogw_front/types/attribute";
+import type { AttributeName } from "@geode/opengeodeweb-viewer/schema_types";
+import type { AttributeTimeStep } from "@ogw_front/types/attribute";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 interface AttributeRangeSource {

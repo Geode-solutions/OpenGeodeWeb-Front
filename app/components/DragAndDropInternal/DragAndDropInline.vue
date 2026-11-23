@@ -45,28 +45,28 @@ const emit = defineEmits<Emits>();
     >
       <v-sheet
         class="mx-auto mb-4 d-flex align-center justify-center transition-swing"
-        :color="isHovering || isDragging ? 'primary' : 'rgba(255,255,255,0.05)'"
+        :color="isHovering || isDragging ? 'primary' : 'rgba(var(--v-theme-on-surface), 0.05)'"
         rounded="circle"
         width="64"
         height="64"
       >
         <v-icon
-          :icon="loading ? 'mdi-loading' : 'mdi-cloud-upload'"
+          :icon="loading ? 'ph-circle-notch' : 'ph-cloud-arrow-up'"
           size="32"
-          :color="isHovering || isDragging ? 'white' : 'primary'"
+          :color="isHovering || isDragging ? 'rgb(var(--v-theme-on-primary))' : 'primary'"
           :class="{ rotating: loading }"
         />
       </v-sheet>
 
       <v-card-text class="pa-0">
         <v-sheet
-          class="text-headline-small font-weight-bold text-white d-block mb-1 bg-transparent"
+          class="text-headline-small font-weight-bold text-high-emphasis d-block mb-1 bg-transparent"
         >
           {{ loading ? texts.loading : isDragging ? texts.drop : texts.idle }}
         </v-sheet>
         <v-sheet
           v-if="accept && showExtensions"
-          class="text-body-medium text-white opacity-60 bg-transparent"
+          class="text-body-medium text-high-emphasis opacity-60 bg-transparent"
         >
           {{ Array.isArray(accept) ? accept.join(", ") : accept }}
         </v-sheet>
@@ -77,8 +77,8 @@ const emit = defineEmits<Emits>();
 
 <style scoped>
 .drag-card-inline {
-  border: 2px dashed rgba(255, 255, 255, 0.1) !important;
-  background: rgba(255, 255, 255, 0.03) !important;
+  border: 2px dashed rgba(var(--v-border-color), var(--v-border-opacity)) !important;
+  background: rgba(var(--v-theme-on-surface), 0.04) !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 

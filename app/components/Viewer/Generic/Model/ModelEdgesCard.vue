@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import type { EdgeWidth, Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import {
   type ModelMenuItemProps,
   useModelMenuContext,
 } from "@ogw_front/composables/model_menu_context";
-import type { Visibility, Width } from "@ogw_front/types/style";
 import ModelCardTabs from "./ModelCardTabs.vue";
 import ViewerGenericModelComponentEdgesOptions from "@ogw_front/components/Viewer/Generic/Model/ComponentEdgesOptions.vue";
 import ViewerOptionsWidthSlider from "@ogw_front/components/Viewer/Options/Sliders/Width.vue";
@@ -53,7 +53,7 @@ const modelEdgesVisibility = computed<Visibility | undefined>({
   },
 });
 
-const modelEdgesWidth = computed<Width | undefined>({
+const modelEdgesWidth = computed<EdgeWidth | undefined>({
   get: () => dataStyleStore.modelEdgesWidth(modelId.value),
   set: async (newValue) => {
     if (newValue === undefined) {

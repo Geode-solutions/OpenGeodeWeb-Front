@@ -7,7 +7,7 @@ interface Props {
   title: string;
   closable?: boolean;
   icon?: string;
-  mdiIcon?: string;
+  fontIcon?: string;
   scrollTop?: number;
   borderRadius?: string;
   borderLeft?: boolean;
@@ -19,9 +19,9 @@ const {
   title,
   closable = false,
   icon = "",
-  mdiIcon = "",
+  fontIcon = "",
   scrollTop = 0,
-  borderRadius = "16px",
+  borderRadius = "var(--ogw-viewer-panel-radius, 16px)",
   borderLeft = true,
   accent = undefined,
 } = defineProps<Props>();
@@ -127,10 +127,14 @@ watch(
         height="24"
         max-width="24"
         class="mr-2"
-        style="filter: brightness(0); display: flex; align-items: center"
+        style="
+          filter: var(--ogw-mono-icon-filter, brightness(0));
+          display: flex;
+          align-items: center;
+        "
       />
-      <v-icon v-else-if="mdiIcon" size="24" class="mr-2">{{ mdiIcon }}</v-icon>
-      <v-icon v-else-if="closable" size="24" class="mr-2">mdi-drag-variant</v-icon>
+      <v-icon v-else-if="fontIcon" size="24" class="mr-2">{{ fontIcon }}</v-icon>
+      <v-icon v-else-if="closable" size="24" class="mr-2">ph-dots-six-vertical</v-icon>
       <v-tooltip :disabled="!slots.tooltip" location="bottom start" open-delay="400">
         <template #activator="{ props: tooltipProps }">
           <span
@@ -153,13 +157,7 @@ watch(
         <slot name="tooltip" />
       </v-tooltip>
       <v-spacer />
-      <v-btn
-        v-if="closable"
-        icon="mdi-close"
-        variant="text"
-        size="x-small"
-        @click="emit('close')"
-      />
+      <v-btn v-if="closable" icon="ph-x" variant="text" size="x-small" @click="emit('close')" />
     </v-card-title>
     <v-divider />
     <v-card-text class="pa-0 flex-grow-1 overflow-hidden d-flex flex-column" style="min-height: 0">
@@ -180,8 +178,8 @@ watch(
   height: 100%;
   min-height: 0;
   background-color: transparent !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity)) !important;
+  box-shadow: 0 4px 15px rgba(var(--v-theme-on-surface), 0.05);
   position: relative;
   overflow: hidden;
   transition:
@@ -193,10 +191,11 @@ watch(
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, var(--adaptive-opacity));
+  /* Adaptive glass: apps can tint it (an "r, g, b" triplet) and change its blending, per theme */
+  background: rgba(var(--ogw-viewer-glass-tint, 255, 255, 255), var(--adaptive-opacity));
   backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
   -webkit-backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
-  mix-blend-mode: lighten;
+  mix-blend-mode: var(--ogw-viewer-glass-blend, lighten);
   z-index: 0;
   pointer-events: none;
   border-radius: inherit;
@@ -225,7 +224,7 @@ watch(
   border-color: var(--tree-box-accent) !important;
   box-shadow:
     inset 0 0 0 2px var(--tree-box-accent),
-    0 4px 15px rgba(0, 0, 0, 0.05);
+    0 4px 15px rgba(var(--v-theme-on-surface), 0.05);
 }
 
 .tree-box.is-highlighted .tree-box-header {
@@ -234,9 +233,9 @@ watch(
 
 .tree-box-header {
   height: 32px !important;
-  padding: 0 10px !important;
-  background-color: rgba(255, 255, 255, 0.05);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 0 var(--ogw-viewer-panel-padding, 10px) !important;
+  background-color: rgba(var(--v-theme-surface), 0.05);
+  border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.05);
   flex-shrink: 0;
   font-size: 0.875rem !important;
   line-height: 1.25rem !important;

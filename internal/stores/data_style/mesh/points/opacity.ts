@@ -1,6 +1,5 @@
+import type { ColorRGBA, Opacity } from "@geode/opengeodeweb-viewer/schema_types";
 import type { MeshId } from "@ogw_front/types/identifiers";
-import type { Opacity } from "@ogw_front/types/style";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
@@ -19,9 +18,9 @@ export function useMeshPointsOpacityStyle(): {
   const viewerStore = useViewerStore();
   const meshPointsCommonStyle = useMeshPointsCommonStyle();
 
-  function meshPointsConstantColor(meshId: MeshId): RGBAColor | undefined {
+  function meshPointsConstantColor(meshId: MeshId): ColorRGBA | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.constant shape is defined by the data style schema.
-    return meshPointsCommonStyle.meshPointsColoring(meshId).constant as RGBAColor | undefined;
+    return meshPointsCommonStyle.meshPointsColoring(meshId).constant as ColorRGBA | undefined;
   }
   function meshPointsOpacity(meshId: MeshId): Opacity | undefined {
     return meshPointsConstantColor(meshId)?.alpha;

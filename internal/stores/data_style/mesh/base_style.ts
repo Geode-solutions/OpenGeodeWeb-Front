@@ -1,6 +1,5 @@
+import type { ColorRGBA, Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import type { MeshId } from "@ogw_front/types/identifiers";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
-import type { Visibility } from "@ogw_front/types/style";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
@@ -16,8 +15,8 @@ const meshSchemas = viewer_schemas.opengeodeweb_viewer.mesh;
 interface MeshBaseStyle {
   meshVisibility: (meshId: MeshId) => Visibility | undefined;
   setMeshVisibility: (meshId: MeshId, visibility: Visibility) => Promise<unknown>;
-  meshColor: (meshId: MeshId) => RGBAColor | undefined;
-  setMeshColor: (meshId: MeshId, color: RGBAColor) => Promise<unknown>;
+  meshColor: (meshId: MeshId) => ColorRGBA | undefined;
+  setMeshColor: (meshId: MeshId, color: ColorRGBA) => Promise<unknown>;
 }
 
 export function useMeshBaseStyle(): MeshBaseStyle {
@@ -49,12 +48,12 @@ export function useMeshBaseStyle(): MeshBaseStyle {
     return result;
   }
 
-  function meshColor(meshId: MeshId): RGBAColor | undefined {
+  function meshColor(meshId: MeshId): ColorRGBA | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- color shape is defined by the data style schema.
-    return dataStyleState.getStyle(meshId).color as RGBAColor | undefined;
+    return dataStyleState.getStyle(meshId).color as ColorRGBA | undefined;
   }
 
-  async function setMeshColor(meshId: MeshId, color: RGBAColor): Promise<unknown> {
+  async function setMeshColor(meshId: MeshId, color: ColorRGBA): Promise<unknown> {
     const schema = meshSchemas.color;
     const params = { id: meshId, color };
     const result = await viewerStore.request(

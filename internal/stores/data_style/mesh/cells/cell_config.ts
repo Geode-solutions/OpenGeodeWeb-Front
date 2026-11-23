@@ -1,15 +1,14 @@
+import type { AttributeColorMap, AttributeRange } from "@ogw_front/types/attribute";
 import type {
-  AttributeColorMap,
   AttributeItem,
   AttributeName,
-  AttributeRange,
-} from "@ogw_front/types/attribute";
+  ColorRGBA,
+} from "@geode/opengeodeweb-viewer/schema_types";
 import type {
   AttributeState,
   AttributeStoredConfig,
 } from "@ogw_internal/stores/data_style/attribute_types";
 import type { MeshId } from "@ogw_front/types/identifiers";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 
 // Local imports
@@ -83,7 +82,7 @@ function useMeshCellsCellAttributeConfig(): UseMeshCellsCellAttributeConfigRetur
 interface UseMeshCellsCellAttributeConfigValuesReturn {
   meshCellsCellAttributeRange: (meshId: MeshId) => AttributeRange;
   meshCellsCellAttributeColorMap: (meshId: MeshId) => AttributeColorMap | undefined;
-  meshCellsCellAttributeNoDataColor: (meshId: MeshId) => RGBAColor;
+  meshCellsCellAttributeNoDataColor: (meshId: MeshId) => ColorRGBA;
 }
 
 function useMeshCellsCellAttributeConfigValues(): UseMeshCellsCellAttributeConfigValuesReturn {
@@ -104,7 +103,7 @@ function useMeshCellsCellAttributeConfigValues(): UseMeshCellsCellAttributeConfi
     const storedConfig = meshCellsCellAttributeStoredConfig(meshId, name, item);
     return storedConfig.colorMap;
   }
-  function meshCellsCellAttributeNoDataColor(meshId: MeshId): RGBAColor {
+  function meshCellsCellAttributeNoDataColor(meshId: MeshId): ColorRGBA {
     const name = meshCellsCellAttributeName(meshId);
     const item = meshCellsCellAttributeItem(meshId);
     const storedConfig = meshCellsCellAttributeStoredConfig(meshId, name, item);
