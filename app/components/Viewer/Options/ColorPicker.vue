@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // oxlint-disable id-length since vuetify require { r,g,b} format to work
 import { formatColorString, parseColorString } from "@ogw_front/utils/color_picker";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
 import { useCopyToClipboard } from "@ogw_front/composables/copy_to_clipboard";
 
 interface Props {
@@ -13,13 +13,13 @@ const { disabledAlpha = false } = defineProps<Props>();
 const colorPickerWrapperRef = useTemplateRef<HTMLElement>("colorPickerWrapperRef");
 const { pressed } = useMousePressed({ target: colorPickerWrapperRef });
 
-const model = defineModel<RGBAColor>();
+const model = defineModel<ColorRGBA>();
 const { copy, copied } = useCopyToClipboard();
 
 const currentMode = ref(disabledAlpha ? "rgb" : "rgba");
 const colorInputText = ref("");
 
-const initialColor = model.value as RGBAColor;
+const initialColor = model.value as ColorRGBA;
 const vuetifyColor = ref({
   r: initialColor.red,
   g: initialColor.green,
@@ -184,7 +184,7 @@ watch(
             @click="toggleMode"
             v-tooltip="'Swap mode (RGB / RGBA)'"
           >
-            <v-icon icon="mdi-swap-horizontal" size="16" />
+            <v-icon icon="ph-arrows-left-right" size="16" />
           </v-btn>
         </div>
 
@@ -198,7 +198,7 @@ watch(
           v-tooltip="'Copy to clipboard'"
         >
           <v-icon
-            :icon="copied ? 'mdi-check' : 'mdi-content-copy'"
+            :icon="copied ? 'ph-check' : 'ph-copy'"
             size="14"
             :color="copied ? 'success' : undefined"
           />
@@ -223,8 +223,8 @@ watch(
 <style scoped>
 .color-picker-wrapper {
   width: 220px;
-  background-color: rgba(33, 33, 33, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  background-color: rgba(var(--v-theme-surface), 0.95);
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity)) !important;
   outline: none;
 }
 
@@ -257,7 +257,7 @@ watch(
   width: 100%;
   box-sizing: border-box;
   padding: 6px 10px;
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: rgba(var(--v-theme-on-surface), 0.08);
   border: 1px solid transparent;
   border-radius: 6px;
   outline: none;
@@ -270,6 +270,6 @@ watch(
 }
 
 .color-input-field:focus {
-  border-color: rgba(255, 255, 255, 0.3);
+  border-color: rgba(var(--v-theme-on-surface), 0.3);
 }
 </style>

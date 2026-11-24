@@ -1,6 +1,6 @@
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
-import type { Visibility } from "@ogw_front/types/style";
+import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 
 export function useMeshPointsCommonStyle(): {

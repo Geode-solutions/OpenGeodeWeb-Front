@@ -128,7 +128,7 @@ describe("import workflow", () => {
 
     await expect(
       importWorkflow([
-        { filename: "broken.vtu", geode_object_type: "SolidMesh3D" },
+        { filename: "broken.vtu", geode_object_type: "TetrahedralSolid3D" },
         { filename: "model.og_brep", geode_object_type: "BRep" },
       ]),
     ).rejects.toThrow("1 file(s) could not be imported");
@@ -155,8 +155,8 @@ describe("import workflow", () => {
     );
 
     const ids = await importWorkflow([
-      { filename: "first.vtu", geode_object_type: "SolidMesh3D" },
-      { filename: "second.vtu", geode_object_type: "SolidMesh3D" },
+      { filename: "first.vtu", geode_object_type: "TetrahedralSolid3D" },
+      { filename: "second.vtu", geode_object_type: "TetrahedralSolid3D" },
     ]);
 
     expect(ids).toStrictEqual(["first_a", "first_b", "second"]);

@@ -1,7 +1,9 @@
 import { type MenuMetaData, useMenuStore } from "@ogw_front/stores/menu";
 import type { Ref, ShallowRef } from "vue";
 import { BASEMAP_GROUP_ID } from "@ogw_front/utils/basemap_tree";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { TreeMenuPayload } from "@ogw_front/utils/treeview";
+import type { ViewerId } from "@geode/opengeodeweb-viewer/schema_types";
 import type { ViewerIdResult } from "@ogw_front/composables/use_overlapping_picker";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useElementSize } from "@vueuse/core";
@@ -69,8 +71,8 @@ async function treeMenuTarget(
 
 async function viewerMenuTarget(
   dataStore: ReturnType<typeof useDataStore>,
-  pickedId: string,
-  viewer_id: number | undefined,
+  pickedId: DataId,
+  viewer_id: ViewerId | undefined,
 ): Promise<MenuTarget> {
   const item = await dataStore.item(pickedId);
   const meta_data: MenuMetaData = { ...item };

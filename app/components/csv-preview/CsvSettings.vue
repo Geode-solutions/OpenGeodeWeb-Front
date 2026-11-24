@@ -67,7 +67,7 @@ watch(customValue, (newVal) => {
 </script>
 
 <template>
-  <div class="pa-6 overflow-y-auto border-e border-opacity-10 bg-white-opacity-5">
+  <div class="pa-6 overflow-y-auto border-e border-opacity-10 bg-subtle">
     <div class="text-overline mb-4 text-primary font-weight-bold">Parser Settings</div>
 
     <v-select
@@ -135,7 +135,7 @@ watch(customValue, (newVal) => {
       label="X Column"
       variant="outlined"
       density="compact"
-      prepend-inner-icon="mdi-axis-x-arrow"
+      prepend-inner-icon="ph-arrow-right"
       color="light-blue-accent-3"
       class="mb-2"
       clearable
@@ -150,7 +150,7 @@ watch(customValue, (newVal) => {
       label="Y Column"
       variant="outlined"
       density="compact"
-      prepend-inner-icon="mdi-axis-y-arrow"
+      prepend-inner-icon="ph-arrow-up-right"
       color="light-green-accent-3"
       class="mb-2"
       clearable
@@ -165,7 +165,7 @@ watch(customValue, (newVal) => {
       label="Z Column"
       variant="outlined"
       density="compact"
-      prepend-inner-icon="mdi-axis-z-arrow"
+      prepend-inner-icon="ph-arrow-up"
       color="red-accent-3"
       class="mb-8"
       clearable
@@ -176,7 +176,7 @@ watch(customValue, (newVal) => {
 </template>
 
 <style scoped>
-.bg-white-opacity-5 {
-  background: rgba(255, 255, 255, 0.03);
+.bg-subtle {
+  background: rgba(var(--v-theme-on-surface), 0.04);
 }
 </style>

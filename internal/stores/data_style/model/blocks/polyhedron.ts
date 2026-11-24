@@ -1,11 +1,7 @@
 // oxlint-disable eslint/max-lines
 import type {
   AttributeColorMap,
-  AttributeItem,
-  AttributeName,
   AttributeRange,
-  AttributeRangeMaximum,
-  AttributeRangeMinimum,
   AttributeTimeStep,
 } from "@ogw_front/types/attribute";
 import type {
@@ -14,8 +10,15 @@ import type {
   AttributeStoredConfig,
   ValidAttributeInput,
 } from "@ogw_internal/stores/data_style/attribute_types";
+import type {
+  AttributeItem,
+  AttributeName,
+  AttributeRangeMaximum,
+  AttributeRangeMinimum,
+  ColorRGBA,
+} from "@geode/opengeodeweb-viewer/schema_types";
 import type { BlockId, ModelId } from "@ogw_front/types/identifiers";
-import { DEFAULT_NO_DATA_COLOR, type RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
@@ -87,11 +90,11 @@ interface UseModelBlocksPolyhedronAttributeReturn {
     blockIds: BlockId[],
     colorMap: AttributeColorMap | undefined,
   ) => Promise<boolean>;
-  modelBlocksPolyhedronAttributeNoDataColor: (modelId: ModelId, blockId?: BlockId) => RGBAColor;
+  modelBlocksPolyhedronAttributeNoDataColor: (modelId: ModelId, blockId?: BlockId) => ColorRGBA;
   setModelBlocksPolyhedronAttributeNoDataColor: (
     modelId: ModelId,
     blockIds: BlockId[],
-    no_data_color: RGBAColor,
+    no_data_color: ColorRGBA,
   ) => Promise<boolean>;
 }
 
@@ -182,7 +185,7 @@ function useModelBlocksPolyhedronAttributeGetters(
   function modelBlocksPolyhedronAttributeNoDataColor(
     modelId: ModelId,
     blockId?: BlockId,
-  ): RGBAColor {
+  ): ColorRGBA {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockId);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockId);
     const storedConfig = modelBlocksPolyhedronAttributeStoredConfig(modelId, blockId, name, item);
@@ -416,7 +419,7 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
   async function setModelBlocksPolyhedronAttributeNoDataColor(
     modelId: ModelId,
     blockIds: BlockId[],
-    no_data_color: RGBAColor,
+    no_data_color: ColorRGBA,
   ): Promise<boolean> {
     const name = modelBlocksPolyhedronAttributeName(modelId, blockIds[0]);
     const item = modelBlocksPolyhedronAttributeItem(modelId, blockIds[0]);

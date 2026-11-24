@@ -11,20 +11,25 @@ const { logo = "" } = defineProps<Props>();
     <v-img
       :src="logo"
       class="responsive-logo"
-      style="filter: drop-shadow(0 0 20px rgba(var(--v-theme-primary), 0.4))"
+      style="
+        filter: var(
+          --ogw-loading-logo-shadow,
+          drop-shadow(0 0 20px rgba(var(--v-theme-primary), 0.4))
+        );
+      "
     />
   </v-row>
 
   <v-card color="transparent" elevation="0" class="mb-4 mb-sm-8 overflow-visible">
     <v-card-title
-      class="font-weight-black text-white text-wrap pa-0 d-block responsive-title"
-      style="text-shadow: 0 0 20px rgba(255, 255, 255, 0.3)"
+      class="font-weight-black text-high-emphasis text-wrap pa-0 d-block responsive-title"
+      style="text-shadow: var(--ogw-loading-title-shadow, 0 0 20px rgba(255, 255, 255, 0.3))"
     >
       STARTING UP
     </v-card-title>
     <v-divider thickness="3" class="border-opacity-100 mx-auto my-4" color="primary" width="60" />
     <v-card-subtitle
-      class="text-subtitle-2 font-weight-bold text-white ls-widest pa-0 text-wrap"
+      class="text-subtitle-2 font-weight-bold text-high-emphasis ls-widest pa-0 text-wrap"
       style="opacity: 0.9"
     >
       YOUR WORKSPACE IS WAKING UP...

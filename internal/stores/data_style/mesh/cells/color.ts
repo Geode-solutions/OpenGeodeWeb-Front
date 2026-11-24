@@ -1,5 +1,5 @@
+import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
 import type { MeshId } from "@ogw_front/types/identifiers";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 // Third party imports
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
@@ -12,17 +12,17 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const schema = viewer_schemas.opengeodeweb_viewer.mesh.cells.color;
 
 export function useMeshCellsColorStyle(): ReturnType<typeof useMeshCellsOpacityStyle> & {
-  meshCellsColor: (meshId: MeshId) => RGBAColor | undefined;
-  setMeshCellsColor: (meshId: MeshId, color: RGBAColor) => Promise<unknown>;
+  meshCellsColor: (meshId: MeshId) => ColorRGBA | undefined;
+  setMeshCellsColor: (meshId: MeshId, color: ColorRGBA) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const meshCellsCommonStyle = useMeshCellsCommonStyle();
 
-  function meshCellsColor(meshId: MeshId): RGBAColor | undefined {
+  function meshCellsColor(meshId: MeshId): ColorRGBA | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.constant shape is defined by the data style schema.
-    return meshCellsCommonStyle.meshCellsColoring(meshId).constant as RGBAColor | undefined;
+    return meshCellsCommonStyle.meshCellsColoring(meshId).constant as ColorRGBA | undefined;
   }
-  async function setMeshCellsColor(meshId: MeshId, color: RGBAColor): Promise<unknown> {
+  async function setMeshCellsColor(meshId: MeshId, color: ColorRGBA): Promise<unknown> {
     const params = { id: meshId, color };
     const result = await viewerStore.request(
       {

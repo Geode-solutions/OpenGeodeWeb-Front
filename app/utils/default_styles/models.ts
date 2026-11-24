@@ -17,7 +17,7 @@ import {
   modelPointsDefaultStyle,
   modelSurfacesDefaultStyle,
 } from "./model_components";
-import type { Visibility } from "@ogw_front/types/style";
+import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 
 interface ModelWithoutBlocksStyle {
   visibility: Visibility;

@@ -36,8 +36,8 @@ describe("object selector", () => {
     test("files with different types are resolved without user input", async () => {
       mockAllowedObjects({
         "mesh.vtu": {
-          allowed_objects: { SolidMesh3D: { is_loadable: LOADABLE_SCORE } },
-          objects_to_load: ["SolidMesh3D"],
+          allowed_objects: { TetrahedralSolid3D: { is_loadable: LOADABLE_SCORE } },
+          objects_to_load: ["TetrahedralSolid3D"],
         },
         "model.og_brep": {
           allowed_objects: { BRep: { is_loadable: LOADABLE_SCORE } },
@@ -52,7 +52,7 @@ describe("object selector", () => {
       const emitted = wrapper.emitted<unknown[]>();
       wrapper.unmount();
       expect(emitted.update_values?.[FIRST_INDEX]?.[FIRST_INDEX]).toStrictEqual({
-        geode_object_types: { "mesh.vtu": ["SolidMesh3D"], "model.og_brep": ["BRep"] },
+        geode_object_types: { "mesh.vtu": ["TetrahedralSolid3D"], "model.og_brep": ["BRep"] },
       });
       expect(emitted.increment_step).toHaveLength(EXPECTED_LENGTH);
     });
@@ -66,8 +66,8 @@ describe("object selector", () => {
         "a.og_brep": { allowed_objects: ambiguous, objects_to_load: [] },
         "b.og_brep": { allowed_objects: ambiguous, objects_to_load: [] },
         "mesh.vtu": {
-          allowed_objects: { SolidMesh3D: { is_loadable: LOADABLE_SCORE } },
-          objects_to_load: ["SolidMesh3D"],
+          allowed_objects: { TetrahedralSolid3D: { is_loadable: LOADABLE_SCORE } },
+          objects_to_load: ["TetrahedralSolid3D"],
         },
       });
       const wrapper = await mountSuspended(ObjectSelector, {
@@ -84,7 +84,7 @@ describe("object selector", () => {
         geode_object_types: {
           "a.og_brep": ["BRep"],
           "b.og_brep": ["BRep"],
-          "mesh.vtu": ["SolidMesh3D"],
+          "mesh.vtu": ["TetrahedralSolid3D"],
         },
       });
     });
@@ -92,8 +92,8 @@ describe("object selector", () => {
     test("unsupported files are skipped and the others can still be imported", async () => {
       mockAllowedObjects({
         "mesh.vtu": {
-          allowed_objects: { SolidMesh3D: { is_loadable: LOADABLE_SCORE } },
-          objects_to_load: ["SolidMesh3D"],
+          allowed_objects: { TetrahedralSolid3D: { is_loadable: LOADABLE_SCORE } },
+          objects_to_load: ["TetrahedralSolid3D"],
         },
       });
       const wrapper = await mountSuspended(ObjectSelector, {
@@ -107,7 +107,7 @@ describe("object selector", () => {
       const emitted = wrapper.emitted<unknown[]>();
       wrapper.unmount();
       expect(emitted.update_values?.[FIRST_INDEX]?.[FIRST_INDEX]).toStrictEqual({
-        geode_object_types: { "mesh.vtu": ["SolidMesh3D"] },
+        geode_object_types: { "mesh.vtu": ["TetrahedralSolid3D"] },
       });
     });
 
@@ -122,7 +122,7 @@ describe("object selector", () => {
         },
         "b.vtu": {
           allowed_objects: {
-            SolidMesh3D: { is_loadable: LOADABLE_SCORE },
+            TetrahedralSolid3D: { is_loadable: LOADABLE_SCORE },
             HybridSolid3D: { is_loadable: LOADABLE_SCORE },
           },
           objects_to_load: [],
@@ -138,7 +138,7 @@ describe("object selector", () => {
       const emitted = wrapper.emitted<unknown[]>();
       wrapper.unmount();
       expect(emitted.update_values?.[FIRST_INDEX]?.[FIRST_INDEX]).toStrictEqual({
-        geode_object_types: { "a.vtp": ["PolygonalSurface3D"], "b.vtu": ["SolidMesh3D"] },
+        geode_object_types: { "a.vtp": ["PolygonalSurface3D"], "b.vtu": ["TetrahedralSolid3D"] },
       });
     });
 

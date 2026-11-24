@@ -1,8 +1,7 @@
 import type {
   AttributeRangeMaximum,
   AttributeRangeMinimum,
-  ValidAttributeRange,
-} from "@ogw_front/types/attribute";
+} from "@geode/opengeodeweb-viewer/schema_types";
 import {
   type ComputedRef,
   type InjectionKey,
@@ -12,7 +11,8 @@ import {
   provide,
   toValue,
 } from "vue";
-import type { DataId } from "@ogw_front/types/identifiers";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { ValidAttributeRange } from "@ogw_front/types/attribute";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 

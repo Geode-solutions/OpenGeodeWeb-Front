@@ -1,7 +1,7 @@
 import { type ComponentStyleFunctions, dispatchToComponentTypes } from "./visibility_dispatch";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import type { ModelId } from "@ogw_front/types/identifiers";
-import type { Visibility } from "@ogw_front/types/style";
+import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";

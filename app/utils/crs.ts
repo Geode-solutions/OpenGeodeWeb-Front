@@ -1,18 +1,18 @@
 import type { CrsItem, NewDataItem } from "@ogw_front/stores/data";
-import type { CRSList } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
+import type { CRS } from "@geode/opengeodeweb-back/schema_types";
 import type { LegacyDataId } from "@ogw_front/utils/legacy_data_id";
 
-function formatCrs(crs: CRSList | undefined): string {
+function formatCrs(crs: CRS | undefined): string {
   return crs ? `${crs.authority}:${crs.code} — ${crs.name}` : "None";
 }
 
 // Code alone, for narrow places: the full name goes in a tooltip
-function formatCrsCode(crs: CRSList | undefined): string {
+function formatCrsCode(crs: CRS | undefined): string {
   return crs ? `${crs.authority}:${crs.code}` : "None";
 }
 
 // The name is only a label: two CRS are the same when their authority code is
-function sameCrs(left: CRSList | undefined, right: CRSList | undefined): boolean {
+function sameCrs(left: CRS | undefined, right: CRS | undefined): boolean {
   return (
     left !== undefined &&
     right !== undefined &&
@@ -22,7 +22,7 @@ function sameCrs(left: CRSList | undefined, right: CRSList | undefined): boolean
 }
 
 // Same CRS, or both still in local coordinates
-function sameCrsState(left: CRSList | undefined, right: CRSList | undefined): boolean {
+function sameCrsState(left: CRS | undefined, right: CRS | undefined): boolean {
   return (left === undefined && right === undefined) || sameCrs(left, right);
 }
 
@@ -31,7 +31,7 @@ function oldestCrs(
   items:
     | readonly Pick<CrsItem, "crs" | "created_at">[]
     | readonly (LegacyDataId<NewDataItem> | NewDataItem)[],
-): CRSList | undefined {
+): CRS | undefined {
   return items
     .filter((item) => item.crs !== undefined)
     .toSorted((left, right) => (left.created_at ?? "").localeCompare(right.created_at ?? ""))[0]

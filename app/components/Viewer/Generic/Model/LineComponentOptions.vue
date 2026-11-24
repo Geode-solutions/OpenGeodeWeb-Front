@@ -2,14 +2,13 @@
 import type {
   AttributeItem,
   AttributeName,
-  AttributeRange,
-  AttributeTimeStep,
-} from "@ogw_front/types/attribute";
+  ColorRGBA,
+  Visibility,
+} from "@geode/opengeodeweb-viewer/schema_types";
+import type { AttributeRange, AttributeTimeStep } from "@ogw_front/types/attribute";
 import type { LineId } from "@ogw_front/types/identifiers";
 import { MODEL_LINE_COLORING } from "@ogw_front/utils/model_component_coloring";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
-import type { Visibility } from "@ogw_front/types/style";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -38,8 +37,8 @@ const lineVisibility = computed<Visibility | undefined>({
   },
 });
 
-const lineColor = computed<RGBAColor | undefined>({
-  get: () => dataStyleStore.modelLineColor(modelId, lineId) as RGBAColor | undefined,
+const lineColor = computed<ColorRGBA | undefined>({
+  get: () => dataStyleStore.modelLineColor(modelId, lineId) as ColorRGBA | undefined,
   set: async (color) => {
     if (lineId === undefined) {
       return;
@@ -117,7 +116,7 @@ const vertexAttributeColorMap = computed<ColorMap | undefined>({
   },
 });
 
-const vertexAttributeNoDataColor = computed<RGBAColor>({
+const vertexAttributeNoDataColor = computed<ColorRGBA>({
   get: () => dataStyleStore.modelLinesVertexAttributeNoDataColor(modelId, lineId),
   set: async (newValue) => {
     if (lineId === undefined) {
@@ -173,7 +172,7 @@ const edgeAttributeRange = computed<AttributeRange>({
   },
 });
 
-const edgeAttributeColorMap = computed<Map<string, RGBAColor> | undefined>({
+const edgeAttributeColorMap = computed<Map<string, ColorRGBA> | undefined>({
   get: () => dataStyleStore.modelLinesEdgeAttributeColorMap(modelId, lineId),
   set: async (newValue) => {
     if (lineId === undefined) {
@@ -184,7 +183,7 @@ const edgeAttributeColorMap = computed<Map<string, RGBAColor> | undefined>({
   },
 });
 
-const edgeAttributeNoDataColor = computed<RGBAColor>({
+const edgeAttributeNoDataColor = computed<ColorRGBA>({
   get: () => dataStyleStore.modelLinesEdgeAttributeNoDataColor(modelId, lineId),
   set: async (newValue) => {
     if (lineId === undefined) {

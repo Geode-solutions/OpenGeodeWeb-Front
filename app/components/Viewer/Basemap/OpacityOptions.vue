@@ -31,7 +31,7 @@ const opacityPercent = computed({
     :index="itemProps.index"
     :itemProps="itemProps"
     :tooltip="tooltip"
-    btnIcon="mdi-circle-half-full"
+    btnIcon="ph-circle-half"
   >
     <template #options>
       <div class="d-flex align-center ga-2 px-1">

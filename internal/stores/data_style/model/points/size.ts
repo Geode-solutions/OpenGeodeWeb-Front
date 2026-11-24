@@ -7,7 +7,7 @@ import {
   useModelComponentPointsStyle,
 } from "@ogw_internal/stores/data_style/model/points/component";
 import type { ModelId } from "@ogw_front/types/identifiers";
-import type { Size } from "@ogw_front/types/style";
+import type { PointSize } from "@geode/opengeodeweb-viewer/schema_types";
 import { useModelPointsCommonStyle } from "./common";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -15,8 +15,8 @@ import { useViewerStore } from "@ogw_front/stores/viewer";
 const schema = viewer_schemas.opengeodeweb_viewer.model.points.size;
 
 export function useModelPointsSizeStyle(): {
-  modelPointsSize: (modelId: ModelId) => Size | undefined;
-  setModelPointsSize: (modelId: ModelId, size: Size) => Promise<unknown>;
+  modelPointsSize: (modelId: ModelId) => PointSize | undefined;
+  setModelPointsSize: (modelId: ModelId, size: PointSize) => Promise<unknown>;
 } {
   const viewerStore = useViewerStore();
   const modelPointsCommonStyle = useModelPointsCommonStyle();
@@ -24,12 +24,12 @@ export function useModelPointsSizeStyle(): {
     useModelComponentPointsStyle(type),
   );
 
-  function modelPointsSize(modelId: ModelId): Size | undefined {
+  function modelPointsSize(modelId: ModelId): PointSize | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- points style values are dynamically typed at runtime.
-    return modelPointsCommonStyle.modelPointsStyle(modelId).size as Size | undefined;
+    return modelPointsCommonStyle.modelPointsStyle(modelId).size as PointSize | undefined;
   }
 
-  async function setModelPointsSize(modelId: ModelId, size: Size): Promise<unknown> {
+  async function setModelPointsSize(modelId: ModelId, size: PointSize): Promise<unknown> {
     const params = { id: modelId, size };
     const result = await viewerStore.request(
       {

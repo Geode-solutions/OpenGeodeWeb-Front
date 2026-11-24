@@ -7,8 +7,8 @@ import {
   resolveAllowedObjectsPerFile,
 } from "@ogw_shared/utils/response_handlers/load.js";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
-import type { GeodeObjectType } from "@ogw_front/types/identifiers";
-import { geode_objects } from "@ogw_front/assets/geode_objects";
+import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
+import { geodeObjectImage } from "@ogw_front/assets/geode_objects";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { useBackStore } from "@ogw_front/stores/back";
 
@@ -94,15 +94,8 @@ function groupPendingFiles(pending: readonly FileAllowedObjects[]): PendingGroup
   return [...groups.values()];
 }
 
-// The geode_objects lookup is fixed and keyed by known object type names; a missing entry only happens if the backend reports a type this table doesn't know about.
 function geodeObjectTooltip(key: string, isLoadable: boolean): string {
-  return isLoadable
-    ? (geode_objects[key]?.tooltip ?? key)
-    : `Data not loadable with this class (${key})`;
-}
-
-function geodeObjectImage(key: string): string | undefined {
-  return geode_objects[key]?.image;
+  return isLoadable ? key : `Data not loadable with this class (${key})`;
 }
 
 function showCommonGeodeObjects(
@@ -210,7 +203,7 @@ await getAllowedGeodeObjects();
       </v-chip>
     </v-row>
     <v-row v-if="skippedFiles.length" align="center">
-      <v-icon color="warning" icon="mdi-file-alert-outline" class="ma-1" />
+      <v-icon color="warning" icon="ph-file-x" class="ma-1" />
       <p class="pa-1">Not supported, will be skipped:</p>
       <v-chip v-for="filename in skippedFiles" :key="filename" class="ma-1" size="small">
         {{ filename }}
@@ -229,7 +222,7 @@ await getAllowedGeodeObjects();
       Choose the data type for: {{ pendingFilenames.join(", ") }}
     </v-col>
     <v-col v-for="(value, key) in allowedGeodeObjects" :key="key" cols="3" md="4">
-      <v-tooltip :text="geodeObjectTooltip(key, Boolean(value['is_loadable']))" location="bottom">
+      <v-tooltip :text="geodeObjectTooltip(key, Boolean(value?.is_loadable))" location="bottom">
         <template v-slot:activator="{ props }">
           <span v-bind="props">
             <v-card
@@ -238,13 +231,13 @@ await getAllowedGeodeObjects();
               hover
               rounded
               @click="setGeodeObject(key)"
-              :disabled="!value['is_loadable']"
-              :elevation="value['is_loadable'] ? 5 : 3"
+              :disabled="!value?.is_loadable"
+              :elevation="value?.is_loadable ? 5 : 3"
             >
               <v-img
                 :src="geodeObjectImage(key)"
                 cover
-                :class="!value['is_loadable'] ? 'disabled' : undefined"
+                :class="!value?.is_loadable ? 'disabled' : undefined"
               />
             </v-card>
           </span>

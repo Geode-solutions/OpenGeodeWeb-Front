@@ -4,10 +4,11 @@ import { requireRenderWindow, useHybridViewerCore } from "./core";
 import viewer_schemas, {
   type ViewerSetBackgroundColorParams,
 } from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
-import type { DataId } from "@ogw_front/types/identifiers";
-import type { Visibility } from "@ogw_front/types/style";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import { base64ToArrayBuffer } from "./base64";
 import { getCameraOptions } from "./camera_animation";
+import { getDefaultSceneStyle } from "@ogw_front/utils/default_styles";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import { newInstance as vtkActor } from "@kitware/vtk.js/Rendering/Core/Actor";
@@ -15,10 +16,16 @@ import { newInstance as vtkMapper } from "@kitware/vtk.js/Rendering/Core/Mapper"
 import type vtkPolyData from "@kitware/vtk.js/Common/DataModel/PolyData";
 import { newInstance as vtkXMLPolyDataReader } from "@kitware/vtk.js/IO/XML/XMLPolyDataReader";
 
+// The local renderer shows while the camera moves: it starts on the scene background the viewer gets after a reset
+function localBackgroundColor(): [number, number, number] {
+  const { red, green, blue } = getDefaultSceneStyle().background_color;
+  return [red / RGB_MAX, green / RGB_MAX, blue / RGB_MAX];
+}
+
 async function setBackgroundColor(color: ViewerSetBackgroundColorParams["color"]): Promise<void> {
   const { genericRenderWindow, remoteRender } = useHybridViewerCore();
   const renderer = requireRenderWindow(genericRenderWindow).getRenderer();
-  renderer.setBackground([color.r / RGB_MAX, color.g / RGB_MAX, color.b / RGB_MAX]);
+  renderer.setBackground([color.red / RGB_MAX, color.green / RGB_MAX, color.blue / RGB_MAX]);
   const renderWindow = requireRenderWindow(genericRenderWindow).getRenderWindow();
   renderWindow.render();
   const viewerStore = useViewerStore();
@@ -174,4 +181,4 @@ const useHybridViewerScene = createSharedComposable(() => {
   };
 });
 
-export { followZScaling, useHybridViewerScene };
+export { followZScaling, localBackgroundColor, useHybridViewerScene };

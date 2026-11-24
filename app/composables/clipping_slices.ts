@@ -4,7 +4,8 @@ import {
   type SliceAxis,
   areAllGrids,
 } from "@ogw_front/utils/slice";
-import type { DataIdentified, GeodeObjectType } from "@ogw_front/types/identifiers";
+import type { DataIdentified } from "@ogw_front/types/identifiers";
+import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import type { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 interface Slice {

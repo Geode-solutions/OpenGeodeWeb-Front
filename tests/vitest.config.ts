@@ -25,6 +25,7 @@ const LINUX_MAX_DIFF_PIXEL_RATIO = 0.02;
 const WINDOWS_MAX_DIFF_PIXEL_RATIO = 0.025;
 const MAX_DIFF_PIXEL_RATIO =
   process.platform === "win32" ? WINDOWS_MAX_DIFF_PIXEL_RATIO : LINUX_MAX_DIFF_PIXEL_RATIO;
+const SUSPENSE_WARNING = "<Suspense> is an experimental feature";
 const browserHelpersPath = path.resolve(__dirname, "browser", "helpers");
 const browserTestsPath = path.resolve(__dirname, "browser", "tests");
 // The reference screenshots mirror the folders of the tests: screenshots/<folder>/<test file>/
@@ -71,6 +72,9 @@ const helpersDirnamePlugin = {
 // oxlint-disable-next-line import/no-default-export
 export default defineConfig({
   test: {
+    // Vue logs it for every component mounted under <Suspense> (Nuxt app root):
+    // https://github.com/nuxt/nuxt/discussions/25973#discussioncomment-11308604
+    onConsoleLog: (log) => !log.startsWith(SUSPENSE_WARNING),
     setupFiles: [path.resolve(__dirname, "./setup_indexeddb.ts")],
     projects: [
       // oxlint-disable-next-line no-top-level-await

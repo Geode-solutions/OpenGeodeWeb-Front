@@ -149,7 +149,7 @@ defineExpose({ resetRange });
       <v-col cols="auto">
         <v-btn
           data-testid="removeThresholdCardButton"
-          icon="mdi-trash-can-outline"
+          icon="ph-trash"
           size="x-small"
           variant="text"
           color="error"

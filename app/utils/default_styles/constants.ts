@@ -1,9 +1,4 @@
-interface RGBAColor {
-  red: number;
-  green: number;
-  blue: number;
-  alpha: number;
-}
+import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
 
 interface AttributeConfig {
   name: string | undefined;
@@ -13,7 +8,7 @@ interface AttributeConfig {
 // How a component of a data is colored: by a constant color or by the attribute of its vertices
 interface ComponentColoring {
   active: string;
-  constant: RGBAColor;
+  constant: ColorRGBA;
   vertex: AttributeConfig;
 }
 
@@ -21,52 +16,52 @@ interface ComponentColoring {
 const MESH_DEFAULT_ACTIVE_COLORING = "constant";
 const POINTS_DEFAULT_VISIBILITY = true;
 const POINTS_DEFAULT_SIZE = 10;
-const POINTS_DEFAULT_COLOR: RGBAColor = { red: 20, green: 20, blue: 20, alpha: 1 };
+const POINTS_DEFAULT_COLOR: ColorRGBA = { red: 20, green: 20, blue: 20, alpha: 1 };
 const EDGES_DEFAULT_VISIBILITY = true;
 const EDGES_DEFAULT_WIDTH = 2;
-const EDGES_DEFAULT_COLOR: RGBAColor = { red: 20, green: 20, blue: 20, alpha: 1 };
+const EDGES_DEFAULT_COLOR: ColorRGBA = { red: 20, green: 20, blue: 20, alpha: 1 };
 const CELLS_DEFAULT_VISIBILITY = true;
-const CELLS_DEFAULT_COLOR: RGBAColor = { red: 255, green: 255, blue: 255, alpha: 1 };
+const CELLS_DEFAULT_COLOR: ColorRGBA = { red: 255, green: 255, blue: 255, alpha: 1 };
 const POLYGONS_DEFAULT_VISIBILITY = true;
-const POLYGONS_DEFAULT_COLOR: RGBAColor = { red: 255, green: 255, blue: 255, alpha: 1 };
+const POLYGONS_DEFAULT_COLOR: ColorRGBA = { red: 255, green: 255, blue: 255, alpha: 1 };
 const POLYHEDRA_DEFAULT_VISIBILITY = true;
-const POLYHEDRA_DEFAULT_COLOR: RGBAColor = { red: 255, green: 255, blue: 255, alpha: 1 };
+const POLYHEDRA_DEFAULT_COLOR: ColorRGBA = { red: 255, green: 255, blue: 255, alpha: 1 };
 
 // Model
-const MODEL_DEFAULT_COLOR: RGBAColor = { red: 255, green: 255, blue: 255, alpha: 1 };
+const MODEL_DEFAULT_COLOR: ColorRGBA = { red: 255, green: 255, blue: 255, alpha: 1 };
 const MODEL_DEFAULT_ACTIVE_COLORING = "constant";
 
 const CORNERS_DEFAULT_VISIBILITY = true;
-const CORNERS_DEFAULT_COLOR: RGBAColor = { red: 20, green: 20, blue: 20, alpha: 1 };
+const CORNERS_DEFAULT_COLOR: ColorRGBA = { red: 20, green: 20, blue: 20, alpha: 1 };
 const CORNERS_DEFAULT_ACTIVE_COLORING = "constant";
 const LINES_DEFAULT_VISIBILITY = true;
-const LINES_DEFAULT_COLOR: RGBAColor = { red: 20, green: 20, blue: 20, alpha: 1 };
+const LINES_DEFAULT_COLOR: ColorRGBA = { red: 20, green: 20, blue: 20, alpha: 1 };
 const LINES_DEFAULT_ACTIVE_COLORING = "constant";
 const SURFACES_DEFAULT_VISIBILITY = true;
-const SURFACES_DEFAULT_COLOR: RGBAColor = { red: 255, green: 255, blue: 255, alpha: 1 };
+const SURFACES_DEFAULT_COLOR: ColorRGBA = { red: 255, green: 255, blue: 255, alpha: 1 };
 const SURFACES_DEFAULT_ACTIVE_COLORING = "constant";
 const BLOCKS_DEFAULT_VISIBILITY = true;
-const BLOCKS_DEFAULT_COLOR: RGBAColor = { red: 255, green: 255, blue: 255, alpha: 1 };
+const BLOCKS_DEFAULT_COLOR: ColorRGBA = { red: 255, green: 255, blue: 255, alpha: 1 };
 const BLOCKS_DEFAULT_ACTIVE_COLORING = "constant";
 
 const MESH_COMPONENT_TYPES = ["Corner", "Line", "Surface", "Block"];
 
-const DEFAULT_MODEL_COMPONENT_TYPE_COLORS: Record<string, RGBAColor> = {
+const DEFAULT_MODEL_COMPONENT_TYPE_COLORS: Record<string, ColorRGBA> = {
   Corner: CORNERS_DEFAULT_COLOR,
   Line: LINES_DEFAULT_COLOR,
   Surface: SURFACES_DEFAULT_COLOR,
   Block: BLOCKS_DEFAULT_COLOR,
 };
 
-const DEFAULT_NO_DATA_COLOR: RGBAColor = { red: 128, green: 128, blue: 128, alpha: 1 };
+const DEFAULT_NO_DATA_COLOR: ColorRGBA = { red: 128, green: 128, blue: 128, alpha: 1 };
 
 // Scene
-const SCENE_DEFAULT_BACKGROUND_COLOR: RGBAColor = { red: 180, green: 180, blue: 180, alpha: 1 };
-const SCENE_DEFAULT_TEXT_COLOR: RGBAColor = { red: 0, green: 0, blue: 0, alpha: 1 };
+const SCENE_DEFAULT_BACKGROUND_COLOR: ColorRGBA = { red: 180, green: 180, blue: 180, alpha: 1 };
+const SCENE_DEFAULT_TEXT_COLOR: ColorRGBA = { red: 0, green: 0, blue: 0, alpha: 1 };
 const SCENE_DEFAULT_FONT_FAMILY = "arial";
 const SCENE_DEFAULT_ORIENTATION_WIDGET = "axes";
 
-export type { RGBAColor, AttributeConfig, ComponentColoring };
+export type { AttributeConfig, ComponentColoring };
 export {
   POINTS_DEFAULT_VISIBILITY,
   POINTS_DEFAULT_SIZE,

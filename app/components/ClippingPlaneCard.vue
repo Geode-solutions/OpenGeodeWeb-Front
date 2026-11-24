@@ -40,7 +40,7 @@ const emit = defineEmits<Emits>();
       <v-col cols="auto">
         <v-btn
           data-testid="removePlaneButton"
-          icon="mdi-trash-can-outline"
+          icon="ph-trash"
           size="x-small"
           variant="text"
           color="error"
@@ -59,7 +59,6 @@ const emit = defineEmits<Emits>();
           :max="1"
           :step="0.05"
           :color="getPlaneCssColor(index)"
-          track-color="grey-lighten-2"
           density="compact"
           hide-details
         />
@@ -104,7 +103,7 @@ const emit = defineEmits<Emits>();
           size="x-small"
           variant="text"
           color="primary"
-          prepend-icon="mdi-swap-horizontal"
+          prepend-icon="ph-arrows-left-right"
           class="text-none text-caption px-1"
           @click="emit('flipNormal')"
         >

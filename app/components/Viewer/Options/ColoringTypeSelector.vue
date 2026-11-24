@@ -5,8 +5,8 @@ import {
   buildColoringStyles,
   resolveAttributeSchemas,
 } from "@ogw_front/utils/coloring_styles";
-import type { DataId } from "@ogw_front/types/identifiers";
-import type { RGBAColor } from "@ogw_front/utils/default_styles/constants";
+import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { RangesPerData } from "@ogw_front/composables/batch_style";
 import type { Texture } from "@ogw_front/types/texture";
 import ViewerOptionsAttributeSelector from "@ogw_front/components/Viewer/Options/AttributeSelector.vue";
@@ -31,7 +31,7 @@ interface Emits {
 
 const emit = defineEmits<Emits>();
 
-const color = defineModel<RGBAColor>("color");
+const color = defineModel<ColorRGBA>("color");
 const opacity = defineModel<number>("opacity");
 const textures = defineModel<Texture[]>("textures");
 
@@ -39,28 +39,28 @@ const vertex_attribute_name = defineModel<string>("vertex_attribute_name");
 const vertex_attribute_item = defineModel<number>("vertex_attribute_item");
 const vertex_attribute_range = defineModel<(number | undefined)[]>("vertex_attribute_range");
 const vertex_attribute_color_map = defineModel<string>("vertex_attribute_color_map");
-const vertex_attribute_no_data_color = defineModel<RGBAColor>("vertex_attribute_no_data_color");
+const vertex_attribute_no_data_color = defineModel<ColorRGBA>("vertex_attribute_no_data_color");
 const vertex_attribute_time_step = defineModel<number>("vertex_attribute_time_step");
 
 const edge_attribute_name = defineModel<string>("edge_attribute_name");
 const edge_attribute_item = defineModel<number>("edge_attribute_item");
 const edge_attribute_range = defineModel<(number | undefined)[]>("edge_attribute_range");
 const edge_attribute_color_map = defineModel<string>("edge_attribute_color_map");
-const edge_attribute_no_data_color = defineModel<RGBAColor>("edge_attribute_no_data_color");
+const edge_attribute_no_data_color = defineModel<ColorRGBA>("edge_attribute_no_data_color");
 const edge_attribute_time_step = defineModel<number>("edge_attribute_time_step");
 
 const cell_attribute_name = defineModel<string>("cell_attribute_name");
 const cell_attribute_item = defineModel<number>("cell_attribute_item");
 const cell_attribute_range = defineModel<(number | undefined)[]>("cell_attribute_range");
 const cell_attribute_color_map = defineModel<string>("cell_attribute_color_map");
-const cell_attribute_no_data_color = defineModel<RGBAColor>("cell_attribute_no_data_color");
+const cell_attribute_no_data_color = defineModel<ColorRGBA>("cell_attribute_no_data_color");
 const cell_attribute_time_step = defineModel<number>("cell_attribute_time_step");
 
 const polygon_attribute_name = defineModel<string>("polygon_attribute_name");
 const polygon_attribute_item = defineModel<number>("polygon_attribute_item");
 const polygon_attribute_range = defineModel<(number | undefined)[]>("polygon_attribute_range");
 const polygon_attribute_color_map = defineModel<string>("polygon_attribute_color_map");
-const polygon_attribute_no_data_color = defineModel<RGBAColor>("polygon_attribute_no_data_color");
+const polygon_attribute_no_data_color = defineModel<ColorRGBA>("polygon_attribute_no_data_color");
 const polygon_attribute_time_step = defineModel<number>("polygon_attribute_time_step");
 
 const polyhedron_attribute_name = defineModel<string>("polyhedron_attribute_name");
@@ -69,7 +69,7 @@ const polyhedron_attribute_range = defineModel<(number | undefined)[]>(
   "polyhedron_attribute_range",
 );
 const polyhedron_attribute_color_map = defineModel<string>("polyhedron_attribute_color_map");
-const polyhedron_attribute_no_data_color = defineModel<RGBAColor>(
+const polyhedron_attribute_no_data_color = defineModel<ColorRGBA>(
   "polyhedron_attribute_no_data_color",
 );
 const polyhedron_attribute_time_step = defineModel<number>("polyhedron_attribute_time_step");
@@ -215,7 +215,7 @@ watch(
   <v-divider class="my-2 mx-2" />
   <v-row justify="center" align="center" no-gutters class="px-2">
     <v-col cols="auto" class="mr-2">
-      <v-icon size="18" icon="mdi-format-color-fill" v-tooltip:left="'Coloring'" />
+      <v-icon size="18" icon="ph-paint-bucket" v-tooltip:left="'Coloring'" />
     </v-col>
     <v-col>
       <v-select
