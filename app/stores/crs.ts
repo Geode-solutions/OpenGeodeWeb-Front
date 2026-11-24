@@ -170,3 +170,5 @@ export const useCrsStore = defineStore("crs", () => {
     importStores,
   };
 });
+
+export type { CrsShortlistStorage };
