@@ -59,6 +59,15 @@ describe("favorite and recent crs", () => {
     expect(recentChips[FIRST_INDEX]?.text()).toContain("EPSG:2154");
   });
 
+  test("shows the favorites and the recent crs in their own labeled row", async () => {
+    const favoritesOnly = await mountShortlist({ favorites: [NZTM] });
+    expect(favoritesOnly.find('[data-testid="crsFavoriteRow"]').text()).toContain("Favorites");
+    expect(favoritesOnly.find('[data-testid="crsRecentRow"]').exists()).toBe(false);
+    const recentOnly = await mountShortlist({ recent: [LAMBERT] });
+    expect(recentOnly.find('[data-testid="crsRecentRow"]').text()).toContain("Recent");
+    expect(recentOnly.find('[data-testid="crsFavoriteRow"]').exists()).toBe(false);
+  });
+
   test("a click on a chip selects its crs", async () => {
     const wrapper = await mountShortlist({ recent: [{ ...LAMBERT }] });
     await wrapper.find('[data-testid="crsRecentChip"]').trigger("click");

@@ -7,7 +7,7 @@ interface Props {
   geodeObjectType: GeodeObjectType;
   // Narrow containers: one "AUTHORITY:CODE" column and a truncated name
   compact?: boolean;
-  // Shown as chips above the search, when they are in the list of this data type
+  // Shown as chips above the search, one row each, when they are in the list of this data type
   favorites?: CRS[];
   recent?: CRS[];
 }
@@ -125,9 +125,11 @@ onMounted(async () => {
 
 <template>
   <div
-    v-if="favorite_chips.length > 0 || recent_chips.length > 0"
-    class="d-flex flex-wrap ga-2 mb-2"
+    v-if="favorite_chips.length > 0"
+    data-testid="crsFavoriteRow"
+    class="d-flex flex-wrap align-center ga-2 mb-2"
   >
+    <span class="shortlist-label text-caption text-medium-emphasis">Favorites</span>
     <v-chip
       v-for="crs in favorite_chips"
       :key="`favorite-${crs_key(crs)}`"
@@ -139,6 +141,13 @@ onMounted(async () => {
       {{ crs_key(crs) }}
       <v-tooltip activator="parent" :text="crs.name" location="top" />
     </v-chip>
+  </div>
+  <div
+    v-if="recent_chips.length > 0"
+    data-testid="crsRecentRow"
+    class="d-flex flex-wrap align-center ga-2 mb-2"
+  >
+    <span class="shortlist-label text-caption text-medium-emphasis">Recent</span>
     <v-chip
       v-for="crs in recent_chips"
       :key="`recent-${crs_key(crs)}`"
@@ -204,5 +213,10 @@ onMounted(async () => {
 <style scoped>
 :deep(.crs-row) {
   cursor: pointer;
+}
+
+/* One width for both labels: the chips of the two rows start at the same place */
+.shortlist-label {
+  min-width: 64px;
 }
 </style>
