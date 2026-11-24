@@ -30,6 +30,8 @@ watch(
     itemId.value = dataId;
     show.value = true;
   },
+  // A request made on a page without a host opens once a host mounts
+  { immediate: true },
 );
 
 function updateShow(value: boolean): void {

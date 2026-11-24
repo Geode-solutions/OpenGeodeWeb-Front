@@ -78,6 +78,27 @@ describe("crs dialog host", () => {
     wrapper.unmount();
   });
 
+  test("opens the dialog for a request made before it mounted", async () => {
+    vi.spyOn(useDataStore(), "item").mockResolvedValue({
+      data_id: "item-1",
+      geode_id: "00000000-0000-0000-0000-000000000001",
+      name: "Points",
+      viewer_object_type: "mesh",
+      geode_object_type: "PointSet3D",
+      visible: true,
+      created_at: "",
+    });
+    // Requested on a page without a host, e.g. from a snackbar
+    useCrsStore().requestCrsEdit("item-1");
+    const wrapper = mount(CrsDialogHost, { global: { plugins: [vuetify] } });
+    await flushPromises();
+
+    const dialog = wrapper.get('[data-testid="crsDialogStub"]');
+    expect(dialog.attributes("data-show")).toBe("true");
+    expect(dialog.attributes("data-item")).toBe("item-1");
+    wrapper.unmount();
+  });
+
   test("an edit request for a deleted data does not open the dialog", async () => {
     vi.spyOn(useDataStore(), "item").mockRejectedValue(new Error("Item not found: item-1"));
     const crsStore = useCrsStore();
