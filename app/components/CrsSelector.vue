@@ -117,7 +117,7 @@ onMounted(async () => {
       v-for="crs in favorite_chips"
       :key="`favorite-${crs_key(crs)}`"
       data-testid="crsFavoriteChip"
-      prepend-icon="ph-star-fill"
+      prepend-icon="ph-fill ph-star"
       size="small"
       @click="select_crs(crs)"
     >
@@ -164,7 +164,7 @@ onMounted(async () => {
     <template #[`item.favorite`]="{ item }">
       <v-btn
         data-testid="crsFavoriteToggle"
-        :icon="favorite_keys.has(crs_key(item)) ? 'ph-star-fill' : 'ph-star'"
+        :icon="favorite_keys.has(crs_key(item)) ? 'ph-fill ph-star' : 'ph-star'"
         :aria-label="
           favorite_keys.has(crs_key(item)) ? 'Remove from favorites' : 'Add to favorites'
         "

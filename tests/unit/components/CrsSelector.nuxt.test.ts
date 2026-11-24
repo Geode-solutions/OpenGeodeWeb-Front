@@ -199,10 +199,11 @@ describe("crs selector", () => {
       ).toStrictEqual(LAMBERT);
     });
 
-    test("no chip row without favorites or recent crs", async () => {
+    test("no chip row nor star column without a shortlist", async () => {
       const wrapper = await mountShortlist({});
       expect(wrapper.find('[data-testid="crsFavoriteChip"]').exists()).toBe(false);
       expect(wrapper.find('[data-testid="crsRecentChip"]').exists()).toBe(false);
+      expect(wrapper.find('[data-testid="crsFavoriteToggle"]').exists()).toBe(false);
     });
 
     test("the star toggles a favorite without selecting the row", async () => {
@@ -214,15 +215,17 @@ describe("crs selector", () => {
       expect(wrapper.emitted()).not.toHaveProperty("update:modelValue");
     });
 
+    test("a favorite shows a filled star on its row and its chip", async () => {
+      const wrapper = await mountShortlist({ favorites: [NZTM], onToggleFavorite: vi.fn() });
+      for (const testid of ["crsFavoriteToggle", "crsFavoriteChip"]) {
+        expect(wrapper.find(`[data-testid="${testid}"] i`).classes()).toContain("ph-fill");
+      }
+    });
+
     test("enter on the star does not select the row", async () => {
       const wrapper = await mountShortlist({ onToggleFavorite: vi.fn() });
       await wrapper.find('[data-testid="crsFavoriteToggle"]').trigger("keydown", { key: "Enter" });
       expect(wrapper.emitted()).not.toHaveProperty("update:modelValue");
-    });
-
-    test("no star column when nobody listens to toggle-favorite", async () => {
-      const wrapper = await mountShortlist({});
-      expect(wrapper.find('[data-testid="crsFavoriteToggle"]').exists()).toBe(false);
     });
   });
 });
