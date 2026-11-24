@@ -1,6 +1,8 @@
 import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
 import { consola } from "consola";
 
+const MILLISECONDS_IN_SECOND = 1000;
+
 interface Loggable {
   $id: string;
 }
@@ -21,7 +23,8 @@ function endRequestLog(
     `[${microservice.$id}] Request completed:`,
     schema.$id,
     "in",
-    requestEndingTime.getSeconds() - requestStartingTime.getSeconds(),
+    // Seconds of the whole duration, not the difference of the clock's seconds field (wrong across a minute)
+    (requestEndingTime.getTime() - requestStartingTime.getTime()) / MILLISECONDS_IN_SECOND,
     "s",
   );
 }
