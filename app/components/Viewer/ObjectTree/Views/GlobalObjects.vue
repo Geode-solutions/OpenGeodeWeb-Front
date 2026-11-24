@@ -8,7 +8,11 @@ import {
   mapId,
   nextBasemapMaps,
 } from "@ogw_front/utils/basemap_tree";
-import { type TreeMenuPayload, compareSelections } from "@ogw_front/utils/treeview";
+import {
+  type TreeMenuPayload,
+  compareSelections,
+  withPendingImports,
+} from "@ogw_front/utils/treeview";
 import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
@@ -40,6 +44,7 @@ interface TreeGroupItem extends Partial<GeodeObjectTyped>, Partial<ViewerObjectT
   id: string;
   title?: string;
   children?: TreeGroupItem[];
+  loading?: boolean;
 }
 
 const mainView = computed<TreeGroupItem>(() => treeviewStore.opened_views[0]);
@@ -57,7 +62,9 @@ const {
   toggleSort,
   customFilter,
   applySearchFilter,
-} = useTreeFilter(() => treeviewStore.items, { recursiveSort: true });
+} = useTreeFilter(() => withPendingImports(treeviewStore.items, treeviewStore.pendingImports), {
+  recursiveSort: true,
+});
 
 // The basemap category comes first, out of the data sort and filters
 const displayedItems = computed(() => {
@@ -123,6 +130,9 @@ watch(
 
 function showMenu(event: MouseEvent, item: TreeGroupItem): void {
   const actualItem = item.raw || item;
+  if (actualItem.loading) {
+    return;
+  }
   if (isBasemapId(actualItem.id)) {
     emit("show-menu", { event, itemId: actualItem.id, context_type: "basemap" });
     return;
@@ -268,7 +278,7 @@ function expandAll(): void {
       </template>
 
       <template #append="{ item }">
-        <template v-if="item.geode_object_type !== 'HorizonStack3D'">
+        <template v-if="item.geode_object_type !== 'HorizonStack3D' && !item.loading">
           <v-btn
             v-if="item.viewer_object_type"
             data-testid="focusObjectButton"
