@@ -122,12 +122,13 @@ defineExpose({ get_viewer_id });
 
   <ProjectCrs />
   <CrsDialogHost />
-  <!-- Points are picked in the viewer: a click there must not close the panel -->
+  <!-- Points are picked in the viewer: a click there must not close the panel.
+       CrsAlign has its own title and close button -->
   <ToolPanel
     v-model="crsStore.showCrsAlign"
-    title="Georeference"
     :width="CRS_ALIGN_PANEL_WIDTH"
     :click-outside="false"
+    hide-actions
     data-testid="crsAlignPanel"
     :escape-function="crsStore.closeCrsAlign"
   >
