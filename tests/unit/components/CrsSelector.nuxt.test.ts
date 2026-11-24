@@ -3,6 +3,7 @@
 // Third party imports
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { VDataTable } from "vuetify/components";
+import type { VueWrapper } from "@vue/test-utils";
 import { mountSuspended } from "@nuxt/test-utils/runtime";
 
 // Local imports
@@ -157,5 +158,65 @@ describe("crs selector", () => {
       props: { geodeObjectType: "BRep" },
     });
     expect(wrapper.text()).toContain("Loading... Please wait");
+  });
+  describe("favorite and recent crs", () => {
+    const NZTM = {
+      authority: "EPSG",
+      code: "2193",
+      name: "NZGD2000 / New Zealand Transverse Mercator 2000",
+    };
+    const LAMBERT = { authority: "EPSG", code: "2154", name: "RGF93 v1 / Lambert-93" };
+    const NZGD_3D = { authority: "EPSG", code: "4959", name: "NZGD2000" };
+
+    async function mountShortlist(props: Record<string, unknown>): Promise<VueWrapper> {
+      const crsStore = useCrsStore();
+      crsStore.geographicList = mockAs<typeof crsStore.geographicList>(
+        vi.fn().mockResolvedValue([NZTM, LAMBERT]),
+      );
+      const wrapper = await mountSuspended(CrsSelector, {
+        global: { plugins: [vuetify, pinia] },
+        props: { geodeObjectType: "BRep", ...props },
+      });
+      await wrapper.vm.$nextTick();
+      return wrapper;
+    }
+
+    test("shows the favorite and recent crs present in the list as chips", async () => {
+      const wrapper = await mountShortlist({ favorites: [NZTM, NZGD_3D], recent: [LAMBERT] });
+      const favoriteChips = wrapper.findAll('[data-testid="crsFavoriteChip"]');
+      const recentChips = wrapper.findAll('[data-testid="crsRecentChip"]');
+      expect(favoriteChips).toHaveLength(EXPECTED_LENGTH);
+      expect(favoriteChips[FIRST_INDEX]?.text()).toContain("EPSG:2193");
+      expect(recentChips).toHaveLength(EXPECTED_LENGTH);
+      expect(recentChips[FIRST_INDEX]?.text()).toContain("EPSG:2154");
+    });
+
+    test("a click on a chip selects its crs", async () => {
+      const wrapper = await mountShortlist({ recent: [{ ...LAMBERT }] });
+      await wrapper.find('[data-testid="crsRecentChip"]').trigger("click");
+      expect(
+        wrapper.emitted<unknown[]>()["update:modelValue"]?.[FIRST_INDEX]?.[FIRST_INDEX],
+      ).toStrictEqual(LAMBERT);
+    });
+
+    test("no chip row without favorites or recent crs", async () => {
+      const wrapper = await mountShortlist({});
+      expect(wrapper.find('[data-testid="crsFavoriteChip"]').exists()).toBe(false);
+      expect(wrapper.find('[data-testid="crsRecentChip"]').exists()).toBe(false);
+    });
+
+    test("the star toggles a favorite without selecting the row", async () => {
+      const wrapper = await mountShortlist({ onToggleFavorite: vi.fn() });
+      await wrapper.find('[data-testid="crsFavoriteToggle"]').trigger("click");
+      expect(
+        wrapper.emitted<unknown[]>()["toggle-favorite"]?.[FIRST_INDEX]?.[FIRST_INDEX],
+      ).toStrictEqual(NZTM);
+      expect(wrapper.emitted()).not.toHaveProperty("update:modelValue");
+    });
+
+    test("no star column when nobody listens to toggle-favorite", async () => {
+      const wrapper = await mountShortlist({});
+      expect(wrapper.find('[data-testid="crsFavoriteToggle"]').exists()).toBe(false);
+    });
   });
 });
