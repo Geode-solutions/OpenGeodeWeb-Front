@@ -110,7 +110,10 @@ const treeviewStoreMock = {
   importStores: vi.fn().mockResolvedValue(undefined),
   finalizeImportSelection: vi.fn(),
   addItem: vi.fn().mockResolvedValue(undefined),
-  untilLoaded: vi.fn((_dataId: string, importing: Promise<string>) => importing),
+  untilLoaded: vi.fn(async (_dataId: string, importing: Promise<string>) => {
+    const dataId = await importing;
+    return dataId;
+  }),
 };
 const dataStoreMock = {
   clear: vi.fn(),
