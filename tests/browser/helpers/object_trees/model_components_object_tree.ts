@@ -187,10 +187,13 @@ async function hideAllComponentLeafRows(window: Page, categoryName: string): Pro
   const leafRows = tree.getByTestId("treeRowWrapper").filter({ hasText: "00000000-" });
   const count = await leafRows.count();
   for (let i = 0; i < count; i += 1) {
-    const eyeBtn = leafRows.nth(i).getByTestId("visibleObjectEyeButton").first();
+    const row = leafRows.nth(i);
+    const eyeBtn = row.getByTestId("visibleObjectEyeButton").first();
     // oxlint-disable no-await-in-loop
     if (await eyeBtn.isVisible()) {
       await eyeBtn.click({ force: true });
+      // The shim clicks through a positional selector (nth among the tree's eye buttons): wait for this row to flip before the next click, or the index shifts under it
+      await row.getByTestId("hiddenObjectEyeButton").first().waitFor({ state: "attached" });
     }
   }
   await waitForActionSettled(window);
