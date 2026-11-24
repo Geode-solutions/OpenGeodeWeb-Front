@@ -4,6 +4,7 @@ import { reportError, reportTimeout } from "./error_feedback.js";
 import type { Microservice } from "./api_fetch.js";
 import type { RpcClient } from "@ogw_shared/utils/call_raw.js";
 import { callSchema } from "@ogw_shared/utils/call_schema";
+import { trackRequest } from "./track_request.js";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 interface ViewerMicroservice extends Microservice {
@@ -16,6 +17,7 @@ interface ViewerCallParams {
   timeout?: number;
 }
 
+// oxlint-disable-next-line max-lines-per-function
 async function viewer_call(
   microservice: ViewerMicroservice,
   { schema, params = {}, timeout }: ViewerCallParams,
@@ -30,7 +32,13 @@ async function viewer_call(
   microservice.start_request();
 
   const requestStartingTime = startRequestLog(microservice, schema);
-  const request = callSchema(
+  const followRequest = trackRequest({
+    source: microservice.$id,
+    kind: "ws",
+    route: schema.$id,
+    params,
+  });
+  const pending = callSchema(
     {
       schema,
       params,
@@ -64,6 +72,7 @@ async function viewer_call(
       },
     },
   );
+  const request = followRequest(pending);
   const result = await reportTimeout(schema.$id, request);
   return result;
 }

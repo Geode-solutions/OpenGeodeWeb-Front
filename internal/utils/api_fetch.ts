@@ -3,6 +3,7 @@ import { endRequestLog, startRequestLog } from "@ogw_front/utils/log";
 import { reportError, reportTimeout } from "./error_feedback.js";
 import { consola } from "consola";
 import { fetchSchema } from "@ogw_shared/utils/fetch_schema";
+import { trackRequest } from "./track_request.js";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 // The microservice-backed Pinia stores (back/app/...) all expose this shape; only the slice actually used here needs to be declared.
@@ -37,7 +38,13 @@ async function api_fetch(
   microservice.start_request();
 
   const requestStartingTime = startRequestLog(microservice, schema);
-  const request = fetchSchema(
+  const followRequest = trackRequest({
+    source: microservice.$id,
+    kind: "http",
+    route: schema.$id,
+    params,
+  });
+  const pending = fetchSchema(
     {
       schema,
       params,
@@ -77,6 +84,7 @@ async function api_fetch(
       },
     },
   );
+  const request = followRequest(pending);
   if (skip_feedback_error === true) {
     return request;
   }
