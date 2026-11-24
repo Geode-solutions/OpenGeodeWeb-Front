@@ -65,7 +65,8 @@ async function importDataItem(item: NewDataItem): Promise<string> {
 }
 // Every item comes through here: from the back-end, which still names its data id `id`, or from a project
 async function importItem(imported: LegacyDataId<NewDataItem> | NewDataItem): Promise<string> {
-  const dataId = await importDataItem(fromLegacyDataId(imported));
+  const item = fromLegacyDataId(imported);
+  const dataId = await useTreeviewStore().untilLoaded(item.data_id, importDataItem(item));
   return dataId;
 }
 

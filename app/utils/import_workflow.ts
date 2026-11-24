@@ -15,6 +15,7 @@ import { useBackStore } from "@ogw_front/stores/back";
 import { useCrsStore } from "@ogw_front/stores/crs";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useProjectCrs } from "@ogw_front/composables/project_crs";
+import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 interface FileToImport extends Readonly<GeodeObjectTyped> {
   readonly filename: string;
@@ -24,14 +25,13 @@ interface FileToImport extends Readonly<GeodeObjectTyped> {
 async function importFile(filename: string, geode_object_type: GeodeObjectType): Promise<string[]> {
   const backStore = useBackStore();
   const schema = back_schemas.opengeodeweb_back.save_viewable_file;
-  const params = {
+  const params = { geode_object_type, filename };
+  // The conversion can be long: the file shows in the tree meanwhile, then is replaced by its objects
+  const response = await useTreeviewStore().whilePendingImport(
     geode_object_type,
     filename,
-  };
-  const response = await backStore.request({
-    schema,
-    params,
-  });
+    backStore.request({ schema, params }),
+  );
   // oxlint-disable-next-line no-unsafe-type-assertion -- this is the trusted API boundary; each back-end response item matches NewDataItem, except for its legacy id.
   const items = response.data as LegacyDataId<NewDataItem>[];
   const dataIds = await Promise.all(

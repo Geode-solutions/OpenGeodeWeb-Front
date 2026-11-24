@@ -1,5 +1,5 @@
 // Third party imports
-import { type H3Event, getQuery, readRawBody } from "h3";
+import { type H3Event, getQuery, readRawBody, setResponseStatus } from "h3";
 import { beforeEach, describe, expect, test } from "vitest";
 import { registerEndpoint } from "@nuxt/test-utils/runtime";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
@@ -13,6 +13,7 @@ import { useFeedbackStore } from "@ogw_front/stores/feedback";
 const ZERO = 0;
 const ONE = 1;
 const TWO = 2;
+const BAD_REQUEST = 400;
 const SECOND_CHUNK_EXTRA_BYTES = 1000;
 const schema = schemas.opengeodeweb_back.upload_file;
 
@@ -158,5 +159,27 @@ describe("upload_file", () => {
     expect(receivedChunks).toHaveLength(TWO);
     expect(receivedChunks[0]).toStrictEqual({ index: "0", total: "2", body: firstChunkContent });
     expect(receivedChunks[ONE]).toStrictEqual({ index: "1", total: "2", body: secondChunkContent });
+  });
+
+  test("error response shows its description", async () => {
+    const feedbackStore = useFeedbackStore();
+    const backStore = useBackStore();
+    const description = "Invalid filename: ../fake_file.txt";
+    registerEndpoint(schema.$id, {
+      method: "PUT",
+      handler: (event) => {
+        setResponseStatus(event, BAD_REQUEST);
+        return { code: BAD_REQUEST, name: "Bad Request", description };
+      },
+    });
+    const file = new File(["fake_file"], "fake_file.txt");
+    await expect(backStore.upload(file)).rejects.toThrow(String(BAD_REQUEST));
+    expect(feedbackStore.feedbacks).toHaveLength(ONE);
+    expect(feedbackStore.feedbacks[ZERO]).toMatchObject({
+      type: "error",
+      code: BAD_REQUEST,
+      name: "Bad Request",
+      description,
+    });
   });
 });

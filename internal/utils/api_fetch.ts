@@ -1,6 +1,6 @@
 import type { JsonRpcSchema, RequestHandlersWithValidation } from "@ogw_shared/utils/types.js";
 import { endRequestLog, startRequestLog } from "@ogw_front/utils/log";
-import type { ErrorResponse } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
+import { reportError, reportTimeout } from "./error_feedback.js";
 import { consola } from "consola";
 import { fetchSchema } from "@ogw_shared/utils/fetch_schema";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
@@ -20,45 +20,6 @@ interface ApiFetchParams {
   headers?: Record<string, string>;
 }
 
-// Loosely-typed shapes for the dynamic error/response values reported by fetchSchema.
-interface FetchErrorLike {
-  code?: number;
-  message?: string;
-  stack?: string;
-}
-
-type FetchErrorResponseLike = { status?: number } & Partial<
-  Pick<ErrorResponse, "name" | "description">
->;
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
-
-function toFetchErrorLike(error: unknown): FetchErrorLike {
-  if (!isRecord(error)) {
-    return {};
-  }
-  return {
-    code: typeof error.code === "number" ? error.code : undefined,
-    message: typeof error.message === "string" ? error.message : undefined,
-    stack: typeof error.stack === "string" ? error.stack : undefined,
-  };
-}
-
-function toFetchErrorResponseLike(response: unknown): FetchErrorResponseLike {
-  if (!isRecord(response)) {
-    return {};
-  }
-  // Ofetch puts the parsed body (an ErrorResponse for Flask microservices) in `_data`
-  const body = isRecord(response._data) ? response._data : response;
-  return {
-    status: typeof response.status === "number" ? response.status : undefined,
-    name: typeof body.name === "string" ? body.name : undefined,
-    description: typeof body.description === "string" ? body.description : undefined,
-  };
-}
-
 // oxlint-disable-next-line max-lines-per-function
 async function api_fetch(
   microservice: Microservice,
@@ -76,7 +37,7 @@ async function api_fetch(
   microservice.start_request();
 
   const requestStartingTime = startRequestLog(microservice, schema);
-  const result = await fetchSchema(
+  const request = fetchSchema(
     {
       schema,
       params,
@@ -87,14 +48,8 @@ async function api_fetch(
     {
       async request_error_function(error: unknown) {
         microservice.stop_request();
-        const typedError = toFetchErrorLike(error);
         if (skip_feedback_error !== true) {
-          feedbackStore.add_error(
-            typedError.code ?? 0,
-            schema.$id,
-            typedError.message ?? "",
-            typedError.stack ?? "",
-          );
+          reportError(schema.$id, error);
         }
         if (request_error_function) {
           await request_error_function(error);
@@ -109,14 +64,8 @@ async function api_fetch(
       },
       async response_error_function(response: unknown) {
         microservice.stop_request();
-        const typedResponse = toFetchErrorResponseLike(response);
         if (skip_feedback_error !== true) {
-          feedbackStore.add_error(
-            typedResponse.status ?? 0,
-            schema.$id,
-            typedResponse.name ?? "",
-            typedResponse.description ?? "",
-          );
+          reportError(schema.$id, response);
         }
         if (response_error_function) {
           await response_error_function(response);
@@ -128,8 +77,12 @@ async function api_fetch(
       },
     },
   );
+  if (skip_feedback_error === true) {
+    return request;
+  }
+  const result = await reportTimeout(schema.$id, request);
   return result;
 }
 
 export { api_fetch };
-export type { FetchErrorLike, Microservice };
+export type { Microservice };

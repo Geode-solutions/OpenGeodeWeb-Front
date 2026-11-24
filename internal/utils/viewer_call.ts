@@ -1,5 +1,6 @@
 import type { JsonRpcSchema, RequestHandlersWithValidation } from "@ogw_shared/utils/types.js";
 import { endRequestLog, startRequestLog } from "@ogw_front/utils/log";
+import { reportError, reportTimeout } from "./error_feedback.js";
 import type { Microservice } from "./api_fetch.js";
 import type { RpcClient } from "@ogw_shared/utils/call_raw.js";
 import { callSchema } from "@ogw_shared/utils/call_schema";
@@ -13,22 +14,6 @@ interface ViewerCallParams {
   schema: JsonRpcSchema;
   params?: object;
   timeout?: number;
-}
-
-// Loosely-typed shape for the dynamic error/response values reported by callSchema.
-interface RpcErrorLike {
-  code?: number;
-  message?: string;
-}
-
-function toRpcErrorLike(value: unknown): RpcErrorLike {
-  if (typeof value !== "object" || value === null) {
-    return {};
-  }
-  return {
-    code: "code" in value && typeof value.code === "number" ? value.code : undefined,
-    message: "message" in value && typeof value.message === "string" ? value.message : undefined,
-  };
 }
 
 async function viewer_call(
@@ -45,7 +30,7 @@ async function viewer_call(
   microservice.start_request();
 
   const requestStartingTime = startRequestLog(microservice, schema);
-  const result = await callSchema(
+  const request = callSchema(
     {
       schema,
       params,
@@ -53,37 +38,24 @@ async function viewer_call(
       timeout,
     },
     {
-      request_error_function(error: unknown) {
-        microservice.stop_request();
-        const typedError = toRpcErrorLike(error);
-        feedbackStore.add_error(
-          typedError.code ?? 0,
-          schema.$id,
-          typedError.message ?? "",
-          typedError.message ?? "",
-        );
+      // CallRaw runs both error handlers on the same rejection: stop the request and report it once, in the response one.
+      async request_error_function(error: unknown) {
         if (request_error_function) {
-          void request_error_function(error);
+          await request_error_function(error);
         }
       },
-      response_function(data: unknown) {
+      async response_function(data: unknown) {
         endRequestLog(microservice, schema, requestStartingTime);
         microservice.stop_request();
         if (response_function) {
-          response_function(data);
+          await response_function(data);
         }
       },
-      response_error_function(response: unknown) {
+      async response_error_function(response: unknown) {
         microservice.stop_request();
-        const typedResponse = toRpcErrorLike(response);
-        feedbackStore.add_error(
-          typedResponse.code ?? 0,
-          schema.$id,
-          typedResponse.message ?? "",
-          typedResponse.message ?? "",
-        );
+        reportError(schema.$id, response);
         if (response_error_function) {
-          void response_error_function(response);
+          await response_error_function(response);
         }
       },
       validation_error_function({ code, name, error }) {
@@ -92,6 +64,7 @@ async function viewer_call(
       },
     },
   );
+  const result = await reportTimeout(schema.$id, request);
   return result;
 }
 
