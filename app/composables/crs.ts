@@ -4,7 +4,7 @@ import type { AssignResponse } from "@ogw_front/composables/crs_assign";
 import type { CRS } from "@geode/opengeodeweb-back/schema_types";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
-import { reloadObject } from "@ogw_front/utils/import_workflow";
+import { reloadObject } from "@ogw_front/utils/reload_object";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useCrsStore } from "@ogw_front/stores/crs";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";

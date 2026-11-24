@@ -9,7 +9,7 @@ import {
   stubCrsStores,
 } from "@ogw_tests/unit/helpers/crs";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import type { reloadObject } from "@ogw_front/utils/import_workflow";
+import type { reloadObject } from "@ogw_front/utils/reload_object";
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useCrs } from "@ogw_front/composables/crs";
 import { useCrsStore } from "@ogw_front/stores/crs";
@@ -21,7 +21,7 @@ vi.setConfig({ testTimeout: 10_000 });
 // Hoisted with vi.mock, so the reloadObject mock can record its call order
 const { calls } = vi.hoisted(() => ({ calls: [] as string[] }));
 
-vi.mock(import("@ogw_front/utils/import_workflow"), () => ({
+vi.mock(import("@ogw_front/utils/reload_object"), () => ({
   reloadObject: vi.fn<typeof reloadObject>().mockImplementation(async () => {
     calls.push("reload");
     await Promise.resolve();
