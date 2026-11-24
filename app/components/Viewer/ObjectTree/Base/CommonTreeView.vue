@@ -140,6 +140,10 @@ function handleItemClick(
   index: number | undefined,
   event?: MouseEvent | KeyboardEvent,
 ): void {
+  // A row still loading cannot be shown, hidden or picked yet
+  if (item.raw.loading === true) {
+    return;
+  }
   if (index !== undefined) {
     focusedIndex.value = index;
   }
@@ -220,6 +224,7 @@ const { handleKeyDown } = useTreeKeyboardNav(
               'is-focused': focusedIndex === index,
               'is-active': item.isActive,
               'is-linked': linked !== undefined && item.raw[actualItemProps.value] === linked.id,
+              'is-loading': item.raw.loading === true,
             },
           ]"
           :style="
@@ -235,11 +240,11 @@ const { handleKeyDown } = useTreeKeyboardNav(
             treeWrapper?.focus();
           "
           @contextmenu.prevent.stop="
-            emit('contextmenu', { event: $event, item: item.raw });
+            item.raw.loading !== true && emit('contextmenu', { event: $event, item: item.raw });
             treeWrapper?.focus();
           "
-          @mouseenter="emit('hover:enter', { item })"
-          @mouseleave="emit('hover:leave', { item })"
+          @mouseenter="item.raw.loading !== true && emit('hover:enter', { item })"
+          @mouseleave="item.raw.loading !== true && emit('hover:leave', { item })"
         >
           <TreeRow
             :item="item"
@@ -318,6 +323,14 @@ const { handleKeyDown } = useTreeKeyboardNav(
 
 .tree-row-wrapper.is-active.is-focused {
   box-shadow: inset 0 0 0 2px rgba(var(--v-theme-primary), 0.6);
+}
+
+.tree-row-wrapper.is-loading {
+  cursor: progress;
+}
+
+.tree-row-wrapper.is-loading :deep(.tree-title) {
+  opacity: 0.6;
 }
 
 .tree-row-wrapper.is-linked {

@@ -77,21 +77,21 @@ async function importDataItem(item: NewDataItem): Promise<string> {
 }
 // Every item comes through here: from the back-end, which still names its data id `id`, or from a project
 async function importItem(imported: LegacyDataId<NewDataItem> | NewDataItem): Promise<string> {
-  const dataId = await importDataItem(fromLegacyDataId(imported));
+  const item = fromLegacyDataId(imported);
+  const dataId = await useTreeviewStore().untilLoaded(item.data_id, importDataItem(item));
   return dataId;
 }
 // A single file can hold several objects: every one of them is imported, ids are returned in the response order
 async function importFile(filename: string, geode_object_type: GeodeObjectType): Promise<string[]> {
   const backStore = useBackStore();
   const schema = back_schemas.opengeodeweb_back.save_viewable_file;
-  const params = {
+  const params = { geode_object_type, filename };
+  // The conversion can be long: the file shows in the tree meanwhile, then is replaced by its objects
+  const response = await useTreeviewStore().whilePendingImport(
     geode_object_type,
     filename,
-  };
-  const response = await backStore.request({
-    schema,
-    params,
-  });
+    backStore.request({ schema, params }),
+  );
   // oxlint-disable-next-line no-unsafe-type-assertion -- this is the trusted API boundary; each back-end response item matches NewDataItem, except for its legacy id.
   const items = response.data as LegacyDataId<NewDataItem>[];
   const dataIds = await Promise.all(
