@@ -40,7 +40,7 @@ function row_props({ item }: { item: CRS }): Record<string, unknown> {
     class: ["crs-row", { "bg-primary": selected }],
     tabindex: 0,
     "aria-selected": selected,
-    onKeydown: (event: KeyboardEvent) => {
+    onKeydown: (event: KeyboardEvent): void => {
       if (event.key === "Enter") {
         select_crs(item);
       }

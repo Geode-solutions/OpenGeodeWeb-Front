@@ -171,7 +171,7 @@ function createServerWsRpcClient(baseUrl: string): ServerWsRpcClient {
   function getConnection(): ReturnType<ServerWsRpcClient["getConnection"]> {
     return {
       getSession: () => ({
-        call: async (rpc: string, [params]: readonly [object]) => {
+        call: async (rpc: string, [params]: readonly [object]): Promise<unknown> => {
           const result = await call(rpc, params);
           return result;
         },
