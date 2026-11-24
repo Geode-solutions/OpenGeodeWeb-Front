@@ -214,6 +214,12 @@ describe("crs selector", () => {
       expect(wrapper.emitted()).not.toHaveProperty("update:modelValue");
     });
 
+    test("enter on the star does not select the row", async () => {
+      const wrapper = await mountShortlist({ onToggleFavorite: vi.fn() });
+      await wrapper.find('[data-testid="crsFavoriteToggle"]').trigger("keydown", { key: "Enter" });
+      expect(wrapper.emitted()).not.toHaveProperty("update:modelValue");
+    });
+
     test("no star column when nobody listens to toggle-favorite", async () => {
       const wrapper = await mountShortlist({});
       expect(wrapper.find('[data-testid="crsFavoriteToggle"]').exists()).toBe(false);

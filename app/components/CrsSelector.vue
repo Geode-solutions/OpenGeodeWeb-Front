@@ -171,6 +171,7 @@ onMounted(async () => {
         variant="text"
         size="x-small"
         @click.stop="emit('toggle-favorite', item)"
+        @keydown.enter.stop
       />
     </template>
     <template v-if="compact" #[`item.name`]="{ value }">
