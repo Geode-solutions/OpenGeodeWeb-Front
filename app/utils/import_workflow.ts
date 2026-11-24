@@ -1,4 +1,4 @@
-// oxlint-disable promise/prefer-await-to-then
+// oxlint-disable promise/prefer-await-to-then, max-lines
 // Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { consola } from "consola";
@@ -6,13 +6,18 @@ import { consola } from "consola";
 // Local imports
 import { type LegacyDataId, fromLegacyDataId } from "@ogw_front/utils/legacy_data_id";
 import { type NewDataItem, useDataStore } from "@ogw_front/stores/data";
+import type { CRS } from "@geode/opengeodeweb-back/schema_types";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import type { GeodeObjectTyped } from "@ogw_front/types/identifiers";
 import { useBackStore } from "@ogw_front/stores/back";
+import { useCrsStore } from "@ogw_front/stores/crs";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+// The cycle (crs -> import_workflow -> project_crs -> crs) is only crossed at call time, never at load
+// oxlint-disable-next-line import/no-cycle
+import { useProjectCrs } from "@ogw_front/composables/project_crs";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 interface FileToImport extends Readonly<GeodeObjectTyped> {
@@ -103,7 +108,7 @@ async function importFile(filename: string, geode_object_type: GeodeObjectType):
   return dataIds;
 }
 
-async function importWorkflow(files: readonly FileToImport[]): Promise<string[]> {
+async function importFiles(files: readonly FileToImport[]): Promise<string[]> {
   const hybridViewerStore = useHybridViewerStore();
   // Files are imported concurrently and the viewer only frames the first actor to arrive, so the camera is reset once everything is loaded
   const wasSceneEmpty = Object.keys(hybridViewerStore.hybridDb).length === 0;
@@ -146,6 +151,32 @@ async function importWorkflow(files: readonly FileToImport[]): Promise<string[]>
     throw new AggregateError(errors, `${errors.length} file(s) could not be imported`);
   }
   return results;
+}
+
+// A harmonization failure is only logged: the import outcome does not depend on it
+async function harmonize(ids: string[], projectCrs: CRS | undefined): Promise<void> {
+  try {
+    await useProjectCrs().harmonizeImportedCrs(ids, projectCrs);
+  } catch (error) {
+    consola.error("CRS harmonization failed:", error);
+  }
+}
+
+// When a file fails, the workflow throws without returning the imported ids: they are found by difference.
+// The project CRS is read before the import, as the project follows the data as they land.
+async function importWorkflow(files: readonly FileToImport[]): Promise<string[]> {
+  const { projectCrs } = useCrsStore();
+  const existingItems = await useDataStore().allItems();
+  const existingIds = new Set(existingItems.map((item) => item.data_id));
+  try {
+    const ids = await importFiles(files);
+    return ids;
+  } finally {
+    const items = await useDataStore().allItems();
+    const importedIds = items.map((item) => item.data_id).filter((id) => !existingIds.has(id));
+    // Conversions can be long: the caller is not kept waiting, the snackbars report the outcome
+    void harmonize(importedIds, projectCrs);
+  }
 }
 
 // NewDataItem has mutable array fields (mesh_components, collection_components), so a readonly array of it can't satisfy prefer-readonly-parameter-types deeply; left unfixed (same pattern as app/plugins/auto_store_register.ts).
