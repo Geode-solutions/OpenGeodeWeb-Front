@@ -18,7 +18,11 @@ const emit = defineEmits<{ "toggle-favorite": [crs: CRS] }>();
 // The star column is only shown to a parent that keeps the favorites
 const canToggleFavorite = getCurrentInstance()?.vnode.props?.onToggleFavorite !== undefined;
 
+const DEFAULT_ITEMS_PER_PAGE = 10;
 const search = ref<string>("");
+const page = ref<number>(1);
+const items_per_page = ref<number>(DEFAULT_ITEMS_PER_PAGE);
+const sort_by = ref<{ key: string; order?: "asc" | "desc" }[]>([]);
 const data_table_loading = ref<boolean>(false);
 // Thousands of rows that are never mutated: no deep reactivity
 const crs_list = shallowRef<CRS[]>([]);
@@ -33,6 +37,17 @@ function crs_key(crs: CRS): string {
 // A click on the row selects it: no checkbox column. Enter does the same once the row is focused
 function select_crs(crs: CRS): void {
   selectedCrs.value = crs;
+}
+
+// A chip selects its CRS and shows its row: no search, default order, on the page of the row.
+// The page is set once the table has seen the new search, which sends it back to the first page
+async function show_crs(crs: CRS): Promise<void> {
+  select_crs(crs);
+  search.value = "";
+  sort_by.value = [];
+  await nextTick();
+  const index = crs_list.value.findIndex((listed_item) => crs_key(listed_item) === crs_key(crs));
+  page.value = Math.floor(index / items_per_page.value) + 1;
 }
 
 // Vuetify passes the click event first, then the clicked row
@@ -119,7 +134,7 @@ onMounted(async () => {
       data-testid="crsFavoriteChip"
       prepend-icon="ph-fill ph-star"
       size="small"
-      @click="select_crs(crs)"
+      @click="show_crs(crs)"
     >
       {{ crs_key(crs) }}
       <v-tooltip activator="parent" :text="crs.name" location="top" />
@@ -131,7 +146,7 @@ onMounted(async () => {
       prepend-icon="ph-clock-counter-clockwise"
       size="small"
       variant="outlined"
-      @click="select_crs(crs)"
+      @click="show_crs(crs)"
     >
       {{ crs_key(crs) }}
       <v-tooltip activator="parent" :text="crs.name" location="top" />
@@ -147,7 +162,9 @@ onMounted(async () => {
     hide-details
   ></v-text-field>
   <v-data-table
-    :items-per-page="10"
+    v-model:page="page"
+    v-model:items-per-page="items_per_page"
+    v-model:sort-by="sort_by"
     :items-per-page-options="items_per_page_options"
     :headers="headers"
     :items="crs_list"
