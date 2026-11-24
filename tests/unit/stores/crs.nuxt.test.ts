@@ -9,7 +9,8 @@ import { useCrsStore } from "@ogw_front/stores/crs";
 vi.setConfig({ testTimeout: 10_000 });
 
 const EXPECTED_REQUESTS = 1;
-const CRS_LIST = [{ authority: "EPSG", code: "2154", name: "RGF93 v1 / Lambert-93" }];
+const ENTRY = { authority: "EPSG", code: "2154", name: "RGF93 v1 / Lambert-93" };
+const CRS_LIST = [ENTRY];
 
 function mockItems(items: DataItem[]): Ref<DataItem[]> {
   const data = ref(items);
@@ -78,6 +79,33 @@ describe("crs store", () => {
     expect(crsStore.crsEditRequest).toBe("data-1");
     crsStore.clearCrsEditRequest();
     expect(crsStore.crsEditRequest).toBeUndefined();
+  });
+
+  test("opens and closes the alignment of a data", () => {
+    const crsStore = useCrsStore();
+    const item = mockAs<DataItem>({ data_id: "data-1", created_at: "1" });
+    crsStore.openCrsAlign(item);
+    expect(crsStore.showCrsAlign).toBe(true);
+    expect(crsStore.crsAlignItem?.data_id).toBe(item.data_id);
+    crsStore.closeCrsAlign();
+    expect(crsStore.showCrsAlign).toBe(false);
+    expect(crsStore.crsAlignItem).toBeUndefined();
+  });
+
+  test("keeps the shortlist in local storage by default", async () => {
+    const crsStore = useCrsStore();
+    crsStore.crsShortlistStorage.favorites.value = [ENTRY];
+    await nextTick();
+    const stored = String(localStorage.getItem("ogw-crs-favorites"));
+    expect(JSON.parse(stored)).toStrictEqual(CRS_LIST);
+  });
+
+  test("uses the shortlist storage given by the app", () => {
+    const crsStore = useCrsStore();
+    const favorites = ref<(typeof ENTRY)[]>([ENTRY]);
+    crsStore.setCrsShortlistStorage(favorites, ref<(typeof ENTRY)[]>([]));
+    expect(crsStore.crsShortlistStorage.favorites).toBe(favorites);
+    expect(crsStore.crsShortlistStorage.favorites.value).toStrictEqual(CRS_LIST);
   });
 });
 

@@ -1,10 +1,17 @@
-import { oldestCrs, sameCrs } from "@ogw_front/utils/crs";
+import { type CrsEntry, oldestCrs, sameCrs } from "@ogw_front/utils/crs";
+import { type DataItem, useDataStore } from "@ogw_front/stores/data";
 import type { CRS } from "@geode/opengeodeweb-back/schema_types";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
+import type { Ref } from "vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { useBackStore } from "@ogw_front/stores/back";
-import { useDataStore } from "@ogw_front/stores/data";
+import { useLocalStorage } from "@vueuse/core";
+
+interface CrsShortlistStorage {
+  favorites: Ref<CrsEntry[]>;
+  history: Ref<CrsEntry[]>;
+}
 
 // Session cache of the available CRS, the project CRS, and the channel the shared components use to ask the host app for a CRS edit
 // oxlint-disable-next-line max-lines-per-function, max-statements
@@ -12,12 +19,19 @@ export const useCrsStore = defineStore("crs", () => {
   const backStore = useBackStore();
   // OpenGeode geosciences lists the same geographic CRS for 2D and 3D data: one list for all types
   let geographicListPromise: Promise<CRS[]> | undefined = undefined;
+  const crsAlignItem = ref<DataItem | undefined>(undefined);
   const crsEditEnabled = ref(false);
   const crsEditRequest = ref<string | undefined>(undefined);
   const dataStore = useDataStore();
   const crsItems = dataStore.refCrsItems();
   const projectCrs = ref<CRS | undefined>(undefined);
   const projectCrsEditRequest = ref(false);
+  const showCrsAlign = ref(false);
+  // Browser storage by default: an app can give its own (e.g. a desktop settings file)
+  const crsShortlistStorage = shallowRef<CrsShortlistStorage>({
+    favorites: useLocalStorage<CrsEntry[]>("ogw-crs-favorites", []),
+    history: useLocalStorage<CrsEntry[]>("ogw-crs-history", []),
+  });
 
   // The project follows its data: once every georeferenced data is in one CRS, it is the project
   // CRS. Data already mixed before any project CRS: the oldest one is the reference
@@ -102,9 +116,24 @@ export const useCrsStore = defineStore("crs", () => {
     projectCrsEditRequest.value = false;
   }
 
+  function openCrsAlign(item: DataItem): void {
+    crsAlignItem.value = item;
+    showCrsAlign.value = true;
+  }
+
+  function closeCrsAlign(): void {
+    showCrsAlign.value = false;
+    crsAlignItem.value = undefined;
+  }
+
+  function setCrsShortlistStorage(favorites: Ref<CrsEntry[]>, history: Ref<CrsEntry[]>): void {
+    crsShortlistStorage.value = { favorites, history };
+  }
+
   // A new project: its data set the project CRS again
   function reset(): void {
     projectCrs.value = undefined;
+    closeCrsAlign();
   }
 
   function exportStores(): { projectCrs?: CRS } {
@@ -130,6 +159,12 @@ export const useCrsStore = defineStore("crs", () => {
     projectCrsEditRequest,
     requestProjectCrsEdit,
     clearProjectCrsEditRequest,
+    showCrsAlign,
+    crsAlignItem,
+    openCrsAlign,
+    closeCrsAlign,
+    crsShortlistStorage,
+    setCrsShortlistStorage,
     reset,
     exportStores,
     importStores,

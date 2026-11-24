@@ -2,6 +2,13 @@ import type { CrsItem, NewDataItem } from "@ogw_front/stores/data";
 import type { CRS } from "@geode/opengeodeweb-back/schema_types";
 import type { LegacyDataId } from "@ogw_front/utils/legacy_data_id";
 
+// Only what a CRS selector shows: the back may add other fields
+interface CrsEntry {
+  authority: string;
+  code: string;
+  name: string;
+}
+
 function formatCrs(crs: CRS | undefined): string {
   return crs ? `${crs.authority}:${crs.code} — ${crs.name}` : "None";
 }
@@ -38,4 +45,5 @@ function oldestCrs(
     ?.crs;
 }
 
+export type { CrsEntry };
 export { formatCrs, formatCrsCode, oldestCrs, sameCrs, sameCrsState };
