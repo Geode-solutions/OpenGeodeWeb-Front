@@ -128,7 +128,6 @@ function handleNormalClick(item: DisplayItem, index: number | undefined): void {
   if (index !== undefined) {
     lastActiveIndex.value = index;
   }
-  toggleSelect(item.raw);
   emit("click:item", item.raw);
 }
 

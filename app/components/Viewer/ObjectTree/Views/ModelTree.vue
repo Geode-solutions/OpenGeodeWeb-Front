@@ -242,7 +242,6 @@ function getLeafViewerIds(item: CollectionTreeItem): number[] {
       :scroll-top="currentView?.scrollTop || 0"
       class="transparent-treeview virtual-tree-height"
       @update:selected="(val) => onUpdateSelection(val as string[])"
-      @click:item="onUpdateSelection([$event.id as string, ...visibleComponents])"
       @update:scroll-top="treeviewStore.setScrollTop(id, $event)"
       @hover:enter="
         ({ item, immediate }) =>
