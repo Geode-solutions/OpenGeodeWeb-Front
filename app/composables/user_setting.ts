@@ -12,8 +12,8 @@ interface DesktopSettingsAPI {
 interface UserSettingDefinition<Value> {
   // Its key in the desktop settings.json
   key: string;
-  // Checks the stored value on read: an invalid one gives the fallback. A setting whose type changes
-  // Keeps the stored values by accepting the old type too, e.g. z.union([newSchema, oldSchema.transform(...)])
+  // Checks the stored value on read, strictly: an invalid one gives the fallback. A setting whose type
+  // Changes takes a new key: the old value is left as is, never converted
   schema: z.ZodType<Value>;
   // A JSON value: copied for each use, compared when the setting is declared again
   fallback: Value;
