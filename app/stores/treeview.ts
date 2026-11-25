@@ -339,8 +339,11 @@ export const useTreeviewStore = defineStore("treeview", () => {
     hoveredModelId.value = id;
   }
 
+  // The objects tree keeps its place, first: only the model trees move
   function moveView(from_index: number, to_index: number): void {
-    if (from_index !== 0 && to_index !== 0) {
+    const moved = opened_views.value[from_index];
+    const target = opened_views.value[to_index];
+    if (moved && target && moved.id !== "main" && target.id !== "main") {
       const [element] = opened_views.value.splice(from_index, 1);
       if (element) {
         opened_views.value.splice(to_index, 0, element);
