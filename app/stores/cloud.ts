@@ -74,7 +74,7 @@ export const useCloudStore = defineStore("cloud", {
               backStore.stop_request();
             },
           },
-          { schema: back_schemas.opengeodeweb_back.ping },
+          { schema: back_schemas.opengeodeweb_back.ping, log_success: false },
         );
       } catch (error) {
         useFeedbackStore().$patch({ server_error: true });
