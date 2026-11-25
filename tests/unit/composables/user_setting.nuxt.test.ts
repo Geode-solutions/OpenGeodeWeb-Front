@@ -1,6 +1,6 @@
 import { type Mock, afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { defineUserSetting, useUserSetting } from "@ogw_front/composables/user_setting";
-import { nextTick } from "vue";
+import { nextTick, reactive } from "vue";
 import { z } from "zod";
 
 vi.setConfig({ testTimeout: 10_000 });
@@ -20,6 +20,7 @@ const listSetting = defineUserSetting({
   schema: crsListSchema,
   fallback: [],
 });
+const textSetting = defineUserSetting({ key: "testText", schema: z.string(), fallback: "" });
 const themeSetting = defineUserSetting({
   key: "testTheme",
   schema: z.enum(["light", "dark"]),
@@ -51,19 +52,23 @@ describe("user setting", () => {
   test("reads and writes a list in the local storage", async () => {
     const setting = useUserSetting(listSetting);
 
-    setting.value.push(LAMBERT);
+    setting.value = [...setting.value, LAMBERT];
     await nextTick();
     expect(localStorage.getItem("ogw-testList")).toBe(JSON.stringify([LAMBERT]));
   });
 
-  test("stores a string raw", async () => {
-    localStorage.setItem("test-theme", "dark");
-    const setting = useUserSetting(themeSetting);
-    expect(setting.value).toBe("dark");
+  test("keeps a string that looks like another type", async () => {
+    const setting = useUserSetting(textSetting);
 
-    setting.value = "light";
+    setting.value = "2024";
     await nextTick();
-    expect(localStorage.getItem("test-theme")).toBe("light");
+    expect(localStorage.getItem("ogw-testText")).toBe(JSON.stringify("2024"));
+    expect(useUserSetting(textSetting).value).toBe("2024");
+  });
+
+  test("reads a string stored raw by a previous version", () => {
+    localStorage.setItem("test-theme", "dark");
+    expect(useUserSetting(themeSetting).value).toBe("dark");
   });
 
   test("falls back on an invalid stored value", () => {
@@ -84,7 +89,8 @@ describe("user setting", () => {
 
   test("accepts the same definition twice", () => {
     const options = { key: "dup", schema: z.array(z.string()), fallback: [] };
-    expect(defineUserSetting(options)).toBe(defineUserSetting({ ...options }));
+    defineUserSetting(options);
+    expect(() => defineUserSetting({ ...options, schema: z.array(z.string()) })).not.toThrow();
   });
 
   test("refuses another definition of a key", () => {
@@ -125,7 +131,7 @@ describe("user setting on desktop", () => {
     const setting = useUserSetting(listSetting);
 
     expect(setting.value).toStrictEqual([LAMBERT]);
-    setting.value.push(UTM);
+    setting.value = [...setting.value, UTM];
     await nextTick();
     expect(writeSettings).toHaveBeenCalledWith({ testList: [LAMBERT, UTM] });
     expect(localStorage.getItem("ogw-testList")).toBeNull();
@@ -140,7 +146,7 @@ describe("user setting on desktop", () => {
     });
     const setting = useUserSetting(listSetting);
 
-    setting.value.push(UTM);
+    setting.value = reactive([LAMBERT, UTM]);
     await nextTick();
     expect(sent).toStrictEqual([{ testList: [LAMBERT, UTM] }]);
   });

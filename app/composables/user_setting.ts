@@ -1,29 +1,33 @@
-import type { Ref } from "vue";
+import type { Ref, ShallowRef } from "vue";
 import { useLocalStorage } from "@vueuse/core";
 import type { z } from "zod";
-
-// A setting of the user (theme, favorite CRS...), declared once next to the feature that uses it
-interface UserSettingDefinition<Value> {
-  // Its key in the desktop settings.json
-  key: string;
-  // Checks the stored value on read: an invalid one gives the fallback
-  schema: z.ZodType<Value>;
-  fallback: Value;
-  // Its key in the browser local storage
-  browserKey: string;
-}
 
 interface DesktopSettingsAPI {
   app_settings: unknown;
   app_settings_write: (settings: Record<string, unknown>) => Promise<unknown>;
 }
 
-const definitions = new Map<string, UserSettingDefinition<unknown>>();
-// One ref per setting shared by every caller, as the local storage refs are kept in sync in the browser
-const desktopSettings = new WeakMap<DesktopSettingsAPI, Map<string, Ref<unknown>>>();
+// A setting of the user (theme, favorite CRS...), declared once next to the feature that uses it.
+// Its value is replaced, never changed in place: `favorites.value = [...favorites.value, entry]`
+interface UserSettingDefinition<Value> {
+  // Its key in the desktop settings.json
+  key: string;
+  // Checks the stored value on read: an invalid one gives the fallback. A setting whose type changes
+  // Keeps the stored values by accepting the old type too, e.g. z.union([newSchema, oldSchema.transform(...)])
+  schema: z.ZodType<Value>;
+  // A JSON value: copied for each use, compared when the setting is declared again
+  fallback: Value;
+  // Its key in the browser local storage
+  browserKey: string;
+  // The value shared by every caller on the desktop, with the settings API it is saved through
+  desktop?: { api: DesktopSettingsAPI; setting: ShallowRef<Value> };
+}
 
-// Declares a setting, at module level. Declaring it again the same way (hot reload, tests) keeps the first
-// Declaration; declaring it differently is an error: two features would overwrite each other's value.
+// The browser key and fallback of each declared setting, as JSON
+const declared = new Map<string, string>();
+
+// Declares a setting, at module level. Declaring it again the same way (hot reload, tests) is fine;
+// Declaring it differently is an error: two features would overwrite each other's value.
 function defineUserSetting<Value>(options: {
   key: string;
   schema: z.ZodType<Value>;
@@ -34,19 +38,13 @@ function defineUserSetting<Value>(options: {
     ...options,
     browserKey: options.browserKey ?? `ogw-${options.key}`,
   };
-  const existing = definitions.get(definition.key);
-  if (existing === undefined) {
-    definitions.set(definition.key, definition);
-    return definition;
-  }
-  if (
-    existing.browserKey !== definition.browserKey ||
-    JSON.stringify(existing.fallback) !== JSON.stringify(definition.fallback)
-  ) {
+  const signature = JSON.stringify([definition.browserKey, definition.fallback]);
+  const existing = declared.get(definition.key);
+  if (existing !== undefined && existing !== signature) {
     throw new Error(`User setting "${definition.key}" is already defined differently`);
   }
-  // oxlint-disable-next-line no-unsafe-type-assertion -- same key, browser key and fallback: same setting
-  return existing as UserSettingDefinition<Value>;
+  declared.set(definition.key, signature);
+  return definition;
 }
 
 function hasDesktopSettingsAPI(
@@ -56,25 +54,22 @@ function hasDesktopSettingsAPI(
     "electronAPI" in value &&
     typeof value.electronAPI === "object" &&
     value.electronAPI !== null &&
+    "app_settings" in value.electronAPI &&
     "app_settings_write" in value.electronAPI
   );
 }
 
-// A copy of the fallback: a list setting changed in place must not change its fallback
-function freshFallback<Value>(definition: UserSettingDefinition<Value>): Value {
-  return structuredClone(definition.fallback);
-}
-
-// The stored value when the setting's schema accepts it, the fallback otherwise
+// The stored value when the setting's schema accepts it, a copy of the fallback otherwise
 function validated<Value>(definition: UserSettingDefinition<Value>, value: unknown): Value {
   const result = definition.schema.safeParse(value);
   if (result.success) {
     return result.data;
   }
-  return freshFallback(definition);
+  return structuredClone(definition.fallback);
 }
 
-// Strings stay raw (the Vease color theme is stored as `dark`), the other values are JSON
+// Every value is stored as JSON. A value that is not JSON is a string stored raw by a previous version
+// (the Vease color theme was stored as `dark`)
 function parseStored(raw: string): unknown {
   try {
     return JSON.parse(raw);
@@ -84,15 +79,11 @@ function parseStored(raw: string): unknown {
 }
 
 function browserSetting<Value>(definition: UserSettingDefinition<Value>): Ref<Value> {
-  return useLocalStorage<Value>(definition.browserKey, freshFallback(definition), {
+  return useLocalStorage<Value>(definition.browserKey, structuredClone(definition.fallback), {
+    shallow: true,
     serializer: {
       read: (raw: string): Value => validated(definition, parseStored(raw)),
-      write: (value: Value): string => {
-        if (typeof value === "string") {
-          return value;
-        }
-        return JSON.stringify(value);
-      },
+      write: (value: Value): string => JSON.stringify(value),
     },
   });
 }
@@ -115,40 +106,28 @@ function desktopSetting<Value>(
   api: DesktopSettingsAPI,
   definition: UserSettingDefinition<Value>,
 ): Ref<Value> {
-  let settings = desktopSettings.get(api);
-  if (!settings) {
-    settings = new Map();
-    desktopSettings.set(api, settings);
-  }
-  const shared = settings.get(definition.key);
-  if (shared) {
-    // oxlint-disable-next-line no-unsafe-type-assertion -- the map holds the ref created below for this key
-    return shared as Ref<Value>;
+  if (definition.desktop?.api === api) {
+    return definition.desktop.setting;
   }
   let saved: unknown = undefined;
   if (typeof api.app_settings === "object" && api.app_settings !== null) {
     saved = Reflect.get(api.app_settings, definition.key);
   }
-  // oxlint-disable-next-line no-unsafe-type-assertion -- ref() unwraps the value type, which a generic setting cannot express
-  const setting = ref(validated(definition, saved)) as Ref<Value>;
+  const setting = shallowRef(validated(definition, saved));
   // Detached: the first caller's unmount must not stop the saving
   effectScope(true).run(() => {
-    watch(
-      setting,
-      (value) => {
-        // Electron cannot send Vue proxies, which a nested value may hold at any depth
-        void api.app_settings_write({ [definition.key]: toPlain(value) });
-      },
-      { deep: true },
-    );
+    watch(setting, (value) => {
+      // Electron cannot send the Vue proxies a new value may hold, at any depth
+      void api.app_settings_write({ [definition.key]: toPlain(value) });
+    });
   });
-  settings.set(definition.key, setting);
+  definition.desktop = { api, setting };
   return setting;
 }
 
 // The value of a setting, shared by every caller. The desktop app clears its browser storage on every launch:
-// There the settings live in its settings.json, read before the page renders and written on every change, nested
-// Ones included. The browser keeps them in its local storage.
+// There the settings live in its settings.json, read before the page renders and written on every change.
+// The browser keeps them in its local storage.
 function useUserSetting<Value>(definition: UserSettingDefinition<Value>): Ref<Value> {
   const globalScope = globalThis;
   if (!hasDesktopSettingsAPI(globalScope)) {
