@@ -128,6 +128,8 @@ watch(
 <style scoped>
 /* Apps can line the first icon up with the panel header icon (fallbacks: the former look) */
 .controls-row {
+  /* Apps can space the toolbar from the panel header above and the first row below */
+  padding-block: var(--ogw-viewer-controls-padding-block, 0px) !important;
   padding-left: calc(
     var(--ogw-viewer-controls-inset, 4px) + var(--tree-box-content-inset, 0px)
   ) !important;
