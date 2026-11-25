@@ -29,6 +29,8 @@ interface OpenedView extends Partial<GeodeObjectTyped> {
   opened: string[];
   // Ties a model tree to its row in the objects tree
   color?: string;
+  // A model tree reduced to its button in the activity bar: still open, with its state kept
+  collapsed?: boolean;
 }
 
 interface TreeviewChild extends TreeNode, GeodeIdentified, GeodeObjectTyped, ViewerObjectTyped {
@@ -318,6 +320,13 @@ export const useTreeviewStore = defineStore("treeview", () => {
     });
   }
 
+  function toggleCollapsed(id: string): void {
+    const existing = opened_views.value.find((view: ReadonlyOpenedView) => view.id === id);
+    if (existing) {
+      existing.collapsed = existing.collapsed !== true;
+    }
+  }
+
   function setHoveredModel(id: string | undefined): void {
     hoveredModelId.value = id;
   }
@@ -455,6 +464,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     displayAdditionalTree,
     closeView,
     toggleView,
+    toggleCollapsed,
     moveView,
     importStores,
     displayFileTree,
