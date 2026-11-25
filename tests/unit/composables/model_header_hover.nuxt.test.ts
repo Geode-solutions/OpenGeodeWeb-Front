@@ -32,7 +32,7 @@ function mount<Result>(setup: () => Result): { result: Result; stop: () => void 
   }
   return {
     result,
-    stop: () => {
+    stop: (): void => {
       scope.stop();
     },
   };

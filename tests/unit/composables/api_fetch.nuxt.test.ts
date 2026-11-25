@@ -2,14 +2,16 @@
 // oxlint-disable eslint/sort-imports
 // Third party imports
 import { beforeEach, describe, expect, test } from "vitest";
-import { registerEndpoint } from "@nuxt/test-utils/runtime";
-
 // Local imports
 import { setupActivePinia, toHTTPMethod } from "@ogw_tests/utils";
+import { registerEndpoint } from "@nuxt/test-utils/runtime";
+import { setResponseStatus } from "h3";
 import { useBackStore } from "@ogw_front/stores/back";
+import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 const FIRST_INDEX = 0;
 const TIMEOUT = 5000;
+const BAD_REQUEST = 400;
 
 describe("backStore.request()", () => {
   const schema = {
@@ -80,6 +82,34 @@ describe("backStore.request()", () => {
       });
       await useBackStore().request({ schema, params }, callbacks);
       expect(errorCalled).toBe(false);
+    },
+    TIMEOUT,
+  );
+
+  test(
+    "error response shows its description",
+    async () => {
+      const backStore = useBackStore();
+      const feedbackStore = useFeedbackStore();
+      const params = { test: "hello" };
+      const description = "No BRep object found in model.og_brep";
+      registerEndpoint(schema.$id, {
+        method: toHTTPMethod(schema.methods[FIRST_INDEX]),
+        handler: (event) => {
+          setResponseStatus(event, BAD_REQUEST);
+          return { code: BAD_REQUEST, name: "Bad Request", description };
+        },
+      });
+      await expect(backStore.request({ schema, params })).rejects.toThrow(String(BAD_REQUEST));
+      expect(feedbackStore.feedbacks).toHaveLength(1);
+      expect(feedbackStore.feedbacks[FIRST_INDEX]).toMatchObject({
+        type: "error",
+        code: BAD_REQUEST,
+        route: schema.$id,
+        name: "Bad Request",
+        description,
+      });
+      expect(backStore.request_counter).toBe(0);
     },
     TIMEOUT,
   );

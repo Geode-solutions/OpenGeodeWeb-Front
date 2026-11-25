@@ -37,6 +37,29 @@ const isHorizonStack = computed<boolean>(() => item.raw.geode_object_type === "H
 // A horizon stack row opens its modal instead of toggling a visibility
 const showEyeButton = computed<boolean>(() => !isHorizonStack.value && isRowViewable(item));
 
+function isLoading(child: unknown): boolean {
+  return (
+    typeof child === "object" && child !== null && "loading" in child && child.loading === true
+  );
+}
+const loadingChildren = computed<number>(() =>
+  Array.isArray(item.raw.children)
+    ? item.raw.children.filter((child) => isLoading(child)).length
+    : 0,
+);
+// A data, or a group of data, that cannot be shown or hidden yet
+const isRowLoading = computed<boolean>(
+  () =>
+    isLoading(item.raw) ||
+    (Array.isArray(item.raw.children) &&
+      loadingChildren.value > 0 &&
+      loadingChildren.value === item.raw.children.length),
+);
+// A folded group shows that some of its data are still loading
+const showGroupSpinner = computed<boolean>(
+  () => !item.isOpen && loadingChildren.value > 0 && !isRowLoading.value,
+);
+
 function handleRowClick(event: MouseEvent): void {
   if (isHorizonStack.value) {
     if (!item.isLeaf) {
@@ -69,8 +92,15 @@ function handleRowClick(event: MouseEvent): void {
       <div v-else class="icon-placeholder" />
 
       <template v-if="selection.selectable">
+        <div
+          v-if="isRowLoading"
+          data-testid="loadingObjectSpinner"
+          class="loading-spinner d-flex align-center justify-center flex-shrink-0"
+        >
+          <v-progress-circular indeterminate size="14" width="2" color="primary" />
+        </div>
         <v-btn
-          v-if="isHorizonStack && item.isLeaf"
+          v-else-if="isHorizonStack && item.isLeaf"
           icon="ph-stack"
           variant="text"
           density="compact"
@@ -118,6 +148,16 @@ function handleRowClick(event: MouseEvent): void {
       </slot>
     </div>
 
+    <v-progress-circular
+      v-if="showGroupSpinner"
+      data-testid="loadingGroupSpinner"
+      indeterminate
+      size="12"
+      width="2"
+      color="primary"
+      class="flex-shrink-0 ms-2"
+    />
+
     <div class="ms-auto d-flex align-center">
       <slot name="append" :item="item.raw" />
     </div>
@@ -135,5 +175,11 @@ function handleRowClick(event: MouseEvent): void {
 
 .tree-title {
   min-height: 24px;
+}
+
+/* Same footprint as the eye button it stands in for */
+.loading-spinner {
+  width: 28px;
+  height: 28px;
 }
 </style>

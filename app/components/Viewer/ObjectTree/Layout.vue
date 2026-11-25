@@ -218,7 +218,7 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
 
 <template>
   <div
-    v-if="treeviewStore.items.length > 0"
+    v-if="treeviewStore.items.length > 0 || treeviewStore.pendingImports.length > 0"
     class="treeview-layout d-flex"
     @contextmenu.prevent
     @mousedown.stop

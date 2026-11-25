@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// oxlint-disable max-dependencies
+// oxlint-disable max-dependencies, eslint/max-lines
 import type { GeodeObjectTyped, ViewerObjectTyped } from "@ogw_front/types/identifiers";
 import {
   type MapStyle,
@@ -8,7 +8,12 @@ import {
   mapId,
   nextBasemapMaps,
 } from "@ogw_front/utils/basemap_tree";
-import { type TreeMenuPayload, compareSelections } from "@ogw_front/utils/treeview";
+import {
+  type TreeMenuPayload,
+  compareSelections,
+  isObjectTreeRowViewable,
+  withPendingImports,
+} from "@ogw_front/utils/treeview";
 import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
@@ -40,6 +45,7 @@ interface TreeGroupItem extends Partial<GeodeObjectTyped>, Partial<ViewerObjectT
   id: string;
   title?: string;
   children?: TreeGroupItem[];
+  loading?: boolean;
 }
 
 const mainView = computed<TreeGroupItem>(() => treeviewStore.opened_views[0]);
@@ -57,20 +63,9 @@ const {
   toggleSort,
   customFilter,
   applySearchFilter,
-} = useTreeFilter(() => treeviewStore.items, { recursiveSort: true });
-
-// A data row follows its data. The basemap rows and the groups of data types always show their
-// Toggle, except the group of horizon stacks, which open their own modal
-function isRowViewable(row: DisplayItem): boolean {
-  const { id, title } = row.raw;
-  if (typeof id !== "string" || isBasemapId(id)) {
-    return true;
-  }
-  if (row.isLeaf) {
-    return dataStore.isViewable(id);
-  }
-  return title !== "HorizonStack3D";
-}
+} = useTreeFilter(() => withPendingImports(treeviewStore.items, treeviewStore.pendingImports), {
+  recursiveSort: true,
+});
 
 // The basemap category comes first, out of the data sort and filters
 const displayedItems = computed(() => {
@@ -136,6 +131,9 @@ watch(
 
 function showMenu(event: MouseEvent, item: TreeGroupItem): void {
   const actualItem = item.raw || item;
+  if (actualItem.loading) {
+    return;
+  }
   if (isBasemapId(actualItem.id)) {
     emit("show-menu", { event, itemId: actualItem.id, context_type: "basemap" });
     return;
@@ -261,7 +259,7 @@ function expandAll(): void {
       }"
       :scroll-top="mainView?.scrollTop || 0"
       :linked="linkedRow"
-      :is-row-viewable="isRowViewable"
+      :is-row-viewable="(row) => isObjectTreeRowViewable(row, dataStore.isViewable)"
       class="transparent-treeview virtual-tree-height"
       @update:selected="(val) => onUpdateSelection(val as string[])"
       @update:scroll-top="treeviewStore.setScrollTop(mainView?.id ?? '', $event)"
@@ -282,7 +280,7 @@ function expandAll(): void {
       </template>
 
       <template #append="{ item }">
-        <template v-if="item.geode_object_type !== 'HorizonStack3D'">
+        <template v-if="item.geode_object_type !== 'HorizonStack3D' && !item.loading">
           <v-btn
             v-if="item.viewer_object_type"
             data-testid="focusObjectButton"

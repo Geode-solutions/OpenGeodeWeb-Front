@@ -23,7 +23,15 @@ import { treeviewConfigDb } from "@ogw_internal/database/database";
 
 const PANEL_WIDTH = 300;
 
-interface TreeviewChild extends TreeNode, GeodeIdentified, GeodeObjectTyped, ViewerObjectTyped {}
+interface TreeviewChild extends TreeNode, GeodeIdentified, GeodeObjectTyped, ViewerObjectTyped {
+  // Still being loaded in the viewer: shown with a spinner and not interactive yet
+  loading?: boolean;
+}
+
+// A file being imported: shown in its type group while the back-end converts it, before its data exist
+interface PendingImport extends TreeNode, GeodeObjectTyped {
+  loading: true;
+}
 
 type TreeviewGroup = TreeGroup<TreeviewChild>;
 
@@ -85,6 +93,8 @@ export const useTreeviewStore = defineStore("treeview", () => {
   const panelWidth = ref(PANEL_WIDTH);
   const additionalPanelWidth = ref(PANEL_WIDTH);
   const isImporting = ref(false);
+  const pendingImports = ref<PendingImport[]>([]);
+  let lastPendingImport = 0;
   const pendingSelectionIds = ref<string[]>([]);
   const rowHeights = ref<number[]>([]);
   // Model hovered in the objects tree or on its model tree header: not saved
@@ -178,12 +188,14 @@ export const useTreeviewStore = defineStore("treeview", () => {
     geode_id: GeodeId,
     viewer_object_type: ViewerObjectType,
   ): void {
+    // Loading until the import workflow has it in the viewer (see untilLoaded)
     const child: TreeviewChild = {
       title: name,
       id: dataId,
       geode_id,
       viewer_object_type,
       geode_object_type: geodeObjectType,
+      loading: true,
     };
     let found = false;
     for (const item of items.value) {
@@ -205,6 +217,47 @@ export const useTreeviewStore = defineStore("treeview", () => {
       );
     }
     selection.value = [...selection.value, dataId];
+  }
+
+  function removePendingImport(id: string): void {
+    pendingImports.value = pendingImports.value.filter((pending) => pending.id !== id);
+    // Its type group shown or hidden as a whole may have selected it
+    if (selection.value.includes(id)) {
+      selection.value = selection.value.filter((selectionId) => selectionId !== id);
+    }
+  }
+
+  // The file is listed in the tree, by its name, until its conversion is done
+  async function whilePendingImport<Result>(
+    geodeObjectType: GeodeObjectType,
+    filename: string,
+    conversion: Promise<Result>,
+  ): Promise<Result> {
+    lastPendingImport += 1;
+    const id = `pending-import-${lastPendingImport}`;
+    const title = filename.split("/").pop() ?? filename;
+    pendingImports.value.push({ id, title, geode_object_type: geodeObjectType, loading: true });
+    try {
+      const result = await conversion;
+      return result;
+    } finally {
+      removePendingImport(id);
+    }
+  }
+
+  // Added as loading, a data stops loading once its import is done, or has failed
+  async function untilLoaded<Result>(dataId: DataId, importing: Promise<Result>): Promise<Result> {
+    try {
+      const result = await importing;
+      return result;
+    } finally {
+      const child = items.value
+        .flatMap((group) => group.children)
+        .find((childItem) => childItem.id === dataId);
+      if (child) {
+        child.loading = false;
+      }
+    }
   }
 
   function removeItem(dataId: DataId): void {
@@ -297,6 +350,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     selection.value = [];
     activeItems.value = [];
     pendingSelectionIds.value = [];
+    pendingImports.value = [];
     opened_views.value = defaultOpenedViews();
   }
 
@@ -372,10 +426,13 @@ export const useTreeviewStore = defineStore("treeview", () => {
     panelWidth,
     additionalPanelWidth,
     isImporting,
+    pendingImports,
     rowHeights,
     hoveredModelId,
     setHoveredModel,
     addItem,
+    whilePendingImport,
+    untilLoaded,
     removeItem,
     renameItem,
     displayAdditionalTree,

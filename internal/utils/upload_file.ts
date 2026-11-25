@@ -1,10 +1,10 @@
-import type { FetchErrorLike, Microservice } from "./api_fetch.js";
 import type { JsonRpcSchema, RequestHandlers } from "@ogw_shared/utils/types.js";
 import { CHUNK_SIZE_BYTES } from "@ogw_shared/utils/file.js";
+import type { Microservice } from "./api_fetch.js";
 import { consola } from "consola";
 import { fetchRaw } from "@ogw_shared/utils/fetch_raw.js";
+import { reportError } from "./error_feedback.js";
 import { uploadPath } from "@ogw_front/utils/upload_path";
-import { useFeedbackStore } from "@ogw_front/stores/feedback.js";
 
 interface UploadFileParams {
   // Always forwarded to fetchRaw via schema.methods, which is only ever set on
@@ -14,28 +14,12 @@ interface UploadFileParams {
   params?: Record<string, string>;
 }
 
-// Loosely-typed shapes for the dynamic error/response values reported by fetchRaw.
-interface FetchErrorResponseLike {
-  status?: number;
-  name?: string;
-  description?: string;
-}
-
-function isFetchErrorLike(value: unknown): value is FetchErrorLike {
-  return typeof value === "object" && value !== null;
-}
-
-function isFetchErrorResponseLike(value: unknown): value is FetchErrorResponseLike {
-  return typeof value === "object" && value !== null;
-}
-
 async function upload_file(
   microservice: Microservice,
   { schema, file, params = {} }: UploadFileParams,
   { request_error_function, response_function, response_error_function }: RequestHandlers = {},
 ): Promise<unknown> {
   consola.debug("[UPLOAD_FILE] Uploading file", { schema, file });
-  const feedbackStore = useFeedbackStore();
 
   if (!(file instanceof File)) {
     throw new TypeError("file must be an instance of File");
@@ -47,13 +31,7 @@ async function upload_file(
 
   function onRequestError(error: unknown): void {
     microservice.stop_request();
-    const typedError = isFetchErrorLike(error) ? error : {};
-    feedbackStore.add_error(
-      typedError.code ?? 0,
-      route,
-      typedError.message ?? "",
-      typedError.stack ?? "",
-    );
+    reportError(route, error);
     if (request_error_function) {
       void request_error_function(error);
     }
@@ -61,13 +39,7 @@ async function upload_file(
 
   function onResponseError(response: unknown): void {
     microservice.stop_request();
-    const typedResponse = isFetchErrorResponseLike(response) ? response : {};
-    feedbackStore.add_error(
-      typedResponse.status ?? 0,
-      route,
-      typedResponse.name ?? "",
-      typedResponse.description ?? "",
-    );
+    reportError(route, response);
     if (response_error_function) {
       void response_error_function(response);
     }

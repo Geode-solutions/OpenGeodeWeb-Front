@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { getPlaneCssColor } from "@ogw_front/utils/clipping_planes";
+import { pasteCoordinates } from "@ogw_front/utils/coordinates";
 
 interface Props {
   plane: { origin?: number[]; normal: number[]; opacity: number };
@@ -79,6 +80,7 @@ const emit = defineEmits<Emits>();
           hide-details
           step="any"
           class="text-caption"
+          @paste="plane.origin && pasteCoordinates($event, plane.origin)"
         />
       </v-col>
     </v-row>
@@ -122,6 +124,7 @@ const emit = defineEmits<Emits>();
           hide-details
           step="any"
           class="text-caption"
+          @paste="pasteCoordinates($event, plane.normal)"
         />
       </v-col>
     </v-row>
