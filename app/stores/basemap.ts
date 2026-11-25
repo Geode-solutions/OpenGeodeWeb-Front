@@ -6,11 +6,28 @@ import { useGeoreferenced } from "./basemap_helpers/georeferenced.js";
 
 const REBUILD_DELAY_MILLISECONDS = 500;
 
+// Apps opt in with `ogwFront.basemap` in their app.config.ts: without it, no map is built or offered
+function readBasemapOption(appConfig: ReturnType<typeof useAppConfig>): boolean {
+  // The resolved type holds the layer's literal default (false): widen it to the config input type
+  const ogwFront: { basemap?: boolean } | undefined = appConfig.ogwFront;
+  return ogwFront?.basemap === true;
+}
+
 export const useBasemapStore = defineStore("basemap", () => {
-  const { available, georeferencedIds, dataBounds, dataKey } = useGeoreferenced();
+  const appConfig = useAppConfig();
+  const enabled = computed(() => readBasemapOption(appConfig));
+  const georeferenced = useGeoreferenced();
+  const { georeferencedIds, dataBounds, dataKey } = georeferenced;
+  const available = computed(() => enabled.value && georeferenced.available.value);
   const layers = useBasemapLayers(georeferencedIds);
   const { shown, maps, opacities, crop, layersParams, applyLayers, applyBasemap } = layers;
-  const { basemapId, grid, attribution, rebuild, reset } = useBasemapBuilds(layers, dataBounds);
+  const builds = useBasemapBuilds(layers, dataBounds);
+  const { basemapId, grid, attribution, reset } = builds;
+  async function rebuild(): Promise<void> {
+    if (enabled.value) {
+      await builds.rebuild();
+    }
+  }
   const settings = useBasemapSettings(layers, basemapId, rebuild);
   const { setMaps, setOpacity, setCrop, exportStores, importStores } = settings;
 

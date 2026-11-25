@@ -3,6 +3,7 @@ import { type DataItem, useDataStore } from "@ogw_front/stores/data";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { mockAs, setupActivePinia } from "@ogw_tests/utils";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
+import { setBasemapOption } from "@ogw_tests/unit/helpers/basemap_option";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useBasemapStore } from "@ogw_front/stores/basemap";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -62,8 +63,9 @@ describe("basemap store", () => {
   let deregisterObject = vi.fn();
   let items = ref<DataItem[]>([]);
 
-  function setup(): ReturnType<typeof useBasemapStore> {
+  function setup(basemapOption = true): ReturnType<typeof useBasemapStore> {
     setupActivePinia();
+    setBasemapOption(basemapOption);
     backRequest = vi.fn().mockResolvedValue(buildResponse("basemap-1"));
     deleteRequest = vi.fn().mockResolvedValue({});
     remoteRender = vi.fn().mockResolvedValue(undefined);
@@ -500,6 +502,16 @@ describe("basemap store", () => {
     await vi.advanceTimersByTimeAsync(REBUILD_DELAY);
     const satelliteParams: unknown = expect.objectContaining({ maps: ["satellite"] });
     expect(backRequest).toHaveBeenCalledWith(expect.objectContaining({ params: satelliteParams }));
+  });
+
+  test("an app without the basemap option builds none and shows no basemap category", async () => {
+    const store = setup(false);
+    items.value = georeferenced().slice(0, 1);
+    await nextTick();
+    await vi.advanceTimersByTimeAsync(REBUILD_DELAY);
+    await store.importStores({ maps: ["satellite"] });
+    expect(backRequest).not.toHaveBeenCalled();
+    expect(store.available).toBe(false);
   });
 
   test("data in another crs than the project stays out of the basemap", async () => {
