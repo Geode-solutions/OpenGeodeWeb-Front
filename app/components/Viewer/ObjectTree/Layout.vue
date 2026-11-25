@@ -6,6 +6,7 @@ import ViewerObjectTreeBox from "@ogw_front/components/Viewer/ObjectTree/Box.vue
 import { geodeObjectImage } from "@ogw_front/assets/geode_objects";
 import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
 import { useModelHeaderHover } from "@ogw_front/composables/model_header_hover";
+import { useModelTreeDrag } from "@ogw_front/composables/model_tree_drag";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const WIDTH_MIN = 100;
@@ -27,6 +28,8 @@ const { containerWidth } = defineProps<Props>();
 
 const treeviewStore = useTreeviewStore();
 const { onModelHeaderEnter, onModelHeaderLeave } = useModelHeaderHover();
+const { draggedId, dropTargetId, onDragStart, onDragOver, onDragEnd, onDrop, dropSide } =
+  useModelTreeDrag();
 
 interface Emits {
   "show-menu": [payload: TreeMenuPayload];
@@ -62,7 +65,6 @@ const rowHeights = computed<number[]>({
   get: () => treeviewStore.rowHeights,
   set: (val) => treeviewStore.setRowHeights(val),
 });
-const draggedId = ref<string | undefined>(undefined);
 
 watch(
   () => shownViews.value.length,
@@ -104,25 +106,6 @@ function modelGeodeId(modelId: string): string | undefined {
     }
   }
   return undefined;
-}
-
-function viewIndex(id: string): number {
-  return treeviewStore.opened_views.findIndex((view) => view.id === id);
-}
-
-function onDragStart(id: string): void {
-  draggedId.value = id;
-}
-
-function onDragOver(event: DragEvent): void {
-  event.preventDefault();
-}
-
-function onDrop(targetId: string): void {
-  if (draggedId.value !== undefined && draggedId.value !== targetId) {
-    treeviewStore.moveView(viewIndex(draggedId.value), viewIndex(targetId));
-  }
-  draggedId.value = undefined;
 }
 
 function onResizeStart(event: MouseEvent): void {
@@ -262,9 +245,16 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
         <div
           v-for="view in additionalViews"
           :key="view.id"
+          data-testid="modelTreeToggle"
           class="model-tree-toggle"
-          :class="{ 'is-collapsed': view.collapsed === true }"
+          :class="[{ 'is-collapsed': view.collapsed === true }, dropSide(view.id)]"
           :style="view.color ? { '--model-tree-color': view.color } : undefined"
+          draggable="true"
+          @dragstart="onDragStart(view.id)"
+          @dragenter.prevent="dropTargetId = view.id"
+          @dragover="onDragOver"
+          @drop="onDrop(view.id)"
+          @dragend="onDragEnd"
         >
           <v-btn
             data-testid="toggleModelTreeButton"
@@ -348,6 +338,7 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
               "
               @close="treeviewStore.closeView(view.id)"
               @dragstart="onDragStart(view.id)"
+              @dragend="onDragEnd"
               @update:scroll-top="treeviewStore.setScrollTop(view.id, $event)"
               @header-enter="onModelHeaderEnter(view.id)"
               @header-leave="onModelHeaderLeave(view.id)"
@@ -489,6 +480,27 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
 
 .model-tree-toggle .v-btn {
   background-color: rgba(var(--v-theme-on-surface), 0.08);
+}
+
+/* Where a dragged model button lands */
+.model-tree-toggle.drop-before::after,
+.model-tree-toggle.drop-after::after {
+  content: "";
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  height: 2px;
+  border-radius: 1px;
+  background-color: rgb(var(--v-theme-primary));
+  pointer-events: none;
+}
+
+.model-tree-toggle.drop-before::after {
+  top: -2px;
+}
+
+.model-tree-toggle.drop-after::after {
+  bottom: -2px;
 }
 
 .model-tree-toggle.is-collapsed::before {
