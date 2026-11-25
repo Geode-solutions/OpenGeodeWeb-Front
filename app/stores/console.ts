@@ -35,6 +35,7 @@ interface ConsoleLogInput extends ConsoleEntryInput {
   error?: string;
 }
 
+// An error or a timeout: what the console counts and shows in red
 function isFailure(status: ConsoleEntryStatus): boolean {
   return status === "error" || status === "timeout";
 }
@@ -125,5 +126,5 @@ const useConsoleStore = defineStore("console", () => {
   };
 });
 
-export { MAX_ENTRIES, useConsoleStore };
+export { MAX_ENTRIES, isFailure, useConsoleStore };
 export type { ConsoleEntry, ConsoleEntryKind, ConsoleEntryStatus, ConsoleOutcome };
