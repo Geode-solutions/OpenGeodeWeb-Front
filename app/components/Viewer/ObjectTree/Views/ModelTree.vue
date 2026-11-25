@@ -39,11 +39,6 @@ const emit = defineEmits<Emits>();
 const treeviewStore = useTreeviewStore();
 const dataStore = useDataStore();
 
-// The components of a model are viewable when the model is
-function isRowViewable(): boolean {
-  return dataStore.isViewable(id);
-}
-
 const {
   isLoading,
   localCategories,
@@ -248,7 +243,7 @@ function getLeafViewerIds(item: CollectionTreeItem): number[] {
       }"
       :scroll-top="currentView?.scrollTop || 0"
       class="transparent-treeview virtual-tree-height"
-      :is-row-viewable="isRowViewable"
+      :is-row-viewable="() => dataStore.isViewable(id)"
       @update:selected="(val) => onUpdateSelection(val as string[])"
       @update:scroll-top="treeviewStore.setScrollTop(id, $event)"
       @hover:enter="
