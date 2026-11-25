@@ -6,15 +6,14 @@ import {
 import { TimeoutError } from "p-timeout";
 import { toErrorFeedback } from "./error_feedback.js";
 
-// The pings run every few seconds: only their failures are worth a console line
-const PING_ROUTE = /[/.]ping$/u;
-
 interface TrackedRequest {
   source: string;
   kind: ConsoleEntryKind;
   route: string;
   label?: string;
   params?: unknown;
+  // False for the requests repeated in the background (pings): only their failures are logged
+  log_success?: boolean;
 }
 
 const GENERIC_ERROR_NAME = "Error";
@@ -40,12 +39,11 @@ function failureOf(error: unknown): ConsoleOutcome {
 type FollowRequest = <Result>(pending: Promise<Result>) => Promise<Result>;
 
 // Opens the console entry of a microservice request: call it before sending, then follow the request until it settles
-function trackRequest(request: TrackedRequest): FollowRequest {
+function trackRequest({ log_success = true, ...request }: TrackedRequest): FollowRequest {
   const consoleStore = useConsoleStore();
-  const isPing = PING_ROUTE.test(request.route);
   const started_at = Date.now();
   let entryId: number | undefined = undefined;
-  if (!isPing) {
+  if (log_success) {
     entryId = consoleStore.start_request(request);
   }
 

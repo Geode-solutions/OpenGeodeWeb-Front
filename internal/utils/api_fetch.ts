@@ -19,12 +19,14 @@ interface ApiFetchParams {
   schema: JsonRpcSchema & { methods: string[] };
   params?: object;
   headers?: Record<string, string>;
+  // False for the requests repeated in the background (pings): the console only shows their failures
+  log_success?: boolean;
 }
 
 // oxlint-disable-next-line max-lines-per-function
 async function api_fetch(
   microservice: Microservice,
-  { schema, params = {}, headers = {} }: ApiFetchParams,
+  { schema, params = {}, headers = {}, log_success = true }: ApiFetchParams,
   {
     request_error_function,
     response_function,
@@ -43,6 +45,7 @@ async function api_fetch(
     kind: "http",
     route: schema.$id,
     params,
+    log_success,
   });
   const pending = fetchSchema(
     {
