@@ -69,3 +69,24 @@ describe("object tree hover highlight", () => {
     );
   });
 });
+
+describe("global objects hover of an image", () => {
+  const pinia = setupActivePinia();
+
+  test.each(["RasterImage2D", "RasterImage3D"])(
+    "a %s is not highlighted",
+    async (geode_object_type) => {
+      const wrapper = await mountSuspended(GlobalObjects, {
+        global: { plugins: [vuetify, pinia], stubs: { CommonTreeView: true } },
+      });
+      const tree = wrapper.findComponent(CommonTreeView);
+      const item = { raw: { id: "image", viewer_object_type: "image", geode_object_type } };
+
+      onHoverEnter.mockClear();
+      tree.vm.$emit("hover:enter", { item, immediate: true });
+      tree.vm.$emit("hover:enter", { item });
+
+      expect(onHoverEnter).not.toHaveBeenCalled();
+    },
+  );
+});
