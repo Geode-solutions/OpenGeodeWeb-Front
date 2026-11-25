@@ -1,0 +1,138 @@
+// Third party imports
+import { beforeEach, describe, expect, test, vi } from "vitest";
+import { flushPromises, mount } from "@vue/test-utils";
+import { ref } from "vue";
+
+// Local imports
+import { type DataItem, useDataStore } from "@ogw_front/stores/data";
+import { SOURCE, TARGET, fill, fillPoints, item } from "@ogw_tests/unit/helpers/crs_align";
+import { setupActivePinia, vuetify } from "@ogw_tests/utils";
+import CrsAlign from "@ogw_front/components/CrsAlign.vue";
+import type CrsSelector from "@ogw_front/components/CrsSelector.vue";
+import type GlassCard from "@ogw_front/components/GlassCard.vue";
+import type { useCrs } from "@ogw_front/composables/crs";
+import { useCrsShortlist } from "@ogw_front/composables/crs_shortlist";
+import { useCrsStore } from "@ogw_front/stores/crs";
+import { useFeedbackStore } from "@ogw_front/stores/feedback";
+import { useViewerStore } from "@ogw_front/stores/viewer";
+
+vi.setConfig({ testTimeout: 10_000 });
+
+// Hoisted with vi.mock, so the GlassCard stub renders the content only
+const { GLASS_CARD_STUB } = vi.hoisted(() => ({
+  GLASS_CARD_STUB: {
+    name: "GlassCard",
+    template: "<div class='glass-card-stub'><slot /></div>",
+  },
+}));
+
+// Hoisted with vi.mock, so the CrsSelector stub can emit LAMBERT
+const { LAMBERT, CRS_SELECTOR_STUB, USE_CRS_MOCK, alignCrs, followProject } = vi.hoisted(() => {
+  const lambert = { authority: "EPSG", code: "2154", name: "RGF93 v1 / Lambert-93" };
+  const alignMock = vi.fn<(...args: unknown[]) => Promise<unknown>>();
+  const followMock = vi.fn<(...args: unknown[]) => Promise<void>>();
+  return {
+    LAMBERT: lambert,
+    alignCrs: alignMock,
+    followProject: followMock,
+    USE_CRS_MOCK: (): unknown => ({
+      alignCrs: alignMock,
+      followProject: followMock,
+      convertCrs: vi.fn<() => Promise<void>>(),
+    }),
+    CRS_SELECTOR_STUB: {
+      name: "CrsSelector",
+      emits: ["update:modelValue"],
+      data: (): { crs: typeof lambert } => ({ crs: lambert }),
+      template:
+        "<button data-testid='crsSelectorStub' @click=\"$emit('update:modelValue', crs)\" />",
+    },
+  };
+});
+
+vi.mock(import("@ogw_front/components/GlassCard.vue"), () => ({
+  // oxlint-disable-next-line no-unsafe-type-assertion -- stub only implements the subset of the component this suite touches
+  default: GLASS_CARD_STUB as unknown as typeof GlassCard,
+}));
+
+vi.mock(import("@ogw_front/components/CrsSelector.vue"), () => ({
+  // oxlint-disable-next-line no-unsafe-type-assertion -- stub only implements the subset of the component this suite touches
+  default: CRS_SELECTOR_STUB as unknown as typeof CrsSelector,
+}));
+
+vi.mock(import("@ogw_front/composables/crs"), () => ({
+  // oxlint-disable-next-line no-unsafe-type-assertion -- mock covers only the calls this suite makes
+  useCrs: USE_CRS_MOCK as unknown as typeof useCrs,
+}));
+
+// The data being aligned, as the data store reads it live
+const storedItem = ref<DataItem | undefined>(undefined);
+
+describe("crs align tool", () => {
+  beforeEach(() => {
+    setupActivePinia();
+    localStorage.clear();
+    storedItem.value = item;
+    vi.spyOn(useDataStore(), "refItem").mockReturnValue(storedItem);
+    vi.spyOn(useViewerStore(), "request").mockResolvedValue(undefined);
+    alignCrs.mockReset().mockResolvedValue(undefined);
+    followProject.mockReset().mockResolvedValue(undefined);
+    useCrsStore().openCrsAlign(item);
+  });
+
+  test("asks for three pairs", () => {
+    const wrapper = mount(CrsAlign, { global: { plugins: [vuetify] } });
+    expect(wrapper.findAll('[data-testid^="crsAlignSource-"]')).toHaveLength(3);
+    expect(wrapper.findAll('[data-testid^="crsAlignTarget-"]')).toHaveLength(3);
+    wrapper.unmount();
+  });
+
+  test("applies an affine alignment once every point and the crs are set", async () => {
+    const success = vi.spyOn(useFeedbackStore(), "add_success");
+    const wrapper = mount(CrsAlign, { global: { plugins: [vuetify] } });
+    const apply = wrapper.find('[data-testid="crsAlignApplyButton"]');
+    expect(apply.attributes("disabled")).toBeDefined();
+
+    await fillPoints(wrapper);
+    await wrapper.find('[data-testid="crsSelectorStub"]').trigger("click");
+    await flushPromises();
+    await apply.trigger("click");
+    await flushPromises();
+
+    // Typed source points are original coordinates, not picked on the displayed data
+    const typedSource = SOURCE.map(({ x, y }) => ({ x, y, picked: false }));
+    expect(alignCrs).toHaveBeenCalledWith(item, LAMBERT, {
+      sourcePoints: typedSource,
+      targetPoints: TARGET,
+      linkedItems: [],
+    });
+    expect(success).toHaveBeenCalledWith("Data georeferenced");
+    // Offered again as a recent CRS in the next CRS selectors
+    expect(useCrsShortlist().recent.value).toStrictEqual([LAMBERT]);
+    expect(useCrsStore().showCrsAlign).toBe(false);
+    wrapper.unmount();
+  });
+
+  test("opening for another item resets points", async () => {
+    const wrapper = mount(CrsAlign, { global: { plugins: [vuetify] } });
+    await fill(wrapper, "crsAlignSource-0", { x: 1, y: 2 });
+    useCrsStore().openCrsAlign({ ...item, data_id: "item-2" });
+    await flushPromises();
+
+    const inputs = wrapper.find('[data-testid="crsAlignSource-0"]').findAll("input");
+    expect(inputs.map((input) => input.element.value)).toStrictEqual(["", ""]);
+    wrapper.unmount();
+  });
+
+  test("closes when its data is deleted", async () => {
+    const wrapper = mount(CrsAlign, { global: { plugins: [vuetify] } });
+    await flushPromises();
+    expect(useCrsStore().showCrsAlign).toBe(true);
+
+    storedItem.value = undefined;
+    await flushPromises();
+
+    expect(useCrsStore().showCrsAlign).toBe(false);
+    wrapper.unmount();
+  });
+});

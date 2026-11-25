@@ -8,15 +8,18 @@ interface Props {
   width?: number;
   closeLabel?: string;
   actionLabel?: string;
+  // The content brings its own title and close control
+  hideActions?: boolean;
   clickOutside?: boolean;
   escapeFunction?: () => void;
 }
 
 const {
-  title = "",
+  title = undefined,
   width = DEFAULT_PANEL_WIDTH,
   closeLabel = "Close",
   actionLabel = undefined,
+  hideActions = false,
   clickOutside = true,
   escapeFunction = undefined,
 } = defineProps<Props>();
@@ -54,7 +57,7 @@ function close(): void {
       <slot />
     </v-card-text>
 
-    <template #actions>
+    <template v-if="!hideActions" #actions>
       <slot name="actions">
         <v-card-actions class="justify-center pb-3 pt-0" style="gap: 8px">
           <v-btn variant="text" size="small" class="text-caption text-none" @click="close">
