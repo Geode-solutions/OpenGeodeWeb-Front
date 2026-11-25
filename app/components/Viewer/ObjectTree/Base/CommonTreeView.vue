@@ -170,6 +170,15 @@ function clearActive(): boolean {
   return true;
 }
 
+// Hovering the tree gives it the keyboard, unless a field (its search) is being typed in
+function focusOnHover(): void {
+  const { activeElement } = document;
+  if (activeElement instanceof HTMLInputElement || activeElement instanceof HTMLTextAreaElement) {
+    return;
+  }
+  treeWrapper.value?.focus();
+}
+
 const { handleKeyDown } = useTreeKeyboardNav(
   displayItems,
   emit as EmitFn,
@@ -190,7 +199,7 @@ const { handleKeyDown } = useTreeKeyboardNav(
     tabindex="0"
     @keydown="handleKeyDown"
     @mousedown="treeWrapper?.focus()"
-    @mouseenter="treeWrapper?.focus()"
+    @mouseenter="focusOnHover"
   >
     <StickyHeader
       v-if="stickyHeader"
