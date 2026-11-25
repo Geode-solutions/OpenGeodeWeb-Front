@@ -39,10 +39,38 @@ function isFailure(status: ConsoleEntryStatus): boolean {
   return status === "error" || status === "timeout";
 }
 
-// oxlint-disable-next-line max-lines-per-function
+function createEntry(id: number, input: ConsoleLogInput): ConsoleEntry {
+  const { params, started_at, ...fields } = input;
+  const summary = summarizeParams(params);
+  return {
+    ...fields,
+    id,
+    started_at: started_at ?? Date.now(),
+    ...(summary !== undefined && { params: summary }),
+  };
+}
+
+// The errors not seen yet, counted in one place whether logged at once or failed later
+function useUnseenErrors(): {
+  unseen_errors: Ref<number>;
+  countFailure: (status: ConsoleEntryStatus) => void;
+  mark_errors_seen: () => void;
+} {
+  const unseen_errors = ref(0);
+  function countFailure(status: ConsoleEntryStatus): void {
+    if (isFailure(status)) {
+      unseen_errors.value += 1;
+    }
+  }
+  function mark_errors_seen(): void {
+    unseen_errors.value = 0;
+  }
+  return { unseen_errors, countFailure, mark_errors_seen };
+}
+
 const useConsoleStore = defineStore("console", () => {
   const entries = ref<ConsoleEntry[]>([]);
-  const unseen_errors = ref(0);
+  const { unseen_errors, countFailure, mark_errors_seen } = useUnseenErrors();
   let next_id = 0;
 
   const running = computed(() => entries.value.filter((entry) => entry.status === "running"));
@@ -50,46 +78,19 @@ const useConsoleStore = defineStore("console", () => {
     () => entries.value.filter((entry) => isFailure(entry.status)).length,
   );
 
-  function push(entry: ConsoleEntry): void {
+  function log(input: ConsoleLogInput): ConsoleEntry {
+    next_id += 1;
+    const entry = createEntry(next_id, input);
     entries.value.push(entry);
     if (entries.value.length > MAX_ENTRIES) {
       entries.value.splice(0, entries.value.length - MAX_ENTRIES);
     }
-    if (isFailure(entry.status)) {
-      unseen_errors.value += 1;
-    }
-  }
-
-  function create(input: ConsoleLogInput): ConsoleEntry {
-    next_id += 1;
-    const entry: ConsoleEntry = {
-      id: next_id,
-      source: input.source,
-      kind: input.kind,
-      route: input.route,
-      status: input.status,
-      started_at: input.started_at ?? Date.now(),
-    };
-    const params = summarizeParams(input.params);
-    if (params !== undefined) {
-      entry.params = params;
-    }
-    if (input.label !== undefined) {
-      entry.label = input.label;
-    }
-    if (input.duration_ms !== undefined) {
-      entry.duration_ms = input.duration_ms;
-    }
-    if (input.error !== undefined) {
-      entry.error = input.error;
-    }
+    countFailure(entry.status);
     return entry;
   }
 
   function start_request(input: ConsoleEntryInput): number {
-    const entry = create({ ...input, status: "running" });
-    push(entry);
-    return entry.id;
+    return log({ ...input, status: "running" }).id;
   }
 
   function finish_request(entryId: number, outcome: ConsoleOutcome): void {
@@ -101,22 +102,14 @@ const useConsoleStore = defineStore("console", () => {
     entry.status = outcome.status;
     if (outcome.status !== "success") {
       entry.error = outcome.error;
-      unseen_errors.value += 1;
     }
-  }
-
-  function log(input: ConsoleLogInput): void {
-    push(create(input));
+    countFailure(outcome.status);
   }
 
   // Empties the view only: running requests stay, they will still finish
   function clear(): void {
     entries.value = entries.value.filter((entry) => entry.status === "running");
-    unseen_errors.value = 0;
-  }
-
-  function mark_errors_seen(): void {
-    unseen_errors.value = 0;
+    mark_errors_seen();
   }
 
   return {
