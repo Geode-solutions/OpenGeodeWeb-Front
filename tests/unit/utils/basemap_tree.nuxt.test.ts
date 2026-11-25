@@ -17,6 +17,7 @@ describe("basemap tree", () => {
       children: [
         { id: "basemap:satellite", title: "Satellite" },
         { id: "basemap:plan", title: "Plan" },
+        { id: "basemap:geology", title: "Geology" },
         { id: "basemap:routes", title: "Routes" },
       ],
     });
@@ -46,6 +47,14 @@ describe("basemap tree", () => {
     expect(sortedMaps(["routes", "satellite", "plan"])).toStrictEqual([
       "satellite",
       "plan",
+      "routes",
+    ]);
+  });
+
+  test("the geology lies under the routes", () => {
+    expect(sortedMaps(["routes", "geology", "satellite"])).toStrictEqual([
+      "satellite",
+      "geology",
       "routes",
     ]);
   });

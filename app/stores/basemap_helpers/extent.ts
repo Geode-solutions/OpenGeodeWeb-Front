@@ -13,7 +13,7 @@ const Y_MAX = 3;
 const Z_MAX = 5;
 
 function everyMap<Value>(value: Value): Record<MapStyle, Value> {
-  return { satellite: value, plan: value, routes: value };
+  return { satellite: value, plan: value, geology: value, routes: value };
 }
 
 // Unscaled polydata bounds: the actor bounds would include the z scale
