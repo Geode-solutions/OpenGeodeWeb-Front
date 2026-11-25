@@ -6,7 +6,11 @@ import { useCrsShortlist } from "@ogw_front/composables/crs_shortlist";
 
 vi.setConfig({ testTimeout: 10_000 });
 
-const LAMBERT = { authority: "EPSG", code: "2154", name: "RGF93 v1 / Lambert-93" };
+const LAMBERT = {
+  authority: "EPSG",
+  code: "2154",
+  name: "RGF93 v1 / Lambert-93",
+};
 const UTM = { authority: "EPSG", code: "32631", name: "WGS 84 / UTM zone 31N" };
 
 function epsg(code: string): CRS {
@@ -24,7 +28,13 @@ describe("crs shortlist", () => {
     for (const code of ["1", "2", "3", "4", "5", "6", "3"]) {
       recordUse(epsg(code));
     }
-    expect(recent.value.map(({ code }) => code)).toStrictEqual(["3", "6", "5", "4", "2"]);
+    expect(recent.value.map(({ code }) => code)).toStrictEqual([
+      "3",
+      "6",
+      "5",
+      "4",
+      "2",
+    ]);
   });
 
   test("toggles a favorite", () => {
@@ -50,14 +60,25 @@ describe("crs shortlist", () => {
       code: "4812",
       name: "New Beijing / 3-degree Gauss-Kruger CM 132E",
     });
-    recordUse({ authority: "ESRI", code: "4812", name: "GCS_Voirol_Unifie_1960_Paris" });
+    recordUse({
+      authority: "ESRI",
+      code: "4812",
+      name: "GCS_Voirol_Unifie_1960_Paris",
+    });
     expect(recent.value).toHaveLength(2);
+  });
+
+  test("reads the favorites stored by a previous launch", () => {
+    localStorage.setItem("ogw-crsFavorites", JSON.stringify([LAMBERT]));
+    expect(useCrsShortlist().favorites.value).toStrictEqual([LAMBERT]);
   });
 
   test("stores only the authority, code and name", async () => {
     const { recordUse } = useCrsShortlist();
     recordUse({ ...LAMBERT, extra: 1 } as CRS);
     await nextTick();
-    expect(localStorage.getItem("ogw-crs-history")).toBe(JSON.stringify([LAMBERT]));
+    expect(localStorage.getItem("ogw-crsHistory")).toBe(
+      JSON.stringify([LAMBERT]),
+    );
   });
 });

@@ -1,6 +1,7 @@
 import type { CrsItem, NewDataItem } from "@ogw_front/stores/data";
 import type { CRS } from "@geode/opengeodeweb-back/schema_types";
 import type { LegacyDataId } from "@ogw_front/utils/legacy_data_id";
+import { z } from "zod";
 
 // Only what a CRS selector shows: the back may add other fields
 interface CrsEntry {
@@ -8,6 +9,13 @@ interface CrsEntry {
   code: string;
   name: string;
 }
+
+// A stored CRS entry (favorites, history): unknown fields are dropped on read
+const crsEntrySchema = z.object({
+  authority: z.string(),
+  code: z.string(),
+  name: z.string(),
+});
 
 function formatCrs(crs: CRS | undefined): string {
   return crs ? `${crs.authority}:${crs.code} — ${crs.name}` : "None";
@@ -41,9 +49,17 @@ function oldestCrs(
 ): CRS | undefined {
   return items
     .filter((item) => item.crs !== undefined)
-    .toSorted((left, right) => (left.created_at ?? "").localeCompare(right.created_at ?? ""))[0]
-    ?.crs;
+    .toSorted((left, right) =>
+      (left.created_at ?? "").localeCompare(right.created_at ?? ""),
+    )[0]?.crs;
 }
 
 export type { CrsEntry };
-export { formatCrs, formatCrsCode, oldestCrs, sameCrs, sameCrsState };
+export {
+  crsEntrySchema,
+  formatCrs,
+  formatCrsCode,
+  oldestCrs,
+  sameCrs,
+  sameCrsState,
+};

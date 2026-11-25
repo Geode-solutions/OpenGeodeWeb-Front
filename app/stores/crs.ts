@@ -1,17 +1,10 @@
-import { type CrsEntry, oldestCrs, sameCrs } from "@ogw_front/utils/crs";
 import { type DataItem, useDataStore } from "@ogw_front/stores/data";
+import { oldestCrs, sameCrs } from "@ogw_front/utils/crs";
 import type { CRS } from "@geode/opengeodeweb-back/schema_types";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
-import type { Ref } from "vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { useBackStore } from "@ogw_front/stores/back";
-import { useLocalStorage } from "@vueuse/core";
-
-interface CrsShortlistStorage {
-  favorites: Ref<CrsEntry[]>;
-  history: Ref<CrsEntry[]>;
-}
 
 // Session cache of the available CRS, the project CRS, and the channel the shared components use to ask the host app for a CRS edit
 // oxlint-disable-next-line max-lines-per-function, max-statements
@@ -27,17 +20,14 @@ export const useCrsStore = defineStore("crs", () => {
   const projectCrs = ref<CRS | undefined>(undefined);
   const projectCrsEditRequest = ref(false);
   const showCrsAlign = ref(false);
-  // Browser storage by default: an app can give its own (e.g. a desktop settings file)
-  const crsShortlistStorage = shallowRef<CrsShortlistStorage>({
-    favorites: useLocalStorage<CrsEntry[]>("ogw-crs-favorites", []),
-    history: useLocalStorage<CrsEntry[]>("ogw-crs-history", []),
-  });
 
   // The project follows its data: once every georeferenced data is in one CRS, it is the project
   // CRS. Data already mixed before any project CRS: the oldest one is the reference
   watch(
     () => {
-      const georeferenced = crsItems.value.filter((item) => item.crs !== undefined);
+      const georeferenced = crsItems.value.filter(
+        (item) => item.crs !== undefined,
+      );
       const [first] = georeferenced;
       if (first === undefined) {
         return undefined;
@@ -67,7 +57,9 @@ export const useCrsStore = defineStore("crs", () => {
     return mismatched;
   });
 
-  async function fetchGeographicList(geodeObjectType: GeodeObjectType): Promise<CRS[]> {
+  async function fetchGeographicList(
+    geodeObjectType: GeodeObjectType,
+  ): Promise<CRS[]> {
     try {
       const response = await backStore.request({
         schema: back_schemas.opengeodeweb_back.crs.geographic_list,
@@ -84,7 +76,9 @@ export const useCrsStore = defineStore("crs", () => {
     return [];
   }
 
-  async function geographicList(geodeObjectType: GeodeObjectType): Promise<CRS[]> {
+  async function geographicList(
+    geodeObjectType: GeodeObjectType,
+  ): Promise<CRS[]> {
     // The promise is cached, so dialogs opened together share a single request.
     // The back still checks each CRS against the list of the data dimension
     geographicListPromise ??= fetchGeographicList(geodeObjectType);
@@ -126,10 +120,6 @@ export const useCrsStore = defineStore("crs", () => {
     crsAlignItem.value = undefined;
   }
 
-  function setCrsShortlistStorage(favorites: Ref<CrsEntry[]>, history: Ref<CrsEntry[]>): void {
-    crsShortlistStorage.value = { favorites, history };
-  }
-
   // A new project: its data set the project CRS again
   function reset(): void {
     projectCrs.value = undefined;
@@ -163,12 +153,8 @@ export const useCrsStore = defineStore("crs", () => {
     crsAlignItem,
     openCrsAlign,
     closeCrsAlign,
-    crsShortlistStorage,
-    setCrsShortlistStorage,
     reset,
     exportStores,
     importStores,
   };
 });
-
-export type { CrsShortlistStorage };
