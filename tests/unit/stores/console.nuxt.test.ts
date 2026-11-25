@@ -2,7 +2,7 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // Local imports
-import { MAX_ENTRIES, useConsoleStore } from "@ogw_front/stores/console";
+import { MAX_ENTRIES, isFailure, useConsoleStore } from "@ogw_front/stores/console";
 import { setupActivePinia } from "@ogw_tests/utils";
 
 vi.setConfig({ testTimeout: 10_000 });
@@ -35,6 +35,14 @@ describe("console store", () => {
     const entryId = consoleStore.start_request(request);
     consoleStore.finish_request(entryId, { status: "success" });
     expect(consoleStore.entries[FIRST_INDEX]?.duration_ms).toBeGreaterThanOrEqual(0);
+  });
+
+  test("errors and timeouts are failures", () => {
+    expect(isFailure("error")).toBe(true);
+    expect(isFailure("timeout")).toBe(true);
+    expect(isFailure("success")).toBe(false);
+    expect(isFailure("running")).toBe(false);
+    expect(isFailure("info")).toBe(false);
   });
 
   test("failures are counted until seen", () => {
