@@ -1,22 +1,17 @@
 <script setup lang="ts">
-// oxlint-disable max-dependencies -- the viewer overlays: one import per overlay
 import {
   type ViewerIdResult,
   useOverlappingPicker,
 } from "@ogw_front/composables/use_overlapping_picker";
 import BasemapAttribution from "@ogw_front/components/BasemapAttribution.vue";
-import CrsAlign from "@ogw_front/components/CrsAlign.vue";
-import CrsDialogHost from "@ogw_front/components/CrsDialogHost.vue";
+import CrsOverlays from "@ogw_front/components/Viewer/CrsOverlays.vue";
 import OverlappingObjectsPicker from "@ogw_front/components/Viewer/OverlappingObjectsPicker.vue";
-import ProjectCrs from "@ogw_front/components/ProjectCrs.vue";
 import ToolActiveChip from "@ogw_front/components/Viewer/ToolActiveChip.vue";
-import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import type { TreeMenuPayload } from "@ogw_front/utils/treeview";
 import ViewerContextMenu from "@ogw_front/components/Viewer/ContextMenu/ContextMenu.vue";
 import ViewerObjectTreeLayout from "@ogw_front/components/Viewer/ObjectTree/Layout.vue";
 import { getCurrentInstance } from "vue";
 import { useBasemapDetailStore } from "@ogw_front/stores/basemap_detail";
-import { useCrsStore } from "@ogw_front/stores/crs";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useMenuStore } from "@ogw_front/stores/menu";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -32,10 +27,7 @@ const { displayMenu, containerWidth, containerHeight } = defineProps<Props>();
 const emit = defineEmits<{
   "show-menu": [payload: TreeMenuPayload];
 }>();
-// Wide enough for the X and Y of the 3 pairs of points
-const CRS_ALIGN_PANEL_WIDTH = 380;
 
-const crsStore = useCrsStore();
 const menuStore = useMenuStore();
 const viewerStore = useViewerStore();
 const hybridViewerStore = useHybridViewerStore();
@@ -120,20 +112,7 @@ defineExpose({ get_viewer_id });
     :container-height="containerHeight"
   />
 
-  <ProjectCrs />
-  <CrsDialogHost />
-  <!-- Points are picked in the viewer: a click there must not close the panel.
-       CrsAlign has its own title and close button -->
-  <ToolPanel
-    v-model="crsStore.showCrsAlign"
-    :width="CRS_ALIGN_PANEL_WIDTH"
-    :click-outside="false"
-    hide-actions
-    data-testid="crsAlignPanel"
-    :escape-function="crsStore.closeCrsAlign"
-  >
-    <CrsAlign />
-  </ToolPanel>
+  <CrsOverlays />
 
   <BasemapAttribution />
 
