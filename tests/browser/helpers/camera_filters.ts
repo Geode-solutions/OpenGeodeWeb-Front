@@ -42,9 +42,11 @@ async function selectShrinkDatasets(window: Page, datasetName: string, index = 0
     .getByTestId("shrinkSelectedDatasetsOption")
     .filter({ hasText: datasetName })
     .nth(index);
-  await option.click({ force: true });
+  // The menu opens with a CSS transition the settle helper cannot see, so a forced click can land beside the moving option: dispatch it instead
+  await option.dispatchEvent("click");
   await waitForActionSettled(window);
   await select.click({ force: true });
+  await option.waitFor({ state: "hidden" });
   await waitForActionSettled(window);
 }
 

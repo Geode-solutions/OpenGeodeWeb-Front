@@ -71,13 +71,15 @@ async function selectClippingDatasets(window: Page, datasetName: string, index =
   // Forced clicks skip Playwright's scroll into view, which shifts the layout of the screenshots
   await select.click({ force: true });
   await waitForActionSettled(window);
-  await window
+  const option = window
     .getByTestId("selectedDatasetsOption")
     .filter({ hasText: datasetName })
-    .nth(index)
-    .click({ force: true });
+    .nth(index);
+  // The menu opens with a CSS transition the settle helper cannot see, so a forced click can land beside the moving option: dispatch it instead
+  await option.dispatchEvent("click");
   await waitForActionSettled(window);
   await select.click({ force: true });
+  await option.waitFor({ state: "hidden" });
   await waitForActionSettled(window);
 }
 
