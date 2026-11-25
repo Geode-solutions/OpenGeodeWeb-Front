@@ -191,8 +191,12 @@ watch(
   content: "";
   position: absolute;
   inset: 0;
-  /* Adaptive glass: apps can tint it (an "r, g, b" triplet) and change its blending, per theme */
-  background: rgba(var(--ogw-viewer-glass-tint, 255, 255, 255), var(--adaptive-opacity));
+  /* Adaptive glass: apps can tint it (an "r, g, b" triplet), change its blending and set a minimum opacity, per
+     theme (the radial menu's one) */
+  background: rgba(
+    var(--ogw-viewer-glass-tint, 255, 255, 255),
+    max(var(--adaptive-opacity), var(--ogw-viewer-glass-min-opacity, 0))
+  );
   backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
   -webkit-backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
   mix-blend-mode: var(--ogw-viewer-glass-blend, lighten);
