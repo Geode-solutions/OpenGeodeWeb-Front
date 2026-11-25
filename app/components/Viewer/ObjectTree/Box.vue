@@ -197,8 +197,15 @@ watch(
     var(--ogw-viewer-glass-tint, 255, 255, 255),
     max(var(--adaptive-opacity), var(--ogw-viewer-glass-min-opacity, 0))
   );
-  backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
-  -webkit-backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
+  /* Apps can replace the adaptive blur and dimming of the backdrop, "none" keeps it sharp */
+  backdrop-filter: var(
+    --ogw-viewer-glass-backdrop,
+    blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness))
+  );
+  -webkit-backdrop-filter: var(
+    --ogw-viewer-glass-backdrop,
+    blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness))
+  );
   mix-blend-mode: var(--ogw-viewer-glass-blend, lighten);
   z-index: 0;
   pointer-events: none;
