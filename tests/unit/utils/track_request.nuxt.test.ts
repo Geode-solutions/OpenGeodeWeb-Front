@@ -16,7 +16,7 @@ const FIRST_INDEX = 0;
 const STATUS_500 = 500;
 
 const request = { source: "back", kind: "http", route: "opengeodeweb_back/test" } as const;
-const ping = { ...request, route: "opengeodeweb_back/ping" } as const;
+const background = { ...request, log_success: false } as const;
 
 describe("trackRequest()", () => {
   beforeEach(() => {
@@ -55,21 +55,28 @@ describe("trackRequest()", () => {
     );
   });
 
-  test("a successful ping is not logged", async () => {
+  test("a background request is not logged when it succeeds", async () => {
     const consoleStore = useConsoleStore();
-    const followPing = trackRequest(ping);
+    const followPing = trackRequest(background);
     expect(consoleStore.running).toHaveLength(0);
     await followPing(Promise.resolve({}));
     expect(consoleStore.entries).toHaveLength(0);
   });
 
-  test("a failed ping is logged", async () => {
+  test("a background request is logged when it fails", async () => {
     const consoleStore = useConsoleStore();
-    const followPing = trackRequest(ping);
+    const followPing = trackRequest(background);
     const failure = Promise.reject(new Error("Down"));
     await expect(followPing(failure)).rejects.toThrow("Down");
     expect(consoleStore.entries).toHaveLength(1);
     expect(consoleStore.entries[FIRST_INDEX]).toMatchObject({ status: "error", error: "Down" });
+  });
+
+  test("a route named like a ping is logged unless the caller says so", async () => {
+    const consoleStore = useConsoleStore();
+    const followRequest = trackRequest({ ...request, route: "extension_back/ping" });
+    await followRequest(Promise.resolve({}));
+    expect(consoleStore.entries).toHaveLength(1);
   });
 });
 
@@ -110,6 +117,17 @@ describe("microservice requests in the console", () => {
       status: "error",
       error: "Internal Server Error: Broken",
     });
+  });
+
+  test("the back ping is not logged", async () => {
+    registerEndpoint(back_schemas.opengeodeweb_back.ping.$id, {
+      method: "POST",
+      handler: () => ({}),
+    });
+    const backStore = useBackStore();
+    const consoleStore = useConsoleStore();
+    await backStore.ping();
+    expect(consoleStore.entries).toHaveLength(0);
   });
 
   test("an upload is logged with its file name", async () => {
