@@ -30,26 +30,26 @@ function viewerCallHandlers(
 ): RequestHandlersWithValidation {
   return {
     // CallRaw runs both error handlers on the same rejection: stop the request and report it once, in the response one.
-    async request_error_function(error: unknown) {
+    async request_error_function(error: unknown): Promise<void> {
       if (request_error_function) {
         await request_error_function(error);
       }
     },
-    async response_function(data: unknown) {
+    async response_function(data: unknown): Promise<void> {
       endRequestLog(microservice, schema, requestStartingTime);
       microservice.stop_request();
       if (response_function) {
         await response_function(data);
       }
     },
-    async response_error_function(response: unknown) {
+    async response_error_function(response: unknown): Promise<void> {
       microservice.stop_request();
       reportError(schema.$id, response);
       if (response_error_function) {
         await response_error_function(response);
       }
     },
-    validation_error_function({ code, name, error }) {
+    validation_error_function({ code, name, error }): void {
       microservice.stop_request();
       useFeedbackStore().add_error(code, schema.$id, name, error ?? "");
     },
