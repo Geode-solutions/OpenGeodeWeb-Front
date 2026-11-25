@@ -62,6 +62,10 @@ async function toggleSearchObjects(window: Page): Promise<void> {
 
 async function fillSearchQuery(window: Page, query: string, tree: Locator): Promise<void> {
   const searchInput = tree.getByTestId("searchObjectsInput").locator("input");
+  // An empty search folds back once the toolbar is left: open it again
+  if (!(await searchInput.isVisible())) {
+    await tree.getByTestId("searchObjectsButton").click();
+  }
   await searchInput.fill(query);
   await moveMouseOutOfTheWay(window);
   await waitForActionSettled(window);
