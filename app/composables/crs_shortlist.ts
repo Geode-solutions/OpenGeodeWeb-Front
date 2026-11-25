@@ -1,9 +1,6 @@
 import type { ComputedRef, Ref } from "vue";
 import { type CrsEntry, crsEntrySchema } from "@ogw_front/utils/crs";
-import {
-  defineUserSetting,
-  useUserSetting,
-} from "@ogw_front/composables/user_setting";
+import { defineUserSetting, useUserSetting } from "@ogw_front/composables/user_setting";
 import type { CRS } from "@geode/opengeodeweb-back/schema_types";
 import { z } from "zod";
 
@@ -48,9 +45,7 @@ function useCrsShortlist(): CrsShortlistApi {
   function toggleFavorite(crs: CRS): void {
     const key = crsKey(crs);
     if (favorites.value.some((entry) => crsKey(entry) === key)) {
-      favorites.value = favorites.value.filter(
-        (entry) => crsKey(entry) !== key,
-      );
+      favorites.value = favorites.value.filter((entry) => crsKey(entry) !== key);
       return;
     }
     favorites.value = [...favorites.value, toEntry(crs)];

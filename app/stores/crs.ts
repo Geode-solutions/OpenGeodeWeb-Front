@@ -25,9 +25,7 @@ export const useCrsStore = defineStore("crs", () => {
   // CRS. Data already mixed before any project CRS: the oldest one is the reference
   watch(
     () => {
-      const georeferenced = crsItems.value.filter(
-        (item) => item.crs !== undefined,
-      );
+      const georeferenced = crsItems.value.filter((item) => item.crs !== undefined);
       const [first] = georeferenced;
       if (first === undefined) {
         return undefined;
@@ -57,9 +55,7 @@ export const useCrsStore = defineStore("crs", () => {
     return mismatched;
   });
 
-  async function fetchGeographicList(
-    geodeObjectType: GeodeObjectType,
-  ): Promise<CRS[]> {
+  async function fetchGeographicList(geodeObjectType: GeodeObjectType): Promise<CRS[]> {
     try {
       const response = await backStore.request({
         schema: back_schemas.opengeodeweb_back.crs.geographic_list,
@@ -76,9 +72,7 @@ export const useCrsStore = defineStore("crs", () => {
     return [];
   }
 
-  async function geographicList(
-    geodeObjectType: GeodeObjectType,
-  ): Promise<CRS[]> {
+  async function geographicList(geodeObjectType: GeodeObjectType): Promise<CRS[]> {
     // The promise is cached, so dialogs opened together share a single request.
     // The back still checks each CRS against the list of the data dimension
     geographicListPromise ??= fetchGeographicList(geodeObjectType);

@@ -49,17 +49,9 @@ function oldestCrs(
 ): CRS | undefined {
   return items
     .filter((item) => item.crs !== undefined)
-    .toSorted((left, right) =>
-      (left.created_at ?? "").localeCompare(right.created_at ?? ""),
-    )[0]?.crs;
+    .toSorted((left, right) => (left.created_at ?? "").localeCompare(right.created_at ?? ""))[0]
+    ?.crs;
 }
 
 export type { CrsEntry };
-export {
-  crsEntrySchema,
-  formatCrs,
-  formatCrsCode,
-  oldestCrs,
-  sameCrs,
-  sameCrsState,
-};
+export { crsEntrySchema, formatCrs, formatCrsCode, oldestCrs, sameCrs, sameCrsState };

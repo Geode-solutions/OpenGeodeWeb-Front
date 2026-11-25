@@ -58,9 +58,7 @@ describe("crs store", () => {
     const crsStore = useCrsStore();
 
     await expect(crsStore.geographicList("BRep")).resolves.toStrictEqual([]);
-    await expect(crsStore.geographicList("BRep")).resolves.toStrictEqual(
-      CRS_LIST,
-    );
+    await expect(crsStore.geographicList("BRep")).resolves.toStrictEqual(CRS_LIST);
   });
 
   test("does not cache a rejected request", async () => {
@@ -73,9 +71,7 @@ describe("crs store", () => {
     const crsStore = useCrsStore();
 
     await expect(crsStore.geographicList("Section")).resolves.toStrictEqual([]);
-    await expect(crsStore.geographicList("Section")).resolves.toStrictEqual(
-      CRS_LIST,
-    );
+    await expect(crsStore.geographicList("Section")).resolves.toStrictEqual(CRS_LIST);
   });
 
   test("forwards an edit request until it is cleared", () => {
@@ -116,9 +112,7 @@ describe("project crs", () => {
   test("follows when every georeferenced data is in one crs", async () => {
     const data = mockItems([]);
     const crsStore = useCrsStore();
-    data.value = mockAs<DataItem[]>([
-      { data_id: "a", created_at: "1", crs: LAMBERT },
-    ]);
+    data.value = mockAs<DataItem[]>([{ data_id: "a", created_at: "1", crs: LAMBERT }]);
     await nextTick();
     expect(crsStore.projectCrs).toStrictEqual(LAMBERT);
     // One data converted alone: mixed, the project keeps its crs
@@ -168,9 +162,7 @@ describe("project crs", () => {
   });
 
   test("is exported and imported with the project", () => {
-    mockItems(
-      mockAs<DataItem[]>([{ data_id: "a", created_at: "1", crs: LAMBERT }]),
-    );
+    mockItems(mockAs<DataItem[]>([{ data_id: "a", created_at: "1", crs: LAMBERT }]));
     const crsStore = useCrsStore();
     crsStore.setProjectCrs(UTM);
     expect(crsStore.exportStores()).toStrictEqual({ projectCrs: UTM });

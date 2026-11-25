@@ -20,10 +20,7 @@ interface DesktopSettingsAPI {
 
 const definitions = new Map<string, UserSettingDefinition<unknown>>();
 // One ref per setting shared by every caller, as the local storage refs are kept in sync in the browser
-const desktopSettings = new WeakMap<
-  DesktopSettingsAPI,
-  Map<string, Ref<unknown>>
->();
+const desktopSettings = new WeakMap<DesktopSettingsAPI, Map<string, Ref<unknown>>>();
 
 // Declares a setting, at module level. Declaring it again the same way (hot reload, tests) keeps the first
 // Declaration; declaring it differently is an error: two features would overwrite each other's value.
@@ -46,9 +43,7 @@ function defineUserSetting<Value>(options: {
     existing.browserKey !== definition.browserKey ||
     JSON.stringify(existing.fallback) !== JSON.stringify(definition.fallback)
   ) {
-    throw new Error(
-      `User setting "${definition.key}" is already defined differently`,
-    );
+    throw new Error(`User setting "${definition.key}" is already defined differently`);
   }
   // oxlint-disable-next-line no-unsafe-type-assertion -- same key, browser key and fallback: same setting
   return existing as UserSettingDefinition<Value>;
@@ -71,10 +66,7 @@ function freshFallback<Value>(definition: UserSettingDefinition<Value>): Value {
 }
 
 // The stored value when the setting's schema accepts it, the fallback otherwise
-function validated<Value>(
-  definition: UserSettingDefinition<Value>,
-  value: unknown,
-): Value {
+function validated<Value>(definition: UserSettingDefinition<Value>, value: unknown): Value {
   const result = definition.schema.safeParse(value);
   if (result.success) {
     return result.data;
@@ -91,24 +83,18 @@ function parseStored(raw: string): unknown {
   }
 }
 
-function browserSetting<Value>(
-  definition: UserSettingDefinition<Value>,
-): Ref<Value> {
-  return useLocalStorage<Value>(
-    definition.browserKey,
-    freshFallback(definition),
-    {
-      serializer: {
-        read: (raw: string): Value => validated(definition, parseStored(raw)),
-        write: (value: Value): string => {
-          if (typeof value === "string") {
-            return value;
-          }
-          return JSON.stringify(value);
-        },
+function browserSetting<Value>(definition: UserSettingDefinition<Value>): Ref<Value> {
+  return useLocalStorage<Value>(definition.browserKey, freshFallback(definition), {
+    serializer: {
+      read: (raw: string): Value => validated(definition, parseStored(raw)),
+      write: (value: Value): string => {
+        if (typeof value === "string") {
+          return value;
+        }
+        return JSON.stringify(value);
       },
     },
-  );
+  });
 }
 
 // A copy without Vue proxies: toRaw only unwraps the outer one, not the elements a filter or a spread returns
@@ -119,10 +105,7 @@ function toPlain(value: unknown): unknown {
   }
   if (typeof raw === "object" && raw !== null) {
     return Object.fromEntries(
-      Object.entries(raw).map(([entryKey, entryValue]) => [
-        entryKey,
-        toPlain(entryValue),
-      ]),
+      Object.entries(raw).map(([entryKey, entryValue]) => [entryKey, toPlain(entryValue)]),
     );
   }
   return raw;
@@ -166,9 +149,7 @@ function desktopSetting<Value>(
 // The value of a setting, shared by every caller. The desktop app clears its browser storage on every launch:
 // There the settings live in its settings.json, read before the page renders and written on every change, nested
 // Ones included. The browser keeps them in its local storage.
-function useUserSetting<Value>(
-  definition: UserSettingDefinition<Value>,
-): Ref<Value> {
+function useUserSetting<Value>(definition: UserSettingDefinition<Value>): Ref<Value> {
   const globalScope = globalThis;
   if (!hasDesktopSettingsAPI(globalScope)) {
     return browserSetting(definition);

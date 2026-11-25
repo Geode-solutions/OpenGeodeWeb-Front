@@ -1,16 +1,5 @@
-import {
-  type Mock,
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  test,
-  vi,
-} from "vitest";
-import {
-  defineUserSetting,
-  useUserSetting,
-} from "@ogw_front/composables/user_setting";
+import { type Mock, afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { defineUserSetting, useUserSetting } from "@ogw_front/composables/user_setting";
 import { nextTick } from "vue";
 import { z } from "zod";
 
@@ -64,9 +53,7 @@ describe("user setting", () => {
 
     setting.value.push(LAMBERT);
     await nextTick();
-    expect(localStorage.getItem("ogw-testList")).toBe(
-      JSON.stringify([LAMBERT]),
-    );
+    expect(localStorage.getItem("ogw-testList")).toBe(JSON.stringify([LAMBERT]));
   });
 
   test("stores a string raw", async () => {

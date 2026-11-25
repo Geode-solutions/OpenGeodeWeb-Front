@@ -28,13 +28,7 @@ describe("crs shortlist", () => {
     for (const code of ["1", "2", "3", "4", "5", "6", "3"]) {
       recordUse(epsg(code));
     }
-    expect(recent.value.map(({ code }) => code)).toStrictEqual([
-      "3",
-      "6",
-      "5",
-      "4",
-      "2",
-    ]);
+    expect(recent.value.map(({ code }) => code)).toStrictEqual(["3", "6", "5", "4", "2"]);
   });
 
   test("toggles a favorite", () => {
@@ -77,8 +71,6 @@ describe("crs shortlist", () => {
     const { recordUse } = useCrsShortlist();
     recordUse({ ...LAMBERT, extra: 1 } as CRS);
     await nextTick();
-    expect(localStorage.getItem("ogw-crsHistory")).toBe(
-      JSON.stringify([LAMBERT]),
-    );
+    expect(localStorage.getItem("ogw-crsHistory")).toBe(JSON.stringify([LAMBERT]));
   });
 });
