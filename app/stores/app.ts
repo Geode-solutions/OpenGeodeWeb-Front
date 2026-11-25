@@ -69,6 +69,14 @@ export const useAppStore = defineStore("app", () => {
     stores.push(store);
   }
 
+  // An uninstalled extension unregisters its stores: they are no longer saved in projects
+  function unregisterStore(storeId: string): void {
+    const index = stores.findIndex((registeredStore) => registeredStore.$id === storeId);
+    if (index !== -1) {
+      stores.splice(index, 1);
+    }
+  }
+
   async function exportStores(
     params: Record<string, unknown> = {},
   ): Promise<Record<string, unknown>> {
@@ -137,6 +145,7 @@ export const useAppStore = defineStore("app", () => {
     base_url,
     is_busy,
     registerStore,
+    unregisterStore,
     exportStores,
     importStores,
     loadedExtensions,
