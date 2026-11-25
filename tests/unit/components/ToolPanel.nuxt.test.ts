@@ -35,6 +35,29 @@ describe("tool panel", () => {
   );
 
   test(
+    "renders only its content without title nor actions",
+    async () => {
+      const wrapper = await mountSuspended(ToolPanel, {
+        global: {
+          plugins: [vuetify],
+        },
+        props: {
+          modelValue: true,
+          hideActions: true,
+        },
+        slots: {
+          default: () => "Panel Content",
+        },
+      });
+
+      expect(wrapper.find(".v-card-title").exists()).toBe(false);
+      expect(wrapper.find(".v-card-actions").exists()).toBe(false);
+      expect(wrapper.text()).toBe("Panel Content");
+    },
+    TIMEOUT,
+  );
+
+  test(
     "triggers escape key binding to close panel",
     async () => {
       const wrapper = await mountSuspended(ToolPanel, {

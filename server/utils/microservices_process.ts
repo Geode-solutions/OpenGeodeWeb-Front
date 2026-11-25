@@ -55,8 +55,11 @@ async function runScript(
   }
 }
 
+// Windows reports a taken port as WinError 10048 ("only one usage of each socket address")
 function isPortInUseError(error: unknown): boolean {
-  return /EADDRINUSE|address already in use|port already in use/iu.test(String(error));
+  return /EADDRINUSE|address already in use|port already in use|only one usage of each socket address/iu.test(
+    String(error),
+  );
 }
 
 function resolveUploadFolderPath(

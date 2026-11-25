@@ -3,6 +3,7 @@ import { type DataItem, useDataStore } from "@ogw_front/stores/data";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { mockAs, setupActivePinia } from "@ogw_tests/utils";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
+import { setBasemapOption } from "@ogw_tests/unit/helpers/basemap_option";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useBasemapDetailStore } from "@ogw_front/stores/basemap_detail";
 import { useBasemapStore } from "@ogw_front/stores/basemap";
@@ -164,6 +165,7 @@ describe("basemap detail store", () => {
     detail: ReturnType<typeof useBasemapDetailStore>;
   }> {
     setupActivePinia();
+    setBasemapOption(true);
     const counters = { base: 0, detail: 0 };
     slowDetail = undefined;
     if (options.slowDetail === true) {
