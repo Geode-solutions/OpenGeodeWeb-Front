@@ -12,8 +12,8 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed
 
 vi.setConfig({ testTimeout: 10_000 });
 
-const OPAQUE = { satellite: 1, plan: 1, routes: 1 };
-const UNCROPPED = { satellite: false, plan: false, routes: false };
+const OPAQUE = { satellite: 1, plan: 1, geology: 1, routes: 1 };
+const UNCROPPED = { satellite: false, plan: false, geology: false, routes: false };
 const LAMBERT = { authority: "EPSG", code: "2154", name: "RGF93 v1 / Lambert-93" };
 const REBUILD_DELAY = 500;
 const HALF_DELAY = 100;
