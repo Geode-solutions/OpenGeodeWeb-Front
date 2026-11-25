@@ -12,7 +12,7 @@ import { hoverViewer, moveMouseOutOfTheWay } from "./viewer_interaction";
 import { getTreeRowByTextAndParent } from "./object_trees/common";
 import { waitForActionSettled } from "./wait_for_action_settled";
 
-type MapTitle = "Satellite" | "Plan" | "Routes";
+type MapTitle = "Satellite" | "Plan" | "Geology" | "Routes";
 const BASEMAP = "Basemap";
 const OPACITY_STEP = 5;
 const ZOOM_WHEEL_DELTA = -300;
