@@ -2,7 +2,7 @@
 import { describe, expect, test, vi } from "vitest";
 
 // Local imports
-import { summarizeParams } from "@ogw_front/utils/console_params";
+import { summarizeParams } from "@ogw_front/utils/activity_params";
 
 vi.setConfig({ testTimeout: 10_000 });
 

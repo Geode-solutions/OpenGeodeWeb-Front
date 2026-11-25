@@ -1,4 +1,4 @@
-// Request params shown in the console: a short JSON, never the whole payload (id lists, styles, files...)
+// Request params shown in the activity panel: a short JSON, never the whole payload (id lists, styles, files...)
 const MAX_ARRAY_ITEMS = 10;
 const MAX_STRING_LENGTH = 120;
 const MAX_SUMMARY_LENGTH = 400;

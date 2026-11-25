@@ -1,11 +1,11 @@
 import { Status } from "@ogw_front/utils/status";
-import { useConsoleStore } from "@ogw_front/stores/console";
+import { useActivityStore } from "@ogw_front/stores/activity";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
-// Writes each microservice connection and disconnection to the console
+// Writes each microservice connection and disconnection to the activity panel
 function watchMicroserviceConnections(): void {
   const infraStore = useInfraStore();
-  const consoleStore = useConsoleStore();
+  const activityStore = useActivityStore();
   const known = new Map<string, string | undefined>();
 
   watch(
@@ -18,9 +18,9 @@ function watchMicroserviceConnections(): void {
           continue;
         }
         if (status === Status.CONNECTED) {
-          consoleStore.log({ source, kind: "connection", route: "Connected", status: "info" });
+          activityStore.log({ source, kind: "connection", route: "Connected", status: "info" });
         } else if (previous === Status.CONNECTED) {
-          consoleStore.log({
+          activityStore.log({
             source,
             kind: "connection",
             route: "Connection lost",

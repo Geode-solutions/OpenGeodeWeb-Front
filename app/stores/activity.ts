@@ -1,18 +1,18 @@
-import { summarizeParams } from "@ogw_front/utils/console_params";
+import { summarizeParams } from "@ogw_front/utils/activity_params";
 
 // Read-only journal of what the app is doing: microservice requests, server events, connection changes
 const MAX_ENTRIES = 500;
 
-type ConsoleEntryKind = "http" | "ws" | "upload" | "event" | "connection";
-type ConsoleEntryStatus = "running" | "success" | "error" | "timeout" | "info";
-type ConsoleOutcome = { status: "success" } | { status: "error" | "timeout"; error: string };
+type ActivityEntryKind = "http" | "ws" | "upload" | "event" | "connection";
+type ActivityEntryStatus = "running" | "success" | "error" | "timeout" | "info";
+type ActivityOutcome = { status: "success" } | { status: "error" | "timeout"; error: string };
 
-interface ConsoleEntry {
+interface ActivityEntry {
   id: number;
   source: string;
-  kind: ConsoleEntryKind;
+  kind: ActivityEntryKind;
   route: string;
-  status: ConsoleEntryStatus;
+  status: ActivityEntryStatus;
   started_at: number;
   label?: string;
   params?: string;
@@ -20,27 +20,27 @@ interface ConsoleEntry {
   error?: string;
 }
 
-interface ConsoleEntryInput {
+interface ActivityEntryInput {
   source: string;
-  kind: ConsoleEntryKind;
+  kind: ActivityEntryKind;
   route: string;
   label?: string;
   params?: unknown;
 }
 
-interface ConsoleLogInput extends ConsoleEntryInput {
-  status: ConsoleEntryStatus;
+interface ActivityLogInput extends ActivityEntryInput {
+  status: ActivityEntryStatus;
   started_at?: number;
   duration_ms?: number;
   error?: string;
 }
 
-// An error or a timeout: what the console counts and shows in red
-function isFailure(status: ConsoleEntryStatus): boolean {
+// An error or a timeout: what the activity panel counts and shows in red
+function isFailure(status: ActivityEntryStatus): boolean {
   return status === "error" || status === "timeout";
 }
 
-function createEntry(id: number, input: ConsoleLogInput): ConsoleEntry {
+function createEntry(id: number, input: ActivityLogInput): ActivityEntry {
   const { params, started_at, ...fields } = input;
   const summary = summarizeParams(params);
   return {
@@ -54,11 +54,11 @@ function createEntry(id: number, input: ConsoleLogInput): ConsoleEntry {
 // The errors not seen yet, counted in one place whether logged at once or failed later
 function useUnseenErrors(): {
   unseen_errors: Ref<number>;
-  countFailure: (status: ConsoleEntryStatus) => void;
+  countFailure: (status: ActivityEntryStatus) => void;
   mark_errors_seen: () => void;
 } {
   const unseen_errors = ref(0);
-  function countFailure(status: ConsoleEntryStatus): void {
+  function countFailure(status: ActivityEntryStatus): void {
     if (isFailure(status)) {
       unseen_errors.value += 1;
     }
@@ -69,8 +69,8 @@ function useUnseenErrors(): {
   return { unseen_errors, countFailure, mark_errors_seen };
 }
 
-const useConsoleStore = defineStore("console", () => {
-  const entries = ref<ConsoleEntry[]>([]);
+const useActivityStore = defineStore("activity", () => {
+  const entries = ref<ActivityEntry[]>([]);
   const { unseen_errors, countFailure, mark_errors_seen } = useUnseenErrors();
   let next_id = 0;
 
@@ -79,7 +79,7 @@ const useConsoleStore = defineStore("console", () => {
     () => entries.value.filter((entry) => isFailure(entry.status)).length,
   );
 
-  function log(input: ConsoleLogInput): ConsoleEntry {
+  function log(input: ActivityLogInput): ActivityEntry {
     next_id += 1;
     const entry = createEntry(next_id, input);
     entries.value.push(entry);
@@ -90,11 +90,11 @@ const useConsoleStore = defineStore("console", () => {
     return entry;
   }
 
-  function start_request(input: ConsoleEntryInput): number {
+  function start_request(input: ActivityEntryInput): number {
     return log({ ...input, status: "running" }).id;
   }
 
-  function finish_request(entryId: number, outcome: ConsoleOutcome): void {
+  function finish_request(entryId: number, outcome: ActivityOutcome): void {
     const entry = entries.value.find((candidate) => candidate.id === entryId);
     if (entry === undefined) {
       return;
@@ -126,5 +126,5 @@ const useConsoleStore = defineStore("console", () => {
   };
 });
 
-export { MAX_ENTRIES, isFailure, useConsoleStore };
-export type { ConsoleEntry, ConsoleEntryKind, ConsoleEntryStatus, ConsoleOutcome };
+export { MAX_ENTRIES, isFailure, useActivityStore };
+export type { ActivityEntry, ActivityEntryKind, ActivityEntryStatus, ActivityOutcome };

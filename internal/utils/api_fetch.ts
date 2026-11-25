@@ -19,7 +19,7 @@ interface ApiFetchParams {
   schema: JsonRpcSchema & { methods: string[] };
   params?: object;
   headers?: Record<string, string>;
-  // False for the requests repeated in the background (pings): the console only shows their failures
+  // False for the requests repeated in the background (pings): the activity panel only shows their failures
   log_success?: boolean;
 }
 

@@ -7,8 +7,8 @@ import { setResponseStatus } from "h3";
 // Local imports
 import { setupActivePinia } from "@ogw_tests/utils";
 import { trackRequest } from "@ogw_internal/utils/track_request";
+import { useActivityStore } from "@ogw_front/stores/activity";
 import { useBackStore } from "@ogw_front/stores/back";
-import { useConsoleStore } from "@ogw_front/stores/console";
 
 vi.setConfig({ testTimeout: 10_000 });
 
@@ -24,24 +24,24 @@ describe("trackRequest()", () => {
   });
 
   test("the entry runs until the request settles", async () => {
-    const consoleStore = useConsoleStore();
+    const activityStore = useActivityStore();
     const followRequest = trackRequest(request);
-    expect(consoleStore.running).toHaveLength(1);
+    expect(activityStore.running).toHaveLength(1);
     await followRequest(Promise.resolve({}));
-    expect(consoleStore.running).toHaveLength(0);
-    expect(consoleStore.entries[FIRST_INDEX]?.status).toBe("success");
+    expect(activityStore.running).toHaveLength(0);
+    expect(activityStore.entries[FIRST_INDEX]?.status).toBe("success");
   });
 
   test("a failed request keeps its error message", async () => {
-    const consoleStore = useConsoleStore();
+    const activityStore = useActivityStore();
     const followRequest = trackRequest(request);
     const failure = Promise.reject(new Error("Boom"));
     await expect(followRequest(failure)).rejects.toThrow("Boom");
-    expect(consoleStore.entries[FIRST_INDEX]).toMatchObject({ status: "error", error: "Boom" });
+    expect(activityStore.entries[FIRST_INDEX]).toMatchObject({ status: "error", error: "Boom" });
   });
 
   test("a failed HTTP request shows the microservice error", async () => {
-    const consoleStore = useConsoleStore();
+    const activityStore = useActivityStore();
     const followRequest = trackRequest(request);
     const fetchError = Object.assign(new Error("[POST] /save_viewable_file: 500"), {
       response: {
@@ -50,37 +50,37 @@ describe("trackRequest()", () => {
       },
     });
     await expect(followRequest(Promise.reject(fetchError))).rejects.toBe(fetchError);
-    expect(consoleStore.entries[FIRST_INDEX]?.error).toBe(
+    expect(activityStore.entries[FIRST_INDEX]?.error).toBe(
       "Internal Server Error: Cannot load BRep from file",
     );
   });
 
   test("a background request is not logged when it succeeds", async () => {
-    const consoleStore = useConsoleStore();
+    const activityStore = useActivityStore();
     const followPing = trackRequest(background);
-    expect(consoleStore.running).toHaveLength(0);
+    expect(activityStore.running).toHaveLength(0);
     await followPing(Promise.resolve({}));
-    expect(consoleStore.entries).toHaveLength(0);
+    expect(activityStore.entries).toHaveLength(0);
   });
 
   test("a background request is logged when it fails", async () => {
-    const consoleStore = useConsoleStore();
+    const activityStore = useActivityStore();
     const followPing = trackRequest(background);
     const failure = Promise.reject(new Error("Down"));
     await expect(followPing(failure)).rejects.toThrow("Down");
-    expect(consoleStore.entries).toHaveLength(1);
-    expect(consoleStore.entries[FIRST_INDEX]).toMatchObject({ status: "error", error: "Down" });
+    expect(activityStore.entries).toHaveLength(1);
+    expect(activityStore.entries[FIRST_INDEX]).toMatchObject({ status: "error", error: "Down" });
   });
 
   test("a route named like a ping is logged unless the caller says so", async () => {
-    const consoleStore = useConsoleStore();
+    const activityStore = useActivityStore();
     const followRequest = trackRequest({ ...request, route: "extension_back/ping" });
     await followRequest(Promise.resolve({}));
-    expect(consoleStore.entries).toHaveLength(1);
+    expect(activityStore.entries).toHaveLength(1);
   });
 });
 
-describe("microservice requests in the console", () => {
+describe("microservice requests in the activity panel", () => {
   beforeEach(() => {
     setupActivePinia();
     const backStore = useBackStore();
@@ -91,9 +91,9 @@ describe("microservice requests in the console", () => {
     const schema = back_schemas.opengeodeweb_back.allowed_files;
     registerEndpoint(schema.$id, { method: "POST", handler: () => ({ extensions: [] }) });
     const backStore = useBackStore();
-    const consoleStore = useConsoleStore();
+    const activityStore = useActivityStore();
     await backStore.request({ schema, params: {} });
-    expect(consoleStore.entries[FIRST_INDEX]).toMatchObject({
+    expect(activityStore.entries[FIRST_INDEX]).toMatchObject({
       source: "back",
       kind: "http",
       route: schema.$id,
@@ -111,9 +111,9 @@ describe("microservice requests in the console", () => {
       },
     });
     const backStore = useBackStore();
-    const consoleStore = useConsoleStore();
+    const activityStore = useActivityStore();
     await expect(backStore.request({ schema, params: {} })).rejects.toThrow(String(STATUS_500));
-    expect(consoleStore.entries[FIRST_INDEX]).toMatchObject({
+    expect(activityStore.entries[FIRST_INDEX]).toMatchObject({
       status: "error",
       error: "Internal Server Error: Broken",
     });
@@ -125,18 +125,18 @@ describe("microservice requests in the console", () => {
       handler: () => ({}),
     });
     const backStore = useBackStore();
-    const consoleStore = useConsoleStore();
+    const activityStore = useActivityStore();
     await backStore.ping();
-    expect(consoleStore.entries).toHaveLength(0);
+    expect(activityStore.entries).toHaveLength(0);
   });
 
   test("an upload is logged with its file name", async () => {
     const schema = back_schemas.opengeodeweb_back.upload_file;
     registerEndpoint(schema.$id, { method: "PUT", handler: () => ({}) });
     const backStore = useBackStore();
-    const consoleStore = useConsoleStore();
+    const activityStore = useActivityStore();
     await backStore.upload(new File(["content"], "model.og_brep"));
-    expect(consoleStore.entries[FIRST_INDEX]).toMatchObject({
+    expect(activityStore.entries[FIRST_INDEX]).toMatchObject({
       kind: "upload",
       route: schema.$id,
       label: "model.og_brep",

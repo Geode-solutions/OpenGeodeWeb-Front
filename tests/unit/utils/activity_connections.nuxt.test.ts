@@ -6,8 +6,8 @@ import { nextTick } from "vue";
 import { type Microservice, useInfraStore } from "@ogw_front/stores/infra";
 import { Status } from "@ogw_front/utils/status";
 import { setupActivePinia } from "@ogw_tests/utils";
-import { useConsoleStore } from "@ogw_front/stores/console";
-import { watchMicroserviceConnections } from "@ogw_front/utils/console_connections";
+import { useActivityStore } from "@ogw_front/stores/activity";
+import { watchMicroserviceConnections } from "@ogw_front/utils/activity_connections";
 
 vi.setConfig({ testTimeout: 10_000 });
 
@@ -39,25 +39,25 @@ describe("watchMicroserviceConnections()", () => {
     registerFakeMicroservice();
     watchMicroserviceConnections();
     await nextTick();
-    expect(useConsoleStore().entries).toHaveLength(0);
+    expect(useActivityStore().entries).toHaveLength(0);
   });
 
   test("connection and loss are logged", async () => {
     const microservice = registerFakeMicroservice();
-    const consoleStore = useConsoleStore();
+    const activityStore = useActivityStore();
     watchMicroserviceConnections();
     microservice.status = Status.CONNECTED;
     await nextTick();
     microservice.status = Status.NOT_CONNECTED;
     await nextTick();
-    expect(consoleStore.entries).toHaveLength(2);
-    expect(consoleStore.entries[FIRST_INDEX]).toMatchObject({
+    expect(activityStore.entries).toHaveLength(2);
+    expect(activityStore.entries[FIRST_INDEX]).toMatchObject({
       source: "back",
       kind: "connection",
       route: "Connected",
       status: "info",
     });
-    expect(consoleStore.entries[SECOND_INDEX]).toMatchObject({
+    expect(activityStore.entries[SECOND_INDEX]).toMatchObject({
       route: "Connection lost",
       status: "error",
     });
