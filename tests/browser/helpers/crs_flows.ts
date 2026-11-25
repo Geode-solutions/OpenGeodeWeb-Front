@@ -1,16 +1,13 @@
 // Third party imports
-import type { Page } from "@playwright/test";
+import { type Page, expect } from "@playwright/test";
 
 // Local imports
 import { BREP_NAME, CURVE_NAME, POINTSET_NAME } from "./crs_test_data";
 import {
-  brepGeodeObjectType,
-  edgedCurveGeodeObjectType,
-  pointSetGeodeObjectType,
-} from "./constants";
-import {
+  applyAlignment,
   clickAssign,
   confirmConvert,
+  expectFeedback,
   expectTreeCrs,
   fillAlignPoints,
   openCrsFromTree,
@@ -20,7 +17,13 @@ import {
   selectCrs,
   selectScope,
 } from "./crs";
+import {
+  brepGeodeObjectType,
+  edgedCurveGeodeObjectType,
+  pointSetGeodeObjectType,
+} from "./constants";
 import { closeFeedbackSnackbar, moveMouseOutOfTheWay } from "./app_interaction";
+import { getMainObjectTree } from "./object_trees/main_object_tree";
 import { waitForActionSettled } from "./wait_for_action_settled";
 
 async function closeCrsDialog(window: Page): Promise<void> {
@@ -84,7 +87,25 @@ async function assignAnywayToAll(window: Page, crsName: string): Promise<void> {
   await moveMouseOutOfTheWay(window);
 }
 
+// With a basemap (only in the apps that opt in), an alignment moving the data out of the domain of the project CRS
+// Makes the basemap build fail: its message shows and the basemap is hidden. Without one, nothing else happens
+async function applyAlignmentOffTheMap(window: Page): Promise<void> {
+  const basemapRow = getMainObjectTree(window)
+    .getByTestId("treeRowWrapper")
+    .filter({ hasText: "Basemap" });
+  if ((await basemapRow.count()) === 0) {
+    await applyAlignment(window);
+    return;
+  }
+  await expectFeedback(window, "Area outside the map projection limits", async () => {
+    await applyAlignment(window);
+  });
+  // Only the last build hides the basemap: no other message comes after
+  await expect(basemapRow.getByTestId("hiddenObjectEyeButton")).toBeVisible();
+}
+
 export {
+  applyAlignmentOffTheMap,
   assignAnywayToAll,
   closeCrsDialog,
   convertAloneTo,

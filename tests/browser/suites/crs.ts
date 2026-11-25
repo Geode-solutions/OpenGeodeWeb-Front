@@ -33,6 +33,7 @@ import {
   startAlignment,
 } from "#browser_helpers/crs";
 import {
+  applyAlignmentOffTheMap,
   assignAnywayToAll,
   closeCrsDialog,
   convertAloneTo,
@@ -46,7 +47,6 @@ import {
   pointSetGeodeObjectType,
 } from "#browser_helpers/constants";
 import { closeFeedbackSnackbar, moveMouseOutOfTheWay } from "#browser_helpers/app_interaction";
-import { getMainObjectTree } from "#browser_helpers/object_trees/main_object_tree";
 import { waitForActionSettled } from "#browser_helpers/wait_for_action_settled";
 
 import type { SuiteRuntime } from "#browser_helpers/suite_runtime";
@@ -116,18 +116,11 @@ function registerTests({ test, loadTestDatas }: SuiteRuntime): void {
   });
 
   // The aligned model lies far from the point set, misplaced by the Lambert-93 assigned anyway:
-  // Their extent leaves the UTM domain, so the basemap build fails and the basemap is hidden
+  // Their extent leaves the UTM domain, so a basemap build fails and the basemap is hidden
   test("apply the alignment", async ({ window }) => {
     // The feedback can take up to its own timeout to show
     test.slow();
-    await expectFeedback(window, "Area outside the map projection limits", async () => {
-      await applyAlignment(window);
-    });
-    // Only the last build hides the basemap: no other message comes after
-    const basemapRow = getMainObjectTree(window)
-      .getByTestId("treeRowWrapper")
-      .filter({ hasText: "Basemap" });
-    await expect(basemapRow.getByTestId("hiddenObjectEyeButton")).toBeVisible();
+    await applyAlignmentOffTheMap(window);
     await closeFeedbackSnackbar(window);
     await moveMouseOutOfTheWay(window);
   });
