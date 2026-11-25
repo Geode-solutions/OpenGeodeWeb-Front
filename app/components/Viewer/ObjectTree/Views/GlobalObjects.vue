@@ -210,7 +210,7 @@ function handleHoverEnter({
 
 function handleHoverLeave({ item }: { item: TreeGroupItem }): void {
   const actualItem = item.raw || item;
-  if (!actualItem.viewer_object_type) {
+  if (!actualItem.viewer_object_type || actualItem.viewer_object_type === "image") {
     return;
   }
   if (treeviewStore.hoveredModelId === actualItem.id) {

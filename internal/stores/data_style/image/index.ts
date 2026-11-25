@@ -12,7 +12,7 @@ import { whenDefined } from "@ogw_internal/stores/data_style/when_defined";
 // Local constants
 const imageSchemas = viewer_schemas.opengeodeweb_viewer.image;
 
-interface ImageStyle {
+interface ImageStyleStore {
   imageVisibility: (imageId: ImageId) => Visibility | undefined;
   setImageVisibility: (imageId: ImageId, visibility: Visibility) => Promise<unknown>;
   imageOpacity: (imageId: ImageId) => Opacity | undefined;
@@ -22,7 +22,7 @@ interface ImageStyle {
 
 // An image shows its own colors: only its visibility and its opacity are styled
 // oxlint-disable-next-line max-lines-per-function
-export function useImageStyle(): ImageStyle {
+export function useImageStyle(): ImageStyleStore {
   const hybridViewerStore = useHybridViewerStore();
   const viewerStore = useViewerStore();
   const dataStyleState = useDataStyleState();
