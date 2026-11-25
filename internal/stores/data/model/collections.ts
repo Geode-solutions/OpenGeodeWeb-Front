@@ -1,5 +1,9 @@
-import { type FormattedComponent, type ModelComponentRecord, useDataMesh } from "./mesh.js";
-import { modelComponentsDb, modelComponentsRelationDb } from "@ogw_internal/database/database.js";
+import {
+  type FormattedComponent,
+  type ModelComponentRecord,
+  useDataMesh,
+} from "./mesh_components.js";
+import { modelComponentRelationsOf, modelComponentsOf } from "@ogw_internal/database/queries.js";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import type { ModelComponentRelationRecord } from "./relations.js";
 import type { ModelId } from "@ogw_front/types/identifiers";
@@ -15,6 +19,27 @@ interface CollectionComponent extends FormattedComponent {
 
 type CollectionComponentGroup = ReadonlyTreeGroup<CollectionComponent>;
 
+async function hasCollectionComponents(modelId: ModelId): Promise<boolean> {
+  const count = await modelComponentsOf(modelId)
+    .and((component: ModelComponentRecord) => !MESH_COMPONENT_TYPES.includes(component.type))
+    .count();
+  return count > 0;
+}
+
+async function getAllCollectionComponents(modelId: ModelId): Promise<FormattedComponent[]> {
+  const items = await modelComponentsOf(modelId).toArray();
+  return items
+    .filter((component: ModelComponentRecord) => !MESH_COMPONENT_TYPES.includes(component.type))
+    .map((component: ModelComponentRecord) => ({
+      id: component.geode_id,
+      geode_id: component.geode_id,
+      title: component.name,
+      category: component.type,
+      viewer_id: Number(component.viewer_id),
+      is_active: component.is_active,
+    }));
+}
+
 // oxlint-disable-next-line eslint/max-lines-per-function
 export function useDataCollections(): {
   hasCollectionComponents: typeof hasCollectionComponents;
@@ -23,38 +48,13 @@ export function useDataCollections(): {
   formatedCollectionComponents: typeof formatedCollectionComponents;
   refFormatedCollectionComponents: typeof refFormatedCollectionComponents;
 } {
-  const modelComponentsTable = modelComponentsDb();
-  const modelComponentsRelationTable = modelComponentsRelationDb();
   const { getAllMeshComponents } = useDataMesh();
-
-  async function hasCollectionComponents(modelId: ModelId): Promise<boolean> {
-    const count = await modelComponentsTable
-      .where("data_id")
-      .equals(modelId)
-      .and((component: ModelComponentRecord) => !MESH_COMPONENT_TYPES.includes(component.type))
-      .count();
-    return count > 0;
-  }
-
-  async function getAllCollectionComponents(modelId: ModelId): Promise<FormattedComponent[]> {
-    const items = await modelComponentsTable.where("data_id").equals(modelId).toArray();
-    return items
-      .filter((component: ModelComponentRecord) => !MESH_COMPONENT_TYPES.includes(component.type))
-      .map((component: ModelComponentRecord) => ({
-        id: component.geode_id,
-        geode_id: component.geode_id,
-        title: component.name,
-        category: component.type,
-        viewer_id: Number(component.viewer_id),
-        is_active: component.is_active,
-      }));
-  }
 
   async function fetchAllCollectionComponents(
     modelId: ModelId,
   ): Promise<Record<string, CollectionComponent[]>> {
     const components = await getAllCollectionComponents(modelId);
-    const relations = await modelComponentsRelationTable.where("data_id").equals(modelId).toArray();
+    const relations = await modelComponentRelationsOf(modelId).toArray();
     const allMeshComponents = await getAllMeshComponents(modelId);
     const meshComponentsById: Record<string, FormattedComponent> = {};
     for (const meshComponent of allMeshComponents) {

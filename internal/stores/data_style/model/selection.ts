@@ -1,13 +1,11 @@
 import type { ModelId, ModelIdentified } from "@ogw_front/types/identifiers";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
-import type { ModelComponentRecord } from "@ogw_front/stores/data_helpers/mesh";
+import type { ModelComponentRecord } from "@ogw_internal/stores/data/model/mesh_components";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
-import { modelComponentsDb } from "@ogw_internal/database/database";
+import { modelComponentsOf } from "@ogw_internal/database/queries";
 import type { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 
 type DataStyleState = ReturnType<typeof useDataStyleState>;
-
-const modelComponentsTable = modelComponentsDb();
 
 function groupComponentsByType(
   components: readonly ModelComponentRecord[],
@@ -108,7 +106,7 @@ function useModelSelection(
 
   void (async (): Promise<void> => {
     try {
-      allComponents.value = await modelComponentsTable.where("data_id").equals(modelId).toArray();
+      allComponents.value = await modelComponentsOf(modelId).toArray();
     } catch {
       allComponents.value = [];
     }

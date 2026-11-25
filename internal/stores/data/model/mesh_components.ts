@@ -1,9 +1,9 @@
 import type { GeodeIdentified, ModelId } from "@ogw_front/types/identifiers";
+import { modelComponentsOf, modelComponentsOfType } from "@ogw_internal/database/queries.js";
 import type { ModelComponentRecord } from "@ogw_internal/database/tables/model_components";
 import type { ReadonlyTreeGroup } from "@ogw_front/types/tree";
 import type { ViewerId } from "@geode/opengeodeweb-viewer/schema_types";
 import { liveObservable } from "@ogw_front/utils/live_observable";
-import { modelComponentsDb } from "@ogw_internal/database/database.js";
 import { useObservable } from "@vueuse/rxjs";
 
 interface FormattedComponent extends Readonly<GeodeIdentified> {
@@ -27,6 +27,11 @@ function toFormattedComponent(meshComponent: ModelComponentRecord): FormattedCom
   };
 }
 
+async function getMeshComponentGeodeIds(modelId: ModelId, type: string): Promise<string[]> {
+  const components = await modelComponentsOfType(modelId, type).toArray();
+  return components.map((component: ModelComponentRecord) => component.geode_id);
+}
+
 // oxlint-disable-next-line eslint/max-lines-per-function
 function useDataMesh(): {
   formatedMeshComponents: typeof formatedMeshComponents;
@@ -40,10 +45,8 @@ function useDataMesh(): {
   getSurfacesGeodeIds: typeof getSurfacesGeodeIds;
   getBlocksGeodeIds: typeof getBlocksGeodeIds;
 } {
-  const modelComponentsTable = modelComponentsDb();
-
   async function formatedMeshComponents(modelId: ModelId): Promise<FormattedComponentGroup[]> {
-    const items = await modelComponentsTable.where("data_id").equals(modelId).toArray();
+    const items = await modelComponentsOf(modelId).toArray();
     const componentTitles: Record<string, string> = {
       Corner: "Corners",
       Line: "Lines",
@@ -86,15 +89,12 @@ function useDataMesh(): {
     modelId: ModelId,
     type: string,
   ): Promise<FormattedComponent[]> {
-    const components = await modelComponentsTable
-      .where("[data_id+type]")
-      .equals([modelId, type])
-      .toArray();
+    const components = await modelComponentsOfType(modelId, type).toArray();
     return components.map((item: ModelComponentRecord) => toFormattedComponent(item));
   }
 
   async function getAllMeshComponents(modelId: ModelId): Promise<FormattedComponent[]> {
-    const items = await modelComponentsTable.where("data_id").equals(modelId).toArray();
+    const items = await modelComponentsOf(modelId).toArray();
     return items.map((item: ModelComponentRecord) => toFormattedComponent(item));
   }
 
@@ -108,14 +108,6 @@ function useDataMesh(): {
       byType[component.category]?.push(component);
     }
     return byType;
-  }
-
-  async function getMeshComponentGeodeIds(modelId: ModelId, type: string): Promise<string[]> {
-    const components = await modelComponentsTable
-      .where("[data_id+type]")
-      .equals([modelId, type])
-      .toArray();
-    return components.map((component: ModelComponentRecord) => component.geode_id);
   }
 
   async function getCornersGeodeIds(modelId: ModelId): Promise<string[]> {

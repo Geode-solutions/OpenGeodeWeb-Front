@@ -1,6 +1,6 @@
 import { type ComputedRef, type Ref, computed, ref, watch } from "vue";
 import type { ModelId, ModelIdentified } from "@ogw_front/types/identifiers";
-import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
+import type { CollectionComponent } from "@ogw_internal/stores/data/model/collections";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import type { MenuViewerObjectType } from "@ogw_front/stores/menu";
 import { useDataStore } from "@ogw_front/stores/data";

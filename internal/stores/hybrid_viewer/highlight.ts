@@ -1,12 +1,13 @@
 import { HOVER_DEBOUNCE_MS, HOVER_TIMEOUT_MS } from "./constants";
 import type { HoverComponentInfo, HoverData } from "./vtk_types";
-import { dataDb, modelComponentsDb } from "@ogw_internal/database/database.js";
 import viewer_schemas, {
   type PickedFieldType,
   type ViewerHighlightResponse,
 } from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 import type { GeodeId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { ModelId } from "@ogw_front/types/identifiers";
+import { dataDb } from "@ogw_internal/database/database.js";
+import { modelComponent } from "@ogw_internal/database/queries.js";
 import { useHybridViewerCore } from "./core";
 import { useHybridViewerScene } from "./scene";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -23,10 +24,7 @@ async function lookupComponentInfo(
   if (geodeId === undefined) {
     return undefined;
   }
-  const component = await modelComponentsDb()
-    .where("[data_id+geode_id]")
-    .equals([modelId, geodeId])
-    .first();
+  const component = await modelComponent(modelId, geodeId).first();
   if (!component) {
     return undefined;
   }

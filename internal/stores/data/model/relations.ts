@@ -1,6 +1,9 @@
-import { type FormattedComponent, toFormattedComponent } from "./mesh.js";
-import { modelComponentsDb, modelComponentsRelationDb } from "@ogw_internal/database/database.js";
-import { Dexie } from "dexie";
+import { type FormattedComponent, toFormattedComponent } from "./mesh_components.js";
+import {
+  componentRelationsOf,
+  modelComponentRelationsOf,
+  modelComponentsByGeodeIds,
+} from "@ogw_internal/database/queries.js";
 import type { ModelComponentRelationRecord } from "@ogw_internal/database/tables/model_components_relation";
 import type { ModelId } from "@ogw_front/types/identifiers";
 
@@ -33,33 +36,27 @@ function groupRelationsByParent(
   return byParent;
 }
 
+async function getRelatedComponents(
+  modelId: ModelId,
+  relations: readonly ModelComponentRelationRecord[],
+  type: string,
+): Promise<FormattedComponent[]> {
+  const childIds = relations
+    .filter((relation) => relation.type === type)
+    .map((relation) => relation.child);
+  const components = await modelComponentsByGeodeIds(modelId, childIds).toArray();
+  return components.map((component) => toFormattedComponent(component));
+}
+
 export function useDataRelations(): {
   getComponentRelations: typeof getComponentRelations;
   fetchAllComponentRelations: typeof fetchAllComponentRelations;
 } {
-  const modelComponentsTable = modelComponentsDb();
-  const modelComponentsRelationTable = modelComponentsRelationDb();
-
-  async function getRelatedComponents(
-    modelId: ModelId,
-    relations: readonly ModelComponentRelationRecord[],
-    type: string,
-  ): Promise<FormattedComponent[]> {
-    const keys = relations
-      .filter((relation) => relation.type === type)
-      .map((relation) => [modelId, relation.child]);
-    const components = await modelComponentsTable.where("[data_id+geode_id]").anyOf(keys).toArray();
-    return components.map((component) => toFormattedComponent(component));
-  }
-
   async function getComponentRelations(
     modelId: ModelId,
     componentId: string,
   ): Promise<ComponentRelations> {
-    const relations = await modelComponentsRelationTable
-      .where("[data_id+parent+child]")
-      .between([modelId, componentId, Dexie.minKey], [modelId, componentId, Dexie.maxKey])
-      .toArray();
+    const relations = await componentRelationsOf(modelId, componentId).toArray();
     const [boundaries, internals] = await Promise.all([
       getRelatedComponents(modelId, relations, "boundary"),
       getRelatedComponents(modelId, relations, "internal"),
@@ -73,7 +70,7 @@ export function useDataRelations(): {
     modelId: ModelId,
     components: readonly FormattedComponent[],
   ): Promise<Record<string, ComponentRelations>> {
-    const relations = await modelComponentsRelationTable.where("data_id").equals(modelId).toArray();
+    const relations = await modelComponentRelationsOf(modelId).toArray();
     return groupRelationsByParent(relations, components);
   }
 
