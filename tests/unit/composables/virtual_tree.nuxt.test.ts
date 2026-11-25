@@ -2,7 +2,7 @@
 // oxlint-disable vitest/require-mock-type-parameters
 // Third party imports
 import { describe, expect, test, vi } from "vitest";
-import { ref } from "vue";
+import { nextTick, ref } from "vue";
 
 // Local imports
 import { type EmitFn, useVirtualTree } from "@ogw_front/composables/virtual_tree";
@@ -141,6 +141,39 @@ describe("virtual tree composable", () => {
         "line2",
       ]);
       expect(tree.isSelected(surface)).toBe(true);
+    });
+  });
+
+  describe("search", () => {
+    const leaf = { id: "leaf", title: "Leaf" };
+    const inner = { id: "inner", title: "Inner", children: [leaf] };
+    const other = {
+      id: "other",
+      title: "Other",
+      children: [{ id: "otherLeaf", title: "Other leaf" }],
+    };
+    const root = { id: "root", title: "Root", children: [inner, other] };
+
+    test("clearing the search reopens the groups opened before it", async () => {
+      const props = ref({ items: [root], opened: ["root"], search: "" });
+      const emit = vi.fn<EmitFn>();
+      useVirtualTree(props, emit);
+
+      props.value.search = "lea";
+      await nextTick();
+      expect(emit).toHaveBeenLastCalledWith("update:opened", ["root", "inner", "other"]);
+      // As the tree owner does
+      props.value.opened = ["root", "inner", "other"];
+      emit.mockClear();
+
+      props.value.search = "leaf";
+      await nextTick();
+      // Typing on does not open the groups again
+      expect(emit).not.toHaveBeenCalled();
+
+      props.value.search = "";
+      await nextTick();
+      expect(emit).toHaveBeenLastCalledWith("update:opened", ["root"]);
     });
   });
 });
