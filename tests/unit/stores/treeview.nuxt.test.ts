@@ -179,4 +179,18 @@ describe("treeview store collapsed model tree", () => {
     treeviewStore.displayAdditionalTree("a", "corbi", "BRep");
     expect(modelView("a")).toBeUndefined();
   });
+
+  test("all the model trees collapse and show again at once", () => {
+    const treeviewStore = useTreeviewStore();
+    treeviewStore.displayAdditionalTree("a", "corbi", "BRep");
+    treeviewStore.displayAdditionalTree("b", "cube", "BRep");
+    treeviewStore.toggleCollapsed("a");
+    treeviewStore.setAllCollapsed(true);
+    expect(modelView("a")?.collapsed).toBe(true);
+    expect(modelView("b")?.collapsed).toBe(true);
+    expect(modelView("main")?.collapsed).toBeUndefined();
+    treeviewStore.setAllCollapsed(false);
+    expect(modelView("a")?.collapsed).toBe(false);
+    expect(modelView("b")?.collapsed).toBe(false);
+  });
 });
