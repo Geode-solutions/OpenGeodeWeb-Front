@@ -327,6 +327,14 @@ export const useTreeviewStore = defineStore("treeview", () => {
     }
   }
 
+  function setAllCollapsed(collapsed: boolean): void {
+    for (const view of opened_views.value) {
+      if (view.type === "component") {
+        view.collapsed = collapsed;
+      }
+    }
+  }
+
   function setHoveredModel(id: string | undefined): void {
     hoveredModelId.value = id;
   }
@@ -465,6 +473,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     closeView,
     toggleView,
     toggleCollapsed,
+    setAllCollapsed,
     moveView,
     importStores,
     displayFileTree,

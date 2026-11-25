@@ -45,6 +45,9 @@ const additionalViews = computed(() =>
 );
 // The model trees not collapsed in the activity bar
 const shownViews = computed(() => additionalViews.value.filter((view) => view.collapsed !== true));
+// From two model trees, one button collapses them all, or shows them all again once all are collapsed
+const MIN_MODEL_TREES_FOR_ALL = 2;
+const showAllToggle = computed(() => additionalViews.value.length >= MIN_MODEL_TREES_FOR_ALL);
 
 const totalWidth = computed<string>(() => {
   const hasAdditional = shownViews.value.length > 0;
@@ -246,6 +249,16 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
       />
       <template v-if="additionalViews.length > 0">
         <div class="activity-bar-separator" />
+        <v-btn
+          v-if="showAllToggle"
+          data-testid="toggleAllModelTreesButton"
+          :icon="shownViews.length > 0 ? 'ph-caret-double-left' : 'ph-caret-double-right'"
+          variant="text"
+          density="comfortable"
+          class="model-tree-toggle-all"
+          v-tooltip="shownViews.length > 0 ? 'Collapse all model trees' : 'Show all model trees'"
+          @click="treeviewStore.setAllCollapsed(shownViews.length > 0)"
+        />
         <div
           v-for="view in additionalViews"
           :key="view.id"
@@ -449,6 +462,10 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
   margin-bottom: 6px;
   flex-shrink: 0;
   background-color: rgba(var(--v-border-color), var(--v-border-opacity));
+}
+
+.model-tree-toggle-all {
+  margin-bottom: 2px;
 }
 
 /* A model tree button: the model type icon, marked with the color of its tree, faded while collapsed */
