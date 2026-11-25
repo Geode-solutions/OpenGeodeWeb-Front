@@ -48,126 +48,157 @@ interface UseCrsAlignReturn {
   editSourcePoint: (index: number, coord: keyof EditablePoint, value: number | string) => void;
 }
 
-// Source points are picked on the data (only x and y are used) or typed, target points are typed
-// oxlint-disable-next-line max-lines-per-function
-function useCrsAlign(): UseCrsAlignReturn {
-  const viewerStore = useViewerStore();
-  const sourcePoints = ref<EditablePoint[]>(emptyPoints());
-  const targetPoints = ref<EditablePoint[]>(emptyPoints());
-  const pickingActive = ref(false);
+interface AlignState {
+  sourcePoints: Ref<EditablePoint[]>;
+  targetPoints: Ref<EditablePoint[]>;
+  pickingActive: Ref<boolean>;
   // Picked z only places the preview markers on the data
-  const pickedZ = ref<number[]>([]);
+  pickedZ: Ref<number[]>;
   // Picked points lie on the displayed data, typed ones are original coordinates
-  const pickedSources = ref<boolean[]>(notPicked());
+  pickedSources: Ref<boolean[]>;
+}
 
-  function pairFilled(index: number): boolean {
-    const source = sourcePoints.value[index];
-    const target = targetPoints.value[index];
-    return source !== undefined && target !== undefined && isFilled(source) && isFilled(target);
-  }
+function pairFilled({ sourcePoints, targetPoints }: AlignState, index: number): boolean {
+  const source = sourcePoints.value[index];
+  const target = targetPoints.value[index];
+  return source !== undefined && target !== undefined && isFilled(source) && isFilled(target);
+}
 
-  const isComplete = computed(() => sourcePoints.value.every((_point, index) => pairFilled(index)));
+function sourceCrsPoints({ sourcePoints, pickedSources }: AlignState): CrsPoint[] {
+  return sourcePoints.value.map((point, index) => ({
+    x: toNumber(point.x),
+    y: toNumber(point.y),
+    picked: pickedSources.value[index] ?? false,
+  }));
+}
 
-  function toSourceCrsPoints(): CrsPoint[] {
-    return sourcePoints.value.map((point, index) => ({
+function targetCrsPoints({ targetPoints }: AlignState): CrsPoint[] {
+  return targetPoints.value.map((point) => ({ x: toNumber(point.x), y: toNumber(point.y) }));
+}
+
+async function preview({ sourcePoints, pickedZ }: AlignState): Promise<void> {
+  const points = sourcePoints.value
+    .map((point, index) => ({
       x: toNumber(point.x),
       y: toNumber(point.y),
-      picked: pickedSources.value[index] ?? false,
-    }));
-  }
+      z: pickedZ.value[index] ?? 0,
+      filled: isFilled(point),
+    }))
+    .filter(({ filled }) => filled)
+    .map(({ x, y, z }) => ({ x, y, z }));
+  await useViewerStore().request({ schema: preview_schema, params: { points, style: "points" } });
+}
 
-  function toTargetCrsPoints(): CrsPoint[] {
-    return targetPoints.value.map((point) => ({ x: toNumber(point.x), y: toNumber(point.y) }));
+// A point picked on the data fills the first empty source point
+function placePickedPoint(
+  { sourcePoints, pickedZ, pickedSources }: AlignState,
+  picked: { x?: number; y?: number; z?: number },
+): void {
+  if (picked.x === undefined || picked.y === undefined) {
+    return;
   }
+  const firstEmpty = sourcePoints.value.findIndex((point) => !isFilled(point));
+  if (firstEmpty === -1) {
+    return;
+  }
+  sourcePoints.value[firstEmpty] = { x: toNumber(picked.x), y: toNumber(picked.y) };
+  pickedZ.value[firstEmpty] = toNumber(picked.z);
+  pickedSources.value[firstEmpty] = true;
+}
+
+// Picking, preview and Escape follow the viewer while the alignment is mounted
+function followViewer(state: AlignState, reset: () => void): void {
+  const viewerStore = useViewerStore();
+  watch(
+    () => viewerStore.picked_point,
+    (picked) => {
+      if (state.pickingActive.value) {
+        placePickedPoint(state, picked);
+      }
+    },
+    { deep: true },
+  );
+  watchDebounced(
+    state.sourcePoints,
+    async () => {
+      await preview(state);
+    },
+    {
+      deep: true,
+      debounce: PREVIEW_DEBOUNCE_MILLISECONDS,
+    },
+  );
+  watch(
+    () => viewerStore.picking_mode,
+    (pickingMode) => {
+      state.pickingActive.value = pickingMode;
+    },
+  );
+  onKeyStroke("Escape", (event) => {
+    if (state.pickingActive.value) {
+      viewerStore.toggle_picking_mode(false);
+      event.stopImmediatePropagation();
+    }
+  });
+  onUnmounted(async () => {
+    reset();
+    await viewerStore.request({ schema: preview_schema, params: { points: [], style: "points" } });
+  });
+}
+
+// Source points are picked on the data (only x and y are used) or typed, target points are typed
+function useCrsAlign(): UseCrsAlignReturn {
+  const viewerStore = useViewerStore();
+  const state: AlignState = {
+    sourcePoints: ref<EditablePoint[]>(emptyPoints()),
+    targetPoints: ref<EditablePoint[]>(emptyPoints()),
+    pickingActive: ref(false),
+    pickedZ: ref<number[]>([]),
+    pickedSources: ref<boolean[]>(notPicked()),
+  };
+  const isComplete = computed(() =>
+    state.sourcePoints.value.every((_point, index) => pairFilled(state, index)),
+  );
 
   function editSourcePoint(
     index: number,
     coord: keyof EditablePoint,
     value: number | string,
   ): void {
-    const point = sourcePoints.value[index];
+    const point = state.sourcePoints.value[index];
     if (!point) {
       return;
     }
     point[coord] = value;
-    pickedSources.value[index] = false;
+    state.pickedSources.value[index] = false;
   }
 
   function togglePickMode(): void {
-    pickingActive.value = !pickingActive.value;
-    viewerStore.toggle_picking_mode(pickingActive.value);
-  }
-
-  async function preview(): Promise<void> {
-    const points = sourcePoints.value
-      .map((point, index) => ({
-        x: toNumber(point.x),
-        y: toNumber(point.y),
-        z: pickedZ.value[index] ?? 0,
-        filled: isFilled(point),
-      }))
-      .filter(({ filled }) => filled)
-      .map(({ x, y, z }) => ({ x, y, z }));
-    await viewerStore.request({ schema: preview_schema, params: { points, style: "points" } });
+    state.pickingActive.value = !state.pickingActive.value;
+    viewerStore.toggle_picking_mode(state.pickingActive.value);
   }
 
   function reset(): void {
-    if (pickingActive.value) {
+    if (state.pickingActive.value) {
       viewerStore.toggle_picking_mode(false);
     }
-    sourcePoints.value = emptyPoints();
-    targetPoints.value = emptyPoints();
-    pickedZ.value = [];
-    pickedSources.value = notPicked();
+    state.sourcePoints.value = emptyPoints();
+    state.targetPoints.value = emptyPoints();
+    state.pickedZ.value = [];
+    state.pickedSources.value = notPicked();
   }
 
-  watch(
-    () => viewerStore.picked_point,
-    (newVal) => {
-      if (!pickingActive.value || newVal.x === undefined || newVal.y === undefined) {
-        return;
-      }
-      const firstEmpty = sourcePoints.value.findIndex((point) => !isFilled(point));
-      if (firstEmpty === -1) {
-        return;
-      }
-      sourcePoints.value[firstEmpty] = { x: toNumber(newVal.x), y: toNumber(newVal.y) };
-      pickedZ.value[firstEmpty] = toNumber(newVal.z);
-      pickedSources.value[firstEmpty] = true;
-    },
-    { deep: true },
-  );
-
-  watchDebounced(sourcePoints, preview, { deep: true, debounce: PREVIEW_DEBOUNCE_MILLISECONDS });
-
-  watch(
-    () => viewerStore.picking_mode,
-    (newVal) => {
-      pickingActive.value = newVal;
-    },
-  );
-
-  onKeyStroke("Escape", (event) => {
-    if (pickingActive.value) {
-      viewerStore.toggle_picking_mode(false);
-      event.stopImmediatePropagation();
-    }
-  });
-
-  onUnmounted(async () => {
-    reset();
-    await viewerStore.request({ schema: preview_schema, params: { points: [], style: "points" } });
-  });
+  followViewer(state, reset);
 
   return {
-    sourcePoints,
-    targetPoints,
-    pickingActive,
+    sourcePoints: state.sourcePoints,
+    targetPoints: state.targetPoints,
+    pickingActive: state.pickingActive,
     togglePickMode,
     reset,
     isComplete,
-    toSourceCrsPoints,
-    toTargetCrsPoints,
+    toSourceCrsPoints: (): CrsPoint[] => sourceCrsPoints(state),
+    toTargetCrsPoints: (): CrsPoint[] => targetCrsPoints(state),
     editSourcePoint,
   };
 }
