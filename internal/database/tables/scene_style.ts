@@ -1,6 +1,8 @@
 import type { TableDefinition } from "./table_definition";
 
-export const sceneStyleTable: TableDefinition = {
+const sceneStyleTable: TableDefinition = {
   name: "scene_style",
   schema: "id",
 };
+
+export { sceneStyleTable };

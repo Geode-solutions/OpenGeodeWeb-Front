@@ -5,7 +5,13 @@ import type {
   ObjectStyle,
   SceneStyle,
 } from "@ogw_internal/stores/data_style/types";
-import { getTable, writeTransaction } from "@ogw_internal/database/database.js";
+import {
+  componentDataStyleDb,
+  componentTypeDataStyleDb,
+  dataStyleDb,
+  sceneStyleDb,
+  writeTransaction,
+} from "@ogw_internal/database/database.js";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
@@ -38,18 +44,14 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   const sceneStyleStore = useSceneStyle();
   const attributeTimeStepStyle = useAttributeTimeStepStyle();
   const dataStore = useDataStore();
-  const data_style_db = getTable<ObjectStyle>("data_style");
+  const dataStyleTable = dataStyleDb();
   // Keyed by [id_model, type] and [id_model, id_component]
-  const model_component_type_datastyle_db = getTable<ModelComponentTypeStyle, [string, string]>(
-    "model_component_type_datastyle",
-  );
-  const component_datastyle_db = getTable<ModelComponentStyle, [string, string]>(
-    "model_component_datastyle",
-  );
+  const componentTypeDataStyleTable = componentTypeDataStyleDb();
+  const componentDataStyleTable = componentDataStyleDb();
 
   async function addDataStyle(dataId: DataId, geodeObjectType: GeodeObjectType): Promise<void> {
     const defaultStyle = getDefaultStyle(geodeObjectType);
-    await data_style_db.put(
+    await dataStyleTable.put(
       structuredClone({ data_id: dataId, ...(isRecord(defaultStyle) ? defaultStyle : {}) }),
     );
   }
@@ -141,17 +143,12 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
     // The snapshot replaces the stored styles as a whole: a failed import leaves the previous ones
     await writeTransaction(
-      [
-        data_style_db,
-        component_datastyle_db,
-        model_component_type_datastyle_db,
-        getTable("scene_style"),
-      ],
+      [dataStyleTable, componentDataStyleTable, componentTypeDataStyleTable, sceneStyleDb()],
       async () => {
         await dataStyleState.clear();
-        await data_style_db.bulkPut(styles);
-        await component_datastyle_db.bulkPut(componentStyles);
-        await model_component_type_datastyle_db.bulkPut(modelComponentTypeStyles);
+        await dataStyleTable.bulkPut(styles);
+        await componentDataStyleTable.bulkPut(componentStyles);
+        await componentTypeDataStyleTable.bulkPut(modelComponentTypeStyles);
       },
     );
     await dataStyleState.loadFromDatabase();

@@ -1,9 +1,3 @@
-// oxlint-disable eslint/max-lines
-// Third party imports
-import type { CRS } from "@geode/opengeodeweb-back/schema_types";
-import { useObservable } from "@vueuse/rxjs";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
-
 // Local imports
 import type { DataId, GeodeId } from "@geode/opengeodeweb-microservice/schema_types";
 import type {
@@ -16,20 +10,21 @@ import type {
 import { type LegacyDataId, fromLegacyDataId } from "@ogw_front/utils/legacy_data_id";
 import { type ModelComponentRecord, useDataMesh } from "./data_helpers/mesh.js";
 import { type ModelComponentRelationRecord, useDataRelations } from "./data_helpers/relations.js";
-import { getTable, writeTransaction } from "@ogw_internal/database/database.js";
+import {
+  dataDb,
+  modelComponentsDb,
+  modelComponentsRelationDb,
+  writeTransaction,
+} from "@ogw_internal/database/database.js";
+// oxlint-disable eslint/max-lines
+// Third party imports
+import type { CRS } from "@geode/opengeodeweb-back/schema_types";
+import type { DataItem } from "@ogw_internal/database/tables/data";
 import { liveObservable } from "@ogw_front/utils/live_observable";
 import { useDataCollections } from "./data_helpers/collections.js";
+import { useObservable } from "@vueuse/rxjs";
 import { useViewerStore } from "@ogw_front/stores/viewer";
-
-interface DataItem extends DataIdentified, GeodeIdentified, GeodeObjectTyped, ViewerObjectTyped {
-  name: string;
-  visible: boolean;
-  created_at: string;
-  is_viewable?: boolean;
-  binary_light_viewable?: string;
-  crs?: CRS;
-}
-
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 // What the CRS features read of a data: light to copy on each change
 type CrsItem = Pick<DataItem, "data_id" | "name" | "crs" | "created_at">;
 
@@ -73,11 +68,9 @@ function isDataItemViewable(data_item: DataItem | undefined): boolean {
 // oxlint-disable-next-line max-lines-per-function, max-statements
 export const useDataStore = defineStore("data", () => {
   const viewerStore = useViewerStore();
-  const data_db = getTable<DataItem>("data");
-  const model_components_db = getTable<ModelComponentRecord>("model_components");
-  const model_components_relation_db = getTable<ModelComponentRelationRecord>(
-    "model_components_relation",
-  );
+  const dataTable = dataDb();
+  const modelComponentsTable = modelComponentsDb();
+  const modelComponentsRelationTable = modelComponentsRelationDb();
   const {
     formatedMeshComponents,
     refFormatedMeshComponents,
@@ -101,20 +94,20 @@ export const useDataStore = defineStore("data", () => {
   // Ids the viewer holds a pipeline for: an item is stored before it is registered, and non viewable items never are
   const registeredIds = reactive(new Set<string>());
   async function item(dataId: DataId): Promise<DataItem> {
-    const data_item = await data_db.get(dataId);
+    const data_item = await dataTable.get(dataId);
     if (!data_item) {
       throw new Error(`Item not found: ${dataId}`);
     }
     return data_item;
   }
   async function allItems(): Promise<DataItem[]> {
-    const items = await data_db.toArray();
+    const items = await dataTable.toArray();
     return items;
   }
   function refItem(dataId: DataId): Ref<DataItem | undefined> {
     return useObservable(
       liveObservable(async () => {
-        const data_item = await data_db.get(dataId);
+        const data_item = await dataTable.get(dataId);
         return data_item;
       }),
       {
@@ -126,7 +119,7 @@ export const useDataStore = defineStore("data", () => {
   // A single live query of the data table, shared by every reader
   const liveItems = useObservable(
     liveObservable(async () => {
-      const all_items = await data_db.toArray();
+      const all_items = await dataTable.toArray();
       return all_items;
     }),
     { initialValue: [] as DataItem[] },
@@ -147,14 +140,14 @@ export const useDataStore = defineStore("data", () => {
   }
   // From the database: for code right after a write, which the live items may not show yet
   async function fetchIsViewable(dataId: DataId): Promise<boolean> {
-    const data_item = await data_db.get(dataId);
+    const data_item = await dataTable.get(dataId);
     return isDataItemViewable(data_item);
   }
   async function meshComponentType(
     modelId: ModelId,
     geode_id: GeodeId,
   ): Promise<string | undefined> {
-    const component = await model_components_db
+    const component = await modelComponentsTable
       .where("[data_id+geode_id]")
       .equals([modelId, geode_id])
       .first();
@@ -205,7 +198,7 @@ export const useDataStore = defineStore("data", () => {
     if (new_item.crs !== undefined) {
       itemData.crs = new_item.crs;
     }
-    const dataId = await data_db.put(itemData);
+    const dataId = await dataTable.put(itemData);
     return dataId;
   }
   // NewDataItem has mutable array fields (mesh_components, collection_components), so it can't
@@ -232,7 +225,7 @@ export const useDataStore = defineStore("data", () => {
     if (new_item.collection_components) {
       addModelComponents(new_item.collection_components);
     }
-    const lastKey = await model_components_db.bulkPut(allComponents);
+    const lastKey = await modelComponentsTable.bulkPut(allComponents);
     return lastKey;
   }
   // NewDataItem has mutable array fields (mesh_components, collection_components), so it can't
@@ -270,14 +263,14 @@ export const useDataStore = defineStore("data", () => {
         }
       }
     }
-    const lastKey = await model_components_relation_db.bulkPut(relations);
+    const lastKey = await modelComponentsRelationTable.bulkPut(relations);
     return lastKey;
   }
   async function getComponentByViewerId(
     modelId: ModelId,
     viewer_id: string | number,
   ): Promise<ModelComponentRecord | undefined> {
-    const component = await model_components_db
+    const component = await modelComponentsTable
       .where("viewer_id")
       .equals(Number(viewer_id))
       .and((model_component: ModelComponentRecord) => model_component.data_id === modelId)
@@ -288,7 +281,7 @@ export const useDataStore = defineStore("data", () => {
     modelId: ModelId,
     viewer_ids: number[],
   ): Promise<ModelComponentRecord[]> {
-    const components = await model_components_db
+    const components = await modelComponentsTable
       .where("viewer_id")
       .anyOf(viewer_ids)
       .and((model_component: ModelComponentRecord) => model_component.data_id === modelId)
@@ -296,29 +289,29 @@ export const useDataStore = defineStore("data", () => {
     return components;
   }
   async function deleteModelComponents(modelId: ModelId): Promise<void> {
-    await writeTransaction([model_components_db, model_components_relation_db], async () => {
-      await model_components_db.where("data_id").equals(modelId).delete();
-      await model_components_relation_db.where("data_id").equals(modelId).delete();
+    await writeTransaction([modelComponentsTable, modelComponentsRelationTable], async () => {
+      await modelComponentsTable.where("data_id").equals(modelId).delete();
+      await modelComponentsRelationTable.where("data_id").equals(modelId).delete();
     });
   }
 
   // A data is deleted with its components and their relations, or not at all
   async function deleteItem(dataId: DataId): Promise<void> {
     await writeTransaction(
-      [data_db, model_components_db, model_components_relation_db],
+      [dataTable, modelComponentsTable, modelComponentsRelationTable],
       async () => {
-        await data_db.delete(dataId);
+        await dataTable.delete(dataId);
         await deleteModelComponents(dataId);
       },
     );
   }
 
   async function updateItem(dataId: DataId, changes: Partial<DataItem>): Promise<void> {
-    await data_db.update(dataId, changes);
+    await dataTable.update(dataId, changes);
   }
 
   async function getAllModelComponentsViewerIds(modelId: ModelId): Promise<number[]> {
-    const components = await model_components_db.where("data_id").equals(modelId).toArray();
+    const components = await modelComponentsTable.where("data_id").equals(modelId).toArray();
     return components.map((component: ModelComponentRecord) =>
       Math.trunc(Number(component.viewer_id)),
     );
@@ -327,7 +320,7 @@ export const useDataStore = defineStore("data", () => {
     modelId: ModelId,
     meshComponentGeodeIds: readonly string[],
   ): Promise<number[]> {
-    const components = await model_components_db
+    const components = await modelComponentsTable
       .where("[data_id+geode_id]")
       .anyOf(meshComponentGeodeIds.map((geode_id) => [modelId, geode_id]))
       .toArray();
@@ -341,20 +334,20 @@ export const useDataStore = defineStore("data", () => {
     modelComponentsRelations: ModelComponentRelationRecord[];
   }> {
     return {
-      items: await data_db.toArray(),
-      modelComponents: await model_components_db.toArray(),
-      modelComponentsRelations: await model_components_relation_db.toArray(),
+      items: await dataTable.toArray(),
+      modelComponents: await modelComponentsTable.toArray(),
+      modelComponentsRelations: await modelComponentsRelationTable.toArray(),
     };
   }
 
   async function clear(): Promise<void> {
     registeredIds.clear();
     await writeTransaction(
-      [data_db, model_components_db, model_components_relation_db],
+      [dataTable, modelComponentsTable, modelComponentsRelationTable],
       async () => {
-        await data_db.clear();
-        await model_components_db.clear();
-        await model_components_relation_db.clear();
+        await dataTable.clear();
+        await modelComponentsTable.clear();
+        await modelComponentsRelationTable.clear();
       },
     );
   }
@@ -373,15 +366,15 @@ export const useDataStore = defineStore("data", () => {
   }): Promise<void> {
     // The snapshot replaces the stored data as a whole: a failed import leaves the previous one
     await writeTransaction(
-      [data_db, model_components_db, model_components_relation_db],
+      [dataTable, modelComponentsTable, modelComponentsRelationTable],
       async () => {
         await clear();
-        await model_components_db.bulkPut(
+        await modelComponentsTable.bulkPut(
           snapshot.modelComponents.map((component) =>
             fromLegacyDataId<ModelComponentRecord>(component),
           ),
         );
-        await model_components_relation_db.bulkPut(
+        await modelComponentsRelationTable.bulkPut(
           snapshot.modelComponentsRelations.map((relation) =>
             fromLegacyDataId<ModelComponentRelationRecord>(relation),
           ),
@@ -433,4 +426,5 @@ export const useDataStore = defineStore("data", () => {
   };
 });
 
-export type { CrsItem, DataItem, NewDataItem, ModelComponentInput };
+export type { CrsItem, NewDataItem, ModelComponentInput };
+export type { DataItem } from "@ogw_internal/database/tables/data";

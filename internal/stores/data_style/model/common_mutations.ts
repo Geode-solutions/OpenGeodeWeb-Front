@@ -3,26 +3,17 @@ import type {
   ModelComponentTypeStyle,
   StyleValues,
 } from "@ogw_internal/stores/data_style/types.js";
-import { getTable, writeTransaction } from "@ogw_internal/database/database";
-import type { Table } from "dexie";
+import {
+  componentDataStyleDb,
+  componentTypeDataStyleDb,
+  writeTransaction,
+} from "@ogw_internal/database/database";
 import merge from "lodash/merge";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
-
-// The component style tables use compound keys: [id_model, id_component] and [id_model, type]
-type ComponentTable = Table<ModelComponentStyle, [string, string]>;
-type ComponentTypeTable = Table<ModelComponentTypeStyle, [string, string]>;
 
 interface ComponentStyleUpdate {
   id_component: string;
   values: StyleValues;
-}
-
-function componentDatastyleTable(): ComponentTable {
-  return getTable<ModelComponentStyle, [string, string]>("model_component_datastyle");
-}
-
-function componentTypeDatastyleTable(): ComponentTypeTable {
-  return getTable<ModelComponentTypeStyle, [string, string]>("model_component_type_datastyle");
 }
 
 interface UseModelComponentStyleMutationsReturn {
@@ -55,8 +46,8 @@ interface UseModelComponentsPerComponentStyleMutationReturn {
 
 function useModelComponentStyleMutations(): UseModelComponentStyleMutationsReturn {
   const dataStyleState = useDataStyleState();
-  const model_component_datastyle_db = componentDatastyleTable();
-  const model_component_type_datastyle_db = componentTypeDatastyleTable();
+  const componentDataStyleTable = componentDataStyleDb();
+  const componentTypeDataStyleTable = componentTypeDataStyleDb();
 
   async function mutateComponentStyle(
     id_model: string,
@@ -65,12 +56,12 @@ function useModelComponentStyleMutations(): UseModelComponentStyleMutationsRetur
   ): Promise<unknown> {
     dataStyleState.updateComponentStyleCache(id_model, id_component, values);
     const key: [string, string] = [id_model, id_component];
-    const entry: ModelComponentStyle = (await model_component_datastyle_db.get(key)) ?? {
+    const entry: ModelComponentStyle = (await componentDataStyleTable.get(key)) ?? {
       id_model,
       id_component,
     };
     merge(entry, values);
-    return model_component_datastyle_db.put(structuredClone(toRaw(entry)));
+    return componentDataStyleTable.put(structuredClone(toRaw(entry)));
   }
 
   async function mutateModelComponentTypeStyle(
@@ -79,14 +70,14 @@ function useModelComponentStyleMutations(): UseModelComponentStyleMutationsRetur
     values: StyleValues,
   ): Promise<void> {
     dataStyleState.updateModelComponentTypeStyleCache(id_model, type, values);
-    await writeTransaction([model_component_type_datastyle_db], async () => {
+    await writeTransaction([componentTypeDataStyleTable], async () => {
       const key: [string, string] = [id_model, type];
-      const entry: ModelComponentTypeStyle = (await model_component_type_datastyle_db.get(key)) ?? {
+      const entry: ModelComponentTypeStyle = (await componentTypeDataStyleTable.get(key)) ?? {
         id_model,
         type,
       };
       merge(entry, values);
-      return model_component_type_datastyle_db.put(structuredClone(toRaw(entry)));
+      return componentTypeDataStyleTable.put(structuredClone(toRaw(entry)));
     });
   }
 
@@ -98,7 +89,7 @@ function useModelComponentStyleMutations(): UseModelComponentStyleMutationsRetur
 
 function useModelComponentsStyleMutation(): UseModelComponentsStyleMutationReturn {
   const dataStyleState = useDataStyleState();
-  const model_component_datastyle_db = componentDatastyleTable();
+  const componentDataStyleTable = componentDataStyleDb();
 
   async function mutateComponentStyles(
     id_model: string,
@@ -106,19 +97,19 @@ function useModelComponentsStyleMutation(): UseModelComponentsStyleMutationRetur
     values: StyleValues,
   ): Promise<void> {
     dataStyleState.bulkUpdateComponentStylesCache(id_model, id_components, values);
-    await writeTransaction([model_component_datastyle_db], async () => {
+    await writeTransaction([componentDataStyleTable], async () => {
       const keys: [string, string][] = id_components.map((id_component) => [
         id_model,
         id_component,
       ]);
-      const existing = await model_component_datastyle_db.bulkGet(keys);
+      const existing = await componentDataStyleTable.bulkGet(keys);
       const updates = id_components.map((id_component, index) => {
         const style: ModelComponentStyle = existing[index] ?? { id_model, id_component };
         merge(style, values);
         return toRaw(style);
       });
 
-      return model_component_datastyle_db.bulkPut(structuredClone(updates));
+      return componentDataStyleTable.bulkPut(structuredClone(updates));
     });
   }
 
@@ -129,25 +120,25 @@ function useModelComponentsStyleMutation(): UseModelComponentsStyleMutationRetur
 
 function useModelComponentsPerComponentStyleMutation(): UseModelComponentsPerComponentStyleMutationReturn {
   const dataStyleState = useDataStyleState();
-  const model_component_datastyle_db = componentDatastyleTable();
+  const componentDataStyleTable = componentDataStyleDb();
 
   async function bulkMutateComponentStylesPerComponent(
     id_model: string,
     component_updates: ComponentStyleUpdate[],
   ): Promise<void> {
     dataStyleState.bulkUpdateComponentStyleCache(id_model, component_updates);
-    await writeTransaction([model_component_datastyle_db], async () => {
+    await writeTransaction([componentDataStyleTable], async () => {
       const keys: [string, string][] = component_updates.map((update) => [
         id_model,
         update.id_component,
       ]);
-      const existing = await model_component_datastyle_db.bulkGet(keys);
+      const existing = await componentDataStyleTable.bulkGet(keys);
       const updates = component_updates.map(({ id_component, values }, index) => {
         const style: ModelComponentStyle = existing[index] ?? { id_model, id_component };
         merge(style, values);
         return toRaw(style);
       });
-      return model_component_datastyle_db.bulkPut(structuredClone(updates));
+      return componentDataStyleTable.bulkPut(structuredClone(updates));
     });
   }
 

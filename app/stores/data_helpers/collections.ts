@@ -1,10 +1,10 @@
 import { type FormattedComponent, type ModelComponentRecord, useDataMesh } from "./mesh.js";
+import { modelComponentsDb, modelComponentsRelationDb } from "@ogw_internal/database/database.js";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import type { ModelComponentRelationRecord } from "./relations.js";
 import type { ModelId } from "@ogw_front/types/identifiers";
 import type { ReadonlyTreeGroup } from "@ogw_front/types/tree";
 import type { Ref } from "vue";
-import { getTable } from "@ogw_internal/database/database.js";
 import { liveObservable } from "@ogw_front/utils/live_observable";
 import { pluralize } from "@ogw_front/utils/string";
 import { useObservable } from "@vueuse/rxjs";
@@ -23,14 +23,12 @@ export function useDataCollections(): {
   formatedCollectionComponents: typeof formatedCollectionComponents;
   refFormatedCollectionComponents: typeof refFormatedCollectionComponents;
 } {
-  const model_components_db = getTable<ModelComponentRecord>("model_components");
-  const model_components_relation_db = getTable<ModelComponentRelationRecord>(
-    "model_components_relation",
-  );
+  const modelComponentsTable = modelComponentsDb();
+  const modelComponentsRelationTable = modelComponentsRelationDb();
   const { getAllMeshComponents } = useDataMesh();
 
   async function hasCollectionComponents(modelId: ModelId): Promise<boolean> {
-    const count = await model_components_db
+    const count = await modelComponentsTable
       .where("data_id")
       .equals(modelId)
       .and((component: ModelComponentRecord) => !MESH_COMPONENT_TYPES.includes(component.type))
@@ -39,7 +37,7 @@ export function useDataCollections(): {
   }
 
   async function getAllCollectionComponents(modelId: ModelId): Promise<FormattedComponent[]> {
-    const items = await model_components_db.where("data_id").equals(modelId).toArray();
+    const items = await modelComponentsTable.where("data_id").equals(modelId).toArray();
     return items
       .filter((component: ModelComponentRecord) => !MESH_COMPONENT_TYPES.includes(component.type))
       .map((component: ModelComponentRecord) => ({
@@ -56,7 +54,7 @@ export function useDataCollections(): {
     modelId: ModelId,
   ): Promise<Record<string, CollectionComponent[]>> {
     const components = await getAllCollectionComponents(modelId);
-    const relations = await model_components_relation_db.where("data_id").equals(modelId).toArray();
+    const relations = await modelComponentsRelationTable.where("data_id").equals(modelId).toArray();
     const allMeshComponents = await getAllMeshComponents(modelId);
     const meshComponentsById: Record<string, FormattedComponent> = {};
     for (const meshComponent of allMeshComponents) {

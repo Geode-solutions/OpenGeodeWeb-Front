@@ -1,21 +1,12 @@
-import type { DataIdentified, ModelId } from "@ogw_front/types/identifiers";
-import {
-  type FormattedComponent,
-  type ModelComponentRecord,
-  toFormattedComponent,
-} from "./mesh.js";
+import { type FormattedComponent, toFormattedComponent } from "./mesh.js";
+import { modelComponentsDb, modelComponentsRelationDb } from "@ogw_internal/database/database.js";
 import { Dexie } from "dexie";
-import { getTable } from "@ogw_internal/database/database.js";
+import type { ModelComponentRelationRecord } from "@ogw_internal/database/tables/model_components_relation";
+import type { ModelId } from "@ogw_front/types/identifiers";
 
 interface ComponentRelations {
   readonly boundaries: readonly FormattedComponent[];
   readonly internals: readonly FormattedComponent[];
-}
-
-interface ModelComponentRelationRecord extends DataIdentified {
-  parent: string;
-  child: string;
-  type: string;
 }
 
 const RELATION_KEYS: Readonly<Record<string, keyof ComponentRelations>> = {
@@ -46,10 +37,8 @@ export function useDataRelations(): {
   getComponentRelations: typeof getComponentRelations;
   fetchAllComponentRelations: typeof fetchAllComponentRelations;
 } {
-  const model_components_db = getTable<ModelComponentRecord>("model_components");
-  const model_components_relation_db = getTable<ModelComponentRelationRecord>(
-    "model_components_relation",
-  );
+  const modelComponentsTable = modelComponentsDb();
+  const modelComponentsRelationTable = modelComponentsRelationDb();
 
   async function getRelatedComponents(
     modelId: ModelId,
@@ -59,7 +48,7 @@ export function useDataRelations(): {
     const keys = relations
       .filter((relation) => relation.type === type)
       .map((relation) => [modelId, relation.child]);
-    const components = await model_components_db.where("[data_id+geode_id]").anyOf(keys).toArray();
+    const components = await modelComponentsTable.where("[data_id+geode_id]").anyOf(keys).toArray();
     return components.map((component) => toFormattedComponent(component));
   }
 
@@ -67,7 +56,7 @@ export function useDataRelations(): {
     modelId: ModelId,
     componentId: string,
   ): Promise<ComponentRelations> {
-    const relations = await model_components_relation_db
+    const relations = await modelComponentsRelationTable
       .where("[data_id+parent+child]")
       .between([modelId, componentId, Dexie.minKey], [modelId, componentId, Dexie.maxKey])
       .toArray();
@@ -84,11 +73,12 @@ export function useDataRelations(): {
     modelId: ModelId,
     components: readonly FormattedComponent[],
   ): Promise<Record<string, ComponentRelations>> {
-    const relations = await model_components_relation_db.where("data_id").equals(modelId).toArray();
+    const relations = await modelComponentsRelationTable.where("data_id").equals(modelId).toArray();
     return groupRelationsByParent(relations, components);
   }
 
   return { getComponentRelations, fetchAllComponentRelations };
 }
 
-export type { ComponentRelations, ModelComponentRelationRecord };
+export type { ComponentRelations };
+export type { ModelComponentRelationRecord } from "@ogw_internal/database/tables/model_components_relation";
