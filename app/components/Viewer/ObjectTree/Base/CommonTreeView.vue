@@ -299,6 +299,8 @@ const { handleKeyDown } = useTreeKeyboardNav(
   cursor: pointer;
   border-radius: var(--ogw-viewer-row-radius, 4px);
   margin: 0 2px;
+  /* After the panel gutter, clear of the accent of a model tree */
+  margin-left: calc(2px + var(--tree-box-content-inset, 0px));
 }
 
 .tree-row-wrapper.is-focused {

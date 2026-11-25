@@ -128,7 +128,9 @@ watch(
 <style scoped>
 /* Apps can line the first icon up with the panel header icon (fallbacks: the former look) */
 .controls-row {
-  padding-left: var(--ogw-viewer-controls-inset, 4px) !important;
+  padding-left: calc(
+    var(--ogw-viewer-controls-inset, 4px) + var(--tree-box-content-inset, 0px)
+  ) !important;
 }
 
 .controls-capsule {

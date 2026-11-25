@@ -104,7 +104,7 @@ watch(
     ref="treeview-box"
     variant="outlined"
     class="tree-box d-flex flex-column"
-    :class="{ 'is-highlighted': accent?.highlighted }"
+    :class="{ 'is-highlighted': accent?.highlighted, 'has-accent': accent !== undefined }"
     :style="[
       adaptiveStyles,
       { borderRadius, borderLeft: borderLeft ? undefined : 'none' },
@@ -220,6 +220,17 @@ watch(
   z-index: 1;
 }
 
+/* Left gutter of the panel content, read by the header, the toolbar and the rows so they keep one column. A model
+   tree leaves its accent that room, so the rounded toolbar and row highlights do not slide under it; apps can give
+   every panel a gutter, so all the trees line up */
+.tree-box {
+  --tree-box-content-inset: var(--ogw-viewer-panel-gutter, 0px);
+}
+
+.tree-box.has-accent {
+  --tree-box-content-inset: max(6px, var(--ogw-viewer-panel-gutter, 0px));
+}
+
 .tree-box-accent {
   position: absolute;
   z-index: 2;
@@ -245,6 +256,9 @@ watch(
 .tree-box-header {
   height: 32px !important;
   padding: 0 var(--ogw-viewer-panel-padding, 10px) !important;
+  padding-left: calc(
+    var(--ogw-viewer-panel-padding, 10px) + var(--tree-box-content-inset, 0px)
+  ) !important;
   background-color: rgba(var(--v-theme-surface), 0.05);
   border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.05);
   flex-shrink: 0;
