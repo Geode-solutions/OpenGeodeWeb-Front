@@ -63,7 +63,7 @@ export const useBackStore = defineStore("back", {
       const feedbackStore = useFeedbackStore();
       const schema = back_schemas.opengeodeweb_back.ping;
       const result = await this.request(
-        { schema },
+        { schema, log_success: false },
         {
           request_error_function: () => {
             feedbackStore.$patch({ server_error: true });
@@ -108,7 +108,11 @@ export const useBackStore = defineStore("back", {
       await Promise.resolve();
     },
     async request<Schema extends JsonRpcSchema>(
-      { schema, params }: { schema: Schema; params?: ParamsOf<Schema> },
+      {
+        schema,
+        params,
+        log_success,
+      }: { schema: Schema; params?: ParamsOf<Schema>; log_success?: boolean },
       callbacks: RequestHandlers<ResponseOf<Schema>> = {},
     ): Promise<ResponseOf<Schema>> {
       const rpc_schema: JsonRpcSchema = schema;
@@ -122,6 +126,7 @@ export const useBackStore = defineStore("back", {
           schema: rpc_schema as JsonRpcSchema & { methods: string[] },
           params: params ?? {},
           headers: {},
+          ...(log_success !== undefined && { log_success }),
         },
         {
           ...callbacks,
