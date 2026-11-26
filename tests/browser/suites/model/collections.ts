@@ -25,7 +25,8 @@ import type { SuiteRuntime } from "#browser_helpers/suite_runtime";
 // Constants
 const structuralModelFilename = "test.og_strm";
 const collectionTypeRowName = "ModelBoundaries";
-const collectionRowName = "019ea684-373";
+// Start of the collection id, still shown once the label is truncated in the middle
+const collectionRowName = "019ea684-37";
 const vertexAttributeName = "test_vertex";
 
 // Shared with the apps built on this layer: each one runs it with its own test fixture and data loader

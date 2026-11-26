@@ -170,6 +170,15 @@ function clearActive(): boolean {
   return true;
 }
 
+// Hovering the tree gives it the keyboard, unless a field (its search) is being typed in
+function focusOnHover(): void {
+  const { activeElement } = document;
+  if (activeElement instanceof HTMLInputElement || activeElement instanceof HTMLTextAreaElement) {
+    return;
+  }
+  treeWrapper.value?.focus();
+}
+
 const { handleKeyDown } = useTreeKeyboardNav(
   displayItems,
   emit as EmitFn,
@@ -190,7 +199,7 @@ const { handleKeyDown } = useTreeKeyboardNav(
     tabindex="0"
     @keydown="handleKeyDown"
     @mousedown="treeWrapper?.focus()"
-    @mouseenter="treeWrapper?.focus()"
+    @mouseenter="focusOnHover"
   >
     <StickyHeader
       v-if="stickyHeader"
@@ -299,6 +308,8 @@ const { handleKeyDown } = useTreeKeyboardNav(
   cursor: pointer;
   border-radius: var(--ogw-viewer-row-radius, 4px);
   margin: 0 2px;
+  /* After the panel gutter, clear of the accent of a model tree */
+  margin-left: calc(2px + var(--tree-box-content-inset, 0px));
 }
 
 .tree-row-wrapper.is-focused {
