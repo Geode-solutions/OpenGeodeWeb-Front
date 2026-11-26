@@ -32,7 +32,11 @@ async function fetchSources(
   dataId: DataId,
 ): Promise<AttributeSource[]> {
   const item = await dataStore.item(dataId);
-  if (item.viewer_object_type !== "model") {
+  // An image shows its own colors: it has no attribute to threshold
+  if (item.viewer_object_type === "image") {
+    return [];
+  }
+  if (item.viewer_object_type === "mesh") {
     return ["vertex", MESH_ELEMENT_KINDS[item.geode_object_type]]
       .filter((kind): kind is string => kind !== undefined)
       .map((kind) => attributeSource(kind, "", { id: dataId }));

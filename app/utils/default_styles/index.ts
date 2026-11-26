@@ -22,6 +22,7 @@ import {
 } from "./meshes";
 import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
 import type { SceneStyle } from "@ogw_internal/stores/data_style/types";
+import { imageDefaultStyle } from "./images";
 
 function default_styles(): Record<string, unknown> {
   return {
@@ -40,8 +41,8 @@ function default_styles(): Record<string, unknown> {
     PolygonalSurface2D: surfaceDefaultStyle(),
     PolygonalSurface3D: surfaceDefaultStyle(),
     PolyhedralSolid3D: solidDefaultStyle(),
-    RasterImage2D: {},
-    RasterImage3D: {},
+    RasterImage2D: imageDefaultStyle(),
+    RasterImage3D: imageDefaultStyle(),
     RegularGrid2D: grid2dDefaultStyle(),
     RegularGrid3D: grid3dDefaultStyle(),
     Section: sectionDefaultStyle(),
