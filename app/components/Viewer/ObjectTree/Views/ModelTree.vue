@@ -6,8 +6,10 @@ import FetchingData from "@ogw_front/components/FetchingData.vue";
 import type { ModelComponentMenuPayload } from "@ogw_front/utils/treeview";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
+import { isPhysicalPropertyId } from "@ogw_front/utils/physical_properties_tree";
 import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import { useModelPhysicalProperties } from "@ogw_front/composables/model_physical_properties";
 import { useModelTree } from "@ogw_front/composables/model_tree";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
@@ -25,6 +27,8 @@ interface CollectionTreeItem {
   relation?: string;
   viewer_id?: number;
   title?: string;
+  // Value of a physical property on a component listed under that property
+  physical_value?: string;
 }
 
 const { onHoverEnter, onHoverLeave } = useHoverhighlight();
@@ -46,6 +50,7 @@ const {
   selection: visibleComponents,
   updateVisibility,
 } = useModelTree(id);
+const physicalProperties = useModelPhysicalProperties(id);
 
 const currentView = computed(() => treeviewStore.opened_views.find((view) => view.id === id));
 
@@ -118,6 +123,9 @@ const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
       ),
     });
   }
+  if (physicalProperties.value) {
+    result.push(physicalProperties.value);
+  }
   return result;
 });
 
@@ -134,8 +142,8 @@ function isCollectionNode(item: CollectionTreeItem): boolean {
 
 function showContextMenu(event: MouseEvent, item: CollectionTreeItem): void {
   const actualItem = item.raw || item;
-  // A boundaries or internals group is not a component type: it has no menu
-  if (actualItem.relation !== undefined) {
+  // A boundaries or internals group, or a physical property, is not a component type: no menu
+  if (actualItem.relation !== undefined || isPhysicalPropertyId(actualItem.id)) {
     return;
   }
   if (isCollectionNode(actualItem)) {
@@ -207,6 +215,10 @@ function expandAll(): void {
   opened.value = allIds;
 }
 
+function physicalValue(item: CollectionTreeItem): string | undefined {
+  return (item.raw || item).physical_value;
+}
+
 function getLeafViewerIds(item: CollectionTreeItem): number[] {
   const actualItem = item.raw || item;
   return extractIds(actualItem);
@@ -262,6 +274,13 @@ function getLeafViewerIds(item: CollectionTreeItem): number[] {
       </template>
 
       <template #append="{ item }">
+        <span
+          v-if="physicalValue(item as unknown as CollectionTreeItem)"
+          class="text-caption text-medium-emphasis text-no-wrap me-2"
+          :data-testid="'physicalValue-' + (item as unknown as CollectionTreeItem).id"
+        >
+          {{ physicalValue(item as unknown as CollectionTreeItem) }}
+        </span>
         <v-btn
           v-if="getLeafViewerIds(item as unknown as CollectionTreeItem).length > 0"
           icon="ph-target"
