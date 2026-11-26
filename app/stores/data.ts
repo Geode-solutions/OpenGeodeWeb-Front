@@ -20,6 +20,7 @@ import { type ModelComponentRelationRecord, useDataRelations } from "./data_help
 import { database } from "@ogw_internal/database/database.js";
 import { liveObservable } from "@ogw_front/utils/live_observable";
 import { useDataCollections } from "./data_helpers/collections.js";
+import { useDataPhysicalProperties } from "./data_helpers/physical_properties.js";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 interface DataItem extends DataIdentified, GeodeIdentified, GeodeObjectTyped, ViewerObjectTyped {
@@ -127,6 +128,13 @@ export const useDataStore = defineStore("data", () => {
     refFormatedCollectionComponents,
   } = useDataCollections();
   const { getComponentRelations, fetchAllComponentRelations } = useDataRelations();
+  const {
+    addPhysicalProperties,
+    getPhysicalProperties,
+    refPhysicalProperties,
+    deletePhysicalProperties,
+    clearPhysicalProperties,
+  } = useDataPhysicalProperties();
   // Ids the viewer holds a pipeline for: an item is stored before it is registered, and non viewable items never are
   const registeredIds = reactive(new Set<string>());
   async function item(dataId: DataId): Promise<DataItem> {
@@ -334,6 +342,7 @@ export const useDataStore = defineStore("data", () => {
   async function deleteModelComponents(modelId: ModelId): Promise<void> {
     await model_components_db.where("data_id").equals(modelId).delete();
     await model_components_relation_db.where("data_id").equals(modelId).delete();
+    await deletePhysicalProperties(modelId);
   }
 
   async function deleteItem(dataId: DataId): Promise<void> {
@@ -383,6 +392,7 @@ export const useDataStore = defineStore("data", () => {
     await data_db.clear();
     await model_components_db.clear();
     await model_components_relation_db.clear();
+    await clearPhysicalProperties();
   }
 
   // Dexie's bulkPut expects mutable arrays, so this snapshot parameter can't deeply satisfy
@@ -450,6 +460,9 @@ export const useDataStore = defineStore("data", () => {
     refFormatedCollectionComponents,
     getComponentRelations,
     fetchAllComponentRelations,
+    addPhysicalProperties,
+    getPhysicalProperties,
+    refPhysicalProperties,
   };
 });
 
