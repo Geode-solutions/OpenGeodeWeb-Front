@@ -182,11 +182,7 @@ function toggleShowName(): void {
         class="circular-menu-items"
         :style="{ width: `${menuStore.menuRadius * 2}px`, height: `${menuStore.menuRadius * 2}px` }"
       >
-        <CircularItems
-          :menu-items="menu_items"
-          :data-id="id"
-          :menu-item-count="menuItemCount"
-        />
+        <CircularItems :menu-items="menu_items" :data-id="id" :menu-item-count="menuItemCount" />
 
         <CenterButton
           v-if="!isSceneMenu"

@@ -138,7 +138,6 @@ const optionsClass = computed<string>(() => {
 function toggleOptions(): void {
   menuStore.toggleItemOptions(index);
 }
-
 </script>
 <template>
   <v-sheet class="menu-item-container transition-swing" color="transparent">

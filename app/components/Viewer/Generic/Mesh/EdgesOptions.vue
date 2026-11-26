@@ -27,7 +27,13 @@ interface Props {
   capabilities?: Record<string, CapabilityConfig>;
 }
 
-const { dataId, index, btnImage, tooltip = "Edges options", capabilities = {} } = defineProps<Props>();
+const {
+  dataId,
+  index,
+  btnImage,
+  tooltip = "Edges options",
+  capabilities = {},
+} = defineProps<Props>();
 
 const visibility = computed<Visibility>({
   get: () => dataStyleStore.meshEdgesVisibility(dataId),
