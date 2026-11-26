@@ -77,4 +77,14 @@ describe("treeview store collapsed model tree", () => {
     treeviewStore.moveView(0, 1);
     expect(treeviewStore.opened_views.map((view) => view.id)).toStrictEqual(["b", "a"]);
   });
+
+  test("a model tree is collapsed or shown explicitly", () => {
+    const treeviewStore = useTreeviewStore();
+    treeviewStore.displayAdditionalTree("a", "corbi", "BRep");
+    treeviewStore.setCollapsed("a", true);
+    treeviewStore.setCollapsed("a", true);
+    expect(modelView("a")?.collapsed).toBe(true);
+    treeviewStore.setCollapsed("a", false);
+    expect(modelView("a")?.collapsed).toBe(false);
+  });
 });
