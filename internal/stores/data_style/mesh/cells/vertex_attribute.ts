@@ -29,7 +29,7 @@ interface UseMeshCellsVertexAttributeStyleReturn {
   meshCellsVertexAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
   ) => AttributeStoredConfig;
   setMeshCellsVertexAttribute: (meshId: MeshId, input: ValidAttributeInput) => Promise<unknown>;
   setMeshCellsVertexAttributeName: (meshId: MeshId, name: AttributeName) => Promise<unknown>;
@@ -41,7 +41,7 @@ interface UseMeshCellsVertexAttributeStyleReturn {
   ) => Promise<unknown>;
   setMeshCellsVertexAttributeColorMap: (
     meshId: MeshId,
-    colorMap: AttributeColorMap | undefined,
+    colorMap: AttributeColorMap,
   ) => Promise<unknown>;
   meshCellsVertexAttributeNoDataColor: (meshId: MeshId) => ColorRGBA;
   setMeshCellsVertexAttributeNoDataColor: (

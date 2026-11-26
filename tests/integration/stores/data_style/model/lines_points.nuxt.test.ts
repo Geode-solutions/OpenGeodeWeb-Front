@@ -6,6 +6,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed
 import { beforeAllTimeout, setupIntegrationTests } from "@ogw_tests/integration/setup";
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 import { Status } from "@ogw_front/utils/status";
+import { assertNonEmpty } from "@ogw_tests/utils";
 import { cleanupBackend } from "@ogw_server/utils/cleanup";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -123,17 +124,17 @@ describe("model lines points", () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();
-      const line_ids = await dataStore.getLinesGeodeIds(id);
-      const block_ids = await dataStore.getMeshComponentsViewerIds(id, line_ids);
+      const lineIds = assertNonEmpty(await dataStore.getLinesGeodeIds(id));
+      const block_ids = await dataStore.getMeshComponentsViewerIds(id, lineIds);
       const name = "points";
       const colorMap = "batlow";
-      await dataStyleStore.setModelLinesPointsVertexAttributeName(id, line_ids, name);
-      await dataStyleStore.setModelLinesPointsVertexAttributeColorMap(id, line_ids, colorMap);
+      await dataStyleStore.setModelLinesPointsVertexAttributeName(id, lineIds, name);
+      await dataStyleStore.setModelLinesPointsVertexAttributeColorMap(id, lineIds, colorMap);
       const spy = vi.spyOn(viewerStore, "request");
       spy.mockClear();
       await dataStyleStore.setModelLinesPointsVertexAttributeRange(
         id,
-        line_ids,
+        lineIds,
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       );
@@ -155,7 +156,7 @@ describe("model lines points", () => {
           response_function: expect.any(Function),
         },
       );
-      const line_id = firstElement(line_ids);
+      const line_id = firstElement(lineIds);
       expect(dataStyleStore.modelLinePointsActiveColoring(id, line_id)).toBe("vertex");
       expect(dataStyleStore.modelLinePointsVertexAttributeName(id, line_id)).toBe(name);
     },

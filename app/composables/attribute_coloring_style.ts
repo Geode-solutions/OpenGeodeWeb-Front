@@ -5,7 +5,9 @@ import type {
 } from "@ogw_front/types/attribute";
 import { type AttributeInfo, getAttributeRange } from "@ogw_front/utils/attributes";
 import { type AttributeSchemas, fetchAttributeRange } from "@ogw_front/utils/attribute_range";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { JsonRpcSchema } from "@ogw_shared/utils/types";
+import type { ModelComponentId } from "@ogw_front/types/identifiers";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -16,7 +18,7 @@ interface AttributeColoring {
   read: (property: string) => unknown;
   write: (property: string, ...values: unknown[]) => Promise<void>;
   schemas: AttributeSchemas;
-  params: { id: string; component_ids?: string[] };
+  params: { id: DataId; component_ids?: ModelComponentId[] };
 }
 
 interface AttributeNamesResponse {

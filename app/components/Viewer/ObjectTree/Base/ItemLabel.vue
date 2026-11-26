@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import type { GeodeIdentified, ModelId } from "@ogw_front/types/identifiers";
 import { formatCrs, formatCrsCode } from "@ogw_front/utils/crs";
 import ComponentRelations from "@ogw_front/components/Viewer/ObjectTree/Base/ComponentRelations.vue";
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
-import type { GeodeIdentified } from "@ogw_front/types/identifiers";
 import { middleTruncate } from "@ogw_front/utils/string";
 import { useClipboard } from "@vueuse/core";
 import { useCrsStore } from "@ogw_front/stores/crs";
@@ -17,7 +17,7 @@ interface Props {
   item: DisplayItem;
   isLeaf?: boolean;
   showCrs?: boolean;
-  modelId?: string;
+  modelId?: ModelId;
 }
 
 const { item, isLeaf, showCrs = false, modelId = "" } = defineProps<Props>();

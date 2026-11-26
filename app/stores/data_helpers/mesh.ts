@@ -1,4 +1,13 @@
-import type { DataIdentified, GeodeIdentified, ModelId } from "@ogw_front/types/identifiers";
+import type {
+  BlockId,
+  CornerId,
+  DataIdentified,
+  GeodeIdentified,
+  LineId,
+  ModelComponentId,
+  ModelId,
+  SurfaceId,
+} from "@ogw_front/types/identifiers";
 import type { ReadonlyTreeGroup } from "@ogw_front/types/tree";
 import type { Table } from "dexie";
 import type { ViewerId } from "@geode/opengeodeweb-viewer/schema_types";
@@ -14,7 +23,7 @@ interface ModelComponentRecord extends DataIdentified, GeodeIdentified {
 }
 
 interface FormattedComponent extends Readonly<GeodeIdentified> {
-  readonly id: string;
+  readonly id: ModelComponentId;
   readonly title: string;
   readonly category: string;
   readonly viewer_id: ViewerId;
@@ -121,7 +130,10 @@ function useDataMesh(): {
     return byType;
   }
 
-  async function getMeshComponentGeodeIds(modelId: ModelId, type: string): Promise<string[]> {
+  async function getMeshComponentGeodeIds(
+    modelId: ModelId,
+    type: string,
+  ): Promise<ModelComponentId[]> {
     const components = await model_components_db
       .where("[data_id+type]")
       .equals([modelId, type])
@@ -129,22 +141,22 @@ function useDataMesh(): {
     return components.map((component: ModelComponentRecord) => component.geode_id);
   }
 
-  async function getCornersGeodeIds(modelId: ModelId): Promise<string[]> {
+  async function getCornersGeodeIds(modelId: ModelId): Promise<CornerId[]> {
     const geodeIds = await getMeshComponentGeodeIds(modelId, "Corner");
     return geodeIds;
   }
 
-  async function getLinesGeodeIds(modelId: ModelId): Promise<string[]> {
+  async function getLinesGeodeIds(modelId: ModelId): Promise<LineId[]> {
     const geodeIds = await getMeshComponentGeodeIds(modelId, "Line");
     return geodeIds;
   }
 
-  async function getSurfacesGeodeIds(modelId: ModelId): Promise<string[]> {
+  async function getSurfacesGeodeIds(modelId: ModelId): Promise<SurfaceId[]> {
     const geodeIds = await getMeshComponentGeodeIds(modelId, "Surface");
     return geodeIds;
   }
 
-  async function getBlocksGeodeIds(modelId: ModelId): Promise<string[]> {
+  async function getBlocksGeodeIds(modelId: ModelId): Promise<BlockId[]> {
     const geodeIds = await getMeshComponentGeodeIds(modelId, "Block");
     return geodeIds;
   }

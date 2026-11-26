@@ -8,6 +8,7 @@ import { type CrsItem, type DataItem, useDataStore } from "@ogw_front/stores/dat
 import { type FeedbackAction, useFeedbackStore } from "@ogw_front/stores/feedback";
 import { formatCrsCode, sameCrs } from "@ogw_front/utils/crs";
 import type { CRS } from "@geode/opengeodeweb-back/schema_types";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import { useCrs } from "@ogw_front/composables/crs";
 import { useCrsStore } from "@ogw_front/stores/crs";
 
@@ -143,7 +144,7 @@ async function assignProjectCrs(withoutCrs: CrsItem[], reference: CRS): Promise<
   );
 }
 
-async function harmonize(ids: string[], projectCrs: CRS | undefined): Promise<void> {
+async function harmonize(ids: DataId[], projectCrs: CRS | undefined): Promise<void> {
   const items = byCreation(await useDataStore().allItems());
   const imported = items.filter((item) => ids.includes(item.data_id));
   const existing = items.filter((item) => !ids.includes(item.data_id));
@@ -159,7 +160,7 @@ async function harmonize(ids: string[], projectCrs: CRS | undefined): Promise<vo
 
 async function harmonizeAfter(
   previous: Promise<void>,
-  ids: string[],
+  ids: DataId[],
   projectCrs: CRS | undefined,
 ): Promise<void> {
   await previous;
@@ -167,7 +168,7 @@ async function harmonizeAfter(
 }
 
 // ProjectCrs: the project CRS taken before the data landed, as the project follows them
-async function harmonizeImportedCrs(ids: string[], projectCrs?: CRS): Promise<void> {
+async function harmonizeImportedCrs(ids: DataId[], projectCrs?: CRS): Promise<void> {
   if (ids.length === 0) {
     return;
   }
@@ -188,7 +189,7 @@ async function adoptProjectCrs(crs: CRS): Promise<void> {
 // Data without CRS take the project CRS when their coordinates fit it.
 // Others are likely in a local frame: the warning leads to their georeferencing
 function useProjectCrs(): {
-  harmonizeImportedCrs: (ids: string[], projectCrs?: CRS) => Promise<void>;
+  harmonizeImportedCrs: (ids: DataId[], projectCrs?: CRS) => Promise<void>;
   adoptProjectCrs: (crs: CRS) => Promise<void>;
 } {
   return { harmonizeImportedCrs, adoptProjectCrs };

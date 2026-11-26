@@ -22,7 +22,7 @@ interface UseMeshPolyhedraVertexAttributeConfigReturn {
   meshPolyhedraVertexAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
   ) => AttributeStoredConfig;
 }
 
@@ -30,13 +30,13 @@ interface UseMeshPolyhedraVertexAttributeConfigWriterReturn {
   mutateMeshPolyhedraVertexStyle: (
     meshId: MeshId,
     values: Record<string, unknown>,
-  ) => Promise<string>;
+  ) => Promise<MeshId>;
   setMeshPolyhedraVertexAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
     config: Partial<AttributeStoredConfig>,
-  ) => Promise<string>;
+  ) => Promise<MeshId>;
 }
 
 function useMeshPolyhedraVertexAttributeConfig(): UseMeshPolyhedraVertexAttributeConfigReturn {
@@ -48,11 +48,11 @@ function useMeshPolyhedraVertexAttributeConfig(): UseMeshPolyhedraVertexAttribut
   function meshPolyhedraVertexAttributeStoredConfig(
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
   ): AttributeStoredConfig {
     const { storedConfigs } = meshPolyhedraVertexAttribute(meshId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
-    const itemConfig = item === undefined ? undefined : nameConfig?.[item];
+    const itemConfig = nameConfig?.[item];
     if (itemConfig !== undefined) {
       return itemConfig;
     }
@@ -127,7 +127,7 @@ function useMeshPolyhedraVertexAttributeConfigWriter(): UseMeshPolyhedraVertexAt
   async function mutateMeshPolyhedraVertexStyle(
     meshId: MeshId,
     values: Record<string, unknown>,
-  ): Promise<string> {
+  ): Promise<MeshId> {
     const result = await meshPolyhedraCommonStyle.mutateMeshPolyhedraStyle(meshId, {
       coloring: {
         vertex: values,
@@ -138,9 +138,9 @@ function useMeshPolyhedraVertexAttributeConfigWriter(): UseMeshPolyhedraVertexAt
   async function setMeshPolyhedraVertexAttributeStoredConfig(
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
     config: Partial<AttributeStoredConfig>,
-  ): Promise<string> {
+  ): Promise<MeshId> {
     const result = await mutateMeshPolyhedraVertexStyle(meshId, {
       storedConfigs: {
         [name ?? ""]: {

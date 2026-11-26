@@ -1,20 +1,25 @@
 <script setup lang="ts">
 import type {
+  AttributeColorMap,
+  AttributeRange,
+  AttributeTimeStep,
+} from "@ogw_front/types/attribute";
+import type {
   AttributeItem,
   AttributeName,
   ColorRGBA,
   Visibility,
 } from "@geode/opengeodeweb-viewer/schema_types";
-import type { AttributeRange, AttributeTimeStep } from "@ogw_front/types/attribute";
-import type { CornerId } from "@ogw_front/types/identifiers";
+import type { CornerId, ModelId } from "@ogw_front/types/identifiers";
 import { MODEL_VERTEX_COLORING } from "@ogw_front/utils/model_component_coloring";
+import type { NonEmptyArray } from "@ogw_front/utils/arrays";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 interface Props {
-  modelId: string;
+  modelId: ModelId;
   cornerId?: CornerId;
   activeTab?: string;
 }
@@ -24,7 +29,12 @@ const { modelId, cornerId = undefined, activeTab = undefined } = defineProps<Pro
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
-const cornerComponentIds = computed<string[]>(() => (cornerId !== undefined && [cornerId]) || []);
+const cornerComponentIds = computed<NonEmptyArray<CornerId> | undefined>(() => {
+  if (cornerId === undefined) {
+    return undefined;
+  }
+  return [cornerId];
+});
 
 const cornerVisibility = computed<Visibility | undefined>({
   get: () => dataStyleStore.modelCornerVisibility(modelId, cornerId) as boolean | undefined,
@@ -105,7 +115,7 @@ const vertexAttributeRange = computed<AttributeRange>({
   },
 });
 
-const vertexAttributeColorMap = computed<ColorMap | undefined>({
+const vertexAttributeColorMap = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => dataStyleStore.modelCornersVertexAttributeColorMap(modelId, cornerId),
   set: async (newValue) => {
     if (cornerId === undefined) {
@@ -135,6 +145,7 @@ const { capabilities, schemas: attributeSchemas } = MODEL_VERTEX_COLORING;
     <VisibilitySwitch v-model="cornerVisibility" />
     <ViewerOptionsColoringTypeSelector
       :data-id="modelId"
+      v-if="cornerComponentIds"
       :componentIds="cornerComponentIds"
       v-model:coloring_style_key="cornerActiveColoring"
       v-model:color="cornerColor"

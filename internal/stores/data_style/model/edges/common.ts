@@ -4,11 +4,11 @@ import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 
 export function useModelEdgesCommonStyle(): {
   modelEdgesStyle: (modelId: ModelId) => StyleValues;
-  mutateModelEdgesStyle: (modelId: ModelId, values: StyleValues) => Promise<string>;
+  mutateModelEdgesStyle: (modelId: ModelId, values: StyleValues) => Promise<ModelId>;
 } {
   const dataStyleState = useDataStyleState();
 
-  async function mutateModelEdgesStyle(modelId: ModelId, values: StyleValues): Promise<string> {
+  async function mutateModelEdgesStyle(modelId: ModelId, values: StyleValues): Promise<ModelId> {
     const result = await dataStyleState.mutateStyle(modelId, {
       edges: values,
     });

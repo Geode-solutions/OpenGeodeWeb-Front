@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ColorRGBA, Visibility } from "@geode/opengeodeweb-viewer/schema_types";
+import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
 import {
   type ModelMenuItemProps,
   useModelMenuContext,
@@ -11,6 +12,7 @@ import ModelCardTabs from "./ModelCardTabs.vue";
 import SurfacesOptions from "./SurfacesOptions.vue";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
+import { isNonEmpty } from "@ogw_front/utils/arrays";
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -33,7 +35,7 @@ const { tabs, activeTab } = useModelTabs({
   componentType,
   componentId,
 });
-function visibleComponents(targetId: string): string[] {
+function visibleComponents(targetId: ModelId): ModelComponentId[] {
   return dataStyleStore.visibleMeshComponents(targetId).value || [];
 }
 
@@ -43,7 +45,7 @@ const modelVisibility = computed<Visibility | undefined>({
     if (newValue === undefined) {
       return;
     }
-    await applyBatchStyle(modelId.value, (targetId: string) =>
+    await applyBatchStyle(modelId.value, (targetId: ModelId) =>
       dataStyleStore.setModelVisibility(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -53,7 +55,7 @@ const modelVisibility = computed<Visibility | undefined>({
 const modelComponentsColor = computed<ColorRGBA | undefined>({
   get: () => dataStyleStore.getModelColor(modelId.value) as ColorRGBA | undefined,
   set: async (color) => {
-    await applyBatchStyle(modelId.value, async (targetId: string) => {
+    await applyBatchStyle(modelId.value, async (targetId: ModelId) => {
       await dataStyleStore.mutateStyle(targetId, {
         coloring: { constant: color },
       });
@@ -75,7 +77,7 @@ const modelComponentsActiveColoring = computed<string | undefined>({
     if (typeof coloringType !== "string") {
       return;
     }
-    await applyBatchStyle(modelId.value, async (targetId: string) => {
+    await applyBatchStyle(modelId.value, async (targetId: ModelId) => {
       await dataStyleStore.mutateStyle(targetId, {
         coloring: { active: coloringType },
       });
@@ -109,38 +111,40 @@ const modelComponentsActiveColoring = computed<string | undefined>({
       />
     </div>
 
-    <BlocksOptions
-      v-if="componentType === 'Block'"
-      :modelId="modelId"
-      :blockId="componentId"
-      :targetBlockIds="targetComponentIds"
-      :collections="collections"
-      :activeTab="activeTab"
-    />
-    <SurfacesOptions
-      v-else-if="componentType === 'Surface'"
-      :modelId="modelId"
-      :surfaceId="componentId"
-      :targetSurfaceIds="targetComponentIds"
-      :collections="collections"
-      :activeTab="activeTab"
-    />
-    <LinesOptions
-      v-else-if="componentType === 'Line'"
-      :modelId="modelId"
-      :lineId="componentId"
-      :targetLineIds="targetComponentIds"
-      :collections="collections"
-      :activeTab="activeTab"
-    />
-    <CornersOptions
-      v-else-if="componentType === 'Corner'"
-      :modelId="modelId"
-      :cornerId="componentId"
-      :targetCornerIds="targetComponentIds"
-      :collections="collections"
-      :activeTab="activeTab"
-    />
+    <template v-if="isNonEmpty(targetComponentIds)">
+      <BlocksOptions
+        v-if="componentType === 'Block'"
+        :modelId="modelId"
+        :blockId="componentId"
+        :targetBlockIds="targetComponentIds"
+        :collections="collections"
+        :activeTab="activeTab"
+      />
+      <SurfacesOptions
+        v-else-if="componentType === 'Surface'"
+        :modelId="modelId"
+        :surfaceId="componentId"
+        :targetSurfaceIds="targetComponentIds"
+        :collections="collections"
+        :activeTab="activeTab"
+      />
+      <LinesOptions
+        v-else-if="componentType === 'Line'"
+        :modelId="modelId"
+        :lineId="componentId"
+        :targetLineIds="targetComponentIds"
+        :collections="collections"
+        :activeTab="activeTab"
+      />
+      <CornersOptions
+        v-else-if="componentType === 'Corner'"
+        :modelId="modelId"
+        :cornerId="componentId"
+        :targetCornerIds="targetComponentIds"
+        :collections="collections"
+        :activeTab="activeTab"
+      />
+    </template>
   </v-sheet>
 </template>
 

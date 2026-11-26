@@ -1,5 +1,5 @@
 import type { AttributeGroup, ColorGroup } from "./coloring_groups";
-import type { ModelId } from "@ogw_front/types/identifiers";
+import type { BlockId, ModelId } from "@ogw_front/types/identifiers";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import type { useModelBlocksColor } from "./color";
 import type { useModelBlocksPolyhedronAttribute } from "./polyhedron";
@@ -11,42 +11,42 @@ type PolyhedronAttributeStyle = ReturnType<typeof useModelBlocksPolyhedronAttrib
 
 function applyModelBlocksConstantColoring(
   modelId: ModelId,
-  type_blocks_ids: string[],
+  typeBlocksIds: BlockId[],
   modelColorStyle: ColorStyle,
 ): Promise<unknown>[] {
   const colorGroups: Record<string, ColorGroup> = {};
-  for (const block_id of type_blocks_ids) {
-    const color = modelColorStyle.modelBlockColor(modelId, block_id);
+  for (const blockId of typeBlocksIds) {
+    const color = modelColorStyle.modelBlockColor(modelId, blockId);
     const color_key = JSON.stringify(color);
-    colorGroups[color_key] ??= { color, blocks_ids: [] };
-    colorGroups[color_key].blocks_ids.push(block_id);
+    colorGroups[color_key] ??= { color, blockIds: [] };
+    colorGroups[color_key].blockIds.push(blockId);
   }
-  return Object.values(colorGroups).map(async ({ color, blocks_ids: ids }) => {
-    const result = await modelColorStyle.setModelBlocksColor(modelId, ids, color, "constant");
+  return Object.values(colorGroups).map(async ({ color, blockIds }) => {
+    const result = await modelColorStyle.setModelBlocksColor(modelId, blockIds, color, "constant");
     return result;
   });
 }
 
 function groupModelBlocksVertexAttributes(
   modelId: ModelId,
-  type_blocks_ids: string[],
+  typeBlocksIds: BlockId[],
   modelBlocksVertexAttribute: VertexAttributeStyle,
 ): Record<string, AttributeGroup> {
   const vertexGroups: Record<string, AttributeGroup> = {};
-  for (const block_id of type_blocks_ids) {
-    const name = modelBlocksVertexAttribute.modelBlocksVertexAttributeName(modelId, block_id);
-    const item = modelBlocksVertexAttribute.modelBlocksVertexAttributeItem(modelId, block_id);
+  for (const blockId of typeBlocksIds) {
+    const name = modelBlocksVertexAttribute.modelBlocksVertexAttributeName(modelId, blockId);
+    const item = modelBlocksVertexAttribute.modelBlocksVertexAttributeItem(modelId, blockId);
     const [minimum, maximum] = modelBlocksVertexAttribute.modelBlocksVertexAttributeRange(
       modelId,
-      block_id,
+      blockId,
     );
     const colorMap = modelBlocksVertexAttribute.modelBlocksVertexAttributeColorMap(
       modelId,
-      block_id,
+      blockId,
     );
     const no_data_color = modelBlocksVertexAttribute.modelBlocksVertexAttributeNoDataColor(
       modelId,
-      block_id,
+      blockId,
     );
     const attribute = {
       name,
@@ -60,32 +60,40 @@ function groupModelBlocksVertexAttributes(
       continue;
     }
     const key = [name, item, colorMap, minimum, maximum, JSON.stringify(no_data_color)].join("_");
-    vertexGroups[key] ??= { ...attribute, blocks_ids: [] };
-    vertexGroups[key].blocks_ids.push(block_id);
+    const group = vertexGroups[key];
+    if (group === undefined) {
+      vertexGroups[key] = { ...attribute, blockIds: [blockId] };
+    } else {
+      group.blockIds.push(blockId);
+    }
   }
   return vertexGroups;
 }
 
 function applyModelBlocksVertexColoring(
   modelId: ModelId,
-  type_blocks_ids: string[],
+  typeBlocksIds: BlockId[],
   modelBlocksVertexAttribute: VertexAttributeStyle,
 ): Promise<unknown>[] {
   const vertexGroups = groupModelBlocksVertexAttributes(
     modelId,
-    type_blocks_ids,
+    typeBlocksIds,
     modelBlocksVertexAttribute,
   );
   return Object.values(vertexGroups).map(
-    async ({ name, item, minimum, maximum, colorMap, no_data_color, blocks_ids: ids }) => {
-      const result = await modelBlocksVertexAttribute.setModelBlocksVertexAttribute(modelId, ids, {
-        name,
-        item,
-        minimum,
-        maximum,
-        colorMap,
-        no_data_color,
-      });
+    async ({ name, item, minimum, maximum, colorMap, no_data_color, blockIds }) => {
+      const result = await modelBlocksVertexAttribute.setModelBlocksVertexAttribute(
+        modelId,
+        blockIds,
+        {
+          name,
+          item,
+          minimum,
+          maximum,
+          colorMap,
+          no_data_color,
+        },
+      );
       return result;
     },
   );
@@ -93,30 +101,30 @@ function applyModelBlocksVertexColoring(
 
 function groupModelBlocksPolyhedronAttributes(
   modelId: ModelId,
-  type_blocks_ids: string[],
+  typeBlocksIds: BlockId[],
   modelBlocksPolyhedronAttribute: PolyhedronAttributeStyle,
 ): Record<string, AttributeGroup> {
   const polyhedronGroups: Record<string, AttributeGroup> = {};
-  for (const block_id of type_blocks_ids) {
+  for (const blockId of typeBlocksIds) {
     const name = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeName(
       modelId,
-      block_id,
+      blockId,
     );
     const item = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeItem(
       modelId,
-      block_id,
+      blockId,
     );
     const [minimum, maximum] = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeRange(
       modelId,
-      block_id,
+      blockId,
     );
     const colorMap = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeColorMap(
       modelId,
-      block_id,
+      blockId,
     );
     const no_data_color = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeNoDataColor(
       modelId,
-      block_id,
+      blockId,
     );
     const attribute = {
       name,
@@ -130,27 +138,31 @@ function groupModelBlocksPolyhedronAttributes(
       continue;
     }
     const key = [name, item, colorMap, minimum, maximum, JSON.stringify(no_data_color)].join("_");
-    polyhedronGroups[key] ??= { ...attribute, blocks_ids: [] };
-    polyhedronGroups[key].blocks_ids.push(block_id);
+    const group = polyhedronGroups[key];
+    if (group === undefined) {
+      polyhedronGroups[key] = { ...attribute, blockIds: [blockId] };
+    } else {
+      group.blockIds.push(blockId);
+    }
   }
   return polyhedronGroups;
 }
 
 function applyModelBlocksPolyhedronColoring(
   modelId: ModelId,
-  type_blocks_ids: string[],
+  typeBlocksIds: BlockId[],
   modelBlocksPolyhedronAttribute: PolyhedronAttributeStyle,
 ): Promise<unknown>[] {
   const polyhedronGroups = groupModelBlocksPolyhedronAttributes(
     modelId,
-    type_blocks_ids,
+    typeBlocksIds,
     modelBlocksPolyhedronAttribute,
   );
   return Object.values(polyhedronGroups).map(
-    async ({ name, item, minimum, maximum, colorMap, no_data_color, blocks_ids: ids }) => {
+    async ({ name, item, minimum, maximum, colorMap, no_data_color, blockIds }) => {
       const result = await modelBlocksPolyhedronAttribute.setModelBlocksPolyhedronAttribute(
         modelId,
-        ids,
+        blockIds,
         {
           name,
           item,

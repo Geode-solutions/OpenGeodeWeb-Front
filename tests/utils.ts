@@ -8,6 +8,7 @@ import { setActivePinia } from "pinia";
 import { vi } from "vitest";
 
 // Local imports
+import { type NonEmptyArray, isNonEmpty } from "@ogw_front/utils/arrays";
 import { phosphorIconOptions } from "@ogw_front/utils/phosphor_icons";
 
 const vuetify = createVuetify({ components, directives, icons: phosphorIconOptions() });
@@ -56,6 +57,17 @@ function assertDefined<TValue>(
   return value;
 }
 
+// Narrows an array that must hold at least one item (e.g. the component ids of a fixture model) through a real runtime check.
+function assertNonEmpty<TItem>(
+  items: TItem[],
+  message = "Expected a non-empty array",
+): NonEmptyArray<TItem> {
+  if (!isNonEmpty(items)) {
+    throw new Error(message);
+  }
+  return items;
+}
+
 // Types a mock as the function it replaces when that function is generic (e.g. `backStore.request`, generic over its schema): the mock only implements it for the route under test.
 // oxlint-disable-next-line typescript/no-unnecessary-type-parameters
 function mockAs<TTarget>(mock: unknown): TTarget {
@@ -63,4 +75,4 @@ function mockAs<TTarget>(mock: unknown): TTarget {
   return mock as TTarget;
 }
 
-export { setupActivePinia, vuetify, toHTTPMethod, assertDefined, mockAs };
+export { setupActivePinia, vuetify, toHTTPMethod, assertDefined, assertNonEmpty, mockAs };

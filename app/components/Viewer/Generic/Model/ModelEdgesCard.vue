@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import type { EdgeWidth, Visibility } from "@geode/opengeodeweb-viewer/schema_types";
+import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
 import {
   type ModelMenuItemProps,
   useModelMenuContext,
 } from "@ogw_front/composables/model_menu_context";
+import { type NonEmptyArray, isNonEmpty } from "@ogw_front/utils/arrays";
 import ModelCardTabs from "./ModelCardTabs.vue";
 import ViewerGenericModelComponentEdgesOptions from "@ogw_front/components/Viewer/Generic/Model/ComponentEdgesOptions.vue";
 import ViewerOptionsWidthSlider from "@ogw_front/components/Viewer/Options/Sliders/Width.vue";
@@ -21,6 +23,11 @@ const EDGES_TYPE_TITLES = {
 } as const;
 type EdgesComponentType = keyof typeof EDGES_TYPE_TITLES;
 const EDGES_COMPONENT_TYPES: EdgesComponentType[] = ["Surface", "Block"];
+
+interface EdgesTarget {
+  componentType: EdgesComponentType;
+  componentIds: NonEmptyArray<ModelComponentId>;
+}
 
 function isEdgesComponentType(type: string | undefined): type is EdgesComponentType {
   return type !== undefined && type in EDGES_TYPE_TITLES;
@@ -46,7 +53,7 @@ const modelEdgesVisibility = computed<Visibility | undefined>({
     if (newValue === undefined) {
       return;
     }
-    await applyBatchStyle(modelId.value, (targetId: string) =>
+    await applyBatchStyle(modelId.value, (targetId: ModelId) =>
       dataStyleStore.setModelEdgesVisibility(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -59,7 +66,7 @@ const modelEdgesWidth = computed<EdgeWidth | undefined>({
     if (newValue === undefined) {
       return;
     }
-    await applyBatchStyle(modelId.value, (targetId: string) =>
+    await applyBatchStyle(modelId.value, (targetId: ModelId) =>
       dataStyleStore.setModelEdgesWidth(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -70,9 +77,7 @@ const edgesComponentType = computed<EdgesComponentType | undefined>(() =>
   isEdgesComponentType(componentType.value) ? componentType.value : undefined,
 );
 
-const allComponentsTargets = ref<{ componentType: EdgesComponentType; componentIds: string[] }[]>(
-  [],
-);
+const allComponentsTargets = ref<EdgesTarget[]>([]);
 watch(
   modelId,
   async (currentModelId) => {
@@ -83,23 +88,25 @@ watch(
       })),
     );
     if (modelId.value === currentModelId) {
-      allComponentsTargets.value = targets.filter((target) => target.componentIds.length > 0);
+      allComponentsTargets.value = targets.filter((target): target is EdgesTarget =>
+        isNonEmpty(target.componentIds),
+      );
     }
   },
   { immediate: true },
 );
 
-const typeTargets = computed(() => {
-  if (edgesComponentType.value === undefined) {
+const typeTargets = computed<EdgesTarget[]>(() => {
+  if (edgesComponentType.value === undefined || !isNonEmpty(targetComponentIds.value)) {
     return [];
   }
   return [{ componentType: edgesComponentType.value, componentIds: targetComponentIds.value }];
 });
-const typeReferenceId = computed<string | undefined>(() =>
+const typeReferenceId = computed<ModelComponentId | undefined>(() =>
   collections.value ? targetComponentIds.value[0] : undefined,
 );
 
-const componentTargets = computed(() => {
+const componentTargets = computed<EdgesTarget[]>(() => {
   if (edgesComponentType.value === undefined || componentId.value === undefined) {
     return [];
   }

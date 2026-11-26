@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDebounceFn } from "@vueuse/core";
@@ -17,7 +18,7 @@ interface Props {
   title: string;
   label: string;
   testIdPrefix: string;
-  setFactor: (ids: string[], factor: number) => Promise<void>;
+  setFactor: (ids: DataId[], factor: number) => Promise<void>;
   factorRange: FactorRange;
   formatValue?: (value: number) => string;
   escapeFunction?: () => void;
@@ -40,11 +41,11 @@ const show = defineModel<boolean>("show", { default: false });
 const dataStore = useDataStore();
 const hybridViewerStore = useHybridViewerStore();
 const targetAllVisible = ref<boolean>(true);
-const selectedDatasetIds = ref<string[]>([]);
+const selectedDatasetIds = ref<DataId[]>([]);
 const factor = ref<number>(factorRange.defaultValue);
 
 const allItems = dataStore.refRegisteredItems();
-const availableDatasets = computed<{ title: string; value: string }[]>(() =>
+const availableDatasets = computed<{ title: string; value: DataId }[]>(() =>
   allItems.value.map((item) => ({
     title: item.name || item.data_id,
     value: item.data_id,

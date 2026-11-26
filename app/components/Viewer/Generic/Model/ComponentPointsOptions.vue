@@ -6,6 +6,8 @@ import type {
   PointSize,
   Visibility,
 } from "@geode/opengeodeweb-viewer/schema_types";
+import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
+import { type NonEmptyArray, isNonEmpty } from "@ogw_front/utils/arrays";
 import type { AttributeColorMap } from "@ogw_front/types/attribute";
 import { MODEL_VERTEX_COLORING } from "@ogw_front/utils/model_component_coloring";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
@@ -16,13 +18,13 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 interface PointsTarget {
   componentType: "Surface" | "Line" | "Block";
-  componentIds: string[];
+  componentIds: NonEmptyArray<ModelComponentId>;
 }
 
 interface Props {
-  modelId: string;
+  modelId: ModelId;
   targets: PointsTarget[];
-  referenceComponentId?: string;
+  referenceComponentId?: ModelComponentId;
 }
 
 const { modelId, targets, referenceComponentId = undefined } = defineProps<Props>();
@@ -100,10 +102,12 @@ const pointsStyle = computed<PointsStyle | undefined>(() => {
   const [reference] = targets;
   return reference === undefined ? undefined : POINTS_STYLES[reference.componentType];
 });
-const allComponentIds = computed<string[]>(() => targets.flatMap((target) => target.componentIds));
+const allComponentIds = computed<ModelComponentId[]>(() =>
+  targets.flatMap((target) => target.componentIds),
+);
 
 async function applyPointsStyle(
-  setter: (style: PointsStyle, componentIds: string[]) => Promise<unknown>,
+  setter: (style: PointsStyle, componentIds: NonEmptyArray<ModelComponentId>) => Promise<unknown>,
 ): Promise<void> {
   await Promise.all(
     targets.map(async (target) => {
@@ -189,7 +193,7 @@ const vertexAttributeRange = computed<(number | undefined)[] | undefined>({
   },
 });
 
-const vertexAttributeColorMap = computed<AttributeColorMap | undefined>({
+const vertexAttributeColorMap = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => pointsStyle.value?.vertexAttributeColorMap(modelId, referenceComponentId),
   set: async (newValue) => {
     await applyPointsStyle((style, ids) =>
@@ -220,6 +224,7 @@ const { capabilities, schemas: attributeSchemas } = MODEL_VERTEX_COLORING;
       <ViewerOptionsSizeSlider data-testid="modelComponentPointsSizeSlider" v-model="size" />
       <ViewerOptionsColoringTypeSelector
         :data-id="modelId"
+        v-if="isNonEmpty(allComponentIds)"
         :componentIds="allComponentIds"
         v-model:coloring_style_key="activeColoring"
         v-model:color="color"

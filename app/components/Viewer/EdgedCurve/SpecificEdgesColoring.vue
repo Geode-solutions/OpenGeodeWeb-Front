@@ -98,7 +98,7 @@ const vertex_attribute_range = computed<AttributeRange>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_color_map = computed<AttributeColorMap | undefined>({
+const vertex_attribute_color_map = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => dataStyleStore.meshEdgesVertexAttributeColorMap(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>
@@ -163,7 +163,7 @@ const edge_attribute_range = computed<AttributeRange>({
     hybridViewerStore.remoteRender();
   },
 });
-const edge_attribute_color_map = computed<AttributeColorMap | undefined>({
+const edge_attribute_color_map = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => dataStyleStore.meshEdgesEdgeAttributeColorMap(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>

@@ -1,6 +1,6 @@
 import { type ComponentStyleFunctions, dispatchToComponentTypes } from "./visibility_dispatch";
+import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
-import type { ModelId } from "@ogw_front/types/identifiers";
 import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
@@ -16,7 +16,7 @@ interface UseModelVisibilityStyleReturn {
   setModelVisibility: (modelId: ModelId, visibility: Visibility) => Promise<unknown>;
   setModelComponentsVisibility: (
     modelId: ModelId,
-    componentIds: string[],
+    componentIds: ModelComponentId[],
     visibility: Visibility,
   ) => Promise<unknown[]>;
   setModelComponentTypeVisibility: (
@@ -24,7 +24,7 @@ interface UseModelVisibilityStyleReturn {
     componentType: string,
     visibility: Visibility,
   ) => Promise<void>;
-  modelComponentVisibility: (modelId: ModelId, componentId: string) => Visibility;
+  modelComponentVisibility: (modelId: ModelId, componentId: ModelComponentId) => Visibility;
   modelComponentTypeVisibility: (modelId: ModelId, componentType: string) => Visibility;
 }
 
@@ -90,7 +90,7 @@ function useModelVisibilityStyle(
   }
   async function setModelComponentsVisibility(
     modelId: ModelId,
-    componentIds: string[],
+    componentIds: ModelComponentId[],
     visibility: Visibility,
   ): Promise<unknown[]> {
     const typeIds = componentIds.filter((id) => MESH_COMPONENT_TYPES.includes(id));
@@ -115,7 +115,7 @@ function useModelVisibilityStyle(
     const results = await Promise.all(promises);
     return results;
   }
-  function modelComponentVisibility(modelId: ModelId, componentId: string): Visibility {
+  function modelComponentVisibility(modelId: ModelId, componentId: ModelComponentId): Visibility {
     const selection = useModelSelection(modelId, dataStyleState);
     return selection.value.includes(componentId);
   }

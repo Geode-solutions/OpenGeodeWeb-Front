@@ -3,6 +3,7 @@ import type {
   ViewerObjectType,
 } from "@geode/opengeodeweb-microservice/data_types";
 import { type MenuItems, menusData } from "./menu_helpers/menus_data.js";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { DataIdentified } from "@ogw_front/types/identifiers";
 
 // What the menus of an entry are chosen by: its viewer_object_type and geode_object_type, or keys when it is not a data
@@ -17,7 +18,7 @@ type MenuObjectType = GeodeObjectType | "scene" | "Basemap" | "Map" | "component
 interface MenuMetaData extends Partial<DataIdentified> {
   viewer_object_type?: MenuViewerObjectType;
   geode_object_type?: MenuObjectType;
-  targetIds?: string[];
+  targetIds?: DataId[];
   [key: string]: unknown;
 }
 

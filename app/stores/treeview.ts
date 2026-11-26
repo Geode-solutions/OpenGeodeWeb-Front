@@ -8,6 +8,7 @@ import type { DataId, GeodeId } from "@geode/opengeodeweb-microservice/schema_ty
 import type {
   GeodeIdentified,
   GeodeObjectTyped,
+  ModelId,
   ViewerObjectTyped,
 } from "@ogw_front/types/identifiers";
 import type {
@@ -32,6 +33,7 @@ interface OpenedView extends Partial<GeodeObjectTyped> {
 }
 
 interface TreeviewChild extends TreeNode, GeodeIdentified, GeodeObjectTyped, ViewerObjectTyped {
+  id: DataId;
   // Still being loaded in the viewer: shown with a spinner and not interactive yet
   loading?: boolean;
 }
@@ -48,7 +50,7 @@ interface TreeviewConfigRecord {
   opened_views: OpenedView[];
   panelWidth: number;
   additionalPanelWidth: number;
-  selectionIds: string[];
+  selectionIds: DataId[];
   rowHeights: number[];
 }
 
@@ -57,8 +59,8 @@ interface TreeviewSnapshot {
   panelWidth?: number;
   additionalPanelWidth?: number;
   rowHeights?: number[];
-  selectionIds?: string[];
-  selection?: (string | { id: string })[];
+  selectionIds?: DataId[];
+  selection?: (DataId | { id: DataId })[];
 }
 
 function defaultOpenedViews(): OpenedView[] {
@@ -76,8 +78,8 @@ interface ReadonlyTreeviewSnapshot {
   panelWidth?: number;
   additionalPanelWidth?: number;
   rowHeights?: readonly number[];
-  selectionIds?: readonly string[];
-  selection?: readonly (string | { id: string })[];
+  selectionIds?: readonly DataId[];
+  selection?: readonly (DataId | { id: DataId })[];
 }
 
 // Model trees saved before they had a color get one, distinct from the others
@@ -92,11 +94,11 @@ function withModelTreeColors(views: OpenedView[]): OpenedView[] {
   return views;
 }
 
-function snapshotSelectionIds(snapshot: ReadonlyTreeviewSnapshot | undefined): string[] {
+function snapshotSelectionIds(snapshot: ReadonlyTreeviewSnapshot | undefined): DataId[] {
   if (snapshot?.selectionIds) {
     return [...snapshot.selectionIds];
   }
-  return (snapshot?.selection ?? []).map((selectionItem: string | { id: string }) =>
+  return (snapshot?.selection ?? []).map((selectionItem: DataId | { id: DataId }) =>
     typeof selectionItem === "string" ? selectionItem : selectionItem.id,
   );
 }
@@ -104,7 +106,7 @@ function snapshotSelectionIds(snapshot: ReadonlyTreeviewSnapshot | undefined): s
 // oxlint-disable-next-line max-lines-per-function, max-statements
 export const useTreeviewStore = defineStore("treeview", () => {
   const items = ref<TreeviewGroup[]>([]);
-  const selection = ref<string[]>([]);
+  const selection = ref<DataId[]>([]);
   const activeItems = ref<string[]>([]);
   const opened_views = ref<OpenedView[]>(defaultOpenedViews());
   const panelWidth = ref(PANEL_WIDTH);
@@ -112,10 +114,10 @@ export const useTreeviewStore = defineStore("treeview", () => {
   const isImporting = ref(false);
   const pendingImports = ref<PendingImport[]>([]);
   let lastPendingImport = 0;
-  const pendingSelectionIds = ref<string[]>([]);
+  const pendingSelectionIds = ref<DataId[]>([]);
   const rowHeights = ref<number[]>([]);
   // Model hovered in the objects tree or on its model tree header: not saved
-  const hoveredModelId = ref<string | undefined>(undefined);
+  const hoveredModelId = ref<ModelId | undefined>(undefined);
 
   const treeview_config_db = getTable<TreeviewConfigRecord>("treeview_config");
 
@@ -150,7 +152,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
       // oxlint-disable-next-line unicorn/prefer-structured-clone, no-unsafe-type-assertion -- JSON round-trip of a known-shape ref; result matches the source type.
       const clean_opened_views = JSON.parse(JSON.stringify(opened_views.value)) as OpenedView[];
       // oxlint-disable-next-line unicorn/prefer-structured-clone, no-unsafe-type-assertion -- JSON round-trip of a known-shape ref; result matches the source type.
-      const clean_selectionIds = JSON.parse(JSON.stringify(selection.value)) as string[];
+      const cleanSelectionIds = JSON.parse(JSON.stringify(selection.value)) as DataId[];
       // oxlint-disable-next-line unicorn/prefer-structured-clone, no-unsafe-type-assertion -- JSON round-trip of a known-shape ref; result matches the source type.
       const clean_rowHeights = JSON.parse(JSON.stringify(rowHeights.value)) as number[];
 
@@ -161,7 +163,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
           opened_views: clean_opened_views,
           panelWidth: panelWidth.value,
           additionalPanelWidth: additionalPanelWidth.value,
-          selectionIds: clean_selectionIds,
+          selectionIds: cleanSelectionIds,
           rowHeights: clean_rowHeights,
         });
       } catch (error) {
@@ -297,7 +299,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
   }
 
   function displayAdditionalTree(
-    id: string,
+    id: ModelId,
     title: string | undefined,
     geodeObjectType: GeodeObjectType,
   ): void {
@@ -318,7 +320,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     });
   }
 
-  function setHoveredModel(id: string | undefined): void {
+  function setHoveredModel(id: ModelId | undefined): void {
     hoveredModelId.value = id;
   }
 
@@ -347,7 +349,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
   }
 
   function finalizeImportSelection(): void {
-    const rebuilt: string[] = [];
+    const rebuilt: DataId[] = [];
     for (const group of items.value) {
       for (const child of group.children) {
         if (

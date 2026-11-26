@@ -29,7 +29,7 @@ interface UseMeshPolyhedraVertexAttributeStyleReturn {
   meshPolyhedraVertexAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
   ) => AttributeStoredConfig;
   setMeshPolyhedraVertexAttribute: (meshId: MeshId, input: ValidAttributeInput) => Promise<unknown>;
   setMeshPolyhedraVertexAttributeName: (meshId: MeshId, name: AttributeName) => Promise<unknown>;
@@ -41,7 +41,7 @@ interface UseMeshPolyhedraVertexAttributeStyleReturn {
   ) => Promise<unknown>;
   setMeshPolyhedraVertexAttributeColorMap: (
     meshId: MeshId,
-    colorMap: AttributeColorMap | undefined,
+    colorMap: AttributeColorMap,
   ) => Promise<unknown>;
   meshPolyhedraVertexAttributeNoDataColor: (meshId: MeshId) => ColorRGBA;
   setMeshPolyhedraVertexAttributeNoDataColor: (

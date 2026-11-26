@@ -1,6 +1,8 @@
 import type { AttributeName } from "@geode/opengeodeweb-viewer/schema_types";
 import type { AttributeTimeStep } from "@ogw_front/types/attribute";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { ModelComponentId } from "@ogw_front/types/identifiers";
+import type { NonEmptyArray } from "@ogw_front/utils/arrays";
 import { attributeArrayName } from "@ogw_front/utils/attributes";
 import { useDataStyleState } from "./state";
 
@@ -23,17 +25,21 @@ interface UseAttributeTimeStepStyleReturn {
 // Identical config means same name, item, range, colormap and no data color.
 // The group key is undefined for a component not showing the series.
 async function reapplySameSeries(
-  allIds: string[],
-  targetIds: string[],
-  groupKey: (componentId: string) => string | undefined,
-  apply: (componentIds: string[]) => Promise<unknown>,
+  allIds: ModelComponentId[],
+  targetIds: ModelComponentId[],
+  groupKey: (componentId: ModelComponentId) => string | undefined,
+  apply: (componentIds: NonEmptyArray<ModelComponentId>) => Promise<unknown>,
 ): Promise<void> {
-  const groups: Record<string, string[]> = {};
+  const groups: Record<string, NonEmptyArray<ModelComponentId>> = {};
   for (const componentId of allIds) {
     const key = groupKey(componentId);
     if (key !== undefined && !targetIds.includes(componentId)) {
-      groups[key] ??= [];
-      groups[key].push(componentId);
+      const group = groups[key];
+      if (group === undefined) {
+        groups[key] = [componentId];
+      } else {
+        group.push(componentId);
+      }
     }
   }
   await Promise.all(

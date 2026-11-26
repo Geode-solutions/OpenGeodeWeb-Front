@@ -7,6 +7,7 @@ import {
 } from "@ogw_front/utils/clipping_planes";
 import type { ClippingPlane } from "@ogw_front/composables/clipping_planes_widget_entries";
 import ClippingPlaneCard from "@ogw_front/components/ClippingPlaneCard.vue";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import SliceCard from "@ogw_front/components/SliceCard.vue";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import { useClippingPlanesWidget } from "@ogw_front/composables/clipping_planes_widget";
@@ -25,7 +26,7 @@ const show = defineModel<boolean>("show", { default: false });
 const dataStore = useDataStore();
 const hybridViewerStore = useHybridViewerStore();
 const targetAllVisible = ref<boolean>(true);
-const selectedDatasetIds = ref<string[]>([]);
+const selectedDatasetIds = ref<DataId[]>([]);
 let lastItemId = 0;
 function newItemId(): number {
   lastItemId += 1;
@@ -36,13 +37,13 @@ function createPlane(origin: ClippingPlane["origin"], normal: number[]): Clippin
 }
 const planes = ref<ClippingPlane[]>([createPlane(undefined, [1, 0, 0])]);
 const allItems = dataStore.refRegisteredItems();
-const targetIds = computed<string[]>(() => {
+const targetIds = computed<DataId[]>(() => {
   if (targetAllVisible.value) {
     return allItems.value.map((item) => item.data_id);
   }
   return selectedDatasetIds.value;
 });
-const availableDatasets = computed<{ title: string; value: string }[]>(() =>
+const availableDatasets = computed<{ title: string; value: DataId }[]>(() =>
   allItems.value.map((item) => ({
     title: item.name || item.data_id,
     value: item.data_id,
@@ -69,7 +70,7 @@ const {
   debouncedApply: (...args: unknown[]) => debouncedApply?.(...args),
 });
 
-function getUntargetedIds(): string[] {
+function getUntargetedIds(): DataId[] {
   return allItems.value
     .map((item) => item.data_id)
     .filter((dataId) => !targetIds.value.includes(dataId));

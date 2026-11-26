@@ -22,18 +22,18 @@ interface UseMeshEdgesEdgeAttributeConfigReturn {
   meshEdgesEdgeAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
   ) => AttributeStoredConfig;
 }
 
 interface UseMeshEdgesEdgeAttributeConfigWriterReturn {
-  mutateMeshEdgesEdgeStyle: (meshId: MeshId, values: Record<string, unknown>) => Promise<string>;
+  mutateMeshEdgesEdgeStyle: (meshId: MeshId, values: Record<string, unknown>) => Promise<MeshId>;
   setMeshEdgesEdgeAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
     config: Partial<AttributeStoredConfig>,
-  ) => Promise<string>;
+  ) => Promise<MeshId>;
 }
 
 function useMeshEdgesEdgeAttributeConfig(): UseMeshEdgesEdgeAttributeConfigReturn {
@@ -45,11 +45,11 @@ function useMeshEdgesEdgeAttributeConfig(): UseMeshEdgesEdgeAttributeConfigRetur
   function meshEdgesEdgeAttributeStoredConfig(
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
   ): AttributeStoredConfig {
     const { storedConfigs } = meshEdgesEdgeAttribute(meshId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
-    const itemConfig = item === undefined ? undefined : nameConfig?.[item];
+    const itemConfig = nameConfig?.[item];
     if (itemConfig !== undefined) {
       return itemConfig;
     }
@@ -121,7 +121,7 @@ function useMeshEdgesEdgeAttributeConfigWriter(): UseMeshEdgesEdgeAttributeConfi
   async function mutateMeshEdgesEdgeStyle(
     meshId: MeshId,
     values: Record<string, unknown>,
-  ): Promise<string> {
+  ): Promise<MeshId> {
     const result = await meshEdgesCommonStyle.mutateMeshEdgesStyle(meshId, {
       coloring: {
         edge: values,
@@ -132,9 +132,9 @@ function useMeshEdgesEdgeAttributeConfigWriter(): UseMeshEdgesEdgeAttributeConfi
   async function setMeshEdgesEdgeAttributeStoredConfig(
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
     config: Partial<AttributeStoredConfig>,
-  ): Promise<string> {
+  ): Promise<MeshId> {
     const result = await mutateMeshEdgesEdgeStyle(meshId, {
       storedConfigs: {
         [name ?? ""]: {

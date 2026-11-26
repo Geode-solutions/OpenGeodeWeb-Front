@@ -5,7 +5,7 @@ import type {
   AttributeRangeMinimum,
   ColorRGBA,
 } from "@geode/opengeodeweb-viewer/schema_types";
-import type { ModelId } from "@ogw_front/types/identifiers";
+import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
 // oxlint-disable eslint/max-lines
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { dispatchToComponentTypes } from "./visibility";
@@ -18,37 +18,41 @@ import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/commo
 type ComponentStyleFunctions = Record<"Surface" | "Line" | "Block" | "Corner", any>;
 
 interface AttributeAccessors {
-  getName: (modelId: ModelId, componentId: string) => string | undefined;
-  setName: (modelId: ModelId, componentIds: string[], name: AttributeName) => unknown;
-  getRange: (modelId: ModelId, componentId: string) => AttributeRange;
+  getName: (modelId: ModelId, componentId: ModelComponentId) => string | undefined;
+  setName: (modelId: ModelId, componentIds: ModelComponentId[], name: AttributeName) => unknown;
+  getRange: (modelId: ModelId, componentId: ModelComponentId) => AttributeRange;
   setRange: (
     modelId: ModelId,
-    componentIds: string[],
+    componentIds: ModelComponentId[],
     minimum: AttributeRangeMinimum,
     maximum: AttributeRangeMaximum,
   ) => unknown;
-  getColorMap: (modelId: ModelId, componentId: string) => AttributeColorMap | undefined;
-  setColorMap: (modelId: ModelId, componentIds: string[], colorMap: AttributeColorMap) => unknown;
+  getColorMap: (modelId: ModelId, componentId: ModelComponentId) => AttributeColorMap | undefined;
+  setColorMap: (
+    modelId: ModelId,
+    componentIds: ModelComponentId[],
+    colorMap: AttributeColorMap,
+  ) => unknown;
 }
 
 // The signatures below describe just the per-attribute-kind methods this module reads off each dynamically-typed composable (see the `any` in ComponentStyleFunctions above). `attributeFn` narrows one such method to its known signature so every downstream read/call is a real, checked type instead of `any`.
-type AttributeNameFn = (modelId: ModelId, componentId: string) => string | undefined;
+type AttributeNameFn = (modelId: ModelId, componentId: ModelComponentId) => string | undefined;
 type SetAttributeNameFn = (
   modelId: ModelId,
-  componentIds: string[],
+  componentIds: ModelComponentId[],
   name: AttributeName,
 ) => unknown;
-type AttributeRangeFn = (modelId: ModelId, componentId: string) => AttributeRange;
+type AttributeRangeFn = (modelId: ModelId, componentId: ModelComponentId) => AttributeRange;
 type SetAttributeRangeFn = (
   modelId: ModelId,
-  componentIds: string[],
+  componentIds: ModelComponentId[],
   minimum: AttributeRangeMinimum,
   maximum: AttributeRangeMaximum,
 ) => unknown;
-type AttributeColorMapFn = (modelId: ModelId, componentId: string) => string | undefined;
+type AttributeColorMapFn = (modelId: ModelId, componentId: ModelComponentId) => string | undefined;
 type SetAttributeColorMapFn = (
   modelId: ModelId,
-  componentIds: string[],
+  componentIds: ModelComponentId[],
   colorMap: AttributeColorMap,
 ) => unknown;
 type DynamicStyleFunctions = Record<string, unknown>;
@@ -62,8 +66,8 @@ function attributeFn<Signature>(method: unknown): Signature {
 // Re-applies the attribute name, range and color map of `firstId` to every id in `componentIds`
 async function applyAttributeAccessors(
   modelId: ModelId,
-  componentIds: string[],
-  firstId: string,
+  componentIds: ModelComponentId[],
+  firstId: ModelComponentId,
   accessors: AttributeAccessors,
 ): Promise<void> {
   const { getName, setName, getRange, setRange, getColorMap, setColorMap } = accessors;
@@ -86,9 +90,13 @@ async function applyAttributeAccessors(
 function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
   getModelColor: (modelId: ModelId) => ColorRGBA | undefined;
   getModelActiveColoring: (modelId: ModelId) => unknown;
-  getModelComponentColor: (modelId: ModelId, componentId: string) => unknown;
-  getModelComponentEffectiveColor: (modelId: ModelId, componentId: string, type: string) => unknown;
-  getModelComponentActiveColoring: (modelId: ModelId, componentId: string) => unknown;
+  getModelComponentColor: (modelId: ModelId, componentId: ModelComponentId) => unknown;
+  getModelComponentEffectiveColor: (
+    modelId: ModelId,
+    componentId: ModelComponentId,
+    type: string,
+  ) => unknown;
+  getModelComponentActiveColoring: (modelId: ModelId, componentId: ModelComponentId) => unknown;
   modelComponentTypeColor: (modelId: ModelId, type: string) => unknown;
   getModelComponentTypeActiveColoring: (modelId: ModelId, type: string) => unknown;
   setModelComponentTypeColor: (modelId: ModelId, type: string, color: ColorRGBA) => Promise<void>;
@@ -99,12 +107,12 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
   ) => Promise<void>;
   setModelComponentActiveColoring: (
     modelId: ModelId,
-    componentId: string,
+    componentId: ModelComponentId,
     activeColoring: string,
   ) => Promise<void>;
   setModelComponentsColor: (
     modelId: ModelId,
-    componentIds: string[],
+    componentIds: ModelComponentId[],
     color: ColorRGBA | undefined,
     activeColoring?: string,
   ) => Promise<unknown[]>;
@@ -198,7 +206,7 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
       },
     },
   };
-  function getModelComponentColor(modelId: ModelId, componentId: string): unknown {
+  function getModelComponentColor(modelId: ModelId, componentId: ModelComponentId): unknown {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
     const coloring = dataStyleState.getComponentStyle(modelId, componentId).coloring as StyleValues;
     return coloring.constant;
@@ -215,7 +223,7 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
   }
   function getModelComponentEffectiveColor(
     modelId: ModelId,
-    componentId: string,
+    componentId: ModelComponentId,
     type: string,
   ): unknown {
     const individualColor = getModelComponentColor(modelId, componentId);
@@ -224,7 +232,10 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
     }
     return modelComponentTypeColor(modelId, type);
   }
-  function getModelComponentActiveColoring(modelId: ModelId, componentId: string): unknown {
+  function getModelComponentActiveColoring(
+    modelId: ModelId,
+    componentId: ModelComponentId,
+  ): unknown {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
     const coloring = dataStyleState.getComponentStyle(modelId, componentId).coloring as StyleValues;
     return coloring.active;
@@ -241,7 +252,7 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
   }
   async function setModelComponentsColor(
     modelId: ModelId,
-    componentIds: string[],
+    componentIds: ModelComponentId[],
     color: ColorRGBA | undefined,
     activeColoring = "constant",
   ): Promise<unknown[]> {
@@ -314,7 +325,7 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
   }
   async function setModelComponentActiveColoring(
     modelId: ModelId,
-    componentId: string,
+    componentId: ModelComponentId,
     activeColoring: string,
   ): Promise<void> {
     await modelCommonStyle.mutateComponentStyle(modelId, componentId, {

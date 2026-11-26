@@ -63,7 +63,7 @@ async function refresh(
 
 // Each reload rebuilds an actor: one after another, then the camera moves once on the item
 async function refreshLinked(
-  linked: { id: string; binary_light_viewable?: string; crs?: CRS }[] | undefined,
+  linked: { id: DataId; binary_light_viewable?: string; crs?: CRS }[] | undefined,
 ): Promise<void> {
   for (const entry of linked ?? []) {
     // oxlint-disable-next-line no-await-in-loop

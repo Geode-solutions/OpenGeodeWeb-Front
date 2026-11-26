@@ -21,7 +21,7 @@ import { useSceneStyle } from "@ogw_internal/stores/data_style/scene";
 
 interface DataStyleSnapshot {
   // Projects saved before data_id existed hold their styles with an `id`
-  readonly styles: Record<string, LegacyDataId<ObjectStyle> | ObjectStyle>;
+  readonly styles: Record<DataId, LegacyDataId<ObjectStyle> | ObjectStyle>;
   readonly componentStyles: Record<string, ModelComponentStyle>;
   readonly modelComponentTypeStyles: Record<string, ModelComponentTypeStyle>;
   readonly sceneStyle?: SceneStyle;
@@ -129,7 +129,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
     const style_promises = Object.entries(stylesSnapshot).map(
       // oxlint-disable-next-line prefer-readonly-parameter-types -- same external ObjectStyle limitation as above.
-      async ([dataId, style]: readonly [string, LegacyDataId<ObjectStyle> | ObjectStyle]) => {
+      async ([dataId, style]: readonly [DataId, LegacyDataId<ObjectStyle> | ObjectStyle]) => {
         const key = await data_style_db.put(
           structuredClone({ ...fromLegacyDataId<ObjectStyle>(style), data_id: dataId }),
         );

@@ -1,6 +1,7 @@
 // Local imports
 import { type LegacyDataId, fromLegacyDataId } from "@ogw_front/utils/legacy_data_id";
 import { type NewDataItem, useDataStore } from "@ogw_front/stores/data";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -38,7 +39,7 @@ async function applyStyleWhenReady(item: NewDataItem, ready: Promise<unknown>): 
 
 // NewDataItem has mutable array fields (mesh_components, collection_components), so it can't
 // Satisfy prefer-readonly-parameter-types deeply; left unfixed (same pattern as app/plugins/auto_store_register.ts).
-async function importDataItem(item: NewDataItem): Promise<string> {
+async function importDataItem(item: NewDataItem): Promise<DataId> {
   const dataStore = useDataStore();
   const dataStyleStore = useDataStyleStore();
   const treeviewStore = useTreeviewStore();
@@ -78,7 +79,7 @@ async function importDataItem(item: NewDataItem): Promise<string> {
   return item.data_id;
 }
 // Every item comes through here: from the back-end, which still names its data id `id`, or from a project
-async function importItem(imported: LegacyDataId<NewDataItem> | NewDataItem): Promise<string> {
+async function importItem(imported: LegacyDataId<NewDataItem> | NewDataItem): Promise<DataId> {
   const item = fromLegacyDataId(imported);
   const dataId = await useTreeviewStore().untilLoaded(item.data_id, importDataItem(item));
   return dataId;

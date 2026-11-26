@@ -1,5 +1,7 @@
 import type { AttributeName } from "@geode/opengeodeweb-viewer/schema_types";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
+import type { ModelComponentId } from "@ogw_front/types/identifiers";
 import { useBackStore } from "@ogw_front/stores/back";
 
 interface AttributeRangeInfo {
@@ -15,8 +17,8 @@ interface AttributeSchemas {
 }
 
 interface AttributeRangeTarget {
-  id: string;
-  component_ids?: string[];
+  id: DataId;
+  component_ids?: ModelComponentId[];
 }
 
 // A data never changes once imported: selectors showing the same attribute share one request

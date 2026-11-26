@@ -13,7 +13,7 @@ function useBatchStyleModel<Value>(
   const { applyBatchStyle } = useBatchStyle();
 
   async function applyValue(value: Value): Promise<void> {
-    await applyBatchStyle(toValue(dataId), async (targetId: string) => {
+    await applyBatchStyle(toValue(dataId), async (targetId: DataId) => {
       await setter(targetId, value);
     });
     await hybridViewerStore.remoteRender();

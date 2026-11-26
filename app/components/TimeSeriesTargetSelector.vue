@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 
 import type { DataIdentified, GeodeObjectTyped } from "@ogw_front/types/identifiers";
@@ -14,7 +15,7 @@ interface Target extends DataIdentified, GeodeObjectTyped {
 }
 
 const emit = defineEmits<{
-  update_values: [values: { target_id: string; geode_object_type: GeodeObjectType }];
+  update_values: [values: { target_id: DataId; geode_object_type: GeodeObjectType }];
   increment_step: [];
   decrement_step: [];
 }>();

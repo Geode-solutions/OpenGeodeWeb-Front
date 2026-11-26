@@ -11,10 +11,10 @@ import {
   model_corners_schemas,
   sleep,
 } from "@ogw_tests/integration/stores/data_style/model/corners_helpers";
+import { assertDefined, assertNonEmpty } from "@ogw_tests/utils";
 import { beforeAllTimeout, setupIntegrationTests } from "@ogw_tests/integration/setup";
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 import { Status } from "@ogw_front/utils/status";
-import { assertDefined } from "@ogw_tests/utils";
 import { cleanupBackend } from "@ogw_server/utils/cleanup";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -49,16 +49,16 @@ describe("model corners", () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();
-      const corner_ids = await dataStore.getCornersGeodeIds(id);
+      const cornerIds = assertNonEmpty(await dataStore.getCornersGeodeIds(id));
       const spy = vi.spyOn(viewerStore, "request");
       spy.mockClear();
-      const result = dataStyleStore.setModelCornersVertexAttributeName(id, corner_ids, "points");
+      const result = dataStyleStore.setModelCornersVertexAttributeName(id, cornerIds, "points");
       expect(result).toBeInstanceOf(Promise);
       await result;
       await sleep(SLEEP_MS);
       // No request sent yet since minimum/maximum/colorMap are still undefined
       expect(spy).not.toHaveBeenCalled();
-      for (const corner_id of corner_ids) {
+      for (const corner_id of cornerIds) {
         expect(dataStyleStore.modelCornersVertexAttributeName(id, corner_id)).toBe("points");
       }
       expect(viewerStore.status).toBe(Status.CONNECTED);
@@ -68,18 +68,18 @@ describe("model corners", () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();
-      const corner_ids = await dataStore.getCornersGeodeIds(id);
-      const corner_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, corner_ids);
+      const cornerIds = assertNonEmpty(await dataStore.getCornersGeodeIds(id));
+      const corner_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, cornerIds);
       const spy = vi.spyOn(viewerStore, "request");
       spy.mockClear();
-      await dataStyleStore.setModelCornersVertexAttributeName(id, corner_ids, "points");
+      await dataStyleStore.setModelCornersVertexAttributeName(id, cornerIds, "points");
       await dataStyleStore.setModelCornersVertexAttributeRange(
         id,
-        corner_ids,
+        cornerIds,
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       );
-      await dataStyleStore.setModelCornersVertexAttributeColorMap(id, corner_ids, "budaS");
+      await dataStyleStore.setModelCornersVertexAttributeColorMap(id, cornerIds, "budaS");
       await sleep(SLEEP_MS);
       const lastCall = assertDefined(spy.mock.calls.at(-1));
       expect(lastCall[0].schema).toStrictEqual(model_corners_schemas.attribute.vertex.attribute);
@@ -100,10 +100,10 @@ describe("model corners", () => {
     test("stored configs 1 - select attribute points and item 2", async () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
-      const corner_ids = await dataStore.getCornersGeodeIds(id);
-      const corner_id = assertDefined(corner_ids[0]);
-      await dataStyleStore.setModelCornersVertexAttributeName(id, corner_ids, "points");
-      await dataStyleStore.setModelCornersVertexAttributeItem(id, corner_ids, 2);
+      const cornerIds = assertNonEmpty(await dataStore.getCornersGeodeIds(id));
+      const corner_id = assertDefined(cornerIds[0]);
+      await dataStyleStore.setModelCornersVertexAttributeName(id, cornerIds, "points");
+      await dataStyleStore.setModelCornersVertexAttributeItem(id, cornerIds, 2);
       expect(dataStyleStore.modelCornersVertexAttributeName(id, corner_id)).toBe("points");
       expect(dataStyleStore.modelCornersVertexAttributeItem(id, corner_id)).toBe(2);
     });
@@ -111,15 +111,15 @@ describe("model corners", () => {
     test("stored configs 2 - set range and colormap", async () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
-      const corner_ids = await dataStore.getCornersGeodeIds(id);
-      const corner_id = assertDefined(corner_ids[0]);
+      const cornerIds = assertNonEmpty(await dataStore.getCornersGeodeIds(id));
+      const corner_id = assertDefined(cornerIds[0]);
       await dataStyleStore.setModelCornersVertexAttributeRange(
         id,
-        corner_ids,
+        cornerIds,
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       );
-      await dataStyleStore.setModelCornersVertexAttributeColorMap(id, corner_ids, "budaS");
+      await dataStyleStore.setModelCornersVertexAttributeColorMap(id, cornerIds, "budaS");
       await sleep(SLEEP_MS);
       expect(dataStyleStore.modelCornersVertexAttributeRange(id, corner_id)).toStrictEqual([
         MINIMUM_RANGE,
@@ -131,10 +131,10 @@ describe("model corners", () => {
     test("stored configs 3 - select unique_vertices", async () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
-      const corner_ids = await dataStore.getCornersGeodeIds(id);
-      const corner_id = assertDefined(corner_ids[0]);
-      await dataStyleStore.setModelCornersVertexAttributeName(id, corner_ids, "unique_vertices");
-      await dataStyleStore.setModelCornersVertexAttributeItem(id, corner_ids, 0);
+      const cornerIds = assertNonEmpty(await dataStore.getCornersGeodeIds(id));
+      const corner_id = assertDefined(cornerIds[0]);
+      await dataStyleStore.setModelCornersVertexAttributeName(id, cornerIds, "unique_vertices");
+      await dataStyleStore.setModelCornersVertexAttributeItem(id, cornerIds, 0);
       expect(dataStyleStore.modelCornersVertexAttributeName(id, corner_id)).toBe("unique_vertices");
       expect(dataStyleStore.modelCornersVertexAttributeItem(id, corner_id)).toBe(0);
     });
@@ -142,9 +142,9 @@ describe("model corners", () => {
     test("stored configs 4 - switch back to points and verify restoration", async () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
-      const corner_ids = await dataStore.getCornersGeodeIds(id);
-      const corner_id = assertDefined(corner_ids[0]);
-      await dataStyleStore.setModelCornersVertexAttributeName(id, corner_ids, "points");
+      const cornerIds = assertNonEmpty(await dataStore.getCornersGeodeIds(id));
+      const corner_id = assertDefined(cornerIds[0]);
+      await dataStyleStore.setModelCornersVertexAttributeName(id, cornerIds, "points");
       expect(dataStyleStore.modelCornersVertexAttributeName(id, corner_id)).toBe("points");
       expect(dataStyleStore.modelCornersVertexAttributeItem(id, corner_id)).toBe(2);
       expect(dataStyleStore.modelCornersVertexAttributeRange(id, corner_id)).toStrictEqual([

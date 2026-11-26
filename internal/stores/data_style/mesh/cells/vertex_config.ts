@@ -22,18 +22,18 @@ interface UseMeshCellsVertexAttributeConfigReturn {
   meshCellsVertexAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
   ) => AttributeStoredConfig;
 }
 
 interface UseMeshCellsVertexAttributeConfigWriterReturn {
-  mutateMeshCellsVertexStyle: (meshId: MeshId, values: Record<string, unknown>) => Promise<string>;
+  mutateMeshCellsVertexStyle: (meshId: MeshId, values: Record<string, unknown>) => Promise<MeshId>;
   setMeshCellsVertexAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
     config: Partial<AttributeStoredConfig>,
-  ) => Promise<string>;
+  ) => Promise<MeshId>;
 }
 
 function useMeshCellsVertexAttributeConfig(): UseMeshCellsVertexAttributeConfigReturn {
@@ -45,11 +45,11 @@ function useMeshCellsVertexAttributeConfig(): UseMeshCellsVertexAttributeConfigR
   function meshCellsVertexAttributeStoredConfig(
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
   ): AttributeStoredConfig {
     const { storedConfigs } = meshCellsVertexAttribute(meshId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
-    const itemConfig = item === undefined ? undefined : nameConfig?.[item];
+    const itemConfig = nameConfig?.[item];
     if (itemConfig !== undefined) {
       return itemConfig;
     }
@@ -124,7 +124,7 @@ function useMeshCellsVertexAttributeConfigWriter(): UseMeshCellsVertexAttributeC
   async function mutateMeshCellsVertexStyle(
     meshId: MeshId,
     values: Record<string, unknown>,
-  ): Promise<string> {
+  ): Promise<MeshId> {
     const result = await meshCellsCommonStyle.mutateMeshCellsStyle(meshId, {
       coloring: {
         vertex: values,
@@ -135,9 +135,9 @@ function useMeshCellsVertexAttributeConfigWriter(): UseMeshCellsVertexAttributeC
   async function setMeshCellsVertexAttributeStoredConfig(
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
     config: Partial<AttributeStoredConfig>,
-  ): Promise<string> {
+  ): Promise<MeshId> {
     const result = await mutateMeshCellsVertexStyle(meshId, {
       storedConfigs: {
         [name ?? ""]: {

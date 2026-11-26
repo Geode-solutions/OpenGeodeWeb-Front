@@ -17,7 +17,7 @@ interface AssignResponse {
   crs?: CRS;
   implausible?: boolean;
   unsupported?: boolean;
-  linked?: { id: string; crs?: CRS; implausible?: boolean; unsupported?: boolean }[];
+  linked?: { id: DataId; crs?: CRS; implausible?: boolean; unsupported?: boolean }[];
 }
 
 function plausibleEntries(entries: AssignedEntry[]): { data_id: DataId; name: string; crs: CRS }[] {
@@ -51,7 +51,7 @@ function buildAssignedEntries(
 function implausibleDescription(
   implausibleItems: Pick<CrsItem, "data_id" | "name">[],
   crs: CRS | undefined,
-  itemId: string | undefined,
+  itemId: DataId | undefined,
 ): string {
   const mismatch = `do not match ${formatCrsCode(crs)}. Georeference the data?`;
   // Named when linked data were assigned too: the user must know which one to align
@@ -63,7 +63,7 @@ function implausibleDescription(
 type ImplausibleWarning = (
   implausibleItems: Pick<CrsItem, "data_id" | "name">[],
   crs: CRS | undefined,
-  itemId: string | undefined,
+  itemId: DataId | undefined,
 ) => void;
 
 // Picking only works in the viewer: the alignment continues in its floating panel

@@ -1,3 +1,4 @@
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import { consola } from "consola";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
@@ -8,7 +9,7 @@ export function useQuickColormap(): {
 } {
   const viewerStore = useViewerStore();
   const quickColormap = reactive<{
-    data_id: string | undefined;
+    data_id: DataId | undefined;
     block_ids: number[] | undefined;
     show: boolean;
     x: number;

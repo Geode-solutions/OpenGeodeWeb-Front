@@ -156,7 +156,7 @@ function useMeshCellsVertexAttributeStyle(): UseMeshCellsVertexAttributeStyleRet
   }
   async function setMeshCellsVertexAttributeColorMap(
     meshId: MeshId,
-    colorMap: AttributeColorMap | undefined,
+    colorMap: AttributeColorMap,
   ): Promise<unknown> {
     const name = meshCellsVertexAttributeName(meshId);
     const item = meshCellsVertexAttributeItem(meshId);

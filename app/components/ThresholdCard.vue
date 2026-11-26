@@ -7,13 +7,14 @@ import {
 import { type AttributeSource, isValidThresholdAttribute } from "@ogw_front/utils/threshold";
 import type { Threshold, ThresholdAttribute } from "@ogw_internal/stores/hybrid_viewer/filters";
 import type { AttributeTimeStep } from "@ogw_front/types/attribute";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import ViewerOptionsAttributeRangeSelector from "@ogw_front/components/Viewer/Options/AttributeRangeSelector.vue";
 import { fetchAttributeRange } from "@ogw_front/utils/attribute_range";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 
 interface Props {
-  datasetId: string;
+  datasetId: DataId;
   sources: AttributeSource[];
   index: number;
   threshold: Threshold;

@@ -6,6 +6,7 @@ import {
   storeMethod,
   useAttributeColoringStyle,
 } from "@ogw_front/composables/attribute_coloring_style";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 
 interface MeshElement {
@@ -30,12 +31,12 @@ function isColoring(value: unknown): value is { active?: string } {
 
 // Styles the mesh elements colored by an attribute
 export function useGlobalAttributeStyle(
-  dataIdRef: Ref<string | undefined>,
+  dataIdRef: Ref<DataId | undefined>,
 ): AttributeColoringStyle {
   const dataStyleStore = useDataStyleStore();
 
   function meshColoring(
-    dataId: string,
+    dataId: DataId,
     { storeName }: MeshElement,
     activeColoring: string,
   ): AttributeColoring {

@@ -23,7 +23,7 @@ async function requestAndRender<Schema extends JsonRpcSchema>(
 }
 
 async function setClippingPlanes(
-  ids: string[],
+  ids: DataId[],
   planes: ViewerClippingPlanesParams["planes"],
 ): Promise<void> {
   await requestAndRender(viewer_schemas.opengeodeweb_viewer.viewer.clipping_planes, {
@@ -31,20 +31,20 @@ async function setClippingPlanes(
     planes,
   });
 }
-async function setShrink(ids: string[], shrink_factor: number): Promise<void> {
+async function setShrink(ids: DataId[], shrink_factor: number): Promise<void> {
   await requestAndRender(viewer_schemas.opengeodeweb_viewer.viewer.shrink, {
     ids,
     shrink_factor,
   });
 }
-async function setExplode(ids: string[], explode_factor: number): Promise<void> {
+async function setExplode(ids: DataId[], explode_factor: number): Promise<void> {
   await requestAndRender(viewer_schemas.opengeodeweb_viewer.viewer.explode, {
     ids,
     explode_factor,
   });
 }
 async function setSlice(
-  ids: string[],
+  ids: DataId[],
   slices: { axis: SliceAxis; index: number }[],
 ): Promise<[number, number, number]> {
   const {
@@ -71,7 +71,7 @@ interface Threshold {
   maximum: number | undefined;
   thresholdAttribute: ThresholdAttribute | undefined;
 }
-async function setThreshold(ids: string[], attributes: ThresholdAttribute[]): Promise<void> {
+async function setThreshold(ids: DataId[], attributes: ThresholdAttribute[]): Promise<void> {
   await requestAndRender(viewer_schemas.opengeodeweb_viewer.viewer.threshold, {
     ids,
     attributes,
@@ -88,7 +88,7 @@ function useHybridViewerFilters(): {
   removeThreshold: (dataId: DataId, index: number) => void;
   removeThresholds: (dataId: DataId) => void;
 } {
-  const thresholds = reactive<Record<string, Threshold[]>>({});
+  const thresholds = reactive<Record<DataId, Threshold[]>>({});
   let lastThresholdId = 0;
 
   function getThresholds(dataId: DataId): Threshold[] {

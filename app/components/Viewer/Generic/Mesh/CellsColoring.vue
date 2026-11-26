@@ -105,7 +105,7 @@ const vertex_attribute_range = computed<AttributeRange>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_color_map = computed<AttributeColorMap | undefined>({
+const vertex_attribute_color_map = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => dataStyleStore.meshCellsVertexAttributeColorMap(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>
@@ -170,7 +170,7 @@ const cell_attribute_range = computed<AttributeRange>({
     hybridViewerStore.remoteRender();
   },
 });
-const cell_attribute_color_map = computed<AttributeColorMap | undefined>({
+const cell_attribute_color_map = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => dataStyleStore.meshCellsCellAttributeColorMap(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>

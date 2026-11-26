@@ -1,3 +1,4 @@
+import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
 import type {
   ModelComponentStyle,
   ModelComponentTypeStyle,
@@ -6,18 +7,18 @@ import type {
   StyleValues,
 } from "./types";
 import { type SharedState, getSharedState } from "./state_shared";
-import type { ModelId } from "@ogw_front/types/identifiers";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import { getDefaultSceneStyle } from "@ogw_front/utils/default_styles";
 import { getTable } from "@ogw_internal/database/database";
 import merge from "lodash/merge";
 
 interface DataStyleStateApi extends SharedState {
-  getStyle: (objectId: string) => ObjectStyle;
-  getComponentStyle: (modelId: ModelId, componentId: string) => ModelComponentStyle;
+  getStyle: (objectId: DataId) => ObjectStyle;
+  getComponentStyle: (modelId: ModelId, componentId: ModelComponentId) => ModelComponentStyle;
   getModelComponentTypeStyle: (modelId: ModelId, componentType: string) => ModelComponentTypeStyle;
-  mutateStyle: (objectId: string, styleValues: StyleValues) => Promise<string>;
-  objectVisibility: ComputedRef<(objectId: string) => boolean | undefined>;
-  selectedObjects: ComputedRef<string[]>;
+  mutateStyle: (objectId: DataId, styleValues: StyleValues) => Promise<DataId>;
+  objectVisibility: ComputedRef<(objectId: DataId) => boolean | undefined>;
+  selectedObjects: ComputedRef<DataId[]>;
   clear: () => Promise<void>;
 }
 
@@ -32,7 +33,7 @@ export function useDataStyleState(): DataStyleStateApi {
   const state = getSharedState();
   const { styles, modelComponentTypeStyles, componentStyles } = state;
 
-  const objectVisibility = computed(() => (objectId: string): boolean | undefined => {
+  const objectVisibility = computed(() => (objectId: DataId): boolean | undefined => {
     const style = styles.value[objectId];
     if (style !== undefined) {
       return style.visibility;
@@ -40,8 +41,8 @@ export function useDataStyleState(): DataStyleStateApi {
     return false;
   });
 
-  const selectedObjects = computed((): string[] => {
-    const visibleObjectIds: string[] = [];
+  const selectedObjects = computed((): DataId[] => {
+    const visibleObjectIds: DataId[] = [];
     for (const [objectId, objectStyle] of Object.entries(styles.value)) {
       if (objectStyle.visibility === true) {
         visibleObjectIds.push(objectId);
@@ -50,7 +51,7 @@ export function useDataStyleState(): DataStyleStateApi {
     return visibleObjectIds;
   });
 
-  function getStyle(objectId: string): ObjectStyle {
+  function getStyle(objectId: DataId): ObjectStyle {
     const style = styles.value[objectId];
     if (style === undefined) {
       return { data_id: objectId };
@@ -58,7 +59,7 @@ export function useDataStyleState(): DataStyleStateApi {
     return { ...toRaw(style) };
   }
 
-  async function mutateStyle(objectId: string, styleValues: StyleValues): Promise<string> {
+  async function mutateStyle(objectId: DataId, styleValues: StyleValues): Promise<DataId> {
     state.updateStyleCache(objectId, styleValues);
     const currentStyle = getStyle(objectId);
     merge(currentStyle, styleValues);
@@ -68,7 +69,7 @@ export function useDataStyleState(): DataStyleStateApi {
     return savedId;
   }
 
-  function getComponentStyle(modelId: ModelId, componentId: string): ModelComponentStyle {
+  function getComponentStyle(modelId: ModelId, componentId: ModelComponentId): ModelComponentStyle {
     const cacheKey = `${modelId}_${componentId}`;
     return merge({ coloring: {} }, componentStyles.value[cacheKey]);
   }

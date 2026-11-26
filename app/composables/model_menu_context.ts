@@ -1,5 +1,5 @@
 import { type ComputedRef, type Ref, computed, ref, watch } from "vue";
-import type { ModelId, ModelIdentified } from "@ogw_front/types/identifiers";
+import type { ModelComponentId, ModelId, ModelIdentified } from "@ogw_front/types/identifiers";
 import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import type { MenuViewerObjectType } from "@ogw_front/stores/menu";
@@ -7,22 +7,22 @@ import { useDataStore } from "@ogw_front/stores/data";
 
 interface ModelMenuMetaData extends Partial<ModelIdentified> {
   viewer_object_type?: MenuViewerObjectType;
-  pickedComponentId?: string;
+  pickedComponentId?: ModelComponentId;
   modelComponentType?: string;
-  targetComponentIds?: string[];
+  targetComponentIds?: ModelComponentId[];
 }
 
 interface ModelMenuItemProps {
-  id: string;
+  id: ModelId;
   meta_data: Record<string, unknown>;
 }
 
 interface ModelMenuContext {
   modelId: ComputedRef<ModelId>;
-  componentId: ComputedRef<string | undefined>;
+  componentId: ComputedRef<ModelComponentId | undefined>;
   componentType: Ref<string | undefined>;
   collections: Ref<CollectionComponent[] | undefined>;
-  targetComponentIds: Ref<string[]>;
+  targetComponentIds: Ref<ModelComponentId[]>;
 }
 
 // Resolves what a model context menu targets: the whole model, a component type, a collection or one component
@@ -32,8 +32,10 @@ function useModelMenuContext(getItemProps: () => ModelMenuItemProps): ModelMenuC
   // oxlint-disable-next-line no-unsafe-type-assertion -- meta_data is filled by the viewer context menu with these keys.
   const metaData = computed(() => getItemProps().meta_data as ModelMenuMetaData);
 
-  const modelId = computed<string>(() => metaData.value.modelId ?? getItemProps().id);
-  const componentId = computed<string | undefined>(() => metaData.value.pickedComponentId);
+  const modelId = computed<ModelId>(() => metaData.value.modelId ?? getItemProps().id);
+  const componentId = computed<ModelComponentId | undefined>(
+    () => metaData.value.pickedComponentId,
+  );
   const componentType = ref<string | undefined>(undefined);
   const collections = ref<CollectionComponent[] | undefined>(undefined);
 
@@ -79,7 +81,7 @@ function useModelMenuContext(getItemProps: () => ModelMenuItemProps): ModelMenuC
     { immediate: true },
   );
 
-  const targetComponentIds = ref<string[]>([]);
+  const targetComponentIds = ref<ModelComponentId[]>([]);
   watch(
     () => [modelId.value, componentType.value, metaData.value.targetComponentIds],
     async () => {

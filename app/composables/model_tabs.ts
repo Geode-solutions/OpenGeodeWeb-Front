@@ -1,4 +1,5 @@
 import { type Ref, computed, ref, watch } from "vue";
+import type { ModelComponentId } from "@ogw_front/types/identifiers";
 
 interface ModelTabItem {
   label: string;
@@ -8,7 +9,7 @@ interface ModelTabItem {
 
 interface ModelTabsOptions {
   componentType: Ref<string | undefined>;
-  componentId: Ref<string | undefined>;
+  componentId: Ref<ModelComponentId | undefined>;
   isTypeSupported?: (type: string) => boolean;
   hasComponentsOptions?: Ref<boolean>;
 }

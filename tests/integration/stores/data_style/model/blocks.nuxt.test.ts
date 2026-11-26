@@ -4,10 +4,10 @@ import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
+import { assertDefined, assertNonEmpty } from "@ogw_tests/utils";
 import { beforeAllTimeout, setupIntegrationTests } from "@ogw_tests/integration/setup";
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 import { Status } from "@ogw_front/utils/status";
-import { assertDefined } from "@ogw_tests/utils";
 import { cleanupBackend } from "@ogw_server/utils/cleanup";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -101,14 +101,14 @@ describe("model blocks", () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();
-      const block_ids = await dataStore.getBlocksGeodeIds(id);
+      const blockIds = assertNonEmpty(await dataStore.getBlocksGeodeIds(id));
       const spy = vi.spyOn(viewerStore, "request");
       spy.mockClear();
-      await dataStyleStore.setModelBlocksVertexAttributeName(id, block_ids, "points");
+      await dataStyleStore.setModelBlocksVertexAttributeName(id, blockIds, "points");
       await sleep(SLEEP_MS);
       // No request sent yet since minimum/maximum/colorMap are still undefined
       expect(spy).not.toHaveBeenCalled();
-      for (const block_id of block_ids) {
+      for (const block_id of blockIds) {
         expect(dataStyleStore.modelBlocksVertexAttributeName(id, block_id)).toBe("points");
       }
       expect(viewerStore.status).toBe(Status.CONNECTED);
@@ -118,18 +118,18 @@ describe("model blocks", () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();
-      const block_ids = await dataStore.getBlocksGeodeIds(id);
-      const block_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, block_ids);
+      const blockIds = assertNonEmpty(await dataStore.getBlocksGeodeIds(id));
+      const block_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, blockIds);
       const spy = vi.spyOn(viewerStore, "request");
       spy.mockClear();
-      await dataStyleStore.setModelBlocksVertexAttributeName(id, block_ids, "points");
+      await dataStyleStore.setModelBlocksVertexAttributeName(id, blockIds, "points");
       await dataStyleStore.setModelBlocksVertexAttributeRange(
         id,
-        block_ids,
+        blockIds,
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       );
-      await dataStyleStore.setModelBlocksVertexAttributeColorMap(id, block_ids, "budaS");
+      await dataStyleStore.setModelBlocksVertexAttributeColorMap(id, blockIds, "budaS");
       await sleep(SLEEP_MS);
       const lastCall = assertDefined(spy.mock.calls.at(-1));
       expect(lastCall[0].schema).toStrictEqual(model_blocks_schemas.attribute.vertex.attribute);
@@ -150,10 +150,10 @@ describe("model blocks", () => {
     test("stored configs 1 - select attribute points and item 2", async () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
-      const block_ids = await dataStore.getBlocksGeodeIds(id);
-      const block_id = assertDefined(block_ids[0]);
-      await dataStyleStore.setModelBlocksVertexAttributeName(id, block_ids, "points");
-      await dataStyleStore.setModelBlocksVertexAttributeItem(id, block_ids, 2);
+      const blockIds = assertNonEmpty(await dataStore.getBlocksGeodeIds(id));
+      const block_id = assertDefined(blockIds[0]);
+      await dataStyleStore.setModelBlocksVertexAttributeName(id, blockIds, "points");
+      await dataStyleStore.setModelBlocksVertexAttributeItem(id, blockIds, 2);
       expect(dataStyleStore.modelBlocksVertexAttributeName(id, block_id)).toBe("points");
       expect(dataStyleStore.modelBlocksVertexAttributeItem(id, block_id)).toBe(2);
     });
@@ -161,15 +161,15 @@ describe("model blocks", () => {
     test("stored configs 2 - set range and colormap", async () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
-      const block_ids = await dataStore.getBlocksGeodeIds(id);
-      const block_id = assertDefined(block_ids[0]);
+      const blockIds = assertNonEmpty(await dataStore.getBlocksGeodeIds(id));
+      const block_id = assertDefined(blockIds[0]);
       await dataStyleStore.setModelBlocksVertexAttributeRange(
         id,
-        block_ids,
+        blockIds,
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       );
-      await dataStyleStore.setModelBlocksVertexAttributeColorMap(id, block_ids, "budaS");
+      await dataStyleStore.setModelBlocksVertexAttributeColorMap(id, blockIds, "budaS");
       await sleep(SLEEP_MS);
       expect(dataStyleStore.modelBlocksVertexAttributeRange(id, block_id)).toStrictEqual([
         MINIMUM_RANGE,
@@ -181,10 +181,10 @@ describe("model blocks", () => {
     test("stored configs 3 - select unique_vertices", async () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
-      const block_ids = await dataStore.getBlocksGeodeIds(id);
-      const block_id = assertDefined(block_ids[0]);
-      await dataStyleStore.setModelBlocksVertexAttributeName(id, block_ids, "unique_vertices");
-      await dataStyleStore.setModelBlocksVertexAttributeItem(id, block_ids, 0);
+      const blockIds = assertNonEmpty(await dataStore.getBlocksGeodeIds(id));
+      const block_id = assertDefined(blockIds[0]);
+      await dataStyleStore.setModelBlocksVertexAttributeName(id, blockIds, "unique_vertices");
+      await dataStyleStore.setModelBlocksVertexAttributeItem(id, blockIds, 0);
       expect(dataStyleStore.modelBlocksVertexAttributeName(id, block_id)).toBe("unique_vertices");
       expect(dataStyleStore.modelBlocksVertexAttributeItem(id, block_id)).toBe(0);
     });
@@ -192,9 +192,9 @@ describe("model blocks", () => {
     test("stored configs 4 - switch back to points and verify restoration", async () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
-      const block_ids = await dataStore.getBlocksGeodeIds(id);
-      const block_id = assertDefined(block_ids[0]);
-      await dataStyleStore.setModelBlocksVertexAttributeName(id, block_ids, "points");
+      const blockIds = assertNonEmpty(await dataStore.getBlocksGeodeIds(id));
+      const block_id = assertDefined(blockIds[0]);
+      await dataStyleStore.setModelBlocksVertexAttributeName(id, blockIds, "points");
       expect(dataStyleStore.modelBlocksVertexAttributeName(id, block_id)).toBe("points");
       expect(dataStyleStore.modelBlocksVertexAttributeItem(id, block_id)).toBe(2);
       expect(dataStyleStore.modelBlocksVertexAttributeRange(id, block_id)).toStrictEqual([
@@ -210,12 +210,12 @@ describe("model blocks", () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();
-      const block_ids = await dataStore.getBlocksGeodeIds(id);
+      const blockIds = assertNonEmpty(await dataStore.getBlocksGeodeIds(id));
       const spy = vi.spyOn(viewerStore, "request");
       spy.mockClear();
       const result = dataStyleStore.setModelBlocksPolyhedronAttributeName(
         id,
-        block_ids,
+        blockIds,
         "test_attribute",
       );
       expect(result).toBeInstanceOf(Promise);
@@ -223,7 +223,7 @@ describe("model blocks", () => {
       await sleep(SLEEP_MS);
       // No request sent yet since minimum/maximum/colorMap are still undefined
       expect(spy).not.toHaveBeenCalled();
-      for (const block_id of block_ids) {
+      for (const block_id of blockIds) {
         expect(dataStyleStore.modelBlocksPolyhedronAttributeName(id, block_id)).toBe(
           "test_attribute",
         );
@@ -235,18 +235,18 @@ describe("model blocks", () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();
-      const block_ids = await dataStore.getBlocksGeodeIds(id);
-      const block_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, block_ids);
+      const blockIds = assertNonEmpty(await dataStore.getBlocksGeodeIds(id));
+      const block_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, blockIds);
       const spy = vi.spyOn(viewerStore, "request");
       spy.mockClear();
-      await dataStyleStore.setModelBlocksPolyhedronAttributeName(id, block_ids, "test_attribute");
+      await dataStyleStore.setModelBlocksPolyhedronAttributeName(id, blockIds, "test_attribute");
       await dataStyleStore.setModelBlocksPolyhedronAttributeRange(
         id,
-        block_ids,
+        blockIds,
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       );
-      await dataStyleStore.setModelBlocksPolyhedronAttributeColorMap(id, block_ids, "budaS");
+      await dataStyleStore.setModelBlocksPolyhedronAttributeColorMap(id, blockIds, "budaS");
       await sleep(SLEEP_MS);
       const lastCall = assertDefined(spy.mock.calls.at(-1));
       expect(lastCall[0].schema).toStrictEqual(model_blocks_schemas.attribute.polyhedron.attribute);
@@ -267,14 +267,14 @@ describe("model blocks", () => {
     test("stored configs 1 - select attribute tetrahedron_vertices and item 2", async () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
-      const block_ids = await dataStore.getBlocksGeodeIds(id);
-      const block_id = assertDefined(block_ids[0]);
+      const blockIds = assertNonEmpty(await dataStore.getBlocksGeodeIds(id));
+      const block_id = assertDefined(blockIds[0]);
       await dataStyleStore.setModelBlocksPolyhedronAttributeName(
         id,
-        block_ids,
+        blockIds,
         "tetrahedron_vertices",
       );
-      await dataStyleStore.setModelBlocksPolyhedronAttributeItem(id, block_ids, 2);
+      await dataStyleStore.setModelBlocksPolyhedronAttributeItem(id, blockIds, 2);
       expect(dataStyleStore.modelBlocksPolyhedronAttributeName(id, block_id)).toBe(
         "tetrahedron_vertices",
       );
@@ -284,15 +284,15 @@ describe("model blocks", () => {
     test("stored configs 2 - set range and colormap", async () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
-      const block_ids = await dataStore.getBlocksGeodeIds(id);
-      const block_id = assertDefined(block_ids[0]);
+      const blockIds = assertNonEmpty(await dataStore.getBlocksGeodeIds(id));
+      const block_id = assertDefined(blockIds[0]);
       await dataStyleStore.setModelBlocksPolyhedronAttributeRange(
         id,
-        block_ids,
+        blockIds,
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       );
-      await dataStyleStore.setModelBlocksPolyhedronAttributeColorMap(id, block_ids, "budaS");
+      await dataStyleStore.setModelBlocksPolyhedronAttributeColorMap(id, blockIds, "budaS");
       await sleep(SLEEP_MS);
       expect(dataStyleStore.modelBlocksPolyhedronAttributeRange(id, block_id)).toStrictEqual([
         MINIMUM_RANGE,
@@ -304,14 +304,14 @@ describe("model blocks", () => {
     test("stored configs 3 - select tetrahedron_adjacents", async () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
-      const block_ids = await dataStore.getBlocksGeodeIds(id);
-      const block_id = assertDefined(block_ids[0]);
+      const blockIds = assertNonEmpty(await dataStore.getBlocksGeodeIds(id));
+      const block_id = assertDefined(blockIds[0]);
       await dataStyleStore.setModelBlocksPolyhedronAttributeName(
         id,
-        block_ids,
+        blockIds,
         "tetrahedron_adjacents",
       );
-      await dataStyleStore.setModelBlocksPolyhedronAttributeItem(id, block_ids, 0);
+      await dataStyleStore.setModelBlocksPolyhedronAttributeItem(id, blockIds, 0);
       expect(dataStyleStore.modelBlocksPolyhedronAttributeName(id, block_id)).toBe(
         "tetrahedron_adjacents",
       );
@@ -321,11 +321,11 @@ describe("model blocks", () => {
     test("stored configs 4 - switch back to tetrahedron_vertices and verify restoration", async () => {
       const dataStyleStore = useDataStyleStore();
       const dataStore = useDataStore();
-      const block_ids = await dataStore.getBlocksGeodeIds(id);
-      const block_id = assertDefined(block_ids[0]);
+      const blockIds = assertNonEmpty(await dataStore.getBlocksGeodeIds(id));
+      const block_id = assertDefined(blockIds[0]);
       await dataStyleStore.setModelBlocksPolyhedronAttributeName(
         id,
-        block_ids,
+        blockIds,
         "tetrahedron_vertices",
       );
       expect(dataStyleStore.modelBlocksPolyhedronAttributeName(id, block_id)).toBe(

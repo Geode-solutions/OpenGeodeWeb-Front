@@ -1,6 +1,8 @@
-import type { AttributeRangeInfo, AttributeSchemas } from "@ogw_front/utils/attribute_range";
 import type { AttributeTimeStep, ValidAttributeRange } from "@ogw_front/types/attribute";
+import type { AttributeRangeInfo } from "@ogw_front/utils/attribute_range";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { ModelComponentId } from "@ogw_front/types/identifiers";
+import type { NonEmptyArray } from "@ogw_front/utils/arrays";
 import { getAttributeRange } from "@ogw_front/utils/attributes";
 
 // The minimum and maximum of an attribute range: each one is clamped by the other
@@ -49,10 +51,10 @@ function attributeItemOptions(itemCount: number): { title: string; value: number
 
 // The range of every target for the picked item
 function attributeRangesPerTarget(
-  rangesPerTarget: ReadonlyMap<string, AttributeRangeInfo>,
+  rangesPerTarget: ReadonlyMap<DataId, AttributeRangeInfo>,
   item: number,
-): Map<string, ValidAttributeRange> {
-  const ranges = new Map<string, ValidAttributeRange>();
+): Map<DataId, ValidAttributeRange> {
+  const ranges = new Map<DataId, ValidAttributeRange>();
   for (const [targetId, range] of rangesPerTarget) {
     const { min, max } = getAttributeRange(range, item);
     ranges.set(targetId, [min, max]);
@@ -89,22 +91,17 @@ function useSeriesTimeStepCommit(
 }
 
 interface AttributeRequestParams {
-  id: string;
-  component_ids?: string[];
+  id: DataId;
+  component_ids?: NonEmptyArray<ModelComponentId>;
 }
 
-// Params of the "names" request, or undefined when the schema needs components and none is selected
+// Params of the "names" request: model routes need the components, mesh routes have none
 function attributeRequestParams(
-  schemas: AttributeSchemas,
   dataId: DataId,
-  componentIds: string[] | undefined,
-): AttributeRequestParams | undefined {
-  const { properties } = schemas.names;
-  if (typeof properties !== "object" || properties === null || !("component_ids" in properties)) {
+  componentIds: NonEmptyArray<ModelComponentId> | undefined,
+): AttributeRequestParams {
+  if (componentIds === undefined) {
     return { id: dataId };
-  }
-  if (!Array.isArray(componentIds) || componentIds.length === 0) {
-    return undefined;
   }
   return { id: dataId, component_ids: componentIds };
 }

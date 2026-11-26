@@ -139,7 +139,7 @@ const vertex_attribute_range = computed<AttributeRange>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_color_map = computed<AttributeColorMap | undefined>({
+const vertex_attribute_color_map = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => dataStyleStore.meshPointsVertexAttributeColorMap(dataId.value),
   set: async (newValue) => {
     await applyBatchStyle(dataId.value, (meshId: MeshId) =>

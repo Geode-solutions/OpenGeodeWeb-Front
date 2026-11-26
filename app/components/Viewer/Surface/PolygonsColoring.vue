@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import type {
+  AttributeColorMap,
+  AttributeRange,
+  AttributeTimeStep,
+} from "@ogw_front/types/attribute";
+import type {
   AttributeItem,
   AttributeName,
   ColorRGBA,
   Opacity,
 } from "@geode/opengeodeweb-viewer/schema_types";
-import type { AttributeRange, AttributeTimeStep } from "@ogw_front/types/attribute";
 import {
   type RangesPerData,
   applyRangesPerData,
@@ -100,7 +104,7 @@ const vertex_attribute_range = computed<AttributeRange>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_color_map = computed<Map<string, ColorRGBA> | undefined>({
+const vertex_attribute_color_map = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => dataStyleStore.meshPolygonsVertexAttributeColorMap(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>
@@ -167,7 +171,7 @@ const polygon_attribute_range = computed<AttributeRange>({
     hybridViewerStore.remoteRender();
   },
 });
-const polygon_attribute_color_map = computed<Map<string, ColorRGBA> | undefined>({
+const polygon_attribute_color_map = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => dataStyleStore.meshPolygonsPolygonAttributeColorMap(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>

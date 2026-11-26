@@ -1,4 +1,5 @@
-import type { ModelIdentified } from "@ogw_front/types/identifiers";
+import type { ModelComponentId, ModelIdentified } from "@ogw_front/types/identifiers";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { Vector3 } from "@kitware/vtk.js/types";
 import type vtkActor from "@kitware/vtk.js/Rendering/Core/Actor";
 import type vtkPolyData from "@kitware/vtk.js/Common/DataModel/PolyData";
@@ -19,11 +20,11 @@ interface HybridDbEntry {
   mapper: unknown;
 }
 
-type HybridDb = Record<string, HybridDbEntry>;
+type HybridDb = Record<DataId, HybridDbEntry>;
 
 interface HoverComponentInfo {
   name: string;
-  id: string;
+  id: ModelComponentId;
   type: string;
 }
 

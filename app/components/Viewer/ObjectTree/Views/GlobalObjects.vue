@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // oxlint-disable max-dependencies
-import type { GeodeObjectTyped, ViewerObjectTyped } from "@ogw_front/types/identifiers";
+import type { GeodeObjectTyped, ModelId, ViewerObjectTyped } from "@ogw_front/types/identifiers";
 import {
   type MapStyle,
   basemapGroup,
@@ -156,7 +156,7 @@ function modelTreeColor(id: string): string | undefined {
 }
 
 // The row of the model whose tree header is hovered
-const linkedRow = computed<{ id: string; color: string } | undefined>(() => {
+const linkedRow = computed<{ id: ModelId; color: string } | undefined>(() => {
   const id = treeviewStore.hoveredModelId;
   if (id === undefined) {
     return undefined;

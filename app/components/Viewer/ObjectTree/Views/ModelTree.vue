@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
 import { sortAndFormatItems, useTreeFilter } from "@ogw_front/composables/tree_filter";
 import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
@@ -12,7 +13,7 @@ import { useModelTree } from "@ogw_front/composables/model_tree";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 interface Props {
-  id: string;
+  id: ModelId;
 }
 
 const { id } = defineProps<Props>();
@@ -65,12 +66,14 @@ const {
   applySearchFilter,
 } = useTreeFilter(localCategories);
 
-function onUpdateSelection(newSelection: string[]): void {
+function onUpdateSelection(newSelection: ModelComponentId[]): void {
   const finalSelection = applySearchFilter(newSelection, visibleComponents.value);
   updateVisibility(finalSelection);
 }
 
-const visibleSelection = computed<string[]>(() => applySearchFilter(visibleComponents.value, []));
+const visibleSelection = computed<ModelComponentId[]>(() =>
+  applySearchFilter(visibleComponents.value, []),
+);
 
 function matchesSearch(item: CollectionTreeItem, query: string): boolean {
   return (
@@ -121,7 +124,7 @@ const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
   return result;
 });
 
-function extractComponentIds(node: CollectionTreeItem): string[] {
+function extractComponentIds(node: CollectionTreeItem): ModelComponentId[] {
   if (node.children) {
     return node.children.flatMap((child) => extractComponentIds(child));
   }
@@ -241,7 +244,7 @@ function getLeafViewerIds(item: CollectionTreeItem): number[] {
       }"
       :scroll-top="currentView?.scrollTop || 0"
       class="transparent-treeview virtual-tree-height"
-      @update:selected="(val) => onUpdateSelection(val as string[])"
+      @update:selected="(val) => onUpdateSelection(val as ModelComponentId[])"
       @update:scroll-top="treeviewStore.setScrollTop(id, $event)"
       @hover:enter="
         ({ item, immediate }) =>

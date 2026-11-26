@@ -1,5 +1,6 @@
 import { type Extent, boxesExtent } from "./extent.js";
 import type { ComputedRef } from "vue";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import { sameCrs } from "@ogw_front/utils/crs";
 import { useCrsStore } from "@ogw_front/stores/crs";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -7,7 +8,7 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 interface Georeferenced {
   // A map needs at least one data in the project CRS to lie under
   available: ComputedRef<boolean>;
-  georeferencedIds: () => string[];
+  georeferencedIds: () => DataId[];
   dataBounds: () => Extent | undefined;
   // Changes with the project CRS, the georeferenced data or their extent
   dataKey: () => string;
@@ -19,7 +20,7 @@ function useGeoreferenced(): Georeferenced {
   const crsStore = useCrsStore();
   const hybridViewerStore = useHybridViewerStore();
 
-  function georeferencedIds(): string[] {
+  function georeferencedIds(): DataId[] {
     return crsStore.crsItems
       .filter((item) => sameCrs(item.crs, crsStore.projectCrs))
       .map((item) => item.data_id);

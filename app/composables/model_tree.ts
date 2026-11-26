@@ -7,8 +7,8 @@ import type {
   FormattedComponent,
   FormattedComponentGroup,
 } from "@ogw_front/stores/data_helpers/mesh";
+import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
 import type { ComponentRelations } from "@ogw_front/stores/data_helpers/relations";
-import type { ModelId } from "@ogw_front/types/identifiers";
 import { compareSelections } from "@ogw_front/utils/treeview";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -31,7 +31,7 @@ const RELATION_GROUPS: readonly { key: keyof ComponentRelations; label: string }
 
 // The boundaries and internals of a component, one group each, shown under it in the tree
 function relationGroups(
-  componentId: string,
+  componentId: ModelComponentId,
   componentRelations: ComponentRelations,
   sortType: string,
 ): RelationGroup[] {
@@ -53,7 +53,7 @@ function useModelVisibility(modelId: ModelId): {
   const hybridViewerStore = useHybridViewerStore();
   const selection = dataStyleStore.visibleMeshComponents(modelId);
 
-  async function updateVisibility(current: readonly string[]): Promise<void> {
+  async function updateVisibility(current: readonly ModelComponentId[]): Promise<void> {
     const { added, removed } = compareSelections([...current], selection.value);
     if (added.length > 0) {
       await dataStyleStore.setModelComponentsVisibility(modelId, added, true);
@@ -75,23 +75,23 @@ type WithRelationDetails<Component> = Component & { details?: RelationGroup[] };
 // Branch, so its own visibility stays its own. The groups of a component are built once per sort:
 // Recomputing the tree (filter, search, cache update) reuses them instead of rebuilding them all
 function useRelationDetails(): {
-  setRelations: (relations: Record<string, ComponentRelations>) => void;
+  setRelations: (relations: Record<ModelComponentId, ComponentRelations>) => void;
   attach: <Component extends { readonly id: string }>(
     components: readonly Component[],
     sortType: string,
   ) => WithRelationDetails<Component>[];
 } {
-  const relations = shallowRef<Readonly<Record<string, ComponentRelations>>>({});
-  const groupsByComponent = new Map<string, RelationGroup[]>();
+  const relations = shallowRef<Readonly<Record<ModelComponentId, ComponentRelations>>>({});
+  const groupsByComponent = new Map<ModelComponentId, RelationGroup[]>();
   let groupsSortType: string | undefined = undefined;
 
-  function setRelations(newRelations: Record<string, ComponentRelations>): void {
+  function setRelations(newRelations: Record<ModelComponentId, ComponentRelations>): void {
     groupsByComponent.clear();
     relations.value = markRaw(newRelations);
   }
 
   function groupsOf(
-    componentId: string,
+    componentId: ModelComponentId,
     componentRelations: ComponentRelations,
     sortType: string,
   ): RelationGroup[] {
@@ -126,7 +126,7 @@ function useRelationDetails(): {
 async function fetchModelTreeData(modelId: ModelId): Promise<{
   meshByType: Record<string, FormattedComponent[]>;
   collectionsByType: Record<string, CollectionComponent[]>;
-  relations: Record<string, ComponentRelations>;
+  relations: Record<ModelComponentId, ComponentRelations>;
 }> {
   const dataStore = useDataStore();
   const [meshByType, collectionsByType] = await Promise.all([

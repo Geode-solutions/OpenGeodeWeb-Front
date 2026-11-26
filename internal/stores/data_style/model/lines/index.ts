@@ -12,7 +12,7 @@ import { useModelLinesPointsStyle } from "./points";
 import { useModelLinesVertexAttribute } from "./vertex";
 import { useModelLinesVisibility } from "./visibility";
 
-async function setModelLinesDefaultStyle(_id: string): Promise<void> {
+async function setModelLinesDefaultStyle(_id: ModelId): Promise<void> {
   // Placeholder
 }
 
@@ -38,7 +38,7 @@ export function useModelLinesStyle(): ReturnType<typeof useModelLinesCommonStyle
     modelId: ModelId,
     lines_ids: LineId[],
   ): Promise<void> {
-    const visibilityGroups: Record<string, string[]> = {};
+    const visibilityGroups: Record<string, LineId[]> = {};
     for (const line_id of lines_ids) {
       const style = modelCommonStyle.modelLineStyle(modelId, line_id);
       const visibility = String(style.visibility);
@@ -61,7 +61,7 @@ export function useModelLinesStyle(): ReturnType<typeof useModelLinesCommonStyle
     modelId: ModelId,
     lines_ids: LineId[],
   ): Promise<unknown[]> {
-    const activeColoringGroups: Record<string, string[]> = {};
+    const activeColoringGroups: Record<string, LineId[]> = {};
     for (const line_id of lines_ids) {
       const activeColoring = String(modelColorStyle.modelLineActiveColoring(modelId, line_id));
       activeColoringGroups[activeColoring] ??= [];

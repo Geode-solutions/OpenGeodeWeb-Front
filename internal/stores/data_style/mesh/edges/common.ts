@@ -5,12 +5,12 @@ import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 export function useMeshEdgesCommonStyle(): {
   meshEdgesStyle: (meshId: MeshId) => StyleValues;
   meshEdgesColoring: (meshId: MeshId) => StyleValues;
-  mutateMeshEdgesStyle: (meshId: MeshId, values: StyleValues) => Promise<string>;
-  mutateMeshEdgesColoring: (meshId: MeshId, values: StyleValues) => Promise<string>;
+  mutateMeshEdgesStyle: (meshId: MeshId, values: StyleValues) => Promise<MeshId>;
+  mutateMeshEdgesColoring: (meshId: MeshId, values: StyleValues) => Promise<MeshId>;
 } {
   const dataStyleState = useDataStyleState();
 
-  async function mutateMeshEdgesStyle(meshId: MeshId, values: StyleValues): Promise<string> {
+  async function mutateMeshEdgesStyle(meshId: MeshId, values: StyleValues): Promise<MeshId> {
     const result = await dataStyleState.mutateStyle(meshId, {
       edges: values,
     });
@@ -26,7 +26,7 @@ export function useMeshEdgesCommonStyle(): {
     return meshEdgesStyle(meshId).coloring as StyleValues;
   }
 
-  async function mutateMeshEdgesColoring(meshId: MeshId, values: StyleValues): Promise<string> {
+  async function mutateMeshEdgesColoring(meshId: MeshId, values: StyleValues): Promise<MeshId> {
     const result = await mutateMeshEdgesStyle(meshId, {
       coloring: values,
     });

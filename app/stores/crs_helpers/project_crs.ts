@@ -2,10 +2,11 @@ import type { ComputedRef, Ref } from "vue";
 import { oldestCrs, sameCrs } from "@ogw_front/utils/crs";
 import type { CRS } from "@geode/opengeodeweb-back/schema_types";
 import type { CrsItem } from "@ogw_front/stores/data";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 
 interface ProjectCrsState {
   projectCrs: Ref<CRS | undefined>;
-  mismatchedCrs: ComputedRef<Map<string, CRS | undefined>>;
+  mismatchedCrs: ComputedRef<Map<DataId, CRS | undefined>>;
   setProjectCrs: (crs: CRS) => void;
 }
 
@@ -41,7 +42,7 @@ function useProjectCrsState(crsItems: Ref<CrsItem[]>): ProjectCrsState {
   // Data without CRS are listed too (value undefined): they could not follow the project
   const mismatchedCrs = computed(() => {
     const project = projectCrs.value;
-    const mismatched = new Map<string, CRS | undefined>();
+    const mismatched = new Map<DataId, CRS | undefined>();
     for (const item of crsItems.value) {
       if (project !== undefined && !sameCrs(item.crs, project)) {
         mismatched.set(item.data_id, item.crs);

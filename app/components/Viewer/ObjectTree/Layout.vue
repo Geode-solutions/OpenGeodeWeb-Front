@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import type { GeodeId } from "@geode/opengeodeweb-microservice/schema_types";
 import GlobalObjects from "@ogw_front/components/Viewer/ObjectTree/Views/GlobalObjects.vue";
+import type { ModelId } from "@ogw_front/types/identifiers";
 import ModelTree from "@ogw_front/components/Viewer/ObjectTree/Views/ModelTree.vue";
 import type { TreeMenuPayload } from "@ogw_front/utils/treeview";
 import ViewerObjectTreeBox from "@ogw_front/components/Viewer/ObjectTree/Box.vue";
@@ -91,7 +93,7 @@ watch([maxWidth, (): number => additionalViews.value.length], ([newMax]): void =
   }
 });
 
-function modelGeodeId(modelId: string): string | undefined {
+function modelGeodeId(modelId: ModelId): GeodeId | undefined {
   for (const group of treeviewStore.items) {
     const child = group.children.find((item) => item.id === modelId);
     if (child) {

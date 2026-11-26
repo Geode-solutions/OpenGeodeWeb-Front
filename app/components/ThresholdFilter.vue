@@ -20,7 +20,7 @@ const { escapeFunction = undefined } = defineProps<Props>();
 const show = defineModel<boolean>("show", { default: false });
 const dataStore = useDataStore();
 const hybridViewerStore = useHybridViewerStore();
-const selectedDatasetId = ref<string>();
+const selectedDatasetId = ref<DataId>();
 const sources = ref<AttributeSource[]>([]);
 const thresholds = computed<Threshold[]>(() => {
   if (!selectedDatasetId.value) {

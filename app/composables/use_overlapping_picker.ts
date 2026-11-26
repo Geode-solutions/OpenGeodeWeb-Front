@@ -111,7 +111,7 @@ export function useOverlappingPicker(): UseOverlappingPickerReturn {
     }
   }
 
-  async function getViewableIds(): Promise<string[]> {
+  async function getViewableIds(): Promise<DataId[]> {
     // Images are not pickable
     const activeIds = new Set(
       dataItems.value
@@ -131,7 +131,7 @@ export function useOverlappingPicker(): UseOverlappingPickerReturn {
         }
       }),
     );
-    return viewableChecks.filter((id): id is string => Boolean(id));
+    return viewableChecks.filter((id): id is DataId => Boolean(id));
   }
 
   function showIntermediateMenu(

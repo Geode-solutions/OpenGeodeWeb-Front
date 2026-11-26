@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
 import {
   type ModelMenuItemProps,
   useModelMenuContext,
 } from "@ogw_front/composables/model_menu_context";
+import { type NonEmptyArray, isNonEmpty } from "@ogw_front/utils/arrays";
 import ModelCardTabs from "./ModelCardTabs.vue";
 import ViewerGenericModelComponentPointsOptions from "@ogw_front/components/Viewer/Generic/Model/ComponentPointsOptions.vue";
 import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
@@ -21,6 +23,11 @@ const POINTS_TYPE_TITLES = {
 } as const;
 type PointsComponentType = keyof typeof POINTS_TYPE_TITLES;
 const POINTS_COMPONENT_TYPES: PointsComponentType[] = ["Surface", "Line", "Block"];
+
+interface PointsTarget {
+  componentType: PointsComponentType;
+  componentIds: NonEmptyArray<ModelComponentId>;
+}
 
 function isPointsComponentType(type: string | undefined): type is PointsComponentType {
   return type !== undefined && type in POINTS_TYPE_TITLES;
@@ -43,7 +50,7 @@ const { modelId, componentId, componentType, collections, targetComponentIds } =
 const modelPointsVisibility = computed<Visibility>({
   get: () => dataStyleStore.modelPointsVisibility(modelId.value),
   set: async (newValue) => {
-    await applyBatchStyle(modelId.value, (targetId: string) =>
+    await applyBatchStyle(modelId.value, (targetId: ModelId) =>
       dataStyleStore.setModelPointsVisibility(targetId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -54,9 +61,7 @@ const pointsComponentType = computed<PointsComponentType | undefined>(() =>
   isPointsComponentType(componentType.value) ? componentType.value : undefined,
 );
 
-const allComponentsTargets = ref<{ componentType: PointsComponentType; componentIds: string[] }[]>(
-  [],
-);
+const allComponentsTargets = ref<PointsTarget[]>([]);
 watch(
   modelId,
   async (currentModelId) => {
@@ -67,23 +72,25 @@ watch(
       })),
     );
     if (modelId.value === currentModelId) {
-      allComponentsTargets.value = targets.filter((target) => target.componentIds.length > 0);
+      allComponentsTargets.value = targets.filter((target): target is PointsTarget =>
+        isNonEmpty(target.componentIds),
+      );
     }
   },
   { immediate: true },
 );
 
-const typeTargets = computed(() => {
-  if (pointsComponentType.value === undefined) {
+const typeTargets = computed<PointsTarget[]>(() => {
+  if (pointsComponentType.value === undefined || !isNonEmpty(targetComponentIds.value)) {
     return [];
   }
   return [{ componentType: pointsComponentType.value, componentIds: targetComponentIds.value }];
 });
-const typeReferenceId = computed<string | undefined>(() =>
+const typeReferenceId = computed<ModelComponentId | undefined>(() =>
   collections.value ? targetComponentIds.value[0] : undefined,
 );
 
-const componentTargets = computed(() => {
+const componentTargets = computed<PointsTarget[]>(() => {
   if (pointsComponentType.value === undefined || componentId.value === undefined) {
     return [];
   }

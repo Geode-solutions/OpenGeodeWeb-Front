@@ -93,7 +93,7 @@ function buildSelection(
   return selection;
 }
 
-const selectionCache = new Map<string, ComputedRef<string[]>>();
+const selectionCache = new Map<ModelId, ComputedRef<string[]>>();
 
 function useModelSelection(
   modelId: ModelId | undefined,

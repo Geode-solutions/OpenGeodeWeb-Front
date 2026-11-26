@@ -100,7 +100,7 @@ const vertex_attribute_range = computed<AttributeRange>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_color_map = computed<AttributeColorMap | undefined>({
+const vertex_attribute_color_map = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => dataStyleStore.meshPolyhedraVertexAttributeColorMap(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>
@@ -167,7 +167,7 @@ const polyhedron_attribute_range = computed<AttributeRange>({
     hybridViewerStore.remoteRender();
   },
 });
-const polyhedron_attribute_color_map = computed<AttributeColorMap | undefined>({
+const polyhedron_attribute_color_map = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => dataStyleStore.meshPolyhedraPolyhedronAttributeColorMap(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>

@@ -1,4 +1,4 @@
-import type { DataIdentified, ModelId } from "@ogw_front/types/identifiers";
+import type { DataIdentified, ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
 import {
   type FormattedComponent,
   type ModelComponentRecord,
@@ -13,8 +13,8 @@ interface ComponentRelations {
 }
 
 interface ModelComponentRelationRecord extends DataIdentified {
-  parent: string;
-  child: string;
+  parent: ModelComponentId;
+  child: ModelComponentId;
   type: string;
 }
 
@@ -28,9 +28,9 @@ type MutableComponentRelations = { [Key in keyof ComponentRelations]: FormattedC
 function groupRelationsByParent(
   relations: readonly ModelComponentRelationRecord[],
   components: readonly FormattedComponent[],
-): Record<string, ComponentRelations> {
+): Record<ModelComponentId, ComponentRelations> {
   const componentsById = new Map(components.map((component) => [component.id, component]));
-  const byParent: Record<string, MutableComponentRelations> = {};
+  const byParent: Record<ModelComponentId, MutableComponentRelations> = {};
   for (const relation of relations) {
     const key = RELATION_KEYS[relation.type];
     const child = componentsById.get(relation.child);
@@ -65,7 +65,7 @@ export function useDataRelations(): {
 
   async function getComponentRelations(
     modelId: ModelId,
-    componentId: string,
+    componentId: ModelComponentId,
   ): Promise<ComponentRelations> {
     const relations = await model_components_relation_db
       .where("[data_id+parent+child]")
@@ -83,7 +83,7 @@ export function useDataRelations(): {
   async function fetchAllComponentRelations(
     modelId: ModelId,
     components: readonly FormattedComponent[],
-  ): Promise<Record<string, ComponentRelations>> {
+  ): Promise<Record<ModelComponentId, ComponentRelations>> {
     const relations = await model_components_relation_db.where("data_id").equals(modelId).toArray();
     return groupRelationsByParent(relations, components);
   }

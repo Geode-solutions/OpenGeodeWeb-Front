@@ -1,7 +1,7 @@
 import { type FormattedComponent, type ModelComponentRecord, useDataMesh } from "./mesh.js";
+import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import type { ModelComponentRelationRecord } from "./relations.js";
-import type { ModelId } from "@ogw_front/types/identifiers";
 import type { ReadonlyTreeGroup } from "@ogw_front/types/tree";
 import type { Ref } from "vue";
 import { getTable } from "@ogw_internal/database/database.js";
@@ -58,7 +58,7 @@ export function useDataCollections(): {
     const components = await getAllCollectionComponents(modelId);
     const relations = await model_components_relation_db.where("data_id").equals(modelId).toArray();
     const allMeshComponents = await getAllMeshComponents(modelId);
-    const meshComponentsById: Record<string, FormattedComponent> = {};
+    const meshComponentsById: Record<ModelComponentId, FormattedComponent> = {};
     for (const meshComponent of allMeshComponents) {
       meshComponentsById[meshComponent.id] = meshComponent;
     }

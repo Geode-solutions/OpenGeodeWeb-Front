@@ -22,7 +22,7 @@ interface UseMeshPolygonsPolygonAttributeConfigReturn {
   meshPolygonsPolygonAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
   ) => AttributeStoredConfig;
 }
 
@@ -30,13 +30,13 @@ interface UseMeshPolygonsPolygonAttributeConfigWriterReturn {
   mutateMeshPolygonsPolygonStyle: (
     meshId: MeshId,
     values: Record<string, unknown>,
-  ) => Promise<string>;
+  ) => Promise<MeshId>;
   setMeshPolygonsPolygonAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
     config: Partial<AttributeStoredConfig>,
-  ) => Promise<string>;
+  ) => Promise<MeshId>;
 }
 
 function useMeshPolygonsPolygonAttributeConfig(): UseMeshPolygonsPolygonAttributeConfigReturn {
@@ -48,11 +48,11 @@ function useMeshPolygonsPolygonAttributeConfig(): UseMeshPolygonsPolygonAttribut
   function meshPolygonsPolygonAttributeStoredConfig(
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
   ): AttributeStoredConfig {
     const { storedConfigs } = meshPolygonsPolygonAttribute(meshId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
-    const itemConfig = item === undefined ? undefined : nameConfig?.[item];
+    const itemConfig = nameConfig?.[item];
     if (itemConfig !== undefined) {
       return itemConfig;
     }
@@ -127,16 +127,16 @@ function useMeshPolygonsPolygonAttributeConfigWriter(): UseMeshPolygonsPolygonAt
   async function mutateMeshPolygonsPolygonStyle(
     meshId: MeshId,
     values: Record<string, unknown>,
-  ): Promise<string> {
+  ): Promise<MeshId> {
     const result = await meshPolygonsCommonStyle.mutateMeshPolygonsPolygonStyle(meshId, values);
     return result;
   }
   async function setMeshPolygonsPolygonAttributeStoredConfig(
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
     config: Partial<AttributeStoredConfig>,
-  ): Promise<string> {
+  ): Promise<MeshId> {
     const result = await mutateMeshPolygonsPolygonStyle(meshId, {
       storedConfigs: {
         [name ?? ""]: {

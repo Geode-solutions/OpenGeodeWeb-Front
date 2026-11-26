@@ -1,4 +1,5 @@
 import type { Bounds } from "@kitware/vtk.js/types";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { DataIdentified } from "@ogw_front/types/identifiers";
 import type vtkActor from "@kitware/vtk.js/Rendering/Core/Actor";
 import type { vtkCamera } from "@kitware/vtk.js/Rendering/Core/Camera";
@@ -67,10 +68,10 @@ interface MainCameraOptions {
 function resolveActiveActors(
   targetAllVisible: boolean,
   allItems: readonly Readonly<DataIdentified>[],
-  selectedDatasetIds: readonly string[],
-  hybridDb: Record<string, ActorEntry | undefined>,
+  selectedDatasetIds: readonly DataId[],
+  hybridDb: Record<DataId, ActorEntry | undefined>,
 ): vtkActor[] {
-  let targetIds: readonly string[] = selectedDatasetIds;
+  let targetIds: readonly DataId[] = selectedDatasetIds;
   if (targetAllVisible) {
     targetIds = allItems.map((item: Readonly<DataIdentified>) => item.data_id);
   }

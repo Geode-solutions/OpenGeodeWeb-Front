@@ -1,5 +1,10 @@
-import type { GeodeObjectTyped, ModelIdentified } from "@ogw_front/types/identifiers";
+import type {
+  GeodeObjectTyped,
+  ModelComponentId,
+  ModelIdentified,
+} from "@ogw_front/types/identifiers";
 import type { TreeGroup, TreeNode } from "@ogw_front/types/tree";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 
 function compareSelections<Item>(
   current: readonly Item[],
@@ -12,7 +17,7 @@ function compareSelections<Item>(
 
 interface DataMenuPayload {
   event: MouseEvent;
-  itemId: string;
+  itemId: DataId;
   context_type?: undefined;
 }
 
@@ -20,7 +25,7 @@ interface GeodeObjectTypeMenuPayload {
   event: MouseEvent;
   itemId: string;
   context_type: "geode_object_type";
-  targetIds: string[];
+  targetIds: DataId[];
 }
 
 interface ModelComponentMenuPayload extends ModelIdentified {
@@ -28,7 +33,7 @@ interface ModelComponentMenuPayload extends ModelIdentified {
   itemId: string;
   context_type: "model_component" | "model_component_type";
   modelComponentType?: string;
-  targetComponentIds?: string[];
+  targetComponentIds?: ModelComponentId[];
 }
 
 // The basemap category and its maps: not project data

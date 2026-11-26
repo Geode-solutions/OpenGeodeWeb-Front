@@ -1,6 +1,7 @@
 import back_schemas, {
   type BasemapBuildResponse,
 } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { MapStyle } from "@ogw_front/utils/basemap_tree";
 import type { Opacity } from "@geode/opengeodeweb-viewer/schema_types";
 import { useBackStore } from "@ogw_front/stores/back";
@@ -23,7 +24,7 @@ interface MapToShow {
   response: BasemapBuildResponse;
   name: string;
   layers: Layer[];
-  dataIds: string[];
+  dataIds: DataId[];
 }
 
 interface BasemapViewer {

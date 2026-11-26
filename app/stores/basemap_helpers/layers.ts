@@ -1,6 +1,7 @@
 import type { ComputedRef, Ref } from "vue";
 import { type Layer, useBasemapViewer } from "./viewer.js";
 import type { BasemapBuildResponse } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { MapStyle } from "@ogw_front/utils/basemap_tree";
 import { everyMap } from "./extent.js";
 
@@ -27,7 +28,7 @@ interface BasemapLayers {
 }
 
 // The state of each map, and how it reaches the viewer
-function useBasemapLayers(georeferencedIds: () => string[]): BasemapLayers {
+function useBasemapLayers(georeferencedIds: () => DataId[]): BasemapLayers {
   const { sendLayers, showMap } = useBasemapViewer();
   const shown = ref<MapStyle[]>(["satellite"]);
   const hidden = ref(false);

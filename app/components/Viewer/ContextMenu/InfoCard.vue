@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { formatCrs, formatCrsCode } from "@ogw_front/utils/crs";
 import GlassCard from "@ogw_front/components/GlassCard.vue";
+import type { ModelComponentId } from "@ogw_front/types/identifiers";
 import { consola } from "consola";
 import { middleTruncate } from "@ogw_front/utils/string";
 import { useCopyToClipboard } from "@ogw_front/composables/copy_to_clipboard";
@@ -39,7 +40,7 @@ const menuStore = useMenuStore();
 const dataStore = useDataStore();
 
 interface MeshComponentInfo {
-  id?: string;
+  id?: ModelComponentId;
   title?: string;
   category?: string;
 }

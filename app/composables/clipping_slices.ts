@@ -4,6 +4,7 @@ import {
   type SliceAxis,
   areAllGrids,
 } from "@ogw_front/utils/slice";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { DataIdentified } from "@ogw_front/types/identifiers";
 import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import type { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -27,15 +28,15 @@ interface SliceSyncParams {
   sliceMaxIndices: Ref<[number, number, number]>;
   isAllGrid: ComputedRef<boolean>;
   isSliceActive: ComputedRef<boolean>;
-  targetIds: ComputedRef<string[]>;
-  getUntargetedIds: () => string[];
+  targetIds: ComputedRef<DataId[]>;
+  getUntargetedIds: () => DataId[];
   hybridViewerStore: ReturnType<typeof useHybridViewerStore>;
 }
 
 interface ClippingSlicesParams {
   allItems: ComputedRef<(DataIdentified & { geode_object_type: GeodeObjectType })[]>;
-  targetIds: ComputedRef<string[]>;
-  getUntargetedIds: () => string[];
+  targetIds: ComputedRef<DataId[]>;
+  getUntargetedIds: () => DataId[];
   newItemId: () => number;
   hybridViewerStore: ReturnType<typeof useHybridViewerStore>;
 }
@@ -45,7 +46,7 @@ interface ClippingSlices extends SliceList {
   isAllGrid: ComputedRef<boolean>;
   isSliceActive: ComputedRef<boolean>;
   applySlices: () => Promise<void>;
-  removeSlices: (allIds: string[]) => Promise<void>;
+  removeSlices: (allIds: DataId[]) => Promise<void>;
 }
 
 function useSliceList(newItemId: () => number): SliceList {
@@ -89,7 +90,7 @@ function createSliceQueue(): (task: () => Promise<void>) => Promise<void> {
 
 function useSliceSync(params: SliceSyncParams): {
   applySlices: () => Promise<void>;
-  removeSlices: (allIds: string[]) => Promise<void>;
+  removeSlices: (allIds: DataId[]) => Promise<void>;
 } {
   const { slices, sliceMaxIndices, isAllGrid, isSliceActive, targetIds, hybridViewerStore } =
     params;
@@ -133,7 +134,7 @@ function useSliceSync(params: SliceSyncParams): {
     await queueSliceTask(sendSlices);
   }
 
-  async function removeSlices(allIds: string[]): Promise<void> {
+  async function removeSlices(allIds: DataId[]): Promise<void> {
     await queueSliceTask(async () => {
       if (areSlicesApplied) {
         await hybridViewerStore.setSlice(allIds, []);

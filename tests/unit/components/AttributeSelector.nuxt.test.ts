@@ -6,6 +6,8 @@ import { mountSuspended } from "@nuxt/test-utils/runtime";
 
 // Local imports
 import AttributeSelector from "@ogw_front/components/Viewer/Options/AttributeSelector.vue";
+import type { ModelComponentId } from "@ogw_front/types/identifiers";
+import type { NonEmptyArray } from "@ogw_front/utils/arrays";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { vuetify } from "@ogw_tests/utils";
 
@@ -139,7 +141,7 @@ describe("attributeSelector time steps", () => {
 
 describe("attributeSelector attribute names", () => {
   test("requests the names again only when the components change", async () => {
-    const componentIds = ref(["component"]);
+    const componentIds = ref<NonEmptyArray<ModelComponentId>>(["component"]);
     const rerenders = ref(0);
     const Parent = defineComponent({
       setup: () => (): VNode =>

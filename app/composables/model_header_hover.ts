@@ -1,17 +1,18 @@
 import { releaseHoverHighlight, useHoverhighlight } from "@ogw_front/composables/hover_highlight";
+import type { ModelId } from "@ogw_front/types/identifiers";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 // Hovering a model tree header shows its model in the viewer and its row in the objects tree
 export function useModelHeaderHover(): {
-  onModelHeaderEnter: (modelId: string) => void;
-  onModelHeaderLeave: (modelId: string) => void;
+  onModelHeaderEnter: (modelId: ModelId) => void;
+  onModelHeaderLeave: (modelId: ModelId) => void;
 } {
   const treeviewStore = useTreeviewStore();
   const dataStore = useDataStore();
   const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 
-  function onModelHeaderEnter(modelId: string): void {
+  function onModelHeaderEnter(modelId: ModelId): void {
     treeviewStore.setHoveredModel(modelId);
     onHoverEnter(
       modelId,
@@ -23,7 +24,7 @@ export function useModelHeaderHover(): {
     );
   }
 
-  function onModelHeaderLeave(modelId: string): void {
+  function onModelHeaderLeave(modelId: ModelId): void {
     if (treeviewStore.hoveredModelId === modelId) {
       treeviewStore.setHoveredModel(undefined);
     }

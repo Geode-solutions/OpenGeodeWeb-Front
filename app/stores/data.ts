@@ -6,17 +6,18 @@ import { useObservable } from "@vueuse/rxjs";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
-import type { DataId, GeodeId } from "@geode/opengeodeweb-microservice/schema_types";
 import type {
   DataIdentified,
   GeodeIdentified,
   GeodeObjectTyped,
+  ModelComponentId,
   ModelId,
   ViewerObjectTyped,
 } from "@ogw_front/types/identifiers";
 import { type LegacyDataId, fromLegacyDataId } from "@ogw_front/utils/legacy_data_id";
 import { type ModelComponentRecord, useDataMesh } from "./data_helpers/mesh.js";
 import { type ModelComponentRelationRecord, useDataRelations } from "./data_helpers/relations.js";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import { database } from "@ogw_internal/database/database.js";
 import { liveObservable } from "@ogw_front/utils/live_observable";
 import { useDataCollections } from "./data_helpers/collections.js";
@@ -39,9 +40,9 @@ interface ModelComponentInput extends GeodeIdentified {
   viewer_id: string | number;
   name: string;
   is_active: boolean;
-  boundaries?: string[];
-  internals?: string[];
-  items?: string[];
+  boundaries?: ModelComponentId[];
+  internals?: ModelComponentId[];
+  items?: ModelComponentId[];
 }
 
 interface NewDataItem extends DataIdentified, GeodeIdentified, GeodeObjectTyped, ViewerObjectTyped {
@@ -87,10 +88,10 @@ function checkItemViewable(item: ViewableItemLike | undefined | null): boolean {
   }
   return true;
 }
-function isItemViewable(itemOrId: string | ViewableItemLike): boolean | Promise<boolean> {
+function isItemViewable(itemOrId: DataId | ViewableItemLike): boolean | Promise<boolean> {
   if (typeof itemOrId === "string") {
     // oxlint-disable-next-line no-unsafe-type-assertion -- database's table map is dynamically typed at runtime; see comment above.
-    return (typedDatabase.data as Table<DataItem, string>).get(itemOrId).then(checkItemViewable);
+    return (typedDatabase.data as Table<DataItem, DataId>).get(itemOrId).then(checkItemViewable);
   }
   return checkItemViewable(itemOrId);
 }
@@ -99,7 +100,7 @@ function isItemViewable(itemOrId: string | ViewableItemLike): boolean | Promise<
 export const useDataStore = defineStore("data", () => {
   const viewerStore = useViewerStore();
   // oxlint-disable-next-line no-unsafe-type-assertion -- database's table map is dynamically typed at runtime; see comment above.
-  const data_db = typedDatabase.data as Table<DataItem, string>;
+  const data_db = typedDatabase.data as Table<DataItem, DataId>;
   // oxlint-disable-next-line no-unsafe-type-assertion -- database's table map is dynamically typed at runtime; see comment above.
   const model_components_db = typedDatabase.model_components as Table<ModelComponentRecord, string>;
   // oxlint-disable-next-line no-unsafe-type-assertion -- database's table map is dynamically typed at runtime; see comment above.
@@ -128,7 +129,7 @@ export const useDataStore = defineStore("data", () => {
   } = useDataCollections();
   const { getComponentRelations, fetchAllComponentRelations } = useDataRelations();
   // Ids the viewer holds a pipeline for: an item is stored before it is registered, and non viewable items never are
-  const registeredIds = reactive(new Set<string>());
+  const registeredIds = reactive(new Set<DataId>());
   async function item(dataId: DataId): Promise<DataItem> {
     const data_item = await data_db.get(dataId);
     if (!data_item) {
@@ -188,11 +189,11 @@ export const useDataStore = defineStore("data", () => {
   }
   async function meshComponentType(
     modelId: ModelId,
-    geode_id: GeodeId,
+    geodeId: ModelComponentId,
   ): Promise<string | undefined> {
     const component = await model_components_db
       .where("[data_id+geode_id]")
-      .equals([modelId, geode_id])
+      .equals([modelId, geodeId])
       .first();
     return component?.type;
   }
@@ -224,7 +225,7 @@ export const useDataStore = defineStore("data", () => {
   }
   // NewDataItem has mutable array fields (mesh_components, collection_components), so it can't
   // Satisfy prefer-readonly-parameter-types deeply; same pattern as app/utils/import_workflow.ts.
-  async function addItem(new_item: NewDataItem): Promise<string> {
+  async function addItem(new_item: NewDataItem): Promise<DataId> {
     const itemData: DataItem = {
       data_id: new_item.data_id,
       geode_id: new_item.geode_id,
@@ -276,8 +277,8 @@ export const useDataStore = defineStore("data", () => {
   async function addComponentRelations(new_item: NewDataItem): Promise<string> {
     const relations: ModelComponentRelationRecord[] = [];
     function addModelComponentRelations(
-      components: readonly string[],
-      parent: string,
+      components: readonly ModelComponentId[],
+      parent: ModelComponentId,
       type: string,
     ): void {
       for (const child of components) {
@@ -353,11 +354,11 @@ export const useDataStore = defineStore("data", () => {
   }
   async function getMeshComponentsViewerIds(
     modelId: ModelId,
-    meshComponentGeodeIds: readonly string[],
+    meshComponentGeodeIds: readonly ModelComponentId[],
   ): Promise<number[]> {
     const components = await model_components_db
       .where("[data_id+geode_id]")
-      .anyOf(meshComponentGeodeIds.map((geode_id) => [modelId, geode_id]))
+      .anyOf(meshComponentGeodeIds.map((geodeId) => [modelId, geodeId]))
       .toArray();
     return components.map((component: ModelComponentRecord) =>
       Math.trunc(Number(component.viewer_id)),

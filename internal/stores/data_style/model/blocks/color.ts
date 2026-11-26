@@ -1,5 +1,7 @@
 import type { BlockId, ModelId } from "@ogw_front/types/identifiers";
 import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
+import type { GeodeId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { NonEmptyArray } from "@ogw_front/utils/arrays";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -16,17 +18,17 @@ export function useModelBlocksColor(): {
   modelBlockColor: (modelId: ModelId, block_id?: BlockId) => ColorRGBA | undefined;
   setModelBlocksColor: (
     modelId: ModelId,
-    blocks_ids: BlockId[],
+    blockIds: BlockId[],
     color: ColorRGBA | undefined,
     activeColoring?: string,
-    collectionId?: string,
+    collectionId?: GeodeId,
   ) => Promise<unknown>;
   modelBlockActiveColoring: (modelId: ModelId, block_id?: BlockId) => unknown;
   setModelBlocksActiveColoring: (
     modelId: ModelId,
-    blocks_ids: BlockId[],
+    blockIds: NonEmptyArray<BlockId>,
     activeColoring: string,
-    collectionId?: string,
+    collectionId?: GeodeId,
   ) => Promise<void>;
 } {
   const dataStore = useDataStore();
@@ -47,14 +49,14 @@ export function useModelBlocksColor(): {
 
   async function setModelBlocksColor(
     modelId: ModelId,
-    blocks_ids: BlockId[],
+    blockIds: BlockId[],
     color: ColorRGBA | undefined,
     activeColoring = "constant",
-    collectionId?: string,
+    collectionId?: GeodeId,
   ): Promise<unknown> {
     const result = await modelCommonStyle.setModelTypeColor(
       modelId,
-      blocks_ids,
+      blockIds,
       color,
       schema,
       activeColoring,
@@ -67,57 +69,59 @@ export function useModelBlocksColor(): {
     return modelBlockColoring(modelId, block_id).active;
   }
 
-  async function applyVertexColoring(modelId: ModelId, blocks_ids: BlockId[]): Promise<void> {
-    const name = modelBlocksVertexAttribute.modelBlocksVertexAttributeName(modelId, blocks_ids[0]);
-    const item = modelBlocksVertexAttribute.modelBlocksVertexAttributeItem(modelId, blocks_ids[0]);
+  async function applyVertexColoring(
+    modelId: ModelId,
+    blockIds: NonEmptyArray<BlockId>,
+  ): Promise<void> {
+    const name = modelBlocksVertexAttribute.modelBlocksVertexAttributeName(modelId, blockIds[0]);
+    const item = modelBlocksVertexAttribute.modelBlocksVertexAttributeItem(modelId, blockIds[0]);
     const [minimum, maximum] = modelBlocksVertexAttribute.modelBlocksVertexAttributeRange(
       modelId,
-      blocks_ids[0],
+      blockIds[0],
     );
     const colorMap = modelBlocksVertexAttribute.modelBlocksVertexAttributeColorMap(
       modelId,
-      blocks_ids[0],
+      blockIds[0],
     );
     const no_data_color = modelBlocksVertexAttribute.modelBlocksVertexAttributeNoDataColor(
       modelId,
-      blocks_ids[0],
+      blockIds[0],
     );
     const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
     if (isAttributeValid(attribute)) {
-      await modelBlocksVertexAttribute.setModelBlocksVertexAttribute(
-        modelId,
-        blocks_ids,
-        attribute,
-      );
+      await modelBlocksVertexAttribute.setModelBlocksVertexAttribute(modelId, blockIds, attribute);
     }
   }
 
-  async function applyPolyhedronColoring(modelId: ModelId, blocks_ids: BlockId[]): Promise<void> {
+  async function applyPolyhedronColoring(
+    modelId: ModelId,
+    blockIds: NonEmptyArray<BlockId>,
+  ): Promise<void> {
     const name = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeName(
       modelId,
-      blocks_ids[0],
+      blockIds[0],
     );
     const item = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeItem(
       modelId,
-      blocks_ids[0],
+      blockIds[0],
     );
     const [minimum, maximum] = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeRange(
       modelId,
-      blocks_ids[0],
+      blockIds[0],
     );
     const colorMap = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeColorMap(
       modelId,
-      blocks_ids[0],
+      blockIds[0],
     );
     const no_data_color = modelBlocksPolyhedronAttribute.modelBlocksPolyhedronAttributeNoDataColor(
       modelId,
-      blocks_ids[0],
+      blockIds[0],
     );
     const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
     if (isAttributeValid(attribute)) {
       await modelBlocksPolyhedronAttribute.setModelBlocksPolyhedronAttribute(
         modelId,
-        blocks_ids,
+        blockIds,
         attribute,
       );
     }
@@ -125,29 +129,29 @@ export function useModelBlocksColor(): {
 
   async function setModelBlocksActiveColoring(
     modelId: ModelId,
-    blocks_ids: BlockId[],
+    blockIds: NonEmptyArray<BlockId>,
     activeColoring: string,
-    collectionId?: string,
+    collectionId?: GeodeId,
   ): Promise<void> {
     const totalBlockIds = await dataStore.getBlocksGeodeIds(modelId);
-    if (blocks_ids.length === totalBlockIds.length) {
+    if (blockIds.length === totalBlockIds.length) {
       await modelBlocksCommonStyle.mutateModelBlocksTypeColoring(modelId, {
         active: activeColoring,
       });
     }
-    await modelCommonStyle.mutateComponentStyles(modelId, blocks_ids, {
+    await modelCommonStyle.mutateComponentStyles(modelId, blockIds, {
       coloring: { active: activeColoring },
     });
     if (activeColoring === "constant" || activeColoring === "random") {
-      const color = modelBlockColor(modelId, blocks_ids[0]);
-      await setModelBlocksColor(modelId, blocks_ids, color, activeColoring, collectionId);
+      const color = modelBlockColor(modelId, blockIds[0]);
+      await setModelBlocksColor(modelId, blockIds, color, activeColoring, collectionId);
       return;
     }
 
     if (activeColoring === "vertex") {
-      await applyVertexColoring(modelId, blocks_ids);
+      await applyVertexColoring(modelId, blockIds);
     } else if (activeColoring === "polyhedron") {
-      await applyPolyhedronColoring(modelId, blocks_ids);
+      await applyPolyhedronColoring(modelId, blockIds);
     }
   }
 

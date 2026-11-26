@@ -8,6 +8,7 @@ import {
 import ViewerContextMenuItem, {
   type ItemProps,
 } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import type { AttributeColorMap } from "@ogw_front/types/attribute";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import PointSetPoints from "@ogw_front/assets/viewer_svgs/point_set_points.svg";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
@@ -132,7 +133,7 @@ const vertex_attribute_range = computed({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_color_map = computed({
+const vertex_attribute_color_map = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => dataStyleStore.meshPointsVertexAttributeColorMap(dataId.value),
   set: async (newValue) => {
     await applyBatchStyle(dataId.value, (meshId: MeshId) =>

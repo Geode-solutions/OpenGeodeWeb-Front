@@ -5,13 +5,14 @@ import {
 } from "@ogw_front/utils/attributes";
 import type { AttributeSource } from "@ogw_front/utils/threshold";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { ModelComponentId } from "@ogw_front/types/identifiers";
 import { attributeSchemas } from "@ogw_front/composables/attribute_coloring_style";
 import type { useDataStore } from "@ogw_front/stores/data";
 
 function attributeSource(
   kind: string,
   title: string,
-  params: { id: string; component_ids?: string[] },
+  params: { id: DataId; component_ids?: ModelComponentId[] },
   modelType?: string,
 ): AttributeSource {
   const schemas = attributeSchemas(modelType === undefined ? "" : "model_component_", kind);

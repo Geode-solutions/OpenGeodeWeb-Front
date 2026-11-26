@@ -16,23 +16,23 @@ import type { ValidAttributeRange } from "@ogw_front/types/attribute";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
-type RangesPerData = ReadonlyMap<string, ValidAttributeRange>;
+type RangesPerData = ReadonlyMap<DataId, ValidAttributeRange>;
 
-const BATCH_GROUP_KEY: InjectionKey<ComputedRef<string[]>> = Symbol("batch_group");
+const BATCH_GROUP_KEY: InjectionKey<ComputedRef<DataId[]>> = Symbol("batch_group");
 
-function provideBatchGroup(targetIds: () => string[]): void {
+function provideBatchGroup(targetIds: () => DataId[]): void {
   provide(BATCH_GROUP_KEY, computed(targetIds));
 }
 
-function injectBatchGroup(): ComputedRef<string[]> {
+function injectBatchGroup(): ComputedRef<DataId[]> {
   return inject(BATCH_GROUP_KEY, () => computed(() => []), true);
 }
 
-function groupTargetsOf(targetIds: string[], dataId: DataId): string[] | undefined {
+function groupTargetsOf(targetIds: DataId[], dataId: DataId): DataId[] | undefined {
   return targetIds.includes(dataId) ? targetIds : undefined;
 }
 
-function useBatchGroup(dataId: MaybeRefOrGetter<DataId>): ComputedRef<string[] | undefined> {
+function useBatchGroup(dataId: MaybeRefOrGetter<DataId>): ComputedRef<DataId[] | undefined> {
   const group = injectBatchGroup();
   return computed(() => groupTargetsOf(group.value, toValue(dataId)));
 }
@@ -53,7 +53,7 @@ async function applyRangesPerData(
 }
 
 async function applyActionOn(
-  targets: readonly string[],
+  targets: readonly DataId[],
   action: (dataId: DataId) => Promise<unknown>,
 ): Promise<void> {
   await Promise.all(

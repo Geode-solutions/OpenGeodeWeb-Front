@@ -156,7 +156,7 @@ function useMeshEdgesVertexAttributeStyle(): UseMeshEdgesVertexAttributeStyleRet
   }
   async function setMeshEdgesVertexAttributeColorMap(
     meshId: MeshId,
-    colorMap: AttributeColorMap | undefined,
+    colorMap: AttributeColorMap,
   ): Promise<unknown> {
     const name = meshEdgesVertexAttributeName(meshId);
     const item = meshEdgesVertexAttributeItem(meshId);

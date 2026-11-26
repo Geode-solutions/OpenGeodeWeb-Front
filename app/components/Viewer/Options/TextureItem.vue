@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import FileUploader from "@ogw_front/components/FileUploader.vue";
+import type { ImageId } from "@ogw_front/types/identifiers";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { intersectBy } from "@ogw_front/utils/attributes";
 import { requestForTargets } from "@ogw_front/utils/request_for_targets";
@@ -18,14 +19,14 @@ const emit = defineEmits<Emits>();
 
 interface Props {
   dataId: DataId;
-  textureId: string;
+  textureId: ImageId;
   textureName: string;
 }
 
 const { dataId, textureId: propTextureId, textureName: propTextureName } = defineProps<Props>();
 
 const textureName = ref<string>(propTextureName);
-const textureId = ref<string>(propTextureId);
+const textureId = ref<ImageId>(propTextureId);
 
 watch(
   () => propTextureName,

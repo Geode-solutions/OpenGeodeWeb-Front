@@ -6,13 +6,13 @@ import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 export function useMeshPointsCommonStyle(): {
   meshPointsStyle: (meshId: MeshId) => StyleValues;
   meshPointsColoring: (meshId: MeshId) => StyleValues;
-  mutateMeshPointsColoring: (meshId: MeshId, values: StyleValues) => Promise<string>;
-  mutateMeshPointsStyle: (meshId: MeshId, values: StyleValues) => Promise<string>;
-  mutateMeshPointsVisibility: (response: { id: string; visibility: Visibility }) => Promise<string>;
+  mutateMeshPointsColoring: (meshId: MeshId, values: StyleValues) => Promise<MeshId>;
+  mutateMeshPointsStyle: (meshId: MeshId, values: StyleValues) => Promise<MeshId>;
+  mutateMeshPointsVisibility: (response: { id: MeshId; visibility: Visibility }) => Promise<MeshId>;
 } {
   const dataStyleState = useDataStyleState();
 
-  async function mutateMeshPointsStyle(meshId: MeshId, values: StyleValues): Promise<string> {
+  async function mutateMeshPointsStyle(meshId: MeshId, values: StyleValues): Promise<MeshId> {
     const result = await dataStyleState.mutateStyle(meshId, {
       points: values,
     });
@@ -20,9 +20,9 @@ export function useMeshPointsCommonStyle(): {
   }
 
   async function mutateMeshPointsVisibility(response: {
-    id: string;
+    id: MeshId;
     visibility: Visibility;
-  }): Promise<string> {
+  }): Promise<MeshId> {
     const result = await mutateMeshPointsStyle(response.id, { visibility: response.visibility });
     return result;
   }
@@ -36,7 +36,7 @@ export function useMeshPointsCommonStyle(): {
     return meshPointsStyle(meshId).coloring as StyleValues;
   }
 
-  async function mutateMeshPointsColoring(meshId: MeshId, values: StyleValues): Promise<string> {
+  async function mutateMeshPointsColoring(meshId: MeshId, values: StyleValues): Promise<MeshId> {
     const result = await mutateMeshPointsStyle(meshId, {
       coloring: values,
     });

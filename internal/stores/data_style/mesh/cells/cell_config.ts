@@ -22,18 +22,18 @@ interface UseMeshCellsCellAttributeConfigReturn {
   meshCellsCellAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
   ) => AttributeStoredConfig;
 }
 
 interface UseMeshCellsCellAttributeConfigWriterReturn {
-  mutateMeshCellsCellStyle: (meshId: MeshId, values: Record<string, unknown>) => Promise<string>;
+  mutateMeshCellsCellStyle: (meshId: MeshId, values: Record<string, unknown>) => Promise<MeshId>;
   setMeshCellsCellAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
     config: Partial<AttributeStoredConfig>,
-  ) => Promise<string>;
+  ) => Promise<MeshId>;
 }
 
 function useMeshCellsCellAttributeConfig(): UseMeshCellsCellAttributeConfigReturn {
@@ -45,11 +45,11 @@ function useMeshCellsCellAttributeConfig(): UseMeshCellsCellAttributeConfigRetur
   function meshCellsCellAttributeStoredConfig(
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
   ): AttributeStoredConfig {
     const { storedConfigs } = meshCellsCellAttribute(meshId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
-    const itemConfig = item === undefined ? undefined : nameConfig?.[item];
+    const itemConfig = nameConfig?.[item];
     if (itemConfig !== undefined) {
       return itemConfig;
     }
@@ -121,7 +121,7 @@ function useMeshCellsCellAttributeConfigWriter(): UseMeshCellsCellAttributeConfi
   async function mutateMeshCellsCellStyle(
     meshId: MeshId,
     values: Record<string, unknown>,
-  ): Promise<string> {
+  ): Promise<MeshId> {
     const result = await meshCellsCommonStyle.mutateMeshCellsStyle(meshId, {
       coloring: {
         cell: values,
@@ -132,9 +132,9 @@ function useMeshCellsCellAttributeConfigWriter(): UseMeshCellsCellAttributeConfi
   async function setMeshCellsCellAttributeStoredConfig(
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
     config: Partial<AttributeStoredConfig>,
-  ): Promise<string> {
+  ): Promise<MeshId> {
     const result = await mutateMeshCellsCellStyle(meshId, {
       storedConfigs: {
         [name ?? ""]: {
