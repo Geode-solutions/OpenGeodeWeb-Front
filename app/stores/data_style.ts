@@ -12,7 +12,7 @@ import {
   sceneStyleDb,
   writeTransaction,
 } from "@ogw_internal/database/database.js";
-import { isMesh, isModel } from "@ogw_front/utils/viewer_object_type";
+import { isImage, isMesh, isModel } from "@ogw_front/utils/viewer_object_type";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
@@ -20,6 +20,7 @@ import { getDefaultStyle } from "@ogw_front/utils/default_styles";
 import { useAttributeTimeStepStyle } from "@ogw_internal/stores/data_style/time_step";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
+import { useImageStyle } from "@ogw_internal/stores/data_style/image/index";
 import { useMeshStyle } from "@ogw_internal/stores/data_style/mesh/index";
 import { useModelStyle } from "@ogw_internal/stores/data_style/model/index";
 import { useSceneStyle } from "@ogw_internal/stores/data_style/scene";
@@ -40,6 +41,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 // oxlint-disable-next-line max-lines-per-function
 export const useDataStyleStore = defineStore("dataStyle", () => {
   const dataStyleState = useDataStyleState();
+  const imageStyleStore = useImageStyle();
   const meshStyleStore = useMeshStyle();
   const modelStyleStore = useModelStyle();
   const sceneStyleStore = useSceneStyle();
@@ -57,11 +59,12 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     );
   }
 
-  // Runs the mesh or the model implementation for a data, or `notViewable` for a data the viewer
+  // Runs the image, the mesh or the model implementation for a data, or `notViewable` for a data the viewer
   // Does not show. An unknown viewer_object_type throws, unless `unknownType` handles it
   async function forViewerType<Result>(
     dataId: DataId,
     handlers: {
+      image: (id: DataId) => Promise<Result>;
       mesh: (id: DataId) => Promise<Result>;
       model: (id: DataId) => Promise<Result>;
       notViewable: (id: DataId) => Promise<Result> | Result;
@@ -71,6 +74,10 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     const item = await dataStore.item(dataId);
     if (!(await dataStore.fetchIsViewable(dataId))) {
       const result = await handlers.notViewable(dataId);
+      return result;
+    }
+    if (isImage(item)) {
+      const result = await handlers.image(dataId);
       return result;
     }
     if (isMesh(item)) {
@@ -90,6 +97,10 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   // A data the viewer does not show only keeps its visibility in its style
   async function setVisibility(dataId: DataId, visibility: Visibility): Promise<unknown> {
     const result = await forViewerType<unknown>(dataId, {
+      image: async (id) => {
+        const image_result = await imageStyleStore.setImageVisibility(id, visibility);
+        return image_result;
+      },
       mesh: async (id) => {
         const mesh_result = await meshStyleStore.setMeshVisibility(id, visibility);
         return mesh_result;
@@ -108,6 +119,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
   async function applyDefaultStyle(dataId: DataId): Promise<unknown[]> {
     const result = await forViewerType(dataId, {
+      image: imageStyleStore.applyImageStyle,
       mesh: meshStyleStore.applyMeshStyle,
       model: modelStyleStore.applyModelStyle,
       notViewable: () => {
@@ -161,6 +173,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     // Restores what can be shown: a non viewable data or an unknown type is skipped
     const promises = ids.map(async (dataId) => {
       await forViewerType<unknown>(dataId, {
+        image: imageStyleStore.applyImageStyle,
         mesh: meshStyleStore.applyMeshStyle,
         model: modelStyleStore.applyModelStyle,
         notViewable: () => undefined,
@@ -180,6 +193,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     applyAllStylesFromState,
     ...dataStyleState,
     ...attributeTimeStepStyle,
+    ...imageStyleStore,
     ...meshStyleStore,
     ...modelStyleStore,
     ...sceneStyleStore,

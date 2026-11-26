@@ -14,11 +14,12 @@ const BLOCK_VIEWER_ID = 3;
 
 const onHoverEnter =
   vi.fn<(id: string, provider: unknown, type: string, immediate: boolean) => void>();
+const onHoverLeave = vi.fn<(id: string) => void>();
 
 vi.mock(import("@ogw_front/composables/hover_highlight") as Promise<unknown>, () => ({
   useHoverhighlight: (): Record<string, unknown> => ({
     onHoverEnter,
-    onHoverLeave: vi.fn<() => void>(),
+    onHoverLeave,
   }),
 }));
 vi.mock(import("@ogw_front/composables/model_tree") as Promise<unknown>, () => ({
@@ -68,4 +69,28 @@ describe("object tree hover highlight", () => {
       false,
     );
   });
+});
+
+describe("global objects hover of an image", () => {
+  const pinia = setupActivePinia();
+
+  test.each(["RasterImage2D", "RasterImage3D"])(
+    "a %s is not highlighted",
+    async (geode_object_type) => {
+      const wrapper = await mountSuspended(GlobalObjects, {
+        global: { plugins: [vuetify, pinia], stubs: { CommonTreeView: true } },
+      });
+      const tree = wrapper.findComponent(CommonTreeView);
+      const item = { raw: { id: "image", viewer_object_type: "image", geode_object_type } };
+
+      onHoverEnter.mockClear();
+      onHoverLeave.mockClear();
+      tree.vm.$emit("hover:enter", { item, immediate: true });
+      tree.vm.$emit("hover:enter", { item });
+      tree.vm.$emit("hover:leave", { item });
+
+      expect(onHoverEnter).not.toHaveBeenCalled();
+      expect(onHoverLeave).not.toHaveBeenCalled();
+    },
+  );
 });

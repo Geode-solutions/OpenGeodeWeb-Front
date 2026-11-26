@@ -1,6 +1,3 @@
-import { ref } from "vue";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
-
 import { type DataItem, useDataStore } from "@ogw_front/stores/data";
 import type {
   GeodeObjectType,
@@ -10,8 +7,11 @@ import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { DataIdentified } from "@ogw_front/types/identifiers";
 import type { ViewerId } from "@geode/opengeodeweb-viewer/schema_types";
 import { computeMenuPosition } from "@ogw_front/composables/overlapping_picker_menu";
+import { isImage } from "@ogw_front/utils/viewer_object_type";
+import { ref } from "vue";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useViewerStore } from "@ogw_front/stores/viewer";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 interface PickedItem {
   id: DataId;
@@ -112,7 +112,10 @@ export function useOverlappingPicker(): UseOverlappingPickerReturn {
   }
 
   function getViewableIds(): string[] {
-    const activeIds = new Set(dataItems.value.map((i: DataItem) => i.data_id));
+    // Images are not pickable
+    const activeIds = new Set(
+      dataItems.value.filter((i: DataItem) => !isImage(i)).map((i: DataItem) => i.data_id),
+    );
     const visibleStyleIds = Object.keys(dataStyleStore.styles).filter(
       (styleId) => activeIds.has(styleId) && dataStyleStore.objectVisibility(styleId) === true,
     );

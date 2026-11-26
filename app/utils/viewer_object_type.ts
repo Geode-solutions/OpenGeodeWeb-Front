@@ -12,4 +12,10 @@ function isMesh<Item extends Partial<ViewerObjectTyped>>(
   return item.viewer_object_type === "mesh";
 }
 
-export { isMesh, isModel };
+function isImage<Item extends Partial<ViewerObjectTyped>>(
+  item: Item,
+): item is Item & { viewer_object_type: "image" } {
+  return item.viewer_object_type === "image";
+}
+
+export { isImage, isMesh, isModel };

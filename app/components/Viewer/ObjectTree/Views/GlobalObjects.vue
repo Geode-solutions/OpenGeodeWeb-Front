@@ -14,12 +14,12 @@ import {
   isObjectTreeRowViewable,
   withPendingImports,
 } from "@ogw_front/utils/treeview";
+import { isImage, isModel } from "@ogw_front/utils/viewer_object_type";
 import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
-import { isModel } from "@ogw_front/utils/viewer_object_type";
 import { useBasemapStore } from "@ogw_front/stores/basemap";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -179,7 +179,8 @@ function handleHoverEnter({
 }): void {
   const actualItem = item.raw || item;
 
-  if (!actualItem.viewer_object_type) {
+  // Images are not pickable: the viewer has nothing to highlight
+  if (!actualItem.viewer_object_type || isImage(actualItem)) {
     return;
   }
 
@@ -203,7 +204,7 @@ function handleHoverEnter({
 
 function handleHoverLeave({ item }: { item: TreeGroupItem }): void {
   const actualItem = item.raw || item;
-  if (!actualItem.viewer_object_type) {
+  if (!actualItem.viewer_object_type || isImage(actualItem)) {
     return;
   }
   if (treeviewStore.hoveredModelId === actualItem.id) {
