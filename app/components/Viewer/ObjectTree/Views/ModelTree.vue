@@ -6,6 +6,7 @@ import FetchingData from "@ogw_front/components/FetchingData.vue";
 import type { ModelComponentMenuPayload } from "@ogw_front/utils/treeview";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
+import PhysicalPropertyActions from "@ogw_front/components/Viewer/ObjectTree/Base/PhysicalPropertyActions.vue";
 import { isPhysicalPropertyId } from "@ogw_front/utils/physical_properties_tree";
 import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -215,8 +216,8 @@ function expandAll(): void {
   opened.value = allIds;
 }
 
-function physicalValue(item: CollectionTreeItem): string | undefined {
-  return (item.raw || item).physical_value;
+function actualRow(item: CollectionTreeItem): CollectionTreeItem {
+  return item.raw || item;
 }
 
 function getLeafViewerIds(item: CollectionTreeItem): number[] {
@@ -274,13 +275,11 @@ function getLeafViewerIds(item: CollectionTreeItem): number[] {
       </template>
 
       <template #append="{ item }">
-        <span
-          v-if="physicalValue(item as unknown as CollectionTreeItem)"
-          class="text-caption text-medium-emphasis text-no-wrap me-2"
-          :data-testid="'physicalValue-' + (item as unknown as CollectionTreeItem).id"
-        >
-          {{ physicalValue(item as unknown as CollectionTreeItem) }}
-        </span>
+        <PhysicalPropertyActions
+          :model-id="id"
+          :row="actualRow(item as unknown as CollectionTreeItem)"
+          :physical-properties="physicalProperties"
+        />
         <v-btn
           v-if="getLeafViewerIds(item as unknown as CollectionTreeItem).length > 0"
           icon="ph-target"

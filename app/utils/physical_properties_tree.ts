@@ -9,6 +9,13 @@ interface PhysicalPropertyLeaf extends FormattedComponent {
   readonly physical_value: string;
 }
 
+// What the model is colored with: an attribute item and its range on every component carrying it
+interface PhysicalPropertyColoring {
+  readonly item: number;
+  readonly minimum: number;
+  readonly maximum: number;
+}
+
 interface PhysicalPropertyNode {
   readonly id: string;
   readonly title: string;
@@ -16,6 +23,8 @@ interface PhysicalPropertyNode {
   readonly attribute_name: string;
   readonly element_type: string;
   readonly component_type: string;
+  // Undefined when no component has a value
+  readonly coloring: PhysicalPropertyColoring | undefined;
   readonly children: PhysicalPropertyLeaf[];
 }
 
@@ -83,6 +92,32 @@ function formatPhysicalPropertyValue(component: PhysicalPropertyComponent): stri
   return `(${items.join(", ")})`;
 }
 
+function itemRange(
+  components: readonly PhysicalPropertyComponent[],
+  item: number,
+): [number, number] | undefined {
+  const minima = components.flatMap((component) => component.min_values[item] ?? []);
+  const maxima = components.flatMap((component) => component.max_values[item] ?? []);
+  if (minima.length === 0 || maxima.length === 0) {
+    return undefined;
+  }
+  return [Math.min(...minima), Math.max(...maxima)];
+}
+
+// The first item with a value is colored, e.g. the x axis of a permeability or the fixed axis of
+// A boundary displacement
+function physicalPropertyColoring(
+  physicalProperty: PhysicalProperty,
+): PhysicalPropertyColoring | undefined {
+  for (let item = 0; item < physicalProperty.nb_items; item += 1) {
+    const range = itemRange(physicalProperty.components, item);
+    if (range !== undefined) {
+      return { item, minimum: range[0], maximum: range[1] };
+    }
+  }
+  return undefined;
+}
+
 function physicalPropertyNode(
   physicalProperty: PhysicalProperty,
   componentsById: ReadonlyMap<string, FormattedComponent>,
@@ -105,6 +140,7 @@ function physicalPropertyNode(
     attribute_name: physicalProperty.attribute_name,
     element_type: physicalProperty.element_type,
     component_type: physicalProperty.component_type,
+    coloring: physicalPropertyColoring(physicalProperty),
     children,
   };
 }
@@ -135,7 +171,13 @@ export {
   formatPhysicalPropertyValue,
   isPhysicalPropertyId,
   physicalPropertiesGroup,
+  physicalPropertyColoring,
   physicalPropertyId,
   physicalPropertyTitle,
 };
-export type { PhysicalPropertiesGroup, PhysicalPropertyLeaf, PhysicalPropertyNode };
+export type {
+  PhysicalPropertiesGroup,
+  PhysicalPropertyColoring,
+  PhysicalPropertyLeaf,
+  PhysicalPropertyNode,
+};
