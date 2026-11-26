@@ -51,7 +51,6 @@ const {
   selection: visibleComponents,
   updateVisibility,
 } = useModelTree(id);
-const physicalProperties = useModelPhysicalProperties(id);
 
 const currentView = computed(() => treeviewStore.opened_views.find((view) => view.id === id));
 
@@ -70,6 +69,7 @@ const {
   customFilter,
   applySearchFilter,
 } = useTreeFilter(localCategories);
+const { physicalProperties, physicalPropertyRows } = useModelPhysicalProperties(id, search);
 
 function onUpdateSelection(newSelection: string[]): void {
   const finalSelection = applySearchFilter(newSelection, visibleComponents.value);
@@ -102,7 +102,7 @@ function searchGroups(query: string): CollectionTreeItem[] {
   return result;
 }
 
-const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
+const componentItems = computed<CollectionTreeItem[]>(() => {
   if (search.value) {
     const query = search.value.toLowerCase();
     return sortAndFormatItems(
@@ -124,11 +124,14 @@ const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
       ),
     });
   }
-  if (physicalProperties.value) {
-    result.push(physicalProperties.value);
-  }
   return result;
 });
+
+// The physical properties come after the component types, also in a search
+const itemsForTreeView = computed<CollectionTreeItem[]>(() => [
+  ...componentItems.value,
+  ...physicalPropertyRows.value,
+]);
 
 function extractComponentIds(node: CollectionTreeItem): string[] {
   if (node.children) {

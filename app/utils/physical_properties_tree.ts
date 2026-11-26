@@ -118,6 +118,14 @@ function physicalPropertyColoring(
   return undefined;
 }
 
+function physicalPropertyNodeTitle(name: string, nbComponents: number): string {
+  return `${physicalPropertyTitle(name)} (${nbComponents})`;
+}
+
+function physicalPropertiesGroupTitle(nbPhysicalProperties: number): string {
+  return `Physical properties (${nbPhysicalProperties})`;
+}
+
 function physicalPropertyNode(
   physicalProperty: PhysicalProperty,
   componentsById: ReadonlyMap<string, FormattedComponent>,
@@ -135,7 +143,7 @@ function physicalPropertyNode(
   );
   return {
     id: physicalPropertyId(physicalProperty.name),
-    title: `${physicalPropertyTitle(physicalProperty.name)} (${children.length})`,
+    title: physicalPropertyNodeTitle(physicalProperty.name, children.length),
     physical_property: physicalProperty.name,
     attribute_name: physicalProperty.attribute_name,
     element_type: physicalProperty.element_type,
@@ -160,9 +168,52 @@ function physicalPropertiesGroup(
   }
   return {
     id: PHYSICAL_PROPERTIES_GROUP_ID,
-    title: `Physical properties (${children.length})`,
+    title: physicalPropertiesGroupTitle(children.length),
     children,
   };
+}
+
+function matchesPhysicalProperty(node: PhysicalPropertyNode, query: string): boolean {
+  return (
+    node.physical_property.toLowerCase().includes(query) ||
+    physicalPropertyTitle(node.physical_property).toLowerCase().includes(query)
+  );
+}
+
+function matchesComponent(component: PhysicalPropertyLeaf, query: string): boolean {
+  return (
+    component.title.toLowerCase().includes(query) || component.id.toLowerCase().includes(query)
+  );
+}
+
+// What a search of the model tree keeps of the physical properties: a property matching by its name
+// ("poro", "boundary p") whole, otherwise the components matching by their title or id, counted in
+// The property title. The tree then shows the matching rows only. No row when nothing matches; the
+// Query is lower case, as the model tree search gives
+function searchPhysicalProperties(
+  group: PhysicalPropertiesGroup | undefined,
+  query: string,
+): PhysicalPropertiesGroup[] {
+  const children = (group?.children ?? []).flatMap((node) => {
+    if (matchesPhysicalProperty(node, query)) {
+      return [node];
+    }
+    const components = node.children.filter((component) => matchesComponent(component, query));
+    if (components.length === 0) {
+      return [];
+    }
+    return [
+      {
+        ...node,
+        title: physicalPropertyNodeTitle(node.physical_property, components.length),
+        children: components,
+      },
+    ];
+  });
+  if (group === undefined || children.length === 0) {
+    return [];
+  }
+  return [{ ...group, title: physicalPropertiesGroupTitle(children.length), children }];
 }
 
 export {
@@ -174,6 +225,7 @@ export {
   physicalPropertyColoring,
   physicalPropertyId,
   physicalPropertyTitle,
+  searchPhysicalProperties,
 };
 export type {
   PhysicalPropertiesGroup,
