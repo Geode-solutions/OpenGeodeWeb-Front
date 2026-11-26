@@ -6,6 +6,7 @@ import {
 import type { AttributeSource } from "@ogw_front/utils/threshold";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import { attributeSchemas } from "@ogw_front/composables/attribute_coloring_style";
+import { isModel } from "@ogw_front/utils/viewer_object_type";
 import type { useDataStore } from "@ogw_front/stores/data";
 
 function attributeSource(
@@ -32,7 +33,7 @@ async function fetchSources(
   dataId: DataId,
 ): Promise<AttributeSource[]> {
   const item = await dataStore.item(dataId);
-  if (item.viewer_object_type !== "model") {
+  if (!isModel(item)) {
     return ["vertex", MESH_ELEMENT_KINDS[item.geode_object_type]]
       .filter((kind): kind is string => kind !== undefined)
       .map((kind) => attributeSource(kind, "", { id: dataId }));

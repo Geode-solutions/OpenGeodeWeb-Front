@@ -19,6 +19,7 @@ import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
+import { isModel } from "@ogw_front/utils/viewer_object_type";
 import { useBasemapStore } from "@ogw_front/stores/basemap";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -169,14 +170,6 @@ const linkedRow = computed<{ id: string; color: string } | undefined>(() => {
   return { id, color };
 });
 
-function isModel(item: TreeGroupItem): boolean {
-  const actualItem = item.raw || item;
-  return (
-    actualItem.viewer_object_type === "model" ||
-    ["BRep", "Section"].includes(actualItem.geode_object_type ?? "")
-  );
-}
-
 function handleHoverEnter({
   item,
   immediate = false,
@@ -190,20 +183,20 @@ function handleHoverEnter({
     return;
   }
 
-  const is_model = isModel(item);
-  if (is_model) {
+  const itemIsModel = isModel(actualItem);
+  if (itemIsModel) {
     treeviewStore.setHoveredModel(actualItem.id);
   }
 
   onHoverEnter(
     actualItem.id,
     async () => {
-      if (is_model) {
+      if (itemIsModel) {
         return await dataStore.getAllModelComponentsViewerIds(actualItem.id);
       }
       return [];
     },
-    is_model ? "model" : "mesh",
+    itemIsModel ? "model" : "mesh",
     immediate,
   );
 }

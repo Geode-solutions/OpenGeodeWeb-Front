@@ -1,6 +1,7 @@
 // Local imports
 import { type LegacyDataId, fromLegacyDataId } from "@ogw_front/utils/legacy_data_id";
 import { type NewDataItem, useDataStore } from "@ogw_front/stores/data";
+import { isModel } from "@ogw_front/utils/viewer_object_type";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -50,7 +51,7 @@ async function importDataItem(item: NewDataItem): Promise<string> {
   const registerTask = registerWhenViewable(item, addDataTask);
   let addDataComponentsTask: Promise<unknown> = Promise.resolve(undefined);
   let addDataRelationsTask: Promise<unknown> = Promise.resolve(undefined);
-  if (item.viewer_object_type === "model") {
+  if (isModel(item)) {
     addDataComponentsTask = dataStore.addComponents(item);
     addDataRelationsTask = dataStore.addComponentRelations(item);
   }

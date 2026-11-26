@@ -12,6 +12,7 @@ import {
   sceneStyleDb,
   writeTransaction,
 } from "@ogw_internal/database/database.js";
+import { isMesh, isModel } from "@ogw_front/utils/viewer_object_type";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
@@ -67,23 +68,23 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
       unknownType?: (id: DataId) => Result;
     },
   ): Promise<Result> {
-    const { viewer_object_type } = await dataStore.item(dataId);
+    const item = await dataStore.item(dataId);
     if (!(await dataStore.fetchIsViewable(dataId))) {
       const result = await handlers.notViewable(dataId);
       return result;
     }
-    if (viewer_object_type === "mesh") {
+    if (isMesh(item)) {
       const result = await handlers.mesh(dataId);
       return result;
     }
-    if (viewer_object_type === "model") {
+    if (isModel(item)) {
       const result = await handlers.model(dataId);
       return result;
     }
     if (handlers.unknownType) {
       return handlers.unknownType(dataId);
     }
-    throw new Error(`Unknown viewer_object_type: ${String(viewer_object_type)}`);
+    throw new Error(`Unknown viewer_object_type: ${item.viewer_object_type}`);
   }
 
   // A data the viewer does not show only keeps its visibility in its style
