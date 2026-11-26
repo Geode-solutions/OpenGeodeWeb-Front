@@ -124,6 +124,7 @@ export default defineConfig({
           globals: true,
           environment: "nuxt",
           alias: browserAliases,
+          setupFiles: [path.resolve(__dirname, "browser", "setup_clipboard.ts")],
           maxWorkers: BROWSER_WORKERS,
           retry: browserRetry,
           testTimeout: BROWSER_TIMEOUT,
