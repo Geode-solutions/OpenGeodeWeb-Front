@@ -1,5 +1,5 @@
 // Third party imports
-import { type Locator, type Page, expect } from "@playwright/test";
+import { expect } from "@playwright/test";
 
 // Local imports
 import {
@@ -7,6 +7,14 @@ import {
   defaultDataName,
   structuralModelGeodeObjectType,
 } from "#browser_helpers/constants";
+import {
+  clickModelTreeBarButton,
+  dragModelTreeButton,
+  getModelTreeButtonColors,
+  getModelTreePanelColors,
+  getModelTreeRows,
+  getModelTreeToggles,
+} from "#browser_helpers/object_trees/model_tree_bar";
 import {
   collapseMainObjectTreeGroup,
   expandMainObjectTree,
@@ -19,72 +27,12 @@ import {
 } from "#browser_helpers/object_trees/model_components_object_tree";
 import { fillSearchQuery } from "#browser_helpers/object_trees/common";
 import { moveMouseOutOfTheWay } from "#browser_helpers/app_interaction";
-import { waitForActionSettled } from "#browser_helpers/wait_for_action_settled";
 
 import type { SuiteRuntime } from "#browser_helpers/suite_runtime";
 
 // Constants
 const brepFilename = "test.og_brep";
 const structuralModelFilename = "test.og_strm";
-const DRAG_STEPS = 10;
-
-function getModelTreeToggles(window: Page): Locator {
-  return window.getByTestId("modelTreeToggle");
-}
-
-function getModelTreeRows(window: Page): Locator {
-  return getModelComponentsObjectTree(window).getByTestId("treeRowWrapper");
-}
-
-async function clickAndSettle(window: Page, locator: Locator): Promise<void> {
-  await locator.click();
-  await moveMouseOutOfTheWay(window);
-  await waitForActionSettled(window);
-}
-
-// The colors of the model trees, in the order of their panels and of their buttons in the activity bar
-async function panelColors(window: Page): Promise<string[]> {
-  const colors = await window.locator(".tree-box").evaluateAll((boxes) =>
-    boxes
-      .map((box) => {
-        if (box instanceof HTMLElement) {
-          return box.style.getPropertyValue("--tree-box-accent");
-        }
-        return "";
-      })
-      .filter((color) => color !== ""),
-  );
-  return colors;
-}
-
-async function buttonColors(window: Page): Promise<string[]> {
-  const colors = await getModelTreeToggles(window).evaluateAll((toggles) =>
-    toggles.map((toggle) => {
-      if (toggle instanceof HTMLElement) {
-        return toggle.style.getPropertyValue("--model-tree-color");
-      }
-      return "";
-    }),
-  );
-  return colors;
-}
-
-// Drags a model button over another one with the mouse, as the native drag and drop needs
-async function dragModelButton(window: Page, fromIndex: number, toIndex: number): Promise<void> {
-  const source = await getModelTreeToggles(window).nth(fromIndex).boundingBox();
-  const target = await getModelTreeToggles(window).nth(toIndex).boundingBox();
-  if (source === null || target === null) {
-    throw new Error("The model buttons are not displayed.");
-  }
-  await window.mouse.move(source.x + source.width / 2, source.y + source.height / 2);
-  await window.mouse.down();
-  await window.mouse.move(target.x + target.width / 2, target.y + target.height / 2, {
-    steps: DRAG_STEPS,
-  });
-  await window.mouse.up();
-  await moveMouseOutOfTheWay(window);
-  await waitForActionSettled(window);
-}
 
 // Shared with the apps built on this layer: each one runs it with its own test fixture and data loader
 function registerTests({ test, loadTestDatas }: SuiteRuntime): void {
@@ -105,13 +53,13 @@ function registerTests({ test, loadTestDatas }: SuiteRuntime): void {
   });
 
   test("collapse the model tree from its button", async ({ window }) => {
-    await clickAndSettle(window, window.getByTestId("toggleModelTreeButton"));
+    await clickModelTreeBarButton(window, window.getByTestId("toggleModelTreeButton"));
     await expect(getModelComponentsObjectTree(window)).toHaveCount(0);
     await expect(getModelTreeToggles(window)).toHaveCount(1);
   });
 
   test("show the model tree again with its state", async ({ window }) => {
-    await clickAndSettle(window, window.getByTestId("toggleModelTreeButton"));
+    await clickModelTreeBarButton(window, window.getByTestId("toggleModelTreeButton"));
     await expect(getModelComponentsObjectTree(window)).toHaveCount(1);
     await expect(getModelTreeRows(window)).toHaveCount(surfaceRows);
   });
@@ -123,25 +71,25 @@ function registerTests({ test, loadTestDatas }: SuiteRuntime): void {
   });
 
   test("collapse all the model trees", async ({ window }) => {
-    await clickAndSettle(window, window.getByTestId("toggleAllModelTreesButton"));
+    await clickModelTreeBarButton(window, window.getByTestId("toggleAllModelTreesButton"));
     await expect(getModelComponentsObjectTree(window)).toHaveCount(0);
   });
 
   test("show all the model trees", async ({ window }) => {
-    await clickAndSettle(window, window.getByTestId("toggleAllModelTreesButton"));
+    await clickModelTreeBarButton(window, window.getByTestId("toggleAllModelTreesButton"));
     await expect(getModelComponentsObjectTree(window)).toHaveCount(2);
   });
 
   test("reorder the model trees from their buttons", async ({ window }) => {
-    const before = await panelColors(window);
-    await dragModelButton(window, 1, 0);
+    const before = await getModelTreePanelColors(window);
+    await dragModelTreeButton(window, 1, 0);
     await expect
       .poll(async () => {
-        const colors = await panelColors(window);
+        const colors = await getModelTreePanelColors(window);
         return colors;
       })
       .toStrictEqual(before.toReversed());
-    expect(await buttonColors(window)).toStrictEqual(before.toReversed());
+    expect(await getModelTreeButtonColors(window)).toStrictEqual(before.toReversed());
   });
 
   test("the search takes the keyboard as it opens", async ({ window }) => {
