@@ -32,6 +32,7 @@ interface HttpRequestArgs<Schema extends JsonRpcSchema> {
   schema: Schema;
   params?: ParamsOf<Schema>;
   headers?: Record<string, string>;
+  log_success?: boolean;
 }
 
 type HttpRequest = <Schema extends JsonRpcSchema>(
@@ -91,13 +92,18 @@ function useHttpTransport(
   }
 
   async function request<Schema extends JsonRpcSchema>(
-    { schema, params, headers = {} }: HttpRequestArgs<Schema>,
+    { schema, params, headers = {}, log_success }: HttpRequestArgs<Schema>,
     callbacks: HttpRequestCallbacks<ResponseOf<Schema>> = {},
   ): Promise<ResponseOf<Schema>> {
     const { response_function } = callbacks;
     const result = await api_fetch(
       microservice(),
-      { schema: asHttpSchema(schema), params: params ?? {}, headers },
+      {
+        schema: asHttpSchema(schema),
+        params: params ?? {},
+        headers,
+        ...(log_success !== undefined && { log_success }),
+      },
       {
         ...callbacks,
         response_function: async (response: unknown) => {

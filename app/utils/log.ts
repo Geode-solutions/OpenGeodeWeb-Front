@@ -23,6 +23,7 @@ function endRequestLog(
     `[${microservice.$id}] Request completed:`,
     schema.$id,
     "in",
+    // Seconds of the whole duration, not the difference of the clock's seconds field (wrong across a minute)
     (requestEndingTime.getTime() - requestStartingTime.getTime()) / MILLISECONDS_IN_SECOND,
     "s",
   );

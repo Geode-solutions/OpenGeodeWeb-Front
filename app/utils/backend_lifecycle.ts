@@ -99,7 +99,7 @@ async function connectExistingCloud(host: string): Promise<void> {
           backStore.stop_request();
         },
       },
-      { schema: back_schemas.opengeodeweb_back.ping },
+      { schema: back_schemas.opengeodeweb_back.ping, log_success: false },
     );
   } catch (error) {
     cloudStore.set_connected(false);

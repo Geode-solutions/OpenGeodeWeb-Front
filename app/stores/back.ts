@@ -48,7 +48,7 @@ export const useBackStore = defineStore(
 
     async function ping(): Promise<unknown> {
       const result = await request(
-        { schema: back_schemas.opengeodeweb_back.ping },
+        { schema: back_schemas.opengeodeweb_back.ping, log_success: false },
         {
           request_error_function: () => {
             set_connected(false);

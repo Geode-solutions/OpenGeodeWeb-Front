@@ -5,6 +5,7 @@ import { setTimeout as sleep } from "node:timers/promises";
 // Local imports
 import type { RpcClient } from "@ogw_shared/utils/call_raw.js";
 import { setupActivePinia } from "@ogw_tests/utils";
+import { useActivityStore } from "@ogw_front/stores/activity";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { viewer_call } from "@ogw_internal/utils/viewer_call";
 
@@ -97,5 +98,37 @@ describe("viewer_call()", () => {
       name: "TimeoutError",
       description: `${schema.$id}: Timed out after ${SHORT_TIMEOUT_MS}ms`,
     });
+  });
+
+  test("a successful call is mirrored in the activity panel", async () => {
+    const activityStore = useActivityStore();
+    let runningDuringCall = 0;
+    const viewer = fakeViewer(async () => {
+      runningDuringCall = activityStore.running.length;
+      await Promise.resolve();
+      return {};
+    });
+    await viewer_call(viewer, { schema, params: {} });
+    expect(runningDuringCall).toBe(1);
+    expect(activityStore.entries).toHaveLength(1);
+    expect(activityStore.entries[FIRST_INDEX]).toMatchObject({
+      source: "viewer",
+      kind: "ws",
+      route: schema.$id,
+      status: "success",
+    });
+    expect(activityStore.entries[FIRST_INDEX]?.duration_ms).toBeGreaterThanOrEqual(0);
+  });
+
+  test("a timeout is mirrored in the activity panel", async () => {
+    const activityStore = useActivityStore();
+    const viewer = fakeViewer(async () => {
+      await sleep(NEVER_MS);
+    });
+    await expect(viewer_call(viewer, { schema, timeout: SHORT_TIMEOUT_MS })).rejects.toThrow(
+      "Timed out",
+    );
+    expect(activityStore.entries[FIRST_INDEX]).toMatchObject({ status: "timeout" });
+    expect(activityStore.unseen_errors).toBe(1);
   });
 });

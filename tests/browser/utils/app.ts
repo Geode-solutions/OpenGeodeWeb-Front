@@ -16,6 +16,9 @@ let projectFolderPath: string | undefined = undefined;
 
 // Starts a back and a viewer for this test file and hosts the real viewer, like the e2e app does
 async function startViewerApp(): Promise<void> {
+  // The test pages share the local storage of the origin (e.g. the CRS favorites): start empty, before any
+  // Store reads it
+  localStorage.clear();
   const microservices = await commands.startMicroservices();
   ({ projectFolderPath } = microservices);
   const infraStore = useInfraStore();

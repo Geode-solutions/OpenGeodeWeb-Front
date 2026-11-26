@@ -7,12 +7,22 @@ interface Props {
   geodeObjectType: GeodeObjectType;
   // Narrow containers: one "AUTHORITY:CODE" column and a truncated name
   compact?: boolean;
+  // Shown as chips above the search, one row each, when they are in the list of this data type
+  favorites?: CRS[];
+  recent?: CRS[];
 }
 
-const { geodeObjectType, compact = false } = defineProps<Props>();
+const { geodeObjectType, compact = false, favorites = [], recent = [] } = defineProps<Props>();
 const selectedCrs = defineModel<CRS | undefined>();
+const emit = defineEmits<{ "toggle-favorite": [crs: CRS] }>();
+// The star column is only shown to a parent that keeps the favorites
+const canToggleFavorite = getCurrentInstance()?.vnode.props?.onToggleFavorite !== undefined;
 
+const DEFAULT_ITEMS_PER_PAGE = 10;
 const search = ref<string>("");
+const page = ref<number>(1);
+const items_per_page = ref<number>(DEFAULT_ITEMS_PER_PAGE);
+const sort_by = ref<{ key: string; order?: "asc" | "desc" }[]>([]);
 const data_table_loading = ref<boolean>(false);
 // Thousands of rows that are never mutated: no deep reactivity
 const crs_list = shallowRef<CRS[]>([]);
@@ -27,6 +37,17 @@ function crs_key(crs: CRS): string {
 // A click on the row selects it: no checkbox column. Enter does the same once the row is focused
 function select_crs(crs: CRS): void {
   selectedCrs.value = crs;
+}
+
+// A chip selects its CRS and shows its row: no search, default order, on the page of the row.
+// The page is set once the table has seen the new search, which sends it back to the first page
+async function show_crs(crs: CRS): Promise<void> {
+  select_crs(crs);
+  search.value = "";
+  sort_by.value = [];
+  await nextTick();
+  const index = crs_list.value.findIndex((listed_item) => crs_key(listed_item) === crs_key(crs));
+  page.value = Math.floor(index / items_per_page.value) + 1;
 }
 
 // Vuetify passes the click event first, then the clicked row
@@ -47,6 +68,17 @@ function row_props({ item }: { item: CRS }): Record<string, unknown> {
     },
   };
 }
+
+const listed_crs = computed(() => new Map(crs_list.value.map((crs) => [crs_key(crs), crs])));
+const favorite_keys = computed(() => new Set(favorites.map((crs) => crs_key(crs))));
+
+// The CRS of the list, not the given ones: a favorite of another data type is left out
+function listed(shortlist: CRS[]): CRS[] {
+  return shortlist.flatMap((crs) => listed_crs.value.get(crs_key(crs)) ?? []);
+}
+
+const favorite_chips = computed(() => listed(favorites));
+const recent_chips = computed(() => listed(recent));
 
 async function get_crs_table(): Promise<void> {
   toggle_loading();
@@ -75,7 +107,15 @@ const compact_headers = [
 // oxlint-disable-next-line no-magic-numbers -- the page sizes Vuetify offers by default, "All" aside
 const items_per_page_options = [10, 25, 50, 100];
 
-const headers = computed(() => (compact ? compact_headers : full_headers));
+const favorite_header = { title: "", key: "favorite", sortable: false, width: 48 } as const;
+
+const headers = computed(() => {
+  const base = compact ? compact_headers : full_headers;
+  if (!canToggleFavorite) {
+    return base;
+  }
+  return [favorite_header, ...base];
+});
 
 // Not awaited in setup: the table renders right away with its loader
 onMounted(async () => {
@@ -84,6 +124,43 @@ onMounted(async () => {
 </script>
 
 <template>
+  <div
+    v-if="favorite_chips.length > 0"
+    data-testid="crsFavoriteRow"
+    class="d-flex flex-wrap align-center ga-2 mb-2"
+  >
+    <span class="shortlist-label text-caption text-medium-emphasis">Favorites</span>
+    <v-chip
+      v-for="crs in favorite_chips"
+      :key="`favorite-${crs_key(crs)}`"
+      data-testid="crsFavoriteChip"
+      prepend-icon="ph-fill ph-star"
+      size="small"
+      @click="show_crs(crs)"
+    >
+      {{ crs_key(crs) }}
+      <v-tooltip activator="parent" :text="crs.name" location="top" />
+    </v-chip>
+  </div>
+  <div
+    v-if="recent_chips.length > 0"
+    data-testid="crsRecentRow"
+    class="d-flex flex-wrap align-center ga-2 mb-2"
+  >
+    <span class="shortlist-label text-caption text-medium-emphasis">Recent</span>
+    <v-chip
+      v-for="crs in recent_chips"
+      :key="`recent-${crs_key(crs)}`"
+      data-testid="crsRecentChip"
+      prepend-icon="ph-clock-counter-clockwise"
+      size="small"
+      variant="outlined"
+      @click="show_crs(crs)"
+    >
+      {{ crs_key(crs) }}
+      <v-tooltip activator="parent" :text="crs.name" location="top" />
+    </v-chip>
+  </div>
   <v-text-field
     v-model="search"
     data-testid="crsSearchInput"
@@ -94,7 +171,9 @@ onMounted(async () => {
     hide-details
   ></v-text-field>
   <v-data-table
-    :items-per-page="10"
+    v-model:page="page"
+    v-model:items-per-page="items_per_page"
+    v-model:sort-by="sort_by"
     :items-per-page-options="items_per_page_options"
     :headers="headers"
     :items="crs_list"
@@ -108,6 +187,19 @@ onMounted(async () => {
     loading-text="Loading... Please wait"
     @click:row="on_row_click"
   >
+    <template #[`item.favorite`]="{ item }">
+      <v-btn
+        data-testid="crsFavoriteToggle"
+        :icon="favorite_keys.has(crs_key(item)) ? 'ph-fill ph-star' : 'ph-star'"
+        :aria-label="
+          favorite_keys.has(crs_key(item)) ? 'Remove from favorites' : 'Add to favorites'
+        "
+        variant="text"
+        size="x-small"
+        @click.stop="emit('toggle-favorite', item)"
+        @keydown.enter.stop
+      />
+    </template>
     <template v-if="compact" #[`item.name`]="{ value }">
       <v-tooltip :text="value" location="top">
         <template #activator="{ props: tooltipProps }">
@@ -121,5 +213,10 @@ onMounted(async () => {
 <style scoped>
 :deep(.crs-row) {
   cursor: pointer;
+}
+
+/* One width for both labels: the chips of the two rows start at the same place */
+.shortlist-label {
+  min-width: 64px;
 }
 </style>

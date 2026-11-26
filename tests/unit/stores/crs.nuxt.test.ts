@@ -10,7 +10,12 @@ import { useCrsStore } from "@ogw_front/stores/crs";
 vi.setConfig({ testTimeout: 10_000 });
 
 const EXPECTED_REQUESTS = 1;
-const CRS_LIST = [{ authority: "EPSG", code: "2154", name: "RGF93 v1 / Lambert-93" }];
+const ENTRY = {
+  authority: "EPSG",
+  code: "2154",
+  name: "RGF93 v1 / Lambert-93",
+};
+const CRS_LIST = [ENTRY];
 
 function mockItems(items: DataItem[]): void {
   setDataItems(items);
@@ -77,9 +82,24 @@ describe("crs store", () => {
     crsStore.clearCrsEditRequest();
     expect(crsStore.crsEditRequest).toBeUndefined();
   });
+
+  test("opens and closes the alignment of a data", () => {
+    const crsStore = useCrsStore();
+    const item = mockAs<DataItem>({ data_id: "data-1", created_at: "1" });
+    crsStore.openCrsAlign(item);
+    expect(crsStore.showCrsAlign).toBe(true);
+    expect(crsStore.crsAlignItem?.data_id).toBe(item.data_id);
+    crsStore.closeCrsAlign();
+    expect(crsStore.showCrsAlign).toBe(false);
+    expect(crsStore.crsAlignItem).toBeUndefined();
+  });
 });
 
-const LAMBERT = { authority: "EPSG", code: "2154", name: "RGF93 v1 / Lambert-93" };
+const LAMBERT = {
+  authority: "EPSG",
+  code: "2154",
+  name: "RGF93 v1 / Lambert-93",
+};
 const UTM = { authority: "EPSG", code: "32631", name: "WGS 84 / UTM zone 31N" };
 
 describe("project crs", () => {

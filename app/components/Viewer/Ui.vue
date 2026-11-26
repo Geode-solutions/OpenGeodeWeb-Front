@@ -4,8 +4,8 @@ import {
   useOverlappingPicker,
 } from "@ogw_front/composables/use_overlapping_picker";
 import BasemapAttribution from "@ogw_front/components/BasemapAttribution.vue";
+import CrsOverlays from "@ogw_front/components/Viewer/CrsOverlays.vue";
 import OverlappingObjectsPicker from "@ogw_front/components/Viewer/OverlappingObjectsPicker.vue";
-import ProjectCrs from "@ogw_front/components/ProjectCrs.vue";
 import ToolActiveChip from "@ogw_front/components/Viewer/ToolActiveChip.vue";
 import type { TreeMenuPayload } from "@ogw_front/utils/treeview";
 import ViewerContextMenu from "@ogw_front/components/Viewer/ContextMenu/ContextMenu.vue";
@@ -27,6 +27,7 @@ const { displayMenu, containerWidth, containerHeight } = defineProps<Props>();
 const emit = defineEmits<{
   "show-menu": [payload: TreeMenuPayload];
 }>();
+
 const menuStore = useMenuStore();
 const viewerStore = useViewerStore();
 const hybridViewerStore = useHybridViewerStore();
@@ -111,7 +112,7 @@ defineExpose({ get_viewer_id });
     :container-height="containerHeight"
   />
 
-  <ProjectCrs />
+  <CrsOverlays />
 
   <BasemapAttribution />
 

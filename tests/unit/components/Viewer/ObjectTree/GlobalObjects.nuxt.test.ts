@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { mockAs, setupActivePinia, vuetify } from "@ogw_tests/utils";
 import GlobalObjects from "@ogw_front/components/Viewer/ObjectTree/Views/GlobalObjects.vue";
 import { mountSuspended } from "@nuxt/test-utils/runtime";
+import { setBasemapOption } from "@ogw_tests/unit/helpers/basemap_option";
 import { setDataItems } from "@ogw_tests/unit/stores/data_helpers";
 import { useBasemapStore } from "@ogw_front/stores/basemap";
 import { useCrsStore } from "@ogw_front/stores/crs";
@@ -66,6 +67,7 @@ function treeSelection(wrapper: VueWrapper): string[] {
 describe("global objects basemap category", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
+    setBasemapOption(true);
   });
 
   test("comes first once data is in the project crs", async () => {
