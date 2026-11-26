@@ -48,34 +48,29 @@ async function getRelatedComponents(
   return components.map((component) => toFormattedComponent(component));
 }
 
-export function useDataRelations(): {
-  getComponentRelations: typeof getComponentRelations;
-  fetchAllComponentRelations: typeof fetchAllComponentRelations;
-} {
-  async function getComponentRelations(
-    modelId: ModelId,
-    componentId: string,
-  ): Promise<ComponentRelations> {
-    const relations = await componentRelationsOf(modelId, componentId).toArray();
-    const [boundaries, internals] = await Promise.all([
-      getRelatedComponents(modelId, relations, "boundary"),
-      getRelatedComponents(modelId, relations, "internal"),
-    ]);
-    return { boundaries, internals };
-  }
+async function getComponentRelations(
+  modelId: ModelId,
+  componentId: string,
+): Promise<ComponentRelations> {
+  const relations = await componentRelationsOf(modelId, componentId).toArray();
+  const [boundaries, internals] = await Promise.all([
+    getRelatedComponents(modelId, relations, "boundary"),
+    getRelatedComponents(modelId, relations, "internal"),
+  ]);
+  return { boundaries, internals };
+}
 
-  // The boundaries and internals of every component of the model, among the given components:
-  // The caller already holds them, so only the relations are read
-  async function fetchAllComponentRelations(
-    modelId: ModelId,
-    components: readonly FormattedComponent[],
-  ): Promise<Record<string, ComponentRelations>> {
-    const relations = await modelComponentRelationsOf(modelId).toArray();
-    return groupRelationsByParent(relations, components);
-  }
-
-  return { getComponentRelations, fetchAllComponentRelations };
+// The boundaries and internals of every component of the model, among the given components:
+// The caller already holds them, so only the relations are read
+async function fetchAllComponentRelations(
+  modelId: ModelId,
+  components: readonly FormattedComponent[],
+): Promise<Record<string, ComponentRelations>> {
+  const relations = await modelComponentRelationsOf(modelId).toArray();
+  return groupRelationsByParent(relations, components);
 }
 
 export type { ComponentRelations };
 export type { ModelComponentRelationRecord } from "@ogw_internal/database/tables/model_components_relation";
+
+export { fetchAllComponentRelations, getComponentRelations };

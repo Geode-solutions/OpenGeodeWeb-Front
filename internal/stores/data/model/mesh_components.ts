@@ -32,118 +32,103 @@ async function getMeshComponentGeodeIds(modelId: ModelId, type: string): Promise
   return components.map((component: ModelComponentRecord) => component.geode_id);
 }
 
-// oxlint-disable-next-line eslint/max-lines-per-function
-function useDataMesh(): {
-  formatedMeshComponents: typeof formatedMeshComponents;
-  refFormatedMeshComponents: typeof refFormatedMeshComponents;
-  getMeshComponentsByType: typeof getMeshComponentsByType;
-  getAllMeshComponents: typeof getAllMeshComponents;
-  fetchAllMeshComponents: typeof fetchAllMeshComponents;
-  getMeshComponentGeodeIds: typeof getMeshComponentGeodeIds;
-  getCornersGeodeIds: typeof getCornersGeodeIds;
-  getLinesGeodeIds: typeof getLinesGeodeIds;
-  getSurfacesGeodeIds: typeof getSurfacesGeodeIds;
-  getBlocksGeodeIds: typeof getBlocksGeodeIds;
-} {
-  async function formatedMeshComponents(modelId: ModelId): Promise<FormattedComponentGroup[]> {
-    const items = await modelComponentsOf(modelId).toArray();
-    const componentTitles: Record<string, string> = {
-      Corner: "Corners",
-      Line: "Lines",
-      Surface: "Surfaces",
-      Block: "Blocks",
-    };
-
-    const componentsByType: Record<string, ModelComponentRecord[]> = {};
-    for (const component_item of items) {
-      if (componentTitles[component_item.type] !== undefined) {
-        componentsByType[component_item.type] ??= [];
-        componentsByType[component_item.type]?.push(component_item);
-      }
-    }
-
-    return Object.keys(componentTitles)
-      .filter((type) => componentsByType[type])
-      .map((type) => ({
-        id: type,
-        title: componentTitles[type] ?? type,
-        children: (componentsByType[type] ?? []).map((item: ModelComponentRecord) =>
-          toFormattedComponent(item),
-        ),
-      }));
-  }
-
-  function refFormatedMeshComponents(modelId: ModelId): Ref<FormattedComponentGroup[] | undefined> {
-    return useObservable(
-      liveObservable(async () => {
-        const components = await formatedMeshComponents(modelId);
-        return components;
-      }),
-      {
-        initialValue: undefined,
-      },
-    );
-  }
-
-  async function getMeshComponentsByType(
-    modelId: ModelId,
-    type: string,
-  ): Promise<FormattedComponent[]> {
-    const components = await modelComponentsOfType(modelId, type).toArray();
-    return components.map((item: ModelComponentRecord) => toFormattedComponent(item));
-  }
-
-  async function getAllMeshComponents(modelId: ModelId): Promise<FormattedComponent[]> {
-    const items = await modelComponentsOf(modelId).toArray();
-    return items.map((item: ModelComponentRecord) => toFormattedComponent(item));
-  }
-
-  async function fetchAllMeshComponents(
-    modelId: ModelId,
-  ): Promise<Record<string, FormattedComponent[]>> {
-    const components = await getAllMeshComponents(modelId);
-    const byType: Record<string, FormattedComponent[]> = {};
-    for (const component of components) {
-      byType[component.category] ??= [];
-      byType[component.category]?.push(component);
-    }
-    return byType;
-  }
-
-  async function getCornersGeodeIds(modelId: ModelId): Promise<string[]> {
-    const geodeIds = await getMeshComponentGeodeIds(modelId, "Corner");
-    return geodeIds;
-  }
-
-  async function getLinesGeodeIds(modelId: ModelId): Promise<string[]> {
-    const geodeIds = await getMeshComponentGeodeIds(modelId, "Line");
-    return geodeIds;
-  }
-
-  async function getSurfacesGeodeIds(modelId: ModelId): Promise<string[]> {
-    const geodeIds = await getMeshComponentGeodeIds(modelId, "Surface");
-    return geodeIds;
-  }
-
-  async function getBlocksGeodeIds(modelId: ModelId): Promise<string[]> {
-    const geodeIds = await getMeshComponentGeodeIds(modelId, "Block");
-    return geodeIds;
-  }
-
-  return {
-    formatedMeshComponents,
-    refFormatedMeshComponents,
-    getMeshComponentsByType,
-    getAllMeshComponents,
-    fetchAllMeshComponents,
-    getMeshComponentGeodeIds,
-    getCornersGeodeIds,
-    getLinesGeodeIds,
-    getSurfacesGeodeIds,
-    getBlocksGeodeIds,
+async function formatedMeshComponents(modelId: ModelId): Promise<FormattedComponentGroup[]> {
+  const items = await modelComponentsOf(modelId).toArray();
+  const componentTitles: Record<string, string> = {
+    Corner: "Corners",
+    Line: "Lines",
+    Surface: "Surfaces",
+    Block: "Blocks",
   };
+
+  const componentsByType: Record<string, ModelComponentRecord[]> = {};
+  for (const component_item of items) {
+    if (componentTitles[component_item.type] !== undefined) {
+      componentsByType[component_item.type] ??= [];
+      componentsByType[component_item.type]?.push(component_item);
+    }
+  }
+
+  return Object.keys(componentTitles)
+    .filter((type) => componentsByType[type])
+    .map((type) => ({
+      id: type,
+      title: componentTitles[type] ?? type,
+      children: (componentsByType[type] ?? []).map((item: ModelComponentRecord) =>
+        toFormattedComponent(item),
+      ),
+    }));
 }
 
-export { toFormattedComponent, useDataMesh };
+function refFormatedMeshComponents(modelId: ModelId): Ref<FormattedComponentGroup[] | undefined> {
+  return useObservable(
+    liveObservable(async () => {
+      const components = await formatedMeshComponents(modelId);
+      return components;
+    }),
+    {
+      initialValue: undefined,
+    },
+  );
+}
+
+async function getMeshComponentsByType(
+  modelId: ModelId,
+  type: string,
+): Promise<FormattedComponent[]> {
+  const components = await modelComponentsOfType(modelId, type).toArray();
+  return components.map((item: ModelComponentRecord) => toFormattedComponent(item));
+}
+
+async function getAllMeshComponents(modelId: ModelId): Promise<FormattedComponent[]> {
+  const items = await modelComponentsOf(modelId).toArray();
+  return items.map((item: ModelComponentRecord) => toFormattedComponent(item));
+}
+
+async function fetchAllMeshComponents(
+  modelId: ModelId,
+): Promise<Record<string, FormattedComponent[]>> {
+  const components = await getAllMeshComponents(modelId);
+  const byType: Record<string, FormattedComponent[]> = {};
+  for (const component of components) {
+    byType[component.category] ??= [];
+    byType[component.category]?.push(component);
+  }
+  return byType;
+}
+
+async function getCornersGeodeIds(modelId: ModelId): Promise<string[]> {
+  const geodeIds = await getMeshComponentGeodeIds(modelId, "Corner");
+  return geodeIds;
+}
+
+async function getLinesGeodeIds(modelId: ModelId): Promise<string[]> {
+  const geodeIds = await getMeshComponentGeodeIds(modelId, "Line");
+  return geodeIds;
+}
+
+async function getSurfacesGeodeIds(modelId: ModelId): Promise<string[]> {
+  const geodeIds = await getMeshComponentGeodeIds(modelId, "Surface");
+  return geodeIds;
+}
+
+async function getBlocksGeodeIds(modelId: ModelId): Promise<string[]> {
+  const geodeIds = await getMeshComponentGeodeIds(modelId, "Block");
+  return geodeIds;
+}
+
+export {
+  fetchAllMeshComponents,
+  formatedMeshComponents,
+  getAllMeshComponents,
+  getBlocksGeodeIds,
+  getCornersGeodeIds,
+  getLinesGeodeIds,
+  getMeshComponentGeodeIds,
+  getMeshComponentsByType,
+  getSurfacesGeodeIds,
+  refFormatedMeshComponents,
+  toFormattedComponent,
+};
 export type { FormattedComponent, FormattedComponentGroup };
 export type { ModelComponentRecord } from "@ogw_internal/database/tables/model_components";

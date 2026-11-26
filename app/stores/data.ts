@@ -23,36 +23,36 @@ import {
   updateItem,
   useDataItems,
 } from "@ogw_internal/stores/data/items";
-import { useDataCollections } from "@ogw_internal/stores/data/model/collections";
-import { useDataMesh } from "@ogw_internal/stores/data/model/mesh_components";
+import {
+  fetchAllCollectionComponents,
+  formatedCollectionComponents,
+  getAllCollectionComponents,
+  hasCollectionComponents,
+  refFormatedCollectionComponents,
+} from "@ogw_internal/stores/data/model/collections";
+import {
+  fetchAllComponentRelations,
+  getComponentRelations,
+} from "@ogw_internal/stores/data/model/relations";
+import {
+  fetchAllMeshComponents,
+  formatedMeshComponents,
+  getAllMeshComponents,
+  getBlocksGeodeIds,
+  getCornersGeodeIds,
+  getLinesGeodeIds,
+  getMeshComponentGeodeIds,
+  getMeshComponentsByType,
+  getSurfacesGeodeIds,
+  refFormatedMeshComponents,
+} from "@ogw_internal/stores/data/model/mesh_components";
 import { useDataRegistration } from "@ogw_internal/stores/data/registration";
-import { useDataRelations } from "@ogw_internal/stores/data/model/relations";
 
 // oxlint-disable-next-line max-lines-per-function
 export const useDataStore = defineStore("data", () => {
   const { items, isViewable } = useDataItems();
   const { registeredItems, isRegistered, registerObject, deregisterObject, clearRegistrations } =
     useDataRegistration(items);
-  const {
-    formatedMeshComponents,
-    refFormatedMeshComponents,
-    getMeshComponentsByType,
-    getAllMeshComponents,
-    fetchAllMeshComponents,
-    getMeshComponentGeodeIds,
-    getCornersGeodeIds,
-    getLinesGeodeIds,
-    getSurfacesGeodeIds,
-    getBlocksGeodeIds,
-  } = useDataMesh();
-  const {
-    hasCollectionComponents,
-    getAllCollectionComponents,
-    fetchAllCollectionComponents,
-    formatedCollectionComponents,
-    refFormatedCollectionComponents,
-  } = useDataCollections();
-  const { getComponentRelations, fetchAllComponentRelations } = useDataRelations();
 
   async function clear(): Promise<void> {
     clearRegistrations();

@@ -1,7 +1,7 @@
 import {
   type FormattedComponent,
   type ModelComponentRecord,
-  useDataMesh,
+  getAllMeshComponents,
 } from "./mesh_components.js";
 import { modelComponentRelationsOf, modelComponentsOf } from "@ogw_internal/database/queries.js";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
@@ -40,81 +40,68 @@ async function getAllCollectionComponents(modelId: ModelId): Promise<FormattedCo
     }));
 }
 
-// oxlint-disable-next-line eslint/max-lines-per-function
-export function useDataCollections(): {
-  hasCollectionComponents: typeof hasCollectionComponents;
-  getAllCollectionComponents: typeof getAllCollectionComponents;
-  fetchAllCollectionComponents: typeof fetchAllCollectionComponents;
-  formatedCollectionComponents: typeof formatedCollectionComponents;
-  refFormatedCollectionComponents: typeof refFormatedCollectionComponents;
-} {
-  const { getAllMeshComponents } = useDataMesh();
-
-  async function fetchAllCollectionComponents(
-    modelId: ModelId,
-  ): Promise<Record<string, CollectionComponent[]>> {
-    const components = await getAllCollectionComponents(modelId);
-    const relations = await modelComponentRelationsOf(modelId).toArray();
-    const allMeshComponents = await getAllMeshComponents(modelId);
-    const meshComponentsById: Record<string, FormattedComponent> = {};
-    for (const meshComponent of allMeshComponents) {
-      meshComponentsById[meshComponent.id] = meshComponent;
-    }
-
-    const byType: Record<string, CollectionComponent[]> = {};
-    for (const component of components) {
-      byType[component.category] ??= [];
-      const itemRelations = relations.filter(
-        (relation: ModelComponentRelationRecord) =>
-          relation.parent === component.id && relation.type === "collection",
-      );
-      const children = itemRelations
-        .map((relation: ModelComponentRelationRecord) => meshComponentsById[relation.child])
-        .filter((child): child is FormattedComponent => Boolean(child));
-      byType[component.category]?.push({
-        ...component,
-        children,
-      });
-    }
-    return byType;
+async function fetchAllCollectionComponents(
+  modelId: ModelId,
+): Promise<Record<string, CollectionComponent[]>> {
+  const components = await getAllCollectionComponents(modelId);
+  const relations = await modelComponentRelationsOf(modelId).toArray();
+  const allMeshComponents = await getAllMeshComponents(modelId);
+  const meshComponentsById: Record<string, FormattedComponent> = {};
+  for (const meshComponent of allMeshComponents) {
+    meshComponentsById[meshComponent.id] = meshComponent;
   }
 
-  async function formatedCollectionComponents(
-    modelId: ModelId,
-  ): Promise<CollectionComponentGroup[]> {
-    const byType = await fetchAllCollectionComponents(modelId);
-    const collectionTypes = Object.keys(byType);
-
-    return collectionTypes
-      .filter((type) => (byType[type]?.length ?? 0) > 0)
-      .map((type) => ({
-        id: type,
-        title: pluralize(type),
-        children: byType[type] ?? [],
-      }));
-  }
-
-  function refFormatedCollectionComponents(
-    modelId: ModelId,
-  ): Ref<CollectionComponentGroup[] | undefined> {
-    return useObservable(
-      liveObservable(async () => {
-        const groups = await formatedCollectionComponents(modelId);
-        return groups;
-      }),
-      {
-        initialValue: undefined,
-      },
+  const byType: Record<string, CollectionComponent[]> = {};
+  for (const component of components) {
+    byType[component.category] ??= [];
+    const itemRelations = relations.filter(
+      (relation: ModelComponentRelationRecord) =>
+        relation.parent === component.id && relation.type === "collection",
     );
+    const children = itemRelations
+      .map((relation: ModelComponentRelationRecord) => meshComponentsById[relation.child])
+      .filter((child): child is FormattedComponent => Boolean(child));
+    byType[component.category]?.push({
+      ...component,
+      children,
+    });
   }
+  return byType;
+}
 
-  return {
-    hasCollectionComponents,
-    getAllCollectionComponents,
-    fetchAllCollectionComponents,
-    formatedCollectionComponents,
-    refFormatedCollectionComponents,
-  };
+async function formatedCollectionComponents(modelId: ModelId): Promise<CollectionComponentGroup[]> {
+  const byType = await fetchAllCollectionComponents(modelId);
+  const collectionTypes = Object.keys(byType);
+
+  return collectionTypes
+    .filter((type) => (byType[type]?.length ?? 0) > 0)
+    .map((type) => ({
+      id: type,
+      title: pluralize(type),
+      children: byType[type] ?? [],
+    }));
+}
+
+function refFormatedCollectionComponents(
+  modelId: ModelId,
+): Ref<CollectionComponentGroup[] | undefined> {
+  return useObservable(
+    liveObservable(async () => {
+      const groups = await formatedCollectionComponents(modelId);
+      return groups;
+    }),
+    {
+      initialValue: undefined,
+    },
+  );
 }
 
 export type { CollectionComponent, CollectionComponentGroup };
+
+export {
+  fetchAllCollectionComponents,
+  formatedCollectionComponents,
+  getAllCollectionComponents,
+  hasCollectionComponents,
+  refFormatedCollectionComponents,
+};
