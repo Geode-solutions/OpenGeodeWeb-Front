@@ -14,6 +14,7 @@ import { getDefaultStyle } from "@ogw_front/utils/default_styles";
 import { useAttributeTimeStepStyle } from "@ogw_internal/stores/data_style/time_step";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
+import { useImageStyle } from "@ogw_internal/stores/data_style/image/index";
 import { useMeshStyle } from "@ogw_internal/stores/data_style/mesh/index";
 import { useModelStyle } from "@ogw_internal/stores/data_style/model/index";
 import { useSceneStyle } from "@ogw_internal/stores/data_style/scene";
@@ -44,6 +45,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 // oxlint-disable-next-line max-lines-per-function
 export const useDataStyleStore = defineStore("dataStyle", () => {
   const dataStyleState = useDataStyleState();
+  const imageStyleStore = useImageStyle();
   const meshStyleStore = useMeshStyle();
   const modelStyleStore = useModelStyle();
   const sceneStyleStore = useSceneStyle();
@@ -76,6 +78,9 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
     const { viewer_object_type } = item;
 
+    if (viewer_object_type === "image") {
+      return imageStyleStore.setImageVisibility(dataId, visibility);
+    }
     if (viewer_object_type === "mesh") {
       return meshStyleStore.setMeshVisibility(dataId, visibility);
     }
@@ -93,6 +98,9 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
     const { viewer_object_type } = item;
 
+    if (viewer_object_type === "image") {
+      return imageStyleStore.applyImageStyle(dataId);
+    }
     if (viewer_object_type === "mesh") {
       return meshStyleStore.applyMeshStyle(dataId);
     }
@@ -158,7 +166,9 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
         return;
       }
       const viewerObjectType = meta.viewer_object_type;
-      if (viewerObjectType === "mesh") {
+      if (viewerObjectType === "image") {
+        await imageStyleStore.applyImageStyle(dataId);
+      } else if (viewerObjectType === "mesh") {
         await meshStyleStore.applyMeshStyle(dataId);
       } else if (viewerObjectType === "model") {
         await modelStyleStore.applyModelStyle(dataId);
@@ -177,6 +187,7 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
     applyAllStylesFromState,
     ...dataStyleState,
     ...attributeTimeStepStyle,
+    ...imageStyleStore,
     ...meshStyleStore,
     ...modelStyleStore,
     ...sceneStyleStore,
