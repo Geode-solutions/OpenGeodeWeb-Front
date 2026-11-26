@@ -1,44 +1,15 @@
-// Third party imports
-import type { Page } from "@playwright/test";
-
 // Local imports
-import {
-  ensureMenuOpen,
-  moveMouseOutOfTheWay,
-  setVisibilityGeneric,
-} from "#browser_helpers/viewer_interaction";
-import {
-  expandMainObjectTree,
-  openDataContextMenu,
-} from "#browser_helpers/object_trees/main_object_tree";
+import { IMAGE_MENU_TEST_ID, openImageMenu, setImageOpacity } from "#browser_helpers/image";
 import type { SuiteRuntime } from "#browser_helpers/suite_runtime";
 import { closeAllMenus } from "#browser_helpers/app_interaction";
-import { waitForActionSettled } from "#browser_helpers/wait_for_action_settled";
+import { expandMainObjectTree } from "#browser_helpers/object_trees/main_object_tree";
+import { setVisibilityGeneric } from "#browser_helpers/viewer_interaction";
 
 // Constants
 const inputFilename = "test_texture.png";
 const dataName = "test_texture";
 const geodeObjectType = "RasterImage2D";
-const menuTestId = "imageMenu";
 const halfOpacity = 0.5;
-
-// Images are not pickable: their menu opens from the object tree
-async function openImageMenu(window: Page): Promise<void> {
-  await openDataContextMenu(window, geodeObjectType, dataName);
-  await ensureMenuOpen(window, menuTestId);
-}
-
-async function setImageOpacity(window: Page, opacity: number): Promise<void> {
-  await ensureMenuOpen(window, menuTestId);
-  const track = window.getByTestId("imageOpacitySlider").locator(".v-slider").first();
-  const box = await track.boundingBox();
-  if (!box) {
-    throw new Error("Could not get bounding box of the image opacity slider");
-  }
-  await track.click({ position: { x: box.width * opacity, y: box.height / 2 } });
-  await moveMouseOutOfTheWay(window);
-  await waitForActionSettled(window);
-}
 
 // Shared with the apps built on this layer: each one runs it with its own test fixture and data loader
 function registerTests({ test, loadTestDatas }: SuiteRuntime): void {
@@ -50,7 +21,7 @@ function registerTests({ test, loadTestDatas }: SuiteRuntime): void {
   });
 
   test("image menu", async ({ window }) => {
-    await openImageMenu(window);
+    await openImageMenu(window, geodeObjectType, dataName);
   });
 
   test("image opacity", async ({ window }) => {
@@ -58,7 +29,7 @@ function registerTests({ test, loadTestDatas }: SuiteRuntime): void {
   });
 
   test("image hidden", async ({ window }) => {
-    await setVisibilityGeneric(window, menuTestId, "imageVisibilitySwitch", false);
+    await setVisibilityGeneric(window, IMAGE_MENU_TEST_ID, "imageVisibilitySwitch", false);
   });
 
   test("close image menu", async ({ window }) => {
