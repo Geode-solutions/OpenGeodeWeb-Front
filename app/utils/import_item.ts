@@ -1,7 +1,6 @@
 // Local imports
 import { type LegacyDataId, fromLegacyDataId } from "@ogw_front/utils/legacy_data_id";
 import { type NewDataItem, useDataStore } from "@ogw_front/stores/data";
-import { fromLegacyViewerObjectType } from "@ogw_front/utils/legacy_viewer_object_type";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -80,7 +79,7 @@ async function importDataItem(item: NewDataItem): Promise<string> {
 }
 // Every item comes through here: from the back-end, which still names its data id `id`, or from a project
 async function importItem(imported: LegacyDataId<NewDataItem> | NewDataItem): Promise<string> {
-  const item = fromLegacyViewerObjectType(fromLegacyDataId(imported));
+  const item = fromLegacyDataId(imported);
   const dataId = await useTreeviewStore().untilLoaded(item.data_id, importDataItem(item));
   return dataId;
 }

@@ -42,14 +42,6 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
-function defaultDataStyle(geodeObjectType: GeodeObjectType | undefined): Record<string, unknown> {
-  if (geodeObjectType === undefined) {
-    return {};
-  }
-  const defaultStyle = getDefaultStyle(geodeObjectType);
-  return isRecord(defaultStyle) ? defaultStyle : {};
-}
-
 // oxlint-disable-next-line max-lines-per-function
 export const useDataStyleStore = defineStore("dataStyle", () => {
   const dataStyleState = useDataStyleState();
@@ -72,8 +64,9 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   );
 
   async function addDataStyle(dataId: DataId, geodeObjectType: GeodeObjectType): Promise<void> {
+    const defaultStyle = getDefaultStyle(geodeObjectType);
     await data_style_db.put(
-      structuredClone({ data_id: dataId, ...defaultDataStyle(geodeObjectType) }),
+      structuredClone({ data_id: dataId, ...(isRecord(defaultStyle) ? defaultStyle : {}) }),
     );
   }
 
@@ -134,19 +127,11 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
 
     await dataStyleState.clear();
 
-    // Styles saved by an older version miss the keys added since: they take their default
-    const items = await dataStore.allItems();
-    const geodeObjectTypes = new Map(items.map((item) => [item.data_id, item.geode_object_type]));
     const style_promises = Object.entries(stylesSnapshot).map(
       // oxlint-disable-next-line prefer-readonly-parameter-types -- same external ObjectStyle limitation as above.
       async ([dataId, style]: readonly [string, LegacyDataId<ObjectStyle> | ObjectStyle]) => {
-        const defaultStyle = defaultDataStyle(geodeObjectTypes.get(dataId));
         const key = await data_style_db.put(
-          structuredClone({
-            ...defaultStyle,
-            ...fromLegacyDataId<ObjectStyle>(style),
-            data_id: dataId,
-          }),
+          structuredClone({ ...fromLegacyDataId<ObjectStyle>(style), data_id: dataId }),
         );
         return key;
       },
