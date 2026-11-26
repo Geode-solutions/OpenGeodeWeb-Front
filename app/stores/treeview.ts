@@ -320,11 +320,16 @@ export const useTreeviewStore = defineStore("treeview", () => {
     });
   }
 
-  function toggleCollapsed(id: string): void {
+  function setCollapsed(id: string, collapsed: boolean): void {
     const existing = opened_views.value.find((view: ReadonlyOpenedView) => view.id === id);
     if (existing) {
-      existing.collapsed = existing.collapsed !== true;
+      existing.collapsed = collapsed;
     }
+  }
+
+  function toggleCollapsed(id: string): void {
+    const existing = opened_views.value.find((view: ReadonlyOpenedView) => view.id === id);
+    setCollapsed(id, existing?.collapsed !== true);
   }
 
   function setAllCollapsed(collapsed: boolean): void {
@@ -475,6 +480,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     displayAdditionalTree,
     closeView,
     toggleView,
+    setCollapsed,
     toggleCollapsed,
     setAllCollapsed,
     moveView,

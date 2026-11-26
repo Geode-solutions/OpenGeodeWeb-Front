@@ -111,6 +111,12 @@ function modelGeodeId(modelId: string): string | undefined {
 function onResizeStart(event: MouseEvent): void {
   const startWidth = treeviewStore.panelWidth;
   const startX = event.clientX;
+  // Both listeners go at once, also from the resize itself once a panel is closed or collapsed
+  const listeners = new AbortController();
+  function stopResize(): void {
+    listeners.abort();
+    document.body.style.userSelect = "";
+  }
   function resize(move_event: MouseEvent): void {
     const deltaX = move_event.clientX - startX;
     let newWidth = startWidth + deltaX;
@@ -124,46 +130,45 @@ function onResizeStart(event: MouseEvent): void {
 
     if (newWidth < AUTO_CLOSE_THRESHOLD) {
       treeviewStore.closeView("main");
+      stopResize();
       return;
     }
 
     treeviewStore.setPanelWidth(Math.max(WIDTH_MIN, newWidth));
     document.body.style.userSelect = "none";
   }
-  function stopResize(): void {
-    document.removeEventListener("mousemove", resize);
-    document.removeEventListener("mouseup", stopResize);
-    document.body.style.userSelect = "";
-  }
-  document.addEventListener("mousemove", resize);
-  document.addEventListener("mouseup", stopResize);
+  document.addEventListener("mousemove", resize, { signal: listeners.signal });
+  document.addEventListener("mouseup", stopResize, { signal: listeners.signal });
 }
 
 function onAdditionalResizeStart(event: MouseEvent): void {
   const startWidth = treeviewStore.additionalPanelWidth;
   const startX = event.clientX;
+  // Both listeners go at once, also from the resize itself once a panel is closed or collapsed
+  const listeners = new AbortController();
+  function stopResize(): void {
+    listeners.abort();
+    document.body.style.userSelect = "";
+  }
   function resize(move_event: MouseEvent): void {
     const deltaX = move_event.clientX - startX;
     const newWidth = startWidth + deltaX;
     const currentTotalWidth = treeviewStore.panelWidth + newWidth + GAP_WIDTH;
+    // Only the last shown tree collapses: the drag ends there, the next moves would collapse the others
     if (newWidth < AUTO_CLOSE_THRESHOLD) {
       const lastShownView = shownViews.value.at(-1);
       if (lastShownView) {
-        treeviewStore.toggleCollapsed(lastShownView.id);
+        treeviewStore.setCollapsed(lastShownView.id, true);
       }
+      stopResize();
       return;
     }
 
     treeviewStore.setAdditionalPanelWidth(Math.max(WIDTH_MIN, newWidth));
     document.body.style.userSelect = "none";
   }
-  function stopResize(): void {
-    document.removeEventListener("mousemove", resize);
-    document.removeEventListener("mouseup", stopResize);
-    document.body.style.userSelect = "";
-  }
-  document.addEventListener("mousemove", resize);
-  document.addEventListener("mouseup", stopResize);
+  document.addEventListener("mousemove", resize, { signal: listeners.signal });
+  document.addEventListener("mouseup", stopResize, { signal: listeners.signal });
 }
 
 function onVerticalResizeStart(event: MouseEvent, index: number): void {
