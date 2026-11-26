@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import type { EdgeWidth, Visibility } from "@geode/opengeodeweb-viewer/schema_types";
-import ViewerContextMenuItem, {
-  type ItemProps,
-} from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { MeshId } from "@ogw_front/types/identifiers";
+import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import ViewerGenericMeshEdgesColoring from "@ogw_front/components/Viewer/Generic/Mesh/EdgesColoring.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import ViewerOptionsWidthSlider from "@ogw_front/components/Viewer/Options/Sliders/Width.vue";
@@ -21,29 +20,28 @@ interface CapabilityConfig {
 }
 
 interface Props {
-  itemProps: ItemProps & { index?: number };
+  dataId: DataId;
+  index: number;
   btnImage: string;
   tooltip?: string;
   capabilities?: Record<string, CapabilityConfig>;
 }
 
-const { itemProps, btnImage, tooltip = "Edges options", capabilities = {} } = defineProps<Props>();
-
-const dataId = toRef(() => itemProps.id);
+const { dataId, index, btnImage, tooltip = "Edges options", capabilities = {} } = defineProps<Props>();
 
 const visibility = computed<Visibility>({
-  get: () => dataStyleStore.meshEdgesVisibility(dataId.value),
+  get: () => dataStyleStore.meshEdgesVisibility(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(dataId.value, (meshId: MeshId) =>
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
       dataStyleStore.setMeshEdgesVisibility(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const width = computed<EdgeWidth>({
-  get: () => dataStyleStore.meshEdgesWidth(dataId.value),
+  get: () => dataStyleStore.meshEdgesWidth(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(dataId.value, (meshId: MeshId) =>
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
       dataStyleStore.setMeshEdgesWidth(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -54,8 +52,7 @@ const width = computed<EdgeWidth>({
 <template>
   <ViewerContextMenuItem
     data-testid="meshEdgesMenu"
-    :index="itemProps.index!"
-    :itemProps="itemProps"
+    :index="index"
     :tooltip="tooltip"
     :btnImage="btnImage"
   >

@@ -1,4 +1,10 @@
 <script setup lang="ts">
+import {
+  type MenuSide,
+  OPPOSITE_SIDE,
+  injectMenuItemCount,
+  menuItemSide,
+} from "@ogw_front/composables/circular_menu";
 import GlassCard from "@ogw_front/components/GlassCard.vue";
 import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
 import { useMenuStore } from "@ogw_front/stores/menu";
@@ -14,27 +20,21 @@ const menuStore = useMenuStore();
 const theme = useTheme();
 const primaryColor = computed(() => theme.current.value.colors.primary);
 
-interface ItemProps {
-  id: string;
-  meta_data: Record<string, unknown>;
-  tooltip_location: "right" | "top" | "left" | "bottom";
-  tooltip_origin: "right" | "top" | "left" | "bottom";
-  totalItems: number;
-}
-
 interface Props {
   index: number;
-  itemProps: ItemProps;
   tooltip: string;
   // An image, or an icon name of the app icon set (ph-...)
   btnImage?: string;
   btnIcon?: string;
 }
 
-const { index, itemProps, tooltip, btnImage = "", btnIcon = "" } = defineProps<Props>();
+const { index, tooltip, btnImage = "", btnIcon = "" } = defineProps<Props>();
+
+const itemCount = injectMenuItemCount();
+const tooltipLocation = computed<MenuSide>(() => menuItemSide(index, itemCount.value));
 
 const buttonCoords = computed(() => {
-  const angle = (index / itemProps.totalItems) * 2 * Math.PI;
+  const angle = (index / itemCount.value) * 2 * Math.PI;
   const deltaX = Math.cos(angle) * menuStore.menuRadius;
   const deltaY = Math.sin(angle) * menuStore.menuRadius;
   const size = 40;
@@ -108,7 +108,7 @@ const optionsStyle = computed<Record<string, string>>(() => {
   if (!is_active.value || !optionsHeight.value) {
     return {};
   }
-  const angle = (index / itemProps.totalItems) * 2 * Math.PI;
+  const angle = (index / itemCount.value) * 2 * Math.PI;
   const radius = menuStore.menuRadius;
   const absoluteButtonY = menuStore.menuY + Math.sin(angle) * radius;
   const height = optionsHeight.value;
@@ -124,7 +124,7 @@ const optionsStyle = computed<Record<string, string>>(() => {
 });
 
 const optionsClass = computed<string>(() => {
-  const loc = itemProps.tooltip_location;
+  const loc = tooltipLocation.value;
   const margin = MARGIN;
   const radius = menuStore.menuRadius;
   if (loc === "right") {
@@ -139,11 +139,10 @@ function toggleOptions(): void {
   menuStore.toggleItemOptions(index);
 }
 
-export type { ItemProps };
 </script>
 <template>
   <v-sheet class="menu-item-container transition-swing" color="transparent">
-    <v-tooltip :location="itemProps.tooltip_location" :origin="itemProps.tooltip_origin">
+    <v-tooltip :location="tooltipLocation" :origin="OPPOSITE_SIDE[tooltipLocation]">
       <template v-slot:activator="{ props: tooltipProps }">
         <v-btn
           icon

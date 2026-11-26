@@ -184,8 +184,7 @@ function toggleShowName(): void {
       >
         <CircularItems
           :menu-items="menu_items"
-          :id="id"
-          :meta-data="meta_data"
+          :data-id="id"
           :menu-item-count="menuItemCount"
         />
 

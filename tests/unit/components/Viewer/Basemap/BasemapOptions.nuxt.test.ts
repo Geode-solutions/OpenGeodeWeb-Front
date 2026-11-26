@@ -19,17 +19,6 @@ const NEW_OPACITY = 0.7;
 // The circular item only shows its options once opened: the stub always shows them
 const MENU_ITEM_STUB = { template: "<div><slot name='options' /></div>" };
 
-function itemProps(id: string): Record<string, unknown> {
-  return {
-    id,
-    meta_data: {},
-    tooltip_location: "right",
-    tooltip_origin: "left",
-    totalItems: 1,
-    index: 0,
-  };
-}
-
 async function mountOptions(component: Component, id: string): Promise<VueWrapper> {
   const pinia = setupActivePinia();
   setDataItems([]);
@@ -40,7 +29,7 @@ async function mountOptions(component: Component, id: string): Promise<VueWrappe
   basemapStore.setCrop = mockAs<typeof basemapStore.setCrop>(vi.fn().mockResolvedValue(undefined));
   basemapStore.opacities = { satellite: 1, plan: 1, routes: ROUTES_OPACITY };
   const wrapper = await mountSuspended(component, {
-    props: { itemProps: itemProps(id) },
+    props: { dataId: id, index: 0 },
     global: { plugins: [vuetify, pinia], stubs: { ViewerContextMenuItem: MENU_ITEM_STUB } },
   });
   return wrapper;
