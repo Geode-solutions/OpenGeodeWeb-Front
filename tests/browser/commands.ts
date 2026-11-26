@@ -139,11 +139,27 @@ async function readFileBase64(_context: BrowserCommandContext, filePath: string)
   return content.toString("base64");
 }
 
-const browserCommands = { mouse, readFileBase64, startMicroservices, stopMicroservices };
+// The clipboard of the browser context, shared by the pages of every worker
+async function readBrowserClipboard(context: BrowserCommandContext): Promise<string> {
+  const clipboardText = await playwrightPage(context).evaluate(async () => {
+    const text = await navigator.clipboard.readText();
+    return text;
+  });
+  return clipboardText;
+}
+
+const browserCommands = {
+  mouse,
+  readBrowserClipboard,
+  readFileBase64,
+  startMicroservices,
+  stopMicroservices,
+};
 
 declare module "vitest/browser" {
   interface BrowserCommands {
     mouse: (action: MouseAction, x: number, y: number, options?: MouseOptions) => Promise<void>;
+    readBrowserClipboard: () => Promise<string>;
     readFileBase64: (filePath: string) => Promise<string>;
     startMicroservices: () => Promise<Microservices>;
     stopMicroservices: (projectFolderPath: string) => Promise<void>;

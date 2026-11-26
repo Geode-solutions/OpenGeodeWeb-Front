@@ -40,11 +40,18 @@ function mapRect(rect: Rect, latestImage: DrawableImage, canvasRect: DOMRect): R
   };
 }
 
-function sampleMinBrightness(
+// Darkest and brightest pixels under the rect: dark text has to stay readable over the first, light text over
+// The second
+interface BrightnessRange {
+  darkest: number;
+  brightest: number;
+}
+
+function sampleBrightnessRange(
   ctx: CanvasRenderingContext2D,
   image: DrawableImage,
   relRect: RelativeRect,
-): number {
+): BrightnessRange {
   ctx.drawImage(
     image,
     Math.max(0, relRect.relX),
@@ -57,14 +64,14 @@ function sampleMinBrightness(
     SAMPLE_SIZE,
   );
   const { data } = ctx.getImageData(0, 0, SAMPLE_SIZE, SAMPLE_SIZE);
-  let minBrightness = 1;
+  let darkest = 1;
+  let brightest = 0;
   for (let i = 0; i < TOTAL_CHANNELS; i += RGBA_CHANNELS) {
     const brightness = ((data[i] ?? 0) + (data[i + 1] ?? 0) + (data[i + 2] ?? 0)) / (3 * RGB_MAX);
-    if (brightness < minBrightness) {
-      minBrightness = brightness;
-    }
+    darkest = Math.min(darkest, brightness);
+    brightest = Math.max(brightest, brightness);
   }
-  return minBrightness;
+  return { darkest, brightest };
 }
 
 // Brightness of the scene background a reset viewer draws, for as long as no viewer image can be sampled
@@ -73,11 +80,16 @@ function defaultBackgroundBrightness(): number {
   return (red + green + blue) / (3 * RGB_MAX);
 }
 
-function computeAverageBrightness(rect: Rect, options: BrightnessOptions): number {
+function defaultBackgroundRange(): BrightnessRange {
+  const brightness = defaultBackgroundBrightness();
+  return { darkest: brightness, brightest: brightness };
+}
+
+function computeBrightnessRange(rect: Rect, options: BrightnessOptions): BrightnessRange {
   const { latestImage, offscreenCtx, offscreenCanvas } = options;
   const { genericRenderWindow } = useHybridViewerCore();
   if (!latestImage || !offscreenCtx || !offscreenCanvas || !genericRenderWindow.value) {
-    return defaultBackgroundBrightness();
+    return defaultBackgroundRange();
   }
   // oxlint-disable-next-line no-unsafe-assignment -- vtk.js has no types for getApiSpecificRenderWindow(); narrowed below.
   const webGLRenderWindow = genericRenderWindow.value.getApiSpecificRenderWindow();
@@ -87,21 +99,21 @@ function computeAverageBrightness(rect: Rect, options: BrightnessOptions): numbe
   };
   const canvas = apiSpecificRenderWindow.getCanvas();
   if (canvas === undefined || canvas === null) {
-    return defaultBackgroundBrightness();
+    return defaultBackgroundRange();
   }
   if (rect.width <= 0 || rect.height <= 0) {
-    return defaultBackgroundBrightness();
+    return defaultBackgroundRange();
   }
   const relRect = mapRect(rect, latestImage, canvas.getBoundingClientRect());
   if (relRect.relW <= 0 || relRect.relH <= 0) {
-    return defaultBackgroundBrightness();
+    return defaultBackgroundRange();
   }
   offscreenCanvas.width = SAMPLE_SIZE;
   offscreenCanvas.height = SAMPLE_SIZE;
   try {
-    return sampleMinBrightness(offscreenCtx, latestImage, relRect);
+    return sampleBrightnessRange(offscreenCtx, latestImage, relRect);
   } catch {
-    return defaultBackgroundBrightness();
+    return defaultBackgroundRange();
   }
 }
 function createOffscreenCanvas(): HTMLCanvasElement | undefined {
@@ -113,7 +125,7 @@ function createOffscreenCanvas(): HTMLCanvasElement | undefined {
 
 function useHybridViewerBrightness(): {
   latestImage: Ref<DrawableImage | undefined>;
-  getAverageBrightness: (rect: Rect) => number;
+  getBrightnessRange: (rect: Rect) => BrightnessRange;
 } {
   const latestImage = ref<DrawableImage | undefined>(undefined);
   const offscreenCanvas: HTMLCanvasElement | undefined = createOffscreenCanvas();
@@ -122,8 +134,8 @@ function useHybridViewerBrightness(): {
         willReadFrequently: true,
       }) ?? undefined)
     : undefined;
-  function getAverageBrightness(rect: Rect): number {
-    return computeAverageBrightness(rect, {
+  function getBrightnessRange(rect: Rect): BrightnessRange {
+    return computeBrightnessRange(rect, {
       latestImage: latestImage.value,
       offscreenCtx,
       offscreenCanvas,
@@ -131,7 +143,12 @@ function useHybridViewerBrightness(): {
   }
   return {
     latestImage,
-    getAverageBrightness,
+    getBrightnessRange,
   };
 }
-export { computeAverageBrightness, defaultBackgroundBrightness, useHybridViewerBrightness };
+export {
+  type BrightnessRange,
+  computeBrightnessRange,
+  defaultBackgroundBrightness,
+  useHybridViewerBrightness,
+};
