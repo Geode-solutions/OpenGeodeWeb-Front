@@ -6,6 +6,7 @@ import {
   formatPhysicalPropertyValue,
   isPhysicalPropertyId,
   physicalPropertiesGroup,
+  physicalPropertyColoring,
   physicalPropertyId,
   physicalPropertyTitle,
 } from "@ogw_front/utils/physical_properties_tree";
@@ -113,6 +114,7 @@ describe("physical properties tree", () => {
           attribute_name: "porosity",
           element_type: "polyhedron",
           component_type: "Block",
+          coloring: { item: 0, minimum: POROSITY, maximum: POROSITY },
           children: [{ ...BLOCK, physical_value: "0.05" }],
         },
         {
@@ -122,6 +124,7 @@ describe("physical properties tree", () => {
           attribute_name: "pressure",
           element_type: "polygon",
           component_type: "Surface",
+          coloring: { item: 0, minimum: BOUNDARY_PRESSURE, maximum: BOUNDARY_PRESSURE },
           children: [
             { ...SURFACE, physical_value: "2e7" },
             { ...SECOND_SURFACE, physical_value: "2e7" },
@@ -129,6 +132,34 @@ describe("physical properties tree", () => {
         },
       ],
     });
+  });
+
+  test("the model is colored by the range of a property over its components", () => {
+    const porosity = physicalProperty("porosity", "porosity", [
+      component(BLOCK_ID, [0.1], [0.2]),
+      component(UNKNOWN_ID, [0.05], [0.3]),
+    ]);
+    expect(physicalPropertyColoring(porosity)).toStrictEqual({
+      item: 0,
+      minimum: 0.05,
+      maximum: 0.3,
+    });
+  });
+
+  test("the first item with a value is colored, none without any value", () => {
+    const displacement = physicalProperty("boundary_displacement", "displacement", [
+      component(SURFACE_ID, [null, null, 0]),
+      component(SECOND_SURFACE_ID, [null, 0.5, null]),
+    ]);
+    expect(physicalPropertyColoring(displacement)).toStrictEqual({
+      item: 1,
+      minimum: 0.5,
+      maximum: 0.5,
+    });
+    const free = physicalProperty("boundary_displacement", "displacement", [
+      component(SURFACE_ID, [null, null, null]),
+    ]);
+    expect(physicalPropertyColoring(free)).toBeUndefined();
   });
 
   test("no group without any shown property", () => {
