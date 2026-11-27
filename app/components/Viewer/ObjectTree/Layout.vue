@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { type TreeMenuPayload, viewModelId } from "@ogw_front/utils/treeview";
+import { type TreeMenuPayload, viewHeader, viewModelId } from "@ogw_front/utils/treeview";
 import GlobalObjects from "@ogw_front/components/Viewer/ObjectTree/Views/GlobalObjects.vue";
 import ModelTree from "@ogw_front/components/Viewer/ObjectTree/Views/ModelTree.vue";
 import PhysicalPropertiesTree from "@ogw_front/components/Viewer/ObjectTree/Views/PhysicalPropertiesTree.vue";
 import ViewerObjectTreeBox from "@ogw_front/components/Viewer/ObjectTree/Box.vue";
-import { geodeObjectImage } from "@ogw_front/assets/geode_objects";
 import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
 import { useModelHeaderHover } from "@ogw_front/composables/model_header_hover";
 import { useModelTreeDrag } from "@ogw_front/composables/model_tree_drag";
@@ -98,13 +97,6 @@ watch([maxWidth, (): number => shownViews.value.length], ([newMax]): void => {
     }
   }
 });
-
-// What a model tree button or header names: the model, or its physical properties
-function viewLabel(view: { type: string; title: string }): string {
-  return view.type === "physical_properties"
-    ? `the physical properties of ${view.title}`
-    : view.title;
-}
 
 function modelGeodeId(modelId: string): string | undefined {
   for (const group of treeviewStore.items) {
@@ -274,17 +266,17 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
             icon
             variant="text"
             density="comfortable"
-            v-tooltip="
-              view.collapsed === true ? `Show ${viewLabel(view)}` : `Collapse ${viewLabel(view)}`
-            "
+            v-tooltip="`${view.collapsed === true ? 'Show' : 'Collapse'} ${viewHeader(view).label}`"
             @click="treeviewStore.toggleCollapsed(view.id)"
             @mouseenter="onModelHeaderEnter(viewModelId(view))"
             @mouseleave="onModelHeaderLeave(viewModelId(view))"
           >
-            <v-icon v-if="view.type === 'physical_properties'" size="22">ph-flask</v-icon>
+            <v-icon v-if="viewHeader(view).fontIcon" size="22">
+              {{ viewHeader(view).fontIcon }}
+            </v-icon>
             <v-img
-              v-else-if="view.geode_object_type"
-              :src="geodeObjectImage(view.geode_object_type)"
+              v-else-if="viewHeader(view).icon"
+              :src="viewHeader(view).icon"
               width="22"
               height="22"
               class="model-tree-toggle-icon"
@@ -341,13 +333,9 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
             @drop="onDrop(view.id)"
           >
             <ViewerObjectTreeBox
-              :title="view.type === 'physical_properties' ? 'Physical properties' : view.title"
-              :icon="
-                view.geode_object_type && view.type !== 'physical_properties'
-                  ? geodeObjectImage(view.geode_object_type)
-                  : undefined
-              "
-              :font-icon="view.type === 'physical_properties' ? 'ph-flask' : undefined"
+              :title="viewHeader(view).title"
+              :icon="viewHeader(view).icon"
+              :font-icon="viewHeader(view).fontIcon"
               :scroll-top="view.scrollTop"
               closable
               :border-radius="`0 ${index === 0 ? PANEL_RADIUS : '0'} ${index === shownViews.length - 1 ? PANEL_RADIUS : '0'} 0`"

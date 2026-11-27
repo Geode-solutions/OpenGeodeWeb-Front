@@ -1,6 +1,8 @@
 import type { GeodeObjectTyped, ModelIdentified } from "@ogw_front/types/identifiers";
 import type { TreeGroup, TreeNode } from "@ogw_front/types/tree";
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
+import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
+import { geodeObjectImage } from "@ogw_front/assets/geode_objects";
 import { isBasemapId } from "@ogw_front/utils/basemap_tree";
 
 function compareSelections<Item>(
@@ -69,6 +71,36 @@ function physicalPropertiesViewId(modelId: string): string {
   return `${modelId}:physical_properties`;
 }
 
+// The header and the activity bar button of a model tree: the model with its type icon, or its
+// Physical properties with the flask
+interface ViewHeader {
+  title: string;
+  // Named in the tooltips of the activity bar button
+  label: string;
+  icon: string | undefined;
+  fontIcon: string | undefined;
+}
+
+function viewHeader(view: {
+  readonly type: string;
+  readonly title: string;
+  readonly geode_object_type?: GeodeObjectType;
+}): ViewHeader {
+  if (view.type === "physical_properties") {
+    return {
+      title: "Physical properties",
+      label: `the physical properties of ${view.title}`,
+      icon: undefined,
+      fontIcon: "ph-flask",
+    };
+  }
+  let icon: string | undefined = undefined;
+  if (view.geode_object_type !== undefined) {
+    icon = geodeObjectImage(view.geode_object_type);
+  }
+  return { title: view.title, label: view.title, icon, fontIcon: undefined };
+}
+
 // The model a tree shows: a model tree has the id of its model, a physical properties tree names it
 function viewModelId(view: { readonly id: string; readonly model_id?: string }): string {
   return view.model_id ?? view.id;
@@ -120,11 +152,13 @@ export {
   isObjectTreeRowViewable,
   nextModelTreeColor,
   physicalPropertiesViewId,
+  viewHeader,
   viewModelId,
   withPendingImports,
 };
 export type {
   DataMenuPayload,
+  ViewHeader,
   GeodeObjectTypeMenuPayload,
   ModelComponentMenuPayload,
   TreeMenuPayload,
