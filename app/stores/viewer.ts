@@ -9,26 +9,21 @@ import opengeodeweb_viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb
 // Local imports
 import { type ViewerRequestArgs, callViewer } from "./viewer_helpers/request.js";
 import {
-  fetchViewerVersion,
-  launchViewerMicroservice,
-  pickWorldPosition,
-  showRenderingWarnings,
-} from "./viewer_helpers/actions.js";
-import {
   getWebsocketApiPort,
   getWebsocketApiProtocol,
   isCloudMode,
 } from "@ogw_front/utils/stores.js";
+import {
+  launchViewerMicroservice,
+  pickWorldPosition,
+  showRenderingWarnings,
+} from "./viewer_helpers/actions.js";
+import { useMicroserviceVersion, useRequestCounter } from "@ogw_internal/stores/microservice";
 import { Status } from "@ogw_front/utils/status";
 import { afterViewerReset } from "@ogw_front/composables/viewer_reset";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
-import type {
-  JsonRpcSchema,
-  MicroserviceVersionSchema,
-  RequestHandlers,
-  ResponseOf,
-} from "@ogw_shared/utils/types.js";
+import type { JsonRpcSchema, RequestHandlers, ResponseOf } from "@ogw_shared/utils/types.js";
 import type { RpcClient } from "@ogw_shared/utils/call_raw.js";
 
 interface ViewSize {
@@ -59,9 +54,8 @@ export const useViewerStore = defineStore(
     });
     // Pixel size of the remote rendering view, as sent to the server by RemoteView.resize()
     const view_size = ref<ViewSize>({ width: 0, height: 0 });
-    const request_counter = ref(0);
+    const { request_counter, is_busy, start_request, stop_request } = useRequestCounter();
     const status = ref(Status.NOT_CONNECTED);
-    const version = ref("0.0.0");
     // The viewer warnings are shown once, not again on each reconnection
     const rendering_warnings_shown = ref(false);
     const protocol = computed(() => getWebsocketApiProtocol());
@@ -74,13 +68,6 @@ export const useViewerStore = defineStore(
       viewer_url += "/ws";
       return viewer_url;
     });
-    function start_request(): void {
-      request_counter.value += 1;
-    }
-    function stop_request(): void {
-      request_counter.value -= 1;
-    }
-    const is_busy = computed(() => request_counter.value > 0);
     function toggle_picking_mode(value: boolean): void {
       picking_mode.value = value;
     }
@@ -157,14 +144,7 @@ export const useViewerStore = defineStore(
     async function connect(): Promise<void> {
       await ws_connect();
     }
-    async function get_version(
-      schema: MicroserviceVersionSchema | undefined,
-    ): Promise<{ microservice_version: string } | undefined> {
-      const result = await fetchViewerVersion(request, schema, (microservice_version) => {
-        version.value = microservice_version;
-      });
-      return result;
-    }
+    const { version, get_version } = useMicroserviceVersion(request);
     return {
       default_local_port,
       client,

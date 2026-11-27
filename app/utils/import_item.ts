@@ -1,6 +1,7 @@
 // Local imports
 import { type LegacyDataId, fromLegacyDataId } from "@ogw_front/utils/legacy_data_id";
 import { type NewDataItem, useDataStore } from "@ogw_front/stores/data";
+import { isModel } from "@ogw_front/utils/viewer_object_type";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -10,7 +11,7 @@ import { useTreeviewStore } from "@ogw_front/stores/treeview";
 async function registerWhenViewable(item: NewDataItem, added: Promise<unknown>): Promise<unknown> {
   const dataStore = useDataStore();
   await added;
-  if (!(await dataStore.isItemViewable(item))) {
+  if (!(await dataStore.fetchIsViewable(item.data_id))) {
     return undefined;
   }
   return dataStore.registerObject(item.data_id, item.name ?? item.data_id);
@@ -22,7 +23,7 @@ async function addToViewerWhenViewable(
 ): Promise<unknown> {
   const dataStore = useDataStore();
   await added;
-  if (!(await dataStore.isItemViewable(item))) {
+  if (!(await dataStore.fetchIsViewable(item.data_id))) {
     return undefined;
   }
   return useHybridViewerStore().addItem(item.data_id);
@@ -30,7 +31,7 @@ async function addToViewerWhenViewable(
 
 async function applyStyleWhenReady(item: NewDataItem, ready: Promise<unknown>): Promise<unknown> {
   await ready;
-  if (!(await useDataStore().isItemViewable(item))) {
+  if (!(await useDataStore().fetchIsViewable(item.data_id))) {
     return undefined;
   }
   return useDataStyleStore().applyDefaultStyle(item.data_id);
@@ -50,7 +51,7 @@ async function importDataItem(item: NewDataItem): Promise<string> {
   const registerTask = registerWhenViewable(item, addDataTask);
   let addDataComponentsTask: Promise<unknown> = Promise.resolve(undefined);
   let addDataRelationsTask: Promise<unknown> = Promise.resolve(undefined);
-  if (item.viewer_object_type === "model") {
+  if (isModel(item)) {
     addDataComponentsTask = dataStore.addComponents(item);
     addDataRelationsTask = dataStore.addComponentRelations(item);
   }

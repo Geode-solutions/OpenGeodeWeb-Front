@@ -5,6 +5,7 @@ import {
   moveMouseOutOfTheWay,
 } from "#browser_helpers/viewer_interaction";
 import { getMenuContainer, resetMenuScroll } from "./attribute_menu";
+import type { ViewerObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import { setFeatureColorMap } from "./attribute_colors";
 import { waitForActionSettled } from "#browser_helpers/wait_for_action_settled";
 
@@ -109,7 +110,7 @@ interface FeatureAttributeOptions {
 
 async function setFeatureAttribute(
   window: Page,
-  viewerObjectType: string,
+  viewerObjectType: ViewerObjectType,
   feature: string,
   attributeType: string,
   attributeName: string,

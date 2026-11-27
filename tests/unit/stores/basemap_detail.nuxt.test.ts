@@ -1,12 +1,13 @@
 // oxlint-disable vitest/require-mock-type-parameters, no-magic-numbers, max-lines, max-lines-per-function
-import { type DataItem, useDataStore } from "@ogw_front/stores/data";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { mockAs, setupActivePinia } from "@ogw_tests/utils";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { setBasemapOption } from "@ogw_tests/unit/helpers/basemap_option";
+import { setDataItems } from "@ogw_tests/unit/stores/data_helpers";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useBasemapDetailStore } from "@ogw_front/stores/basemap_detail";
 import { useBasemapStore } from "@ogw_front/stores/basemap";
+import { useDataStore } from "@ogw_front/stores/data";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
@@ -203,8 +204,7 @@ describe("basemap detail store", () => {
     const viewerStore = useViewerStore();
     viewerStore.request = mockAs<typeof viewerStore.request>(viewerRequest);
     const dataStore = useDataStore();
-    const items = ref(mockAs<DataItem[]>([{ data_id: FIRST_DATA, created_at: "1", crs: LAMBERT }]));
-    dataStore.refCrsItems = mockAs<typeof dataStore.refCrsItems>(() => items);
+    setDataItems([{ data_id: FIRST_DATA, created_at: "1", crs: LAMBERT }]);
     dataStore.registerObject = mockAs<typeof dataStore.registerObject>(
       vi.fn().mockResolvedValue({}),
     );

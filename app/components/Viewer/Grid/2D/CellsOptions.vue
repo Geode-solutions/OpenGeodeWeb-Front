@@ -1,18 +1,20 @@
 <script setup lang="ts">
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import Grid2D_Cells from "@ogw_front/assets/viewer_svgs/grid_2d_cells.svg";
-import type { ItemProps } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import ViewerGenericMeshCellsOptions from "@ogw_front/components/Viewer/Generic/Mesh/CellsOptions.vue";
 
 interface Props {
-  itemProps: ItemProps & { index?: number };
+  dataId: DataId;
+  index: number;
 }
 
-const { itemProps } = defineProps<Props>();
+const { dataId, index } = defineProps<Props>();
 </script>
 
 <template>
   <ViewerGenericMeshCellsOptions
-    :itemProps="itemProps"
+    :data-id="dataId"
+    :index="index"
     :btnImage="Grid2D_Cells"
     tooltip="Cells options"
   />

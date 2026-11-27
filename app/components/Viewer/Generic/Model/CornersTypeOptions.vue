@@ -6,7 +6,7 @@ import type {
   Visibility,
 } from "@geode/opengeodeweb-viewer/schema_types";
 import type { AttributeRange, AttributeTimeStep } from "@ogw_front/types/attribute";
-import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
+import type { CollectionComponent } from "@ogw_internal/stores/data/model/collections";
 import { MODEL_VERTEX_COLORING } from "@ogw_front/utils/model_component_coloring";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";

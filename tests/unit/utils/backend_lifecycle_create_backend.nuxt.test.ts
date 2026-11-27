@@ -13,6 +13,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 // Local imports
 import { Status } from "@ogw_front/utils/status";
 import { appMode } from "@ogw_shared/app_mode";
+import { createBackend } from "@ogw_front/utils/backend_lifecycle";
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useInfraStore } from "@ogw_front/stores/infra";
@@ -65,12 +66,12 @@ async function respondWithSuccess(
   await onResponse({ request, options: resolvedOptions, response });
 }
 
-describe("infra store", () => {
+describe("backend lifecycle", () => {
   beforeEach(() => {
     setupActivePinia();
   });
 
-  describe("create_backend", () => {
+  describe("create the backend", () => {
     test("with end-point", async () => {
       const infraStore = useInfraStore();
       const backStore = useBackStore();
@@ -84,7 +85,7 @@ describe("infra store", () => {
         return data;
       });
 
-      await infraStore.create_backend("token");
+      await createBackend("token");
       expect(infraStore.status).toBe(Status.CREATED);
       expect(infraStore.domain_name).toBe(url);
 
@@ -98,7 +99,7 @@ describe("infra store", () => {
       infraStore.app_mode = appMode.CLOUD;
       vi.mocked($fetch).mockRejectedValue(new Error("unreachable"));
 
-      await expect(infraStore.create_backend("token")).rejects.toThrow("unreachable");
+      await expect(createBackend("token")).rejects.toThrow("unreachable");
       expect(infraStore.status).toBe(Status.NOT_CREATED);
     });
   });

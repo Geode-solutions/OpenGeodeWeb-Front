@@ -1,25 +1,22 @@
 <script setup lang="ts">
 import type { Component } from "vue";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import { provideMenuItemCount } from "@ogw_front/composables/circular_menu";
 import { useMenuStore } from "@ogw_front/stores/menu";
 
 interface Props {
   menuItems: Component[];
-  id: string;
-  metaData: Record<string, unknown>;
+  dataId: DataId;
   menuItemCount: number;
 }
 
-const { menuItems, id, metaData, menuItemCount } = defineProps<Props>();
+const { menuItems, dataId, menuItemCount } = defineProps<Props>();
 
 const Z_INDEX_ACTIVE_ITEM = 10;
 const Z_INDEX_BASE_ITEM = 1;
-const FULL_ANGLE = 360;
-const ANGLE_45 = 45;
-const ANGLE_135 = 135;
-const ANGLE_225 = 225;
-const ANGLE_315 = 315;
 
 const menuStore = useMenuStore();
+provideMenuItemCount(() => menuItemCount);
 
 function getItemStyle(index: number): Record<string, string> {
   const angle = (index / menuItemCount) * 2 * Math.PI;
@@ -30,34 +27,6 @@ function getItemStyle(index: number): Record<string, string> {
     zIndex: menuStore.active_item_index === index ? Z_INDEX_ACTIVE_ITEM : Z_INDEX_BASE_ITEM,
   };
 }
-
-function getTooltipLocation(index: number): string {
-  const angle = (index / menuItemCount) * FULL_ANGLE;
-  if (angle < ANGLE_45 || angle >= ANGLE_315) {
-    return "right";
-  }
-  if (angle >= ANGLE_45 && angle < ANGLE_135) {
-    return "top";
-  }
-  if (angle >= ANGLE_135 && angle < ANGLE_225) {
-    return "left";
-  }
-  return "bottom";
-}
-
-function getTooltipOrigin(index: number): string {
-  const angle = (index / menuItemCount) * FULL_ANGLE;
-  if (angle < ANGLE_45 || angle >= ANGLE_315) {
-    return "left";
-  }
-  if (angle >= ANGLE_45 && angle < ANGLE_135) {
-    return "bottom";
-  }
-  if (angle >= ANGLE_135 && angle < ANGLE_225) {
-    return "right";
-  }
-  return "top";
-}
 </script>
 
 <template>
@@ -66,13 +35,7 @@ function getTooltipOrigin(index: number): string {
     :is="item"
     :key="index"
     :index="index"
-    :itemProps="{
-      id: id,
-      meta_data: metaData,
-      tooltip_location: getTooltipLocation(index),
-      tooltip_origin: getTooltipOrigin(index),
-      totalItems: menuItemCount,
-    }"
+    :data-id="dataId"
     class="menu-item-wrapper"
     :style="getItemStyle(index)"
     @mousedown.stop

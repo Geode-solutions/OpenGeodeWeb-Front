@@ -3,6 +3,7 @@ import {
   MODEL_COMPONENT_ATTRIBUTE_SCHEMAS,
   MODEL_COMPONENT_KINDS,
 } from "@ogw_front/utils/attributes";
+import { isImage, isMesh } from "@ogw_front/utils/viewer_object_type";
 import type { AttributeSource } from "@ogw_front/utils/threshold";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import { attributeSchemas } from "@ogw_front/composables/attribute_coloring_style";
@@ -33,10 +34,10 @@ async function fetchSources(
 ): Promise<AttributeSource[]> {
   const item = await dataStore.item(dataId);
   // An image shows its own colors: it has no attribute to threshold
-  if (item.viewer_object_type === "image") {
+  if (isImage(item)) {
     return [];
   }
-  if (item.viewer_object_type === "mesh") {
+  if (isMesh(item)) {
     return ["vertex", MESH_ELEMENT_KINDS[item.geode_object_type]]
       .filter((kind): kind is string => kind !== undefined)
       .map((kind) => attributeSource(kind, "", { id: dataId }));

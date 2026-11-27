@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import type { EdgeWidth, Visibility } from "@geode/opengeodeweb-viewer/schema_types";
-import ViewerContextMenuItem, {
-  type ItemProps,
-} from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import EdgedCurveEdges from "@ogw_front/assets/viewer_svgs/edged_curve_edges.svg";
 import type { MeshId } from "@ogw_front/types/identifiers";
+import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import ViewerEdgedCurveSpecificEdgesColoring from "@ogw_front/components/Viewer/EdgedCurve/SpecificEdgesColoring.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import ViewerOptionsWidthSlider from "@ogw_front/components/Viewer/Options/Sliders/Width.vue";
@@ -17,26 +16,25 @@ const hybridViewerStore = useHybridViewerStore();
 const { applyBatchStyle } = useBatchStyle();
 
 interface Props {
-  itemProps: ItemProps & { index?: number };
+  dataId: DataId;
+  index: number;
 }
 
-const { itemProps } = defineProps<Props>();
-
-const dataId = toRef(() => itemProps.id);
+const { dataId, index } = defineProps<Props>();
 
 const visibility = computed<Visibility>({
-  get: () => dataStyleStore.meshEdgesVisibility(dataId.value),
+  get: () => dataStyleStore.meshEdgesVisibility(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(dataId.value, (meshId: MeshId) =>
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
       dataStyleStore.setMeshEdgesVisibility(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
   },
 });
 const width = computed<EdgeWidth>({
-  get: () => dataStyleStore.meshEdgesWidth(dataId.value),
+  get: () => dataStyleStore.meshEdgesWidth(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(dataId.value, (meshId: MeshId) =>
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
       dataStyleStore.setMeshEdgesWidth(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -47,8 +45,7 @@ const width = computed<EdgeWidth>({
 <template>
   <ViewerContextMenuItem
     data-testid="meshEdgesMenu"
-    :index="itemProps.index!"
-    :itemProps="itemProps"
+    :index="index"
     :btnImage="EdgedCurveEdges"
     tooltip="Edges options"
   >

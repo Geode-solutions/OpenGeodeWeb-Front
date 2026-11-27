@@ -1,7 +1,26 @@
+import type {
+  DataIdentified,
+  GeodeIdentified,
+  GeodeObjectTyped,
+  ViewerObjectTyped,
+} from "@ogw_front/types/identifiers";
+import type { CRS } from "@geode/opengeodeweb-back/schema_types";
 import type { TableDefinition } from "./table_definition";
 
-export const dataTable: TableDefinition = {
+interface DataItem extends DataIdentified, GeodeIdentified, GeodeObjectTyped, ViewerObjectTyped {
+  name: string;
+  visible: boolean;
+  created_at: string;
+  is_viewable?: boolean;
+  binary_light_viewable?: string;
+  crs?: CRS;
+}
+
+const dataTable: TableDefinition = {
   name: "data",
   schema:
     "data_id, geode_id, name, viewer_object_type, geode_object_type, visible, created_at, binary_light_viewable",
 };
+
+export { dataTable };
+export type { DataItem };

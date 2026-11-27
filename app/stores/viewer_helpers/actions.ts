@@ -1,4 +1,3 @@
-import type { MicroserviceVersionSchema } from "@ogw_shared/utils/types.js";
 import type { Vector3 } from "@kitware/vtk.js/types";
 import type { ViewerRequest } from "./request.js";
 import { consola } from "consola";
@@ -46,27 +45,6 @@ async function launchViewerMicroservice(
   return result;
 }
 
-async function fetchViewerVersion(
-  request: ViewerRequest,
-  schema: MicroserviceVersionSchema | undefined,
-  onVersion: (version: string) => void,
-): Promise<{ microservice_version: string } | undefined> {
-  if (!schema) {
-    return undefined;
-  }
-  const result = await request(
-    {
-      schema,
-    },
-    {
-      response_function: ({ microservice_version }) => {
-        onVersion(microservice_version);
-      },
-    },
-  );
-  return result;
-}
-
 // Shows the viewer's warnings about its rendering setup, e.g. software rendering fallback.
 // Informational only: a failure is logged, never thrown, so it cannot break the connection.
 async function showRenderingWarnings(request: ViewerRequest): Promise<void> {
@@ -82,4 +60,4 @@ async function showRenderingWarnings(request: ViewerRequest): Promise<void> {
   }
 }
 
-export { fetchViewerVersion, launchViewerMicroservice, pickWorldPosition, showRenderingWarnings };
+export { launchViewerMicroservice, pickWorldPosition, showRenderingWarnings };

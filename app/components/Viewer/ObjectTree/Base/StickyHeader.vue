@@ -13,9 +13,11 @@ interface Props {
   selection: SelectionConfig;
   isSelected: (item: TreeItem) => boolean;
   getIndeterminate: (item: TreeItem) => boolean;
+  isRowViewable: (item: DisplayItem) => boolean;
 }
 
-const { item, itemProps, selection, isSelected, getIndeterminate } = defineProps<Props>();
+const { item, itemProps, selection, isSelected, getIndeterminate, isRowViewable } =
+  defineProps<Props>();
 
 interface Emits {
   "toggle-open": [item: TreeItem];
@@ -33,6 +35,7 @@ const emit = defineEmits<Emits>();
       :selection="selection"
       :is-selected="isSelected"
       :get-indeterminate="getIndeterminate"
+      :is-row-viewable="isRowViewable"
       @toggle-open="$emit('toggle-open', $event)"
       @toggle-select="$emit('toggle-select', $event)"
     >
