@@ -4,6 +4,7 @@ import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
 import PhysicalPropertyActions from "@ogw_front/components/Viewer/ObjectTree/Base/PhysicalPropertyActions.vue";
+import { useDataStore } from "@ogw_front/stores/data";
 import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useModelPhysicalProperties } from "@ogw_front/composables/model_physical_properties";
@@ -30,6 +31,7 @@ interface PhysicalPropertyRow {
 }
 
 const treeviewStore = useTreeviewStore();
+const dataStore = useDataStore();
 const hybridViewerStore = useHybridViewerStore();
 const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 const { selection: visibleComponents, updateVisibility } = useModelVisibility(modelId);
@@ -104,6 +106,7 @@ function expandAll(): void {
       v-model:active="treeviewStore.activeItems"
       :items="items"
       :options="{ selection: { selectable: true, strategy: 'classic' }, search }"
+      :is-row-viewable="() => dataStore.isViewable(modelId)"
       :scroll-top="currentView?.scrollTop || 0"
       class="transparent-treeview virtual-tree-height"
       @update:selected="(val) => updateVisibility(val as string[])"

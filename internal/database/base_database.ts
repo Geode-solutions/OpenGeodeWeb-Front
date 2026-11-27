@@ -8,6 +8,7 @@ import { modelComponentsRelationTable } from "./tables/model_components_relation
 import { modelComponentsTable } from "./tables/model_components";
 import { modelPhysicalPropertiesTable } from "./tables/model_physical_properties";
 import { sceneStyleTable } from "./tables/scene_style";
+import { treeviewConfigTable } from "./tables/treeview_config";
 
 export class BaseDatabase extends Dexie {
   public static get initialStores(): Record<string, string> {
@@ -21,7 +22,7 @@ export class BaseDatabase extends Dexie {
       [modelPhysicalPropertiesTable.name]: modelPhysicalPropertiesTable.schema,
       [cameraPositionsTable.name]: cameraPositionsTable.schema,
       [sceneStyleTable.name]: sceneStyleTable.schema,
-      treeview_config: "id",
+      [treeviewConfigTable.name]: treeviewConfigTable.schema,
     };
   }
 

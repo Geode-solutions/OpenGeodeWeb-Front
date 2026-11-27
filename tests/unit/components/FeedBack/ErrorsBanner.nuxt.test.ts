@@ -20,7 +20,7 @@ describe("feedback error banner", () => {
     });
     const reload_spy = vi.spyOn(wrapper.vm, "reload");
     const feedbackStore = useFeedbackStore();
-    feedbackStore.$patch({ server_error: true });
+    feedbackStore.set_server_error(true);
     expect(feedbackStore.server_error).toBe(true);
     await wrapper.vm.$nextTick();
     const v_btn = wrapper.findAll(".v-btn");

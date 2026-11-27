@@ -1,13 +1,13 @@
 import type {
   CollectionComponent,
   CollectionComponentGroup,
-} from "@ogw_front/stores/data_helpers/collections";
+} from "@ogw_internal/stores/data/model/collections";
 import { type FilterableItem, sortAndFormatItems } from "@ogw_front/composables/tree_filter";
 import type {
   FormattedComponent,
   FormattedComponentGroup,
-} from "@ogw_front/stores/data_helpers/mesh";
-import type { ComponentRelations } from "@ogw_front/stores/data_helpers/relations";
+} from "@ogw_internal/stores/data/model/mesh_components";
+import type { ComponentRelations } from "@ogw_internal/stores/data/model/relations";
 import type { ModelId } from "@ogw_front/types/identifiers";
 import { compareSelections } from "@ogw_front/utils/treeview";
 import { useDataStore } from "@ogw_front/stores/data";

@@ -5,10 +5,15 @@ import type {
   SceneStyle,
   StyleValues,
 } from "./types";
+import {
+  componentDataStyleDb,
+  componentTypeDataStyleDb,
+  dataStyleDb,
+  sceneStyleDb,
+} from "@ogw_internal/database/database";
 import type { ModelId } from "@ogw_front/types/identifiers";
 import type { Observable as RxObservable } from "rxjs";
 import { getDefaultSceneStyle } from "@ogw_front/utils/default_styles";
-import { getTable } from "@ogw_internal/database/database";
 import { liveQuery } from "dexie";
 import merge from "lodash/merge";
 import { useObservable } from "@vueuse/rxjs";
@@ -52,11 +57,9 @@ function getSharedState(): SharedState {
     return sharedState;
   }
 
-  const dataStyleTable = getTable<ObjectStyle>("data_style");
-  const modelComponentDataStyleTable = getTable<ModelComponentStyle>("model_component_datastyle");
-  const modelComponentTypeDataStyleTable = getTable<ModelComponentTypeStyle>(
-    "model_component_type_datastyle",
-  );
+  const dataStyleTable = dataStyleDb();
+  const modelComponentDataStyleTable = componentDataStyleDb();
+  const modelComponentTypeDataStyleTable = componentTypeDataStyleDb();
 
   // Dexie's `liveQuery` returns Dexie's own `Observable` type, structurally distinct
   // From rxjs's `Observable` that `useObservable` (from @vueuse/rxjs) expects, even
@@ -78,7 +81,7 @@ function getSharedState(): SharedState {
 
   const modelComponentTypeStyles = ref<Record<string, ModelComponentTypeStyle>>({});
   const componentStyles = ref<Record<string, ModelComponentStyle>>({});
-  const sceneStyleTable = getTable<SceneStyle>("scene_style");
+  const sceneStyleTable = sceneStyleDb();
   const sceneStyle = ref<SceneStyle>(getDefaultSceneStyle());
 
   async function loadFromDatabase(): Promise<void> {

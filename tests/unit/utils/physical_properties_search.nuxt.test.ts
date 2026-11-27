@@ -4,7 +4,7 @@ import {
   searchPhysicalProperties,
   sortPhysicalPropertyLeaves,
 } from "@ogw_front/utils/physical_properties_tree";
-import type { FormattedComponent } from "@ogw_front/stores/data_helpers/mesh";
+import type { FormattedComponent } from "@ogw_internal/stores/data/model/mesh_components";
 import type { PhysicalProperty } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 
 const BLOCK_ID = "block-1";

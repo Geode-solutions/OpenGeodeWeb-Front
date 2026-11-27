@@ -1,9 +1,6 @@
-// Third party imports
+import { type DataItem, useDataStore } from "@ogw_front/stores/data";
 import { type MockInstance, vi } from "vitest";
-import { ref } from "vue";
-
-// Local imports
-import { type CrsItem, type DataItem, useDataStore } from "@ogw_front/stores/data";
+import { setDataItems } from "@ogw_tests/unit/stores/data_helpers";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
@@ -32,16 +29,7 @@ function projectItems(): DataItem[] {
 
 // The crs store reads the data when it is created: mocked first
 function mockCrsItems(items: DataItem[]): void {
-  vi.spyOn(useDataStore(), "refCrsItems").mockReturnValue(
-    ref<CrsItem[]>(
-      items.map(({ data_id, name, crs, created_at }) => ({
-        data_id,
-        name,
-        crs,
-        created_at: created_at ?? "",
-      })),
-    ),
-  );
+  setDataItems(items);
 }
 
 type BackRequest = ReturnType<typeof useBackStore>["request"];

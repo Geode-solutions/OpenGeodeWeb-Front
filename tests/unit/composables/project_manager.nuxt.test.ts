@@ -120,7 +120,8 @@ const dataStoreMock = {
   registerObject: vi.fn().mockResolvedValue(undefined),
   addItem: vi.fn().mockResolvedValue(undefined),
   importStores: vi.fn().mockResolvedValue(undefined),
-  isItemViewable: vi.fn().mockReturnValue(true),
+  isViewable: vi.fn().mockReturnValue(true),
+  fetchIsViewable: vi.fn().mockResolvedValue(true),
 };
 const dataStyleStoreMock = {
   importStores: vi.fn().mockResolvedValue(undefined),

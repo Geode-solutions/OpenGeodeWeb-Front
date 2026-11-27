@@ -9,6 +9,7 @@ import { setupActivePinia, vuetify } from "@ogw_tests/utils";
 import CrsDialog from "@ogw_front/components/CrsDialog.vue";
 import type CrsSelector from "@ogw_front/components/CrsSelector.vue";
 import type GlassCard from "@ogw_front/components/GlassCard.vue";
+import { setDataItems } from "@ogw_tests/unit/stores/data_helpers";
 import { useBackStore } from "@ogw_front/stores/back";
 import type { useCrs } from "@ogw_front/composables/crs";
 import { useCrsShortlist } from "@ogw_front/composables/crs_shortlist";
@@ -115,7 +116,7 @@ const mockItem: DataItem = {
 };
 
 function mockDataItems(items: DataItem[]): void {
-  vi.spyOn(useDataStore(), "refCrsItems").mockReturnValue(ref(items));
+  setDataItems(items);
   vi.spyOn(useDataStore(), "updateItem").mockResolvedValue(undefined);
 }
 

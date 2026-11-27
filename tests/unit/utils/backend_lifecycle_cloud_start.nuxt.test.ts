@@ -13,10 +13,10 @@ import {
   setCloudUrlParam,
   setupConfig,
   toHookArray,
-} from "@ogw_tests/unit/stores/cloud_helpers";
+} from "@ogw_tests/unit/utils/cloud_helpers";
 import { appMode } from "@ogw_shared/app_mode";
 import { setupActivePinia } from "@ogw_tests/utils";
-import { useCloudStore } from "@ogw_front/stores/cloud";
+import { startCloud } from "@ogw_front/utils/backend_lifecycle";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
 // A hand-built `$Fetch`: a mock function plus the `raw`/`native`/`create` members the real
@@ -31,13 +31,13 @@ vi.mock(import("ofetch"), () => ({
 
 const mockedFetch = vi.mocked($fetch);
 
-describe("cloud store", () => {
+describe("backend lifecycle", () => {
   beforeEach(() => {
     setupActivePinia();
   });
 
-  describe("actions", () => {
-    describe("start", () => {
+  describe("cloud", () => {
+    describe("start the cloud", () => {
       beforeEach(() => {
         mockedFetch.mockReset();
         useInfraStore().app_mode = appMode.CLOUD;
@@ -59,7 +59,7 @@ describe("cloud store", () => {
       test("without cloud_url launches a new service", async () => {
         setupConfig();
         setCloudUrlParam();
-        await useCloudStore().start(TOKEN);
+        await startCloud(TOKEN);
 
         expect(mockedFetch).toHaveBeenCalledWith("cloud_api/cloud/run", expect.anything());
         expect(useInfraStore().domain_name).toBe("test.com");
@@ -68,7 +68,7 @@ describe("cloud store", () => {
       test("without cloud_url nor auth token getter rejects", async () => {
         setupConfig();
         setCloudUrlParam();
-        await expect(useCloudStore().start()).rejects.toThrow("requires an authenticated user");
+        await expect(startCloud()).rejects.toThrow("requires an authenticated user");
 
         expect(mockedFetch).not.toHaveBeenCalledWith("cloud_api/cloud/run", expect.anything());
       });
@@ -76,7 +76,7 @@ describe("cloud store", () => {
       test("with cloud_url connects to the existing service", async () => {
         setupConfig();
         setCloudUrlParam(CLOUD_RUN_HOST);
-        await useCloudStore().start(TOKEN);
+        await startCloud(TOKEN);
 
         expect(mockedFetch).not.toHaveBeenCalledWith("cloud_api/cloud/run", expect.anything());
         expect(mockedFetch).toHaveBeenCalledWith("opengeodeweb_back/ping", expect.anything());
@@ -87,14 +87,13 @@ describe("cloud store", () => {
       test("failed cloud_url is cleared so a retry launches a new service", async () => {
         setupConfig();
         setCloudUrlParam(CLOUD_RUN_HOST);
-        const cloudStore = useCloudStore();
         mockedFetch.mockRejectedValueOnce(new Error("unreachable"));
 
-        await expect(cloudStore.start(TOKEN)).rejects.toThrow("unreachable");
+        await expect(startCloud(TOKEN)).rejects.toThrow("unreachable");
         expect(globalThis.location.search).toBe("");
 
         mockedFetch.mockClear();
-        await cloudStore.start(TOKEN);
+        await startCloud(TOKEN);
         expect(mockedFetch).toHaveBeenCalledWith("cloud_api/cloud/run", expect.anything());
         expect(mockedFetch).not.toHaveBeenCalledWith("opengeodeweb_back/ping", expect.anything());
         expect(useInfraStore().domain_name).toBe("test.com");

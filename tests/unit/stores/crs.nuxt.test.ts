@@ -1,8 +1,9 @@
 // oxlint-disable vitest/require-mock-type-parameters
-import { type DataItem, useDataStore } from "@ogw_front/stores/data";
-import { type Ref, nextTick, ref } from "vue";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { mockAs, setupActivePinia } from "@ogw_tests/utils";
+import type { DataItem } from "@ogw_front/stores/data";
+import { nextTick } from "vue";
+import { setDataItems } from "@ogw_tests/unit/stores/data_helpers";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useCrsStore } from "@ogw_front/stores/crs";
 
@@ -16,11 +17,8 @@ const ENTRY = {
 };
 const CRS_LIST = [ENTRY];
 
-function mockItems(items: DataItem[]): Ref<DataItem[]> {
-  const data = ref(items);
-  const dataStore = useDataStore();
-  dataStore.refCrsItems = mockAs<typeof dataStore.refCrsItems>(() => data);
-  return data;
+function mockItems(items: DataItem[]): void {
+  setDataItems(items);
 }
 
 describe("crs store", () => {
@@ -110,20 +108,20 @@ describe("project crs", () => {
   });
 
   test("follows when every georeferenced data is in one crs", async () => {
-    const data = mockItems([]);
+    mockItems([]);
     const crsStore = useCrsStore();
-    data.value = mockAs<DataItem[]>([{ data_id: "a", created_at: "1", crs: LAMBERT }]);
+    setDataItems([{ data_id: "a", created_at: "1", crs: LAMBERT }]);
     await nextTick();
     expect(crsStore.projectCrs).toStrictEqual(LAMBERT);
     // One data converted alone: mixed, the project keeps its crs
-    data.value = mockAs<DataItem[]>([
+    setDataItems([
       { data_id: "a", created_at: "1", crs: UTM },
       { data_id: "b", created_at: "2", crs: LAMBERT },
       { data_id: "local", created_at: "3" },
     ]);
     await nextTick();
     expect(crsStore.projectCrs).toStrictEqual(LAMBERT);
-    data.value = mockAs<DataItem[]>([
+    setDataItems([
       { data_id: "a", created_at: "1", crs: UTM },
       { data_id: "b", created_at: "2", crs: UTM },
       { data_id: "local", created_at: "3" },

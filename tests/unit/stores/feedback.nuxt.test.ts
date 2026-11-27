@@ -110,10 +110,20 @@ describe("feedback store", () => {
       });
     });
 
+    describe("set_server_error", () => {
+      test("set_server_error", () => {
+        const feedbackStore = useFeedbackStore();
+        feedbackStore.set_server_error(true);
+        expect(feedbackStore.server_error).toBe(true);
+        feedbackStore.set_server_error(false);
+        expect(feedbackStore.server_error).toBe(false);
+      });
+    });
+
     describe("delete_server_error", () => {
       test("delete_server_error", () => {
         const feedbackStore = useFeedbackStore();
-        feedbackStore.$patch({ server_error: true });
+        feedbackStore.set_server_error(true);
         feedbackStore.delete_server_error();
         expect(feedbackStore.server_error).toBe(false);
       });

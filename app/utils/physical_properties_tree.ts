@@ -2,7 +2,7 @@ import type {
   PhysicalProperty,
   Component as PhysicalPropertyComponent,
 } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
-import type { FormattedComponent } from "@ogw_front/stores/data_helpers/mesh";
+import type { FormattedComponent } from "@ogw_internal/stores/data/model/mesh_components";
 
 interface PhysicalPropertyLeaf extends FormattedComponent {
   // Value of the property on the component, already formatted for the tree

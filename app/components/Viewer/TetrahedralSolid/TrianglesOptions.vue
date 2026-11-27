@@ -1,18 +1,20 @@
 <script setup lang="ts">
-import type { ItemProps } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import TetrahedralSolidTriangles from "@ogw_front/assets/viewer_svgs/solid_facets.svg";
 import ViewerGenericMeshPolygonsOptions from "@ogw_front/components/Viewer/Generic/Mesh/PolygonsOptions.vue";
 
 interface Props {
-  itemProps: ItemProps & { index?: number };
+  dataId: DataId;
+  index: number;
 }
 
-const { itemProps } = defineProps<Props>();
+const { dataId, index } = defineProps<Props>();
 </script>
 
 <template>
   <ViewerGenericMeshPolygonsOptions
-    :itemProps="itemProps"
+    :data-id="dataId"
+    :index="index"
     :btnImage="TetrahedralSolidTriangles"
     tooltip="Triangles options"
   />

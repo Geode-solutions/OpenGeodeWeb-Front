@@ -1,16 +1,14 @@
 <script setup lang="ts">
-import ViewerContextMenuItem, {
-  type ItemProps,
-} from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import type { SceneOrientationWidget } from "@ogw_internal/stores/data_style/types";
+import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 interface Props {
-  itemProps: ItemProps & { index: number };
+  index: number;
 }
 
-const { itemProps } = defineProps<Props>();
+const { index } = defineProps<Props>();
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
@@ -27,8 +25,7 @@ const orientationWidget = computed<SceneOrientationWidget>({
 <template>
   <ViewerContextMenuItem
     data-testid="sceneOrientationWidgetMenu"
-    :index="itemProps.index"
-    :itemProps="itemProps"
+    :index="index"
     tooltip="Orientation widget"
     btnIcon="ph-compass"
   >

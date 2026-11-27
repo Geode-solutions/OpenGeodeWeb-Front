@@ -1,15 +1,15 @@
 // Only ever fires now that tests are .ts; asks every bare `vi.fn()` mock to carry an explicit call-signature type parameter. Real value for a handful of mocks, but for the many plain mock objects across this test suite it would mean guessing a signature that's already implied by how the mock is used (risking a type that quietly doesn't match, which defeats the point) rather than deriving it from each real function - left off rather than doing that at scale.
 // oxlint-disable vitest/require-mock-type-parameters
-// Third party imports
+import { type EmitFn, useVirtualTree } from "@ogw_front/composables/virtual_tree";
+import {
+  boundaries,
+  rows,
+  setupDetailsTree,
+  surface,
+  surfaces,
+} from "@ogw_tests/unit/helpers/virtual_tree";
 import { describe, expect, test, vi } from "vitest";
 import { nextTick, ref } from "vue";
-
-// Local imports
-import { type EmitFn, useVirtualTree } from "@ogw_front/composables/virtual_tree";
-
-function rows(tree: ReturnType<typeof useVirtualTree>): unknown[] {
-  return tree.displayItems.value.map((row) => [row.id, row.depth, row.isLeaf, row.isExpandable]);
-}
 
 describe("virtual tree composable", () => {
   test("correctly handles empty collections without treating them as leaf nodes", () => {
@@ -62,31 +62,8 @@ describe("virtual tree composable", () => {
   });
 
   describe("details", () => {
-    // Surface S has its boundaries as details: Surfaces > S > Boundaries > line1, line2
-    const line1 = { id: "line1", title: "Line 1" };
-    const line2 = { id: "line2", title: "Line 2" };
-    const boundaries = { id: "S:boundaries", title: "Boundaries (2)", children: [line1, line2] };
-    const surface = { id: "S", title: "Surface S", details: [boundaries] };
-    const otherSurface = { id: "T", title: "Surface T" };
-    const surfaces = { id: "Surface", title: "Surfaces", children: [surface, otherSurface] };
-
-    function setup(overrides: Record<string, unknown> = {}): {
-      tree: ReturnType<typeof useVirtualTree>;
-      emit: ReturnType<typeof vi.fn<EmitFn>>;
-    } {
-      const props = ref({
-        items: [surfaces],
-        opened: ["Surface"],
-        selected: [] as string[],
-        selection: { selectable: true, strategy: "classic" },
-        ...overrides,
-      });
-      const emit = vi.fn<EmitFn>();
-      return { tree: useVirtualTree(props, emit), emit };
-    }
-
     test("an item with details is an expandable leaf", () => {
-      const { tree } = setup();
+      const { tree } = setupDetailsTree();
       expect(rows(tree)).toStrictEqual([
         ["Surface", 0, false, true],
         ["S", 1, true, true],
@@ -95,7 +72,7 @@ describe("virtual tree composable", () => {
     });
 
     test("opening an item lists its details under it", () => {
-      const { tree } = setup({ opened: ["Surface", "S", "S:boundaries"] });
+      const { tree } = setupDetailsTree({ opened: ["Surface", "S", "S:boundaries"] });
       expect(rows(tree)).toStrictEqual([
         ["Surface", 0, false, true],
         ["S", 1, true, true],
@@ -107,7 +84,10 @@ describe("virtual tree composable", () => {
     });
 
     test("details are hidden while searching", () => {
-      const { tree } = setup({ opened: ["Surface", "S", "S:boundaries"], search: "Surface S" });
+      const { tree } = setupDetailsTree({
+        opened: ["Surface", "S", "S:boundaries"],
+        search: "Surface S",
+      });
       expect(rows(tree)).toStrictEqual([
         ["Surface", 0, false, true],
         ["S", 1, true, false],
@@ -115,7 +95,7 @@ describe("virtual tree composable", () => {
     });
 
     test("selecting an item with details only selects the item itself", () => {
-      const { tree, emit } = setup();
+      const { tree, emit } = setupDetailsTree();
       tree.toggleSelect(surface);
       expect(emit).toHaveBeenLastCalledWith("update:selected", ["S"]);
 
@@ -124,7 +104,7 @@ describe("virtual tree composable", () => {
     });
 
     test("an item visibility does not depend on its details", () => {
-      const { tree } = setup({ selected: ["line1", "line2"] });
+      const { tree } = setupDetailsTree({ selected: ["line1", "line2"] });
       expect(tree.isSelected(surface)).toBe(false);
       expect(tree.getIndeterminate(surface)).toBe(false);
       expect(tree.isSelected(boundaries)).toBe(true);
@@ -132,7 +112,7 @@ describe("virtual tree composable", () => {
     });
 
     test("selecting a details group selects its components", () => {
-      const { tree, emit } = setup({ selected: ["S"] });
+      const { tree, emit } = setupDetailsTree({ selected: ["S"] });
       tree.toggleSelect(boundaries);
       expect(emit).toHaveBeenLastCalledWith("update:selected", [
         "S",
