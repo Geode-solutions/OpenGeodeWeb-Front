@@ -1,0 +1,167 @@
+// oxlint-disable no-magic-numbers
+// oxlint-disable unicorn/no-null -- the back sends null for an item without value (NaN is not JSON)
+import { describe, expect, test } from "vitest";
+import {
+  formatNumber,
+  formatPhysicalPropertyValue,
+  physicalPropertyColoring,
+  physicalPropertyId,
+  physicalPropertyNodes,
+  physicalPropertyTitle,
+} from "@ogw_front/utils/physical_properties_tree";
+import type { FormattedComponent } from "@ogw_internal/stores/data/model/mesh_components";
+import type { PhysicalProperty } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
+
+const BLOCK_ID = "block-1";
+const SURFACE_ID = "surface-1";
+const SECOND_SURFACE_ID = "surface-2";
+const UNKNOWN_ID = "unknown";
+const POROSITY = 0.05;
+const BOUNDARY_PRESSURE = 2e7;
+
+function formattedComponent(id: string, title: string, category: string): FormattedComponent {
+  return { id, geode_id: id, title, category, viewer_id: 0, is_active: true };
+}
+
+const BLOCK = formattedComponent(BLOCK_ID, "h2_1", "Block");
+// Out of name order: the tree sorts them
+const SECOND_SURFACE = formattedComponent(SECOND_SURFACE_ID, "boundary 10", "Surface");
+const SURFACE = formattedComponent(SURFACE_ID, "boundary 2", "Surface");
+const COMPONENTS = [BLOCK, SECOND_SURFACE, SURFACE];
+
+function component(
+  geode_id: string,
+  min_values: (number | null)[],
+  max_values: (number | null)[] = min_values,
+): PhysicalProperty["components"][number] {
+  return { geode_id, min_values, max_values };
+}
+
+function physicalProperty(
+  name: string,
+  attribute_name: string,
+  components: PhysicalProperty["components"],
+): PhysicalProperty {
+  const onBlocks = name === "porosity";
+  return {
+    name,
+    component_type: onBlocks ? "Block" : "Surface",
+    attribute_id: `${name}-id`,
+    attribute_name,
+    element_type: onBlocks ? "polyhedron" : "polygon",
+    nb_items: components[0]?.min_values.length ?? 1,
+    components,
+  };
+}
+
+describe("physical properties tree", () => {
+  test("numbers keep a few significant digits", () => {
+    // Float attribute values
+    expect(formatNumber(0.050000000745)).toBe("0.05");
+    expect(formatNumber(2650)).toBe("2650");
+    expect(formatNumber(0)).toBe("0");
+  });
+
+  test("very small or large numbers get an exponent", () => {
+    expect(formatNumber(1.000000004e-15)).toBe("1e-15");
+    expect(formatNumber(13_333_332_992)).toBe("1.333e10");
+    expect(formatNumber(-2e7)).toBe("-2e7");
+  });
+
+  test("a uniform value is shown alone, a varying one as its range", () => {
+    expect(formatPhysicalPropertyValue(component(BLOCK_ID, [POROSITY]))).toBe("0.05");
+    expect(formatPhysicalPropertyValue(component(BLOCK_ID, [0.1], [0.3]))).toBe("0.1 – 0.3");
+  });
+
+  test("vectors are written (x, y, z), an item without value as a dash", () => {
+    expect(formatPhysicalPropertyValue(component(SURFACE_ID, [1e-13, 1e-13, 1e-14]))).toBe(
+      "(1e-13, 1e-13, 1e-14)",
+    );
+    expect(formatPhysicalPropertyValue(component(SURFACE_ID, [null, 0, null]))).toBe("(–, 0, –)");
+  });
+
+  test("property names are titled", () => {
+    expect(physicalPropertyTitle("boundary_pressure")).toBe("Boundary pressure");
+    expect(physicalPropertyTitle("porosity")).toBe("Porosity");
+  });
+
+  test("property rows are never taken for component rows", () => {
+    expect(physicalPropertyId("porosity")).toBe("physical_properties:porosity");
+  });
+
+  test("one row per property by name, listing its components by name with their value", () => {
+    const properties = [
+      physicalProperty("porosity", "porosity", [component(BLOCK_ID, [POROSITY])]),
+      // The attribute keeps its own name
+      physicalProperty("boundary_pressure", "pressure", [
+        component(SECOND_SURFACE_ID, [BOUNDARY_PRESSURE]),
+        component(SURFACE_ID, [BOUNDARY_PRESSURE]),
+        // Not a mesh component of the tree: skipped
+        component(UNKNOWN_ID, [BOUNDARY_PRESSURE]),
+      ]),
+    ];
+    expect(physicalPropertyNodes(properties, COMPONENTS)).toStrictEqual([
+      {
+        id: "physical_properties:boundary_pressure",
+        title: "Boundary pressure (2)",
+        physical_property: "boundary_pressure",
+        attribute_name: "pressure",
+        element_type: "polygon",
+        component_type: "Surface",
+        coloring: { item: 0, minimum: BOUNDARY_PRESSURE, maximum: BOUNDARY_PRESSURE },
+        viewer_ids: [SURFACE.viewer_id, SECOND_SURFACE.viewer_id],
+        children: [
+          { ...SURFACE, physical_value: "2e7" },
+          { ...SECOND_SURFACE, physical_value: "2e7" },
+        ],
+      },
+      {
+        id: "physical_properties:porosity",
+        title: "Porosity (1)",
+        physical_property: "porosity",
+        attribute_name: "porosity",
+        element_type: "polyhedron",
+        component_type: "Block",
+        coloring: { item: 0, minimum: POROSITY, maximum: POROSITY },
+        viewer_ids: [BLOCK.viewer_id],
+        children: [{ ...BLOCK, physical_value: "0.05" }],
+      },
+    ]);
+  });
+
+  test("the model is colored by the range of a property over its components", () => {
+    const porosity = physicalProperty("porosity", "porosity", [
+      component(BLOCK_ID, [0.1], [0.2]),
+      component(UNKNOWN_ID, [0.05], [0.3]),
+    ]);
+    expect(physicalPropertyColoring(porosity)).toStrictEqual({
+      item: 0,
+      minimum: 0.05,
+      maximum: 0.3,
+    });
+  });
+
+  test("the first item with a value is colored, none without any value", () => {
+    const displacement = physicalProperty("boundary_displacement", "displacement", [
+      component(SURFACE_ID, [null, null, 0]),
+      component(SECOND_SURFACE_ID, [null, 0.5, null]),
+    ]);
+    expect(physicalPropertyColoring(displacement)).toStrictEqual({
+      item: 1,
+      minimum: 0.5,
+      maximum: 0.5,
+    });
+    const free = physicalProperty("boundary_displacement", "displacement", [
+      component(SURFACE_ID, [null, null, null]),
+    ]);
+    expect(physicalPropertyColoring(free)).toBeUndefined();
+  });
+
+  test("a property on no component of the tree is left out", () => {
+    expect(physicalPropertyNodes([], COMPONENTS)).toStrictEqual([]);
+    const onUnknownComponent = physicalProperty("porosity", "porosity", [
+      component(UNKNOWN_ID, [POROSITY]),
+    ]);
+    expect(physicalPropertyNodes([onUnknownComponent], COMPONENTS)).toStrictEqual([]);
+  });
+});

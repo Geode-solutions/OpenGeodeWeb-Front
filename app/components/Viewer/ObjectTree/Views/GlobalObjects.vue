@@ -152,18 +152,13 @@ function showMenu(event: MouseEvent, item: TreeGroupItem): void {
   });
 }
 
-// Color of the opened model tree of a data, the link between the row and that tree
-function modelTreeColor(id: string): string | undefined {
-  return treeviewStore.opened_views.find((view) => view.id === id)?.color;
-}
-
 // The row of the model whose tree header is hovered
 const linkedRow = computed<{ id: string; color: string } | undefined>(() => {
   const id = treeviewStore.hoveredModelId;
   if (id === undefined) {
     return undefined;
   }
-  const color = modelTreeColor(id);
+  const color = treeviewStore.openedModelColor(id);
   if (color === undefined) {
     return undefined;
   }
@@ -291,10 +286,10 @@ function expandAll(): void {
             size="medium"
             style="height: 23px; width: 23px"
             class="ml-2"
-            :variant="modelTreeColor(item.id as string) ? 'tonal' : 'text'"
-            :color="modelTreeColor(item.id as string)"
+            :variant="treeviewStore.viewColor(item.id as string) ? 'tonal' : 'text'"
+            :color="treeviewStore.viewColor(item.id as string)"
             v-tooltip="
-              modelTreeColor(item.id as string)
+              treeviewStore.viewColor(item.id as string)
                 ? 'Close model\'s mesh components'
                 : 'Model\'s mesh components'
             "
@@ -308,6 +303,12 @@ function expandAll(): void {
           >
             <v-icon size="18">ph-magnifying-glass-plus</v-icon>
           </v-btn>
+          <!-- Keyed: the virtual scroll reuses the rows for other data -->
+          <ViewerObjectTreeBasePhysicalPropertiesButton
+            v-if="isModel(item as unknown as TreeGroupItem)"
+            :key="item.id as string"
+            :model="item as unknown as TreeGroupItem"
+          />
         </template>
       </template>
     </CommonTreeView>

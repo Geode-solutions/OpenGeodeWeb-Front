@@ -1,6 +1,7 @@
 import { releaseHoverHighlight, useHoverhighlight } from "@ogw_front/composables/hover_highlight";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
+import { viewModelId } from "@ogw_front/utils/treeview";
 
 // Hovering a model tree header shows its model in the viewer and its row in the objects tree
 export function useModelHeaderHover(): {
@@ -32,7 +33,7 @@ export function useModelHeaderHover(): {
 
   // A view closed under the cursor never gets its mouseleave: release what its hover started
   watch(
-    () => treeviewStore.opened_views.map((view) => view.id),
+    () => treeviewStore.opened_views.map((view) => viewModelId(view)),
     (newIds, oldIds) => {
       for (const viewId of oldIds) {
         if (!newIds.includes(viewId)) {

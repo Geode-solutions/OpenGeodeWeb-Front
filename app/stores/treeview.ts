@@ -18,7 +18,11 @@ import { consola } from "consola";
 // Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
 // oxlint-disable eslint/sort-imports, eslint/max-lines
 import { defineStore } from "pinia";
-import { nextModelTreeColor } from "@ogw_front/utils/treeview";
+import {
+  nextModelTreeColor,
+  physicalPropertiesViewId,
+  viewModelId,
+} from "@ogw_front/utils/treeview";
 import { treeviewConfigDb } from "@ogw_internal/database/database";
 
 const PANEL_WIDTH = 300;
@@ -67,7 +71,7 @@ interface ReadonlyTreeviewSnapshot {
 function withModelTreeColors(views: OpenedView[]): OpenedView[] {
   const used: (string | undefined)[] = views.map((view) => view.color);
   for (const view of views) {
-    if (view.type === "component" && view.color === undefined) {
+    if (view.type !== "object" && view.color === undefined) {
       view.color = nextModelTreeColor(used);
       used.push(view.color);
     }
@@ -279,25 +283,63 @@ export const useTreeviewStore = defineStore("treeview", () => {
     }
   }
 
+  // The color of an opened tree, undefined while it is closed
+  function viewColor(viewId: string): string | undefined {
+    return opened_views.value.find((view: ReadonlyOpenedView) => view.id === viewId)?.color;
+  }
+
+  // The trees of a model share its color: the one of its opened trees (model tree, physical properties)
+  function openedModelColor(modelId: string): string | undefined {
+    return opened_views.value.find(
+      (view: ReadonlyOpenedView) => view.type !== "object" && viewModelId(view) === modelId,
+    )?.color;
+  }
+
+  // Opens a tree of a model next to the objects tree, or closes it when already opened
+  function toggleModelView(view: Omit<OpenedView, "scrollTop" | "opened" | "color">): void {
+    const index = opened_views.value.findIndex(
+      (openedView: ReadonlyOpenedView) => openedView.id === view.id,
+    );
+    if (index !== -1) {
+      closeView(view.id);
+      return;
+    }
+    additionalPanelWidth.value = panelWidth.value;
+    opened_views.value.push({
+      ...view,
+      scrollTop: 0,
+      opened: [],
+      color:
+        openedModelColor(viewModelId(view)) ??
+        nextModelTreeColor(opened_views.value.map((openedView) => openedView.color)),
+    });
+  }
+
   function displayAdditionalTree(
     id: string,
     title: string | undefined,
     geodeObjectType: GeodeObjectType,
   ): void {
-    const index = opened_views.value.findIndex((view: ReadonlyOpenedView) => view.id === id);
-    if (index !== -1) {
-      closeView(id);
-      return;
-    }
-    additionalPanelWidth.value = panelWidth.value;
-    opened_views.value.push({
+    toggleModelView({
       type: "component",
       id,
       title: title ?? id,
       geode_object_type: geodeObjectType,
-      scrollTop: 0,
-      opened: [],
-      color: nextModelTreeColor(opened_views.value.map((view) => view.color)),
+    });
+  }
+
+  // The physical properties of a model, in their own tree
+  function displayPhysicalPropertiesTree(
+    modelId: string,
+    title: string | undefined,
+    geodeObjectType: GeodeObjectType | undefined,
+  ): void {
+    toggleModelView({
+      type: "physical_properties",
+      id: physicalPropertiesViewId(modelId),
+      model_id: modelId,
+      title: title ?? modelId,
+      geode_object_type: geodeObjectType,
     });
   }
 
@@ -315,7 +357,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
 
   function setAllCollapsed(collapsed: boolean): void {
     for (const view of opened_views.value) {
-      if (view.type === "component") {
+      if (view.type !== "object") {
         view.collapsed = collapsed;
       }
     }
@@ -433,11 +475,10 @@ export const useTreeviewStore = defineStore("treeview", () => {
         break;
       }
     }
-    const view = opened_views.value.find(
-      (openedView: ReadonlyOpenedView) => openedView.id === dataId,
-    );
-    if (view) {
-      view.title = newName;
+    for (const view of opened_views.value) {
+      if (view.type !== "object" && viewModelId(view) === dataId) {
+        view.title = newName;
+      }
     }
   }
 
@@ -452,6 +493,8 @@ export const useTreeviewStore = defineStore("treeview", () => {
     pendingImports,
     rowHeights,
     hoveredModelId,
+    openedModelColor,
+    viewColor,
     setHoveredModel,
     addItem,
     whilePendingImport,
@@ -459,6 +502,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     removeItem,
     renameItem,
     displayAdditionalTree,
+    displayPhysicalPropertiesTree,
     closeView,
     toggleView,
     setCollapsed,

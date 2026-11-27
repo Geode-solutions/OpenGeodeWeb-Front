@@ -24,6 +24,11 @@ import {
   useDataItems,
 } from "@ogw_internal/stores/data/items";
 import {
+  addPhysicalProperties,
+  getPhysicalProperties,
+  refPhysicalProperties,
+} from "@ogw_internal/stores/data/model/physical_properties";
+import {
   fetchAllCollectionComponents,
   formatedCollectionComponents,
   getAllCollectionComponents,
@@ -105,6 +110,9 @@ export const useDataStore = defineStore("data", () => {
     refFormatedCollectionComponents,
     getComponentRelations,
     fetchAllComponentRelations,
+    addPhysicalProperties,
+    getPhysicalProperties,
+    refPhysicalProperties,
   };
 });
 
