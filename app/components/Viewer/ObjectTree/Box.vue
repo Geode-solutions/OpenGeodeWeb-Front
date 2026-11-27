@@ -104,7 +104,7 @@ watch(
     ref="treeview-box"
     variant="outlined"
     class="tree-box d-flex flex-column"
-    :class="{ 'is-highlighted': accent?.highlighted }"
+    :class="{ 'is-highlighted': accent?.highlighted, 'has-accent': accent !== undefined }"
     :style="[
       adaptiveStyles,
       { borderRadius, borderLeft: borderLeft ? undefined : 'none' },
@@ -191,10 +191,21 @@ watch(
   content: "";
   position: absolute;
   inset: 0;
-  /* Adaptive glass: apps can tint it (an "r, g, b" triplet) and change its blending, per theme */
-  background: rgba(var(--ogw-viewer-glass-tint, 255, 255, 255), var(--adaptive-opacity));
-  backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
-  -webkit-backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
+  /* Adaptive glass: apps can tint it (an "r, g, b" triplet), change its blending and set a minimum opacity, per
+     theme (the radial menu's one) */
+  background: rgba(
+    var(--ogw-viewer-glass-tint, 255, 255, 255),
+    max(var(--adaptive-opacity), var(--ogw-viewer-glass-min-opacity, 0))
+  );
+  /* Apps can replace the adaptive blur and dimming of the backdrop, "none" keeps it sharp */
+  backdrop-filter: var(
+    --ogw-viewer-glass-backdrop,
+    blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness))
+  );
+  -webkit-backdrop-filter: var(
+    --ogw-viewer-glass-backdrop,
+    blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness))
+  );
   mix-blend-mode: var(--ogw-viewer-glass-blend, lighten);
   z-index: 0;
   pointer-events: none;
@@ -207,6 +218,17 @@ watch(
 .tree-box > * {
   position: relative;
   z-index: 1;
+}
+
+/* Left gutter of the panel content, read by the header, the toolbar and the rows so they keep one column. A model
+   tree leaves its accent that room, so the rounded toolbar and row highlights do not slide under it; apps can give
+   every panel a gutter, so all the trees line up */
+.tree-box {
+  --tree-box-content-inset: var(--ogw-viewer-panel-gutter, 0px);
+}
+
+.tree-box.has-accent {
+  --tree-box-content-inset: max(6px, var(--ogw-viewer-panel-gutter, 0px));
 }
 
 .tree-box-accent {
@@ -234,6 +256,9 @@ watch(
 .tree-box-header {
   height: 32px !important;
   padding: 0 var(--ogw-viewer-panel-padding, 10px) !important;
+  padding-left: calc(
+    var(--ogw-viewer-panel-padding, 10px) + var(--tree-box-content-inset, 0px)
+  ) !important;
   background-color: rgba(var(--v-theme-surface), 0.05);
   border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.05);
   flex-shrink: 0;

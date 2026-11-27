@@ -9,6 +9,8 @@ interface OpenedView extends Partial<GeodeObjectTyped> {
   opened: string[];
   // Ties a model tree to its row in the objects tree
   color?: string;
+  // A model tree reduced to its button in the activity bar: still open, with its state kept
+  collapsed?: boolean;
 }
 
 interface TreeviewConfigRecord {

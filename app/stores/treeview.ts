@@ -301,12 +301,35 @@ export const useTreeviewStore = defineStore("treeview", () => {
     });
   }
 
+  function setCollapsed(id: string, collapsed: boolean): void {
+    const existing = opened_views.value.find((view: ReadonlyOpenedView) => view.id === id);
+    if (existing) {
+      existing.collapsed = collapsed;
+    }
+  }
+
+  function toggleCollapsed(id: string): void {
+    const existing = opened_views.value.find((view: ReadonlyOpenedView) => view.id === id);
+    setCollapsed(id, existing?.collapsed !== true);
+  }
+
+  function setAllCollapsed(collapsed: boolean): void {
+    for (const view of opened_views.value) {
+      if (view.type === "component") {
+        view.collapsed = collapsed;
+      }
+    }
+  }
+
   function setHoveredModel(id: string | undefined): void {
     hoveredModelId.value = id;
   }
 
+  // The objects tree keeps its place, first: only the model trees move
   function moveView(from_index: number, to_index: number): void {
-    if (from_index !== 0 && to_index !== 0) {
+    const moved = opened_views.value[from_index];
+    const target = opened_views.value[to_index];
+    if (moved && target && moved.id !== "main" && target.id !== "main") {
       const [element] = opened_views.value.splice(from_index, 1);
       if (element) {
         opened_views.value.splice(to_index, 0, element);
@@ -438,6 +461,9 @@ export const useTreeviewStore = defineStore("treeview", () => {
     displayAdditionalTree,
     closeView,
     toggleView,
+    setCollapsed,
+    toggleCollapsed,
+    setAllCollapsed,
     moveView,
     importStores,
     displayFileTree,

@@ -7,6 +7,7 @@ import { expect } from "@playwright/test";
 import {
   checkFilterCategory,
   copyTreeRowId,
+  expandGeodeObjectTypeInTree,
   fillSearchQuery,
   getTreeRowId,
   hideObjectInTree,
@@ -88,6 +89,8 @@ function registerTests({ test, loadTestDatas }: SuiteRuntime): void {
 
   test("search by id", async ({ window, screenshotMask }) => {
     const mainObjectTree = getMainObjectTree(window);
+    // Clearing the search folded the groups back as they were before it
+    await expandGeodeObjectTypeInTree(window, brepGeodeObjectType, mainObjectTree);
     const brepLabel = mainObjectTree
       .locator('[data-testid^="treeRow-"]', { hasText: "test" })
       .first();
