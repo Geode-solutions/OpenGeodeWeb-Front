@@ -1,8 +1,15 @@
+import type {
+  AttributeItem,
+  AttributeName,
+  AttributeRangeMaximum,
+  AttributeRangeMinimum,
+} from "@geode/opengeodeweb-viewer/schema_types";
+import type { FilterFactor, Index } from "@ogw_front/types/ui";
 import type { JsonRpcSchema, ParamsOf, ResponseOf } from "@ogw_shared/utils/types.js";
+import type { SliceLayer, SliceMaxLayers } from "@ogw_front/composables/clipping_slices";
 import viewer_schemas, {
   type ViewerClippingPlanesParams,
 } from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
-import type { AttributeName } from "@geode/opengeodeweb-viewer/schema_types";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { SliceAxis } from "@ogw_front/utils/slice";
 import { useHybridViewerCore } from "./core";
@@ -23,7 +30,7 @@ async function requestAndRender<Schema extends JsonRpcSchema>(
 }
 
 async function setClippingPlanes(
-  ids: string[],
+  ids: DataId[],
   planes: ViewerClippingPlanesParams["planes"],
 ): Promise<void> {
   await requestAndRender(viewer_schemas.opengeodeweb_viewer.viewer.clipping_planes, {
@@ -31,22 +38,22 @@ async function setClippingPlanes(
     planes,
   });
 }
-async function setShrink(ids: string[], shrink_factor: number): Promise<void> {
+async function setShrink(ids: DataId[], shrink_factor: FilterFactor): Promise<void> {
   await requestAndRender(viewer_schemas.opengeodeweb_viewer.viewer.shrink, {
     ids,
     shrink_factor,
   });
 }
-async function setExplode(ids: string[], explode_factor: number): Promise<void> {
+async function setExplode(ids: DataId[], explode_factor: FilterFactor): Promise<void> {
   await requestAndRender(viewer_schemas.opengeodeweb_viewer.viewer.explode, {
     ids,
     explode_factor,
   });
 }
 async function setSlice(
-  ids: string[],
-  slices: { axis: SliceAxis; index: number }[],
-): Promise<[number, number, number]> {
+  ids: DataId[],
+  slices: { axis: SliceAxis; index: SliceLayer }[],
+): Promise<SliceMaxLayers> {
   const {
     max_indices: [max_i = 0, max_j = 0, max_k = 0],
   } = await requestAndRender(viewer_schemas.opengeodeweb_viewer.viewer.slice, {
@@ -55,23 +62,29 @@ async function setSlice(
   });
   return [max_i, max_j, max_k];
 }
+// A threshold of a data, by the id the filters store gives it
+type ThresholdId = number;
+
+// The position of a threshold in the list of thresholds of its data
+type ThresholdIndex = number;
+
 interface ThresholdAttribute {
-  name: string;
+  name: AttributeName;
   location: "point" | "cell";
-  item: number;
-  minimum: number;
-  maximum: number;
+  item: AttributeItem;
+  minimum: AttributeRangeMinimum;
+  maximum: AttributeRangeMaximum;
 }
 interface Threshold {
-  id: number;
-  sourceIndex: number | undefined;
+  id: ThresholdId;
+  sourceIndex: Index | undefined;
   attributeName: AttributeName | undefined;
-  item: number;
-  minimum: number | undefined;
-  maximum: number | undefined;
+  item: AttributeItem;
+  minimum: AttributeRangeMinimum | undefined;
+  maximum: AttributeRangeMaximum | undefined;
   thresholdAttribute: ThresholdAttribute | undefined;
 }
-async function setThreshold(ids: string[], attributes: ThresholdAttribute[]): Promise<void> {
+async function setThreshold(ids: DataId[], attributes: ThresholdAttribute[]): Promise<void> {
   await requestAndRender(viewer_schemas.opengeodeweb_viewer.viewer.threshold, {
     ids,
     attributes,
@@ -85,10 +98,10 @@ function useHybridViewerFilters(): {
   setThreshold: typeof setThreshold;
   getThresholds: (dataId: DataId) => Threshold[];
   addThreshold: (dataId: DataId) => void;
-  removeThreshold: (dataId: DataId, index: number) => void;
+  removeThreshold: (dataId: DataId, index: ThresholdIndex) => void;
   removeThresholds: (dataId: DataId) => void;
 } {
-  const thresholds = reactive<Record<string, Threshold[]>>({});
+  const thresholds = reactive<Record<DataId, Threshold[]>>({});
   let lastThresholdId = 0;
 
   function getThresholds(dataId: DataId): Threshold[] {
@@ -109,7 +122,7 @@ function useHybridViewerFilters(): {
     });
   }
 
-  function removeThreshold(dataId: DataId, index: number): void {
+  function removeThreshold(dataId: DataId, index: ThresholdIndex): void {
     thresholds[dataId]?.splice(index, 1);
   }
 
@@ -130,4 +143,4 @@ function useHybridViewerFilters(): {
   };
 }
 export { useHybridViewerFilters };
-export type { Threshold, ThresholdAttribute };
+export type { Threshold, ThresholdAttribute, ThresholdId, ThresholdIndex };

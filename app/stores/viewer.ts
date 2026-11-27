@@ -1,12 +1,15 @@
 // Third party imports
 // oxlint-disable-next-line no-unassigned-import
 import "@kitware/vtk.js/Rendering/OpenGL/Profiles/Geometry";
+import type { Coordinate } from "@ogw_front/types/geometry";
+import type { Pixels } from "@ogw_front/types/ui";
 import type { Vector3 } from "@kitware/vtk.js/types";
 import { connectImageStream } from "@kitware/vtk.js/Rendering/Misc/RemoteView";
 import { initWebSocketClient } from "@ogw_internal/utils/ws_client";
 import opengeodeweb_viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
+import { type LaunchArgs, useInfraStore } from "@ogw_front/stores/infra";
 import { type ViewerRequestArgs, callViewer } from "./viewer_helpers/request.js";
 import {
   getWebsocketApiPort,
@@ -21,20 +24,19 @@ import {
 import { useMicroserviceVersion, useRequestCounter } from "@ogw_internal/stores/microservice";
 import { Status } from "@ogw_front/utils/status";
 import { afterViewerReset } from "@ogw_front/composables/viewer_reset";
-import { useInfraStore } from "@ogw_front/stores/infra";
 
 import type { JsonRpcSchema, RequestHandlers, ResponseOf } from "@ogw_shared/utils/types.js";
 import type { RpcClient } from "@ogw_shared/utils/call_raw.js";
 
 interface ViewSize {
-  width: number;
-  height: number;
+  width: Pixels;
+  height: Pixels;
 }
 
 interface PickedPoint {
-  x: number | undefined;
-  y: number | undefined;
-  z: number | undefined;
+  x: Coordinate | undefined;
+  y: Coordinate | undefined;
+  z: Coordinate | undefined;
 }
 
 export const useViewerStore = defineStore(
@@ -71,7 +73,7 @@ export const useViewerStore = defineStore(
     function toggle_picking_mode(value: boolean): void {
       picking_mode.value = value;
     }
-    function set_view_size(width: number, height: number): void {
+    function set_view_size(width: Pixels, height: Pixels): void {
       view_size.value = { width, height };
     }
     // oxlint-disable-next-line unicorn/consistent-function-scoping
@@ -89,11 +91,11 @@ export const useViewerStore = defineStore(
       const result = await callViewer(microservice, args, callbacks);
       return result;
     }
-    async function pick_world_position(x: number, y: number): Promise<Vector3> {
+    async function pick_world_position(x: Coordinate, y: Coordinate): Promise<Vector3> {
       const position = await pickWorldPosition(request, x, y);
       return position;
     }
-    async function set_picked_point(x: number, y: number): Promise<void> {
+    async function set_picked_point(x: Coordinate, y: Coordinate): Promise<void> {
       const [world_x, world_y, world_z] = await pick_world_position(x, y);
       picked_point.value = { x: world_x, y: world_y, z: world_z };
     }
@@ -135,7 +137,7 @@ export const useViewerStore = defineStore(
         }
       });
     }
-    async function launch(args: Readonly<{ projectFolderPath: string }>): Promise<unknown> {
+    async function launch(args: Readonly<LaunchArgs>): Promise<unknown> {
       const result = await launchViewerMicroservice(args, (new_port) => {
         default_local_port.value = new_port;
       });

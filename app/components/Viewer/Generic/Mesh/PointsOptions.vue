@@ -3,6 +3,7 @@ import type {
   AttributeColorMap,
   AttributeRange,
   AttributeTimeStep,
+  ColoringType,
 } from "@ogw_front/types/attribute";
 import type {
   AttributeItem,
@@ -12,12 +13,12 @@ import type {
   PointSize,
   Visibility,
 } from "@geode/opengeodeweb-viewer/schema_types";
+import type { ImageSource, MenuItemIndex, Tooltip } from "@ogw_front/types/ui";
 import {
   type RangesPerData,
   applyRangesPerData,
   useBatchStyle,
 } from "@ogw_front/composables/batch_style";
-import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
@@ -26,16 +27,16 @@ import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
+interface Props {
+  dataId: MeshId;
+  index: MenuItemIndex;
+  btnImage: ImageSource;
+  tooltip?: Tooltip;
+}
+
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const { applyBatchStyle } = useBatchStyle();
-
-interface Props {
-  dataId: DataId;
-  index: number;
-  btnImage: string;
-  tooltip?: string;
-}
 
 const { dataId, index, btnImage, tooltip = "Points options" } = defineProps<Props>();
 
@@ -57,7 +58,7 @@ const size = computed<PointSize>({
     hybridViewerStore.remoteRender();
   },
 });
-const coloring_style_key = computed<string>({
+const coloringStyleKey = computed<ColoringType>({
   get: () => dataStyleStore.meshPointsActiveColoring(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>
@@ -137,7 +138,7 @@ const vertex_attribute_range = computed<AttributeRange>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_color_map = computed<AttributeColorMap | undefined>({
+const vertex_attribute_color_map = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => dataStyleStore.meshPointsVertexAttributeColorMap(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>
@@ -185,7 +186,7 @@ async function setVertexAttributeRangesPerData(ranges: RangesPerData): Promise<v
         <ViewerOptionsSizeSlider data-testid="meshPointsSizeSlider" v-model="size" />
         <ViewerOptionsColoringTypeSelector
           :data-id="dataId"
-          v-model:coloring_style_key="coloring_style_key"
+          v-model:coloring_style_key="coloringStyleKey"
           v-model:color="color"
           v-model:opacity="opacity"
           v-model:vertex_attribute_name="vertex_attribute_name"

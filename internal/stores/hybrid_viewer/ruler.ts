@@ -1,3 +1,4 @@
+import type { Coordinate, Coordinates } from "@ogw_front/types/geometry";
 import viewer_schemas, {
   type PickedFieldType,
 } from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
@@ -14,19 +15,19 @@ interface RulerHoverState {
 function useHybridViewerRuler(): {
   is_ruler_active: Ref<boolean>;
   ruler_snap: Ref<boolean>;
-  ruler_point1: Ref<number[] | undefined>;
-  ruler_point2: Ref<number[] | undefined>;
+  ruler_point1: Ref<Coordinates | undefined>;
+  ruler_point2: Ref<Coordinates | undefined>;
   ruler_distance: Ref<number | undefined>;
   ruler_awaiting_point: Ref<number>;
-  handleRulerClick: (x: number, y: number) => Promise<void>;
+  handleRulerClick: (x: Coordinate, y: Coordinate) => Promise<void>;
   applyRuler: () => Promise<void>;
   clearRuler: () => Promise<void>;
   deactivateRuler: () => void;
 } {
   const is_ruler_active = ref(false);
   const ruler_snap = ref(false);
-  const ruler_point1 = ref<number[] | undefined>(undefined);
-  const ruler_point2 = ref<number[] | undefined>(undefined);
+  const ruler_point1 = ref<Coordinates | undefined>(undefined);
+  const ruler_point2 = ref<Coordinates | undefined>(undefined);
   const ruler_distance = ref<number | undefined>(undefined);
   const ruler_awaiting_point = ref(1);
   // Hover highlight state overridden by the snap, restored when snapping stops. Without snap the ruler leaves the hover highlight untouched.
@@ -71,10 +72,10 @@ function useHybridViewerRuler(): {
     await remoteRender();
   }
 
-  async function handleRulerClick(x: number, y: number): Promise<void> {
+  async function handleRulerClick(x: Coordinate, y: Coordinate): Promise<void> {
     const { hybridDb } = useHybridViewerScene();
     const viewerStore = useViewerStore();
-    let coords: number[] | undefined = undefined;
+    let coords: Coordinates | undefined = undefined;
     if (ruler_snap.value) {
       const schema = viewer_schemas.opengeodeweb_viewer.viewer.highlight;
       const params = {

@@ -1,13 +1,13 @@
 <script setup lang="ts">
+import { type VuetifyThemeName, useChromeTheme } from "@ogw_front/composables/chrome_theme";
 import { computed, useAttrs } from "vue";
 import { onKeyStroke } from "@vueuse/core";
-import { useChromeTheme } from "@ogw_front/composables/chrome_theme";
 
 interface Props {
   variant?: "panel" | "ui";
   rounded?: string;
   padding?: string;
-  theme?: string;
+  theme?: VuetifyThemeName;
   escapeFunction?: () => void;
 }
 

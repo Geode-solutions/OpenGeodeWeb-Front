@@ -1,24 +1,25 @@
 import { type ComputedRef, type Ref, computed, ref, watch } from "vue";
 import { type MenuViewerObjectType, useMenuStore } from "@ogw_front/stores/menu";
-import type { ModelId, ModelIdentified } from "@ogw_front/types/identifiers";
+import type { ModelComponentId, ModelId, ModelIdentified } from "@ogw_front/types/identifiers";
 import type { CollectionComponent } from "@ogw_internal/stores/data/model/collections";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
+import type { ModelComponentType } from "@ogw_front/types/model";
 import { useDataStore } from "@ogw_front/stores/data";
 
 interface ModelMenuMetaData extends Partial<ModelIdentified> {
   viewer_object_type?: MenuViewerObjectType;
-  pickedComponentId?: string;
-  modelComponentType?: string;
-  targetComponentIds?: string[];
+  pickedComponentId?: ModelComponentId;
+  modelComponentType?: ModelComponentType;
+  targetComponentIds?: ModelComponentId[];
 }
 
 interface ModelMenuContext {
   modelId: ComputedRef<ModelId>;
-  componentId: ComputedRef<string | undefined>;
-  componentType: Ref<string | undefined>;
+  componentId: ComputedRef<ModelComponentId | undefined>;
+  componentType: Ref<ModelComponentType | undefined>;
   collections: Ref<CollectionComponent[] | undefined>;
-  targetComponentIds: Ref<string[]>;
+  targetComponentIds: Ref<ModelComponentId[]>;
 }
 
 // Resolves what a model context menu targets: the whole model, a component type, a collection or one component
@@ -29,9 +30,11 @@ function useModelMenuContext(getDataId: () => DataId): ModelMenuContext {
   // oxlint-disable-next-line no-unsafe-type-assertion -- meta_data is filled by the viewer context menu with these keys.
   const metaData = computed(() => menuStore.current_meta_data as ModelMenuMetaData);
 
-  const modelId = computed<string>(() => metaData.value.modelId ?? getDataId());
-  const componentId = computed<string | undefined>(() => metaData.value.pickedComponentId);
-  const componentType = ref<string | undefined>(undefined);
+  const modelId = computed<ModelId>(() => metaData.value.modelId ?? getDataId());
+  const componentId = computed<ModelComponentId | undefined>(
+    () => metaData.value.pickedComponentId,
+  );
+  const componentType = ref<ModelComponentType | undefined>(undefined);
   const collections = ref<CollectionComponent[] | undefined>(undefined);
 
   // A function so the check after an await is not narrowed by the one before it
@@ -76,7 +79,7 @@ function useModelMenuContext(getDataId: () => DataId): ModelMenuContext {
     { immediate: true },
   );
 
-  const targetComponentIds = ref<string[]>([]);
+  const targetComponentIds = ref<ModelComponentId[]>([]);
   watch(
     () => [modelId.value, componentType.value, metaData.value.targetComponentIds],
     async () => {

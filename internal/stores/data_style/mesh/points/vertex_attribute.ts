@@ -29,7 +29,7 @@ interface UseMeshPointsVertexAttributeStyleReturn {
   meshPointsVertexAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
   ) => AttributeStoredConfig;
   setMeshPointsVertexAttribute: (meshId: MeshId, input: ValidAttributeInput) => Promise<unknown>;
   setMeshPointsVertexAttributeName: (meshId: MeshId, name: AttributeName) => Promise<unknown>;
@@ -41,7 +41,7 @@ interface UseMeshPointsVertexAttributeStyleReturn {
   ) => Promise<unknown>;
   setMeshPointsVertexAttributeColorMap: (
     meshId: MeshId,
-    colorMap: AttributeColorMap | undefined,
+    colorMap: AttributeColorMap,
   ) => Promise<unknown>;
   meshPointsVertexAttributeNoDataColor: (meshId: MeshId) => ColorRGBA;
   setMeshPointsVertexAttributeNoDataColor: (

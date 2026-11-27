@@ -5,6 +5,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed
 // Local imports
 import { beforeAllTimeout, setupIntegrationTests } from "@ogw_tests/integration/setup";
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
+import { assertNonEmpty } from "@ogw_tests/utils";
 import { cleanupBackend } from "@ogw_server/utils/cleanup";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -37,13 +38,13 @@ describe("model time series", () => {
     const dataStyleStore = useDataStyleStore();
     const viewerStore = useViewerStore();
     const dataStore = useDataStore();
-    const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-    const surface_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, surface_ids);
+    const surfaceIds = assertNonEmpty(await dataStore.getSurfacesGeodeIds(id));
+    const surface_viewer_ids = await dataStore.getMeshComponentsViewerIds(id, surfaceIds);
     const spy = vi.spyOn(viewerStore, "request");
-    await dataStyleStore.setModelSurfacesPolygonAttribute(id, surface_ids, temperature);
+    await dataStyleStore.setModelSurfacesPolygonAttribute(id, surfaceIds, temperature);
     await dataStyleStore.setModelSurfacesPolygonAttributeTimeStep(
       id,
-      surface_ids,
+      surfaceIds,
       SURFACES_TIME_STEP,
     );
     const params = {
@@ -63,11 +64,11 @@ describe("model time series", () => {
     const dataStyleStore = useDataStyleStore();
     const dataStore = useDataStore();
     const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-    const line_ids = await dataStore.getLinesGeodeIds(id);
-    await dataStyleStore.setModelLinesEdgeAttribute(id, line_ids, temperature);
-    expect(dataStyleStore.modelLinesEdgeAttributeTimeStep(id, line_ids[0])).toBeUndefined();
-    await dataStyleStore.setModelLinesEdgeAttributeTimeStep(id, line_ids, LINES_TIME_STEP);
-    expect(dataStyleStore.modelLinesEdgeAttributeTimeStep(id, line_ids[0])).toBe(LINES_TIME_STEP);
+    const lineIds = assertNonEmpty(await dataStore.getLinesGeodeIds(id));
+    await dataStyleStore.setModelLinesEdgeAttribute(id, lineIds, temperature);
+    expect(dataStyleStore.modelLinesEdgeAttributeTimeStep(id, lineIds[0])).toBeUndefined();
+    await dataStyleStore.setModelLinesEdgeAttributeTimeStep(id, lineIds, LINES_TIME_STEP);
+    expect(dataStyleStore.modelLinesEdgeAttributeTimeStep(id, lineIds[0])).toBe(LINES_TIME_STEP);
     expect(dataStyleStore.modelSurfacesPolygonAttributeTimeStep(id, surface_ids[0])).toBe(
       SURFACES_TIME_STEP,
     );

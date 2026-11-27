@@ -5,12 +5,12 @@ import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 export function useMeshPolyhedraCommonStyle(): {
   meshPolyhedraStyle: (meshId: MeshId) => StyleValues;
   meshPolyhedraColoring: (meshId: MeshId) => StyleValues;
-  mutateMeshPolyhedraStyle: (meshId: MeshId, values: StyleValues) => Promise<string>;
-  mutateMeshPolyhedraColoring: (meshId: MeshId, values: StyleValues) => Promise<string>;
+  mutateMeshPolyhedraStyle: (meshId: MeshId, values: StyleValues) => Promise<MeshId>;
+  mutateMeshPolyhedraColoring: (meshId: MeshId, values: StyleValues) => Promise<MeshId>;
 } {
   const dataStyleState = useDataStyleState();
 
-  async function mutateMeshPolyhedraStyle(meshId: MeshId, values: StyleValues): Promise<string> {
+  async function mutateMeshPolyhedraStyle(meshId: MeshId, values: StyleValues): Promise<MeshId> {
     const result = await dataStyleState.mutateStyle(meshId, {
       polyhedra: values,
     });
@@ -26,7 +26,7 @@ export function useMeshPolyhedraCommonStyle(): {
     return meshPolyhedraStyle(meshId).coloring as StyleValues;
   }
 
-  async function mutateMeshPolyhedraColoring(meshId: MeshId, values: StyleValues): Promise<string> {
+  async function mutateMeshPolyhedraColoring(meshId: MeshId, values: StyleValues): Promise<MeshId> {
     const result = await mutateMeshPolyhedraStyle(meshId, {
       coloring: values,
     });

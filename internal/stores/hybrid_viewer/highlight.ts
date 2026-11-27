@@ -4,6 +4,8 @@ import viewer_schemas, {
   type PickedFieldType,
   type ViewerHighlightResponse,
 } from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
+import type { Coordinate } from "@ogw_front/types/geometry";
+import type { DataName } from "@ogw_front/types/data";
 import type { GeodeId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { ModelId } from "@ogw_front/types/identifiers";
 import { dataDb } from "@ogw_internal/database/database.js";
@@ -12,7 +14,7 @@ import { useHybridViewerCore } from "./core";
 import { useHybridViewerScene } from "./scene";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
-async function lookupModelName(modelId: ModelId): Promise<string | undefined> {
+async function lookupModelName(modelId: ModelId): Promise<DataName | undefined> {
   const modelRecord = await dataDb().get(modelId);
   return modelRecord?.name;
 }
@@ -94,7 +96,7 @@ const useHybridViewerHighlight = createSharedComposable(() => {
 
   async function handleHoverResponse(
     response: ViewerHighlightResponse,
-    relativeMousePosition: { x: number; y: number },
+    relativeMousePosition: { x: Coordinate; y: Coordinate },
   ): Promise<void> {
     if (
       !is_hover_highlight.value ||

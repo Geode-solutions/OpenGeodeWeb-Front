@@ -29,7 +29,7 @@ interface UseMeshEdgesEdgeAttributeStyleReturn {
   meshEdgesEdgeAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
   ) => AttributeStoredConfig;
   setMeshEdgesEdgeAttribute: (meshId: MeshId, input: ValidAttributeInput) => Promise<unknown>;
   setMeshEdgesEdgeAttributeName: (meshId: MeshId, name: AttributeName) => Promise<unknown>;
@@ -41,7 +41,7 @@ interface UseMeshEdgesEdgeAttributeStyleReturn {
   ) => Promise<unknown>;
   setMeshEdgesEdgeAttributeColorMap: (
     meshId: MeshId,
-    colorMap: AttributeColorMap | undefined,
+    colorMap: AttributeColorMap,
   ) => Promise<unknown>;
   meshEdgesEdgeAttributeNoDataColor: (meshId: MeshId) => ColorRGBA;
   setMeshEdgesEdgeAttributeNoDataColor: (

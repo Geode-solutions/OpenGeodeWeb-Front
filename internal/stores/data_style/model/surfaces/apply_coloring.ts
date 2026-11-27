@@ -1,5 +1,5 @@
 import type { AttributeGroup, ColorGroup } from "./coloring_groups";
-import type { ModelId } from "@ogw_front/types/identifiers";
+import type { ModelId, SurfaceId } from "@ogw_front/types/identifiers";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import type { useModelSurfacesColor } from "./color";
 import type { useModelSurfacesPolygonAttribute } from "./polygon";
@@ -11,48 +11,47 @@ type PolygonAttributeStyle = ReturnType<typeof useModelSurfacesPolygonAttribute>
 
 function applyModelSurfacesConstantColoring(
   modelId: ModelId,
-  type_surfaces_ids: string[],
+  typeSurfacesIds: SurfaceId[],
   modelColorStyle: ColorStyle,
 ): Promise<unknown>[] {
   const colorGroups: Record<string, ColorGroup> = {};
-  for (const surfaces_id of type_surfaces_ids) {
-    const color = modelColorStyle.modelSurfaceColor(modelId, surfaces_id);
+  for (const surfaceId of typeSurfacesIds) {
+    const color = modelColorStyle.modelSurfaceColor(modelId, surfaceId);
     const color_key = JSON.stringify(color);
-    colorGroups[color_key] ??= { color, surfaces_ids: [] };
-    colorGroups[color_key].surfaces_ids.push(surfaces_id);
+    colorGroups[color_key] ??= { color, surfaceIds: [] };
+    colorGroups[color_key].surfaceIds.push(surfaceId);
   }
-  return Object.values(colorGroups).map(async ({ color, surfaces_ids: ids }) => {
-    const result = await modelColorStyle.setModelSurfacesColor(modelId, ids, color, "constant");
+  return Object.values(colorGroups).map(async ({ color, surfaceIds }) => {
+    const result = await modelColorStyle.setModelSurfacesColor(
+      modelId,
+      surfaceIds,
+      color,
+      "constant",
+    );
     return result;
   });
 }
 
 function groupModelSurfacesVertexAttributes(
   modelId: ModelId,
-  type_surfaces_ids: string[],
+  typeSurfacesIds: SurfaceId[],
   modelSurfacesVertexAttribute: VertexAttributeStyle,
 ): Record<string, AttributeGroup> {
   const vertexGroups: Record<string, AttributeGroup> = {};
-  for (const surfaces_id of type_surfaces_ids) {
-    const name = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeName(
-      modelId,
-      surfaces_id,
-    );
-    const item = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeItem(
-      modelId,
-      surfaces_id,
-    );
+  for (const surfaceId of typeSurfacesIds) {
+    const name = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeName(modelId, surfaceId);
+    const item = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeItem(modelId, surfaceId);
     const [minimum, maximum] = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeRange(
       modelId,
-      surfaces_id,
+      surfaceId,
     );
     const colorMap = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeColorMap(
       modelId,
-      surfaces_id,
+      surfaceId,
     );
     const no_data_color = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeNoDataColor(
       modelId,
-      surfaces_id,
+      surfaceId,
     );
     const attribute = {
       name,
@@ -66,27 +65,31 @@ function groupModelSurfacesVertexAttributes(
       continue;
     }
     const key = [name, item, colorMap, minimum, maximum, JSON.stringify(no_data_color)].join("_");
-    vertexGroups[key] ??= { ...attribute, surfaces_ids: [] };
-    vertexGroups[key].surfaces_ids.push(surfaces_id);
+    const group = vertexGroups[key];
+    if (group === undefined) {
+      vertexGroups[key] = { ...attribute, surfaceIds: [surfaceId] };
+    } else {
+      group.surfaceIds.push(surfaceId);
+    }
   }
   return vertexGroups;
 }
 
 function applyModelSurfacesVertexColoring(
   modelId: ModelId,
-  type_surfaces_ids: string[],
+  typeSurfacesIds: SurfaceId[],
   modelSurfacesVertexAttribute: VertexAttributeStyle,
 ): Promise<unknown>[] {
   const vertexGroups = groupModelSurfacesVertexAttributes(
     modelId,
-    type_surfaces_ids,
+    typeSurfacesIds,
     modelSurfacesVertexAttribute,
   );
   return Object.values(vertexGroups).map(
-    async ({ name, item, minimum, maximum, colorMap, no_data_color, surfaces_ids: ids }) => {
+    async ({ name, item, minimum, maximum, colorMap, no_data_color, surfaceIds }) => {
       const result = await modelSurfacesVertexAttribute.setModelSurfacesVertexAttribute(
         modelId,
-        ids,
+        surfaceIds,
         {
           name,
           item,
@@ -103,30 +106,30 @@ function applyModelSurfacesVertexColoring(
 
 function groupModelSurfacesPolygonAttributes(
   modelId: ModelId,
-  type_surfaces_ids: string[],
+  typeSurfacesIds: SurfaceId[],
   modelSurfacesPolygonAttribute: PolygonAttributeStyle,
 ): Record<string, AttributeGroup> {
   const polygonGroups: Record<string, AttributeGroup> = {};
-  for (const surfaces_id of type_surfaces_ids) {
+  for (const surfaceId of typeSurfacesIds) {
     const name = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeName(
       modelId,
-      surfaces_id,
+      surfaceId,
     );
     const item = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeItem(
       modelId,
-      surfaces_id,
+      surfaceId,
     );
     const [minimum, maximum] = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeRange(
       modelId,
-      surfaces_id,
+      surfaceId,
     );
     const colorMap = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeColorMap(
       modelId,
-      surfaces_id,
+      surfaceId,
     );
     const no_data_color = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeNoDataColor(
       modelId,
-      surfaces_id,
+      surfaceId,
     );
     const attribute = {
       name,
@@ -140,27 +143,31 @@ function groupModelSurfacesPolygonAttributes(
       continue;
     }
     const key = [name, item, colorMap, minimum, maximum, JSON.stringify(no_data_color)].join("_");
-    polygonGroups[key] ??= { ...attribute, surfaces_ids: [] };
-    polygonGroups[key].surfaces_ids.push(surfaces_id);
+    const group = polygonGroups[key];
+    if (group === undefined) {
+      polygonGroups[key] = { ...attribute, surfaceIds: [surfaceId] };
+    } else {
+      group.surfaceIds.push(surfaceId);
+    }
   }
   return polygonGroups;
 }
 
 function applyModelSurfacesPolygonColoring(
   modelId: ModelId,
-  type_surfaces_ids: string[],
+  typeSurfacesIds: SurfaceId[],
   modelSurfacesPolygonAttribute: PolygonAttributeStyle,
 ): Promise<unknown>[] {
   const polygonGroups = groupModelSurfacesPolygonAttributes(
     modelId,
-    type_surfaces_ids,
+    typeSurfacesIds,
     modelSurfacesPolygonAttribute,
   );
   return Object.values(polygonGroups).map(
-    async ({ name, item, minimum, maximum, colorMap, no_data_color, surfaces_ids: ids }) => {
+    async ({ name, item, minimum, maximum, colorMap, no_data_color, surfaceIds }) => {
       const result = await modelSurfacesPolygonAttribute.setModelSurfacesPolygonAttribute(
         modelId,
-        ids,
+        surfaceIds,
         {
           name,
           item,

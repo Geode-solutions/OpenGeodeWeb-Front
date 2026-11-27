@@ -3,8 +3,10 @@ import back_schemas, {
   type BasemapBuildResponse,
 } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { ignoreError, useBasemapViewer } from "./viewer.js";
+import type { BasemapId } from "@ogw_front/types/identifiers";
 import type { BasemapLayers } from "./layers.js";
 import type { CRS } from "@geode/opengeodeweb-back/schema_types";
+import type { Coordinate } from "@ogw_front/types/geometry";
 import type { Extent } from "./extent.js";
 import type { Ref } from "vue";
 import { useBackStore } from "@ogw_front/stores/back";
@@ -13,11 +15,14 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 // The grid of the basemap shown, and the height it lies at
 interface BasemapGrid extends Pick<BasemapBuildResponse, "bounds" | "columns" | "zoom"> {
-  z: number;
+  z: Coordinate;
 }
 
+// A build of the basemap, by the number it is started with
+type BasemapBuildNumber = number;
+
 interface BasemapBuilds {
-  basemapId: Ref<string | undefined>;
+  basemapId: Ref<BasemapId | undefined>;
   grid: Ref<BasemapGrid | undefined>;
   attribution: Ref<string | undefined>;
   rebuild: () => Promise<void>;
@@ -37,7 +42,7 @@ function useBasemapBuilds(
   const crsStore = useCrsStore();
   const hybridViewerStore = useHybridViewerStore();
   const { discardMap } = useBasemapViewer();
-  const basemapId = ref<string | undefined>(undefined);
+  const basemapId = ref<BasemapId | undefined>(undefined);
   // The detail store compares its resolution with the screen
   const grid = ref<BasemapGrid | undefined>(undefined);
   const attribution = ref<string | undefined>(undefined);
@@ -49,7 +54,11 @@ function useBasemapBuilds(
   let shownMaps: MapStyle[] = [];
 
   // A build of a previous project: the viewer and the back already cleared it
-  async function discardBuild(build: number, id: string, registered: boolean): Promise<void> {
+  async function discardBuild(
+    build: BasemapBuildNumber,
+    id: BasemapId,
+    registered: boolean,
+  ): Promise<void> {
     if (build > lastBuildOfPreviousProject) {
       await discardMap(id, registered);
     }
@@ -73,7 +82,7 @@ function useBasemapBuilds(
     await hybridViewerStore.remoteRender();
   }
 
-  async function display(build: number, extent: Extent, crs: CRS): Promise<void> {
+  async function display(build: BasemapBuildNumber, extent: Extent, crs: CRS): Promise<void> {
     const response = await backStore.request({
       schema: back_schemas.opengeodeweb_back.basemap.build,
       params: { maps: [...maps.value], crs, ...extent },

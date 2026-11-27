@@ -1,3 +1,5 @@
+import type { DisplayText, Pixels } from "@ogw_front/types/ui";
+import type { ReadonlyMaybeRefOrGetter } from "@ogw_front/composables/virtual_tree_types";
 import { middleTruncate } from "@ogw_front/utils/string";
 
 const UUID_END_CHARS = 12;
@@ -6,20 +8,17 @@ const MIN_START_CHARS = 4;
 const DEFAULT_ESTIMATED_CHAR_WIDTH = 8.5;
 
 interface ResponsiveMiddleTruncateOptions {
-  readonly estimatedCharWidth?: number;
+  readonly estimatedCharWidth?: Pixels;
   readonly uuidEndChars?: number;
   readonly ellipsisLength?: number;
   readonly minStartChars?: number;
 }
 
-// Same shape as Vue's MaybeRefOrGetter<T>, kept as a local alias for readability at call sites.
-type ReadonlyMaybeRefOrGetter<Value> = Value | Ref<Value> | (() => Value);
-
 export function useResponsiveMiddleTruncate(
-  textRef: ReadonlyMaybeRefOrGetter<string | undefined | null>,
-  containerWidthRef: ReadonlyMaybeRefOrGetter<number | undefined>,
+  textRef: ReadonlyMaybeRefOrGetter<DisplayText | undefined | null>,
+  containerWidthRef: ReadonlyMaybeRefOrGetter<Pixels | undefined>,
   options: ResponsiveMiddleTruncateOptions = {},
-): ComputedRef<string> {
+): ComputedRef<DisplayText> {
   const {
     estimatedCharWidth = DEFAULT_ESTIMATED_CHAR_WIDTH,
     uuidEndChars = UUID_END_CHARS,

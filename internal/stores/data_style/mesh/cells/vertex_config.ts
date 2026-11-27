@@ -9,6 +9,7 @@ import type {
   AttributeStoredConfig,
 } from "@ogw_internal/stores/data_style/attribute_types";
 import type { MeshId } from "@ogw_front/types/identifiers";
+import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 
 // Local imports
@@ -17,23 +18,26 @@ import { useMeshCellsCommonStyle } from "./common";
 interface UseMeshCellsVertexAttributeConfigReturn {
   meshCellsVertexAttribute: (meshId: MeshId) => AttributeState;
   meshCellsVertexAttributeName: (meshId: MeshId) => AttributeName | undefined;
-  meshCellsVertexAttributeLastItem: (meshId: MeshId, name: AttributeName | undefined) => number;
+  meshCellsVertexAttributeLastItem: (
+    meshId: MeshId,
+    name: AttributeName | undefined,
+  ) => AttributeItem;
   meshCellsVertexAttributeItem: (meshId: MeshId) => AttributeItem;
   meshCellsVertexAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
   ) => AttributeStoredConfig;
 }
 
 interface UseMeshCellsVertexAttributeConfigWriterReturn {
-  mutateMeshCellsVertexStyle: (meshId: MeshId, values: Record<string, unknown>) => Promise<string>;
+  mutateMeshCellsVertexStyle: (meshId: MeshId, values: StyleValues) => Promise<MeshId>;
   setMeshCellsVertexAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
     config: Partial<AttributeStoredConfig>,
-  ) => Promise<string>;
+  ) => Promise<MeshId>;
 }
 
 function useMeshCellsVertexAttributeConfig(): UseMeshCellsVertexAttributeConfigReturn {
@@ -45,11 +49,11 @@ function useMeshCellsVertexAttributeConfig(): UseMeshCellsVertexAttributeConfigR
   function meshCellsVertexAttributeStoredConfig(
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
   ): AttributeStoredConfig {
     const { storedConfigs } = meshCellsVertexAttribute(meshId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
-    const itemConfig = item === undefined ? undefined : nameConfig?.[item];
+    const itemConfig = nameConfig?.[item];
     if (itemConfig !== undefined) {
       return itemConfig;
     }
@@ -61,7 +65,7 @@ function useMeshCellsVertexAttributeConfig(): UseMeshCellsVertexAttributeConfigR
   function meshCellsVertexAttributeLastItem(
     meshId: MeshId,
     name: AttributeName | undefined,
-  ): number {
+  ): AttributeItem {
     const { storedConfigs } = meshCellsVertexAttribute(meshId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
     if (nameConfig !== undefined) {
@@ -121,10 +125,7 @@ function useMeshCellsVertexAttributeConfigValues(): UseMeshCellsVertexAttributeC
 
 function useMeshCellsVertexAttributeConfigWriter(): UseMeshCellsVertexAttributeConfigWriterReturn {
   const meshCellsCommonStyle = useMeshCellsCommonStyle();
-  async function mutateMeshCellsVertexStyle(
-    meshId: MeshId,
-    values: Record<string, unknown>,
-  ): Promise<string> {
+  async function mutateMeshCellsVertexStyle(meshId: MeshId, values: StyleValues): Promise<MeshId> {
     const result = await meshCellsCommonStyle.mutateMeshCellsStyle(meshId, {
       coloring: {
         vertex: values,
@@ -135,9 +136,9 @@ function useMeshCellsVertexAttributeConfigWriter(): UseMeshCellsVertexAttributeC
   async function setMeshCellsVertexAttributeStoredConfig(
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
     config: Partial<AttributeStoredConfig>,
-  ): Promise<string> {
+  ): Promise<MeshId> {
     const result = await mutateMeshCellsVertexStyle(meshId, {
       storedConfigs: {
         [name ?? ""]: {

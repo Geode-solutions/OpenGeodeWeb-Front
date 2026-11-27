@@ -6,6 +6,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed
 import { beforeAllTimeout, setupIntegrationTests } from "@ogw_tests/integration/setup";
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 import { Status } from "@ogw_front/utils/status";
+import { assertNonEmpty } from "@ogw_tests/utils";
 import { cleanupBackend } from "@ogw_server/utils/cleanup";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -123,17 +124,17 @@ describe("model surfaces edges", () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();
-      const surface_ids = await dataStore.getSurfacesGeodeIds(id);
-      const block_ids = await dataStore.getMeshComponentsViewerIds(id, surface_ids);
+      const surfaceIds = assertNonEmpty(await dataStore.getSurfacesGeodeIds(id));
+      const block_ids = await dataStore.getMeshComponentsViewerIds(id, surfaceIds);
       const name = "points";
       const colorMap = "batlow";
-      await dataStyleStore.setModelSurfacesEdgesVertexAttributeName(id, surface_ids, name);
-      await dataStyleStore.setModelSurfacesEdgesVertexAttributeColorMap(id, surface_ids, colorMap);
+      await dataStyleStore.setModelSurfacesEdgesVertexAttributeName(id, surfaceIds, name);
+      await dataStyleStore.setModelSurfacesEdgesVertexAttributeColorMap(id, surfaceIds, colorMap);
       const spy = vi.spyOn(viewerStore, "request");
       spy.mockClear();
       await dataStyleStore.setModelSurfacesEdgesVertexAttributeRange(
         id,
-        surface_ids,
+        surfaceIds,
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       );
@@ -155,7 +156,7 @@ describe("model surfaces edges", () => {
           response_function: expect.any(Function),
         },
       );
-      const surface_id = firstElement(surface_ids);
+      const surface_id = firstElement(surfaceIds);
       expect(dataStyleStore.modelSurfaceEdgesActiveColoring(id, surface_id)).toBe("vertex");
       expect(dataStyleStore.modelSurfaceEdgesVertexAttributeName(id, surface_id)).toBe(name);
     },

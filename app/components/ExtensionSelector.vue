@@ -1,24 +1,31 @@
 <script setup lang="ts">
+import type { FileExtension, FileName } from "@ogw_front/types/files";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 
 import FetchingData from "@ogw_front/components/FetchingData.vue";
 import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import { useBackStore } from "@ogw_front/stores/back";
 
-const schema = schemas.opengeodeweb_back.geode_objects_and_output_extensions;
-const emit = defineEmits<{
-  update_values: [values: { output_geode_object: GeodeObjectType; output_extension: string }];
-  increment_step: [];
-  decrement_step: [];
-}>();
+// The extensions a geode object can be saved to, by extension
+type OutputExtensions = Record<FileExtension, { is_saveable: boolean }>;
 
 interface Props {
   geodeObjectType: GeodeObjectType;
-  filenames: string[];
+  filenames: FileName[];
 }
 
+interface Emits {
+  update_values: [
+    values: { output_geode_object: GeodeObjectType; output_extension: FileExtension },
+  ];
+  increment_step: [];
+  decrement_step: [];
+}
+
+const schema = schemas.opengeodeweb_back.geode_objects_and_output_extensions;
+const emit = defineEmits<Emits>();
+
 const { geodeObjectType, filenames } = defineProps<Props>();
-type OutputExtensions = Record<string, { is_saveable: boolean }>;
 
 const geode_objects_and_output_extensions = ref<Partial<Record<GeodeObjectType, OutputExtensions>>>(
   {},
@@ -31,15 +38,18 @@ async function get_output_file_extensions(): Promise<void> {
   toggle_loading();
   geode_objects_and_output_extensions.value = {};
   const backStore = useBackStore();
-  const values: Partial<Record<GeodeObjectType, Record<string, boolean>>>[] = await Promise.all(
-    filenames.map(
-      async (filename): Promise<Partial<Record<GeodeObjectType, Record<string, boolean>>>> => {
-        const params = { geode_object_type: geodeObjectType, filename };
-        const response = await backStore.request({ schema, params });
-        return response.geode_objects_and_output_extensions;
-      },
-    ),
-  );
+  const values: Partial<Record<GeodeObjectType, Record<FileExtension, boolean>>>[] =
+    await Promise.all(
+      filenames.map(
+        async (
+          filename,
+        ): Promise<Partial<Record<GeodeObjectType, Record<FileExtension, boolean>>>> => {
+          const params = { geode_object_type: geodeObjectType, filename };
+          const response = await backStore.request({ schema, params });
+          return response.geode_objects_and_output_extensions;
+        },
+      ),
+    );
   const all_keys = [...new Set(values.flatMap((value) => Object.keys(value) as GeodeObjectType[]))];
   const common_keys = all_keys.filter((i) => !values.some((j) => !Object.keys(j).includes(i)));
   const final_object: Partial<Record<GeodeObjectType, OutputExtensions>> = {};
@@ -60,7 +70,10 @@ async function get_output_file_extensions(): Promise<void> {
   toggle_loading();
 }
 
-function update_values(output_geode_object: GeodeObjectType, output_extension: string): void {
+function update_values(
+  output_geode_object: GeodeObjectType,
+  output_extension: FileExtension,
+): void {
   if (output_extension !== "") {
     emit("update_values", {
       output_geode_object,

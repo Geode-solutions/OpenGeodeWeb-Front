@@ -1,5 +1,7 @@
-import type { ColorRGBA, Visibility } from "@geode/opengeodeweb-viewer/schema_types";
-import type { DataIdentified } from "@ogw_front/types/identifiers";
+import type { AttributeName, ColorRGBA, Visibility } from "@geode/opengeodeweb-viewer/schema_types";
+import type { AttributeTimeStep, TimeStepKey } from "@ogw_front/types/attribute";
+import type { DataIdentified, ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
+import type { ModelComponentType } from "@ogw_front/types/model";
 
 type StyleValues = Record<string, unknown>;
 
@@ -16,18 +18,18 @@ interface ObjectStyle extends DataIdentified {
   surfaces?: StyleValues;
   blocks?: StyleValues;
   attributes?: StyleValues;
-  timeSteps?: Record<string, Record<string, number>>;
+  timeSteps?: Record<TimeStepKey, Record<AttributeName, AttributeTimeStep>>;
   [key: string]: unknown;
 }
 
 interface ModelComponentTypeStyle extends StyleValues {
-  id_model: string;
-  type: string;
+  id_model: ModelId;
+  type: ModelComponentType;
 }
 
 interface ModelComponentStyle extends StyleValues {
-  id_model: string;
-  id_component: string;
+  id_model: ModelId;
+  id_component: ModelComponentId;
 }
 
 type SceneFontFamily = "arial" | "courier" | "times";

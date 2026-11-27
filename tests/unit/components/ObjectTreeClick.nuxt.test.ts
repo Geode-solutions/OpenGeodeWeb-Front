@@ -22,7 +22,15 @@ describe("object tree row click", () => {
   ])("clicking $name activates it without changing its visibility", async ({ selected }) => {
     const wrapper = await mountSuspended(CommonTreeView, {
       global: { plugins: [vuetify, pinia] },
-      props: { items, selected },
+      props: {
+        items,
+        selected,
+        opened: [],
+        active: [],
+        scrollTop: 0,
+        options: {},
+        isRowViewable: () => true,
+      },
     });
     const rows = wrapper.findAll("[data-testid='treeRowWrapper']");
     expect(rows).toHaveLength(items.length);

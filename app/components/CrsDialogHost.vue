@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import CrsDialog from "@ogw_front/components/CrsDialog.vue";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import ProjectCrsDialog from "@ogw_front/components/ProjectCrsDialog.vue";
 import { useCrsStore } from "@ogw_front/stores/crs";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -9,7 +10,7 @@ const crsStore = useCrsStore();
 const dataStore = useDataStore();
 const feedbackStore = useFeedbackStore();
 const show = ref(false);
-const itemId = ref<string | undefined>(undefined);
+const itemId = ref<DataId | undefined>(undefined);
 
 // The app hosts the CRS dialog: the shared tree and info card may offer CRS edits
 crsStore.enableCrsEdit();

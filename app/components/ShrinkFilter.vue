@@ -1,22 +1,23 @@
 <script setup lang="ts">
+import type { DisplayText, FilterFactor } from "@ogw_front/types/ui";
 import FactorFilterPanel from "@ogw_front/components/FactorFilterPanel.vue";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+
+interface Props {
+  escapeFunction: () => void;
+}
 
 const DEFAULT_SHRINK_VALUE = 0.8;
 const MIN_SHRINK_VALUE = 0;
 const MAX_SHRINK_VALUE = 1;
 const PERCENT = 100;
 
-interface Props {
-  escapeFunction?: () => void;
-}
-
-const { escapeFunction = undefined } = defineProps<Props>();
+const { escapeFunction } = defineProps<Props>();
 
 const show = defineModel<boolean>("show", { default: false });
 const hybridViewerStore = useHybridViewerStore();
 
-function formatShrinkFactor(value: number): string {
+function formatShrinkFactor(value: FilterFactor): DisplayText {
   return `${(value * PERCENT).toFixed(0)}% (${value.toFixed(2)})`;
 }
 </script>

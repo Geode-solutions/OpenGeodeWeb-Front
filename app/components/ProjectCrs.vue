@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { formatCrs, formatCrsCode } from "@ogw_front/utils/crs";
+import type { Label } from "@ogw_front/types/ui";
 import { useCrsStore } from "@ogw_front/stores/crs";
 
 const crsStore = useCrsStore();
-const label = computed<string>(() =>
+const label = computed<Label>(() =>
   crsStore.projectCrs
     ? `CRS: ${formatCrsCode(crsStore.projectCrs)} · ${crsStore.projectCrs.name}`
     : "No CRS",

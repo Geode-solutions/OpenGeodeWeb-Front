@@ -7,28 +7,33 @@ import {
   resolveAllowedObjectsPerFile,
 } from "@ogw_shared/utils/response_handlers/load.js";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
+import type { FileName } from "@ogw_front/types/files";
 import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
+import type { Tooltip } from "@ogw_front/types/ui";
 import { geodeObjectImage } from "@ogw_front/assets/geode_objects";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { useBackStore } from "@ogw_front/stores/back";
 
-const schema = schemas.opengeodeweb_back.allowed_objects;
-
+// Files sharing the same candidate geode object types, and the one chosen for them
 interface PendingGroup {
-  filenames: string[];
-  candidates: string[];
-  selected: string;
+  filenames: FileName[];
+  candidates: GeodeObjectType[];
+  selected: GeodeObjectType | undefined;
 }
-
-const emit = defineEmits<{
-  // Filename -> geode object types (one per content of the file), files that cannot be loaded are left out
-  update_values: [value: { geode_object_types: Record<string, GeodeObjectType[]> }];
-  increment_step: [];
-}>();
 
 interface Props {
-  filenames: string[];
+  filenames: FileName[];
 }
+
+interface Emits {
+  // Filename -> geode object types (one per content of the file), files that cannot be loaded are left out
+  update_values: [value: { geode_object_types: Record<FileName, GeodeObjectType[]> }];
+  increment_step: [];
+}
+
+const schema = schemas.opengeodeweb_back.allowed_objects;
+
+const emit = defineEmits<Emits>();
 
 const { filenames } = defineProps<Props>();
 
@@ -39,10 +44,10 @@ const allowedGeodeObjects = ref<AllowedObjectMap>({});
 const toggleLoading = useToggle(loading);
 const multipleFilesNoCommon = ref<boolean>(false);
 // Types already known, files left to choose for, and files that cannot be loaded
-const resolvedTypes = ref<Record<string, GeodeObjectType[]>>({});
-const pendingFilenames = ref<string[]>([]);
+const resolvedTypes = ref<Record<FileName, GeodeObjectType[]>>({});
+const pendingFilenames = ref<FileName[]>([]);
 const pendingGroups = ref<PendingGroup[]>([]);
-const skippedFiles = ref<string[]>([]);
+const skippedFiles = ref<FileName[]>([]);
 const showPerFile = ref<boolean>(false);
 // Every file got its type without the user, nothing to display
 const autoResolved = ref<boolean>(false);
@@ -55,7 +60,7 @@ function fetchAllowedObjectsList(): Promise<AllowedObjectsResponse[]> {
   return Promise.all(promiseArray);
 }
 
-function emitGeodeObjectTypes(geode_object_types: Record<string, GeodeObjectType[]>): void {
+function emitGeodeObjectTypes(geode_object_types: Record<FileName, GeodeObjectType[]>): void {
   emit("update_values", { geode_object_types });
   emit("increment_step");
 }
@@ -87,19 +92,19 @@ function groupPendingFiles(pending: readonly FileAllowedObjects[]): PendingGroup
       groups.set(key, {
         filenames: [file.filename],
         candidates: file.candidates,
-        selected: file.candidates[0] ?? "",
+        selected: file.candidates[0],
       });
     }
   }
   return [...groups.values()];
 }
 
-function geodeObjectTooltip(key: string, isLoadable: boolean): string {
+function geodeObjectTooltip(key: GeodeObjectType, isLoadable: boolean): Tooltip {
   return isLoadable ? key : `Data not loadable with this class (${key})`;
 }
 
 function showCommonGeodeObjects(
-  pendingNames: readonly string[],
+  pendingNames: readonly FileName[],
   allowedObjectsList: readonly AllowedObjectMap[],
 ): void {
   const resolved = resolveAllowedObjects(pendingNames, allowedObjectsList);
@@ -107,8 +112,10 @@ function showCommonGeodeObjects(
   multipleFilesNoCommon.value = resolved.multipleFilesNoCommon;
 }
 
-function toResolvedEntries(loadable: readonly FileAllowedObjects[]): [string, GeodeObjectType[]][] {
-  return loadable.flatMap((file): [string, GeodeObjectType[]][] => {
+function toResolvedEntries(
+  loadable: readonly FileAllowedObjects[],
+): [FileName, GeodeObjectType[]][] {
+  return loadable.flatMap((file): [FileName, GeodeObjectType[]][] => {
     if (file.selectedGeodeObjects.length === 0) {
       return [];
     }

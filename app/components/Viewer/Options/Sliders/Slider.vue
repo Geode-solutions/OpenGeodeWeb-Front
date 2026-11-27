@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import BasicSlider from "@ogw_front/components/Basic/Slider.vue";
-
-const model = defineModel<number>();
+import type { Tooltip } from "@ogw_front/types/ui";
 
 interface Props {
-  tooltip: string;
+  tooltip: Tooltip;
 }
+
+const model = defineModel<number>();
 
 const { tooltip } = defineProps<Props>();
 </script>

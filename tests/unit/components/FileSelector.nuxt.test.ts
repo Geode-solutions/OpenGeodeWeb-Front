@@ -37,7 +37,13 @@ describe("file selector", () => {
       global: {
         plugins: [vuetify, pinia],
       },
-      props: { multiple: false, autoUpload: false },
+      props: {
+        multiple: false,
+        files: [],
+        autoUpload: false,
+        showOverlay: true,
+        timeSeries: false,
+      },
     });
 
     const file_uploader = wrapper.findComponent(FileUploader);
@@ -92,6 +98,8 @@ describe("file selector", () => {
           multiple: false,
           files,
           autoUpload: true,
+          showOverlay: true,
+          timeSeries: false,
         },
       });
 
@@ -116,6 +124,8 @@ describe("file selector", () => {
           multiple: false,
           files,
           autoUpload: false,
+          showOverlay: true,
+          timeSeries: false,
         },
       });
 

@@ -156,7 +156,7 @@ function useMeshPolygonsPolygonAttributeStyle(): UseMeshPolygonsPolygonAttribute
   }
   async function setMeshPolygonsPolygonAttributeColorMap(
     meshId: MeshId,
-    colorMap: AttributeColorMap | undefined,
+    colorMap: AttributeColorMap,
   ): Promise<unknown> {
     const name = meshPolygonsPolygonAttributeName(meshId);
     const item = meshPolygonsPolygonAttributeItem(meshId);

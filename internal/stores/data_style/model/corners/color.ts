@@ -1,5 +1,8 @@
 import type { CornerId, ModelId } from "@ogw_front/types/identifiers";
 import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
+import type { ColoringType } from "@ogw_front/types/attribute";
+import type { GeodeId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { NonEmptyArray } from "@ogw_front/utils/arrays";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -13,19 +16,19 @@ const schema = viewer_schemas.opengeodeweb_viewer.model.corners.color;
 interface ModelCornersColorApi {
   setModelCornersColor: (
     modelId: ModelId,
-    corners_ids: CornerId[],
+    cornerIds: CornerId[],
     color: ColorRGBA | undefined,
-    activeColoring?: string,
-    collectionId?: string,
+    activeColoring?: ColoringType,
+    collectionId?: GeodeId,
   ) => Promise<unknown>;
   modelCornerColoring: (modelId: ModelId, corner_id?: CornerId) => StyleValues;
   modelCornerColor: (modelId: ModelId, corner_id?: CornerId) => ColorRGBA | undefined;
   modelCornerActiveColoring: (modelId: ModelId, corner_id?: CornerId) => unknown;
   setModelCornersActiveColoring: (
     modelId: ModelId,
-    corners_ids: CornerId[],
-    activeColoring: string,
-    collectionId?: string,
+    cornerIds: NonEmptyArray<CornerId>,
+    activeColoring: ColoringType,
+    collectionId?: GeodeId,
   ) => Promise<unknown>;
 }
 
@@ -47,14 +50,14 @@ export function useModelCornersColor(): ModelCornersColorApi {
 
   async function setModelCornersColor(
     modelId: ModelId,
-    corners_ids: CornerId[],
+    cornerIds: CornerId[],
     color: ColorRGBA | undefined,
     activeColoring = "constant",
-    collectionId?: string,
+    collectionId?: GeodeId,
   ): Promise<unknown> {
     const result = await modelCommonStyle.setModelTypeColor(
       modelId,
-      corners_ids,
+      cornerIds,
       color,
       schema,
       activeColoring,
@@ -69,50 +72,50 @@ export function useModelCornersColor(): ModelCornersColorApi {
 
   async function setModelCornersActiveColoring(
     modelId: ModelId,
-    corners_ids: CornerId[],
-    activeColoring: string,
-    collectionId?: string,
+    cornerIds: NonEmptyArray<CornerId>,
+    activeColoring: ColoringType,
+    collectionId?: GeodeId,
   ): Promise<unknown> {
     const totalCornerIds = await dataStore.getCornersGeodeIds(modelId);
-    if (corners_ids.length === totalCornerIds.length) {
+    if (cornerIds.length === totalCornerIds.length) {
       await modelCornersCommonStyle.mutateModelCornersTypeColoring(modelId, {
         active: activeColoring,
       });
     }
-    await modelCommonStyle.mutateComponentStyles(modelId, corners_ids, {
+    await modelCommonStyle.mutateComponentStyles(modelId, cornerIds, {
       coloring: { active: activeColoring },
     });
     if (activeColoring === "constant" || activeColoring === "random") {
-      const color = modelCornerColor(modelId, corners_ids[0]);
-      return setModelCornersColor(modelId, corners_ids, color, activeColoring, collectionId);
+      const color = modelCornerColor(modelId, cornerIds[0]);
+      return setModelCornersColor(modelId, cornerIds, color, activeColoring, collectionId);
     }
 
     if (activeColoring === "vertex") {
       const name = modelCornersVertexAttribute.modelCornersVertexAttributeName(
         modelId,
-        corners_ids[0],
+        cornerIds[0],
       );
       const item = modelCornersVertexAttribute.modelCornersVertexAttributeItem(
         modelId,
-        corners_ids[0],
+        cornerIds[0],
       );
       const [minimum, maximum] = modelCornersVertexAttribute.modelCornersVertexAttributeRange(
         modelId,
-        corners_ids[0],
+        cornerIds[0],
       );
       const colorMap = modelCornersVertexAttribute.modelCornersVertexAttributeColorMap(
         modelId,
-        corners_ids[0],
+        cornerIds[0],
       );
       const no_data_color = modelCornersVertexAttribute.modelCornersVertexAttributeNoDataColor(
         modelId,
-        corners_ids[0],
+        cornerIds[0],
       );
       const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
       if (isAttributeValid(attribute)) {
         return modelCornersVertexAttribute.setModelCornersVertexAttribute(
           modelId,
-          corners_ids,
+          cornerIds,
           attribute,
         );
       }

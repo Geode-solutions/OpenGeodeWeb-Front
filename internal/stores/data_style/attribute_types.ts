@@ -45,7 +45,10 @@ interface ValidAttributeInput extends AttributeSelection, AttributeBounds, Attri
 }
 
 interface AttributeState extends Partial<AttributeSelection> {
-  storedConfigs?: Record<string, { lastItem: number } & Record<string, AttributeStoredConfig>>;
+  storedConfigs?: Record<
+    AttributeName,
+    { lastItem: AttributeItem } & Record<string, AttributeStoredConfig>
+  >;
 }
 
 export type {

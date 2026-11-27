@@ -1,8 +1,16 @@
-import { EASE_EXPONENT, applyCameraOptions, getImageStyle, toBounds } from "./camera_helpers";
+import {
+  type CameraOrientationKey,
+  EASE_EXPONENT,
+  applyCameraOptions,
+  getImageStyle,
+  toBounds,
+} from "./camera_helpers";
 import { animateCamera, computeAnimationDuration, getCameraOptions } from "./camera_animation";
 import { requireRenderWindow, useHybridViewerCore } from "./core";
+import type { BlockIds } from "@geode/opengeodeweb-viewer/schema_types";
 import type { CameraOptions } from "./vtk_types";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { ZScale } from "@ogw_front/types/geometry";
 import { animateCameraOrientation } from "./camera_orientation";
 import { useHybridViewerScene } from "./scene";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -92,7 +100,7 @@ const useHybridViewerCamera = createSharedComposable(() => {
 
   async function performFocusCameraOnObject(
     dataId: DataId,
-    block_ids: number[] = [],
+    block_ids: BlockIds = [],
   ): Promise<void> {
     const { genericRenderWindow } = useHybridViewerCore();
     const { hybridDb } = useHybridViewerScene();
@@ -121,11 +129,11 @@ const useHybridViewerCamera = createSharedComposable(() => {
     performSetCamera(targetOptions);
   }
 
-  async function focusCameraOnObject(dataId: DataId, block_ids: number[] = []): Promise<void> {
+  async function focusCameraOnObject(dataId: DataId, block_ids: BlockIds = []): Promise<void> {
     await performFocusCameraOnObject(dataId, block_ids);
   }
 
-  function setCameraOrientation(orientation: string): void {
+  function setCameraOrientation(orientation: CameraOrientationKey): void {
     animateCameraOrientation(orientation, performSyncRemoteCamera);
   }
 
@@ -140,7 +148,7 @@ const useHybridViewerCamera = createSharedComposable(() => {
 });
 
 interface CameraSnapshot {
-  zScale?: number;
+  zScale?: ZScale;
   camera_options?: CameraOptions;
 }
 

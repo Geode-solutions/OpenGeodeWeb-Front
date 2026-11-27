@@ -5,7 +5,7 @@ import type { Ref } from "vue";
 interface CrsRequests {
   crsEditEnabled: Ref<boolean>;
   enableCrsEdit: () => void;
-  crsEditRequest: Ref<string | undefined>;
+  crsEditRequest: Ref<DataId | undefined>;
   requestCrsEdit: (dataId: DataId) => void;
   clearCrsEditRequest: () => void;
   projectCrsEditRequest: Ref<boolean>;
@@ -20,7 +20,7 @@ interface CrsRequests {
 // The channel the shared components use to ask the host app for a CRS edit or an alignment
 function useCrsRequests(): CrsRequests {
   const crsEditEnabled = ref(false);
-  const crsEditRequest = ref<string | undefined>(undefined);
+  const crsEditRequest = ref<DataId | undefined>(undefined);
   const projectCrsEditRequest = ref(false);
   const showCrsAlign = ref(false);
   const crsAlignItem = ref<DataItem | undefined>(undefined);

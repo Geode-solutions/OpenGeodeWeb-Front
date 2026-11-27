@@ -1,12 +1,19 @@
 import type { ComputedRef, Ref } from "vue";
 import { onKeyStroke, watchDebounced } from "@vueuse/core";
+import type { Coordinate } from "@ogw_front/types/geometry";
 import type { CrsPoint } from "@ogw_front/composables/crs";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
+// A coordinate as the user types it: a number, or a string not parsed yet
+type EditableCoordinate = number | string;
+
+// Which of the source/target point pairs of the alignment
+type AlignmentPairIndex = number;
+
 interface EditablePoint {
-  x: number | string;
-  y: number | string;
+  x: EditableCoordinate;
+  y: EditableCoordinate;
 }
 
 // Three pairs: the affine alignment places, rotates, scales and shears the data
@@ -23,12 +30,12 @@ function notPicked(): boolean[] {
   return Array.from({ length: NB_POINTS }, () => false);
 }
 
-function toNumber(value: number | string | undefined): number {
+function toNumber(value: EditableCoordinate | undefined): number {
   return Number(String(value).replaceAll(",", "."));
 }
 
 // "" or a partly typed "-" / "." is not a coordinate yet
-function isCoordinate(value: number | string): boolean {
+function isCoordinate(value: EditableCoordinate): boolean {
   return value !== "" && Number.isFinite(toNumber(value));
 }
 
@@ -45,7 +52,11 @@ interface UseCrsAlignReturn {
   isComplete: ComputedRef<boolean>;
   toSourceCrsPoints: () => CrsPoint[];
   toTargetCrsPoints: () => CrsPoint[];
-  editSourcePoint: (index: number, coord: keyof EditablePoint, value: number | string) => void;
+  editSourcePoint: (
+    index: AlignmentPairIndex,
+    coord: keyof EditablePoint,
+    value: EditableCoordinate,
+  ) => void;
 }
 
 interface AlignState {
@@ -53,12 +64,15 @@ interface AlignState {
   targetPoints: Ref<EditablePoint[]>;
   pickingActive: Ref<boolean>;
   // Picked z only places the preview markers on the data
-  pickedZ: Ref<number[]>;
+  pickedZ: Ref<Coordinate[]>;
   // Picked points lie on the displayed data, typed ones are original coordinates
   pickedSources: Ref<boolean[]>;
 }
 
-function pairFilled({ sourcePoints, targetPoints }: AlignState, index: number): boolean {
+function pairFilled(
+  { sourcePoints, targetPoints }: AlignState,
+  index: AlignmentPairIndex,
+): boolean {
   const source = sourcePoints.value[index];
   const target = targetPoints.value[index];
   return source !== undefined && target !== undefined && isFilled(source) && isFilled(target);
@@ -92,7 +106,7 @@ async function preview({ sourcePoints, pickedZ }: AlignState): Promise<void> {
 // A point picked on the data fills the first empty source point
 function placePickedPoint(
   { sourcePoints, pickedZ, pickedSources }: AlignState,
-  picked: { x?: number; y?: number; z?: number },
+  picked: { x?: Coordinate; y?: Coordinate; z?: Coordinate },
 ): void {
   if (picked.x === undefined || picked.y === undefined) {
     return;
@@ -153,7 +167,7 @@ function useCrsAlign(): UseCrsAlignReturn {
     sourcePoints: ref<EditablePoint[]>(emptyPoints()),
     targetPoints: ref<EditablePoint[]>(emptyPoints()),
     pickingActive: ref(false),
-    pickedZ: ref<number[]>([]),
+    pickedZ: ref<Coordinate[]>([]),
     pickedSources: ref<boolean[]>(notPicked()),
   };
   const isComplete = computed(() =>
@@ -161,9 +175,9 @@ function useCrsAlign(): UseCrsAlignReturn {
   );
 
   function editSourcePoint(
-    index: number,
+    index: AlignmentPairIndex,
     coord: keyof EditablePoint,
-    value: number | string,
+    value: EditableCoordinate,
   ): void {
     const point = state.sourcePoints.value[index];
     if (!point) {

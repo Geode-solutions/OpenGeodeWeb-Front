@@ -1,6 +1,7 @@
 // Third party imports
 
 // Local imports
+import type { ColoringType } from "@ogw_front/types/attribute";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
@@ -56,7 +57,7 @@ function handleMeshCellsCellColoring(
 
 async function applyMeshCellsActiveColoring(
   meshId: MeshId,
-  type: string | undefined,
+  type: ColoringType | undefined,
   deps: MeshCellsActiveColoringDeps,
 ): Promise<unknown> {
   await deps.commonStyle.mutateMeshCellsStyle(meshId, {
@@ -91,7 +92,7 @@ async function applyMeshCellsActiveColoring(
 
 async function setMeshCellsActiveColoring(
   meshId: MeshId,
-  type: string | undefined,
+  type: ColoringType | undefined,
   deps: MeshCellsActiveColoringDeps,
 ): Promise<unknown> {
   const result = await applyMeshCellsActiveColoring(meshId, type, deps);
@@ -108,7 +109,7 @@ async function setMeshCellsActiveColoring(
 async function applyMeshCellsStyle(
   meshId: MeshId,
   visibilityStyle: ReturnType<typeof useMeshCellsVisibilityStyle>,
-  activeColoringType: string | undefined,
+  activeColoringType: ColoringType | undefined,
   deps: MeshCellsActiveColoringDeps,
 ): Promise<unknown[]> {
   const result = await Promise.all([
@@ -123,8 +124,8 @@ async function applyMeshCellsStyle(
 
 type UseMeshCellsStyleReturn = ReturnType<typeof useMeshCellsCommonStyle> & {
   meshCellsColoring: (meshId: MeshId) => StyleValues;
-  meshCellsActiveColoring: (meshId: MeshId) => string | undefined;
-  setMeshCellsActiveColoring: (meshId: MeshId, type: string | undefined) => Promise<unknown>;
+  meshCellsActiveColoring: (meshId: MeshId) => ColoringType | undefined;
+  setMeshCellsActiveColoring: (meshId: MeshId, type: ColoringType | undefined) => Promise<unknown>;
   applyMeshCellsStyle: (meshId: MeshId) => Promise<unknown[]>;
 } & ReturnType<typeof useMeshCellsVisibilityStyle> &
   ReturnType<typeof useMeshCellsColorStyle> &
@@ -152,14 +153,14 @@ export function useMeshCellsStyle(): UseMeshCellsStyleReturn {
     return meshCellsCommonStyle.meshCellsColoring(meshId);
   }
 
-  function meshCellsActiveColoring(meshId: MeshId): string | undefined {
+  function meshCellsActiveColoring(meshId: MeshId): ColoringType | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.active is defined as string in the data style schema.
-    return meshCellsColoring(meshId).active as string | undefined;
+    return meshCellsColoring(meshId).active as ColoringType | undefined;
   }
 
   async function boundSetMeshCellsActiveColoring(
     meshId: MeshId,
-    type: string | undefined,
+    type: ColoringType | undefined,
   ): Promise<unknown> {
     const result = await setMeshCellsActiveColoring(meshId, type, activeColoringDeps);
     return result;

@@ -1,3 +1,5 @@
+import type { CssColor, Index } from "@ogw_front/types/ui";
+import type { Ratio } from "@ogw_front/types/geometry";
 // Colors of the orientation cube of the camera orientation panel (CameraOrientation.vue), from the
 // Vuetify theme it is shown in: faces a bit off the surface, labels and edges in the surface ink,
 // The hovered face inverted. The cube is drawn by vtk.js on canvases, so it takes CSS color strings.
@@ -22,14 +24,14 @@ const FALLBACK_SURFACE: ColorRGB = {
 const FALLBACK_INK: ColorRGB = { red: MAX_CHANNEL, green: MAX_CHANNEL, blue: MAX_CHANNEL };
 
 interface CubeStyle {
-  faceColor: string;
-  fontColor: string;
-  edgeColor: string;
-  hoveredFaceColor: string;
-  hoveredFontColor: string;
+  faceColor: CssColor;
+  fontColor: CssColor;
+  edgeColor: CssColor;
+  hoveredFaceColor: CssColor;
+  hoveredFontColor: CssColor;
 }
 
-function hexChannel(hex: string, index: number): number {
+function hexChannel(hex: CssColor, index: Index): number {
   return Number.parseInt(hex.slice(index * CHANNEL_LENGTH, (index + 1) * CHANNEL_LENGTH), HEX_BASE);
 }
 
@@ -46,7 +48,7 @@ function rgba({ red, green, blue }: ColorRGB, alpha = 1): string {
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 }
 
-function mix(base: ColorRGB, ink: ColorRGB, ratio: number): ColorRGB {
+function mix(base: ColorRGB, ink: ColorRGB, ratio: Ratio): ColorRGB {
   function channel(key: keyof ColorRGB): number {
     return Math.round(base[key] * (1 - ratio) + ink[key] * ratio);
   }

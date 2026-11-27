@@ -1,34 +1,25 @@
-import type {
-  GeodeObjectType,
-  ViewerObjectType,
-} from "@geode/opengeodeweb-microservice/data_types";
-import { type MenuItems, menusData } from "./menu_helpers/menus_data.js";
-import type { DataIdentified } from "@ogw_front/types/identifiers";
-
-// What the menus of an entry are chosen by: its viewer_object_type and geode_object_type, or keys when it is not a data
-type MenuViewerObjectType =
-  | ViewerObjectType
-  | "scene"
-  | "basemap"
-  | "model_component"
-  | "model_component_type";
-type MenuObjectType = GeodeObjectType | "scene" | "Basemap" | "Map" | "component" | "type";
+import type { DataIdentified, TreeNodeId } from "@ogw_front/types/identifiers";
+import type { MenuItemIndex, Pixels } from "@ogw_front/types/ui";
+import type { MenuItems, MenuObjectType, MenuViewerObjectType } from "./menu_helpers/types.js";
+import type { Coordinate } from "@ogw_front/types/geometry";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import { menusData } from "./menu_helpers/menus_data.js";
 
 interface MenuMetaData extends Partial<DataIdentified> {
   viewer_object_type?: MenuViewerObjectType;
   geode_object_type?: MenuObjectType;
-  targetIds?: string[];
+  targetIds?: DataId[];
   [key: string]: unknown;
 }
 
 interface OpenMenuOptions {
-  readonly id: string;
-  readonly x: number | undefined;
-  readonly y: number | undefined;
-  readonly width: number;
-  readonly height: number;
-  readonly top: number;
-  readonly left: number;
+  readonly id: TreeNodeId;
+  readonly x: Coordinate | undefined;
+  readonly y: Coordinate | undefined;
+  readonly width: Pixels;
+  readonly height: Pixels;
+  readonly top: Pixels;
+  readonly left: Pixels;
   readonly meta_data: MenuMetaData | undefined;
 }
 
@@ -38,14 +29,14 @@ const SCENE_MENU_RADIUS = 65;
 export const useMenuStore = defineStore("menu", () => {
   const menus = shallowRef(menusData);
   const display_menu = ref(false);
-  const current_id = ref<string | undefined>(undefined);
+  const current_id = ref<TreeNodeId | undefined>(undefined);
   const menuX = ref(0);
   const menuY = ref(0);
   const containerWidth = ref(window.innerWidth);
   const containerHeight = ref(window.innerHeight);
   const containerTop = ref(0);
   const containerLeft = ref(0);
-  const active_item_index = ref<number | undefined>(undefined);
+  const active_item_index = ref<MenuItemIndex | undefined>(undefined);
   const current_meta_data = ref<MenuMetaData>({});
   const menuRadius = computed(() =>
     current_meta_data.value.viewer_object_type === "scene" ? SCENE_MENU_RADIUS : MENU_RADIUS,
@@ -101,12 +92,12 @@ export const useMenuStore = defineStore("menu", () => {
     display_menu.value = true;
   }
 
-  function setMenuPosition(x: number, y: number): void {
+  function setMenuPosition(x: Coordinate, y: Coordinate): void {
     menuX.value = x;
     menuY.value = y;
   }
 
-  function toggleItemOptions(index: number): void {
+  function toggleItemOptions(index: MenuItemIndex): void {
     if (active_item_index.value === index) {
       active_item_index.value = undefined;
     } else {
@@ -144,4 +135,5 @@ export const useMenuStore = defineStore("menu", () => {
   };
 });
 
-export type { MenuMetaData, MenuViewerObjectType };
+export type { MenuMetaData };
+export type { MenuViewerObjectType } from "./menu_helpers/types.js";

@@ -1,17 +1,27 @@
 <script setup lang="ts">
+import type {
+  AttributeRangeMaximum,
+  AttributeRangeMinimum,
+} from "@geode/opengeodeweb-viewer/schema_types";
+import type { AttributeRange } from "@ogw_front/types/attribute";
+
+// A bound of the range an attribute coloring covers, its minimum or its maximum
+
 interface Emits {
   reset: [];
 }
 
+type AttributeRangeBound = NonNullable<AttributeRange[number]>;
+
 const emit = defineEmits<Emits>();
 
-const minimum = defineModel<number>("minimum");
-const maximum = defineModel<number>("maximum");
+const minimum = defineModel<AttributeRangeMinimum>("minimum");
+const maximum = defineModel<AttributeRangeMaximum>("maximum");
 
 const minimumText = ref<string>("");
 const maximumText = ref<string>("");
 
-function formatValue(value: number | undefined): string {
+function formatValue(value: AttributeRangeBound | undefined): string {
   if (value === undefined) {
     return "";
   }
@@ -26,7 +36,7 @@ watch(maximum, (value) => (maximumText.value = formatValue(value)), {
 });
 
 // Text inputs (not type="number") so scientific notation like 1.5e7 can be typed, committed on enter or blur.
-function parseValue(text: string): number | undefined {
+function parseValue(text: string): AttributeRangeBound | undefined {
   const value = Number(text.trim());
   return text.trim() === "" || !Number.isFinite(value) ? undefined : value;
 }

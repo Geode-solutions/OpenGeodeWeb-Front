@@ -1,5 +1,8 @@
 import type { ModelId, SurfaceId } from "@ogw_front/types/identifiers";
 import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
+import type { ColoringType } from "@ogw_front/types/attribute";
+import type { GeodeId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { NonEmptyArray } from "@ogw_front/utils/arrays";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -14,19 +17,19 @@ const schema = viewer_schemas.opengeodeweb_viewer.model.surfaces.color;
 export function useModelSurfacesColor(): {
   setModelSurfacesColor: (
     modelId: ModelId,
-    surfaces_ids: SurfaceId[],
+    surfaceIds: SurfaceId[],
     color: ColorRGBA | undefined,
-    activeColoring?: string,
-    collectionId?: string,
+    activeColoring?: ColoringType,
+    collectionId?: GeodeId,
   ) => Promise<unknown>;
   modelSurfaceColoring: (modelId: ModelId, surface_id?: SurfaceId) => StyleValues;
   modelSurfaceColor: (modelId: ModelId, surface_id?: SurfaceId) => ColorRGBA | undefined;
   modelSurfaceActiveColoring: (modelId: ModelId, surface_id?: SurfaceId) => unknown;
   setModelSurfacesActiveColoring: (
     modelId: ModelId,
-    surfaces_ids: SurfaceId[],
-    activeColoring: string,
-    collectionId?: string,
+    surfaceIds: NonEmptyArray<SurfaceId>,
+    activeColoring: ColoringType,
+    collectionId?: GeodeId,
   ) => Promise<unknown>;
 } {
   const dataStore = useDataStore();
@@ -47,14 +50,14 @@ export function useModelSurfacesColor(): {
 
   async function setModelSurfacesColor(
     modelId: ModelId,
-    surfaces_ids: SurfaceId[],
+    surfaceIds: SurfaceId[],
     color: ColorRGBA | undefined,
     activeColoring = "constant",
-    collectionId?: string,
+    collectionId?: GeodeId,
   ): Promise<unknown> {
     const result = await modelCommonStyle.setModelTypeColor(
       modelId,
-      surfaces_ids,
+      surfaceIds,
       color,
       schema,
       activeColoring,
@@ -69,33 +72,33 @@ export function useModelSurfacesColor(): {
 
   async function applyVertexColoring(
     modelId: ModelId,
-    surfaces_ids: SurfaceId[],
+    surfaceIds: NonEmptyArray<SurfaceId>,
   ): Promise<unknown> {
     const name = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeName(
       modelId,
-      surfaces_ids[0],
+      surfaceIds[0],
     );
     const item = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeItem(
       modelId,
-      surfaces_ids[0],
+      surfaceIds[0],
     );
     const [minimum, maximum] = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeRange(
       modelId,
-      surfaces_ids[0],
+      surfaceIds[0],
     );
     const colorMap = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeColorMap(
       modelId,
-      surfaces_ids[0],
+      surfaceIds[0],
     );
     const no_data_color = modelSurfacesVertexAttribute.modelSurfacesVertexAttributeNoDataColor(
       modelId,
-      surfaces_ids[0],
+      surfaceIds[0],
     );
     const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
     if (isAttributeValid(attribute)) {
       const result = await modelSurfacesVertexAttribute.setModelSurfacesVertexAttribute(
         modelId,
-        surfaces_ids,
+        surfaceIds,
         attribute,
       );
       return result;
@@ -105,33 +108,33 @@ export function useModelSurfacesColor(): {
 
   async function applyPolygonColoring(
     modelId: ModelId,
-    surfaces_ids: SurfaceId[],
+    surfaceIds: NonEmptyArray<SurfaceId>,
   ): Promise<unknown> {
     const name = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeName(
       modelId,
-      surfaces_ids[0],
+      surfaceIds[0],
     );
     const item = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeItem(
       modelId,
-      surfaces_ids[0],
+      surfaceIds[0],
     );
     const [minimum, maximum] = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeRange(
       modelId,
-      surfaces_ids[0],
+      surfaceIds[0],
     );
     const colorMap = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeColorMap(
       modelId,
-      surfaces_ids[0],
+      surfaceIds[0],
     );
     const no_data_color = modelSurfacesPolygonAttribute.modelSurfacesPolygonAttributeNoDataColor(
       modelId,
-      surfaces_ids[0],
+      surfaceIds[0],
     );
     const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
     if (isAttributeValid(attribute)) {
       const result = await modelSurfacesPolygonAttribute.setModelSurfacesPolygonAttribute(
         modelId,
-        surfaces_ids,
+        surfaceIds,
         attribute,
       );
       return result;
@@ -141,28 +144,28 @@ export function useModelSurfacesColor(): {
 
   async function setModelSurfacesActiveColoring(
     modelId: ModelId,
-    surfaces_ids: SurfaceId[],
-    activeColoring: string,
-    collectionId?: string,
+    surfaceIds: NonEmptyArray<SurfaceId>,
+    activeColoring: ColoringType,
+    collectionId?: GeodeId,
   ): Promise<unknown> {
     const totalSurfaceIds = await dataStore.getSurfacesGeodeIds(modelId);
-    if (surfaces_ids.length === totalSurfaceIds.length) {
+    if (surfaceIds.length === totalSurfaceIds.length) {
       await modelSurfacesCommonStyle.mutateModelSurfacesTypeColoring(modelId, {
         active: activeColoring,
       });
     }
-    await modelCommonStyle.mutateComponentStyles(modelId, surfaces_ids, {
+    await modelCommonStyle.mutateComponentStyles(modelId, surfaceIds, {
       coloring: { active: activeColoring },
     });
     if (activeColoring === "constant" || activeColoring === "random") {
-      const color = modelSurfaceColor(modelId, surfaces_ids[0]);
-      return setModelSurfacesColor(modelId, surfaces_ids, color, activeColoring, collectionId);
+      const color = modelSurfaceColor(modelId, surfaceIds[0]);
+      return setModelSurfacesColor(modelId, surfaceIds, color, activeColoring, collectionId);
     }
 
     if (activeColoring === "vertex") {
-      return applyVertexColoring(modelId, surfaces_ids);
+      return applyVertexColoring(modelId, surfaceIds);
     } else if (activeColoring === "polygon") {
-      return applyPolygonColoring(modelId, surfaces_ids);
+      return applyPolygonColoring(modelId, surfaceIds);
     }
     return undefined;
   }

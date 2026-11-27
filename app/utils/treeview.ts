@@ -1,12 +1,26 @@
-import type { GeodeObjectTyped, ModelIdentified } from "@ogw_front/types/identifiers";
+import type {
+  GeodeObjectTyped,
+  ModelComponentId,
+  ModelIdentified,
+  TreeNodeId,
+} from "@ogw_front/types/identifiers";
 import type { TreeGroup, TreeNode } from "@ogw_front/types/tree";
+import type { CssColor } from "@ogw_front/types/ui";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
+import type { ModelComponentType } from "@ogw_front/types/model";
 import { isBasemapId } from "@ogw_front/utils/basemap_tree";
+
+// What a new selection adds to the previous one and removes from it
+interface SelectionChanges<Item> {
+  added: Item[];
+  removed: Item[];
+}
 
 function compareSelections<Item>(
   current: readonly Item[],
   previous: readonly Item[],
-): { added: Item[]; removed: Item[] } {
+): SelectionChanges<Item> {
   const added = current.filter((item) => !previous.includes(item));
   const removed = previous.filter((item) => !current.includes(item));
   return { added, removed };
@@ -14,29 +28,29 @@ function compareSelections<Item>(
 
 interface DataMenuPayload {
   event: MouseEvent;
-  itemId: string;
+  itemId: DataId;
   context_type?: undefined;
 }
 
 interface GeodeObjectTypeMenuPayload {
   event: MouseEvent;
-  itemId: string;
+  itemId: TreeNodeId;
   context_type: "geode_object_type";
-  targetIds: string[];
+  targetIds: DataId[];
 }
 
 interface ModelComponentMenuPayload extends ModelIdentified {
   event: MouseEvent;
-  itemId: string;
+  itemId: TreeNodeId;
   context_type: "model_component" | "model_component_type";
-  modelComponentType?: string;
-  targetComponentIds?: string[];
+  modelComponentType?: ModelComponentType;
+  targetComponentIds?: ModelComponentId[];
 }
 
 // The basemap category and its maps: not project data
 interface BasemapMenuPayload {
   event: MouseEvent;
-  itemId: string;
+  itemId: TreeNodeId;
   context_type: "basemap";
 }
 
@@ -59,7 +73,7 @@ const MODEL_TREE_COLORS = [
 ] as const;
 
 // The first color no opened tree uses, cycling once they are all taken
-function nextModelTreeColor(usedColors: readonly (string | undefined)[]): string {
+function nextModelTreeColor(usedColors: readonly (CssColor | undefined)[]): CssColor {
   const free = MODEL_TREE_COLORS.find((color) => !usedColors.includes(color));
   return free ?? MODEL_TREE_COLORS[usedColors.length % MODEL_TREE_COLORS.length] ?? "";
 }
@@ -92,7 +106,7 @@ function withPendingImports<Child extends TreeNode, Pending extends TreeNode & G
 // Always show their toggle, except the group of horizon stacks, which open their own modal
 function isObjectTreeRowViewable(
   row: DisplayItem,
-  isDataViewable: (dataId: string) => boolean,
+  isDataViewable: (dataId: DataId) => boolean,
 ): boolean {
   const { id, title } = row.raw;
   if (typeof id !== "string" || isBasemapId(id)) {

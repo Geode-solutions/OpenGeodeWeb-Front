@@ -1,16 +1,22 @@
 <script setup lang="ts">
+import type {
+  AttributeRangeMaximum,
+  AttributeRangeMinimum,
+} from "@geode/opengeodeweb-viewer/schema_types";
 import { drawCanvasForPreset, getPresetsWithCurrentAtTop } from "@ogw_front/utils/colormap";
+import type { AttributeColorMap } from "@ogw_front/types/attribute";
 import ColorMapList from "./ColorMapList.vue";
+import type { ColorMapPreset } from "@ogw_front/types/props/viewer/options";
 import GlassCard from "@ogw_front/components/GlassCard.vue";
 
 interface Props {
-  min: number;
-  max: number;
+  min: AttributeRangeMinimum;
+  max: AttributeRangeMaximum;
 }
 
 const { max, min } = defineProps<Props>();
 
-const selectedPresetName = defineModel<string>("selectedPresetName", {
+const selectedPresetName = defineModel<AttributeColorMap>("selectedPresetName", {
   default: "batlow",
 });
 
@@ -23,13 +29,21 @@ function drawLutCanvas(): void {
   drawCanvasForPreset(selectedPresetName.value, lutCanvas.value);
 }
 
-function onSelectPreset(preset: { Name: string }): void {
+function onSelectPreset(preset: ColorMapPreset): void {
   selectedPresetName.value = preset.Name;
   menuOpen.value = false;
 }
 
 onMounted(() => nextTick(drawLutCanvas));
-watch([lutCanvas, selectedPresetName, (): number => min, (): number => max], drawLutCanvas);
+watch(
+  [
+    lutCanvas,
+    selectedPresetName,
+    (): AttributeRangeMinimum => min,
+    (): AttributeRangeMaximum => max,
+  ],
+  drawLutCanvas,
+);
 </script>
 
 <template>

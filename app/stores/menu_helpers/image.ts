@@ -1,9 +1,9 @@
 import ImageOptions from "@ogw_front/components/Viewer/Image/ImageOptions.vue";
-import type { MenuItems } from "./types.js";
+import type { MenusByObjectType } from "./types.js";
 
 const Image_menu = [ImageOptions];
 
-const imageMenus: Record<string, MenuItems> = {
+const imageMenus: MenusByObjectType = {
   RasterImage2D: Image_menu,
   RasterImage3D: Image_menu,
 };

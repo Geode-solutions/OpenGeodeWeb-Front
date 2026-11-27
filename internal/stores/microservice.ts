@@ -1,4 +1,10 @@
 import type { ComputedRef, MaybeRefOrGetter, Ref } from "vue";
+import {
+  type HttpJsonRpcSchema,
+  type Microservice,
+  type RequestFeedbackOptions,
+  api_fetch,
+} from "@ogw_internal/utils/api_fetch";
 import type {
   JsonRpcSchema,
   MicroserviceVersionSchema,
@@ -6,7 +12,10 @@ import type {
   RequestHandlers,
   ResponseOf,
 } from "@ogw_shared/utils/types.js";
-import { type Microservice, api_fetch } from "@ogw_internal/utils/api_fetch";
+import type { Count } from "@ogw_front/types/ui";
+import type { PackageVersion } from "@ogw_front/types/server";
+import type { StoreId } from "@ogw_front/types/identifiers";
+import type { Url } from "@ogw_front/types/files";
 import { upload_file } from "@ogw_internal/utils/upload_file.js";
 
 // The pieces every microservice store is made of: a busy counter, an HTTP transport,
@@ -17,16 +26,13 @@ const DEFAULT_PING_INTERVAL_SECONDS = 10;
 const DEFAULT_VERSION = "0.0.0";
 
 interface RequestCounter {
-  request_counter: Ref<number>;
+  request_counter: Ref<Count>;
   is_busy: ComputedRef<boolean>;
   start_request: () => void;
   stop_request: () => void;
 }
 
-type HttpRequestCallbacks<Response> = RequestHandlers<Response> & {
-  readonly skip_feedback_error?: boolean;
-  readonly timeout?: number;
-};
+type HttpRequestCallbacks<Response> = RequestHandlers<Response> & Readonly<RequestFeedbackOptions>;
 
 interface HttpRequestArgs<Schema extends JsonRpcSchema> {
   schema: Schema;
@@ -54,16 +60,21 @@ interface HttpTransport {
   upload: (args: HttpUploadArgs, callbacks?: RequestHandlers) => Promise<unknown>;
 }
 
+// What a microservice answers when asked for its version
+interface MicroserviceVersionResponse {
+  microservice_version: PackageVersion;
+}
+
 type VersionRequest = (
   args: { schema: MicroserviceVersionSchema },
-  callbacks: RequestHandlers<{ microservice_version: string }>,
-) => Promise<{ microservice_version: string }>;
+  callbacks: RequestHandlers<MicroserviceVersionResponse>,
+) => Promise<MicroserviceVersionResponse>;
 
 // HTTP schemas ("front"/"back"/"cloud") always carry `methods`; the shared JsonRpcSchema
 // Type keeps it optional because websocket ("viewer") schemas have `rpc` instead.
-function asHttpSchema(schema: JsonRpcSchema): JsonRpcSchema & { methods: string[] } {
+function asHttpSchema(schema: JsonRpcSchema): HttpJsonRpcSchema {
   // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- see comment above.
-  return schema as JsonRpcSchema & { methods: string[] };
+  return schema as HttpJsonRpcSchema;
 }
 
 function useRequestCounter(): RequestCounter {
@@ -83,8 +94,8 @@ function useRequestCounter(): RequestCounter {
 
 // `base_url` is read on each request: pass the store's ref, not a copy of its value
 function useHttpTransport(
-  id: string,
-  base_url: MaybeRefOrGetter<string>,
+  id: StoreId,
+  base_url: MaybeRefOrGetter<Url>,
   { start_request, stop_request }: RequestTracker,
 ): HttpTransport {
   function microservice(): Microservice {
@@ -161,16 +172,16 @@ function usePing(
 }
 
 function useMicroserviceVersion(request: VersionRequest): {
-  version: Ref<string>;
+  version: Ref<PackageVersion>;
   get_version: (
     schema: MicroserviceVersionSchema | undefined,
-  ) => Promise<{ microservice_version: string } | undefined>;
+  ) => Promise<MicroserviceVersionResponse | undefined>;
 } {
   const version = ref(DEFAULT_VERSION);
 
   async function get_version(
     schema: MicroserviceVersionSchema | undefined,
-  ): Promise<{ microservice_version: string } | undefined> {
+  ): Promise<MicroserviceVersionResponse | undefined> {
     if (!schema) {
       return undefined;
     }

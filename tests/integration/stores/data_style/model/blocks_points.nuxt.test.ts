@@ -6,6 +6,7 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed
 import { beforeAllTimeout, setupIntegrationTests } from "@ogw_tests/integration/setup";
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 import { Status } from "@ogw_front/utils/status";
+import { assertNonEmpty } from "@ogw_tests/utils";
 import { cleanupBackend } from "@ogw_server/utils/cleanup";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -123,21 +124,17 @@ describe("model blocks points", () => {
       const dataStyleStore = useDataStyleStore();
       const viewerStore = useViewerStore();
       const dataStore = useDataStore();
-      const block_geode_ids = await dataStore.getBlocksGeodeIds(id);
-      const block_ids = await dataStore.getMeshComponentsViewerIds(id, block_geode_ids);
+      const blockGeodeIds = assertNonEmpty(await dataStore.getBlocksGeodeIds(id));
+      const block_ids = await dataStore.getMeshComponentsViewerIds(id, blockGeodeIds);
       const name = "points";
       const colorMap = "batlow";
-      await dataStyleStore.setModelBlocksPointsVertexAttributeName(id, block_geode_ids, name);
-      await dataStyleStore.setModelBlocksPointsVertexAttributeColorMap(
-        id,
-        block_geode_ids,
-        colorMap,
-      );
+      await dataStyleStore.setModelBlocksPointsVertexAttributeName(id, blockGeodeIds, name);
+      await dataStyleStore.setModelBlocksPointsVertexAttributeColorMap(id, blockGeodeIds, colorMap);
       const spy = vi.spyOn(viewerStore, "request");
       spy.mockClear();
       await dataStyleStore.setModelBlocksPointsVertexAttributeRange(
         id,
-        block_geode_ids,
+        blockGeodeIds,
         MINIMUM_RANGE,
         MAXIMUM_RANGE,
       );
@@ -159,7 +156,7 @@ describe("model blocks points", () => {
           response_function: expect.any(Function),
         },
       );
-      const block_geode_id = firstElement(block_geode_ids);
+      const block_geode_id = firstElement(blockGeodeIds);
       expect(dataStyleStore.modelBlockPointsActiveColoring(id, block_geode_id)).toBe("vertex");
       expect(dataStyleStore.modelBlockPointsVertexAttributeName(id, block_geode_id)).toBe(name);
     },

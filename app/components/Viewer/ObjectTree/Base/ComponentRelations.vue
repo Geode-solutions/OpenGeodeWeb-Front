@@ -1,13 +1,23 @@
 <script setup lang="ts">
+import type { Count, DisplayText, Label, TestId } from "@ogw_front/types/ui";
+import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
 import type { ComponentRelations } from "@ogw_internal/stores/data/model/relations";
 import type { FormattedComponent } from "@ogw_internal/stores/data/model/mesh_components";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
+import type { ModelComponentType } from "@ogw_front/types/model";
 import { pluralize } from "@ogw_front/utils/string";
 import { useDataStore } from "@ogw_front/stores/data";
 
 interface Props {
-  modelId: string;
-  componentId: string;
+  modelId: ModelId;
+  componentId: ModelComponentId;
+}
+
+// A line of the relations of a component: its relation and a count of the related components per type
+interface ComponentRelationsRow {
+  label: Label;
+  summary: DisplayText;
+  testId: TestId;
 }
 
 const { modelId, componentId } = defineProps<Props>();
@@ -23,8 +33,8 @@ watch(
   { immediate: true },
 );
 
-function summarize(components: readonly FormattedComponent[]): string {
-  const counts = new Map<string, number>();
+function summarize(components: readonly FormattedComponent[]): DisplayText {
+  const counts = new Map<ModelComponentType, Count>();
   for (const component of components) {
     counts.set(component.category, (counts.get(component.category) ?? 0) + 1);
   }
@@ -39,7 +49,7 @@ function summarize(components: readonly FormattedComponent[]): string {
     .join(", ");
 }
 
-const rows = computed<{ label: string; summary: string; testId: string }[]>(() => {
+const rows = computed<ComponentRelationsRow[]>(() => {
   if (!relations.value) {
     return [];
   }

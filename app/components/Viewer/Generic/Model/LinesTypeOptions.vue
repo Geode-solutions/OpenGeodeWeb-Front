@@ -1,36 +1,39 @@
 <script setup lang="ts">
 import type {
+  AttributeColorMap,
+  AttributeRange,
+  AttributeTimeStep,
+  ColoringType,
+} from "@ogw_front/types/attribute";
+import type {
   AttributeItem,
   AttributeName,
   ColorRGBA,
   Visibility,
 } from "@geode/opengeodeweb-viewer/schema_types";
-import type { AttributeRange, AttributeTimeStep } from "@ogw_front/types/attribute";
+import type { LineId, ModelId } from "@ogw_front/types/identifiers";
+import { type NonEmptyArray, isNonEmpty } from "@ogw_front/utils/arrays";
 import type { CollectionComponent } from "@ogw_internal/stores/data/model/collections";
 import { MODEL_LINE_COLORING } from "@ogw_front/utils/model_component_coloring";
+import type { TabName } from "@ogw_front/types/ui";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 interface Props {
-  modelId: string;
-  targetLineIds: string[];
-  collections?: CollectionComponent[];
-  activeTab?: string;
+  modelId: ModelId;
+  targetLineIds: NonEmptyArray<LineId>;
+  collections: CollectionComponent[] | undefined;
+  activeTab: TabName | undefined;
 }
 
-const {
-  modelId,
-  targetLineIds,
-  collections = undefined,
-  activeTab = undefined,
-} = defineProps<Props>();
+const { modelId, targetLineIds, collections, activeTab } = defineProps<Props>();
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
-const referenceLineId = computed<string | undefined>(() =>
+const referenceLineId = computed<LineId | undefined>(() =>
   collections ? targetLineIds[0] : undefined,
 );
 
@@ -57,23 +60,29 @@ const linesColor = computed<ColorRGBA | undefined>({
   },
 });
 
-const linesActiveColoring = computed<string | undefined>({
+const linesActiveColoring = computed<ColoringType | undefined>({
   get: () =>
-    dataStyleStore.modelLineActiveColoring(modelId, referenceLineId.value) as string | undefined,
+    dataStyleStore.modelLineActiveColoring(modelId, referenceLineId.value) as
+      | ColoringType
+      | undefined,
   set: async (coloringType) => {
     if (typeof coloringType !== "string") {
       return;
     }
     if (collections && coloringType === "random") {
       await Promise.all(
-        collections.map((collection) =>
-          dataStyleStore.setModelLinesActiveColoring(
+        collections.map((collection) => {
+          const childIds = collection.children.map((child) => child.id);
+          if (!isNonEmpty(childIds)) {
+            return undefined;
+          }
+          return dataStyleStore.setModelLinesActiveColoring(
             modelId,
-            collection.children.map((child) => child.id),
+            childIds,
             coloringType,
             collection.id,
-          ),
-        ),
+          );
+        }),
       );
     } else {
       await dataStyleStore.setModelLinesActiveColoring(modelId, targetLineIds, coloringType);
@@ -130,7 +139,7 @@ const linesVertexAttributeRange = computed<AttributeRange>({
   },
 });
 
-const linesVertexAttributeColorMap = computed<RGBAColorMap | undefined>({
+const linesVertexAttributeColorMap = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => dataStyleStore.modelLinesVertexAttributeColorMap(modelId, referenceLineId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesVertexAttributeColorMap(modelId, targetLineIds, newValue);
@@ -188,7 +197,7 @@ const linesEdgeAttributeRange = computed<AttributeRange>({
   },
 });
 
-const linesEdgeAttributeColorMap = computed<Map<string, ColorRGBA> | undefined>({
+const linesEdgeAttributeColorMap = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => dataStyleStore.modelLinesEdgeAttributeColorMap(modelId, referenceLineId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelLinesEdgeAttributeColorMap(modelId, targetLineIds, newValue);

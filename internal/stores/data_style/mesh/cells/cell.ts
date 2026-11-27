@@ -151,7 +151,7 @@ function useMeshCellsCellAttributeStyle(): UseMeshCellsCellAttributeStyleReturn 
   }
   async function setMeshCellsCellAttributeColorMap(
     meshId: MeshId,
-    colorMap: AttributeColorMap | undefined,
+    colorMap: AttributeColorMap,
   ): Promise<unknown> {
     const name = meshCellsCellAttributeName(meshId);
     const item = meshCellsCellAttributeItem(meshId);

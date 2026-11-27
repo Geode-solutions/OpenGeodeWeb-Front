@@ -14,6 +14,8 @@ import {
   type vtkWidgetManager as WidgetManagerInstance,
   newInstance as vtkWidgetManager,
 } from "@kitware/vtk.js/Widgets/Core/WidgetManager";
+import type { Coordinates } from "@ogw_front/types/geometry";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { DataIdentified } from "@ogw_front/types/identifiers";
 import type { vtkGenericRenderWindow as GenericRenderWindowInstance } from "@ogw_internal/stores/hybrid_viewer/vtk_types";
 import type { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -23,7 +25,7 @@ import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering
 interface ClippingPlanesWidgetParams {
   planes: Ref<ClippingPlane[]>;
   targetAllVisible: Ref<boolean>;
-  selectedDatasetIds: Ref<string[]>;
+  selectedDatasetIds: Ref<DataId[]>;
   allItems: Ref<DataIdentified[]>;
   hybridViewerStore: ReturnType<typeof useHybridViewerStore>;
   debouncedApply: (...args: readonly unknown[]) => void;
@@ -63,7 +65,7 @@ function useClippingPlanesWidget({
       ),
     );
   }
-  function getSceneCenter(): readonly number[] {
+  function getSceneCenter(): Readonly<Coordinates> {
     return getSceneBoundsInfo().center;
   }
 

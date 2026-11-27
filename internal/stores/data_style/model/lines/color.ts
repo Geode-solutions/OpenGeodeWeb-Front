@@ -1,5 +1,8 @@
 import type { LineId, ModelId } from "@ogw_front/types/identifiers";
 import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
+import type { ColoringType } from "@ogw_front/types/attribute";
+import type { GeodeId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { NonEmptyArray } from "@ogw_front/utils/arrays";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -14,19 +17,19 @@ const schema = viewer_schemas.opengeodeweb_viewer.model.lines.color;
 export function useModelLinesColor(): {
   setModelLinesColor: (
     modelId: ModelId,
-    lines_ids: LineId[],
+    lineIds: LineId[],
     color: ColorRGBA | undefined,
-    activeColoring?: string,
-    collectionId?: string,
+    activeColoring?: ColoringType,
+    collectionId?: GeodeId,
   ) => Promise<unknown>;
   modelLineColoring: (modelId: ModelId, line_id?: LineId) => StyleValues;
   modelLineColor: (modelId: ModelId, line_id?: LineId) => ColorRGBA | undefined;
   modelLineActiveColoring: (modelId: ModelId, line_id?: LineId) => unknown;
   setModelLinesActiveColoring: (
     modelId: ModelId,
-    lines_ids: LineId[],
-    activeColoring: string,
-    collectionId?: string,
+    lineIds: NonEmptyArray<LineId>,
+    activeColoring: ColoringType,
+    collectionId?: GeodeId,
   ) => Promise<unknown>;
 } {
   const dataStore = useDataStore();
@@ -47,14 +50,14 @@ export function useModelLinesColor(): {
 
   async function setModelLinesColor(
     modelId: ModelId,
-    lines_ids: LineId[],
+    lineIds: LineId[],
     color: ColorRGBA | undefined,
     activeColoring = "constant",
-    collectionId?: string,
+    collectionId?: GeodeId,
   ): Promise<unknown> {
     const result = await modelCommonStyle.setModelTypeColor(
       modelId,
-      lines_ids,
+      lineIds,
       color,
       schema,
       activeColoring,
@@ -67,26 +70,29 @@ export function useModelLinesColor(): {
     return modelLineColoring(modelId, line_id).active;
   }
 
-  async function applyVertexColoring(modelId: ModelId, lines_ids: LineId[]): Promise<unknown> {
-    const name = modelLinesVertexAttribute.modelLinesVertexAttributeName(modelId, lines_ids[0]);
-    const item = modelLinesVertexAttribute.modelLinesVertexAttributeItem(modelId, lines_ids[0]);
+  async function applyVertexColoring(
+    modelId: ModelId,
+    lineIds: NonEmptyArray<LineId>,
+  ): Promise<unknown> {
+    const name = modelLinesVertexAttribute.modelLinesVertexAttributeName(modelId, lineIds[0]);
+    const item = modelLinesVertexAttribute.modelLinesVertexAttributeItem(modelId, lineIds[0]);
     const [minimum, maximum] = modelLinesVertexAttribute.modelLinesVertexAttributeRange(
       modelId,
-      lines_ids[0],
+      lineIds[0],
     );
     const colorMap = modelLinesVertexAttribute.modelLinesVertexAttributeColorMap(
       modelId,
-      lines_ids[0],
+      lineIds[0],
     );
     const no_data_color = modelLinesVertexAttribute.modelLinesVertexAttributeNoDataColor(
       modelId,
-      lines_ids[0],
+      lineIds[0],
     );
     const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
     if (isAttributeValid(attribute)) {
       const result = await modelLinesVertexAttribute.setModelLinesVertexAttribute(
         modelId,
-        lines_ids,
+        lineIds,
         attribute,
       );
       return result;
@@ -94,23 +100,26 @@ export function useModelLinesColor(): {
     return undefined;
   }
 
-  async function applyEdgeColoring(modelId: ModelId, lines_ids: LineId[]): Promise<unknown> {
-    const name = modelLinesEdgeAttribute.modelLinesEdgeAttributeName(modelId, lines_ids[0]);
-    const item = modelLinesEdgeAttribute.modelLinesEdgeAttributeItem(modelId, lines_ids[0]);
+  async function applyEdgeColoring(
+    modelId: ModelId,
+    lineIds: NonEmptyArray<LineId>,
+  ): Promise<unknown> {
+    const name = modelLinesEdgeAttribute.modelLinesEdgeAttributeName(modelId, lineIds[0]);
+    const item = modelLinesEdgeAttribute.modelLinesEdgeAttributeItem(modelId, lineIds[0]);
     const [minimum, maximum] = modelLinesEdgeAttribute.modelLinesEdgeAttributeRange(
       modelId,
-      lines_ids[0],
+      lineIds[0],
     );
-    const colorMap = modelLinesEdgeAttribute.modelLinesEdgeAttributeColorMap(modelId, lines_ids[0]);
+    const colorMap = modelLinesEdgeAttribute.modelLinesEdgeAttributeColorMap(modelId, lineIds[0]);
     const no_data_color = modelLinesEdgeAttribute.modelLinesEdgeAttributeNoDataColor(
       modelId,
-      lines_ids[0],
+      lineIds[0],
     );
     const attribute = { name, item, minimum, maximum, colorMap, no_data_color };
     if (isAttributeValid(attribute)) {
       const result = await modelLinesEdgeAttribute.setModelLinesEdgeAttribute(
         modelId,
-        lines_ids,
+        lineIds,
         attribute,
       );
       return result;
@@ -120,28 +129,28 @@ export function useModelLinesColor(): {
 
   async function setModelLinesActiveColoring(
     modelId: ModelId,
-    lines_ids: LineId[],
-    activeColoring: string,
-    collectionId?: string,
+    lineIds: NonEmptyArray<LineId>,
+    activeColoring: ColoringType,
+    collectionId?: GeodeId,
   ): Promise<unknown> {
     const totalLineIds = await dataStore.getLinesGeodeIds(modelId);
-    if (lines_ids.length === totalLineIds.length) {
+    if (lineIds.length === totalLineIds.length) {
       await modelLinesCommonStyle.mutateModelLinesTypeColoring(modelId, {
         active: activeColoring,
       });
     }
-    await modelCommonStyle.mutateComponentStyles(modelId, lines_ids, {
+    await modelCommonStyle.mutateComponentStyles(modelId, lineIds, {
       coloring: { active: activeColoring },
     });
     if (activeColoring === "constant" || activeColoring === "random") {
-      const color = modelLineColor(modelId, lines_ids[0]);
-      return setModelLinesColor(modelId, lines_ids, color, activeColoring, collectionId);
+      const color = modelLineColor(modelId, lineIds[0]);
+      return setModelLinesColor(modelId, lineIds, color, activeColoring, collectionId);
     }
 
     if (activeColoring === "vertex") {
-      return applyVertexColoring(modelId, lines_ids);
+      return applyVertexColoring(modelId, lineIds);
     } else if (activeColoring === "edge") {
-      return applyEdgeColoring(modelId, lines_ids);
+      return applyEdgeColoring(modelId, lineIds);
     }
     return undefined;
   }

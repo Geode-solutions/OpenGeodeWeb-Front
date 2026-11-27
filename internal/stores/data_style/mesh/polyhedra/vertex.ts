@@ -156,7 +156,7 @@ function useMeshPolyhedraVertexAttributeStyle(): UseMeshPolyhedraVertexAttribute
   }
   async function setMeshPolyhedraVertexAttributeColorMap(
     meshId: MeshId,
-    colorMap: AttributeColorMap | undefined,
+    colorMap: AttributeColorMap,
   ): Promise<unknown> {
     const name = meshPolyhedraVertexAttributeName(meshId);
     const item = meshPolyhedraVertexAttributeItem(meshId);

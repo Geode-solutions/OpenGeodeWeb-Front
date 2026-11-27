@@ -1,30 +1,42 @@
 <script setup lang="ts">
 import type {
+  AttributeColorMap,
+  AttributeRange,
+  AttributeTimeStep,
+  ColoringType,
+} from "@ogw_front/types/attribute";
+import type {
   AttributeItem,
   AttributeName,
   ColorRGBA,
   Visibility,
 } from "@geode/opengeodeweb-viewer/schema_types";
-import type { AttributeRange, AttributeTimeStep } from "@ogw_front/types/attribute";
-import type { LineId } from "@ogw_front/types/identifiers";
+import type { LineId, ModelId } from "@ogw_front/types/identifiers";
 import { MODEL_LINE_COLORING } from "@ogw_front/utils/model_component_coloring";
+import type { NonEmptyArray } from "@ogw_front/utils/arrays";
+import type { TabName } from "@ogw_front/types/ui";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 interface Props {
-  modelId: string;
-  lineId?: LineId;
-  activeTab?: string;
+  modelId: ModelId;
+  lineId: LineId | undefined;
+  activeTab: TabName | undefined;
 }
 
-const { modelId, lineId = undefined, activeTab = undefined } = defineProps<Props>();
+const { modelId, lineId, activeTab } = defineProps<Props>();
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
-const lineComponentIds = computed<string[]>(() => (lineId !== undefined && [lineId]) || []);
+const lineComponentIds = computed<NonEmptyArray<LineId> | undefined>(() => {
+  if (lineId === undefined) {
+    return undefined;
+  }
+  return [lineId];
+});
 
 const lineVisibility = computed<Visibility | undefined>({
   get: () => dataStyleStore.modelLineVisibility(modelId, lineId) as boolean | undefined,
@@ -48,8 +60,8 @@ const lineColor = computed<ColorRGBA | undefined>({
   },
 });
 
-const lineActiveColoring = computed<string | undefined>({
-  get: () => dataStyleStore.modelLineActiveColoring(modelId, lineId) as string | undefined,
+const lineActiveColoring = computed<ColoringType | undefined>({
+  get: () => dataStyleStore.modelLineActiveColoring(modelId, lineId) as ColoringType | undefined,
   set: async (coloringType) => {
     if (lineId === undefined || typeof coloringType !== "string") {
       return;
@@ -105,7 +117,7 @@ const vertexAttributeRange = computed<AttributeRange>({
   },
 });
 
-const vertexAttributeColorMap = computed<ColorMap | undefined>({
+const vertexAttributeColorMap = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => dataStyleStore.modelLinesVertexAttributeColorMap(modelId, lineId),
   set: async (newValue) => {
     if (lineId === undefined) {
@@ -172,7 +184,7 @@ const edgeAttributeRange = computed<AttributeRange>({
   },
 });
 
-const edgeAttributeColorMap = computed<Map<string, ColorRGBA> | undefined>({
+const edgeAttributeColorMap = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => dataStyleStore.modelLinesEdgeAttributeColorMap(modelId, lineId),
   set: async (newValue) => {
     if (lineId === undefined) {
@@ -202,6 +214,7 @@ const { capabilities, schemas: attributeSchemas } = MODEL_LINE_COLORING;
     <VisibilitySwitch v-model="lineVisibility" />
     <ViewerOptionsColoringTypeSelector
       :data-id="modelId"
+      v-if="lineComponentIds"
       :componentIds="lineComponentIds"
       v-model:coloring_style_key="lineActiveColoring"
       v-model:color="lineColor"

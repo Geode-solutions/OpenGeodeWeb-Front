@@ -1,6 +1,9 @@
 import back_schemas, {
   type BasemapBuildResponse,
 } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
+import type { BasemapId } from "@ogw_front/types/identifiers";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { DataName } from "@ogw_front/types/data";
 import type { MapStyle } from "@ogw_front/utils/basemap_tree";
 import type { Opacity } from "@geode/opengeodeweb-viewer/schema_types";
 import { useBackStore } from "@ogw_front/stores/back";
@@ -21,15 +24,15 @@ function ignoreError(): void {
 
 interface MapToShow {
   response: BasemapBuildResponse;
-  name: string;
+  name: DataName;
   layers: Layer[];
-  dataIds: string[];
+  dataIds: DataId[];
 }
 
 interface BasemapViewer {
-  discardMap: (id: string, registered: boolean) => Promise<void>;
-  sendLayers: (id: string, layers: Layer[]) => Promise<void>;
-  showMap: (map: Readonly<MapToShow>, detailOf?: string) => Promise<void>;
+  discardMap: (id: BasemapId, registered: boolean) => Promise<void>;
+  sendLayers: (id: BasemapId, layers: Layer[]) => Promise<void>;
+  showMap: (map: Readonly<MapToShow>, detailOf?: BasemapId) => Promise<void>;
 }
 
 // The stores are taken once: a call still running after a project reset reaches its own stores
@@ -40,7 +43,7 @@ function useBasemapViewer(): BasemapViewer {
 
   // Best effort: a map left behind is only a leftover, never an error to show twice.
   // A registered map leaves the viewer before the back deletes its files
-  async function discardMap(id: string, registered: boolean): Promise<void> {
+  async function discardMap(id: BasemapId, registered: boolean): Promise<void> {
     if (registered) {
       await dataStore.deregisterObject(id).catch(ignoreError);
     }
@@ -50,7 +53,7 @@ function useBasemapViewer(): BasemapViewer {
   }
 
   // The viewer recomposes its textures: no download, no new mesh
-  async function sendLayers(id: string, layers: Layer[]): Promise<void> {
+  async function sendLayers(id: BasemapId, layers: Layer[]): Promise<void> {
     await viewerStore.request({
       schema: viewer_schemas.opengeodeweb_viewer.mesh.basemap_layers,
       params: { id, layers },
@@ -60,7 +63,7 @@ function useBasemapViewer(): BasemapViewer {
   // Registers a built map, shows it with the layers and drapes the top surfaces of the data
   async function showMap(
     { response, name, layers, dataIds }: Readonly<MapToShow>,
-    detailOf?: string,
+    detailOf?: BasemapId,
   ): Promise<void> {
     await dataStore.registerObject(response.id, name);
     await viewerStore.request({

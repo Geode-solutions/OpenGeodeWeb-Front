@@ -1,22 +1,25 @@
 <script setup lang="ts">
+import type { Count } from "@ogw_front/types/ui";
+import type { DataName } from "@ogw_front/types/data";
 import GlassCard from "./GlassCard.vue";
 
+// An item the DeleteDialog asks to delete
 interface DeleteItem {
-  name: string;
+  name: DataName;
 }
 
 interface Props {
-  show?: boolean;
+  show: boolean;
   item?: DeleteItem;
-  selectedCount?: number;
+  selectedCount?: Count;
 }
-
-const { show = false, item = undefined, selectedCount = 0 } = defineProps<Props>();
 
 interface Emits {
   "update:show": [value: boolean];
   confirm: [];
 }
+
+const { show, item = undefined, selectedCount = 0 } = defineProps<Props>();
 
 const emit = defineEmits<Emits>();
 </script>

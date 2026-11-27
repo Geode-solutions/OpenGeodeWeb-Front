@@ -1,3 +1,4 @@
+import type { ColorMode, CssColor } from "@ogw_front/types/ui";
 import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
 
 const RGB_MAX = 255;
@@ -24,7 +25,7 @@ function parseAlpha(alphaText: string | undefined): number {
   return Math.min(1, Math.max(0, roundedAlpha));
 }
 
-function parseColorString(colorText: string): ColorRGBA | undefined {
+function parseColorString(colorText: CssColor): ColorRGBA | undefined {
   if (colorText === "") {
     return undefined;
   }
@@ -47,7 +48,7 @@ function parseColorString(colorText: string): ColorRGBA | undefined {
   return { red, green, blue, alpha };
 }
 
-function formatColorString(color: ColorRGBA, mode: string): string {
+function formatColorString(color: ColorRGBA, mode: ColorMode): CssColor {
   const { red, green, blue, alpha } = color;
   const roundRed = Math.round(red);
   const roundGreen = Math.round(green);

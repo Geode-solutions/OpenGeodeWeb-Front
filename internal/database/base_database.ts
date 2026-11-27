@@ -1,4 +1,5 @@
 import { Dexie } from "dexie";
+import type { TableSchemas } from "./types";
 import { cameraPositionsTable } from "./tables/camera_positions";
 import { dataStyleTable } from "./tables/data_style";
 import { dataTable } from "./tables/data";
@@ -10,7 +11,7 @@ import { sceneStyleTable } from "./tables/scene_style";
 import { treeviewConfigTable } from "./tables/treeview_config";
 
 export class BaseDatabase extends Dexie {
-  public static get initialStores(): Record<string, string> {
+  public static get initialStores(): TableSchemas {
     return {
       [dataTable.name]: dataTable.schema,
       [modelComponentsTable.name]: modelComponentsTable.schema,

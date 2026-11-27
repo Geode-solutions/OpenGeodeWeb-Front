@@ -1,3 +1,7 @@
+import type { Count, Label, Message } from "@ogw_front/types/ui";
+import type { Milliseconds, Timestamp } from "@ogw_front/types/time";
+import type { MicroserviceId } from "@ogw_front/types/identifiers";
+import type { Route } from "@ogw_front/types/server";
 import { summarizeParams } from "@ogw_front/utils/activity_params";
 
 // Read-only journal of what the app is doing: microservice requests, server events, connection changes
@@ -5,34 +9,36 @@ const MAX_ENTRIES = 500;
 
 type ActivityEntryKind = "http" | "ws" | "upload" | "event" | "connection";
 type ActivityEntryStatus = "running" | "success" | "error" | "timeout" | "info";
-type ActivityOutcome = { status: "success" } | { status: "error" | "timeout"; error: string };
+// An entry of the activity journal, by the number it was logged with
+type ActivityEntryId = number;
+type ActivityOutcome = { status: "success" } | { status: "error" | "timeout"; error: Message };
 
 interface ActivityEntry {
-  id: number;
-  source: string;
+  id: ActivityEntryId;
+  source: MicroserviceId;
   kind: ActivityEntryKind;
-  route: string;
+  route: Route;
   status: ActivityEntryStatus;
-  started_at: number;
-  label?: string;
+  started_at: Timestamp;
+  label?: Label;
   params?: string;
-  duration_ms?: number;
-  error?: string;
+  duration_ms?: Milliseconds;
+  error?: Message;
 }
 
 interface ActivityEntryInput {
-  source: string;
+  source: MicroserviceId;
   kind: ActivityEntryKind;
-  route: string;
-  label?: string;
+  route: Route;
+  label?: Label;
   params?: unknown;
 }
 
 interface ActivityLogInput extends ActivityEntryInput {
   status: ActivityEntryStatus;
-  started_at?: number;
-  duration_ms?: number;
-  error?: string;
+  started_at?: Timestamp;
+  duration_ms?: Milliseconds;
+  error?: Message;
 }
 
 // An error or a timeout: what the activity panel counts and shows in red
@@ -40,7 +46,7 @@ function isFailure(status: ActivityEntryStatus): boolean {
   return status === "error" || status === "timeout";
 }
 
-function createEntry(id: number, input: ActivityLogInput): ActivityEntry {
+function createEntry(id: ActivityEntryId, input: ActivityLogInput): ActivityEntry {
   const { params, started_at, ...fields } = input;
   const summary = summarizeParams(params);
   return {
@@ -53,7 +59,7 @@ function createEntry(id: number, input: ActivityLogInput): ActivityEntry {
 
 // The errors not seen yet, counted in one place whether logged at once or failed later
 function useUnseenErrors(): {
-  unseen_errors: Ref<number>;
+  unseen_errors: Ref<Count>;
   countFailure: (status: ActivityEntryStatus) => void;
   mark_errors_seen: () => void;
 } {
@@ -90,11 +96,11 @@ const useActivityStore = defineStore("activity", () => {
     return entry;
   }
 
-  function start_request(input: ActivityEntryInput): number {
+  function start_request(input: ActivityEntryInput): ActivityEntryId {
     return log({ ...input, status: "running" }).id;
   }
 
-  function finish_request(entryId: number, outcome: ActivityOutcome): void {
+  function finish_request(entryId: ActivityEntryId, outcome: ActivityOutcome): void {
     const entry = entries.value.find((candidate) => candidate.id === entryId);
     if (entry === undefined) {
       return;
@@ -127,4 +133,10 @@ const useActivityStore = defineStore("activity", () => {
 });
 
 export { MAX_ENTRIES, isFailure, useActivityStore };
-export type { ActivityEntry, ActivityEntryKind, ActivityEntryStatus, ActivityOutcome };
+export type {
+  ActivityEntry,
+  ActivityEntryId,
+  ActivityEntryKind,
+  ActivityEntryStatus,
+  ActivityOutcome,
+};

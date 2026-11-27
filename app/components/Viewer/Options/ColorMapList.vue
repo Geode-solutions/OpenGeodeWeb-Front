@@ -1,40 +1,51 @@
 <script setup lang="ts">
+import type { AttributeColorMap } from "@ogw_front/types/attribute";
+import type { ColorMapPreset } from "@ogw_front/types/props/viewer/options";
 import GlassCard from "@ogw_front/components/GlassCard.vue";
+import type { SearchQuery } from "@ogw_front/types/ui";
 import { drawCanvasForPreset } from "@ogw_front/utils/colormap";
 
-const CHUNK_SIZE = 5;
+// A canvas of the color map list, by the id of the row that draws it
+type ColorMapCanvasId = string;
 
-interface ColorMapPreset {
-  Name: string;
-  Children?: ColorMapPreset[];
-  [key: string]: unknown;
+// A canvas of the color map list, with the preset it draws
+interface ColorMapCanvasEntry {
+  element: HTMLCanvasElement;
+  presetName: AttributeColorMap;
 }
+
+// A position in the canvases the color map list draws chunk by chunk
+type ColorMapCanvasIndex = number;
+
+// A drawing pass of the color map list canvases, the latest one cancelling the earlier ones
+type ColorMapRenderJobId = number;
 
 interface Props {
-  presets: ColorMapPreset[];
-  selectedPresetName?: string;
+  presets: readonly ColorMapPreset[];
+  selectedPresetName: AttributeColorMap;
 }
-
-const { presets, selectedPresetName = "" } = defineProps<Props>();
 
 interface Emits {
   select: [preset: ColorMapPreset];
 }
 
+const CHUNK_SIZE = 5;
+
+const { presets, selectedPresetName } = defineProps<Props>();
+
 const emit = defineEmits<Emits>();
 
-interface CanvasRefEntry {
-  element: HTMLCanvasElement;
-  presetName: string;
-}
-
-const filterText = ref<string>("");
-const canvasRefs = ref<Map<string, CanvasRefEntry>>(new Map());
+const filterText = ref<SearchQuery>("");
+const canvasRefs = ref<Map<ColorMapCanvasId, ColorMapCanvasEntry>>(new Map());
 const loading = ref<boolean>(true);
-const renderJobId = ref<number>(0);
-const openedGroups = ref<string[]>([]);
+const renderJobId = ref<ColorMapRenderJobId>(0);
+const openedGroups = ref<AttributeColorMap[]>([]);
 
-function setCanvasRef(presetName: string, element: Element | null, id: string): void {
+function setCanvasRef(
+  presetName: AttributeColorMap,
+  element: Element | null,
+  id: ColorMapCanvasId,
+): void {
   if (element) {
     canvasRefs.value.set(id, {
       element: element as HTMLCanvasElement,
@@ -45,7 +56,7 @@ function setCanvasRef(presetName: string, element: Element | null, id: string): 
   }
 }
 
-const filteredPresets = computed<ColorMapPreset[]>(() => {
+const filteredPresets = computed<readonly ColorMapPreset[]>(() => {
   const allPresets = presets;
   if (!filterText.value) {
     return allPresets;
@@ -76,7 +87,11 @@ watch(filterText, (newFilterText) => {
   }
 });
 
-function processChunk(entries: [string, CanvasRefEntry][], index: number, jobId: number): void {
+function processChunk(
+  entries: [ColorMapCanvasId, ColorMapCanvasEntry][],
+  index: ColorMapCanvasIndex,
+  jobId: ColorMapRenderJobId,
+): void {
   if (jobId !== renderJobId.value || index >= entries.length) {
     if (jobId === renderJobId.value) {
       loading.value = false;

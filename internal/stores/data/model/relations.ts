@@ -1,18 +1,19 @@
 import { type FormattedComponent, toFormattedComponent } from "./mesh_components.js";
+import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
 import {
   componentRelationsOf,
   modelComponentRelationsOf,
   modelComponentsByGeodeIds,
 } from "@ogw_internal/database/queries.js";
 import type { ModelComponentRelationRecord } from "@ogw_internal/database/tables/model_components_relation";
-import type { ModelId } from "@ogw_front/types/identifiers";
+import type { ModelComponentRelationType } from "@ogw_front/types/model";
 
 interface ComponentRelations {
   readonly boundaries: readonly FormattedComponent[];
   readonly internals: readonly FormattedComponent[];
 }
 
-const RELATION_KEYS: Readonly<Record<string, keyof ComponentRelations>> = {
+const RELATION_KEYS: Readonly<Record<ModelComponentRelationType, keyof ComponentRelations>> = {
   boundary: "boundaries",
   internal: "internals",
 };
@@ -22,9 +23,9 @@ type MutableComponentRelations = { [Key in keyof ComponentRelations]: FormattedC
 function groupRelationsByParent(
   relations: readonly ModelComponentRelationRecord[],
   components: readonly FormattedComponent[],
-): Record<string, ComponentRelations> {
+): Record<ModelComponentId, ComponentRelations> {
   const componentsById = new Map(components.map((component) => [component.id, component]));
-  const byParent: Record<string, MutableComponentRelations> = {};
+  const byParent: Record<ModelComponentId, MutableComponentRelations> = {};
   for (const relation of relations) {
     const key = RELATION_KEYS[relation.type];
     const child = componentsById.get(relation.child);
@@ -39,7 +40,7 @@ function groupRelationsByParent(
 async function getRelatedComponents(
   modelId: ModelId,
   relations: readonly ModelComponentRelationRecord[],
-  type: string,
+  type: ModelComponentRelationType,
 ): Promise<FormattedComponent[]> {
   const childIds = relations
     .filter((relation) => relation.type === type)
@@ -50,7 +51,7 @@ async function getRelatedComponents(
 
 async function getComponentRelations(
   modelId: ModelId,
-  componentId: string,
+  componentId: ModelComponentId,
 ): Promise<ComponentRelations> {
   const relations = await componentRelationsOf(modelId, componentId).toArray();
   const [boundaries, internals] = await Promise.all([
@@ -65,7 +66,7 @@ async function getComponentRelations(
 async function fetchAllComponentRelations(
   modelId: ModelId,
   components: readonly FormattedComponent[],
-): Promise<Record<string, ComponentRelations>> {
+): Promise<Record<ModelComponentId, ComponentRelations>> {
   const relations = await modelComponentRelationsOf(modelId).toArray();
   return groupRelationsByParent(relations, components);
 }

@@ -1,6 +1,7 @@
 // Third party imports
 import { type VueWrapper, flushPromises } from "@vue/test-utils";
 import { describe, expect, test } from "vitest";
+import type { AttributeRange } from "@ogw_front/types/attribute";
 import { mountSuspended } from "@nuxt/test-utils/runtime";
 
 // Local imports
@@ -10,7 +11,7 @@ import { vuetify } from "@ogw_tests/utils";
 const ID = "12345678901234567890123456789012";
 const OPACITY = 0.5;
 const COLOR = { red: 255, green: 0, blue: 0, alpha: OPACITY };
-const RANGE = [0, 1];
+const RANGE: AttributeRange = [0, 1];
 
 async function mountSelector(coloringStyleKey: string): Promise<VueWrapper> {
   const wrapper = await mountSuspended(ColoringTypeSelector, {

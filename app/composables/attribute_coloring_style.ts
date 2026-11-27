@@ -1,22 +1,32 @@
 import type {
   AttributeColorMap,
   AttributeTimeStep,
+  AttributeTimeValue,
+  ColoringType,
   ValidAttributeRange,
 } from "@ogw_front/types/attribute";
 import { type AttributeInfo, getAttributeRange } from "@ogw_front/utils/attributes";
 import { type AttributeSchemas, fetchAttributeRange } from "@ogw_front/utils/attribute_range";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { JsonRpcSchema } from "@ogw_shared/utils/types";
+import type { ModelComponentId } from "@ogw_front/types/identifiers";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
+// A style property of an attribute coloring, the suffix of its store methods ("Name", "Range", ...)
+type StyleProperty = string;
+
+// What the back schemas of an attribute coloring start with: "" for a data, "model_component_" for model components
+type SchemaPrefix = string;
+
 // Elements colored by the same attribute, with the store and back accesses of their data
 interface AttributeColoring {
   // Reads a style property ("Name", "Range", ...) of the attribute coloring
-  read: (property: string) => unknown;
-  write: (property: string, ...values: unknown[]) => Promise<void>;
+  read: (property: StyleProperty) => unknown;
+  write: (property: StyleProperty, ...values: unknown[]) => Promise<void>;
   schemas: AttributeSchemas;
-  params: { id: string; component_ids?: string[] };
+  params: { id: DataId; component_ids?: ModelComponentId[] };
 }
 
 interface AttributeNamesResponse {
@@ -28,7 +38,7 @@ interface AttributeColoringStyle {
   currentRange: WritableComputedRef<Readonly<ValidAttributeRange>>;
   applyGlobalColormap: (colorMap: AttributeColorMap) => Promise<void>;
   resetGlobalRange: () => Promise<void>;
-  currentTimeSteps: Ref<number[]>;
+  currentTimeSteps: Ref<AttributeTimeValue[]>;
   currentTimeStep: WritableComputedRef<AttributeTimeStep>;
   loadTimeSteps: () => Promise<void>;
 }
@@ -43,11 +53,15 @@ function storeMethod(store: object, name: string): StoreMethod {
 }
 
 // "Polyhedron" in the store method names of the "polyhedron" coloring
-function attributeType(activeColoring: string): string {
+function attributeType(activeColoring: ColoringType): string {
   return `${activeColoring.charAt(0).toUpperCase()}${activeColoring.slice(1)}Attribute`;
 }
 
-function attributeSchema(prefix: string, activeColoring: string, route: string): JsonRpcSchema {
+function attributeSchema(
+  prefix: SchemaPrefix,
+  activeColoring: ColoringType,
+  route: string,
+): JsonRpcSchema {
   const schema: unknown = Reflect.get(
     back_schemas.opengeodeweb_back,
     `${prefix}${activeColoring}_attribute_${route}`,
@@ -57,7 +71,7 @@ function attributeSchema(prefix: string, activeColoring: string, route: string):
 }
 
 // The `${prefix}${activeColoring}_attribute_names` and `_attribute_range` schemas
-function attributeSchemas(prefix: string, activeColoring: string): AttributeSchemas {
+function attributeSchemas(prefix: SchemaPrefix, activeColoring: ColoringType): AttributeSchemas {
   return {
     names: attributeSchema(prefix, activeColoring, "names"),
     range: attributeSchema(prefix, activeColoring, "range"),
@@ -69,10 +83,10 @@ function useAttributeColoringStyle(colorings: Ref<AttributeColoring[]>): Attribu
   const backStore = useBackStore();
   const hybridViewerStore = useHybridViewerStore();
 
-  const currentTimeSteps = ref<number[]>([]);
+  const currentTimeSteps = ref<AttributeTimeValue[]>([]);
   const temporalColoring = shallowRef<AttributeColoring | undefined>(undefined);
 
-  async function writeAll(property: string, ...values: unknown[]): Promise<void> {
+  async function writeAll(property: StyleProperty, ...values: unknown[]): Promise<void> {
     await Promise.all(
       colorings.value.map(async (coloring) => {
         await coloring.write(property, ...values);
@@ -125,7 +139,7 @@ function useAttributeColoringStyle(colorings: Ref<AttributeColoring[]>): Attribu
     await hybridViewerStore.remoteRender();
   }
 
-  async function requestTimeSteps(coloring: AttributeColoring): Promise<number[]> {
+  async function requestTimeSteps(coloring: AttributeColoring): Promise<AttributeTimeValue[]> {
     const name = coloring.read("Name");
     const response = await backStore.request({
       schema: coloring.schemas.names,
@@ -150,7 +164,7 @@ function useAttributeColoringStyle(colorings: Ref<AttributeColoring[]>): Attribu
     }
   }
 
-  async function applyTimeStep(step: number): Promise<void> {
+  async function applyTimeStep(step: AttributeTimeStep): Promise<void> {
     if (temporalColoring.value) {
       await temporalColoring.value.write("TimeStep", step);
       await hybridViewerStore.remoteRender();
@@ -158,7 +172,7 @@ function useAttributeColoringStyle(colorings: Ref<AttributeColoring[]>): Attribu
   }
 
   const currentTimeStep = computed<AttributeTimeStep>({
-    get(): number {
+    get(): AttributeTimeStep {
       const coloring = temporalColoring.value;
       if (!coloring) {
         return 0;
@@ -166,7 +180,7 @@ function useAttributeColoringStyle(colorings: Ref<AttributeColoring[]>): Attribu
       return Number(coloring.read("TimeStep") ?? 0);
     },
     // Setter cannot be async (see `currentRange`), so the write is delegated.
-    set: (step: number): void => {
+    set: (step: AttributeTimeStep): void => {
       /* oxlint-disable-next-line promise/prefer-await-to-then -- setter cannot be async; see comment above. */
       applyTimeStep(step).catch(() => undefined);
     },

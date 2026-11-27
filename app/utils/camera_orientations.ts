@@ -1,6 +1,9 @@
+import type { Label, Tooltip } from "@ogw_front/types/ui";
+import type { Angle } from "@ogw_front/types/geometry";
 // Camera orientations of the orientation panel (CameraOrientation.vue). Each one looks from a world
 // Axis; with the compass marker, the labels follow the scene compass (north = world +Y, east = +X,
 // Up = +Z, see utils/orientation_compass.ts) instead of the axis names.
+import type { CameraOrientationKey } from "@ogw_internal/stores/hybrid_viewer/camera_helpers";
 import type { SceneOrientationWidget } from "@ogw_internal/stores/data_style/types";
 
 const QUARTER_TURN = 90;
@@ -12,17 +15,17 @@ type PanelPosition = Record<"top" | "left", string>;
 
 interface CameraOrientation {
   // Key of hybridViewerStore.setCameraOrientation
-  value: string;
+  value: CameraOrientationKey;
   face: string;
   vtkKey: string;
   // Rotation of the label on its cube face
   rotation: number;
   // Place around the cube in the panel with the axes marker
   position: PanelPosition;
-  label: string;
-  tooltip: string;
+  label: Label;
+  tooltip: Tooltip;
   // Clockwise angle in degrees from north of the side it looks from, with the compass marker
-  heading?: number;
+  heading?: Angle;
   // Looks from above or below, with the compass marker
   vertical?: Vertical;
 }
@@ -30,16 +33,16 @@ interface CameraOrientation {
 type Vertical = "up" | "down";
 
 interface OrientationEntry {
-  value: string;
+  value: CameraOrientationKey;
   face: string;
   vtkKey: string;
   rotation: number;
   position: PanelPosition;
-  axisLabel: string;
-  compassLabel: string;
+  axisLabel: Label;
+  compassLabel: Label;
   // Side it looks from, as read in "View from ..."
   compassName: string;
-  heading?: number;
+  heading?: Angle;
   vertical?: Vertical;
 }
 

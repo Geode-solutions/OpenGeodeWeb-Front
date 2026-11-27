@@ -3,10 +3,11 @@ import {
   type ModelComponentRecord,
   getAllMeshComponents,
 } from "./mesh_components.js";
+import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
 import { modelComponentRelationsOf, modelComponentsOf } from "@ogw_internal/database/queries.js";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import type { ModelComponentRelationRecord } from "./relations.js";
-import type { ModelId } from "@ogw_front/types/identifiers";
+import type { ModelComponentType } from "@ogw_front/types/model";
 import type { ReadonlyTreeGroup } from "@ogw_front/types/tree";
 import type { Ref } from "vue";
 import { liveObservable } from "@ogw_front/utils/live_observable";
@@ -42,16 +43,16 @@ async function getAllCollectionComponents(modelId: ModelId): Promise<FormattedCo
 
 async function fetchAllCollectionComponents(
   modelId: ModelId,
-): Promise<Record<string, CollectionComponent[]>> {
+): Promise<Record<ModelComponentType, CollectionComponent[]>> {
   const components = await getAllCollectionComponents(modelId);
   const relations = await modelComponentRelationsOf(modelId).toArray();
   const allMeshComponents = await getAllMeshComponents(modelId);
-  const meshComponentsById: Record<string, FormattedComponent> = {};
+  const meshComponentsById: Record<ModelComponentId, FormattedComponent> = {};
   for (const meshComponent of allMeshComponents) {
     meshComponentsById[meshComponent.id] = meshComponent;
   }
 
-  const byType: Record<string, CollectionComponent[]> = {};
+  const byType: Record<ModelComponentType, CollectionComponent[]> = {};
   for (const component of components) {
     byType[component.category] ??= [];
     const itemRelations = relations.filter(

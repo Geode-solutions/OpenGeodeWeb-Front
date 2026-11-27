@@ -1,4 +1,8 @@
-import type { ModelIdentified } from "@ogw_front/types/identifiers";
+import type { ModelComponentId, ModelIdentified } from "@ogw_front/types/identifiers";
+import type { ModelComponentName, ModelComponentType } from "@ogw_front/types/model";
+import type { AttributeName } from "@geode/opengeodeweb-viewer/schema_types";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { DataName } from "@ogw_front/types/data";
 import type { Vector3 } from "@kitware/vtk.js/types";
 import type vtkActor from "@kitware/vtk.js/Rendering/Core/Actor";
 import type vtkPolyData from "@kitware/vtk.js/Common/DataModel/PolyData";
@@ -19,21 +23,21 @@ interface HybridDbEntry {
   mapper: unknown;
 }
 
-type HybridDb = Record<string, HybridDbEntry>;
+type HybridDb = Record<DataId, HybridDbEntry>;
 
 interface HoverComponentInfo {
-  name: string;
-  id: string;
-  type: string;
+  name: ModelComponentName;
+  id: ModelComponentId;
+  type: ModelComponentType;
 }
 
 interface HoverData extends ModelIdentified {
-  modelName: string | undefined;
-  blockName: string | undefined;
+  modelName: DataName | undefined;
+  blockName: ModelComponentName | undefined;
   pickedId: unknown;
   fieldType: unknown;
   component: HoverComponentInfo | undefined;
-  attributes: Record<string, unknown>;
+  attributes: Record<AttributeName, unknown>;
 }
 
 // The image stream object returned by vtk.js's ImageStream.createViewStream(); vtk.js's own vtkViewStream type declares `onImageReady` with a zero-arg callback, which doesn't match how it's actually invoked at runtime (with the decoded image), so this describes the shape as it's actually used here.

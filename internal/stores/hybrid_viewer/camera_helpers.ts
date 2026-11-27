@@ -11,7 +11,10 @@ interface OrientationConfig {
   view_up: Vector3;
 }
 
-const ORIENTATIONS: Record<string, OrientationConfig> = {
+// A direction the camera can be oriented to, such as "zplus" or "xminus", in any case
+type CameraOrientationKey = string;
+
+const ORIENTATIONS: Record<CameraOrientationKey, OrientationConfig> = {
   zplus: {
     position: [0, 0, 1],
     view_up: [0, 1, 0],
@@ -118,3 +121,4 @@ export {
   getImageStyle,
   toBounds,
 };
+export type { CameraOrientationKey };

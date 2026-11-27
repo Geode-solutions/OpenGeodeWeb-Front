@@ -1,21 +1,21 @@
 <script setup lang="ts">
+import type { Pixels } from "@ogw_front/types/ui";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
-
-const zScale = defineModel<number>({ default: 1 });
-const show = defineModel<boolean>("show", { default: false });
-
-const DEFAULT_PANEL_WIDTH = 260;
+import type { ZScale } from "@ogw_front/types/geometry";
 
 interface Props {
-  width?: number;
-  escapeFunction?: () => void;
+  width: Pixels;
+  escapeFunction: () => void;
 }
-
-const { width = DEFAULT_PANEL_WIDTH, escapeFunction = undefined } = defineProps<Props>();
 
 interface Emits {
   apply: [];
 }
+
+const zScale = defineModel<ZScale>({ default: 1 });
+const show = defineModel<boolean>("show", { default: false });
+
+const { width, escapeFunction } = defineProps<Props>();
 
 const emit = defineEmits<Emits>();
 

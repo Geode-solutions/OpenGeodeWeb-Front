@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import { SLICE_AXES, type SliceAxis } from "@ogw_front/utils/slice";
-
-interface Props {
-  slice: { axis: SliceAxis; index: number };
-  index: number;
-  maxIndex: number;
-}
-
-const { slice, index, maxIndex } = defineProps<Props>();
+import type { Slice, SliceIndex, SliceLayer } from "@ogw_front/composables/clipping_slices";
+import { SLICE_AXES } from "@ogw_front/utils/slice";
 
 interface Emits {
   remove: [];
 }
+
+interface Props {
+  slice: Slice;
+  index: SliceIndex;
+  maxIndex: SliceLayer;
+}
+
+const { slice, index, maxIndex } = defineProps<Props>();
 
 const emit = defineEmits<Emits>();
 </script>

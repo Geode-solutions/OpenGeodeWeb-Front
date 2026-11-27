@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import type { FileName, MimeType } from "@ogw_front/types/files";
 import {
   MAX_SCREENSHOT_SIZE,
   MIN_SCREENSHOT_SIZE,
   useScreenshotSize,
 } from "@ogw_front/composables/screenshot_size";
+import type { Message, Pixels } from "@ogw_front/types/ui";
 import viewer_schemas, {
   type ViewerTakeScreenshotParams,
 } from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
@@ -15,19 +17,25 @@ import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import { withViewerMarker } from "@ogw_front/composables/orientation_overlay";
 
+// The options of a capture of the current browser tab
+
+interface Props {
+  width?: Pixels;
+  escapeFunction: () => void;
+}
+
+interface TabCaptureOptions extends DisplayMediaStreamOptions {
+  preferCurrentTab: boolean;
+}
+
 const DEFAULT_PANEL_WIDTH = 260;
 const EXTENSION_SELECT_WIDTH = 80;
 
 const show = defineModel<boolean>({ default: false });
 
-interface Props {
-  width?: number;
-  escapeFunction?: () => void;
-}
+const { width = DEFAULT_PANEL_WIDTH, escapeFunction } = defineProps<Props>();
 
-const { width = DEFAULT_PANEL_WIDTH, escapeFunction = undefined } = defineProps<Props>();
-
-function getErrorMessage(error: unknown): string {
+function getErrorMessage(error: unknown): Message {
   if (error instanceof Error) {
     return error.message;
   }
@@ -36,7 +44,7 @@ function getErrorMessage(error: unknown): string {
 
 const output_extensions =
   viewer_schemas.opengeodeweb_viewer.viewer.take_screenshot.properties.output_extension.enum;
-const filename = ref<string>("");
+const filename = ref<FileName>("");
 const output_extension = ref<ViewerTakeScreenshotParams["output_extension"]>("png");
 const include_background = ref<boolean>(true);
 const include_ui = ref<boolean>(false);
@@ -46,10 +54,13 @@ const { screenshot_size, displayed_size, resetSize, setWidth, setHeight } =
 
 const { copy } = useClipboardItems();
 
-async function deliverScreenshot(blob: Blob | Uint8Array, current_filename: string): Promise<void> {
+async function deliverScreenshot(
+  blob: Blob | Uint8Array,
+  currentFilename: FileName,
+): Promise<void> {
   const feedbackStore = useFeedbackStore();
   if (screenshot_type.value === "file") {
-    fileDownload(blob, `${current_filename}.${output_extension.value}`);
+    fileDownload(blob, `${currentFilename}.${output_extension.value}`);
     feedbackStore.add_success("Screenshot downloaded");
     return;
   }
@@ -68,12 +79,12 @@ async function deliverScreenshot(blob: Blob | Uint8Array, current_filename: stri
   }
 }
 
-async function takeSceneScreenshot(current_filename: string): Promise<void> {
+async function takeSceneScreenshot(currentFilename: FileName): Promise<void> {
   const viewerStore = useViewerStore();
   const dataStyleStore = useDataStyleStore();
   const schema = viewer_schemas.opengeodeweb_viewer.viewer.take_screenshot;
   const params = {
-    filename: current_filename,
+    filename: currentFilename,
     output_extension: output_extension.value,
     include_background: include_background.value,
     ...screenshot_size.value,
@@ -91,7 +102,7 @@ async function takeSceneScreenshot(current_filename: string): Promise<void> {
         {
           // `blob` is the image file content, received as binary (Uint8Array) through wslink
           response_function: async ({ blob }) => {
-            await deliverScreenshot(blob, current_filename);
+            await deliverScreenshot(blob, currentFilename);
           },
         },
       );
@@ -100,12 +111,9 @@ async function takeSceneScreenshot(current_filename: string): Promise<void> {
 }
 
 // `preferCurrentTab` is not yet part of the TypeScript DOM lib
-interface TabCaptureOptions extends DisplayMediaStreamOptions {
-  preferCurrentTab: boolean;
-}
 
 // Captures the whole browser tab (scene and web UI) through the native screen capture API
-async function captureTab(mime_type: string): Promise<Blob> {
+async function captureTab(mimeType: MimeType): Promise<Blob> {
   const options: TabCaptureOptions = { video: true, audio: false, preferCurrentTab: true };
   const stream = await navigator.mediaDevices.getDisplayMedia(options);
   try {
@@ -125,7 +133,7 @@ async function captureTab(mime_type: string): Promise<Blob> {
         } else {
           reject(new Error("Failed to encode the captured frame"));
         }
-      }, mime_type);
+      }, mimeType);
     });
   } finally {
     for (const track of stream.getTracks()) {
@@ -134,12 +142,12 @@ async function captureTab(mime_type: string): Promise<Blob> {
   }
 }
 
-async function takeUiScreenshot(current_filename: string): Promise<void> {
+async function takeUiScreenshot(currentFilename: FileName): Promise<void> {
   const feedbackStore = useFeedbackStore();
-  const mime_type = output_extension.value === "jpg" ? "image/jpeg" : "image/png";
+  const mimeType = output_extension.value === "jpg" ? "image/jpeg" : "image/png";
   try {
-    const blob = await captureTab(mime_type);
-    await deliverScreenshot(blob, current_filename);
+    const blob = await captureTab(mimeType);
+    await deliverScreenshot(blob, currentFilename);
   } catch (error) {
     const message = getErrorMessage(error);
     feedbackStore.add_error(0, "", "Screenshot Error", `Failed to capture the page: ${message}`);
@@ -147,14 +155,14 @@ async function takeUiScreenshot(current_filename: string): Promise<void> {
 }
 
 async function takeScreenshot(): Promise<void> {
-  const current_filename = screenshot_type.value === "file" ? filename.value : "screenshot";
+  const currentFilename = screenshot_type.value === "file" ? filename.value : "screenshot";
   if (include_ui.value) {
     // Close the panel first so it does not appear on the captured page
     show.value = false;
     await nextTick();
-    await takeUiScreenshot(current_filename);
+    await takeUiScreenshot(currentFilename);
   } else {
-    await takeSceneScreenshot(current_filename);
+    await takeSceneScreenshot(currentFilename);
     show.value = false;
   }
 }

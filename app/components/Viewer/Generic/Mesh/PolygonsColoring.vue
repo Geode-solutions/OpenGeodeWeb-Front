@@ -3,6 +3,7 @@ import type {
   AttributeColorMap,
   AttributeRange,
   AttributeTimeStep,
+  ColoringType,
 } from "@ogw_front/types/attribute";
 import type {
   AttributeItem,
@@ -15,7 +16,7 @@ import {
   applyRangesPerData,
   useBatchStyle,
 } from "@ogw_front/composables/batch_style";
-import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { ColoringCapabilities } from "@ogw_front/types/props/viewer/options";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { Texture } from "@ogw_front/types/texture";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
@@ -23,18 +24,18 @@ import { useBatchStyleModel } from "@ogw_front/composables/batch_style_model";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
+interface Props {
+  dataId: MeshId;
+  capabilities: ColoringCapabilities;
+}
+
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const { applyBatchStyle } = useBatchStyle();
 
-interface Props {
-  dataId: DataId;
-  capabilities: Record<string, { available?: boolean; hasColorMap?: boolean }>;
-}
-
 const { dataId, capabilities } = defineProps<Props>();
 
-const coloring_style_key = computed<string>({
+const coloringStyleKey = computed<ColoringType>({
   get: () => dataStyleStore.meshPolygonsActiveColoring(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>
@@ -106,7 +107,7 @@ const vertex_attribute_range = computed<AttributeRange>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_color_map = computed<AttributeColorMap | undefined>({
+const vertex_attribute_color_map = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => dataStyleStore.meshPolygonsVertexAttributeColorMap(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>
@@ -173,7 +174,7 @@ const polygon_attribute_range = computed<AttributeRange>({
     hybridViewerStore.remoteRender();
   },
 });
-const polygon_attribute_color_map = computed<AttributeColorMap | undefined>({
+const polygon_attribute_color_map = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => dataStyleStore.meshPolygonsPolygonAttributeColorMap(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>
@@ -210,7 +211,7 @@ async function setPolygonAttributeRangesPerData(ranges: RangesPerData): Promise<
 <template>
   <ViewerOptionsColoringTypeSelector
     :data-id="dataId"
-    v-model:coloring_style_key="coloring_style_key"
+    v-model:coloring_style_key="coloringStyleKey"
     v-model:color="color"
     v-model:opacity="opacity"
     v-model:textures="textures"

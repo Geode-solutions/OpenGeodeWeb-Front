@@ -29,7 +29,7 @@ interface UseMeshPolyhedraPolyhedronAttributeStyleReturn {
   meshPolyhedraPolyhedronAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
   ) => AttributeStoredConfig;
   setMeshPolyhedraPolyhedronAttribute: (
     meshId: MeshId,
@@ -50,7 +50,7 @@ interface UseMeshPolyhedraPolyhedronAttributeStyleReturn {
   ) => Promise<unknown>;
   setMeshPolyhedraPolyhedronAttributeColorMap: (
     meshId: MeshId,
-    colorMap: AttributeColorMap | undefined,
+    colorMap: AttributeColorMap,
   ) => Promise<unknown>;
   meshPolyhedraPolyhedronAttributeNoDataColor: (meshId: MeshId) => ColorRGBA;
   setMeshPolyhedraPolyhedronAttributeNoDataColor: (

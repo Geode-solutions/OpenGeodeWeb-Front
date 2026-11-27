@@ -1,35 +1,43 @@
 import { type Collection, Dexie } from "dexie";
+import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
 import { modelComponentsDb, modelComponentsRelationDb } from "./database";
 import type { ModelComponentRecord } from "./tables/model_components";
 import type { ModelComponentRelationRecord } from "./tables/model_components_relation";
+import type { ModelComponentType } from "@ogw_front/types/model";
 
 type ModelComponents = Collection<ModelComponentRecord, string>;
 type ModelComponentRelations = Collection<ModelComponentRelationRecord, string>;
 
-function modelComponentsOf(modelId: string): ModelComponents {
+function modelComponentsOf(modelId: ModelId): ModelComponents {
   return modelComponentsDb().where("data_id").equals(modelId);
 }
 
-function modelComponentsOfType(modelId: string, type: string): ModelComponents {
+function modelComponentsOfType(modelId: ModelId, type: ModelComponentType): ModelComponents {
   return modelComponentsDb().where("[data_id+type]").equals([modelId, type]);
 }
 
-function modelComponent(modelId: string, geodeId: string): ModelComponents {
+function modelComponent(modelId: ModelId, geodeId: ModelComponentId): ModelComponents {
   return modelComponentsDb().where("[data_id+geode_id]").equals([modelId, geodeId]);
 }
 
-function modelComponentsByGeodeIds(modelId: string, geodeIds: readonly string[]): ModelComponents {
+function modelComponentsByGeodeIds(
+  modelId: ModelId,
+  geodeIds: readonly ModelComponentId[],
+): ModelComponents {
   return modelComponentsDb()
     .where("[data_id+geode_id]")
     .anyOf(geodeIds.map((geodeId) => [modelId, geodeId]));
 }
 
-function modelComponentRelationsOf(modelId: string): ModelComponentRelations {
+function modelComponentRelationsOf(modelId: ModelId): ModelComponentRelations {
   return modelComponentsRelationDb().where("data_id").equals(modelId);
 }
 
 // The relations whose parent is the given component
-function componentRelationsOf(modelId: string, parentId: string): ModelComponentRelations {
+function componentRelationsOf(
+  modelId: ModelId,
+  parentId: ModelComponentId,
+): ModelComponentRelations {
   return modelComponentsRelationDb()
     .where("[data_id+parent+child]")
     .between([modelId, parentId, Dexie.minKey], [modelId, parentId, Dexie.maxKey]);

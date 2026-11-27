@@ -1,10 +1,15 @@
 import type { DataIdentified, GeodeIdentified } from "@ogw_front/types/identifiers";
+import type {
+  ModelComponentName,
+  ModelComponentType,
+  ModelComponentViewerId,
+} from "@ogw_front/types/model";
 import type { TableDefinition } from "./table_definition";
 
 interface ModelComponentRecord extends DataIdentified, GeodeIdentified {
-  type: string;
-  viewer_id: string | number;
-  name: string;
+  type: ModelComponentType;
+  viewer_id: ModelComponentViewerId;
+  name: ModelComponentName;
   is_active: boolean;
 }
 

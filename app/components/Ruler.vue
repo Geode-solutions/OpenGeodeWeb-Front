@@ -1,18 +1,19 @@
 <script setup lang="ts">
+import type { Coordinates } from "@ogw_front/types/geometry";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 interface Props {
-  escapeFunction?: () => void;
+  escapeFunction: () => void;
 }
 
-const { escapeFunction = undefined } = defineProps<Props>();
+const { escapeFunction } = defineProps<Props>();
 
 const show = defineModel<boolean>("show", { default: false });
 const hybridViewerStore = useHybridViewerStore();
 
-const localPoint1 = ref<number[]>([0, 0, 0]);
-const localPoint2 = ref<number[]>([0, 0, 0]);
+const localPoint1 = ref<Coordinates>([0, 0, 0]);
+const localPoint2 = ref<Coordinates>([0, 0, 0]);
 
 watch(
   () => hybridViewerStore.ruler_point1,

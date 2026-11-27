@@ -1,4 +1,11 @@
 <script setup lang="ts">
+import type {
+  CsvColumnKey,
+  CsvHeader,
+  CsvRow,
+  CsvRowIndex,
+  CsvSeparator,
+} from "@ogw_front/types/props/csv_preview";
 import { useToggle } from "@vueuse/core";
 
 import { useChromeTheme } from "@ogw_front/composables/chrome_theme";
@@ -6,25 +13,28 @@ import { useChromeTheme } from "@ogw_front/composables/chrome_theme";
 import CsvSettings from "./CsvSettings.vue";
 import CsvTable from "./CsvTable.vue";
 
-interface CsvHeader {
-  title: string;
-  key: string;
-  align: "start" | "end" | "center";
-  sortable: boolean;
-}
-type CsvRow = Record<string, string>;
+// The rows and columns the user picked to read a csv file
+
+// The position of a column in a row of a csv file
+type CsvColumnIndex = number;
+
 interface CsvParseResult {
-  firstRow: number;
-  headerRow: number;
-  separator: string;
-  xColumn: number;
-  yColumn: number;
-  zColumn: number;
+  firstRow: CsvRowIndex;
+  headerRow: CsvRowIndex;
+  separator: CsvSeparator;
+  xColumn: CsvColumnIndex;
+  yColumn: CsvColumnIndex;
+  zColumn: CsvColumnIndex;
 }
 
 interface Props {
   file: File;
   modelValue?: boolean;
+}
+
+interface Emits {
+  "update:modelValue": [value: boolean];
+  confirm: [result: CsvParseResult];
 }
 
 const { file, modelValue = false } = defineProps<Props>();
@@ -37,20 +47,15 @@ const MIN_AVG_COUNT = 1.5;
 const MAX_VARIANCE = 0.5;
 const PREVIEW_ROWS_LIMIT = 101;
 
-interface Emits {
-  "update:modelValue": [value: boolean];
-  confirm: [result: CsvParseResult];
-}
-
 const emit = defineEmits<Emits>();
 
-const separator = ref<string>(",");
-const headerRow = ref<number>(0);
-const firstRow = ref<number>(1);
+const separator = ref<CsvSeparator>(",");
+const headerRow = ref<CsvRowIndex>(0);
+const firstRow = ref<CsvRowIndex>(1);
 
-const xColumn = ref<string | undefined>(undefined);
-const yColumn = ref<string | undefined>(undefined);
-const zColumn = ref<string | undefined>(undefined);
+const xColumn = ref<CsvColumnKey | undefined>(undefined);
+const yColumn = ref<CsvColumnKey | undefined>(undefined);
+const zColumn = ref<CsvColumnKey | undefined>(undefined);
 
 const rawContent = ref<string>("");
 const previewRows = ref<CsvRow[]>([]);
@@ -58,7 +63,7 @@ const previewHeaders = ref<CsvHeader[]>([]);
 const loading = ref<boolean>(false);
 const toggleLoading = useToggle(loading);
 
-function autoDetectSeparator(content: string): string {
+function autoDetectSeparator(content: string): CsvSeparator {
   const lines = content
     .slice(0, MAX_CONTENT_SLICE)
     .split(/\r?\n/u)

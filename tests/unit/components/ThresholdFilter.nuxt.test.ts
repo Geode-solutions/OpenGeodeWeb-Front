@@ -64,7 +64,7 @@ describe("thresholdFilter time steps", () => {
   test("applies the threshold again on the new array when the stored step changes", async () => {
     const wrapper = await mountSuspended(ThresholdFilter, {
       global: { plugins: [vuetify] },
-      props: { show: true },
+      props: { show: true, escapeFunction: vi.fn<() => void>() },
     });
     // oxlint-disable-next-line no-unsafe-type-assertion -- script setup refs are not typed on vm
     const state = wrapper.vm as unknown as Record<string, unknown>;
@@ -93,7 +93,7 @@ describe("thresholdFilter time steps", () => {
   test("restores the card state when the panel is reopened", async () => {
     const wrapper = await mountSuspended(ThresholdFilter, {
       global: { plugins: [vuetify] },
-      props: { show: true },
+      props: { show: true, escapeFunction: vi.fn<() => void>() },
     });
     // oxlint-disable-next-line no-unsafe-type-assertion -- script setup refs are not typed on vm
     const state = wrapper.vm as unknown as Record<string, unknown>;

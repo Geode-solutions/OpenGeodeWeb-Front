@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Angle, Coordinate } from "@ogw_front/types/geometry";
 import { BRAND_ORANGE, BRAND_ORANGE_BORDER } from "@ogw_front/utils/brand_colors";
 import {
   COMPASS_TICK_ANGLES,
@@ -6,6 +7,7 @@ import {
   isCardinalAngle,
 } from "@ogw_front/utils/orientation_compass";
 import { type CameraOrientation, isNorth } from "@ogw_front/utils/camera_orientations";
+import type { Pixels } from "@ogw_front/types/ui";
 import { useCompassDial } from "@ogw_front/composables/compass_dial";
 
 // Compass layout of the orientation panel, in the look of the scene compass (Viewer/OrientationCompass.vue):
@@ -40,8 +42,8 @@ const dialTransform = computed(() => `scale(1 ${tilt.value}) rotate(${-heading.v
 
 interface PlacedOrientation {
   orientation: CameraOrientation;
-  x: number;
-  y: number;
+  x: Coordinate;
+  y: Coordinate;
 }
 
 const placed = computed<PlacedOrientation[]>(() =>
@@ -64,7 +66,7 @@ const hoveredHeading = computed(
   () => orientations.find((orientation) => orientation.face === hoveredFace.value)?.heading,
 );
 
-function tickInnerRadius(angle: number): number {
+function tickInnerRadius(angle: Angle): Pixels {
   return isCardinalAngle(angle) ? CARDINAL_TICK_INNER_RADIUS : TICK_INNER_RADIUS;
 }
 

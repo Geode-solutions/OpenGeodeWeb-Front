@@ -1,4 +1,5 @@
 import { centerCameraOnPosition, useHybridViewerCamera } from "./camera";
+import type { Pixels } from "@ogw_front/types/ui";
 import { Status } from "@ogw_front/utils/status";
 import type { ViewStreamLike } from "./vtk_types";
 import { WHEEL_TIME_OUT_MS } from "./constants";
@@ -10,11 +11,11 @@ type ContainerRef = Ref<{ $el: HTMLElement } | undefined>;
 
 interface HybridViewerViewport {
   setContainer: (container: ContainerRef | undefined) => void;
-  resize: (width: number, height: number) => Promise<void>;
+  resize: (width: Pixels, height: Pixels) => Promise<void>;
   viewStream: Ref<ViewStreamLike | undefined>;
 }
 
-async function resize(width: number, height: number): Promise<void> {
+async function resize(width: Pixels, height: Pixels): Promise<void> {
   const { genericRenderWindow, remoteRender, status, viewStream } = useHybridViewerCore();
   const viewerStore = useViewerStore();
   if (viewerStore.status !== Status.CONNECTED || status.value !== Status.CREATED) {

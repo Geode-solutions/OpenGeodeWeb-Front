@@ -1,3 +1,4 @@
+// oxlint-disable import/max-dependencies -- the import workflow drives the back, data, crs, viewer and tree stores
 // Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { consola } from "consola";
@@ -6,6 +7,7 @@ import { consola } from "consola";
 import { type NewDataItem, useDataStore } from "@ogw_front/stores/data";
 import type { CRS } from "@geode/opengeodeweb-back/schema_types";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { FileName } from "@ogw_front/types/files";
 import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import type { GeodeObjectTyped } from "@ogw_front/types/identifiers";
 import type { LegacyDataId } from "@ogw_front/utils/legacy_data_id";
@@ -17,12 +19,18 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useProjectCrs } from "@ogw_front/composables/project_crs";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
+// A chunk of the files imported together, by its index
+type ChunkIndex = number;
+
 interface FileToImport extends Readonly<GeodeObjectTyped> {
-  readonly filename: string;
+  readonly filename: FileName;
 }
 
 // A single file can hold several objects: every one of them is imported, ids are returned in the response order
-async function importFile(filename: string, geode_object_type: GeodeObjectType): Promise<string[]> {
+async function importFile(
+  filename: FileName,
+  geode_object_type: GeodeObjectType,
+): Promise<DataId[]> {
   const backStore = useBackStore();
   const schema = back_schemas.opengeodeweb_back.save_viewable_file;
   const params = { geode_object_type, filename };
@@ -43,7 +51,7 @@ async function importFile(filename: string, geode_object_type: GeodeObjectType):
   return dataIds;
 }
 
-async function importFiles(files: readonly FileToImport[]): Promise<string[]> {
+async function importFiles(files: readonly FileToImport[]): Promise<DataId[]> {
   const hybridViewerStore = useHybridViewerStore();
   // Files are imported concurrently and the viewer only frames the first actor to arrive, so the camera is reset once everything is loaded
   const wasSceneEmpty = Object.keys(hybridViewerStore.hybridDb).length === 0;
@@ -53,9 +61,9 @@ async function importFiles(files: readonly FileToImport[]): Promise<string[]> {
     chunks.push(files.slice(i, i + chunk_size));
   }
 
-  const results: string[] = [];
+  const results: DataId[] = [];
   const errors: unknown[] = [];
-  async function processChunk(chunkIndex: number): Promise<void> {
+  async function processChunk(chunkIndex: ChunkIndex): Promise<void> {
     if (chunkIndex >= chunks.length) {
       return;
     }
@@ -89,7 +97,7 @@ async function importFiles(files: readonly FileToImport[]): Promise<string[]> {
 }
 
 // A harmonization failure is only logged: the import outcome does not depend on it
-async function harmonize(ids: string[], projectCrs: CRS | undefined): Promise<void> {
+async function harmonize(ids: DataId[], projectCrs: CRS | undefined): Promise<void> {
   try {
     await useProjectCrs().harmonizeImportedCrs(ids, projectCrs);
   } catch (error) {
@@ -99,7 +107,7 @@ async function harmonize(ids: string[], projectCrs: CRS | undefined): Promise<vo
 
 // When a file fails, the workflow throws without returning the imported ids: they are found by difference.
 // The project CRS is read before the import, as the project follows the data as they land.
-async function importWorkflow(files: readonly FileToImport[]): Promise<string[]> {
+async function importWorkflow(files: readonly FileToImport[]): Promise<DataId[]> {
   const { projectCrs } = useCrsStore();
   const existingItems = await useDataStore().allItems();
   const existingIds = new Set(existingItems.map((item) => item.data_id));
@@ -117,7 +125,7 @@ async function importWorkflow(files: readonly FileToImport[]): Promise<string[]>
 // NewDataItem has mutable array fields (mesh_components, collection_components), so a readonly array of it can't satisfy prefer-readonly-parameter-types deeply; left unfixed (same pattern as app/plugins/auto_store_register.ts).
 async function importWorkflowFromSnapshot(
   items: readonly (LegacyDataId<NewDataItem> | NewDataItem)[],
-): Promise<string[]> {
+): Promise<DataId[]> {
   consola.debug("[importWorkflowFromSnapshot] start", { count: items?.length });
   const hybridViewerStore = useHybridViewerStore();
   const chunk_size = 5;
@@ -125,8 +133,8 @@ async function importWorkflowFromSnapshot(
   for (let i = 0; i < items.length; i += chunk_size) {
     chunks.push(items.slice(i, i + chunk_size));
   }
-  const ids: string[] = [];
-  async function processChunk(chunkIndex: number): Promise<void> {
+  const ids: DataId[] = [];
+  async function processChunk(chunkIndex: ChunkIndex): Promise<void> {
     if (chunkIndex >= chunks.length) {
       return;
     }
@@ -149,7 +157,7 @@ async function importWorkflowFromSnapshot(
 }
 
 // The time series only adds attributes to the model, so the viewer object is reloaded.
-async function applyTimeSeriesWorkflow(filename: string, dataId: DataId): Promise<string> {
+async function applyTimeSeriesWorkflow(filename: FileName, dataId: DataId): Promise<DataId> {
   const backStore = useBackStore();
   await backStore.request({
     schema: back_schemas.opengeodeweb_back.apply_time_series,

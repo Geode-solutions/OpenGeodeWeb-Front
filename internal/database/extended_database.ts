@@ -1,10 +1,11 @@
+import type { DatabaseVersion, TableSchemas } from "./types";
 import { BaseDatabase } from "./base_database";
 
 export class ExtendedDatabase extends BaseDatabase {
   public constructor(
-    currentVersion: number,
-    currentStores: Record<string, string>,
-    newTables: Record<string, string>,
+    currentVersion: DatabaseVersion,
+    currentStores: TableSchemas,
+    newTables: TableSchemas,
   ) {
     super("Database");
 

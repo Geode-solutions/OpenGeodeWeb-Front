@@ -9,6 +9,7 @@ import type {
   AttributeStoredConfig,
 } from "@ogw_internal/stores/data_style/attribute_types";
 import type { MeshId } from "@ogw_front/types/identifiers";
+import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 
 // Local imports
@@ -17,26 +18,26 @@ import { useMeshPolygonsCommonStyle } from "./common";
 interface UseMeshPolygonsVertexAttributeConfigReturn {
   meshPolygonsVertexAttribute: (meshId: MeshId) => AttributeState;
   meshPolygonsVertexAttributeName: (meshId: MeshId) => AttributeName | undefined;
-  meshPolygonsVertexAttributeLastItem: (meshId: MeshId, name: AttributeName | undefined) => number;
+  meshPolygonsVertexAttributeLastItem: (
+    meshId: MeshId,
+    name: AttributeName | undefined,
+  ) => AttributeItem;
   meshPolygonsVertexAttributeItem: (meshId: MeshId) => AttributeItem;
   meshPolygonsVertexAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
   ) => AttributeStoredConfig;
 }
 
 interface UseMeshPolygonsVertexAttributeConfigWriterReturn {
-  mutateMeshPolygonsVertexStyle: (
-    meshId: MeshId,
-    values: Record<string, unknown>,
-  ) => Promise<string>;
+  mutateMeshPolygonsVertexStyle: (meshId: MeshId, values: StyleValues) => Promise<MeshId>;
   setMeshPolygonsVertexAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
     config: Partial<AttributeStoredConfig>,
-  ) => Promise<string>;
+  ) => Promise<MeshId>;
 }
 
 function useMeshPolygonsVertexAttributeConfig(): UseMeshPolygonsVertexAttributeConfigReturn {
@@ -48,11 +49,11 @@ function useMeshPolygonsVertexAttributeConfig(): UseMeshPolygonsVertexAttributeC
   function meshPolygonsVertexAttributeStoredConfig(
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
   ): AttributeStoredConfig {
     const { storedConfigs } = meshPolygonsVertexAttribute(meshId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
-    const itemConfig = item === undefined ? undefined : nameConfig?.[item];
+    const itemConfig = nameConfig?.[item];
     if (itemConfig !== undefined) {
       return itemConfig;
     }
@@ -64,7 +65,7 @@ function useMeshPolygonsVertexAttributeConfig(): UseMeshPolygonsVertexAttributeC
   function meshPolygonsVertexAttributeLastItem(
     meshId: MeshId,
     name: AttributeName | undefined,
-  ): number {
+  ): AttributeItem {
     const { storedConfigs } = meshPolygonsVertexAttribute(meshId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
     if (nameConfig !== undefined) {
@@ -126,8 +127,8 @@ function useMeshPolygonsVertexAttributeConfigWriter(): UseMeshPolygonsVertexAttr
   const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle();
   async function mutateMeshPolygonsVertexStyle(
     meshId: MeshId,
-    values: Record<string, unknown>,
-  ): Promise<string> {
+    values: StyleValues,
+  ): Promise<MeshId> {
     const result = await meshPolygonsCommonStyle.mutateMeshPolygonsStyle(meshId, {
       coloring: {
         vertex: values,
@@ -138,9 +139,9 @@ function useMeshPolygonsVertexAttributeConfigWriter(): UseMeshPolygonsVertexAttr
   async function setMeshPolygonsVertexAttributeStoredConfig(
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
     config: Partial<AttributeStoredConfig>,
-  ): Promise<string> {
+  ): Promise<MeshId> {
     const result = await mutateMeshPolygonsVertexStyle(meshId, {
       storedConfigs: {
         [name ?? ""]: {

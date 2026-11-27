@@ -3,6 +3,7 @@ import type {
   AttributeColorMap,
   AttributeRange,
   AttributeTimeStep,
+  ColoringType,
 } from "@ogw_front/types/attribute";
 import type {
   AttributeItem,
@@ -22,17 +23,17 @@ import { useBatchStyleModel } from "@ogw_front/composables/batch_style_model";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
-const dataStyleStore = useDataStyleStore();
-const hybridViewerStore = useHybridViewerStore();
-const { applyBatchStyle } = useBatchStyle();
-
 interface Props {
   dataId: DataId;
 }
 
+const dataStyleStore = useDataStyleStore();
+const hybridViewerStore = useHybridViewerStore();
+const { applyBatchStyle } = useBatchStyle();
+
 const { dataId } = defineProps<Props>();
 
-const coloring_style_key = computed<string>({
+const coloringStyleKey = computed<ColoringType>({
   get: () => dataStyleStore.meshEdgesActiveColoring(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>
@@ -98,7 +99,7 @@ const vertex_attribute_range = computed<AttributeRange>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_color_map = computed<AttributeColorMap | undefined>({
+const vertex_attribute_color_map = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => dataStyleStore.meshEdgesVertexAttributeColorMap(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>
@@ -163,7 +164,7 @@ const edge_attribute_range = computed<AttributeRange>({
     hybridViewerStore.remoteRender();
   },
 });
-const edge_attribute_color_map = computed<AttributeColorMap | undefined>({
+const edge_attribute_color_map = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => dataStyleStore.meshEdgesEdgeAttributeColorMap(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>
@@ -200,7 +201,7 @@ async function setEdgeAttributeRangesPerData(ranges: RangesPerData): Promise<voi
 <template>
   <ViewerOptionsColoringTypeSelector
     :data-id="dataId"
-    v-model:coloring_style_key="coloring_style_key"
+    v-model:coloring_style_key="coloringStyleKey"
     v-model:color="color"
     v-model:opacity="opacity"
     v-model:vertex_attribute_name="vertex_attribute_name"

@@ -1,3 +1,4 @@
+import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
 import type {
   ModelComponentStyle,
   ModelComponentTypeStyle,
@@ -8,39 +9,40 @@ import {
   componentTypeDataStyleDb,
   writeTransaction,
 } from "@ogw_internal/database/database";
+import type { ModelComponentType } from "@ogw_front/types/model";
 import merge from "lodash/merge";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 
 interface ComponentStyleUpdate {
-  id_component: string;
+  id_component: ModelComponentId;
   values: StyleValues;
 }
 
 interface UseModelComponentStyleMutationsReturn {
   mutateComponentStyle: (
-    id_model: string,
-    id_component: string,
+    modelId: ModelId,
+    componentId: ModelComponentId,
     values: StyleValues,
   ) => Promise<unknown>;
   mutateModelComponentTypeStyle: (
-    id_model: string,
-    type: string,
+    modelId: ModelId,
+    type: ModelComponentType,
     values: StyleValues,
   ) => Promise<void>;
 }
 
 interface UseModelComponentsStyleMutationReturn {
   mutateComponentStyles: (
-    id_model: string,
-    id_components: string[],
+    modelId: ModelId,
+    componentIds: ModelComponentId[],
     values: StyleValues,
   ) => Promise<void>;
 }
 
 interface UseModelComponentsPerComponentStyleMutationReturn {
   bulkMutateComponentStylesPerComponent: (
-    id_model: string,
-    component_updates: ComponentStyleUpdate[],
+    modelId: ModelId,
+    componentUpdates: ComponentStyleUpdate[],
   ) => Promise<void>;
 }
 
@@ -50,30 +52,30 @@ function useModelComponentStyleMutations(): UseModelComponentStyleMutationsRetur
   const componentTypeDataStyleTable = componentTypeDataStyleDb();
 
   async function mutateComponentStyle(
-    id_model: string,
-    id_component: string,
+    modelId: ModelId,
+    componentId: ModelComponentId,
     values: StyleValues,
   ): Promise<unknown> {
-    dataStyleState.updateComponentStyleCache(id_model, id_component, values);
-    const key: [string, string] = [id_model, id_component];
+    dataStyleState.updateComponentStyleCache(modelId, componentId, values);
+    const key: [ModelId, ModelComponentId] = [modelId, componentId];
     const entry: ModelComponentStyle = (await componentDataStyleTable.get(key)) ?? {
-      id_model,
-      id_component,
+      id_model: modelId,
+      id_component: componentId,
     };
     merge(entry, values);
     return componentDataStyleTable.put(structuredClone(toRaw(entry)));
   }
 
   async function mutateModelComponentTypeStyle(
-    id_model: string,
-    type: string,
+    modelId: ModelId,
+    type: ModelComponentType,
     values: StyleValues,
   ): Promise<void> {
-    dataStyleState.updateModelComponentTypeStyleCache(id_model, type, values);
+    dataStyleState.updateModelComponentTypeStyleCache(modelId, type, values);
     await writeTransaction([componentTypeDataStyleTable], async () => {
-      const key: [string, string] = [id_model, type];
+      const key: [ModelId, ModelComponentType] = [modelId, type];
       const entry: ModelComponentTypeStyle = (await componentTypeDataStyleTable.get(key)) ?? {
-        id_model,
+        id_model: modelId,
         type,
       };
       merge(entry, values);
@@ -92,19 +94,22 @@ function useModelComponentsStyleMutation(): UseModelComponentsStyleMutationRetur
   const componentDataStyleTable = componentDataStyleDb();
 
   async function mutateComponentStyles(
-    id_model: string,
-    id_components: string[],
+    modelId: ModelId,
+    componentIds: ModelComponentId[],
     values: StyleValues,
   ): Promise<void> {
-    dataStyleState.bulkUpdateComponentStylesCache(id_model, id_components, values);
+    dataStyleState.bulkUpdateComponentStylesCache(modelId, componentIds, values);
     await writeTransaction([componentDataStyleTable], async () => {
-      const keys: [string, string][] = id_components.map((id_component) => [
-        id_model,
-        id_component,
+      const keys: [ModelId, ModelComponentId][] = componentIds.map((componentId) => [
+        modelId,
+        componentId,
       ]);
       const existing = await componentDataStyleTable.bulkGet(keys);
-      const updates = id_components.map((id_component, index) => {
-        const style: ModelComponentStyle = existing[index] ?? { id_model, id_component };
+      const updates = componentIds.map((componentId, index) => {
+        const style: ModelComponentStyle = existing[index] ?? {
+          id_model: modelId,
+          id_component: componentId,
+        };
         merge(style, values);
         return toRaw(style);
       });
@@ -123,18 +128,18 @@ function useModelComponentsPerComponentStyleMutation(): UseModelComponentsPerCom
   const componentDataStyleTable = componentDataStyleDb();
 
   async function bulkMutateComponentStylesPerComponent(
-    id_model: string,
-    component_updates: ComponentStyleUpdate[],
+    modelId: ModelId,
+    componentUpdates: ComponentStyleUpdate[],
   ): Promise<void> {
-    dataStyleState.bulkUpdateComponentStyleCache(id_model, component_updates);
+    dataStyleState.bulkUpdateComponentStyleCache(modelId, componentUpdates);
     await writeTransaction([componentDataStyleTable], async () => {
-      const keys: [string, string][] = component_updates.map((update) => [
-        id_model,
+      const keys: [ModelId, ModelComponentId][] = componentUpdates.map((update) => [
+        modelId,
         update.id_component,
       ]);
       const existing = await componentDataStyleTable.bulkGet(keys);
-      const updates = component_updates.map(({ id_component, values }, index) => {
-        const style: ModelComponentStyle = existing[index] ?? { id_model, id_component };
+      const updates = componentUpdates.map(({ id_component, values }, index) => {
+        const style: ModelComponentStyle = existing[index] ?? { id_model: modelId, id_component };
         merge(style, values);
         return toRaw(style);
       });

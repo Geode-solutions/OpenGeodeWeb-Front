@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AttributeColorMap, AttributeRange, ColoringType } from "@ogw_front/types/attribute";
 import type {
   AttributeItem,
   AttributeName,
@@ -6,7 +7,12 @@ import type {
   EdgeWidth,
   Visibility,
 } from "@geode/opengeodeweb-viewer/schema_types";
-import type { AttributeColorMap } from "@ogw_front/types/attribute";
+import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
+import type {
+  ModelEdgesComponentType,
+  ModelEdgesTarget,
+} from "@ogw_front/types/props/viewer/generic_model";
+import { type NonEmptyArray, isNonEmpty } from "@ogw_front/utils/arrays";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import ViewerOptionsWidthSlider from "@ogw_front/components/Viewer/Options/Sliders/Width.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
@@ -14,15 +20,10 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schem
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
-interface EdgesTarget {
-  componentType: "Surface" | "Block";
-  componentIds: string[];
-}
-
 interface Props {
-  modelId: string;
-  targets: EdgesTarget[];
-  referenceComponentId?: string;
+  modelId: ModelId;
+  targets: ModelEdgesTarget[];
+  referenceComponentId?: ModelComponentId;
 }
 
 const { modelId, targets, referenceComponentId = undefined } = defineProps<Props>();
@@ -73,17 +74,19 @@ const EDGES_STYLES = {
     setVertexAttributeNoDataColor: dataStyleStore.setModelBlocksEdgesVertexAttributeNoDataColor,
   },
 };
-type EdgesStyle = (typeof EDGES_STYLES)[EdgesTarget["componentType"]];
+type EdgesStyle = (typeof EDGES_STYLES)[ModelEdgesComponentType];
 
 // Values are read from the first target, changes are applied to every target
 const edgesStyle = computed<EdgesStyle | undefined>(() => {
   const [reference] = targets;
   return reference === undefined ? undefined : EDGES_STYLES[reference.componentType];
 });
-const allComponentIds = computed<string[]>(() => targets.flatMap((target) => target.componentIds));
+const allComponentIds = computed<ModelComponentId[]>(() =>
+  targets.flatMap((target) => target.componentIds),
+);
 
 async function applyEdgesStyle(
-  setter: (style: EdgesStyle, componentIds: string[]) => Promise<unknown>,
+  setter: (style: EdgesStyle, componentIds: NonEmptyArray<ModelComponentId>) => Promise<unknown>,
 ): Promise<void> {
   await Promise.all(
     targets.map(async (target) => {
@@ -113,7 +116,7 @@ const width = computed<EdgeWidth | undefined>({
   },
 });
 
-const activeColoring = computed<string | undefined>({
+const activeColoring = computed<ColoringType | undefined>({
   get: () => edgesStyle.value?.activeColoring(modelId, referenceComponentId),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -153,7 +156,7 @@ const vertexAttributeItem = computed<AttributeItem | undefined>({
   },
 });
 
-const vertexAttributeRange = computed<(number | undefined)[] | undefined>({
+const vertexAttributeRange = computed<AttributeRange | undefined>({
   get: () => edgesStyle.value?.vertexAttributeRange(modelId, referenceComponentId),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -169,7 +172,7 @@ const vertexAttributeRange = computed<(number | undefined)[] | undefined>({
   },
 });
 
-const vertexAttributeColorMap = computed<AttributeColorMap | undefined>({
+const vertexAttributeColorMap = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => edgesStyle.value?.vertexAttributeColorMap(modelId, referenceComponentId),
   set: async (newValue) => {
     await applyEdgesStyle((style, ids) => style.setVertexAttributeColorMap(modelId, ids, newValue));
@@ -214,6 +217,7 @@ const attributeSchemas = {
       <ViewerOptionsWidthSlider data-testid="modelComponentEdgesWidthSlider" v-model="width" />
       <ViewerOptionsColoringTypeSelector
         :data-id="modelId"
+        v-if="isNonEmpty(allComponentIds)"
         :componentIds="allComponentIds"
         v-model:coloring_style_key="activeColoring"
         v-model:color="color"

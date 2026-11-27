@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import type { DisplayText, Label, Title, Tooltip } from "@ogw_front/types/ui";
+import type { GeodeIdentified, ModelId, TreeNodeId } from "@ogw_front/types/identifiers";
 import { formatCrs, formatCrsCode } from "@ogw_front/utils/crs";
 import ComponentRelations from "@ogw_front/components/Viewer/ObjectTree/Base/ComponentRelations.vue";
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
-import type { GeodeIdentified } from "@ogw_front/types/identifiers";
+import type { ModelComponentType } from "@ogw_front/types/model";
 import { middleTruncate } from "@ogw_front/utils/string";
 import { useClipboard } from "@vueuse/core";
 import { useCrsStore } from "@ogw_front/stores/crs";
@@ -10,17 +12,12 @@ import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useLiveDataItem } from "@ogw_front/composables/live_data_item";
 import { useResponsiveMiddleTruncate } from "@ogw_front/composables/responsive_middle_truncate";
 
-const feedbackStore = useFeedbackStore();
-const { copy } = useClipboard();
-
 interface Props {
   item: DisplayItem;
-  isLeaf?: boolean;
+  isLeaf: boolean;
   showCrs?: boolean;
-  modelId?: string;
+  modelId?: ModelId;
 }
-
-const { item, isLeaf, showCrs = false, modelId = "" } = defineProps<Props>();
 
 interface Emits {
   contextmenu: [event: MouseEvent];
@@ -28,21 +25,29 @@ interface Emits {
   mouseleave: [];
 }
 
+// The domain object a label shows: a data, a group or a model component
+interface LabeledTreeItem extends Partial<GeodeIdentified> {
+  id: TreeNodeId;
+  title?: Title;
+  is_active?: boolean;
+  category?: ModelComponentType;
+  children?: unknown[];
+}
+
+const feedbackStore = useFeedbackStore();
+const { copy } = useClipboard();
+
+const { item, isLeaf, showCrs = false, modelId = "" } = defineProps<Props>();
+
 const emit = defineEmits<Emits>();
 
 const labelContainer = useTemplateRef("label-container");
 const { width: containerWidth } = useElementSize(labelContainer);
 
 // The item prop can be either a DisplayItem wrapper (with a `.raw` domain object) or the domain object itself when this component is used outside CommonTreeView's slot machinery; the domain object always carries an id/title at runtime.
-interface LabeledItem extends Partial<GeodeIdentified> {
-  id: string;
-  title?: string;
-  is_active?: boolean;
-  category?: string;
-  children?: unknown[];
-}
-
-const actualItem = computed<LabeledItem>(() => (item.raw || item) as unknown as LabeledItem);
+const actualItem = computed<LabeledTreeItem>(
+  () => (item.raw || item) as unknown as LabeledTreeItem,
+);
 
 const TOOLTIP_NAME_MAX_LENGTH = 40;
 const TOOLTIP_NAME_START_CHARS = 10;
@@ -50,7 +55,7 @@ const TOOLTIP_NAME_END_CHARS = 8;
 
 const displayTitle = useResponsiveMiddleTruncate(() => actualItem.value.title, containerWidth);
 
-const tooltipTitle = computed<string>(() =>
+const tooltipTitle = computed<Title>(() =>
   middleTruncate(
     actualItem.value.title,
     TOOLTIP_NAME_MAX_LENGTH,
@@ -66,7 +71,7 @@ const tooltipOpen = ref(false);
 const dataItem = useLiveDataItem(() =>
   showCrs && tooltipOpen.value ? actualItem.value.id : undefined,
 );
-const crsLabel = computed<string>(
+const crsLabel = computed<Label>(
   () =>
     middleTruncate(
       formatCrs(dataItem.value?.crs),
@@ -78,7 +83,7 @@ const crsLabel = computed<string>(
 
 // Read from the store map: one database query for the whole tree, not one per row
 const mismatched = computed(() => showCrs && crsStore.mismatchedCrs.has(actualItem.value.id));
-const mismatchTooltip = computed<string>(() => {
+const mismatchTooltip = computed<Tooltip>(() => {
   const project = formatCrsCode(crsStore.projectCrs);
   const crs = crsStore.mismatchedCrs.get(actualItem.value.id);
   return crs === undefined
@@ -103,7 +108,7 @@ const tooltipDisabled = computed<boolean>(() => {
   return actualItem.value.children && actualItem.value.children.length > 0;
 });
 
-async function copyToClipboard(text: string, label: string): Promise<void> {
+async function copyToClipboard(text: DisplayText, label: Label): Promise<void> {
   await copy(text);
   feedbackStore.add_success(`${label} copied to clipboard`);
 }

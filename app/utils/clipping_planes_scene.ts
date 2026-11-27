@@ -1,4 +1,6 @@
 import type { Bounds } from "@kitware/vtk.js/types";
+import type { Coordinates } from "@ogw_front/types/geometry";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { DataIdentified } from "@ogw_front/types/identifiers";
 import type vtkActor from "@kitware/vtk.js/Rendering/Core/Actor";
 import type { vtkCamera } from "@kitware/vtk.js/Rendering/Core/Camera";
@@ -20,7 +22,7 @@ function computeSceneBounds(actors: readonly vtkActor[]): Bounds {
 }
 
 interface SceneBoundsInfo {
-  readonly center: readonly number[];
+  readonly center: Readonly<Coordinates>;
   readonly cubicBounds: readonly number[];
 }
 
@@ -60,17 +62,17 @@ interface ActorEntry {
 
 interface MainCameraOptions {
   readonly focal_point?: readonly number[];
-  readonly position?: readonly number[];
+  readonly position?: Readonly<Coordinates>;
   readonly view_up?: readonly number[];
 }
 
 function resolveActiveActors(
   targetAllVisible: boolean,
   allItems: readonly Readonly<DataIdentified>[],
-  selectedDatasetIds: readonly string[],
-  hybridDb: Record<string, ActorEntry | undefined>,
+  selectedDatasetIds: readonly DataId[],
+  hybridDb: Record<DataId, ActorEntry | undefined>,
 ): vtkActor[] {
-  let targetIds: readonly string[] = selectedDatasetIds;
+  let targetIds: readonly DataId[] = selectedDatasetIds;
   if (targetAllVisible) {
     targetIds = allItems.map((item: Readonly<DataIdentified>) => item.data_id);
   }
@@ -87,7 +89,7 @@ function resolveActiveActors(
 
 function computeNormalizedViewDirection(
   focalPoint: readonly number[],
-  position: readonly number[],
+  position: Readonly<Coordinates>,
 ): readonly number[] | undefined {
   const dir = [
     (position[0] ?? 0) - (focalPoint[0] ?? 0),
@@ -106,7 +108,7 @@ function computeNormalizedViewDirection(
 function alignCameraToMainCamera(
   camera: vtkCamera,
   mainCam: MainCameraOptions,
-  center: readonly number[],
+  center: Readonly<Coordinates>,
 ): void {
   if (!mainCam.focal_point || !mainCam.position) {
     return;

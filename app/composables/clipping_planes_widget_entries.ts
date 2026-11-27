@@ -5,23 +5,36 @@ import {
   getPlaneStyle,
   hasPlaneChanged,
 } from "@ogw_front/utils/clipping_planes";
+import type { Bounds, Coordinates, Ratio } from "@ogw_front/types/geometry";
+import type { Opacity } from "@geode/opengeodeweb-viewer/schema_types";
 import type { vtkWidgetManager as WidgetManagerInstance } from "@kitware/vtk.js/Widgets/Core/WidgetManager";
 import type vtkAbstractWidget from "@kitware/vtk.js/Widgets/Core/AbstractWidget";
 import type vtkAbstractWidgetFactory from "@kitware/vtk.js/Widgets/Core/AbstractWidgetFactory";
 import { newInstance as vtkImplicitPlaneWidget } from "@kitware/vtk.js/Widgets/Widgets3D/ImplicitPlaneWidget";
 
-interface ClippingPlane {
-  id: number;
-  origin?: number[];
-  normal: number[];
-  opacity: number;
+// A clipping plane or slice, by the id its panel gives it: unique among both
+type ClippingItemId = number;
+
+// The position of a clipping plane in the list of planes, which also picks its color
+type ClippingPlaneIndex = number;
+
+// Where a clipping plane cuts and how opaque it is drawn
+interface ClippingPlaneGeometry {
+  origin?: Coordinates;
+  normal: Coordinates;
+  opacity: Opacity;
+}
+
+// A clipping plane of the list, with the id of its widget entry
+interface ClippingPlane extends ClippingPlaneGeometry {
+  id: ClippingItemId;
 }
 
 interface ClippingWidgetState {
-  getOrigin: () => number[];
-  setOrigin: (origin: readonly number[]) => void;
-  getNormal: () => number[];
-  setNormal: (normal: readonly number[]) => void;
+  getOrigin: () => Coordinates;
+  setOrigin: (origin: Readonly<Coordinates>) => void;
+  getNormal: () => Coordinates;
+  setNormal: (normal: Readonly<Coordinates>) => void;
   onModified: (callback: () => void) => { unsubscribe: () => void };
 }
 
@@ -32,9 +45,9 @@ interface PlaneWidget {
 
 interface WidgetHandle {
   setAxisScale: (scale: number) => void;
-  setHandleSizeRatio: (ratio: number) => void;
+  setHandleSizeRatio: (ratio: Ratio) => void;
   setRepresentationStyle: (style: unknown) => void;
-  placeWidget: (bounds: readonly number[]) => void;
+  placeWidget: (bounds: Readonly<Bounds>) => void;
 }
 
 interface WidgetEntry {
@@ -62,9 +75,9 @@ interface WidgetEntryManagerParams {
 function useWidgetEntryManager({ planes, debouncedApply }: WidgetEntryManagerParams): {
   removeExtraWidgets: (widgetManager: WidgetManagerInstance | undefined) => void;
   updateWidgetEntry: (
-    idx: number,
+    idx: ClippingPlaneIndex,
     plane: ClippingPlane,
-    cubicBounds: readonly number[],
+    cubicBounds: Readonly<Bounds>,
     widgetManager: WidgetManagerInstance,
   ) => void;
   cleanupAll: (widgetManager: WidgetManagerInstance | undefined) => void;
@@ -77,7 +90,7 @@ function useWidgetEntryManager({ planes, debouncedApply }: WidgetEntryManagerPar
   function createWidgetEntry(
     planeWidget: PlaneWidget,
     widgetHandle: WidgetHandle,
-    planeIndex: number,
+    planeIndex: ClippingPlaneIndex,
   ): WidgetEntry {
     const widgetState = planeWidget.getWidgetState();
     const plane = planes.value[planeIndex];
@@ -91,8 +104,12 @@ function useWidgetEntryManager({ planes, debouncedApply }: WidgetEntryManagerPar
       if (fromWidget) {
         return;
       }
-      const origin: number[] = widgetState.getOrigin().map((val: number) => Number(val.toFixed(4)));
-      const normal: number[] = widgetState.getNormal().map((val: number) => Number(val.toFixed(4)));
+      const origin: Coordinates = widgetState
+        .getOrigin()
+        .map((val: number) => Number(val.toFixed(4)));
+      const normal: Coordinates = widgetState
+        .getNormal()
+        .map((val: number) => Number(val.toFixed(4)));
       const currentPlane = planes.value[planeIndex];
       if (
         !currentPlane ||
@@ -129,9 +146,9 @@ function useWidgetEntryManager({ planes, debouncedApply }: WidgetEntryManagerPar
   }
 
   function updateWidgetEntry(
-    idx: number,
+    idx: ClippingPlaneIndex,
     plane: ClippingPlane,
-    cubicBounds: readonly number[],
+    cubicBounds: Readonly<Bounds>,
     widgetManager: WidgetManagerInstance,
   ): void {
     // Modulo guarantees this index is within bounds of the non-empty PLANE_COLORS array.
@@ -190,4 +207,10 @@ function useWidgetEntryManager({ planes, debouncedApply }: WidgetEntryManagerPar
   };
 }
 
-export { useWidgetEntryManager, type ClippingPlane };
+export {
+  useWidgetEntryManager,
+  type ClippingItemId,
+  type ClippingPlane,
+  type ClippingPlaneGeometry,
+  type ClippingPlaneIndex,
+};

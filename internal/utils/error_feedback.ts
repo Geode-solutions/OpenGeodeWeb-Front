@@ -1,4 +1,5 @@
 import type { ErrorResponse } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
+import type { Route } from "@ogw_front/types/server";
 import { TimeoutError } from "p-timeout";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
@@ -10,18 +11,21 @@ const DEFAULT_DESCRIPTION = "An unexpected error occurred";
 const PYTHON_REPR = /^(?<name>[A-Za-z_][\w.]*)\((?<args>.*)\)$/su;
 const QUOTED_STRING = /^(?<quote>['"])(?<content>.*)\k<quote>$/su;
 
-type Fields = Record<string, unknown>;
+// A field of an error response, by its name
+type FieldName = string;
+
+type Fields = Record<FieldName, unknown>;
 
 function isRecord(value: unknown): value is Fields {
   return typeof value === "object" && value !== null;
 }
 
-function stringField(record: Fields, key: string): string | undefined {
+function stringField(record: Fields, key: FieldName): string | undefined {
   const value = record[key];
   return typeof value === "string" && value !== "" ? value : undefined;
 }
 
-function numberField(record: Fields, key: string): number | undefined {
+function numberField(record: Fields, key: FieldName): number | undefined {
   const value = record[key];
   return typeof value === "number" ? value : undefined;
 }
@@ -86,13 +90,13 @@ function toErrorFeedback(value: unknown): ErrorResponse {
 }
 
 // The single entry point to show a microservice error to the user
-function reportError(route: string, value: unknown): void {
+function reportError(route: Route, value: unknown): void {
   const { code, name, description } = toErrorFeedback(value);
   useFeedbackStore().add_error(code, route, name, description);
 }
 
 // A timeout rejects without going through the request handlers: report it as well
-async function reportTimeout<Result>(route: string, request: Promise<Result>): Promise<Result> {
+async function reportTimeout<Result>(route: Route, request: Promise<Result>): Promise<Result> {
   try {
     return await request;
   } catch (error) {

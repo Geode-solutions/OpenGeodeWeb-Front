@@ -13,7 +13,7 @@ import { useModelBlocksPolyhedronAttribute } from "./polyhedron";
 import { useModelBlocksVertexAttribute } from "./vertex";
 import { useModelBlocksVisibility } from "./visibility";
 
-async function setModelBlocksDefaultStyle(_id: string): Promise<void> {
+async function setModelBlocksDefaultStyle(_id: ModelId): Promise<void> {
   // Placeholder
 }
 
@@ -43,7 +43,7 @@ export function useModelBlocksStyle(): UseModelBlocksStyleReturn {
     modelId: ModelId,
     blocks_ids: BlockId[],
   ): Promise<unknown[]> {
-    const visibilityGroups: Record<string, string[]> = {};
+    const visibilityGroups: Record<string, BlockId[]> = {};
     for (const block_id of blocks_ids) {
       const style = modelCommonStyle.modelBlockStyle(modelId, block_id);
       const visibility = String(style.visibility);
@@ -67,7 +67,7 @@ export function useModelBlocksStyle(): UseModelBlocksStyleReturn {
     modelId: ModelId,
     blocks_ids: BlockId[],
   ): Promise<unknown[]> {
-    const activeColoringGroups: Record<string, string[]> = {};
+    const activeColoringGroups: Record<string, BlockId[]> = {};
     for (const block_id of blocks_ids) {
       const activeColoring = String(modelColorStyle.modelBlockActiveColoring(modelId, block_id));
       activeColoringGroups[activeColoring] ??= [];

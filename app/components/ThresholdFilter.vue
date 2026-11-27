@@ -1,7 +1,12 @@
 <script setup lang="ts">
-import type { Threshold, ThresholdAttribute } from "@ogw_internal/stores/hybrid_viewer/filters";
+import type {
+  Threshold,
+  ThresholdAttribute,
+  ThresholdIndex,
+} from "@ogw_internal/stores/hybrid_viewer/filters";
 import type { AttributeSource } from "@ogw_front/utils/threshold";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { DatasetOption } from "@ogw_front/types/props/components_tools";
 import ThresholdCard from "@ogw_front/components/ThresholdCard.vue";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import { fetchSources } from "@ogw_front/utils/threshold_sources";
@@ -9,18 +14,18 @@ import { useDataStore } from "@ogw_front/stores/data";
 import { useDebounceFn } from "@vueuse/core";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
-const DEBOUNCE_DELAY = 100;
-
 interface Props {
-  escapeFunction?: () => void;
+  escapeFunction: () => void;
 }
 
-const { escapeFunction = undefined } = defineProps<Props>();
+const DEBOUNCE_DELAY = 100;
+
+const { escapeFunction } = defineProps<Props>();
 
 const show = defineModel<boolean>("show", { default: false });
 const dataStore = useDataStore();
 const hybridViewerStore = useHybridViewerStore();
-const selectedDatasetId = ref<string>();
+const selectedDatasetId = ref<DataId>();
 const sources = ref<AttributeSource[]>([]);
 const thresholds = computed<Threshold[]>(() => {
   if (!selectedDatasetId.value) {
@@ -30,7 +35,7 @@ const thresholds = computed<Threshold[]>(() => {
 });
 const cards = useTemplateRef("cards");
 
-const availableDatasets = computed<{ title: string; value: string }[]>(() =>
+const availableDatasets = computed<DatasetOption[]>(() =>
   dataStore.items.map((item) => ({
     title: item.name || item.data_id,
     value: item.data_id,
@@ -57,7 +62,7 @@ function addThreshold(): void {
   }
 }
 
-function removeThreshold(index: number): void {
+function removeThreshold(index: ThresholdIndex): void {
   if (selectedDatasetId.value) {
     hybridViewerStore.removeThreshold(selectedDatasetId.value, index);
   }

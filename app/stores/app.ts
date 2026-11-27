@@ -10,6 +10,8 @@ import { Status } from "@ogw_front/utils/status";
 import { useAppExtensions } from "./app_helpers/extension.js";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
+import type { ExtensionId, StoreId } from "@ogw_front/types/identifiers";
+import type { FilePath } from "@ogw_front/types/files";
 import type { RequestHandlers } from "@ogw_shared/utils/types.js";
 import type { StateTree } from "pinia";
 
@@ -27,7 +29,7 @@ declare module "pinia" {
 // oxlint-disable-next-line max-lines-per-function, max-statements
 export const useAppStore = defineStore("app", () => {
   const stores: RegisterableStore[] = [];
-  const globalComponents = ref<Map<string, Map<string, unknown>>>(new Map());
+  const globalComponents = ref<Map<ExtensionId, Map<string, unknown>>>(new Map());
   const default_local_port = ref(globalThis.location.port);
   const status = ref(Status.NOT_CONNECTED);
   const protocol = computed(() => getRestApiProtocol());
@@ -43,7 +45,7 @@ export const useAppStore = defineStore("app", () => {
   });
 
   function registerGlobalComponent(
-    extensionId: string,
+    extensionId: ExtensionId,
     componentId: string,
     component: unknown,
   ): void {
@@ -53,7 +55,7 @@ export const useAppStore = defineStore("app", () => {
     globalComponents.value.get(extensionId)?.set(componentId, component);
   }
 
-  function unregisterGlobalComponent(extensionId: string, componentId: string): void {
+  function unregisterGlobalComponent(extensionId: ExtensionId, componentId: string): void {
     if (globalComponents.value.has(extensionId)) {
       globalComponents.value.get(extensionId)?.delete(componentId);
     }
@@ -70,7 +72,7 @@ export const useAppStore = defineStore("app", () => {
   }
 
   // An uninstalled extension unregisters its stores: they are no longer saved in projects
-  function unregisterStore(storeId: string): void {
+  function unregisterStore(storeId: StoreId): void {
     const index = stores.findIndex((registeredStore) => registeredStore.$id === storeId);
     if (index !== -1) {
       stores.splice(index, 1);
@@ -79,12 +81,12 @@ export const useAppStore = defineStore("app", () => {
 
   async function exportStores(
     params: Record<string, unknown> = {},
-  ): Promise<Record<string, unknown>> {
+  ): Promise<Record<StoreId, unknown>> {
     const snapshot = await exportRegisteredStores(stores, params);
     return snapshot;
   }
 
-  async function importStores(snapshot: Record<string, unknown> | undefined): Promise<void> {
+  async function importStores(snapshot: Record<StoreId, unknown> | undefined): Promise<void> {
     await importRegisteredStores(stores, snapshot);
   }
 
@@ -114,9 +116,9 @@ export const useAppStore = defineStore("app", () => {
     return result;
   }
 
-  const projectFolderPath = ref("");
+  const projectFolderPath = ref<FilePath>("");
 
-  function set_project_folder_path(path: string): void {
+  function set_project_folder_path(path: FilePath): void {
     projectFolderPath.value = path;
   }
 

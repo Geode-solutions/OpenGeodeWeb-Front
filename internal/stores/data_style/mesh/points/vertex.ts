@@ -156,7 +156,7 @@ function useMeshPointsVertexAttributeStyle(): UseMeshPointsVertexAttributeStyleR
   }
   async function setMeshPointsVertexAttributeColorMap(
     meshId: MeshId,
-    colorMap: AttributeColorMap | undefined,
+    colorMap: AttributeColorMap,
   ): Promise<unknown> {
     const name = meshPointsVertexAttributeName(meshId);
     const item = meshPointsVertexAttributeItem(meshId);

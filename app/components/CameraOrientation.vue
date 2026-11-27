@@ -4,9 +4,11 @@ import {
   cameraOrientations,
   isNorth,
 } from "@ogw_front/utils/camera_orientations";
+import type { CssColor, Pixels } from "@ogw_front/types/ui";
 import { BRAND_ORANGE } from "@ogw_front/utils/brand_colors";
 import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types.js";
 import CameraOrientationDial from "@ogw_front/components/CameraOrientationDial.vue";
+import type { CameraOrientationKey } from "@ogw_internal/stores/hybrid_viewer/camera_helpers";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import { applyCameraOptions } from "@ogw_internal/stores/hybrid_viewer/camera";
 import { orientationCubeStyle } from "@ogw_front/utils/orientation_cube_style";
@@ -17,23 +19,19 @@ import { useTheme } from "vuetify";
 import { newInstance as vtkAnnotatedCubeActor } from "@kitware/vtk.js/Rendering/Core/AnnotatedCubeActor";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 
-const DEFAULT_PANEL_WIDTH = 260;
-
 interface Props {
-  panel?: boolean;
-  width?: number;
+  panel: boolean;
+  width?: Pixels;
   escapeFunction?: () => void;
 }
 
-const {
-  panel = false,
-  width = DEFAULT_PANEL_WIDTH,
-  escapeFunction = undefined,
-} = defineProps<Props>();
-
 interface Emits {
-  select: [value: string];
+  select: [value: CameraOrientationKey];
 }
+
+const DEFAULT_PANEL_WIDTH = 260;
+
+const { panel, width = DEFAULT_PANEL_WIDTH, escapeFunction = undefined } = defineProps<Props>();
 
 const emit = defineEmits<Emits>();
 
@@ -67,7 +65,7 @@ let isInteracting = false;
 function faceStyle(
   orientation: CameraOrientation,
   hovered: boolean,
-): { faceColor: string; fontColor: string } {
+): { faceColor: CssColor; fontColor: CssColor } {
   const style = cubeStyle.value;
   if (hovered) {
     return { faceColor: style.hoveredFaceColor, fontColor: style.hoveredFontColor };
@@ -88,7 +86,7 @@ function labelFaces(): void {
   }
 }
 
-function edgeStyle(): { edgeColor: string } {
+function edgeStyle(): { edgeColor: CssColor } {
   return { edgeColor: cubeStyle.value.edgeColor };
 }
 

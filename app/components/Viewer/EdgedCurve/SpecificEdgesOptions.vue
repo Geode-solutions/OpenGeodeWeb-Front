@@ -2,6 +2,7 @@
 import type { EdgeWidth, Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import EdgedCurveEdges from "@ogw_front/assets/viewer_svgs/edged_curve_edges.svg";
+import type { MenuItemIndex } from "@ogw_front/types/ui";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import ViewerEdgedCurveSpecificEdgesColoring from "@ogw_front/components/Viewer/EdgedCurve/SpecificEdgesColoring.vue";
@@ -11,14 +12,14 @@ import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
+interface Props {
+  dataId: DataId;
+  index: MenuItemIndex;
+}
+
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const { applyBatchStyle } = useBatchStyle();
-
-interface Props {
-  dataId: DataId;
-  index: number;
-}
 
 const { dataId, index } = defineProps<Props>();
 

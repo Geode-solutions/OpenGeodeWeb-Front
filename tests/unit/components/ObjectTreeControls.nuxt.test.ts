@@ -8,7 +8,13 @@ import { nextTick } from "vue";
 import { setupActivePinia, vuetify } from "@ogw_tests/utils";
 import Controls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 
-const props = { search: "", sortType: "name", filterOptions: {}, availableFilterOptions: [] };
+const props = {
+  search: "",
+  sortType: "name" as const,
+  filterOptions: {},
+  availableFilterOptions: [],
+  isCollapsed: false,
+};
 
 async function openSearch(): Promise<VueWrapper> {
   const wrapper = await mountSuspended(Controls, {

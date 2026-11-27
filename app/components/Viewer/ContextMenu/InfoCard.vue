@@ -1,6 +1,11 @@
 <script setup lang="ts">
+import type { ModelComponentName, ModelComponentType } from "@ogw_front/types/model";
 import { formatCrs, formatCrsCode } from "@ogw_front/utils/crs";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { DataName } from "@ogw_front/types/data";
 import GlassCard from "@ogw_front/components/GlassCard.vue";
+import type { ModelComponentId } from "@ogw_front/types/identifiers";
+import type { Title } from "@ogw_front/types/ui";
 import { consola } from "consola";
 import { middleTruncate } from "@ogw_front/utils/string";
 import { useCopyToClipboard } from "@ogw_front/composables/copy_to_clipboard";
@@ -15,11 +20,20 @@ interface Props {
   metaData: Record<string, any>;
 }
 
+interface Emits {
+  "update:show": [show: boolean];
+}
+
+// The component of a model the context menu is opened on, as the info card shows it
+interface MeshComponentInfo {
+  id?: ModelComponentId;
+  title?: ModelComponentName;
+  category?: ModelComponentType;
+}
+
 const { show, metaData } = defineProps<Props>();
 
-const emit = defineEmits<{
-  "update:show": [value: boolean];
-}>();
+const emit = defineEmits<Emits>();
 
 const MAX_SHORT_ID_LENGTH = 15;
 const ID_SLICE_START = 8;
@@ -31,20 +45,14 @@ const TRUNCATE_END_CHARS = 7;
 const { copy, copied } = useCopyToClipboard();
 const copiedId = ref("");
 
-function isCopied(id: string | undefined): boolean {
+function isCopied(id: DataId | ModelComponentId | undefined): boolean {
   return copied.value && copiedId.value === id;
 }
 
 const menuStore = useMenuStore();
 const dataStore = useDataStore();
 
-interface MeshComponentInfo {
-  id?: string;
-  title?: string;
-  category?: string;
-}
-
-const componentName = ref<string>("");
+const componentName = ref<ModelComponentName>("");
 const componentItem = ref<MeshComponentInfo | undefined>(undefined);
 
 function asString(value: unknown): string | undefined {
@@ -75,7 +83,7 @@ watch(
   { immediate: true },
 );
 
-const cleanName = computed<string>(() => {
+const cleanName = computed<DataName>(() => {
   const meta = menuStore.current_meta_data;
   if (!meta) {
     return "Unnamed Object";
@@ -86,7 +94,7 @@ const cleanName = computed<string>(() => {
   return asString(meta.name) ?? "Unnamed Object";
 });
 
-const displayTitle = computed<string>(() => {
+const displayTitle = computed<Title>(() => {
   const name = cleanName.value;
   if (!name) {
     return "";
@@ -94,7 +102,7 @@ const displayTitle = computed<string>(() => {
   return middleTruncate(name, TRUNCATE_MAX_LENGTH, TRUNCATE_START_CHARS, TRUNCATE_END_CHARS);
 });
 
-const displayComponentTitle = computed<string>(() => {
+const displayComponentTitle = computed<Title>(() => {
   if (!componentItem.value) {
     return "";
   }
@@ -106,7 +114,7 @@ const displayComponentTitle = computed<string>(() => {
   );
 });
 
-async function copyId(targetId: string | undefined): Promise<void> {
+async function copyId(targetId: DataId | ModelComponentId | undefined): Promise<void> {
   if (!targetId) {
     return;
   }
@@ -118,7 +126,7 @@ async function copyId(targetId: string | undefined): Promise<void> {
   }
 }
 
-function formatId(id: string | undefined): string {
+function formatId(id: DataId | ModelComponentId | undefined): string {
   if (!id) {
     return "";
   }

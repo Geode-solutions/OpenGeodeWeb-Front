@@ -56,7 +56,7 @@ async function fetchIsViewable(dataId: DataId): Promise<boolean> {
 
 // NewDataItem has mutable array fields (mesh_components, collection_components), so it can't
 // Satisfy prefer-readonly-parameter-types deeply; same pattern as app/utils/import_workflow.ts.
-async function addItem(newItem: NewDataItem): Promise<string> {
+async function addItem(newItem: NewDataItem): Promise<DataId> {
   const itemData: DataItem = {
     data_id: newItem.data_id,
     geode_id: newItem.geode_id,
@@ -84,7 +84,7 @@ async function updateItem(dataId: DataId, changes: Partial<DataItem>): Promise<v
 // A single live query of the data table, shared by every reader
 function useDataItems(): {
   items: ComputedRef<DataItem[]>;
-  itemsById: ComputedRef<Map<string, DataItem>>;
+  itemsById: ComputedRef<Map<DataId, DataItem>>;
   isViewable: (dataId: DataId) => boolean;
 } {
   const liveItems = useObservable(

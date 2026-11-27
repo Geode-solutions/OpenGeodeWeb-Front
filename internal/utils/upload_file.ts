@@ -1,6 +1,8 @@
-import type { JsonRpcSchema, RequestHandlers } from "@ogw_shared/utils/types.js";
+import type { HttpJsonRpcSchema, HttpMethod, Microservice } from "./api_fetch.js";
 import { CHUNK_SIZE_BYTES } from "@ogw_shared/utils/file.js";
-import type { Microservice } from "./api_fetch.js";
+import type { Count } from "@ogw_front/types/ui";
+import type { RequestHandlers } from "@ogw_shared/utils/types.js";
+import type { Route } from "@ogw_front/types/server";
 import { consola } from "consola";
 import { fetchRaw } from "@ogw_shared/utils/fetch_raw.js";
 import { reportError } from "./error_feedback.js";
@@ -10,24 +12,24 @@ import { uploadPath } from "@ogw_front/utils/upload_path";
 interface UploadFileParams {
   // Always forwarded to fetchRaw via schema.methods, which is only ever set on
   // HTTP-flavored ("front"/"back") schemas.
-  schema: JsonRpcSchema & { methods: string[] };
+  schema: HttpJsonRpcSchema;
   file: File;
   params?: Record<string, string>;
 }
 
 interface ChunkUpload {
   microservice: Microservice;
-  route: string;
-  method: string | undefined;
+  route: Route;
+  method: HttpMethod | undefined;
   file: File;
   params: Record<string, string>;
-  totalChunks: number;
+  totalChunks: Count;
 }
 
 // A failed chunk stops the request and is reported before the caller's own handler runs
 function chunkErrorHandlers(
   microservice: Microservice,
-  route: string,
+  route: Route,
   { request_error_function, response_error_function }: RequestHandlers,
 ): RequestHandlers {
   return {

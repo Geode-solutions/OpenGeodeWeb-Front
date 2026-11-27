@@ -1,5 +1,6 @@
-import type { GeodeIdentified, ModelId } from "@ogw_front/types/identifiers";
+import type { GeodeIdentified, ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
+import type { ModelComponentType } from "@ogw_front/types/model";
 import { useDataStore } from "@ogw_front/stores/data";
 
 // The four per-component-type style composables (Surface/Line/Block/Corner) each expose a different, large set of methods (color, visibility, per-attribute-kind getters/setters...). This module only cares about looking a handful of them up dynamically by name, so a precise structural type for componentStyleFunctions isn't worth modelling here; `any` keeps the dynamic dispatch table honest about that.
@@ -7,7 +8,7 @@ import { useDataStore } from "@ogw_front/stores/data";
 type ComponentStyleFunctions = Record<"Surface" | "Line" | "Block" | "Corner", any>;
 
 interface ModelComponent extends GeodeIdentified {
-  type: string;
+  type: ModelComponentType;
 }
 
 async function callComponentStyleFunction(
@@ -21,9 +22,10 @@ async function callComponentStyleFunction(
   return result;
 }
 
-async function getModelComponentsMap(
-  modelId: ModelId,
-): Promise<{ allComponents: ModelComponent[]; componentsMap: Record<string, ModelComponent> }> {
+async function getModelComponentsMap(modelId: ModelId): Promise<{
+  allComponents: ModelComponent[];
+  componentsMap: Record<ModelComponentId, ModelComponent>;
+}> {
   const dataStore = useDataStore();
   const results = await Promise.all(
     MESH_COMPONENT_TYPES.map(async (type) => {
@@ -38,7 +40,10 @@ async function getModelComponentsMap(
   return {
     allComponents,
     componentsMap: Object.fromEntries(
-      allComponents.map((component): [string, ModelComponent] => [component.geode_id, component]),
+      allComponents.map((component): [ModelComponentId, ModelComponent] => [
+        component.geode_id,
+        component,
+      ]),
     ),
   };
 }
@@ -61,10 +66,10 @@ const DISPATCH_METHODS: Partial<Record<string, Record<ComponentTypeName, string>
 };
 
 function groupIdsByComponentType(
-  componentIds: string[],
-  componentsMap: Record<string, ModelComponent>,
-): Record<ComponentTypeName, string[]> {
-  const idsByComponent: Record<ComponentTypeName, string[]> = {
+  componentIds: ModelComponentId[],
+  componentsMap: Record<ModelComponentId, ModelComponent>,
+): Record<ComponentTypeName, ModelComponentId[]> {
+  const idsByComponent: Record<ComponentTypeName, ModelComponentId[]> = {
     Block: [],
     Surface: [],
     Line: [],
@@ -73,7 +78,7 @@ function groupIdsByComponentType(
   for (const id of componentIds) {
     const type = componentsMap[id]?.type;
     if (type !== undefined && type in idsByComponent) {
-      (idsByComponent as Record<string, string[]>)[type]?.push(id);
+      (idsByComponent as Record<string, ModelComponentId[]>)[type]?.push(id);
     }
   }
   return idsByComponent;
@@ -81,7 +86,7 @@ function groupIdsByComponentType(
 
 async function dispatchToComponentTypes(
   modelId: ModelId,
-  componentIds: string[],
+  componentIds: ModelComponentId[],
   action: string,
   { componentStyleFunctions }: { componentStyleFunctions: ComponentStyleFunctions },
   ...args: unknown[]

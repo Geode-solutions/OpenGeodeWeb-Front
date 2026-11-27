@@ -1,3 +1,5 @@
+import type { StepIndex } from "@ogw_front/types/ui";
+
 interface StepperTreeApi {
   state: Record<string, unknown>;
   update_values: (keys_values_object: Record<string, unknown>) => void;
@@ -10,7 +12,7 @@ function isUnknownArray(value: unknown): value is unknown[] {
   return Array.isArray(value);
 }
 
-function get_current_step_index(state: Record<string, unknown>): number {
+function get_current_step_index(state: Record<string, unknown>): StepIndex {
   const value = state.current_step_index;
   return typeof value === "number" ? value : 0;
 }

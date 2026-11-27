@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
+import type { MenuItemIndex } from "@ogw_front/types/ui";
 import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 
 interface Props {
-  index: number;
+  index: MenuItemIndex;
 }
 
 const { index } = defineProps<Props>();

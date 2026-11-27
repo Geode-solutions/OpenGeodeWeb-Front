@@ -173,6 +173,8 @@ export type {
   DisplayItem,
   EmitFn,
   ItemPropsConfig,
+  ReadonlyDisplayItem,
+  ReadonlyMaybeRefOrGetter,
   SelectionConfig,
   TreeItem,
 } from "./virtual_tree_types";

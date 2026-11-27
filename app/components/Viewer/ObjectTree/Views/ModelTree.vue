@@ -1,11 +1,17 @@
 <script setup lang="ts">
+// oxlint-disable import/max-dependencies -- the model tree view wires the tree filter, the hover highlight, the viewer and the treeview store
+import type { ModelComponentId, ModelId, TreeNodeId } from "@ogw_front/types/identifiers";
+import type { ModelTreeItem, TreeRowHoverPayload } from "@ogw_front/types/props/viewer/object_tree";
 import { sortAndFormatItems, useTreeFilter } from "@ogw_front/composables/tree_filter";
 import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
 import type { ModelComponentMenuPayload } from "@ogw_front/utils/treeview";
+import type { ModelComponentType } from "@ogw_front/types/model";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
+import type { SearchQuery } from "@ogw_front/types/ui";
+import type { ViewerId } from "@geode/opengeodeweb-viewer/schema_types";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -13,27 +19,17 @@ import { useModelTree } from "@ogw_front/composables/model_tree";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 interface Props {
-  id: string;
+  id: ModelId;
 }
 
-const { id } = defineProps<Props>();
-
-interface CollectionTreeItem {
-  raw?: CollectionTreeItem;
-  id: string;
-  category?: string;
-  children?: CollectionTreeItem[];
-  relation?: string;
-  viewer_id?: number;
-  title?: string;
-}
-
-const { onHoverEnter, onHoverLeave } = useHoverhighlight();
-const hybridViewerStore = useHybridViewerStore();
 interface Emits {
   "show-menu": [payload: ModelComponentMenuPayload];
 }
 
+const { id } = defineProps<Props>();
+
+const { onHoverEnter, onHoverLeave } = useHoverhighlight();
+const hybridViewerStore = useHybridViewerStore();
 const emit = defineEmits<Emits>();
 
 const treeviewStore = useTreeviewStore();
@@ -51,7 +47,7 @@ const {
 
 const currentView = computed(() => treeviewStore.opened_views.find((view) => view.id === id));
 
-const opened = computed<string[]>({
+const opened = computed<TreeNodeId[]>({
   get: () => currentView.value?.opened || [],
   set: (val) => treeviewStore.setOpened(id, val),
 });
@@ -67,14 +63,16 @@ const {
   applySearchFilter,
 } = useTreeFilter(localCategories);
 
-function onUpdateSelection(newSelection: string[]): void {
+function onUpdateSelection(newSelection: ModelComponentId[]): void {
   const finalSelection = applySearchFilter(newSelection, visibleComponents.value);
   updateVisibility(finalSelection);
 }
 
-const visibleSelection = computed<string[]>(() => applySearchFilter(visibleComponents.value, []));
+const visibleSelection = computed<ModelComponentId[]>(() =>
+  applySearchFilter(visibleComponents.value, []),
+);
 
-function matchesSearch(item: CollectionTreeItem, query: string): boolean {
+function matchesSearch(item: ModelTreeItem, query: SearchQuery): boolean {
   return (
     (item.title ?? "").toLowerCase().includes(query) ||
     item.id.toLowerCase().includes(query) ||
@@ -82,40 +80,37 @@ function matchesSearch(item: CollectionTreeItem, query: string): boolean {
   );
 }
 
-function searchGroups(query: string): CollectionTreeItem[] {
-  const groups = (cache.value ?? {}) as Record<string, CollectionTreeItem[]>;
-  const result: CollectionTreeItem[] = [];
+function searchGroups(query: SearchQuery): ModelTreeItem[] {
+  const groups = (cache.value ?? {}) as Record<ModelComponentType, ModelTreeItem[]>;
+  const result: ModelTreeItem[] = [];
   for (const [type, components] of Object.entries(groups)) {
     const matches = components.filter((component) => matchesSearch(component, query));
     if (matches.length > 0) {
       result.push({
         id: type,
         title: `${type}s (${matches.length})`,
-        children: sortAndFormatItems(matches, sortType.value) as unknown as CollectionTreeItem[],
+        children: sortAndFormatItems(matches, sortType.value) as unknown as ModelTreeItem[],
       });
     }
   }
   return result;
 }
 
-const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
+const itemsForTreeView = computed<ModelTreeItem[]>(() => {
   if (search.value) {
     const query = search.value.toLowerCase();
-    return sortAndFormatItems(
-      searchGroups(query),
-      sortType.value,
-    ) as unknown as CollectionTreeItem[];
+    return sortAndFormatItems(searchGroups(query), sortType.value) as unknown as ModelTreeItem[];
   }
 
-  const result: CollectionTreeItem[] = [];
+  const result: ModelTreeItem[] = [];
   for (const category of filteredCategories.value) {
-    const categoryId = category.id as string;
+    const categoryId = category.id as ModelComponentType;
     result.push({
       ...category,
       id: categoryId,
       children: withRelations(
         categoryId,
-        sortAndFormatItems(cache.value?.[categoryId], sortType.value) as CollectionTreeItem[],
+        sortAndFormatItems(cache.value?.[categoryId], sortType.value) as ModelTreeItem[],
         sortType.value,
       ),
     });
@@ -123,18 +118,18 @@ const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
   return result;
 });
 
-function extractComponentIds(node: CollectionTreeItem): string[] {
+function extractComponentIds(node: ModelTreeItem): ModelComponentId[] {
   if (node.children) {
     return node.children.flatMap((child) => extractComponentIds(child));
   }
   return [node.id];
 }
 
-function isCollectionNode(item: CollectionTreeItem): boolean {
+function isCollectionNode(item: ModelTreeItem): boolean {
   return collectionTypes.value.has(item.category ?? item.id);
 }
 
-function showContextMenu(event: MouseEvent, item: CollectionTreeItem): void {
+function showContextMenu(event: MouseEvent, item: ModelTreeItem): void {
   const actualItem = item.raw || item;
   // A boundaries or internals group is not a component type: it has no menu
   if (actualItem.relation !== undefined) {
@@ -164,23 +159,17 @@ function showContextMenu(event: MouseEvent, item: CollectionTreeItem): void {
   });
 }
 
-function extractIds(node: CollectionTreeItem): number[] {
+function extractIds(node: ModelTreeItem): ViewerId[] {
   if (node.children) {
     return node.children.flatMap((child) => extractIds(child));
   }
   if (Number.isInteger(node.viewer_id)) {
-    return [node.viewer_id as number];
+    return [node.viewer_id as ViewerId];
   }
   return [];
 }
 
-function handleHoverEnter({
-  item,
-  immediate = false,
-}: {
-  item: CollectionTreeItem;
-  immediate?: boolean;
-}): void {
+function handleHoverEnter({ item, immediate = false }: TreeRowHoverPayload<ModelTreeItem>): void {
   const actualItem = item.raw || item;
 
   if (!actualItem.category && (!actualItem.children || actualItem.children.length === 0)) {
@@ -196,8 +185,8 @@ function handleHoverLeave(): void {
 }
 
 function expandAll(): void {
-  const allIds: string[] = [];
-  function traverse(itemsList: CollectionTreeItem[]): void {
+  const allIds: TreeNodeId[] = [];
+  function traverse(itemsList: ModelTreeItem[]): void {
     for (const item of itemsList) {
       if (item.children && item.children.length > 0) {
         allIds.push(item.id);
@@ -209,7 +198,7 @@ function expandAll(): void {
   opened.value = allIds;
 }
 
-function getLeafViewerIds(item: CollectionTreeItem): number[] {
+function getLeafViewerIds(item: ModelTreeItem): ViewerId[] {
   const actualItem = item.raw || item;
   return extractIds(actualItem);
 }
@@ -244,14 +233,14 @@ function getLeafViewerIds(item: CollectionTreeItem): number[] {
       :scroll-top="currentView?.scrollTop || 0"
       class="transparent-treeview virtual-tree-height"
       :is-row-viewable="() => dataStore.isViewable(id)"
-      @update:selected="(val) => onUpdateSelection(val as string[])"
+      @update:selected="(val) => onUpdateSelection(val as ModelComponentId[])"
       @update:scroll-top="treeviewStore.setScrollTop(id, $event)"
       @hover:enter="
         ({ item, immediate }) =>
-          handleHoverEnter({ item: item as unknown as CollectionTreeItem, immediate })
+          handleHoverEnter({ item: item as unknown as ModelTreeItem, immediate })
       "
       @hover:leave="handleHoverLeave"
-      @contextmenu="showContextMenu($event.event, $event.item as unknown as CollectionTreeItem)"
+      @contextmenu="showContextMenu($event.event, $event.item as unknown as ModelTreeItem)"
     >
       <template #title="{ item, isLeaf }">
         <ObjectTreeItemLabel
@@ -260,13 +249,13 @@ function getLeafViewerIds(item: CollectionTreeItem): number[] {
           :model-id="id"
           show-tooltip
           class="text-body-1"
-          @contextmenu="showContextMenu($event, item as unknown as CollectionTreeItem)"
+          @contextmenu="showContextMenu($event, item as unknown as ModelTreeItem)"
         />
       </template>
 
       <template #append="{ item }">
         <v-btn
-          v-if="getLeafViewerIds(item as unknown as CollectionTreeItem).length > 0"
+          v-if="getLeafViewerIds(item as unknown as ModelTreeItem).length > 0"
           icon="ph-target"
           size="medium"
           variant="text"
@@ -274,7 +263,7 @@ function getLeafViewerIds(item: CollectionTreeItem): number[] {
           @click.stop="
             hybridViewerStore.focusCameraOnObject(
               id,
-              getLeafViewerIds(item as unknown as CollectionTreeItem),
+              getLeafViewerIds(item as unknown as ModelTreeItem),
             )
           "
         />

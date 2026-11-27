@@ -1,8 +1,10 @@
-// Files carry extra app-specific bookkeeping fields once picked up by the uploader.
-type UploadFile = File & { relativePath?: string; isConfigured?: boolean; displayName?: string };
+import type { FileExtension, FilePath, UploadFile } from "@ogw_front/types/files";
+
+// The index of a selected file among the selected paths
+type SelectedFileIndex = number;
 
 // Path of the file inside the back upload folder: keeps the folder tree of a dropped directory.
-function uploadPath(file: UploadFile): string {
+function uploadPath(file: UploadFile): FilePath {
   for (const candidate of [file.relativePath, file.webkitRelativePath]) {
     if (candidate !== undefined && candidate !== "") {
       return candidate;
@@ -11,7 +13,7 @@ function uploadPath(file: UploadFile): string {
   return file.name;
 }
 
-function fileExtension(path: string): string {
+function fileExtension(path: FilePath): FileExtension {
   const name = path.slice(path.lastIndexOf("/") + 1);
   const index = name.lastIndexOf(".");
   if (index === -1) {
@@ -21,11 +23,11 @@ function fileExtension(path: string): string {
 }
 
 type FileMatch =
-  | { status: "matched"; indices: (number | undefined)[] }
-  | { status: "ambiguous"; path: string };
+  | { status: "matched"; indices: (SelectedFileIndex | undefined)[] }
+  | { status: "ambiguous"; path: FilePath };
 
 // Number of folders the two paths have in common, in order: 0 when the file names differ.
-function matchScore(path: string, expected_path: string): number {
+function matchScore(path: FilePath, expected_path: FilePath): number {
   const segments = path.split("/");
   const expected_segments = expected_path.split("/");
   if (segments.at(-1) !== expected_segments.at(-1)) {
@@ -50,14 +52,14 @@ function matchScore(path: string, expected_path: string): number {
 // Finds each expected file in a selected folder, whatever the folder layout: a selected file is
 // Kept for an expected path when each is the other's closest match (most folders in common).
 // Gives, for each expected path, the index of its selected path (undefined when not found).
-function matchExpectedFiles(paths: readonly string[], expected: readonly string[]): FileMatch {
+function matchExpectedFiles(paths: readonly FilePath[], expected: readonly FilePath[]): FileMatch {
   const scores = expected.map((expected_path) =>
     paths.map((path) => matchScore(path, expected_path)),
   );
   const path_best_scores = paths.map((_path, index) =>
     Math.max(0, ...scores.map((expected_scores) => expected_scores[index] ?? 0)),
   );
-  const indices: (number | undefined)[] = [];
+  const indices: (SelectedFileIndex | undefined)[] = [];
   for (const [expected_index, expected_scores] of scores.entries()) {
     const best = Math.max(0, ...expected_scores);
     const candidates = expected_scores.flatMap((score, index) => {
@@ -78,4 +80,4 @@ function matchExpectedFiles(paths: readonly string[], expected: readonly string[
 const foldersIgnoredWarning = "Folders can't be dropped here";
 
 export { fileExtension, foldersIgnoredWarning, matchExpectedFiles, uploadPath };
-export type { UploadFile };
+export type { SelectedFileIndex };

@@ -1,14 +1,16 @@
 <script setup lang="ts">
+import type { AppName } from "@ogw_front/types/server";
 import ChromeTheme from "@ogw_front/components/ChromeTheme.vue";
+import type { ImageSource } from "@ogw_front/types/ui";
 import { Status } from "@ogw_front/utils/status";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
 interface Props {
-  logo?: string;
-  appName: string;
+  logo: ImageSource;
+  appName: AppName;
 }
 
-const { logo = "", appName } = defineProps<Props>();
+const { logo, appName } = defineProps<Props>();
 
 const infraStore = useInfraStore();
 

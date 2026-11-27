@@ -1,31 +1,30 @@
 <script setup lang="ts">
+import type { SearchQuery, SortType } from "@ogw_front/types/ui";
 import ActionButton from "@ogw_front/components/ActionButton.vue";
 import SearchBar from "@ogw_front/components/SearchBar.vue";
+import type { TreeFilterCategory } from "@ogw_front/types/tree";
+
+// The events of the search, sort and fold toolbar of an object tree
 
 interface Props {
-  search: string;
-  sortType: string;
-  filterOptions: Record<string, boolean>;
-  availableFilterOptions: string[];
-  isCollapsed?: boolean;
+  search: SearchQuery;
+  sortType: SortType;
+  filterOptions: Record<TreeFilterCategory, boolean>;
+  availableFilterOptions: TreeFilterCategory[];
+  isCollapsed: boolean;
 }
 
-const {
-  search,
-  sortType,
-  filterOptions,
-  availableFilterOptions,
-  isCollapsed = false,
-} = defineProps<Props>();
-
-interface Emits {
-  "update:search": [value: string];
+interface ObjectTreeControlsEmits {
+  "update:search": [search: SearchQuery];
   "toggle-sort": [];
   "collapse-all": [];
   "expand-all": [];
 }
 
-const emit = defineEmits<Emits>();
+const { search, sortType, filterOptions, availableFilterOptions, isCollapsed } =
+  defineProps<Props>();
+
+const emit = defineEmits<ObjectTreeControlsEmits>();
 
 const showSearch = ref<boolean>(false);
 const capsule = useTemplateRef("capsule");

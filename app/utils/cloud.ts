@@ -1,10 +1,11 @@
+import type { Url } from "@ogw_front/types/files";
 import { consola } from "consola";
 
 const CLOUD_URL_PARAM = "cloud_url";
 const CLOUD_RUN_HOST_SUFFIX = ".run.app";
 
 // Hostname of an already running Cloud Run service passed as `?cloud_url=`, restricted to Cloud Run hosts so a crafted link cannot point the app at an arbitrary server.
-function getCloudUrlParam(): string | undefined {
+function getCloudUrlParam(): Url | undefined {
   const value = new URLSearchParams(globalThis.location.search).get(CLOUD_URL_PARAM);
   if (value === null || value === "") {
     return undefined;

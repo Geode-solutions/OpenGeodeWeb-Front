@@ -1,6 +1,8 @@
 // Heading math of the compass overlay (Viewer/OrientationCompass.vue). Same convention as the VTK
 // Compass of OpenGeodeWeb-Viewer (orientation_marker.py): north = world +Y, east = +X, up = +Z.
+import type { Angle, Coordinate } from "@ogw_front/types/geometry";
 import type { CameraPose, Vec3, ViewBasis } from "@ogw_front/utils/orientation_gizmo";
+import type { Pixels } from "@ogw_front/types/ui";
 
 const DEGREES_PER_HALF_TURN = 180;
 const RADIANS_PER_DEGREE = Math.PI / DEGREES_PER_HALF_TURN;
@@ -20,15 +22,15 @@ const COMPASS_TICK_ANGLES: readonly number[] = Array.from(
 );
 
 interface DialPoint {
-  x: number;
-  y: number;
+  x: Coordinate;
+  y: Coordinate;
 }
 
 // Clockwise angle in degrees from north to the direction the camera looks at, on the ground plane.
 // Read from the screen right vector, which stays horizontal both for side views and for views
 // Straight down or up (where the view direction has no horizontal part). Undefined when the camera
 // Is rolled until its right vector is vertical.
-function compassHeading(basis: ViewBasis): number | undefined {
+function compassHeading(basis: ViewBasis): Angle | undefined {
   const [rightX, rightY] = basis.right;
   if (Math.hypot(rightX, rightY) < MIN_HORIZONTAL_RIGHT) {
     return undefined;
@@ -44,7 +46,7 @@ function compassTilt(basis: ViewBasis): number {
 
 // SVG position (y downwards) of the dial point at the given clockwise angle from north, once the
 // Dial is turned by -heading and flattened by tilt
-function compassDialPoint(angle: number, radius: number, heading: number, tilt: number): DialPoint {
+function compassDialPoint(angle: Angle, radius: Pixels, heading: Angle, tilt: number): DialPoint {
   const screenAngle = (angle - heading) * RADIANS_PER_DEGREE;
   return {
     x: radius * Math.sin(screenAngle),
@@ -53,7 +55,7 @@ function compassDialPoint(angle: number, radius: number, heading: number, tilt: 
 }
 
 // Whether the camera already looks towards the given heading, clockwise in degrees from north
-function isFacing(basis: ViewBasis, targetHeading: number): boolean {
+function isFacing(basis: ViewBasis, targetHeading: Angle): boolean {
   const heading = compassHeading(basis);
   if (heading === undefined) {
     return false;
@@ -62,7 +64,7 @@ function isFacing(basis: ViewBasis, targetHeading: number): boolean {
   return Math.min(gap, FULL_TURN - gap) < FACING_TOLERANCE;
 }
 
-function rotateAroundZ(vector: Vec3, angle: number): Vec3 {
+function rotateAroundZ(vector: Vec3, angle: Angle): Vec3 {
   const cosine = Math.cos(angle);
   const sine = Math.sin(angle);
   return [vector[0] * cosine - vector[1] * sine, vector[0] * sine + vector[1] * cosine, vector[2]];
@@ -74,7 +76,7 @@ function rotateAroundZ(vector: Vec3, angle: number): Vec3 {
 function facingCameraPose(
   pose: CameraPose,
   basis: ViewBasis,
-  targetHeading: number,
+  targetHeading: Angle,
 ): CameraPose | undefined {
   const heading = compassHeading(basis);
   if (heading === undefined) {
@@ -95,7 +97,7 @@ function facingCameraPose(
 }
 
 // Whether the dial angle, clockwise in degrees from north, is a cardinal direction (N, E, S or W)
-function isCardinalAngle(angle: number): boolean {
+function isCardinalAngle(angle: Angle): boolean {
   return angle % QUARTER_TURN === 0;
 }
 

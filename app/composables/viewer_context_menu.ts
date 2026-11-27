@@ -1,8 +1,11 @@
 import { type MenuMetaData, useMenuStore } from "@ogw_front/stores/menu";
 import type { Ref, ShallowRef } from "vue";
 import { BASEMAP_GROUP_ID } from "@ogw_front/utils/basemap_tree";
+import type { Coordinate } from "@ogw_front/types/geometry";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { Pixels } from "@ogw_front/types/ui";
 import type { TreeMenuPayload } from "@ogw_front/utils/treeview";
+import type { TreeNodeId } from "@ogw_front/types/identifiers";
 import type { ViewerId } from "@geode/opengeodeweb-viewer/schema_types";
 import type { ViewerIdResult } from "@ogw_front/composables/use_overlapping_picker";
 import { isModel } from "@ogw_front/utils/viewer_object_type";
@@ -10,11 +13,11 @@ import { useDataStore } from "@ogw_front/stores/data";
 import { useElementSize } from "@vueuse/core";
 
 interface ViewerUIExposed {
-  get_viewer_id: (x: number, y: number) => Promise<ViewerIdResult>;
+  get_viewer_id: (x: Coordinate, y: Coordinate) => Promise<ViewerIdResult>;
 }
 
 interface MenuTarget {
-  id: string;
+  id: TreeNodeId;
   meta_data: MenuMetaData;
 }
 
@@ -90,8 +93,8 @@ export function useViewerContextMenu(
   container: Readonly<ShallowRef<HTMLElement | null>>,
   viewerUI: Readonly<ShallowRef<ViewerUIExposed | null>>,
 ): {
-  containerWidth: Ref<number>;
-  containerHeight: Ref<number>;
+  containerWidth: Ref<Pixels>;
+  containerHeight: Ref<Pixels>;
   openTreeMenu: (payload: TreeMenuPayload) => Promise<void>;
   openViewerMenu: (event: MouseEvent) => Promise<void>;
 } {

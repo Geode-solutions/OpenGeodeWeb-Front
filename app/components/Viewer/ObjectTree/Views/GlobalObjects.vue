@@ -1,6 +1,19 @@
 <script setup lang="ts">
+import type {
+  GeodeObjectTyped,
+  TreeNodeId,
+  TreeViewId,
+  ViewerObjectTyped,
+} from "@ogw_front/types/identifiers";
+import {
+  type TreeMenuPayload,
+  compareSelections,
+  isObjectTreeRowViewable,
+  withPendingImports,
+} from "@ogw_front/utils/treeview";
 // oxlint-disable max-dependencies, eslint/max-lines
-import type { GeodeObjectTyped, ViewerObjectTyped } from "@ogw_front/types/identifiers";
+import type { CssColor, Title } from "@ogw_front/types/ui";
+import type { LinkedTreeRow, TreeRowHoverPayload } from "@ogw_front/types/props/viewer/object_tree";
 import {
   type MapStyle,
   basemapGroup,
@@ -8,12 +21,6 @@ import {
   mapId,
   nextBasemapMaps,
 } from "@ogw_front/utils/basemap_tree";
-import {
-  type TreeMenuPayload,
-  compareSelections,
-  isObjectTreeRowViewable,
-  withPendingImports,
-} from "@ogw_front/utils/treeview";
 import { isImage, isModel } from "@ogw_front/utils/viewer_object_type";
 import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
@@ -28,6 +35,20 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTreeFilter } from "@ogw_front/composables/tree_filter";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
+// A row of the objects tree: a data, a group of data by type or a basemap
+
+interface Emits {
+  "show-menu": [payload: TreeMenuPayload];
+}
+
+interface GlobalObjectsTreeItem extends Partial<GeodeObjectTyped>, Partial<ViewerObjectTyped> {
+  raw?: GlobalObjectsTreeItem;
+  id: TreeNodeId;
+  title?: Title;
+  children?: GlobalObjectsTreeItem[];
+  loading?: boolean;
+}
+
 const treeviewStore = useTreeviewStore();
 const dataStore = useDataStore();
 const dataStyleStore = useDataStyleStore();
@@ -35,22 +56,10 @@ const hybridViewerStore = useHybridViewerStore();
 const basemapStore = useBasemapStore();
 const { onHoverEnter, onHoverLeave } = useHoverhighlight();
 
-interface Emits {
-  "show-menu": [payload: TreeMenuPayload];
-}
-
 const emit = defineEmits<Emits>();
 
-interface TreeGroupItem extends Partial<GeodeObjectTyped>, Partial<ViewerObjectTyped> {
-  raw?: TreeGroupItem;
-  id: string;
-  title?: string;
-  children?: TreeGroupItem[];
-  loading?: boolean;
-}
-
-const mainView = computed<TreeGroupItem>(() => treeviewStore.opened_views[0]);
-const opened = computed<string[]>({
+const mainView = computed<GlobalObjectsTreeItem>(() => treeviewStore.opened_views[0]);
+const opened = computed<TreeNodeId[]>({
   get: () => mainView.value?.opened || [],
   set: (val) => treeviewStore.setOpened(mainView.value?.id ?? "", val),
 });
@@ -77,7 +86,9 @@ const displayedItems = computed(() => {
 });
 
 // The basemap rows show the basemap state: they are never stored in the data selection
-const basemapRows = computed<string[]>(() => basemapStore.maps.map((mapStyle) => mapId(mapStyle)));
+const basemapRows = computed<TreeNodeId[]>(() =>
+  basemapStore.maps.map((mapStyle) => mapId(mapStyle)),
+);
 
 async function showBasemap(maps: MapStyle[]): Promise<void> {
   try {
@@ -88,17 +99,17 @@ async function showBasemap(maps: MapStyle[]): Promise<void> {
 }
 
 // Basemap rows are never filtered out by the search
-function onUpdateSelection(val: string[]): void {
-  const { added, removed } = compareSelections(val, basemapRows.value);
+function onUpdateSelection(newSelection: TreeNodeId[]): void {
+  const { added, removed } = compareSelections(newSelection, basemapRows.value);
   const maps = nextBasemapMaps(basemapStore.maps, basemapStore.shown, added, removed);
   if (maps.join(",") !== basemapStore.maps.join(",")) {
     void showBasemap(maps);
   }
-  const data = val.filter((id) => !isBasemapId(id));
+  const data = newSelection.filter((id) => !isBasemapId(id));
   treeviewStore.selection = applySearchFilter(data, treeviewStore.selection);
 }
 
-const visibleSelection = computed<string[]>(() => [
+const visibleSelection = computed<TreeNodeId[]>(() => [
   ...applySearchFilter(treeviewStore.selection, []),
   ...basemapRows.value,
 ]);
@@ -130,7 +141,7 @@ watch(
   },
 );
 
-function showMenu(event: MouseEvent, item: TreeGroupItem): void {
+function showMenu(event: MouseEvent, item: GlobalObjectsTreeItem): void {
   const actualItem = item.raw || item;
   if (actualItem.loading) {
     return;
@@ -153,12 +164,12 @@ function showMenu(event: MouseEvent, item: TreeGroupItem): void {
 }
 
 // Color of the opened model tree of a data, the link between the row and that tree
-function modelTreeColor(id: string): string | undefined {
+function modelTreeColor(id: TreeViewId): CssColor | undefined {
   return treeviewStore.opened_views.find((view) => view.id === id)?.color;
 }
 
 // The row of the model whose tree header is hovered
-const linkedRow = computed<{ id: string; color: string } | undefined>(() => {
+const linkedRow = computed<LinkedTreeRow | undefined>(() => {
   const id = treeviewStore.hoveredModelId;
   if (id === undefined) {
     return undefined;
@@ -173,10 +184,7 @@ const linkedRow = computed<{ id: string; color: string } | undefined>(() => {
 function handleHoverEnter({
   item,
   immediate = false,
-}: {
-  item: TreeGroupItem;
-  immediate?: boolean;
-}): void {
+}: TreeRowHoverPayload<GlobalObjectsTreeItem>): void {
   const actualItem = item.raw || item;
 
   // Images are not pickable: the viewer has nothing to highlight
@@ -202,7 +210,7 @@ function handleHoverEnter({
   );
 }
 
-function handleHoverLeave({ item }: { item: TreeGroupItem }): void {
+function handleHoverLeave({ item }: TreeRowHoverPayload<GlobalObjectsTreeItem>): void {
   const actualItem = item.raw || item;
   if (!actualItem.viewer_object_type || isImage(actualItem)) {
     return;
@@ -214,8 +222,8 @@ function handleHoverLeave({ item }: { item: TreeGroupItem }): void {
 }
 
 function expandAll(): void {
-  const allIds: string[] = [];
-  function traverse(itemsList: TreeGroupItem[]): void {
+  const allIds: TreeNodeId[] = [];
+  function traverse(itemsList: GlobalObjectsTreeItem[]): void {
     for (const item of itemsList) {
       if (item.children && item.children.length > 0) {
         allIds.push(item.id);
@@ -259,17 +267,19 @@ function expandAll(): void {
       @update:scroll-top="treeviewStore.setScrollTop(mainView?.id ?? '', $event)"
       @hover:enter="
         ({ item, immediate }) =>
-          handleHoverEnter({ item: item as unknown as TreeGroupItem, immediate })
+          handleHoverEnter({ item: item as unknown as GlobalObjectsTreeItem, immediate })
       "
-      @hover:leave="({ item }) => handleHoverLeave({ item: item as unknown as TreeGroupItem })"
-      @contextmenu="showMenu($event.event, $event.item as unknown as TreeGroupItem)"
+      @hover:leave="
+        ({ item }) => handleHoverLeave({ item: item as unknown as GlobalObjectsTreeItem })
+      "
+      @contextmenu="showMenu($event.event, $event.item as unknown as GlobalObjectsTreeItem)"
     >
       <template #title="{ item, isLeaf }">
         <ObjectTreeItemLabel
           :item="item as unknown as DisplayItem"
           :is-leaf="isLeaf"
           :show-crs="isLeaf && !isBasemapId(item.id as string)"
-          @contextmenu="showMenu($event, item as unknown as TreeGroupItem)"
+          @contextmenu="showMenu($event, item as unknown as GlobalObjectsTreeItem)"
         />
       </template>
 
@@ -285,7 +295,7 @@ function expandAll(): void {
             @click.stop="hybridViewerStore.focusCameraOnObject(item.id as string)"
           />
           <v-btn
-            v-if="isModel(item as unknown as TreeGroupItem)"
+            v-if="isModel(item as unknown as GlobalObjectsTreeItem)"
             data-testid="expandModelComponentsButton"
             icon
             size="medium"

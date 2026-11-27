@@ -1,4 +1,4 @@
-import type { MenuItems } from "@ogw_front/stores/menu_helpers/types";
+import type { MenusByObjectType } from "@ogw_front/stores/menu_helpers/types";
 import SolidEdgesOptions from "@ogw_front/components/Viewer/Solid/EdgesOptions.vue";
 import SolidPointsOptions from "@ogw_front/components/Viewer/Solid/PointsOptions.vue";
 import SolidPolygonsOptions from "@ogw_front/components/Viewer/Solid/PolygonsOptions.vue";
@@ -20,7 +20,7 @@ const TetrahedralSolid_menu = [
   TetrahedralSolidTetrahedraOptions,
 ];
 
-const solidMenus: Record<string, MenuItems> = {
+const solidMenus: MenusByObjectType = {
   HybridSolid3D: Solid_menu,
   PolyhedralSolid3D: Solid_menu,
   TetrahedralSolid3D: TetrahedralSolid_menu,

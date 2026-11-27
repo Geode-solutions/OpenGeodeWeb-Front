@@ -7,8 +7,10 @@ import {
   isCardinalAngle,
   isFacing,
 } from "@ogw_front/utils/orientation_compass";
+import type { Angle } from "@ogw_front/types/geometry";
 import { BRAND_ORANGE } from "@ogw_front/utils/brand_colors";
 import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types";
+import type { Pixels } from "@ogw_front/types/ui";
 import { toCameraPose } from "@ogw_front/utils/orientation_gizmo";
 import { useCompassDial } from "@ogw_front/composables/compass_dial";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -50,11 +52,11 @@ const letters = computed(() =>
   }),
 );
 
-function tickInnerRadius(angle: number): number {
+function tickInnerRadius(angle: Angle): Pixels {
   return isCardinalAngle(angle) ? CARDINAL_TICK_INNER_RADIUS : TICK_INNER_RADIUS;
 }
 
-function face(targetHeading: number): void {
+function face(targetHeading: Angle): void {
   // Like a click without drag in the viewer: a camera already facing that way is not moved (no viewer call)
   if (!basis.value || isFacing(basis.value, targetHeading)) {
     return;

@@ -1,14 +1,21 @@
 <script setup lang="ts">
+import type { BlockId, ModelId } from "@ogw_front/types/identifiers";
+import type { CollectionComponent } from "@ogw_internal/stores/data/model/collections";
+import type { TabName } from "@ogw_front/types/ui";
 // oxlint-disable eslint/max-lines
+import type {
+  AttributeColorMap,
+  AttributeRange,
+  AttributeTimeStep,
+  ColoringType,
+} from "@ogw_front/types/attribute";
 import type {
   AttributeItem,
   AttributeName,
   ColorRGBA,
   Visibility,
 } from "@geode/opengeodeweb-viewer/schema_types";
-import type { AttributeRange, AttributeTimeStep } from "@ogw_front/types/attribute";
-import type { BlockId } from "@ogw_front/types/identifiers";
-import type { CollectionComponent } from "@ogw_internal/stores/data/model/collections";
+import { type NonEmptyArray, isNonEmpty } from "@ogw_front/utils/arrays";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
@@ -16,29 +23,28 @@ import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 interface Props {
-  modelId: string;
-  blockId?: BlockId;
-  targetBlockIds: string[];
-  collections?: CollectionComponent[];
-  activeTab?: string;
+  modelId: ModelId;
+  blockId: BlockId | undefined;
+  targetBlockIds: NonEmptyArray<BlockId>;
+  collections: CollectionComponent[] | undefined;
+  activeTab: TabName | undefined;
 }
 
-const {
-  modelId,
-  blockId = undefined,
-  targetBlockIds,
-  collections = undefined,
-  activeTab = undefined,
-} = defineProps<Props>();
+const { modelId, blockId, targetBlockIds, collections, activeTab } = defineProps<Props>();
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
-const referenceBlockId = computed<string | undefined>(() =>
+const referenceBlockId = computed<BlockId | undefined>(() =>
   collections ? targetBlockIds[0] : undefined,
 );
 
-const blockComponentIds = computed<string[]>(() => (blockId !== undefined && [blockId]) || []);
+const blockComponentIds = computed<NonEmptyArray<BlockId> | undefined>(() => {
+  if (blockId === undefined) {
+    return undefined;
+  }
+  return [blockId];
+});
 
 // Visibility
 const blocksVisibility = computed<Visibility>({
@@ -86,23 +92,29 @@ const blockColor = computed<ColorRGBA | undefined>({
   },
 });
 
-const blocksActiveColoring = computed<string | undefined>({
+const blocksActiveColoring = computed<ColoringType | undefined>({
   get: () =>
-    dataStyleStore.modelBlockActiveColoring(modelId, referenceBlockId.value) as string | undefined,
+    dataStyleStore.modelBlockActiveColoring(modelId, referenceBlockId.value) as
+      | ColoringType
+      | undefined,
   set: async (coloringType) => {
     if (typeof coloringType !== "string") {
       return;
     }
     if (collections && coloringType === "random") {
       await Promise.all(
-        collections.map((collection) =>
-          dataStyleStore.setModelBlocksActiveColoring(
+        collections.map((collection) => {
+          const childIds = collection.children.map((child) => child.id);
+          if (!isNonEmpty(childIds)) {
+            return undefined;
+          }
+          return dataStyleStore.setModelBlocksActiveColoring(
             modelId,
-            collection.children.map((child) => child.id),
+            childIds,
             coloringType,
             collection.id,
-          ),
-        ),
+          );
+        }),
       );
     } else {
       await dataStyleStore.setModelBlocksActiveColoring(modelId, targetBlockIds, coloringType);
@@ -111,8 +123,8 @@ const blocksActiveColoring = computed<string | undefined>({
   },
 });
 
-const blockActiveColoring = computed<string | undefined>({
-  get: () => dataStyleStore.modelBlockActiveColoring(modelId, blockId) as string | undefined,
+const blockActiveColoring = computed<ColoringType | undefined>({
+  get: () => dataStyleStore.modelBlockActiveColoring(modelId, blockId) as ColoringType | undefined,
   set: async (coloringType) => {
     if (blockId === undefined || typeof coloringType !== "string") {
       return;
@@ -170,7 +182,7 @@ const blocksVertexAttributeRange = computed<AttributeRange>({
   },
 });
 
-const blocksVertexAttributeColorMap = computed<Map<string, ColorRGBA> | undefined>({
+const blocksVertexAttributeColorMap = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => dataStyleStore.modelBlocksVertexAttributeColorMap(modelId, referenceBlockId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelBlocksVertexAttributeColorMap(modelId, targetBlockIds, newValue);
@@ -257,7 +269,10 @@ const blocksPolyhedronAttributeRange = computed<AttributeRange>({
   },
 });
 
-const blocksPolyhedronAttributeColorMap = computed<Map<string, ColorRGBA> | undefined>({
+const blocksPolyhedronAttributeColorMap = computed<
+  AttributeColorMap | undefined,
+  AttributeColorMap
+>({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeColorMap(modelId, referenceBlockId.value),
   set: async (newValue) => {
     const applied = await dataStyleStore.setModelBlocksPolyhedronAttributeColorMap(
@@ -332,7 +347,7 @@ const vertexAttributeRange = computed<AttributeRange>({
   },
 });
 
-const vertexAttributeColorMap = computed<Map<string, ColorRGBA> | undefined>({
+const vertexAttributeColorMap = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => dataStyleStore.modelBlocksVertexAttributeColorMap(modelId, blockId),
   set: async (newValue) => {
     if (blockId === undefined) {
@@ -424,7 +439,7 @@ const polyhedronAttributeRange = computed<AttributeRange>({
   },
 });
 
-const polyhedronAttributeColorMap = computed<Map<string, ColorRGBA> | undefined>({
+const polyhedronAttributeColorMap = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => dataStyleStore.modelBlocksPolyhedronAttributeColorMap(modelId, blockId),
   set: async (newValue) => {
     if (blockId === undefined) {
@@ -515,6 +530,7 @@ const attributeSchemas = {
     <VisibilitySwitch v-model="blockVisibility" />
     <ViewerOptionsColoringTypeSelector
       :data-id="modelId"
+      v-if="blockComponentIds"
       :componentIds="blockComponentIds"
       v-model:coloring_style_key="blockActiveColoring"
       v-model:color="blockColor"

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { CameraPositionId, CameraPositionName } from "@ogw_internal/database/types";
 import { useCameraManagerStore } from "@ogw_front/stores/camera_manager";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
@@ -7,10 +8,10 @@ const hybridViewerStore = useHybridViewerStore();
 
 const savedPositions = cameraManagerStore.refAllCameraPositions();
 
-const editingId = ref<number | undefined>(undefined);
-const editingName = ref<string>("");
+const editingId = ref<CameraPositionId | undefined>(undefined);
+const editingName = ref<CameraPositionName>("");
 
-async function restorePosition(positionId: number): void {
+async function restorePosition(positionId: CameraPositionId): void {
   const position = await cameraManagerStore.getCameraPosition(positionId);
   if (position) {
     if (hybridViewerStore.genericRenderWindow) {
@@ -21,11 +22,11 @@ async function restorePosition(positionId: number): void {
   }
 }
 
-async function deletePosition(positionId: number): void {
+async function deletePosition(positionId: CameraPositionId): void {
   await cameraManagerStore.deleteCameraPosition(positionId);
 }
 
-function startEditing(position: { id?: number; name?: string }): void {
+function startEditing(position: { id?: CameraPositionId; name?: CameraPositionName }): void {
   editingId.value = position.id;
   editingName.value = position.name ?? "";
 }

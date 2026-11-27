@@ -1,3 +1,4 @@
+import type { CreationDate, DataName, LightViewable } from "@ogw_front/types/data";
 import type {
   DataIdentified,
   GeodeIdentified,
@@ -8,11 +9,11 @@ import type { CRS } from "@geode/opengeodeweb-back/schema_types";
 import type { TableDefinition } from "./table_definition";
 
 interface DataItem extends DataIdentified, GeodeIdentified, GeodeObjectTyped, ViewerObjectTyped {
-  name: string;
+  name: DataName;
   visible: boolean;
-  created_at: string;
+  created_at: CreationDate;
   is_viewable?: boolean;
-  binary_light_viewable?: string;
+  binary_light_viewable?: LightViewable;
   crs?: CRS;
 }
 

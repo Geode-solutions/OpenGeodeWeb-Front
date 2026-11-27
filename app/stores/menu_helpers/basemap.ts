@@ -1,8 +1,8 @@
 import BasemapCropOptions from "@ogw_front/components/Viewer/Basemap/CropOptions.vue";
 import BasemapOpacityOptions from "@ogw_front/components/Viewer/Basemap/OpacityOptions.vue";
-import type { MenuItems } from "./types.js";
+import type { MenusByObjectType } from "./types.js";
 
-const basemapMenus: Record<string, MenuItems> = {
+const basemapMenus: MenusByObjectType = {
   Basemap: [BasemapCropOptions],
   Map: [BasemapOpacityOptions, BasemapCropOptions],
 };

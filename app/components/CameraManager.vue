@@ -1,21 +1,22 @@
 <script setup lang="ts">
 import List from "@ogw_front/components/CameraManager/List.vue";
+import type { Pixels } from "@ogw_front/types/ui";
 import Saver from "@ogw_front/components/CameraManager/Saver.vue";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 
-const DEFAULT_PANEL_WIDTH = 260;
+interface Props {
+  showDialog: boolean;
+  width?: Pixels;
+  escapeFunction?: () => void;
+}
 
 interface Emits {
   close: [];
 }
 
-const emit = defineEmits<Emits>();
+const DEFAULT_PANEL_WIDTH = 260;
 
-interface Props {
-  showDialog: boolean;
-  width?: number;
-  escapeFunction?: () => void;
-}
+const emit = defineEmits<Emits>();
 
 const {
   showDialog,

@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { foldersIgnoredWarning } from "@ogw_front/utils/upload_path";
+import { type SelectedFileIndex, foldersIgnoredWarning } from "@ogw_front/utils/upload_path";
+import type { AcceptRule } from "@ogw_front/utils/drag_and_drop";
+import type { Index } from "@ogw_front/types/ui";
+import type { UploadFile } from "@ogw_front/types/files";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
@@ -7,28 +10,29 @@ import CsvPreviewer from "@ogw_front/components/csv-preview/CsvPreviewer.vue";
 import DragAndDrop from "@ogw_front/components/DragAndDrop.vue";
 
 // Files carry extra app-specific bookkeeping fields once picked up here.
-type UploadFile = File & { isConfigured?: boolean; displayName?: string };
-
-const emit = defineEmits<{
-  files_uploaded: [files: UploadFile[]];
-  decrement_step: [];
-  reset_values: [];
-}>();
 
 interface Props {
-  multiple?: boolean;
-  accept?: string | string[];
+  multiple: boolean;
+  accept: AcceptRule | AcceptRule[];
   files?: UploadFile[];
-  autoUpload?: boolean;
+  autoUpload: boolean;
   showOverlay?: boolean;
   mini?: boolean;
 }
 
+interface Emits {
+  files_uploaded: [files: UploadFile[]];
+  decrement_step: [];
+  reset_values: [];
+}
+
+const emit = defineEmits<Emits>();
+
 const {
-  multiple = false,
-  accept = "",
+  multiple,
+  accept,
   files = [],
-  autoUpload = true,
+  autoUpload,
   showOverlay = false,
   mini = false,
 } = defineProps<Props>();
@@ -38,7 +42,7 @@ const internal_files = ref<UploadFile[]>(files);
 const dragAndDropRef = useTemplateRef("dragAndDropRef");
 const csv_dialog = ref<boolean>(false);
 const current_csv_file = ref<UploadFile | undefined>(undefined);
-const current_csv_index = ref<number>(-1);
+const current_csv_index = ref<Index>(-1);
 const loading = ref<boolean>(false);
 const files_uploaded = ref<boolean>(false);
 const toggle_loading = useToggle(loading);
@@ -47,7 +51,7 @@ function isCsv(file: UploadFile): boolean {
   return file.name.toLowerCase().endsWith(".csv");
 }
 
-function openCsvPreviewer(file: UploadFile, index: number): void {
+function openCsvPreviewer(file: UploadFile, index: SelectedFileIndex): void {
   current_csv_file.value = file;
   current_csv_index.value = index;
   csv_dialog.value = true;
@@ -89,7 +93,7 @@ function processSelectedFiles(selected_files: UploadFile[]): void {
   }
 }
 
-function removeFile(index: number): void {
+function removeFile(index: SelectedFileIndex): void {
   internal_files.value.splice(index, 1);
   if (internal_files.value.length === 0) {
     files_uploaded.value = false;

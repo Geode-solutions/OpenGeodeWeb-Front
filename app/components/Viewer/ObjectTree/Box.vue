@@ -1,20 +1,37 @@
 <script setup lang="ts">
+import type { CssColor, IconName, ImageSource, Pixels, Title } from "@ogw_front/types/ui";
 import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
+
+// The props of the panel an object tree view is shown in
+
+// Ties an object tree box to its row in the objects tree, highlighted while either is hovered
+interface ObjectTreeBoxAccent {
+  color: CssColor;
+  highlighted: boolean;
+}
+
+interface ObjectTreeBoxProps {
+  title: Title;
+  closable?: boolean;
+  icon?: ImageSource;
+  fontIcon?: IconName;
+  scrollTop?: Pixels;
+  borderRadius?: string;
+  borderLeft?: boolean;
+  accent?: ObjectTreeBoxAccent;
+}
+
+// The events of the panel an object tree view is shown in
+interface ObjectTreeBoxEmits {
+  close: [];
+  dragstart: [event: DragEvent];
+  "update:scrollTop": [scrollTop: Pixels];
+  "header-enter": [];
+  "header-leave": [];
+}
 
 const SCROLL_SYNC_DELAY = 50;
 const SCROLL_THRESHOLD = 1;
-interface Props {
-  title: string;
-  closable?: boolean;
-  icon?: string;
-  fontIcon?: string;
-  scrollTop?: number;
-  borderRadius?: string;
-  borderLeft?: boolean;
-  // Ties the box to its row in the objects tree, highlighted while either is hovered
-  accent?: { color: string; highlighted: boolean };
-}
-
 const {
   title,
   closable = false,
@@ -24,19 +41,11 @@ const {
   borderRadius = "var(--ogw-viewer-panel-radius, 16px)",
   borderLeft = true,
   accent = undefined,
-} = defineProps<Props>();
+} = defineProps<ObjectTreeBoxProps>();
 
 const slots = useSlots();
 
-interface Emits {
-  close: [];
-  dragstart: [event: DragEvent];
-  "update:scrollTop": [value: number];
-  "header-enter": [];
-  "header-leave": [];
-}
-
-const emit = defineEmits<Emits>();
+const emit = defineEmits<ObjectTreeBoxEmits>();
 
 const scrollContainer = useTemplateRef("scroll-container");
 const treeviewBox = useTemplateRef("treeview-box");
@@ -53,10 +62,10 @@ function handleScroll(event: Event): void {
   emit("update:scrollTop", (event.target as HTMLElement).scrollTop);
 }
 
-function applyScrollTop(val: number): void {
+function applyScrollTop(newScrollTop: Pixels): void {
   if (scrollContainer.value) {
     isApplyingScroll = true;
-    scrollContainer.value.scrollTop = val;
+    scrollContainer.value.scrollTop = newScrollTop;
     setTimeout(() => {
       isApplyingScroll = false;
     }, SCROLL_SYNC_DELAY);

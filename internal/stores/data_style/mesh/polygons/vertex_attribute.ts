@@ -29,7 +29,7 @@ interface UseMeshPolygonsVertexAttributeStyleReturn {
   meshPolygonsVertexAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
   ) => AttributeStoredConfig;
   setMeshPolygonsVertexAttribute: (meshId: MeshId, input: ValidAttributeInput) => Promise<unknown>;
   setMeshPolygonsVertexAttributeName: (meshId: MeshId, name: AttributeName) => Promise<unknown>;
@@ -41,7 +41,7 @@ interface UseMeshPolygonsVertexAttributeStyleReturn {
   ) => Promise<unknown>;
   setMeshPolygonsVertexAttributeColorMap: (
     meshId: MeshId,
-    colorMap: AttributeColorMap | undefined,
+    colorMap: AttributeColorMap,
   ) => Promise<unknown>;
   meshPolygonsVertexAttributeNoDataColor: (meshId: MeshId) => ColorRGBA;
   setMeshPolygonsVertexAttributeNoDataColor: (

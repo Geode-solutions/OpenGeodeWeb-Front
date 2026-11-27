@@ -1,5 +1,5 @@
 import type { AttributeGroup, ColorGroup } from "./coloring_groups";
-import type { ModelId } from "@ogw_front/types/identifiers";
+import type { LineId, ModelId } from "@ogw_front/types/identifiers";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 import type { useModelLinesColor } from "./color";
 import type { useModelLinesEdgeAttribute } from "./edge";
@@ -11,39 +11,39 @@ type EdgeAttributeStyle = ReturnType<typeof useModelLinesEdgeAttribute>;
 
 function applyModelLinesConstantColoring(
   modelId: ModelId,
-  type_lines_ids: string[],
+  typeLinesIds: LineId[],
   modelColorStyle: ColorStyle,
 ): Promise<unknown>[] {
   const colorGroups: Record<string, ColorGroup> = {};
-  for (const line_id of type_lines_ids) {
-    const color = modelColorStyle.modelLineColor(modelId, line_id);
+  for (const lineId of typeLinesIds) {
+    const color = modelColorStyle.modelLineColor(modelId, lineId);
     const color_key = JSON.stringify(color);
-    colorGroups[color_key] ??= { color, lines_ids: [] };
-    colorGroups[color_key].lines_ids.push(line_id);
+    colorGroups[color_key] ??= { color, lineIds: [] };
+    colorGroups[color_key].lineIds.push(lineId);
   }
-  return Object.values(colorGroups).map(async ({ color, lines_ids: ids }) => {
-    const result = await modelColorStyle.setModelLinesColor(modelId, ids, color, "constant");
+  return Object.values(colorGroups).map(async ({ color, lineIds }) => {
+    const result = await modelColorStyle.setModelLinesColor(modelId, lineIds, color, "constant");
     return result;
   });
 }
 
 function groupModelLinesVertexAttributes(
   modelId: ModelId,
-  type_lines_ids: string[],
+  typeLinesIds: LineId[],
   modelLinesVertexAttribute: VertexAttributeStyle,
 ): Record<string, AttributeGroup> {
   const vertexGroups: Record<string, AttributeGroup> = {};
-  for (const line_id of type_lines_ids) {
-    const name = modelLinesVertexAttribute.modelLinesVertexAttributeName(modelId, line_id);
-    const item = modelLinesVertexAttribute.modelLinesVertexAttributeItem(modelId, line_id);
+  for (const lineId of typeLinesIds) {
+    const name = modelLinesVertexAttribute.modelLinesVertexAttributeName(modelId, lineId);
+    const item = modelLinesVertexAttribute.modelLinesVertexAttributeItem(modelId, lineId);
     const [minimum, maximum] = modelLinesVertexAttribute.modelLinesVertexAttributeRange(
       modelId,
-      line_id,
+      lineId,
     );
-    const colorMap = modelLinesVertexAttribute.modelLinesVertexAttributeColorMap(modelId, line_id);
+    const colorMap = modelLinesVertexAttribute.modelLinesVertexAttributeColorMap(modelId, lineId);
     const no_data_color = modelLinesVertexAttribute.modelLinesVertexAttributeNoDataColor(
       modelId,
-      line_id,
+      lineId,
     );
     const attribute = {
       name,
@@ -57,32 +57,40 @@ function groupModelLinesVertexAttributes(
       continue;
     }
     const key = [name, item, colorMap, minimum, maximum, JSON.stringify(no_data_color)].join("_");
-    vertexGroups[key] ??= { ...attribute, lines_ids: [] };
-    vertexGroups[key].lines_ids.push(line_id);
+    const group = vertexGroups[key];
+    if (group === undefined) {
+      vertexGroups[key] = { ...attribute, lineIds: [lineId] };
+    } else {
+      group.lineIds.push(lineId);
+    }
   }
   return vertexGroups;
 }
 
 function applyModelLinesVertexColoring(
   modelId: ModelId,
-  type_lines_ids: string[],
+  typeLinesIds: LineId[],
   modelLinesVertexAttribute: VertexAttributeStyle,
 ): Promise<unknown>[] {
   const vertexGroups = groupModelLinesVertexAttributes(
     modelId,
-    type_lines_ids,
+    typeLinesIds,
     modelLinesVertexAttribute,
   );
   return Object.values(vertexGroups).map(
-    async ({ name, item, minimum, maximum, colorMap, no_data_color, lines_ids: ids }) => {
-      const result = await modelLinesVertexAttribute.setModelLinesVertexAttribute(modelId, ids, {
-        name,
-        item,
-        minimum,
-        maximum,
-        colorMap,
-        no_data_color,
-      });
+    async ({ name, item, minimum, maximum, colorMap, no_data_color, lineIds }) => {
+      const result = await modelLinesVertexAttribute.setModelLinesVertexAttribute(
+        modelId,
+        lineIds,
+        {
+          name,
+          item,
+          minimum,
+          maximum,
+          colorMap,
+          no_data_color,
+        },
+      );
       return result;
     },
   );
@@ -90,21 +98,21 @@ function applyModelLinesVertexColoring(
 
 function groupModelLinesEdgeAttributes(
   modelId: ModelId,
-  type_lines_ids: string[],
+  typeLinesIds: LineId[],
   modelLinesEdgeAttribute: EdgeAttributeStyle,
 ): Record<string, AttributeGroup> {
   const edgeGroups: Record<string, AttributeGroup> = {};
-  for (const line_id of type_lines_ids) {
-    const name = modelLinesEdgeAttribute.modelLinesEdgeAttributeName(modelId, line_id);
-    const item = modelLinesEdgeAttribute.modelLinesEdgeAttributeItem(modelId, line_id);
+  for (const lineId of typeLinesIds) {
+    const name = modelLinesEdgeAttribute.modelLinesEdgeAttributeName(modelId, lineId);
+    const item = modelLinesEdgeAttribute.modelLinesEdgeAttributeItem(modelId, lineId);
     const [minimum, maximum] = modelLinesEdgeAttribute.modelLinesEdgeAttributeRange(
       modelId,
-      line_id,
+      lineId,
     );
-    const colorMap = modelLinesEdgeAttribute.modelLinesEdgeAttributeColorMap(modelId, line_id);
+    const colorMap = modelLinesEdgeAttribute.modelLinesEdgeAttributeColorMap(modelId, lineId);
     const no_data_color = modelLinesEdgeAttribute.modelLinesEdgeAttributeNoDataColor(
       modelId,
-      line_id,
+      lineId,
     );
     const attribute = {
       name,
@@ -118,25 +126,25 @@ function groupModelLinesEdgeAttributes(
       continue;
     }
     const key = [name, item, colorMap, minimum, maximum, JSON.stringify(no_data_color)].join("_");
-    edgeGroups[key] ??= { ...attribute, lines_ids: [] };
-    edgeGroups[key].lines_ids.push(line_id);
+    const group = edgeGroups[key];
+    if (group === undefined) {
+      edgeGroups[key] = { ...attribute, lineIds: [lineId] };
+    } else {
+      group.lineIds.push(lineId);
+    }
   }
   return edgeGroups;
 }
 
 function applyModelLinesEdgeColoring(
   modelId: ModelId,
-  type_lines_ids: string[],
+  typeLinesIds: LineId[],
   modelLinesEdgeAttribute: EdgeAttributeStyle,
 ): Promise<unknown>[] {
-  const edgeGroups = groupModelLinesEdgeAttributes(
-    modelId,
-    type_lines_ids,
-    modelLinesEdgeAttribute,
-  );
+  const edgeGroups = groupModelLinesEdgeAttributes(modelId, typeLinesIds, modelLinesEdgeAttribute);
   return Object.values(edgeGroups).map(
-    async ({ name, item, minimum, maximum, colorMap, no_data_color, lines_ids: ids }) => {
-      const result = await modelLinesEdgeAttribute.setModelLinesEdgeAttribute(modelId, ids, {
+    async ({ name, item, minimum, maximum, colorMap, no_data_color, lineIds }) => {
+      const result = await modelLinesEdgeAttribute.setModelLinesEdgeAttribute(modelId, lineIds, {
         name,
         item,
         minimum,

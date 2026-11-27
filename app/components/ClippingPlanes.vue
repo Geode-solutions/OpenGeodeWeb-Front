@@ -1,12 +1,17 @@
 <script setup lang="ts">
+import type {
+  ClippingPlane,
+  ClippingPlaneIndex,
+} from "@ogw_front/composables/clipping_planes_widget_entries";
 import {
   DEBOUNCE_DELAY,
   DEFAULT_NORMALS,
   DEFAULT_PLANE_OPACITY,
   getPlaneRgbaColor,
 } from "@ogw_front/utils/clipping_planes";
-import type { ClippingPlane } from "@ogw_front/composables/clipping_planes_widget_entries";
 import ClippingPlaneCard from "@ogw_front/components/ClippingPlaneCard.vue";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { DatasetOption } from "@ogw_front/types/props/components_tools";
 import SliceCard from "@ogw_front/components/SliceCard.vue";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import { useClippingPlanesWidget } from "@ogw_front/composables/clipping_planes_widget";
@@ -16,18 +21,18 @@ import { useDebounceFn } from "@vueuse/core";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 interface Props {
-  escapeFunction?: () => void;
+  escapeFunction: () => void;
 }
 
-const { escapeFunction = undefined } = defineProps<Props>();
+const { escapeFunction } = defineProps<Props>();
 
 const show = defineModel<boolean>("show", { default: false });
 const dataStore = useDataStore();
 const hybridViewerStore = useHybridViewerStore();
 const targetAllVisible = ref<boolean>(true);
-const selectedDatasetIds = ref<string[]>([]);
+const selectedDatasetIds = ref<DataId[]>([]);
 let lastItemId = 0;
-function newItemId(): number {
+function newItemId(): ClippingPlane["id"] {
   lastItemId += 1;
   return lastItemId;
 }
@@ -36,17 +41,14 @@ function createPlane(origin: ClippingPlane["origin"], normal: number[]): Clippin
 }
 const planes = ref<ClippingPlane[]>([createPlane(undefined, [1, 0, 0])]);
 const allItems = computed(() => dataStore.registeredItems);
-const targetIds = computed<string[]>(() => {
+const targetIds = computed<DataId[]>(() => {
   if (targetAllVisible.value) {
     return allItems.value.map((item) => item.data_id);
   }
   return selectedDatasetIds.value;
 });
-const availableDatasets = computed<{ title: string; value: string }[]>(() =>
-  allItems.value.map((item) => ({
-    title: item.name || item.data_id,
-    value: item.data_id,
-  })),
+const availableDatasets = computed<DatasetOption[]>(() =>
+  allItems.value.map((item) => ({ title: item.name || item.data_id, value: item.data_id })),
 );
 const widgetContainer = useTemplateRef("widgetContainer");
 let debouncedApply: ((...args: unknown[]) => void) | undefined = undefined;
@@ -69,7 +71,7 @@ const {
   debouncedApply: (...args: unknown[]) => debouncedApply?.(...args),
 });
 
-function getUntargetedIds(): string[] {
+function getUntargetedIds(): DataId[] {
   return allItems.value
     .map((item) => item.data_id)
     .filter((dataId) => !targetIds.value.includes(dataId));
@@ -126,11 +128,11 @@ function addPlane(): void {
   planes.value.push(createPlane([...getSceneCenter()], normal));
 }
 
-function removePlane(index: number): void {
+function removePlane(index: ClippingPlaneIndex): void {
   planes.value.splice(index, 1);
 }
 
-function flipNormal(plane: { normal: number[] }): void {
+function flipNormal(plane: ClippingPlane): void {
   plane.normal = plane.normal.map((component) => -component);
   syncWidgets();
   applyClippingPlanes();

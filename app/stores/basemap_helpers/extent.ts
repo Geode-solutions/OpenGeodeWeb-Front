@@ -1,10 +1,14 @@
 import type { BasemapBuildResponse } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
+import type { Coordinate } from "@ogw_front/types/geometry";
 import type { MapStyle } from "@ogw_front/utils/basemap_tree";
 
 interface Extent {
   bounds: BasemapBuildResponse["bounds"];
-  z: number;
+  z: Coordinate;
 }
+
+// A coordinate of a bounding box: x_min, x_max, y_min, y_max, z_min or z_max
+type BoxCoordinateIndex = number;
 
 const X_MIN = 0;
 const X_MAX = 1;
@@ -21,7 +25,7 @@ function boxesExtent(boxes: readonly (readonly number[])[]): Extent | undefined 
   if (boxes.length === 0) {
     return undefined;
   }
-  function side(index: number): number[] {
+  function side(index: BoxCoordinateIndex): number[] {
     return boxes.map((box) => box[index] ?? 0);
   }
   return {

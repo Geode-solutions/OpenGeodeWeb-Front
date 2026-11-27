@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AttributeColorMap, AttributeRange, ColoringType } from "@ogw_front/types/attribute";
 import type {
   AttributeItem,
   AttributeName,
@@ -6,7 +7,12 @@ import type {
   PointSize,
   Visibility,
 } from "@geode/opengeodeweb-viewer/schema_types";
-import type { AttributeColorMap } from "@ogw_front/types/attribute";
+import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
+import type {
+  ModelPointsComponentType,
+  ModelPointsTarget,
+} from "@ogw_front/types/props/viewer/generic_model";
+import { type NonEmptyArray, isNonEmpty } from "@ogw_front/utils/arrays";
 import { MODEL_VERTEX_COLORING } from "@ogw_front/utils/model_component_coloring";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import ViewerOptionsSizeSlider from "@ogw_front/components/Viewer/Options/Sliders/Size.vue";
@@ -14,15 +20,10 @@ import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwi
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
-interface PointsTarget {
-  componentType: "Surface" | "Line" | "Block";
-  componentIds: string[];
-}
-
 interface Props {
-  modelId: string;
-  targets: PointsTarget[];
-  referenceComponentId?: string;
+  modelId: ModelId;
+  targets: ModelPointsTarget[];
+  referenceComponentId?: ModelComponentId;
 }
 
 const { modelId, targets, referenceComponentId = undefined } = defineProps<Props>();
@@ -93,17 +94,19 @@ const POINTS_STYLES = {
     setVertexAttributeNoDataColor: dataStyleStore.setModelBlocksPointsVertexAttributeNoDataColor,
   },
 };
-type PointsStyle = (typeof POINTS_STYLES)[PointsTarget["componentType"]];
+type PointsStyle = (typeof POINTS_STYLES)[ModelPointsComponentType];
 
 // Values are read from the first target, changes are applied to every target
 const pointsStyle = computed<PointsStyle | undefined>(() => {
   const [reference] = targets;
   return reference === undefined ? undefined : POINTS_STYLES[reference.componentType];
 });
-const allComponentIds = computed<string[]>(() => targets.flatMap((target) => target.componentIds));
+const allComponentIds = computed<ModelComponentId[]>(() =>
+  targets.flatMap((target) => target.componentIds),
+);
 
 async function applyPointsStyle(
-  setter: (style: PointsStyle, componentIds: string[]) => Promise<unknown>,
+  setter: (style: PointsStyle, componentIds: NonEmptyArray<ModelComponentId>) => Promise<unknown>,
 ): Promise<void> {
   await Promise.all(
     targets.map(async (target) => {
@@ -133,7 +136,7 @@ const size = computed<PointSize | undefined>({
   },
 });
 
-const activeColoring = computed<string | undefined>({
+const activeColoring = computed<ColoringType | undefined>({
   get: () => pointsStyle.value?.activeColoring(modelId, referenceComponentId),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -173,7 +176,7 @@ const vertexAttributeItem = computed<AttributeItem | undefined>({
   },
 });
 
-const vertexAttributeRange = computed<(number | undefined)[] | undefined>({
+const vertexAttributeRange = computed<AttributeRange | undefined>({
   get: () => pointsStyle.value?.vertexAttributeRange(modelId, referenceComponentId),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -189,7 +192,7 @@ const vertexAttributeRange = computed<(number | undefined)[] | undefined>({
   },
 });
 
-const vertexAttributeColorMap = computed<AttributeColorMap | undefined>({
+const vertexAttributeColorMap = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => pointsStyle.value?.vertexAttributeColorMap(modelId, referenceComponentId),
   set: async (newValue) => {
     await applyPointsStyle((style, ids) =>
@@ -220,6 +223,7 @@ const { capabilities, schemas: attributeSchemas } = MODEL_VERTEX_COLORING;
       <ViewerOptionsSizeSlider data-testid="modelComponentPointsSizeSlider" v-model="size" />
       <ViewerOptionsColoringTypeSelector
         :data-id="modelId"
+        v-if="isNonEmpty(allComponentIds)"
         :componentIds="allComponentIds"
         v-model:coloring_style_key="activeColoring"
         v-model:color="color"

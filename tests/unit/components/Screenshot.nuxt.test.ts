@@ -46,7 +46,7 @@ function sizeInput(wrapper: VueWrapper, id: string): string {
 async function mountScreenshot(): Promise<Record<string, unknown>> {
   const wrapper = await mountSuspended(Screenshot, {
     global: { plugins: [vuetify] },
-    props: { modelValue: true },
+    props: { modelValue: true, escapeFunction: vi.fn<() => void>() },
   });
   return wrapper.vm;
 }
@@ -59,7 +59,7 @@ describe("screenshot", () => {
   test("has no background color picker", async () => {
     const wrapper = await mountSuspended(Screenshot, {
       global: { plugins: [vuetify] },
-      props: { modelValue: true },
+      props: { modelValue: true, escapeFunction: vi.fn<() => void>() },
     });
     expect(wrapper.find('[data-testid="screenshotIncludeBackgroundSwitch"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="screenshotBackgroundColorPicker"]').exists()).toBe(false);
@@ -137,7 +137,7 @@ describe("screenshot", () => {
     globalThis.dispatchEvent(new Event("resize"));
     const wrapper = await mountSuspended(Screenshot, {
       global: { plugins: [vuetify] },
-      props: { modelValue: true },
+      props: { modelValue: true, escapeFunction: vi.fn<() => void>() },
     });
     expect(sizeInput(wrapper, "screenshotWidthInput")).toBe(String(VIEW_WIDTH));
 

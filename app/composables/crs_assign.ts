@@ -2,14 +2,21 @@ import { type CrsItem, useDataStore } from "@ogw_front/stores/data";
 import type { CRS } from "@geode/opengeodeweb-back/schema_types";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { DataIdentified } from "@ogw_front/types/identifiers";
+import type { Description } from "@ogw_front/types/ui";
 import { formatCrsCode } from "@ogw_front/utils/crs";
 import { useCrsStore } from "@ogw_front/stores/crs";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 interface AssignedEntry extends DataIdentified {
-  name: string;
+  name: CrsItem["name"];
   crs?: CRS;
   implausible?: boolean;
+}
+
+// A data with a CRS its coordinates match
+interface PlausibleEntry extends DataIdentified {
+  name: CrsItem["name"];
+  crs: CRS;
 }
 
 // Unsupported: the data cannot hold a CRS, like a grid, and is left as it is
@@ -17,10 +24,10 @@ interface AssignResponse {
   crs?: CRS;
   implausible?: boolean;
   unsupported?: boolean;
-  linked?: { id: string; crs?: CRS; implausible?: boolean; unsupported?: boolean }[];
+  linked?: { id: DataId; crs?: CRS; implausible?: boolean; unsupported?: boolean }[];
 }
 
-function plausibleEntries(entries: AssignedEntry[]): { data_id: DataId; name: string; crs: CRS }[] {
+function plausibleEntries(entries: AssignedEntry[]): PlausibleEntry[] {
   return entries.flatMap(({ data_id, name, crs, implausible }) => {
     if (crs === undefined || implausible === true) {
       return [];
@@ -51,8 +58,8 @@ function buildAssignedEntries(
 function implausibleDescription(
   implausibleItems: Pick<CrsItem, "data_id" | "name">[],
   crs: CRS | undefined,
-  itemId: string | undefined,
-): string {
+  itemId: DataId | undefined,
+): Description {
   const mismatch = `do not match ${formatCrsCode(crs)}. Georeference the data?`;
   // Named when linked data were assigned too: the user must know which one to align
   return implausibleItems.length === 1 && implausibleItems[0]?.data_id === itemId
@@ -63,7 +70,7 @@ function implausibleDescription(
 type ImplausibleWarning = (
   implausibleItems: Pick<CrsItem, "data_id" | "name">[],
   crs: CRS | undefined,
-  itemId: string | undefined,
+  itemId: DataId | undefined,
 ) => void;
 
 // Picking only works in the viewer: the alignment continues in its floating panel
@@ -98,5 +105,5 @@ function useImplausibleWarning(
   };
 }
 
-export type { AssignResponse, AssignedEntry };
+export type { AssignResponse, AssignedEntry, PlausibleEntry };
 export { buildAssignedEntries, plausibleEntries, useImplausibleWarning, useOpenCrsAlignment };

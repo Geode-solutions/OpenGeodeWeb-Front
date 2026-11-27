@@ -9,6 +9,7 @@ import type {
   AttributeStoredConfig,
 } from "@ogw_internal/stores/data_style/attribute_types";
 import type { MeshId } from "@ogw_front/types/identifiers";
+import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 
 // Local imports
@@ -17,23 +18,26 @@ import { useMeshEdgesCommonStyle } from "./common";
 interface UseMeshEdgesVertexAttributeConfigReturn {
   meshEdgesVertexAttribute: (meshId: MeshId) => AttributeState;
   meshEdgesVertexAttributeName: (meshId: MeshId) => AttributeName | undefined;
-  meshEdgesVertexAttributeLastItem: (meshId: MeshId, name: AttributeName | undefined) => number;
+  meshEdgesVertexAttributeLastItem: (
+    meshId: MeshId,
+    name: AttributeName | undefined,
+  ) => AttributeItem;
   meshEdgesVertexAttributeItem: (meshId: MeshId) => AttributeItem;
   meshEdgesVertexAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
   ) => AttributeStoredConfig;
 }
 
 interface UseMeshEdgesVertexAttributeConfigWriterReturn {
-  mutateMeshEdgesVertexStyle: (meshId: MeshId, values: Record<string, unknown>) => Promise<string>;
+  mutateMeshEdgesVertexStyle: (meshId: MeshId, values: StyleValues) => Promise<MeshId>;
   setMeshEdgesVertexAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
     config: Partial<AttributeStoredConfig>,
-  ) => Promise<string>;
+  ) => Promise<MeshId>;
 }
 
 function useMeshEdgesVertexAttributeConfig(): UseMeshEdgesVertexAttributeConfigReturn {
@@ -45,11 +49,11 @@ function useMeshEdgesVertexAttributeConfig(): UseMeshEdgesVertexAttributeConfigR
   function meshEdgesVertexAttributeStoredConfig(
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
   ): AttributeStoredConfig {
     const { storedConfigs } = meshEdgesVertexAttribute(meshId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
-    const itemConfig = item === undefined ? undefined : nameConfig?.[item];
+    const itemConfig = nameConfig?.[item];
     if (itemConfig !== undefined) {
       return itemConfig;
     }
@@ -61,7 +65,7 @@ function useMeshEdgesVertexAttributeConfig(): UseMeshEdgesVertexAttributeConfigR
   function meshEdgesVertexAttributeLastItem(
     meshId: MeshId,
     name: AttributeName | undefined,
-  ): number {
+  ): AttributeItem {
     const { storedConfigs } = meshEdgesVertexAttribute(meshId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
     if (nameConfig !== undefined) {
@@ -121,10 +125,7 @@ function useMeshEdgesVertexAttributeConfigValues(): UseMeshEdgesVertexAttributeC
 
 function useMeshEdgesVertexAttributeConfigWriter(): UseMeshEdgesVertexAttributeConfigWriterReturn {
   const meshEdgesCommonStyle = useMeshEdgesCommonStyle();
-  async function mutateMeshEdgesVertexStyle(
-    meshId: MeshId,
-    values: Record<string, unknown>,
-  ): Promise<string> {
+  async function mutateMeshEdgesVertexStyle(meshId: MeshId, values: StyleValues): Promise<MeshId> {
     const result = await meshEdgesCommonStyle.mutateMeshEdgesStyle(meshId, {
       coloring: {
         vertex: values,
@@ -135,9 +136,9 @@ function useMeshEdgesVertexAttributeConfigWriter(): UseMeshEdgesVertexAttributeC
   async function setMeshEdgesVertexAttributeStoredConfig(
     meshId: MeshId,
     name: AttributeName | undefined,
-    item: AttributeItem | undefined,
+    item: AttributeItem,
     config: Partial<AttributeStoredConfig>,
-  ): Promise<string> {
+  ): Promise<MeshId> {
     const result = await mutateMeshEdgesVertexStyle(meshId, {
       storedConfigs: {
         [name ?? ""]: {

@@ -6,16 +6,19 @@ import {
   storeMethod,
   useAttributeColoringStyle,
 } from "@ogw_front/composables/attribute_coloring_style";
-import type { ModelId } from "@ogw_front/types/identifiers";
+import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
+import type { BlockIds } from "@geode/opengeodeweb-viewer/schema_types";
+import type { ColoringType } from "@ogw_front/types/attribute";
+import type { ModelComponentType } from "@ogw_front/types/model";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 
 // Components of the same type colored by the same attribute share the store methods, e.g. "modelBlocksPolyhedronAttributeName"
 interface ComponentGroup {
   // Component type of the store methods, e.g. "Block"
-  type: string;
-  activeColoring: string;
-  componentIds: string[];
+  type: ModelComponentType;
+  activeColoring: ColoringType;
+  componentIds: ModelComponentId[];
 }
 
 function modelColoring(
@@ -42,8 +45,8 @@ function modelColoring(
 
 // Styles the model components colored by the picked scalar bar
 export function useModelAttributeStyle(
-  modelIdRef: Ref<string>,
-  blockViewerIdsRef: Ref<number[]>,
+  modelIdRef: Ref<ModelId>,
+  blockViewerIdsRef: Ref<BlockIds>,
 ): AttributeColoringStyle {
   const dataStyleStore = useDataStyleStore();
   const dataStore = useDataStore();

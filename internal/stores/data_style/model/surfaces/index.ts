@@ -13,7 +13,7 @@ import { useModelSurfacesPolygonAttribute } from "./polygon";
 import { useModelSurfacesVertexAttribute } from "./vertex";
 import { useModelSurfacesVisibility } from "./visibility";
 
-async function setModelSurfacesDefaultStyle(_id: string): Promise<void> {
+async function setModelSurfacesDefaultStyle(_id: ModelId): Promise<void> {
   // Placeholder
 }
 
@@ -43,7 +43,7 @@ export function useModelSurfacesStyle(): UseModelSurfacesStyleReturn {
     modelId: ModelId,
     surfaces_ids: SurfaceId[],
   ): Promise<void> {
-    const visibilityGroups: Record<string, string[]> = {};
+    const visibilityGroups: Record<string, SurfaceId[]> = {};
     for (const surfaces_id of surfaces_ids) {
       const style = modelCommonStyle.modelSurfaceStyle(modelId, surfaces_id);
       const visibility = String(style.visibility);
@@ -66,7 +66,7 @@ export function useModelSurfacesStyle(): UseModelSurfacesStyleReturn {
     modelId: ModelId,
     surfaces_ids: SurfaceId[],
   ): Promise<unknown[]> {
-    const activeColoringGroups: Record<string, string[]> = {};
+    const activeColoringGroups: Record<string, SurfaceId[]> = {};
     for (const surfaces_id of surfaces_ids) {
       const activeColoring = String(
         modelColorStyle.modelSurfaceActiveColoring(modelId, surfaces_id),

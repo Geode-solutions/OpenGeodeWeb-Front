@@ -1,9 +1,11 @@
 // Creates the backend: launches the local microservices, or launches / reaches the cloud service,
 // Then connects every registered microservice. It drives the stores from outside, so the stores
 // Only hold their own state and no store imports another one to orchestrate it.
-import { type Microservice, useInfraStore } from "@ogw_front/stores/infra";
+import { type LaunchArgs, type Microservice, useInfraStore } from "@ogw_front/stores/infra";
 import { clearCloudUrlParam, getCloudUrlParam } from "@ogw_front/utils/cloud";
+import type { AuthToken } from "@ogw_front/types/server";
 import { Status } from "@ogw_front/utils/status";
+import type { Url } from "@ogw_front/types/files";
 import { api_fetch } from "@ogw_internal/utils/api_fetch";
 import { appMode } from "@ogw_shared/app_mode";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
@@ -19,7 +21,7 @@ const CLOUD_PROJECT_FOLDER_PATH = "/project";
 
 interface ElectronApi {
   electronAPI: {
-    project_folder_path: (args: { projectFolderPath: string }) => void;
+    project_folder_path: (args: LaunchArgs) => void;
   };
 }
 
@@ -48,7 +50,7 @@ async function launchLocalServices(): Promise<void> {
   await Promise.all(launch_promises);
 }
 
-async function onCloudConnected(url: string): Promise<void> {
+async function onCloudConnected(url: Url): Promise<void> {
   const appStore = useAppStore();
   useCloudStore().set_connected(true);
   useInfraStore().set_domain_name(url);
@@ -57,7 +59,7 @@ async function onCloudConnected(url: string): Promise<void> {
 }
 
 // `authToken` is the user's Firebase ID token, checked by the Cloud API
-async function launchCloud(authToken: string): Promise<unknown> {
+async function launchCloud(authToken: AuthToken): Promise<unknown> {
   const cloudStore = useCloudStore();
   cloudStore.set_connecting();
   const { PROJECT, BRANCH } = useRuntimeConfig().public;
@@ -82,7 +84,7 @@ async function launchCloud(authToken: string): Promise<unknown> {
   return result;
 }
 
-async function connectExistingCloud(host: string): Promise<void> {
+async function connectExistingCloud(host: Url): Promise<void> {
   const cloudStore = useCloudStore();
   cloudStore.set_connecting();
   const backStore = useBackStore();
@@ -110,7 +112,7 @@ async function connectExistingCloud(host: string): Promise<void> {
 
 // Reuses the running service given by `?cloud_url=` when present, otherwise launches a new one.
 // The param is single use: it is cleared whatever the outcome, so a retry launches a new service.
-async function startCloud(authToken?: string): Promise<void> {
+async function startCloud(authToken?: AuthToken): Promise<void> {
   const existing_host = getCloudUrlParam();
   if (existing_host === undefined) {
     if (authToken === undefined) {
@@ -126,7 +128,7 @@ async function startCloud(authToken?: string): Promise<void> {
   }
 }
 
-async function createBackend(authToken?: string): Promise<void> {
+async function createBackend(authToken?: AuthToken): Promise<void> {
   const infraStore = useInfraStore();
   if (infraStore.status === Status.CREATED) {
     return;

@@ -1,8 +1,8 @@
-import { type LogObject, consola } from "consola";
+import { type LogLevel, type LogObject, consola } from "consola";
 
 const WARN_LEVEL = 1;
 
-function consoleMethod(level: number): "error" | "warn" | "log" {
+function consoleMethod(level: LogLevel): "error" | "warn" | "log" {
   if (level < WARN_LEVEL) {
     return "error";
   }

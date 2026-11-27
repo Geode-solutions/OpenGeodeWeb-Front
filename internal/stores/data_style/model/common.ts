@@ -5,7 +5,10 @@ import {
   useModelComponentsPerComponentStyleMutation,
   useModelComponentsStyleMutation,
 } from "./common_mutations";
-import type { ModelId } from "@ogw_front/types/identifiers";
+import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
+import type { ColoringType } from "@ogw_front/types/attribute";
+import type { GeodeId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { ModelComponentType } from "@ogw_front/types/model";
 import type { ParamsOf } from "@ogw_shared/utils/types.js";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -21,41 +24,41 @@ type ModelColorSchema = ModelComponentSchemas["color"];
 type ModelVisibilitySchema = ModelComponentSchemas["visibility"];
 type ModelColorMode = ParamsOf<ModelColorSchema>["color_mode"];
 
-function isModelColorMode(value: string): value is ModelColorMode {
+function isModelColorMode(value: ColoringType): value is ModelColorMode {
   return value === "constant" || value === "random";
 }
 
 interface UseModelCommonStyleReturn {
   mutateComponentStyle: (
-    id_model: string,
-    id_component: string,
+    modelId: ModelId,
+    componentId: ModelComponentId,
     values: StyleValues,
   ) => Promise<unknown>;
   mutateModelComponentTypeStyle: (
-    id_model: string,
-    type: string,
+    modelId: ModelId,
+    type: ModelComponentType,
     values: StyleValues,
   ) => Promise<void>;
   mutateComponentStyles: (
-    id_model: string,
-    id_components: string[],
+    modelId: ModelId,
+    componentIds: ModelComponentId[],
     values: StyleValues,
   ) => Promise<void>;
   bulkMutateComponentStylesPerComponent: (
-    id_model: string,
-    component_updates: ComponentStyleUpdate[],
+    modelId: ModelId,
+    componentUpdates: ComponentStyleUpdate[],
   ) => Promise<void>;
   setModelTypeColor: (
     modelId: ModelId,
-    component_ids: string[],
+    componentIds: ModelComponentId[],
     color: ColorRGBA | undefined,
     schema: ModelColorSchema,
-    activeColoring?: string,
-    collectionId?: string,
+    activeColoring?: ColoringType,
+    collectionId?: GeodeId,
   ) => Promise<unknown>;
   setModelTypeVisibility: (
     modelId: ModelId,
-    component_ids: string[],
+    componentIds: ModelComponentId[],
     visibility: Visibility,
     schema: ModelVisibilitySchema,
   ) => Promise<unknown>;
@@ -70,23 +73,23 @@ export function useModelCommonStyle(): UseModelCommonStyleReturn {
   const { bulkMutateComponentStylesPerComponent } = useModelComponentsPerComponentStyleMutation();
   async function setModelTypeColor(
     modelId: ModelId,
-    component_ids: string[],
+    componentIds: ModelComponentId[],
     color: ColorRGBA | undefined,
     schema: ModelColorSchema,
     activeColoring = "constant",
-    collectionId?: string,
+    collectionId?: GeodeId,
   ): Promise<unknown> {
-    if (!component_ids?.length) {
+    if (!componentIds?.length) {
       return undefined;
     }
 
-    const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, component_ids);
+    const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, componentIds);
     if (!viewer_ids?.length) {
       return undefined;
     }
 
     if (activeColoring === "constant") {
-      await mutateComponentStyles(modelId, component_ids, {
+      await mutateComponentStyles(modelId, componentIds, {
         coloring: {
           constant: color,
         },
@@ -108,7 +111,7 @@ export function useModelCommonStyle(): UseModelCommonStyleReturn {
       {
         response_function: async ({ colors }) => {
           if (activeColoring === "constant") {
-            await mutateComponentStyles(modelId, component_ids, {
+            await mutateComponentStyles(modelId, componentIds, {
               coloring: {
                 constant: color,
               },
@@ -138,15 +141,15 @@ export function useModelCommonStyle(): UseModelCommonStyleReturn {
 
   async function setModelTypeVisibility(
     modelId: ModelId,
-    component_ids: string[],
+    componentIds: ModelComponentId[],
     visibility: Visibility,
     schema: ModelVisibilitySchema,
   ): Promise<unknown> {
-    if (!component_ids?.length) {
+    if (!componentIds?.length) {
       return undefined;
     }
 
-    const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, component_ids);
+    const viewer_ids = await dataStore.getMeshComponentsViewerIds(modelId, componentIds);
     if (!viewer_ids?.length) {
       return undefined;
     }
@@ -155,7 +158,7 @@ export function useModelCommonStyle(): UseModelCommonStyleReturn {
       { schema, params },
       {
         response_function: async () => {
-          await mutateComponentStyles(modelId, component_ids, { visibility });
+          await mutateComponentStyles(modelId, componentIds, { visibility });
         },
       },
     );

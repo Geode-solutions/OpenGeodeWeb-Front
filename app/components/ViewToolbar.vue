@@ -8,6 +8,7 @@ import Ruler from "@ogw_front/components/Ruler.vue";
 import Screenshot from "@ogw_front/components/Screenshot.vue";
 import ShrinkFilter from "@ogw_front/components/ShrinkFilter.vue";
 import ThresholdFilter from "@ogw_front/components/ThresholdFilter.vue";
+import type { ZScale } from "@ogw_front/types/geometry";
 import ZScaling from "@ogw_front/components/ZScaling.vue";
 import { onKeyStroke } from "@vueuse/core";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -27,7 +28,7 @@ const {
   showThresholdFilter,
   showRuler,
 } = tools;
-const zScale = ref<number>(hybridViewerStore.zScale);
+const zScale = ref<ZScale>(hybridViewerStore.zScale);
 const openSubMenus = ref<Record<string, boolean>>({});
 const camera_options = useViewToolbarOptions(tools);
 

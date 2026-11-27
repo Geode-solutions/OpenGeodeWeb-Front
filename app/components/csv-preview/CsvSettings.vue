@@ -1,25 +1,29 @@
 <script setup lang="ts">
-interface HeaderOption {
-  title: string;
-  key: string;
+import type { CsvColumnKey, CsvRowIndex, CsvSeparator } from "@ogw_front/types/props/csv_preview";
+import type { Title } from "@ogw_front/types/ui";
+
+// A column the user can pick as a coordinate
+interface CsvHeaderOption {
+  title: Title;
+  key: CsvColumnKey;
 }
 
 interface Props {
-  separator: string;
-  headers?: HeaderOption[];
+  separator: CsvSeparator;
+  headers: CsvHeaderOption[];
 }
-
-const { separator, headers = [] } = defineProps<Props>();
-
-const headerRow = defineModel<number>("headerRow", { required: true });
-const firstRow = defineModel<number>("firstRow", { required: true });
-const xColumn = defineModel<string>("xColumn");
-const yColumn = defineModel<string>("yColumn");
-const zColumn = defineModel<string>("zColumn");
 
 interface Emits {
-  "update:separator": [value: string];
+  "update:separator": [value: CsvSeparator];
 }
+
+const { separator, headers } = defineProps<Props>();
+
+const headerRow = defineModel<CsvRowIndex>("headerRow", { required: true });
+const firstRow = defineModel<CsvRowIndex>("firstRow", { required: true });
+const xColumn = defineModel<CsvColumnKey>("xColumn");
+const yColumn = defineModel<CsvColumnKey>("yColumn");
+const zColumn = defineModel<CsvColumnKey>("zColumn");
 
 const emit = defineEmits<Emits>();
 
@@ -32,8 +36,8 @@ const separators = [
   { title: "Custom", value: "custom" },
 ];
 
-const selectedType = ref<string>(",");
-const customValue = ref<string>("");
+const selectedType = ref<CsvSeparator>(",");
+const customValue = ref<CsvSeparator>("");
 
 watch(
   () => separator,

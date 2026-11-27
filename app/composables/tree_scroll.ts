@@ -1,7 +1,14 @@
-import type { DisplayItem, EmitFn, ItemPropsConfig } from "./virtual_tree";
+import type {
+  EmitFn,
+  ItemPropsConfig,
+  ReadonlyDisplayItem,
+  ReadonlyMaybeRefOrGetter,
+} from "./virtual_tree";
+import type { Pixels } from "@ogw_front/types/ui";
+import type { TreeRowIndex } from "@ogw_front/types/tree";
 
 interface TreeScrollProps {
-  scrollTop?: number;
+  scrollTop?: Pixels;
 }
 
 interface ScrollableElement {
@@ -9,27 +16,21 @@ interface ScrollableElement {
 }
 
 interface ScrollInfo {
-  scrollTop: number;
-  containerHeight: number;
-  itemHeight: number;
+  scrollTop: Pixels;
+  containerHeight: Pixels;
+  itemHeight: Pixels;
 }
-
-type ReadonlyMaybeRefOrGetter<Value> = Value | Ref<Value> | (() => Value);
-
-type ReadonlyDisplayItem = Omit<DisplayItem, "raw"> & {
-  readonly raw: Record<string, unknown>;
-};
 
 interface ScrollEventLike {
   readonly target: EventTarget | null;
 }
 
 interface UseTreeScrollReturn {
-  internalScrollTop: Ref<number>;
+  internalScrollTop: Ref<Pixels>;
   virtualScrollRef: Ref<ScrollableElement | undefined>;
   stickyHeader: ComputedRef<ReadonlyDisplayItem | undefined>;
   handleScroll: (event: ScrollEventLike) => void;
-  scrollToIndex: (index: number) => void;
+  scrollToIndex: (index: TreeRowIndex) => void;
   getScrollInfo: () => ScrollInfo;
 }
 
@@ -105,7 +106,7 @@ export function useTreeScroll(
     return undefined;
   });
 
-  function scrollToIndex(index: number): void {
+  function scrollToIndex(index: TreeRowIndex): void {
     if (index === -1 || virtualScrollRef.value === undefined) {
       return;
     }

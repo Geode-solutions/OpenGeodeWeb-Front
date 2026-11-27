@@ -1,4 +1,10 @@
 <script setup lang="ts">
+import type {
+  AttributeColorMap,
+  AttributeRange,
+  AttributeTimeStep,
+  AttributeTimeValue,
+} from "@ogw_front/types/attribute";
 import {
   type AttributeInfo,
   type AttributeRequestParams,
@@ -8,6 +14,7 @@ import {
   useAttributeRangeBounds,
   useSeriesTimeStepCommit,
 } from "@ogw_front/composables/attribute_selector";
+import type { AttributeItem, AttributeName } from "@geode/opengeodeweb-viewer/schema_types";
 import {
   type AttributeRangeInfo,
   type AttributeSchemas,
@@ -17,43 +24,45 @@ import { type RangesPerData, useBatchGroup } from "@ogw_front/composables/batch_
 import { getAttributeRange, intersectAttributes } from "@ogw_front/utils/attributes";
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { ModelComponentId } from "@ogw_front/types/identifiers";
+import type { NonEmptyArray } from "@ogw_front/utils/arrays";
 import ViewerOptionsAttributeColorBar from "@ogw_front/components/Viewer/Options/AttributeColorBar.vue";
 import ViewerOptionsNoDataColorInfo from "@ogw_front/components/Viewer/Options/NoDataColorInfo.vue";
 import ViewerOptionsTimeStepSlider from "@ogw_front/components/Viewer/Options/TimeStepSlider.vue";
 import { requestForTargets } from "@ogw_front/utils/request_for_targets";
 import { useBackStore } from "@ogw_front/stores/back";
 
-const backStore = useBackStore();
-
-const attributeName = defineModel<string>("attributeName");
-const attributeItem = defineModel<number>("attributeItem");
-const attributeRange = defineModel<(number | undefined)[]>("attributeRange", {
-  default: () => [],
-});
-const attributeColorMap = defineModel<string>("attributeColorMap");
-const attributeNoDataColor = defineModel<typeof DEFAULT_NO_DATA_COLOR>("attributeNoDataColor");
-const attributeTimeStep = defineModel<number>("attributeTimeStep");
-
 interface Props {
   dataId: DataId;
-  componentIds?: string[];
+  componentIds: NonEmptyArray<ModelComponentId> | undefined;
   schemas: AttributeSchemas;
 }
 
-const { dataId, componentIds = undefined, schemas } = defineProps<Props>();
-
 interface Emits {
-  "update:attributeColorMap": [colorMap: string];
-  "update:attributeTimeStep": [timeStep: number];
+  "update:attributeColorMap": [colorMap: AttributeColorMap];
+  "update:attributeTimeStep": [timeStep: AttributeTimeStep];
   ranges_per_data: [ranges: RangesPerData];
 }
+
+const backStore = useBackStore();
+
+const attributeName = defineModel<AttributeName>("attributeName");
+const attributeItem = defineModel<AttributeItem>("attributeItem");
+const attributeRange = defineModel<AttributeRange>("attributeRange", {
+  default: () => [undefined, undefined],
+});
+const attributeColorMap = defineModel<AttributeColorMap>("attributeColorMap");
+const attributeNoDataColor = defineModel<typeof DEFAULT_NO_DATA_COLOR>("attributeNoDataColor");
+const attributeTimeStep = defineModel<AttributeTimeStep>("attributeTimeStep");
+
+const { dataId, componentIds, schemas } = defineProps<Props>();
 
 const emit = defineEmits<Emits>();
 
 const attributes = ref<AttributeInfo[]>([]);
-let attributesPerTarget = new Map<string, AttributeInfo[]>();
-const rangesPerTarget = ref(new Map<string, AttributeRangeInfo>());
-let rangesName: string | undefined = undefined;
+let attributesPerTarget = new Map<DataId, AttributeInfo[]>();
+const rangesPerTarget = ref(new Map<DataId, AttributeRangeInfo>());
+let rangesName: AttributeName | undefined = undefined;
 let rangesLoading: Promise<void> = Promise.resolve();
 
 const groupTargetIds = useBatchGroup(() => dataId);
@@ -61,7 +70,7 @@ const groupTargetIds = useBatchGroup(() => dataId);
 const currentAttribute = computed<AttributeInfo | undefined>(() =>
   attributes.value.find((attr) => attr.attribute_name === attributeName.value),
 );
-const timeSteps = computed<number[]>(() => currentAttribute.value?.time_steps ?? []);
+const timeSteps = computed<AttributeTimeValue[]>(() => currentAttribute.value?.time_steps ?? []);
 const noData = computed<boolean>(() =>
   [...rangesPerTarget.value.values()].some((range) => range.no_data),
 );
@@ -77,18 +86,13 @@ const commitSeriesTimeStep = useSeriesTimeStepCommit(
 
 const { rangeMin, rangeMax } = useAttributeRangeBounds(attributeRange);
 
-const componentItems = computed<{ title: string; value: number }[]>(() => {
-  if (currentAttribute.value) {
-    return attributeItemOptions(currentAttribute.value.nb_items);
-  }
-  return [];
-});
+const componentItems = computed(() => attributeItemOptions(currentAttribute.value?.nb_items ?? 0));
 
-function requestParams(): AttributeRequestParams | undefined {
-  return attributeRequestParams(schemas, dataId, componentIds);
+function requestParams(): AttributeRequestParams {
+  return attributeRequestParams(dataId, componentIds);
 }
 
-function getRangeTargets(name: string): [string, AttributeRequestParams | undefined][] {
+function getRangeTargets(name: AttributeName): [DataId, AttributeRequestParams][] {
   if (groupTargetIds.value) {
     return [...attributesPerTarget]
       .filter(([, targetAttributes]) =>
@@ -100,25 +104,23 @@ function getRangeTargets(name: string): [string, AttributeRequestParams | undefi
 }
 
 // Ranges are computed by the back for the selected attribute only, as scanning every step of every series is slow
-async function requestRanges(name: string): Promise<void> {
+async function requestRanges(name: AttributeName): Promise<void> {
   const targets = getRangeTargets(name);
   const entries = await Promise.all(
-    targets.map(async ([targetId, params]): Promise<[string, AttributeRangeInfo | undefined]> => {
-      if (!params) {
-        return [targetId, undefined];
-      }
-      return [targetId, await fetchAttributeRange(schemas.range, params, name)];
-    }),
+    targets.map(async ([targetId, params]): Promise<[DataId, AttributeRangeInfo | undefined]> => [
+      targetId,
+      await fetchAttributeRange(schemas.range, params, name),
+    ]),
   );
   if (rangesName !== name) {
     return;
   }
   rangesPerTarget.value = new Map(
-    entries.filter((entry): entry is [string, AttributeRangeInfo] => entry[1] !== undefined),
+    entries.filter((entry): entry is [DataId, AttributeRangeInfo] => entry[1] !== undefined),
   );
 }
 
-async function loadRanges(name: string): Promise<void> {
+async function loadRanges(name: AttributeName): Promise<void> {
   if (name !== rangesName) {
     rangesName = name;
     rangesPerTarget.value = new Map();
@@ -142,7 +144,7 @@ async function resetRange(): Promise<void> {
   }
 }
 
-async function getGroupAttributes(targetIds: string[]): Promise<void> {
+async function getGroupAttributes(targetIds: DataId[]): Promise<void> {
   const responses = await requestForTargets<{ attributes: AttributeInfo[] }>(
     schemas.names,
     targetIds,
@@ -156,7 +158,7 @@ async function getGroupAttributes(targetIds: string[]): Promise<void> {
   attributes.value = intersectAttributes([...attributesPerTarget.values()]);
 }
 
-async function initGroupAttribute(name: string, item: number): Promise<void> {
+async function initGroupAttribute(name: AttributeName, item: AttributeItem): Promise<void> {
   await loadRanges(name);
   if (attributeName.value !== name) {
     return;
@@ -172,13 +174,8 @@ async function getAttributes(): Promise<void> {
     await getGroupAttributes(groupTargetIds.value);
     return;
   }
-  const params = requestParams();
-  if (!params) {
-    return;
-  }
-
   await backStore.request(
-    { schema: schemas.names, params },
+    { schema: schemas.names, params: requestParams() },
     {
       response_function: (response: unknown) => {
         attributes.value = (response as { attributes: AttributeInfo[] }).attributes;
@@ -192,7 +189,7 @@ onMounted(async () => {
 });
 
 watch(
-  [(): string => dataId, (): string[] | undefined => componentIds, (): AttributeSchemas => schemas],
+  [(): DataId => dataId, (): typeof componentIds => componentIds, (): AttributeSchemas => schemas],
   async () => {
     await getAttributes();
   },

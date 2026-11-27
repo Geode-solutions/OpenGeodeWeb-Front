@@ -1,35 +1,21 @@
 <script setup lang="ts">
+import type { AcceptRule } from "@ogw_front/utils/drag_and_drop";
+import type { DragAndDropTexts } from "@ogw_front/types/props/components_files";
 import GlassCard from "@ogw_front/components/GlassCard.vue";
-
-interface DragAndDropTexts {
-  idle: string;
-  drop: string;
-  loading: string;
-}
 
 interface Props {
   isDragging: boolean;
   loading: boolean;
-  texts?: DragAndDropTexts;
-  accept?: string | string[];
+  texts: DragAndDropTexts;
+  accept: AcceptRule | AcceptRule[];
   showExtensions: boolean;
 }
-
-const {
-  isDragging,
-  loading,
-  texts = {
-    idle: "Click or drag and drop",
-    drop: "Drop files here",
-    loading: "Loading...",
-  },
-  accept = "",
-  showExtensions,
-} = defineProps<Props>();
 
 interface Emits {
   click: [];
 }
+
+const { isDragging, loading, texts, accept, showExtensions } = defineProps<Props>();
 
 const emit = defineEmits<Emits>();
 </script>

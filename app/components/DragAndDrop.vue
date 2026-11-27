@@ -1,18 +1,14 @@
 <script setup lang="ts">
-import { filesFromEntry, isFileAccepted } from "@ogw_front/utils/drag_and_drop";
+import { type AcceptRule, filesFromEntry, isFileAccepted } from "@ogw_front/utils/drag_and_drop";
 import DragAndDropInline from "./DragAndDropInternal/DragAndDropInline.vue";
 import DragAndDropOverlay from "./DragAndDropInternal/DragAndDropOverlay.vue";
-import type { UploadFile } from "@ogw_front/utils/upload_path";
-
-interface DragAndDropTexts {
-  idle: string;
-  drop: string;
-  loading: string;
-}
+import type { DragAndDropTexts } from "@ogw_front/types/props/components_files";
+import type { Message } from "@ogw_front/types/ui";
+import type { UploadFile } from "@ogw_front/types/files";
 
 interface Props {
   multiple?: boolean;
-  accept?: string | string[];
+  accept?: AcceptRule | AcceptRule[];
   loading?: boolean;
   showExtensions?: boolean;
   fullscreen?: boolean;
@@ -20,6 +16,12 @@ interface Props {
   showOverlay?: boolean;
   texts?: DragAndDropTexts;
   directory?: boolean;
+}
+
+interface Emits {
+  "files-selected": [files: UploadFile[]];
+  "folders-ignored": [];
+  "folder-read-error": [message: Message];
 }
 
 const {
@@ -46,18 +48,14 @@ const displayed_texts = computed<DragAndDropTexts>(() => {
   return texts;
 });
 
-const emit = defineEmits<{
-  "files-selected": [files: UploadFile[]];
-  "folders-ignored": [];
-  "folder-read-error": [message: string];
-}>();
+const emit = defineEmits<Emits>();
 
 const isDragging = ref(false);
 const isInternalDrag = ref(false);
 const dragCounter = ref(0);
 const fileInput = ref<HTMLInputElement | undefined>(undefined);
 
-function getErrorMessage(error: unknown): string {
+function getErrorMessage(error: unknown): Message {
   if (error instanceof Error) {
     return error.message;
   }

@@ -1,3 +1,4 @@
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { DataIdentified } from "@ogw_front/types/identifiers";
 import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 
@@ -17,7 +18,7 @@ const DEFAULT_SLICE_AXIS: SliceAxis = 2;
 
 function areAllGrids(
   items: (DataIdentified & { geode_object_type: GeodeObjectType })[],
-  ids: string[],
+  ids: DataId[],
 ): boolean {
   const targetedItems = items.filter((item) => ids.includes(item.data_id));
   return (

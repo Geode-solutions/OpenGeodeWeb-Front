@@ -1,14 +1,21 @@
 <script setup lang="ts">
+import type { ModelId, SurfaceId } from "@ogw_front/types/identifiers";
+import type { CollectionComponent } from "@ogw_internal/stores/data/model/collections";
+import type { TabName } from "@ogw_front/types/ui";
 // oxlint-disable eslint/max-lines
+import type {
+  AttributeColorMap,
+  AttributeRange,
+  AttributeTimeStep,
+  ColoringType,
+} from "@ogw_front/types/attribute";
 import type {
   AttributeItem,
   AttributeName,
   ColorRGBA,
   Visibility,
 } from "@geode/opengeodeweb-viewer/schema_types";
-import type { AttributeRange, AttributeTimeStep } from "@ogw_front/types/attribute";
-import type { CollectionComponent } from "@ogw_internal/stores/data/model/collections";
-import type { SurfaceId } from "@ogw_front/types/identifiers";
+import { type NonEmptyArray, isNonEmpty } from "@ogw_front/utils/arrays";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
@@ -16,31 +23,28 @@ import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 interface Props {
-  modelId: string;
-  surfaceId?: SurfaceId;
-  targetSurfaceIds: string[];
-  collections?: CollectionComponent[];
-  activeTab?: string;
+  modelId: ModelId;
+  surfaceId: SurfaceId | undefined;
+  targetSurfaceIds: NonEmptyArray<SurfaceId>;
+  collections: CollectionComponent[] | undefined;
+  activeTab: TabName | undefined;
 }
 
-const {
-  modelId,
-  surfaceId = undefined,
-  targetSurfaceIds,
-  collections = undefined,
-  activeTab = undefined,
-} = defineProps<Props>();
+const { modelId, surfaceId, targetSurfaceIds, collections, activeTab } = defineProps<Props>();
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
-const referenceSurfaceId = computed<string | undefined>(() =>
+const referenceSurfaceId = computed<SurfaceId | undefined>(() =>
   collections ? targetSurfaceIds[0] : undefined,
 );
 
-const surfaceComponentIds = computed<string[]>(
-  () => (surfaceId !== undefined && [surfaceId]) || [],
-);
+const surfaceComponentIds = computed<NonEmptyArray<SurfaceId> | undefined>(() => {
+  if (surfaceId === undefined) {
+    return undefined;
+  }
+  return [surfaceId];
+});
 
 // Visibility
 const surfacesVisibility = computed<Visibility>({
@@ -88,10 +92,10 @@ const surfaceColor = computed<ColorRGBA | undefined>({
   },
 });
 
-const surfacesActiveColoring = computed<string | undefined>({
+const surfacesActiveColoring = computed<ColoringType | undefined>({
   get: () =>
     dataStyleStore.modelSurfaceActiveColoring(modelId, referenceSurfaceId.value) as
-      | string
+      | ColoringType
       | undefined,
   set: async (coloringType) => {
     if (typeof coloringType !== "string") {
@@ -99,14 +103,18 @@ const surfacesActiveColoring = computed<string | undefined>({
     }
     if (collections && coloringType === "random") {
       await Promise.all(
-        collections.map((collection) =>
-          dataStyleStore.setModelSurfacesActiveColoring(
+        collections.map((collection) => {
+          const childIds = collection.children.map((child) => child.id);
+          if (!isNonEmpty(childIds)) {
+            return undefined;
+          }
+          return dataStyleStore.setModelSurfacesActiveColoring(
             modelId,
-            collection.children.map((child) => child.id),
+            childIds,
             coloringType,
             collection.id,
-          ),
-        ),
+          );
+        }),
       );
     } else {
       await dataStyleStore.setModelSurfacesActiveColoring(modelId, targetSurfaceIds, coloringType);
@@ -115,8 +123,9 @@ const surfacesActiveColoring = computed<string | undefined>({
   },
 });
 
-const surfaceActiveColoring = computed<string | undefined>({
-  get: () => dataStyleStore.modelSurfaceActiveColoring(modelId, surfaceId) as string | undefined,
+const surfaceActiveColoring = computed<ColoringType | undefined>({
+  get: () =>
+    dataStyleStore.modelSurfaceActiveColoring(modelId, surfaceId) as ColoringType | undefined,
   set: async (coloringType) => {
     if (surfaceId === undefined || typeof coloringType !== "string") {
       return;
@@ -178,7 +187,7 @@ const surfacesVertexAttributeRange = computed<AttributeRange>({
   },
 });
 
-const surfacesVertexAttributeColorMap = computed<Map<string, ColorRGBA> | undefined>({
+const surfacesVertexAttributeColorMap = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeColorMap(modelId, referenceSurfaceId.value),
   set: async (newValue) => {
     await dataStyleStore.setModelSurfacesVertexAttributeColorMap(
@@ -255,18 +264,20 @@ const surfacesPolygonAttributeRange = computed<AttributeRange>({
   },
 });
 
-const surfacesPolygonAttributeColorMap = computed<Map<string, ColorRGBA> | undefined>({
-  get: () =>
-    dataStyleStore.modelSurfacesPolygonAttributeColorMap(modelId, referenceSurfaceId.value),
-  set: async (newValue) => {
-    await dataStyleStore.setModelSurfacesPolygonAttributeColorMap(
-      modelId,
-      targetSurfaceIds,
-      newValue,
-    );
-    hybridViewerStore.remoteRender();
+const surfacesPolygonAttributeColorMap = computed<AttributeColorMap | undefined, AttributeColorMap>(
+  {
+    get: () =>
+      dataStyleStore.modelSurfacesPolygonAttributeColorMap(modelId, referenceSurfaceId.value),
+    set: async (newValue) => {
+      await dataStyleStore.setModelSurfacesPolygonAttributeColorMap(
+        modelId,
+        targetSurfaceIds,
+        newValue,
+      );
+      hybridViewerStore.remoteRender();
+    },
   },
-});
+);
 
 const surfacesPolygonAttributeNoDataColor = computed<ColorRGBA>({
   get: () =>
@@ -332,7 +343,7 @@ const vertexAttributeRange = computed<AttributeRange>({
   },
 });
 
-const vertexAttributeColorMap = computed<Map<string, ColorRGBA> | undefined>({
+const vertexAttributeColorMap = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => dataStyleStore.modelSurfacesVertexAttributeColorMap(modelId, surfaceId),
   set: async (newValue) => {
     if (surfaceId === undefined) {
@@ -404,7 +415,7 @@ const polygonAttributeRange = computed<AttributeRange>({
   },
 });
 
-const polygonAttributeColorMap = computed<Map<string, ColorRGBA> | undefined>({
+const polygonAttributeColorMap = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => dataStyleStore.modelSurfacesPolygonAttributeColorMap(modelId, surfaceId),
   set: async (newValue) => {
     if (surfaceId === undefined) {
@@ -487,6 +498,7 @@ const attributeSchemas = {
     <VisibilitySwitch v-model="surfaceVisibility" />
     <ViewerOptionsColoringTypeSelector
       :data-id="modelId"
+      v-if="surfaceComponentIds"
       :componentIds="surfaceComponentIds"
       v-model:coloring_style_key="surfaceActiveColoring"
       v-model:color="surfaceColor"

@@ -1,7 +1,8 @@
+import type { StoreId } from "@ogw_front/types/identifiers";
 import { consola } from "consola";
 
 interface RegisterableStore {
-  $id: string;
+  $id: StoreId;
   $patch?: (partial: Record<string, unknown>) => void;
   exportStores?: (params?: Record<string, unknown>) => Promise<unknown>;
   importStores?: (snapshot: unknown) => Promise<void> | void;
@@ -13,8 +14,8 @@ interface RegisterableStore {
 async function exportRegisteredStores(
   stores: readonly RegisterableStore[],
   params: Record<string, unknown> = {},
-): Promise<Record<string, unknown>> {
-  const snapshot: Record<string, unknown> = {};
+): Promise<Record<StoreId, unknown>> {
+  const snapshot: Record<StoreId, unknown> = {};
 
   await Promise.all(
     stores.map(async (store: RegisterableStore) => {
@@ -34,13 +35,13 @@ async function exportRegisteredStores(
 
 async function importRegisteredStores(
   stores: readonly RegisterableStore[],
-  snapshot: Record<string, unknown> | undefined,
+  snapshot: Record<StoreId, unknown> | undefined,
 ): Promise<void> {
   if (!snapshot) {
     return;
   }
 
-  const missingStoreIds: string[] = [];
+  const missingStoreIds: StoreId[] = [];
 
   await Promise.all(
     stores.map(async (store: RegisterableStore) => {

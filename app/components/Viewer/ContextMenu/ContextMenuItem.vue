@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { IconName, ImageSource, MenuItemIndex, Pixels, Tooltip } from "@ogw_front/types/ui";
 import {
   type MenuSide,
   OPPOSITE_SIDE,
@@ -11,6 +12,14 @@ import { useMenuStore } from "@ogw_front/stores/menu";
 import { useTheme } from "vuetify";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
+interface Props {
+  index: MenuItemIndex;
+  tooltip: Tooltip;
+  // An image, or an icon name of the app icon set (ph-...)
+  btnImage?: ImageSource;
+  btnIcon?: IconName;
+}
+
 const CARD_WIDTH = 300;
 const CARD_HEIGHT = 500;
 const MARGIN = 60;
@@ -19,14 +28,6 @@ const OFFSET = 40;
 const menuStore = useMenuStore();
 const theme = useTheme();
 const primaryColor = computed(() => theme.current.value.colors.primary);
-
-interface Props {
-  index: number;
-  tooltip: string;
-  // An image, or an icon name of the app icon set (ph-...)
-  btnImage?: string;
-  btnIcon?: string;
-}
 
 const { index, tooltip, btnImage = "", btnIcon = "" } = defineProps<Props>();
 
@@ -100,7 +101,7 @@ const is_active = computed<boolean>(() => menuStore.active_item_index === index)
 const optionsRef = ref<HTMLElement | undefined>(undefined);
 const { height: optionsHeight } = useElementSize(optionsRef);
 
-const maxCardHeight = computed<number>(() =>
+const maxCardHeight = computed<Pixels>(() =>
   Math.min(CARD_HEIGHT, menuStore.containerHeight - OFFSET),
 );
 

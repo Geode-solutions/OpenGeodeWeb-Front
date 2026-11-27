@@ -1,15 +1,18 @@
 // Third party imports
 import { type VueWrapper, flushPromises } from "@vue/test-utils";
 import { describe, expect, test, vi } from "vitest";
+import type { AttributeRange } from "@ogw_front/types/attribute";
 import type { VNode } from "vue";
 import { mountSuspended } from "@nuxt/test-utils/runtime";
 
 // Local imports
 import AttributeSelector from "@ogw_front/components/Viewer/Options/AttributeSelector.vue";
+import type { ModelComponentId } from "@ogw_front/types/identifiers";
+import type { NonEmptyArray } from "@ogw_front/utils/arrays";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { vuetify } from "@ogw_tests/utils";
 
-const ATTRIBUTE_RANGE = [0, 1];
+const ATTRIBUTE_RANGE: AttributeRange = [0, 1];
 const VERTEX_SCHEMAS = {
   names: back_schemas.opengeodeweb_back.vertex_attribute_names,
   range: back_schemas.opengeodeweb_back.vertex_attribute_range,
@@ -61,12 +64,13 @@ vi.mock(import("@ogw_front/composables/batch_style") as Promise<unknown>, () => 
 async function mountSelector(
   attributeName: string,
   attributeTimeStep?: number,
-  attributeRange: (number | undefined)[] = ATTRIBUTE_RANGE,
+  attributeRange: AttributeRange = ATTRIBUTE_RANGE,
 ): Promise<VueWrapper> {
   const wrapper = await mountSuspended(AttributeSelector, {
     global: { plugins: [vuetify] },
     props: {
       dataId: "id",
+      componentIds: undefined,
       schemas: VERTEX_SCHEMAS,
       attributeName,
       attributeItem: 0,
@@ -128,7 +132,7 @@ describe("attributeSelector time steps", () => {
   });
 
   test("requests the range of the selected attribute when it is unset", async () => {
-    const wrapper = await mountSelector("plain", undefined, []);
+    const wrapper = await mountSelector("plain", undefined, [undefined, undefined]);
 
     expect(wrapper.emitted("update:attributeRange")?.at(-1)).toStrictEqual([
       [RANGE_MIN, RANGE_MAX],
@@ -139,7 +143,7 @@ describe("attributeSelector time steps", () => {
 
 describe("attributeSelector attribute names", () => {
   test("requests the names again only when the components change", async () => {
-    const componentIds = ref(["component"]);
+    const componentIds = ref<NonEmptyArray<ModelComponentId>>(["component"]);
     const rerenders = ref(0);
     const Parent = defineComponent({
       setup: () => (): VNode =>

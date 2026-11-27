@@ -3,6 +3,7 @@ import type {
   AttributeColorMap,
   AttributeRange,
   AttributeTimeStep,
+  ColoringType,
 } from "@ogw_front/types/attribute";
 import type {
   AttributeItem,
@@ -15,7 +16,6 @@ import {
   applyRangesPerData,
   useBatchStyle,
 } from "@ogw_front/composables/batch_style";
-import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { Texture } from "@ogw_front/types/texture";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
@@ -23,17 +23,17 @@ import { useBatchStyleModel } from "@ogw_front/composables/batch_style_model";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
+interface Props {
+  dataId: MeshId;
+}
+
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const { applyBatchStyle } = useBatchStyle();
 
-interface Props {
-  dataId: DataId;
-}
-
 const { dataId } = defineProps<Props>();
 
-const coloring_style_key = computed<string>({
+const coloringStyleKey = computed<ColoringType>({
   get: () => dataStyleStore.meshCellsActiveColoring(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>
@@ -105,7 +105,7 @@ const vertex_attribute_range = computed<AttributeRange>({
     hybridViewerStore.remoteRender();
   },
 });
-const vertex_attribute_color_map = computed<AttributeColorMap | undefined>({
+const vertex_attribute_color_map = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => dataStyleStore.meshCellsVertexAttributeColorMap(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>
@@ -170,7 +170,7 @@ const cell_attribute_range = computed<AttributeRange>({
     hybridViewerStore.remoteRender();
   },
 });
-const cell_attribute_color_map = computed<AttributeColorMap | undefined>({
+const cell_attribute_color_map = computed<AttributeColorMap | undefined, AttributeColorMap>({
   get: () => dataStyleStore.meshCellsCellAttributeColorMap(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>
@@ -207,7 +207,7 @@ async function setCellAttributeRangesPerData(ranges: RangesPerData): Promise<voi
 <template>
   <ViewerOptionsColoringTypeSelector
     :data-id="dataId"
-    v-model:coloring_style_key="coloring_style_key"
+    v-model:coloring_style_key="coloringStyleKey"
     v-model:color="color"
     v-model:opacity="opacity"
     v-model:textures="textures"
