@@ -1,5 +1,5 @@
 import {
-  type CameraOrientation,
+  type CameraOrientationKey,
   EASE_EXPONENT,
   applyCameraOptions,
   getImageStyle,
@@ -133,7 +133,7 @@ const useHybridViewerCamera = createSharedComposable(() => {
     await performFocusCameraOnObject(dataId, block_ids);
   }
 
-  function setCameraOrientation(orientation: CameraOrientation): void {
+  function setCameraOrientation(orientation: CameraOrientationKey): void {
     animateCameraOrientation(orientation, performSyncRemoteCamera);
   }
 

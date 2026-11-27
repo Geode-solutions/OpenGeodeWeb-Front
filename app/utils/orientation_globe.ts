@@ -5,7 +5,7 @@
 import type { Angle, Coordinate } from "@ogw_front/types/geometry";
 import type { DisplayText, Pixels } from "@ogw_front/types/ui";
 import type { Vec3, ViewBasis } from "@ogw_front/utils/orientation_gizmo";
-import type { CameraOrientation } from "@ogw_internal/stores/hybrid_viewer/camera_helpers";
+import type { CameraOrientationKey } from "@ogw_internal/stores/hybrid_viewer/camera_helpers";
 
 type GlobeAxis = "x" | "y" | "z";
 
@@ -14,7 +14,7 @@ interface GlobeLabel {
   // Text drawn at the end of the axis: X, Y or Z
   text: DisplayText;
   // Key of the camera orientation looking from this end (see camera_helpers ORIENTATIONS)
-  key: CameraOrientation;
+  key: CameraOrientationKey;
   // Projected end of the axis, on the sphere
   tipX: Coordinate;
   tipY: Coordinate;
@@ -59,7 +59,7 @@ const LABEL_GAP = 11;
 // Under this projected length (ratio of the radius), the axis points at the viewer
 const FORESHORTENED_RATIO = 0.18;
 const FORESHORTENED_OFFSET = 8;
-const AXES: readonly { axis: GlobeAxis; vector: Vec3; key: CameraOrientation }[] = [
+const AXES: readonly { axis: GlobeAxis; vector: Vec3; key: CameraOrientationKey }[] = [
   { axis: "x", vector: [1, 0, 0], key: "xplus" },
   { axis: "y", vector: [0, 1, 0], key: "yplus" },
   { axis: "z", vector: [0, 0, 1], key: "zplus" },

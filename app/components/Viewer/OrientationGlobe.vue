@@ -8,6 +8,7 @@ import {
   strataRings,
 } from "@ogw_front/utils/orientation_globe";
 import { cameraViewBasis, toCameraPose } from "@ogw_front/utils/orientation_gizmo";
+import { BRAND_ORANGE } from "@ogw_front/utils/brand_colors";
 import type { CssColor } from "@ogw_front/types/ui";
 import type { Opacity } from "@geode/opengeodeweb-viewer/schema_types";
 import { compassHeading } from "@ogw_front/utils/orientation_compass";
@@ -37,7 +38,6 @@ const LIGHT_INK_LUMINANCE = 0.5;
 const LUMINANCE_WEIGHTS = { red: 0.2126, green: 0.7152, blue: 0.0722 } as const;
 const MAX_CHANNEL = 255;
 const AXIS_COLORS = { x: "#D9553B", y: "#3F8F63", z: "#3567B5" } as const;
-const ORANGE = "#F48830";
 
 const hybridViewerStore = useHybridViewerStore();
 const dataStyleStore = useDataStyleStore();
@@ -322,7 +322,7 @@ svg {
 }
 
 .north {
-  fill: v-bind(ORANGE);
+  fill: v-bind(BRAND_ORANGE);
   stroke: #e8eef0;
   stroke-width: 1.5px;
   pointer-events: none;

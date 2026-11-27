@@ -1,10 +1,21 @@
 <script setup lang="ts">
+import {
+  type CameraOrientation,
+  cameraOrientations,
+  isNorth,
+} from "@ogw_front/utils/camera_orientations";
+import type { CssColor, Pixels } from "@ogw_front/types/ui";
+import { BRAND_ORANGE } from "@ogw_front/utils/brand_colors";
 import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types.js";
-import type { CameraOrientation } from "@ogw_internal/stores/hybrid_viewer/camera_helpers";
-import type { Pixels } from "@ogw_front/types/ui";
+import CameraOrientationDial from "@ogw_front/components/CameraOrientationDial.vue";
+import type { CameraOrientationKey } from "@ogw_internal/stores/hybrid_viewer/camera_helpers";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import { applyCameraOptions } from "@ogw_internal/stores/hybrid_viewer/camera";
+import { orientationCubeStyle } from "@ogw_front/utils/orientation_cube_style";
+import { useChromeTheme } from "@ogw_front/composables/chrome_theme";
+import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import { useTheme } from "vuetify";
 import { newInstance as vtkAnnotatedCubeActor } from "@kitware/vtk.js/Rendering/Core/AnnotatedCubeActor";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 
@@ -15,7 +26,7 @@ interface Props {
 }
 
 interface Emits {
-  select: [value: CameraOrientation];
+  select: [value: CameraOrientationKey];
 }
 
 const DEFAULT_PANEL_WIDTH = 260;
@@ -26,56 +37,22 @@ const emit = defineEmits<Emits>();
 
 const show = defineModel<boolean>("show", { default: false });
 
-const orientations = [
-  {
-    label: "Z+",
-    value: "zplus",
-    face: "top",
-    vtkKey: "ZPlus",
-    rotation: 0,
-    position: { top: "15%", left: "50%" },
-  },
-  {
-    label: "Z-",
-    value: "zminus",
-    face: "bottom",
-    vtkKey: "ZMinus",
-    rotation: 0,
-    position: { top: "85%", left: "50%" },
-  },
-  {
-    label: "Y+",
-    value: "yplus",
-    face: "front",
-    vtkKey: "YPlus",
-    rotation: 180,
-    position: { top: "35%", left: "22%" },
-  },
-  {
-    label: "Y-",
-    value: "yminus",
-    face: "back",
-    vtkKey: "YMinus",
-    rotation: 0,
-    position: { top: "65%", left: "78%" },
-  },
-  {
-    label: "X+",
-    value: "xplus",
-    face: "right",
-    vtkKey: "XPlus",
-    rotation: 90,
-    position: { top: "35%", left: "78%" },
-  },
-  {
-    label: "X-",
-    value: "xminus",
-    face: "left",
-    vtkKey: "XMinus",
-    rotation: -90,
-    position: { top: "65%", left: "22%" },
-  },
-];
+// With the compass marker, the orientations read north, east, south, west, up and down
+const dataStyleStore = useDataStyleStore();
+const isCompass = computed(() => dataStyleStore.sceneStyle.orientation_widget === "compass");
+const orientations = computed(() =>
+  cameraOrientations(dataStyleStore.sceneStyle.orientation_widget),
+);
+
+// The cube follows the theme it is shown in: the chrome theme of the panel (GlassCard), the app
+// Theme for the menu
+const theme = useTheme();
+const chromeTheme = useChromeTheme();
+const cubeStyle = computed(() => {
+  const name = panel ? chromeTheme.value : theme.global.name.value;
+  const colors = theme.computedThemes.value[name]?.colors;
+  return orientationCubeStyle({ surface: colors?.surface, "on-surface": colors?.["on-surface"] });
+});
 
 const hoveredFace = ref<string | undefined>(undefined);
 const hybridViewerStore = useHybridViewerStore();
@@ -84,6 +61,43 @@ const cubeContainer = useTemplateRef("cubeContainer");
 let genericRenderWindow: unknown = undefined;
 let cubeActor: unknown = undefined;
 let isInteracting = false;
+
+function faceStyle(
+  orientation: CameraOrientation,
+  hovered: boolean,
+): { faceColor: CssColor; fontColor: CssColor } {
+  const style = cubeStyle.value;
+  if (hovered) {
+    return { faceColor: style.hoveredFaceColor, fontColor: style.hoveredFontColor };
+  }
+  return {
+    faceColor: style.faceColor,
+    fontColor: isNorth(orientation) ? BRAND_ORANGE : style.fontColor,
+  };
+}
+
+function labelFaces(): void {
+  for (const orientation of orientations.value) {
+    cubeActor[`set${orientation.vtkKey}FaceProperty`]({
+      text: orientation.label,
+      faceRotation: orientation.rotation,
+      ...faceStyle(orientation, orientation.face === hoveredFace.value),
+    });
+  }
+}
+
+function edgeStyle(): { edgeColor: CssColor } {
+  return { edgeColor: cubeStyle.value.edgeColor };
+}
+
+watch([orientations, cubeStyle], () => {
+  if (!cubeActor) {
+    return;
+  }
+  cubeActor.setDefaultStyle(edgeStyle());
+  labelFaces();
+  genericRenderWindow.getRenderWindow().render();
+});
 
 function initVTK(): void {
   if (genericRenderWindow) {
@@ -107,21 +121,13 @@ function initVTK(): void {
   cubeActor.setDefaultStyle({
     fontFamily: "sans-serif",
     fontStyle: "bold",
-    faceColor: "rgba(60, 60, 60, 1)",
-    fontColor: "white",
-    edgeColor: "rgba(255, 255, 255, 0.4)",
+    ...edgeStyle(),
     edgeThickness: 0.1,
     resolution: 400,
     fontSizeScale: (resolution: number) => resolution / 4,
   });
 
-  for (const orientation of orientations) {
-    cubeActor[`set${orientation.vtkKey}FaceProperty`]({
-      text: orientation.label,
-      faceRotation: orientation.rotation,
-    });
-  }
-
+  labelFaces();
   cubeActor.getProperty().setBackfaceCulling(true);
 
   const renderer = genericRenderWindow.getRenderer();
@@ -164,12 +170,9 @@ watch(hoveredFace, (newFace, oldFace) => {
     return;
   }
   function updateFace(face: string | undefined, active: boolean): void {
-    const config = orientations.find((orientation) => orientation.face === face);
+    const config = orientations.value.find((orientation) => orientation.face === face);
     if (config) {
-      cubeActor[`set${config.vtkKey}FaceProperty`]({
-        faceColor: active ? "rgba(255, 255, 255, 0.95)" : "rgba(60, 60, 60, 1)",
-        fontColor: active ? "black" : "white",
-      });
+      cubeActor[`set${config.vtkKey}FaceProperty`](faceStyle(config, active));
     }
   }
 
@@ -187,7 +190,16 @@ watch(hoveredFace, (newFace, oldFace) => {
     :width="width"
     :escapeFunction="escapeFunction"
   >
+    <CameraOrientationDial
+      v-if="isCompass"
+      v-model:hoveredFace="hoveredFace"
+      :orientations="orientations"
+      @select="(value) => emit('select', value)"
+    >
+      <div ref="cubeContainer" style="width: 70px; height: 70px; pointer-events: none" />
+    </CameraOrientationDial>
     <div
+      v-else
       class="pa-0 overflow-hidden position-relative"
       style="
         height: 220px;
@@ -234,7 +246,7 @@ watch(hoveredFace, (newFace, oldFace) => {
         @mouseleave="hoveredFace = undefined"
         @click.stop="emit('select', orientation.value)"
       >
-        <v-tooltip activator="parent" location="top">{{ orientation.value }} View</v-tooltip>
+        <v-tooltip activator="parent" location="top">{{ orientation.tooltip }}</v-tooltip>
         <span class="text-caption font-weight-black" style="font-size: 0.7rem !important">{{
           orientation.label
         }}</span>
@@ -264,8 +276,10 @@ watch(hoveredFace, (newFace, oldFace) => {
           @mouseleave="hoveredFace = undefined"
           @click.stop="emit('select', orientation.value)"
         >
-          <v-tooltip activator="parent" location="top">{{ orientation.label }}</v-tooltip>
-          <span class="text-caption font-weight-black">{{ orientation.label }}</span>
+          <v-tooltip activator="parent" location="top">{{ orientation.tooltip }}</v-tooltip>
+          <span class="text-caption font-weight-black" :class="{ north: isNorth(orientation) }">{{
+            orientation.label
+          }}</span>
         </v-btn>
       </div>
     </div>
@@ -287,6 +301,9 @@ watch(hoveredFace, (newFace, oldFace) => {
 }
 .transition-all {
   transition: all 0.4s ease;
+}
+.north {
+  color: v-bind(BRAND_ORANGE);
 }
 .orientation-menu {
   min-width: 180px;
