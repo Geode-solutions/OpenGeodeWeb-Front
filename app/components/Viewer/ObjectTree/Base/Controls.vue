@@ -28,23 +28,43 @@ interface Emits {
 const emit = defineEmits<Emits>();
 
 const showSearch = ref<boolean>(false);
+const capsule = useTemplateRef("capsule");
 
+// The search field takes the focus as soon as it shows, so typing goes straight into it
 watch(
   () => showSearch.value,
-  (val) => {
+  async (val) => {
     if (!val) {
       emit("update:search", "");
+      return;
     }
+    await nextTick();
+    capsule.value
+      ?.querySelector<HTMLInputElement>('[data-testid="searchObjectsInput"] input')
+      ?.focus();
   },
 );
+
+// Leaving the toolbar folds an empty search back; a search in progress stays shown with its query
+function onFocusOut(event: FocusEvent): void {
+  const next = event.relatedTarget;
+  if (next instanceof Node && capsule.value?.contains(next)) {
+    return;
+  }
+  if (search === "") {
+    showSearch.value = false;
+  }
+}
 </script>
 
 <template>
   <v-row dense align="center" class="controls-row pa-1 py-0">
     <v-col cols="12">
       <div
+        ref="capsule"
         class="controls-capsule d-flex align-center rounded-pill overflow-hidden"
         :class="{ 'is-expanded': showSearch }"
+        @focusout="onFocusOut"
       >
         <ActionButton
           data-testid="searchObjectsButton"
@@ -128,7 +148,11 @@ watch(
 <style scoped>
 /* Apps can line the first icon up with the panel header icon (fallbacks: the former look) */
 .controls-row {
-  padding-left: var(--ogw-viewer-controls-inset, 4px) !important;
+  /* Apps can space the toolbar from the panel header above and the first row below */
+  padding-block: var(--ogw-viewer-controls-padding-block, 0px) !important;
+  padding-left: calc(
+    var(--ogw-viewer-controls-inset, 4px) + var(--tree-box-content-inset, 0px)
+  ) !important;
 }
 
 .controls-capsule {

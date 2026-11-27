@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import ViewerContextMenuItem, {
-  type ItemProps,
-} from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { MeshId } from "@ogw_front/types/identifiers";
+import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import ViewerGenericMeshPolygonsColoring from "@ogw_front/components/Viewer/Generic/Mesh/PolygonsColoring.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
@@ -20,25 +19,25 @@ const hybridViewerStore = useHybridViewerStore();
 const { applyBatchStyle } = useBatchStyle();
 
 interface Props {
-  itemProps: ItemProps & { index?: number };
+  dataId: DataId;
+  index: number;
   btnImage: string;
   tooltip?: string;
   capabilities?: Record<string, CapabilityConfig>;
 }
 
 const {
-  itemProps,
+  dataId,
+  index,
   btnImage,
   tooltip = "Polygons options",
   capabilities = {},
 } = defineProps<Props>();
 
-const dataId = toRef(() => itemProps.id);
-
 const visibility = computed<Visibility>({
-  get: () => dataStyleStore.meshPolygonsVisibility(dataId.value),
+  get: () => dataStyleStore.meshPolygonsVisibility(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(dataId.value, (meshId: MeshId) =>
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
       dataStyleStore.setMeshPolygonsVisibility(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -49,8 +48,7 @@ const visibility = computed<Visibility>({
 <template>
   <ViewerContextMenuItem
     data-testid="meshPolygonsMenu"
-    :index="itemProps.index!"
-    :itemProps="itemProps"
+    :index="index"
     :tooltip="tooltip"
     :btnImage="btnImage"
   >

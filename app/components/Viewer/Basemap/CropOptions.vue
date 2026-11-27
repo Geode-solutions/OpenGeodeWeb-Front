@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import { MAP_STYLES, mapStyleOf } from "@ogw_front/utils/basemap_tree";
-import ViewerContextMenuItem, {
-  type ItemProps,
-} from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import { useBasemapStore } from "@ogw_front/stores/basemap";
 
 interface Props {
-  itemProps: ItemProps & { index: number };
+  dataId: DataId;
+  index: number;
   tooltip?: string;
 }
 
-const { itemProps, tooltip = "Crop to data" } = defineProps<Props>();
+const { dataId, index, tooltip = "Crop to data" } = defineProps<Props>();
 const basemapStore = useBasemapStore();
 // A map menu crops that map, the basemap category menu crops every map
 const mapStyles = computed(() => {
-  const mapStyle = mapStyleOf(itemProps.id);
+  const mapStyle = mapStyleOf(dataId);
   if (mapStyle === undefined) {
     return MAP_STYLES;
   }
@@ -28,8 +28,7 @@ const indeterminate = computed(() => new Set(cropped.value).size > 1);
 <template>
   <ViewerContextMenuItem
     data-testid="basemapCropMenu"
-    :index="itemProps.index"
-    :itemProps="itemProps"
+    :index="index"
     :tooltip="tooltip"
     btnIcon="ph-panorama"
   >

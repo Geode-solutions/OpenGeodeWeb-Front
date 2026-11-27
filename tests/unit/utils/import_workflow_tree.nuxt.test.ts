@@ -24,7 +24,7 @@ function setup(): { request: Mock; addHybridItem: Mock } {
   const addHybridItem = vi.fn();
   backStore.request = mockAs<typeof backStore.request>(request);
   dataStore.addItem = mockAs<typeof dataStore.addItem>(vi.fn().mockResolvedValue(undefined));
-  dataStore.isItemViewable = mockAs<typeof dataStore.isItemViewable>(
+  dataStore.fetchIsViewable = mockAs<typeof dataStore.fetchIsViewable>(
     vi.fn().mockResolvedValue(true),
   );
   dataStore.registerObject = mockAs<typeof dataStore.registerObject>(vi.fn());

@@ -69,6 +69,40 @@ describe("app store", () => {
       });
     });
 
+    describe("unregisterStore", () => {
+      test("removes the store from the registered ones", () => {
+        const appStore = useAppStore();
+        appStore.registerStore({ $id: "userStore" });
+        appStore.registerStore({ $id: "extensionStore" });
+
+        appStore.unregisterStore("extensionStore");
+
+        expect(appStore.stores).toHaveLength(SINGLE_STORE_LENGTH);
+        expect(appStore.stores[FIRST_INDEX]?.$id).toBe("userStore");
+      });
+
+      test("an unregistered store is no longer exported", async () => {
+        const appStore = useAppStore();
+        const exportStores = vi.fn().mockResolvedValue({ value: 1 });
+        appStore.registerStore({ $id: "extensionStore", exportStores });
+
+        appStore.unregisterStore("extensionStore");
+        const snapshot = await appStore.exportStores();
+
+        expect(snapshot).not.toHaveProperty("extensionStore");
+        expect(exportStores).not.toHaveBeenCalled();
+      });
+
+      test("an unknown id changes nothing", () => {
+        const appStore = useAppStore();
+        appStore.registerStore({ $id: "userStore" });
+
+        appStore.unregisterStore("unknownStore");
+
+        expect(appStore.stores).toHaveLength(SINGLE_STORE_LENGTH);
+      });
+    });
+
     describe("export", () => {
       test("export stores with exportStores method", async () => {
         const appStore = useAppStore();

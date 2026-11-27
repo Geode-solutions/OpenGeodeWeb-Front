@@ -1,6 +1,24 @@
-import { Dexie, type Table } from "dexie";
+import { type CameraPositionRecord, cameraPositionsTable } from "./tables/camera_positions";
+import { type DataItem, dataTable } from "./tables/data";
+import { Dexie, type IndexableType, type Table } from "dexie";
+import { type ModelComponentRecord, modelComponentsTable } from "./tables/model_components";
+import {
+  type ModelComponentRelationRecord,
+  modelComponentsRelationTable,
+} from "./tables/model_components_relation";
+import type {
+  ModelComponentStyle,
+  ModelComponentTypeStyle,
+  ObjectStyle,
+  SceneStyle,
+} from "@ogw_internal/stores/data_style/types";
+import { type TreeviewConfigRecord, treeviewConfigTable } from "./tables/treeview_config";
 import { BaseDatabase } from "./base_database";
 import { ExtendedDatabase } from "./extended_database";
+import { dataStyleTable } from "./tables/data_style";
+import { modelComponentDataStyleTable } from "./tables/model_component_datastyle";
+import { modelComponentTypeDataStyleTable } from "./tables/model_component_type_datastyle";
+import { sceneStyleTable } from "./tables/scene_style";
 
 interface DatabaseContainer {
   instance: Dexie | undefined;
@@ -104,7 +122,7 @@ function currentInstance(): Dexie {
   return databaseContainer.instance;
 }
 
-function liveTable<TRow>(tableName: string): Table<TRow, string> {
+function liveTable<TRow, TKey extends IndexableType>(tableName: string): Table<TRow, TKey> {
   const handler: ProxyHandler<object> = {
     get(_target, prop: string | symbol): unknown {
       const table = currentInstance().table(tableName);
@@ -121,7 +139,7 @@ function liveTable<TRow>(tableName: string): Table<TRow, string> {
     },
   };
   // oxlint-disable-next-line no-unsafe-type-assertion -- the proxy forwards every access to a Dexie Table.
-  return new Proxy({}, handler) as Table<TRow, string>;
+  return new Proxy({}, handler) as Table<TRow, TKey>;
 }
 
 function isTableName(instance: Dexie, prop: string | symbol): prop is string {
@@ -149,9 +167,74 @@ const database = new Proxy<DatabaseTables>(
   },
 );
 
-// Callers cast to the row type they know a given table holds.
-function getTable<TRow>(tableName: string): Table<TRow, string> {
-  return liveTable<TRow>(tableName);
+// For the tables an extension registers at runtime, which the accessors below do not know.
+// The caller gives the row type, and the key type when it is not a string.
+function getTable<TRow, TKey extends IndexableType = string>(tableName: string): Table<TRow, TKey> {
+  return liveTable<TRow, TKey>(tableName);
 }
 
-export { Database, database, getTable };
+// One accessor per table: its row and key types are written once, here
+function dataDb(): Table<DataItem, string> {
+  return liveTable(dataTable.name);
+}
+
+function modelComponentsDb(): Table<ModelComponentRecord, string> {
+  return liveTable(modelComponentsTable.name);
+}
+
+function modelComponentsRelationDb(): Table<ModelComponentRelationRecord, string> {
+  return liveTable(modelComponentsRelationTable.name);
+}
+
+function dataStyleDb(): Table<ObjectStyle, string> {
+  return liveTable(dataStyleTable.name);
+}
+
+// Keyed by [id_model, id_component]
+function componentDataStyleDb(): Table<ModelComponentStyle, [string, string]> {
+  return liveTable(modelComponentDataStyleTable.name);
+}
+
+// Keyed by [id_model, type]
+function componentTypeDataStyleDb(): Table<ModelComponentTypeStyle, [string, string]> {
+  return liveTable(modelComponentTypeDataStyleTable.name);
+}
+
+function sceneStyleDb(): Table<SceneStyle, string> {
+  return liveTable(sceneStyleTable.name);
+}
+
+// Keyed by an auto-incremented number
+function cameraPositionsDb(): Table<CameraPositionRecord, number> {
+  return liveTable(cameraPositionsTable.name);
+}
+
+function treeviewConfigDb(): Table<TreeviewConfigRecord, string> {
+  return liveTable(treeviewConfigTable.name);
+}
+
+// Runs `scope` in one read-write transaction over `tables`: its writes all apply, or none do.
+// Only database calls may be awaited inside `scope`, or Dexie commits the transaction early.
+async function writeTransaction<Result>(
+  tables: readonly Table[],
+  scope: () => Promise<Result>,
+): Promise<Result> {
+  const result = await currentInstance().transaction("rw", [...tables], scope);
+  return result;
+}
+
+export {
+  Database,
+  cameraPositionsDb,
+  componentDataStyleDb,
+  componentTypeDataStyleDb,
+  dataDb,
+  dataStyleDb,
+  database,
+  getTable,
+  modelComponentsDb,
+  modelComponentsRelationDb,
+  sceneStyleDb,
+  treeviewConfigDb,
+  writeTransaction,
+};

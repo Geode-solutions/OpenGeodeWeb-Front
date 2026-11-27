@@ -36,7 +36,7 @@ function createPlane(origin: ClippingPlane["origin"], normal: number[]): Clippin
   return { id: newItemId(), origin, normal, opacity: DEFAULT_PLANE_OPACITY };
 }
 const planes = ref<ClippingPlane[]>([createPlane(undefined, [1, 0, 0])]);
-const allItems = dataStore.refRegisteredItems();
+const allItems = computed(() => dataStore.registeredItems);
 const targetIds = computed<DataId[]>(() => {
   if (targetAllVisible.value) {
     return allItems.value.map((item) => item.data_id);

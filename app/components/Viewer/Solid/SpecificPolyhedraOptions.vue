@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import ViewerContextMenuItem, {
-  type ItemProps,
-} from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import SolidPolyhedra from "@ogw_front/assets/viewer_svgs/solid_polyhedra.svg";
+import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import ViewerOptionsVisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import ViewerSolidSpecificPolyhedraColoring from "@ogw_front/components/Viewer/Solid/SpecificPolyhedraColoring.vue";
 import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
@@ -16,18 +15,17 @@ const hybridViewerStore = useHybridViewerStore();
 const { applyBatchStyle } = useBatchStyle();
 
 interface Props {
-  itemProps: ItemProps & { index: number };
+  dataId: DataId;
+  index: number;
   tooltip?: string;
 }
 
-const { itemProps, tooltip = "Polyhedra options" } = defineProps<Props>();
-
-const dataId = toRef(() => itemProps.id);
+const { dataId, index, tooltip = "Polyhedra options" } = defineProps<Props>();
 
 const visibility = computed<Visibility>({
-  get: () => dataStyleStore.meshPolyhedraVisibility(dataId.value),
+  get: () => dataStyleStore.meshPolyhedraVisibility(dataId),
   set: async (newValue) => {
-    await applyBatchStyle(dataId.value, (meshId: MeshId) =>
+    await applyBatchStyle(dataId, (meshId: MeshId) =>
       dataStyleStore.setMeshPolyhedraVisibility(meshId, newValue),
     );
     hybridViewerStore.remoteRender();
@@ -38,8 +36,7 @@ const visibility = computed<Visibility>({
 <template>
   <ViewerContextMenuItem
     data-testid="meshPolyhedraMenu"
-    :index="itemProps.index"
-    :itemProps="itemProps"
+    :index="index"
     :tooltip="tooltip"
     :btnImage="SolidPolyhedra"
   >

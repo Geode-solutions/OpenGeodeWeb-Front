@@ -51,7 +51,7 @@ function followZScaling(camera: vtkCamera, ratio: number): void {
 
 async function fetchBinaryLightViewable(dataId: DataId): Promise<string | undefined> {
   const dataStore = useDataStore();
-  const isViewable = await dataStore.isItemViewable(dataId);
+  const isViewable = await dataStore.fetchIsViewable(dataId);
   if (!isViewable) {
     return undefined;
   }

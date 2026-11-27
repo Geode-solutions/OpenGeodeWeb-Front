@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// oxlint-disable max-dependencies
+// oxlint-disable max-dependencies, eslint/max-lines
 import type { GeodeObjectTyped, ModelId, ViewerObjectTyped } from "@ogw_front/types/identifiers";
 import {
   type MapStyle,
@@ -11,8 +11,10 @@ import {
 import {
   type TreeMenuPayload,
   compareSelections,
+  isObjectTreeRowViewable,
   withPendingImports,
 } from "@ogw_front/utils/treeview";
+import { isImage, isModel } from "@ogw_front/utils/viewer_object_type";
 import CommonTreeView from "@ogw_front/components/Viewer/ObjectTree/Base/CommonTreeView.vue";
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
 import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
@@ -168,14 +170,6 @@ const linkedRow = computed<{ id: ModelId; color: string } | undefined>(() => {
   return { id, color };
 });
 
-function isModel(item: TreeGroupItem): boolean {
-  const actualItem = item.raw || item;
-  return (
-    actualItem.viewer_object_type === "model" ||
-    ["BRep", "Section"].includes(actualItem.geode_object_type ?? "")
-  );
-}
-
 function handleHoverEnter({
   item,
   immediate = false,
@@ -186,31 +180,31 @@ function handleHoverEnter({
   const actualItem = item.raw || item;
 
   // Images are not pickable: the viewer has nothing to highlight
-  if (!actualItem.viewer_object_type || actualItem.viewer_object_type === "image") {
+  if (!actualItem.viewer_object_type || isImage(actualItem)) {
     return;
   }
 
-  const is_model = isModel(item);
-  if (is_model) {
+  const itemIsModel = isModel(actualItem);
+  if (itemIsModel) {
     treeviewStore.setHoveredModel(actualItem.id);
   }
 
   onHoverEnter(
     actualItem.id,
     async () => {
-      if (is_model) {
+      if (itemIsModel) {
         return await dataStore.getAllModelComponentsViewerIds(actualItem.id);
       }
       return [];
     },
-    is_model ? "model" : "mesh",
+    itemIsModel ? "model" : "mesh",
     immediate,
   );
 }
 
 function handleHoverLeave({ item }: { item: TreeGroupItem }): void {
   const actualItem = item.raw || item;
-  if (!actualItem.viewer_object_type || actualItem.viewer_object_type === "image") {
+  if (!actualItem.viewer_object_type || isImage(actualItem)) {
     return;
   }
   if (treeviewStore.hoveredModelId === actualItem.id) {
@@ -259,6 +253,7 @@ function expandAll(): void {
       }"
       :scroll-top="mainView?.scrollTop || 0"
       :linked="linkedRow"
+      :is-row-viewable="(row) => isObjectTreeRowViewable(row, dataStore.isViewable)"
       class="transparent-treeview virtual-tree-height"
       @update:selected="(val) => onUpdateSelection(val as string[])"
       @update:scroll-top="treeviewStore.setScrollTop(mainView?.id ?? '', $event)"

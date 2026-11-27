@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import type { ColorRGBA, Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
-import {
-  type ModelMenuItemProps,
-  useModelMenuContext,
-} from "@ogw_front/composables/model_menu_context";
 import BlocksOptions from "./BlocksOptions.vue";
 import CornersOptions from "./CornersOptions.vue";
 import LinesOptions from "./LinesOptions.vue";
@@ -16,6 +12,7 @@ import { isNonEmpty } from "@ogw_front/utils/arrays";
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import { useModelMenuContext } from "@ogw_front/composables/model_menu_context";
 import { useModelTabs } from "@ogw_front/composables/model_tabs";
 
 const dataStyleStore = useDataStyleStore();
@@ -23,13 +20,13 @@ const hybridViewerStore = useHybridViewerStore();
 const { applyBatchStyle } = useBatchStyle();
 
 interface Props {
-  itemProps: ModelMenuItemProps;
+  dataId: ModelId;
 }
 
-const { itemProps } = defineProps<Props>();
+const { dataId } = defineProps<Props>();
 
 const { modelId, componentId, componentType, collections, targetComponentIds } =
-  useModelMenuContext(() => itemProps);
+  useModelMenuContext(() => dataId);
 
 const { tabs, activeTab } = useModelTabs({
   componentType,

@@ -40,7 +40,7 @@ const MUTATION_QUIET_MS = 250;
 const MUTATION_POLL_INTERVAL_MS = 20;
 
 async function waitForDomSettled(window: Page, budgetMs: number): Promise<void> {
-  await window.evaluate((quietMs: number) => {
+  await window.evaluate(() => {
     globalThis.e2eLastMutationAt = performance.now();
     if (!globalThis.e2eMutationObserver) {
       const observer = new MutationObserver(() => {
@@ -49,8 +49,7 @@ async function waitForDomSettled(window: Page, budgetMs: number): Promise<void> 
       observer.observe(document.body, { attributes: true, childList: true, subtree: true });
       globalThis.e2eMutationObserver = observer;
     }
-    void quietMs;
-  }, MUTATION_QUIET_MS);
+  });
 
   await window
     .waitForFunction(

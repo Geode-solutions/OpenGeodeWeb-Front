@@ -12,7 +12,7 @@ import type {
 } from "@geode/opengeodeweb-viewer/schema_types";
 import type { LineId, ModelId } from "@ogw_front/types/identifiers";
 import { type NonEmptyArray, isNonEmpty } from "@ogw_front/utils/arrays";
-import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
+import type { CollectionComponent } from "@ogw_internal/stores/data/model/collections";
 import { MODEL_LINE_COLORING } from "@ogw_front/utils/model_component_coloring";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";

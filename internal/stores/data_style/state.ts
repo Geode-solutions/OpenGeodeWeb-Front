@@ -3,13 +3,17 @@ import type {
   ModelComponentStyle,
   ModelComponentTypeStyle,
   ObjectStyle,
-  SceneStyle,
   StyleValues,
 } from "./types";
 import { type SharedState, getSharedState } from "./state_shared";
+import {
+  componentDataStyleDb,
+  componentTypeDataStyleDb,
+  dataStyleDb,
+  sceneStyleDb,
+} from "@ogw_internal/database/database";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import { getDefaultSceneStyle } from "@ogw_front/utils/default_styles";
-import { getTable } from "@ogw_internal/database/database";
 import merge from "lodash/merge";
 
 interface DataStyleStateApi extends SharedState {
@@ -24,11 +28,9 @@ interface DataStyleStateApi extends SharedState {
 
 // oxlint-disable-next-line max-lines-per-function
 export function useDataStyleState(): DataStyleStateApi {
-  const dataStyleTable = getTable<ObjectStyle>("data_style");
-  const modelComponentDataStyleTable = getTable<ModelComponentStyle>("model_component_datastyle");
-  const modelComponentTypeDataStyleTable = getTable<ModelComponentTypeStyle>(
-    "model_component_type_datastyle",
-  );
+  const dataStyleTable = dataStyleDb();
+  const modelComponentDataStyleTable = componentDataStyleDb();
+  const modelComponentTypeDataStyleTable = componentTypeDataStyleDb();
 
   const state = getSharedState();
   const { styles, modelComponentTypeStyles, componentStyles } = state;
@@ -87,7 +89,7 @@ export function useDataStyleState(): DataStyleStateApi {
       dataStyleTable.clear(),
       modelComponentDataStyleTable.clear(),
       modelComponentTypeDataStyleTable.clear(),
-      getTable<SceneStyle>("scene_style").clear(),
+      sceneStyleDb().clear(),
     ]);
     modelComponentTypeStyles.value = {};
     componentStyles.value = {};

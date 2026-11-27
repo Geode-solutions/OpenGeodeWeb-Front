@@ -10,7 +10,7 @@ import {
 } from "@ogw_front/composables/orientation_overlay";
 import { consola } from "consola";
 import { getDefaultSceneStyle } from "@ogw_front/utils/default_styles";
-import { getTable } from "@ogw_internal/database/database";
+import { sceneStyleDb } from "@ogw_internal/database/database";
 import { toViewerColor } from "@ogw_front/composables/viewer_reset";
 import { useDataStyleState } from "./state";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -32,7 +32,7 @@ export function useSceneStyle(): {
   const viewerStore = useViewerStore();
   const hybridViewerStore = useHybridViewerStore();
   const { sceneStyle } = useDataStyleState();
-  const sceneStyleTable = getTable<SceneStyle>("scene_style");
+  const sceneStyleTable = sceneStyleDb();
 
   async function saveSceneStyle(values: Partial<Omit<SceneStyle, "id">>): Promise<void> {
     // Values may hold nested reactive proxies (e.g. an exported snapshot), which IndexedDB cannot clone

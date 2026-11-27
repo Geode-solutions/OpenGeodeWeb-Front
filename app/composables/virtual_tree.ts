@@ -140,14 +140,20 @@ function useVirtualTree(
   };
   const displayItems = computed(() => flattenTree(flattenContext, props.value.items ?? []));
 
+  // A search opens every group to show its matches: clearing it reopens the groups opened before
+  let openedBeforeSearch: unknown[] | undefined = undefined;
   watch(
     () => props.value.search,
     (newSearch, oldSearch) => {
       const hasNewSearch = newSearch !== undefined && newSearch !== "";
       const hadOldSearch = oldSearch !== undefined && oldSearch !== "";
       if (hasNewSearch && !hadOldSearch) {
+        openedBeforeSearch = [...(props.value.opened ?? [])];
         const allIds = collectNonLeafIds(props.value.items ?? []);
-        emit("update:opened", [...new Set([...(props.value.opened ?? []), ...allIds])]);
+        emit("update:opened", [...new Set([...openedBeforeSearch, ...allIds])]);
+      } else if (!hasNewSearch && hadOldSearch && openedBeforeSearch !== undefined) {
+        emit("update:opened", openedBeforeSearch);
+        openedBeforeSearch = undefined;
       }
     },
   );

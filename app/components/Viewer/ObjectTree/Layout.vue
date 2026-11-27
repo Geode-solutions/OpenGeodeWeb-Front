@@ -8,6 +8,7 @@ import ViewerObjectTreeBox from "@ogw_front/components/Viewer/ObjectTree/Box.vue
 import { geodeObjectImage } from "@ogw_front/assets/geode_objects";
 import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
 import { useModelHeaderHover } from "@ogw_front/composables/model_header_hover";
+import { useModelTreeDrag } from "@ogw_front/composables/model_tree_drag";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 const WIDTH_MIN = 100;
@@ -29,6 +30,8 @@ const { containerWidth } = defineProps<Props>();
 
 const treeviewStore = useTreeviewStore();
 const { onModelHeaderEnter, onModelHeaderLeave } = useModelHeaderHover();
+const { draggedId, dropTargetId, onDragStart, onDragOver, onDragEnd, onDrop, dropSide } =
+  useModelTreeDrag();
 
 interface Emits {
   "show-menu": [payload: TreeMenuPayload];
@@ -45,9 +48,14 @@ const mainView = computed(() => treeviewStore.opened_views.find((view) => view.i
 const additionalViews = computed(() =>
   treeviewStore.opened_views.filter((view) => view.id !== "main"),
 );
+// The model trees not collapsed in the activity bar
+const shownViews = computed(() => additionalViews.value.filter((view) => view.collapsed !== true));
+// From two model trees, one button collapses them all, or shows them all again once all are collapsed
+const MIN_MODEL_TREES_FOR_ALL = 2;
+const showAllToggle = computed(() => additionalViews.value.length >= MIN_MODEL_TREES_FOR_ALL);
 
 const totalWidth = computed<string>(() => {
-  const hasAdditional = additionalViews.value.length > 0;
+  const hasAdditional = shownViews.value.length > 0;
   const hasMain = Boolean(mainView.value);
   const gap = hasAdditional && hasMain ? GAP_WIDTH : 0;
   const firstColWidth = hasMain ? treeviewStore.panelWidth : 0;
@@ -59,10 +67,9 @@ const rowHeights = computed<number[]>({
   get: () => treeviewStore.rowHeights,
   set: (val) => treeviewStore.setRowHeights(val),
 });
-const draggedIndex = ref<number | undefined>(undefined);
 
 watch(
-  () => additionalViews.value.length,
+  () => shownViews.value.length,
   (newLength) => {
     if (newLength > 0 && rowHeights.value.length !== newLength) {
       treeviewStore.setRowHeights(Array.from({ length: newLength }, () => PERCENT_100 / newLength));
@@ -71,8 +78,8 @@ watch(
   { immediate: true },
 );
 
-watch([maxWidth, (): number => additionalViews.value.length], ([newMax]): void => {
-  const hasAdditional = additionalViews.value.length > 0;
+watch([maxWidth, (): number => shownViews.value.length], ([newMax]): void => {
+  const hasAdditional = shownViews.value.length > 0;
   const gap = hasAdditional ? GAP_WIDTH : 0;
   const total =
     treeviewStore.panelWidth + (hasAdditional ? treeviewStore.additionalPanelWidth : 0) + gap;
@@ -103,28 +110,19 @@ function modelGeodeId(modelId: ModelId): GeodeId | undefined {
   return undefined;
 }
 
-function onDragStart(index: number): void {
-  draggedIndex.value = index;
-}
-
-function onDragOver(event: DragEvent): void {
-  event.preventDefault();
-}
-
-function onDrop(targetIndex: number): void {
-  if (draggedIndex.value !== undefined && draggedIndex.value !== targetIndex) {
-    treeviewStore.moveView(draggedIndex.value, targetIndex);
-  }
-  draggedIndex.value = undefined;
-}
-
 function onResizeStart(event: MouseEvent): void {
   const startWidth = treeviewStore.panelWidth;
   const startX = event.clientX;
+  // Both listeners go at once, also from the resize itself once a panel is closed or collapsed
+  const listeners = new AbortController();
+  function stopResize(): void {
+    listeners.abort();
+    document.body.style.userSelect = "";
+  }
   function resize(move_event: MouseEvent): void {
     const deltaX = move_event.clientX - startX;
     let newWidth = startWidth + deltaX;
-    const hasAdditional = additionalViews.value.length > 0;
+    const hasAdditional = shownViews.value.length > 0;
     const gap = hasAdditional ? GAP_WIDTH : 0;
     const currentTotalWidth =
       newWidth + (hasAdditional ? treeviewStore.additionalPanelWidth : 0) + gap;
@@ -134,46 +132,45 @@ function onResizeStart(event: MouseEvent): void {
 
     if (newWidth < AUTO_CLOSE_THRESHOLD) {
       treeviewStore.closeView("main");
+      stopResize();
       return;
     }
 
     treeviewStore.setPanelWidth(Math.max(WIDTH_MIN, newWidth));
     document.body.style.userSelect = "none";
   }
-  function stopResize(): void {
-    document.removeEventListener("mousemove", resize);
-    document.removeEventListener("mouseup", stopResize);
-    document.body.style.userSelect = "";
-  }
-  document.addEventListener("mousemove", resize);
-  document.addEventListener("mouseup", stopResize);
+  document.addEventListener("mousemove", resize, { signal: listeners.signal });
+  document.addEventListener("mouseup", stopResize, { signal: listeners.signal });
 }
 
 function onAdditionalResizeStart(event: MouseEvent): void {
   const startWidth = treeviewStore.additionalPanelWidth;
   const startX = event.clientX;
+  // Both listeners go at once, also from the resize itself once a panel is closed or collapsed
+  const listeners = new AbortController();
+  function stopResize(): void {
+    listeners.abort();
+    document.body.style.userSelect = "";
+  }
   function resize(move_event: MouseEvent): void {
     const deltaX = move_event.clientX - startX;
     const newWidth = startWidth + deltaX;
     const currentTotalWidth = treeviewStore.panelWidth + newWidth + GAP_WIDTH;
+    // Only the last shown tree collapses: the drag ends there, the next moves would collapse the others
     if (newWidth < AUTO_CLOSE_THRESHOLD) {
-      const lastAdditionalView = additionalViews.value.at(-1);
-      if (lastAdditionalView) {
-        treeviewStore.closeView(lastAdditionalView.id);
+      const lastShownView = shownViews.value.at(-1);
+      if (lastShownView) {
+        treeviewStore.setCollapsed(lastShownView.id, true);
       }
+      stopResize();
       return;
     }
 
     treeviewStore.setAdditionalPanelWidth(Math.max(WIDTH_MIN, newWidth));
     document.body.style.userSelect = "none";
   }
-  function stopResize(): void {
-    document.removeEventListener("mousemove", resize);
-    document.removeEventListener("mouseup", stopResize);
-    document.body.style.userSelect = "";
-  }
-  document.addEventListener("mousemove", resize);
-  document.addEventListener("mouseup", stopResize);
+  document.addEventListener("mousemove", resize, { signal: listeners.signal });
+  document.addEventListener("mouseup", stopResize, { signal: listeners.signal });
 }
 
 function onVerticalResizeStart(event: MouseEvent, index: number): void {
@@ -228,7 +225,7 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
     <div
       ref="activity-bar"
       class="activity-bar d-flex flex-column align-center py-2"
-      :class="{ 'is-closed': treeviewStore.opened_views.length === 0 }"
+      :class="{ 'is-closed': !mainView && shownViews.length === 0 }"
       :style="activityBarAdaptiveStyles"
     >
       <v-btn
@@ -240,6 +237,53 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
         v-tooltip="'Toggle Objects'"
         @click="treeviewStore.toggleView('main')"
       />
+      <template v-if="additionalViews.length > 0">
+        <div class="activity-bar-separator" />
+        <v-btn
+          v-if="showAllToggle"
+          data-testid="toggleAllModelTreesButton"
+          :icon="shownViews.length > 0 ? 'ph-caret-double-left' : 'ph-caret-double-right'"
+          variant="text"
+          density="comfortable"
+          class="model-tree-toggle-all"
+          v-tooltip="shownViews.length > 0 ? 'Collapse all model trees' : 'Show all model trees'"
+          @click="treeviewStore.setAllCollapsed(shownViews.length > 0)"
+        />
+        <div
+          v-for="view in additionalViews"
+          :key="view.id"
+          data-testid="modelTreeToggle"
+          class="model-tree-toggle"
+          :class="[{ 'is-collapsed': view.collapsed === true }, dropSide(view.id)]"
+          :style="view.color ? { '--model-tree-color': view.color } : undefined"
+          draggable="true"
+          @dragstart="onDragStart(view.id)"
+          @dragenter.prevent="dropTargetId = view.id"
+          @dragover="onDragOver"
+          @drop="onDrop(view.id)"
+          @dragend="onDragEnd"
+        >
+          <v-btn
+            data-testid="toggleModelTreeButton"
+            icon
+            variant="text"
+            density="comfortable"
+            v-tooltip="view.collapsed === true ? `Show ${view.title}` : `Collapse ${view.title}`"
+            @click="treeviewStore.toggleCollapsed(view.id)"
+            @mouseenter="onModelHeaderEnter(view.id)"
+            @mouseleave="onModelHeaderLeave(view.id)"
+          >
+            <v-img
+              v-if="view.geode_object_type"
+              :src="geodeObjectImage(view.geode_object_type)"
+              width="22"
+              height="22"
+              class="model-tree-toggle-icon"
+            />
+            <v-icon v-else size="22">ph-cube</v-icon>
+          </v-btn>
+        </div>
+      </template>
     </div>
 
     <div class="treeview-container d-flex" :style="{ width: totalWidth }">
@@ -255,7 +299,7 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
           font-icon="ph-tree-structure"
           :scroll-top="mainView?.scrollTop || 0"
           closable
-          :border-radius="additionalViews.length > 0 ? '0' : `0 ${PANEL_RADIUS} ${PANEL_RADIUS} 0`"
+          :border-radius="shownViews.length > 0 ? '0' : `0 ${PANEL_RADIUS} ${PANEL_RADIUS} 0`"
           :border-left="false"
           @close="treeviewStore.closeView('main')"
           @update:scroll-top="mainView && treeviewStore.setScrollTop(mainView.id, $event)"
@@ -265,34 +309,34 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
       </div>
 
       <div
-        v-if="mainView && additionalViews.length > 0"
+        v-if="mainView && shownViews.length > 0"
         class="column-separator"
         @mousedown="onResizeStart"
       />
 
       <div
-        v-if="additionalViews.length > 0"
+        v-if="shownViews.length > 0"
         class="column additional-column"
         :style="{
           width: `${treeviewStore.additionalPanelWidth}px`,
         }"
       >
-        <template v-for="(view, index) in additionalViews" :key="view.id">
+        <template v-for="(view, index) in shownViews" :key="view.id">
           <div
             class="view-wrapper"
             :class="{
-              'drag-over': draggedIndex !== undefined && draggedIndex !== index + 1,
+              'drag-over': draggedId !== undefined && draggedId !== view.id,
             }"
             :style="{ flex: `0 0 ${rowHeights[index]}%` }"
             @dragover="onDragOver"
-            @drop="onDrop(index + 1)"
+            @drop="onDrop(view.id)"
           >
             <ViewerObjectTreeBox
               :title="view.title"
               :icon="view.geode_object_type ? geodeObjectImage(view.geode_object_type) : undefined"
               :scroll-top="view.scrollTop"
               closable
-              :border-radius="`0 ${index === 0 ? PANEL_RADIUS : '0'} ${index === additionalViews.length - 1 ? PANEL_RADIUS : '0'} 0`"
+              :border-radius="`0 ${index === 0 ? PANEL_RADIUS : '0'} ${index === shownViews.length - 1 ? PANEL_RADIUS : '0'} 0`"
               :border-left="false"
               :accent="
                 view.color
@@ -300,7 +344,8 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
                   : undefined
               "
               @close="treeviewStore.closeView(view.id)"
-              @dragstart="onDragStart(index + 1)"
+              @dragstart="onDragStart(view.id)"
+              @dragend="onDragEnd"
               @update:scroll-top="treeviewStore.setScrollTop(view.id, $event)"
               @header-enter="onModelHeaderEnter(view.id)"
               @header-leave="onModelHeaderLeave(view.id)"
@@ -324,17 +369,17 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
             </ViewerObjectTreeBox>
           </div>
           <div
-            v-if="index < additionalViews.length - 1"
+            v-if="index < shownViews.length - 1"
             class="v-split-resizer"
             @mousedown="onVerticalResizeStart($event, index)"
           />
         </template>
       </div>
       <div
-        v-if="treeviewStore.opened_views.length > 0"
+        v-if="mainView || shownViews.length > 0"
         class="total-resizer"
         @mousedown="
-          additionalViews.length > 0
+          shownViews.length > 0
             ? onAdditionalResizeStart($event)
             : mainView
               ? onResizeStart($event)
@@ -380,10 +425,21 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
   content: "";
   position: absolute;
   inset: 0;
-  /* Adaptive glass: apps can tint it (an "r, g, b" triplet) and change its blending, per theme */
-  background: rgba(var(--ogw-viewer-glass-tint, 255, 255, 255), var(--adaptive-opacity));
-  backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
-  -webkit-backdrop-filter: blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness));
+  /* Adaptive glass: apps can tint it (an "r, g, b" triplet), change its blending and set a minimum opacity, per
+     theme (the radial menu's one) */
+  background: rgba(
+    var(--ogw-viewer-glass-tint, 255, 255, 255),
+    max(var(--adaptive-opacity), var(--ogw-viewer-glass-min-opacity, 0))
+  );
+  /* Apps can replace the adaptive blur and dimming of the backdrop, "none" keeps it sharp */
+  backdrop-filter: var(
+    --ogw-viewer-glass-backdrop,
+    blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness))
+  );
+  -webkit-backdrop-filter: var(
+    --ogw-viewer-glass-backdrop,
+    blur(var(--adaptive-blur)) brightness(var(--adaptive-brightness))
+  );
   mix-blend-mode: var(--ogw-viewer-glass-blend, lighten);
   z-index: 0;
   pointer-events: none;
@@ -396,6 +452,79 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
 .activity-bar > * {
   position: relative;
   z-index: 1;
+}
+
+.activity-bar-separator {
+  width: 24px;
+  height: 1px;
+  margin-bottom: 6px;
+  flex-shrink: 0;
+  background-color: rgba(var(--v-border-color), var(--v-border-opacity));
+}
+
+.model-tree-toggle-all {
+  margin-bottom: 2px;
+}
+
+/* A model tree button: the model type icon, marked with the color of its tree, faded while collapsed */
+.model-tree-toggle {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 2px;
+}
+
+.model-tree-toggle::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+  background-color: var(--model-tree-color, transparent);
+}
+
+.model-tree-toggle .v-btn {
+  background-color: rgba(var(--v-theme-on-surface), 0.08);
+}
+
+/* Where a dragged model button lands */
+.model-tree-toggle.drop-before::after,
+.model-tree-toggle.drop-after::after {
+  content: "";
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  height: 2px;
+  border-radius: 1px;
+  background-color: rgb(var(--v-theme-primary));
+  pointer-events: none;
+}
+
+.model-tree-toggle.drop-before::after {
+  top: -2px;
+}
+
+.model-tree-toggle.drop-after::after {
+  bottom: -2px;
+}
+
+.model-tree-toggle.is-collapsed::before {
+  opacity: 0.5;
+}
+
+.model-tree-toggle.is-collapsed .v-btn {
+  background-color: transparent;
+}
+
+.model-tree-toggle.is-collapsed :deep(.v-btn__content) {
+  opacity: 0.55;
+}
+
+.model-tree-toggle-icon {
+  flex: 0 0 auto;
+  filter: var(--ogw-mono-icon-filter, brightness(0));
 }
 
 .treeview-container {

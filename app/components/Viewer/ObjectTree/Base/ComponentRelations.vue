@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
-import type { ComponentRelations } from "@ogw_front/stores/data_helpers/relations";
-import type { FormattedComponent } from "@ogw_front/stores/data_helpers/mesh";
+import type { ComponentRelations } from "@ogw_internal/stores/data/model/relations";
+import type { FormattedComponent } from "@ogw_internal/stores/data/model/mesh_components";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import { pluralize } from "@ogw_front/utils/string";
 import { useDataStore } from "@ogw_front/stores/data";

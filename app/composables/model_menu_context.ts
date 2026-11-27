@@ -1,8 +1,9 @@
 import { type ComputedRef, type Ref, computed, ref, watch } from "vue";
+import { type MenuViewerObjectType, useMenuStore } from "@ogw_front/stores/menu";
 import type { ModelComponentId, ModelId, ModelIdentified } from "@ogw_front/types/identifiers";
-import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
+import type { CollectionComponent } from "@ogw_internal/stores/data/model/collections";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
-import type { MenuViewerObjectType } from "@ogw_front/stores/menu";
 import { useDataStore } from "@ogw_front/stores/data";
 
 interface ModelMenuMetaData extends Partial<ModelIdentified> {
@@ -10,11 +11,6 @@ interface ModelMenuMetaData extends Partial<ModelIdentified> {
   pickedComponentId?: ModelComponentId;
   modelComponentType?: string;
   targetComponentIds?: ModelComponentId[];
-}
-
-interface ModelMenuItemProps {
-  id: ModelId;
-  meta_data: Record<string, unknown>;
 }
 
 interface ModelMenuContext {
@@ -27,12 +23,13 @@ interface ModelMenuContext {
 
 // Resolves what a model context menu targets: the whole model, a component type, a collection or one component
 // oxlint-disable-next-line max-lines-per-function
-function useModelMenuContext(getItemProps: () => ModelMenuItemProps): ModelMenuContext {
+function useModelMenuContext(getDataId: () => DataId): ModelMenuContext {
   const dataStore = useDataStore();
+  const menuStore = useMenuStore();
   // oxlint-disable-next-line no-unsafe-type-assertion -- meta_data is filled by the viewer context menu with these keys.
-  const metaData = computed(() => getItemProps().meta_data as ModelMenuMetaData);
+  const metaData = computed(() => menuStore.current_meta_data as ModelMenuMetaData);
 
-  const modelId = computed<ModelId>(() => metaData.value.modelId ?? getItemProps().id);
+  const modelId = computed<ModelId>(() => metaData.value.modelId ?? getDataId());
   const componentId = computed<ModelComponentId | undefined>(
     () => metaData.value.pickedComponentId,
   );
@@ -106,4 +103,3 @@ function useModelMenuContext(getItemProps: () => ModelMenuItemProps): ModelMenuC
 }
 
 export { useModelMenuContext };
-export type { ModelMenuItemProps };

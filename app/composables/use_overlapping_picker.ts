@@ -1,6 +1,3 @@
-import { ref } from "vue";
-import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
-
 import { type DataItem, useDataStore } from "@ogw_front/stores/data";
 import type {
   GeodeObjectType,
@@ -10,8 +7,11 @@ import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { DataIdentified } from "@ogw_front/types/identifiers";
 import type { ViewerId } from "@geode/opengeodeweb-viewer/schema_types";
 import { computeMenuPosition } from "@ogw_front/composables/overlapping_picker_menu";
+import { isImage } from "@ogw_front/utils/viewer_object_type";
+import { ref } from "vue";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useViewerStore } from "@ogw_front/stores/viewer";
+import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 interface PickedItem {
   id: DataId;
@@ -55,7 +55,6 @@ export function useOverlappingPicker(): UseOverlappingPickerReturn {
   const dataStore = useDataStore();
   const dataStyleStore = useDataStyleStore();
   const viewerStore = useViewerStore();
-  const dataItems = dataStore.refAllItems();
 
   const displayIntermediate = ref(false);
   const intermediateItems = ref<ProposedItem[]>([]);
@@ -111,27 +110,16 @@ export function useOverlappingPicker(): UseOverlappingPickerReturn {
     }
   }
 
-  async function getViewableIds(): Promise<DataId[]> {
+  function getViewableIds(): DataId[] {
     // Images are not pickable
     const activeIds = new Set(
-      dataItems.value
-        .filter((i: DataItem) => i.viewer_object_type !== "image")
-        .map((i: DataItem) => i.data_id),
+      dataStore.items.filter((i: DataItem) => !isImage(i)).map((i: DataItem) => i.data_id),
     );
     const visibleStyleIds = Object.keys(dataStyleStore.styles).filter(
       (styleId) => activeIds.has(styleId) && dataStyleStore.objectVisibility(styleId) === true,
     );
 
-    const viewableChecks = await Promise.all(
-      visibleStyleIds.map(async (styleId) => {
-        try {
-          return (await dataStore.isItemViewable(styleId)) ? styleId : undefined;
-        } catch {
-          return undefined;
-        }
-      }),
-    );
-    return viewableChecks.filter((id): id is DataId => Boolean(id));
+    return visibleStyleIds.filter((styleId) => dataStore.isViewable(styleId));
   }
 
   function showIntermediateMenu(
@@ -145,7 +133,7 @@ export function useOverlappingPicker(): UseOverlappingPickerReturn {
   }
 
   async function get_viewer_id(params: GetViewerIdParams): Promise<ViewerIdResult> {
-    const ids = await getViewableIds();
+    const ids = getViewableIds();
 
     const schema = viewer_schemas.opengeodeweb_viewer.viewer.picked_ids;
     const { array_ids, viewer_id } = await viewerStore.request({
