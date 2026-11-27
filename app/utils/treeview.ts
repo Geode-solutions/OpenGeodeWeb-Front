@@ -62,6 +62,16 @@ function nextModelTreeColor(usedColors: readonly (string | undefined)[]): string
   return free ?? MODEL_TREE_COLORS[usedColors.length % MODEL_TREE_COLORS.length] ?? "";
 }
 
+// The physical properties tree of a model, next to its model tree
+function physicalPropertiesViewId(modelId: string): string {
+  return `${modelId}:physical_properties`;
+}
+
+// The model a tree shows: a model tree has the id of its model, a physical properties tree names it
+function viewModelId(view: { readonly id: string; readonly model_id?: string }): string {
+  return view.model_id ?? view.id;
+}
+
 // Files being imported are listed in their type group, created for them when no data of that type exists yet
 function withPendingImports<Child extends TreeNode, Pending extends TreeNode & GeodeObjectTyped>(
   groups: readonly TreeGroup<Child>[],
@@ -86,7 +96,14 @@ function withPendingImports<Child extends TreeNode, Pending extends TreeNode & G
   return merged;
 }
 
-export { MODEL_TREE_COLORS, compareSelections, nextModelTreeColor, withPendingImports };
+export {
+  MODEL_TREE_COLORS,
+  compareSelections,
+  nextModelTreeColor,
+  physicalPropertiesViewId,
+  viewModelId,
+  withPendingImports,
+};
 export type {
   DataMenuPayload,
   GeodeObjectTypeMenuPayload,

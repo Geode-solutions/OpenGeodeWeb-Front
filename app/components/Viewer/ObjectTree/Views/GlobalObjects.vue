@@ -161,7 +161,7 @@ const linkedRow = computed<{ id: string; color: string } | undefined>(() => {
   if (id === undefined) {
     return undefined;
   }
-  const color = modelTreeColor(id);
+  const color = treeviewStore.openedModelColor(id);
   if (color === undefined) {
     return undefined;
   }
@@ -313,6 +313,10 @@ function expandAll(): void {
           >
             <v-icon size="18">ph-magnifying-glass-plus</v-icon>
           </v-btn>
+          <ViewerObjectTreeBasePhysicalPropertiesButton
+            v-if="isModel(item as unknown as TreeGroupItem)"
+            :model="item as unknown as TreeGroupItem"
+          />
         </template>
       </template>
     </CommonTreeView>

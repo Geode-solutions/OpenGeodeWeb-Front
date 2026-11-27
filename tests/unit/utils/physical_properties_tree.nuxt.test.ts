@@ -4,10 +4,9 @@ import { describe, expect, test } from "vitest";
 import {
   formatNumber,
   formatPhysicalPropertyValue,
-  isPhysicalPropertyId,
-  physicalPropertiesGroup,
   physicalPropertyColoring,
   physicalPropertyId,
+  physicalPropertyNodes,
   physicalPropertyTitle,
 } from "@ogw_front/utils/physical_properties_tree";
 import type { FormattedComponent } from "@ogw_front/stores/data_helpers/mesh";
@@ -86,13 +85,11 @@ describe("physical properties tree", () => {
     expect(physicalPropertyTitle("porosity")).toBe("Porosity");
   });
 
-  test("property rows are never component rows", () => {
-    expect(isPhysicalPropertyId("physical_properties")).toBe(true);
-    expect(isPhysicalPropertyId(physicalPropertyId("porosity"))).toBe(true);
-    expect(isPhysicalPropertyId(BLOCK_ID)).toBe(false);
+  test("property rows are never taken for component rows", () => {
+    expect(physicalPropertyId("porosity")).toBe("physical_properties:porosity");
   });
 
-  test("one child per property, listing its components by name with their value", () => {
+  test("one row per property by name, listing its components by name with their value", () => {
     const properties = [
       physicalProperty("porosity", "porosity", [component(BLOCK_ID, [POROSITY])]),
       // The attribute keeps its own name
@@ -103,35 +100,31 @@ describe("physical properties tree", () => {
         component(UNKNOWN_ID, [BOUNDARY_PRESSURE]),
       ]),
     ];
-    expect(physicalPropertiesGroup(properties, COMPONENTS)).toStrictEqual({
-      id: "physical_properties",
-      title: "Physical properties (2)",
-      children: [
-        {
-          id: "physical_properties:porosity",
-          title: "Porosity (1)",
-          physical_property: "porosity",
-          attribute_name: "porosity",
-          element_type: "polyhedron",
-          component_type: "Block",
-          coloring: { item: 0, minimum: POROSITY, maximum: POROSITY },
-          children: [{ ...BLOCK, physical_value: "0.05" }],
-        },
-        {
-          id: "physical_properties:boundary_pressure",
-          title: "Boundary pressure (2)",
-          physical_property: "boundary_pressure",
-          attribute_name: "pressure",
-          element_type: "polygon",
-          component_type: "Surface",
-          coloring: { item: 0, minimum: BOUNDARY_PRESSURE, maximum: BOUNDARY_PRESSURE },
-          children: [
-            { ...SURFACE, physical_value: "2e7" },
-            { ...SECOND_SURFACE, physical_value: "2e7" },
-          ],
-        },
-      ],
-    });
+    expect(physicalPropertyNodes(properties, COMPONENTS)).toStrictEqual([
+      {
+        id: "physical_properties:boundary_pressure",
+        title: "Boundary pressure (2)",
+        physical_property: "boundary_pressure",
+        attribute_name: "pressure",
+        element_type: "polygon",
+        component_type: "Surface",
+        coloring: { item: 0, minimum: BOUNDARY_PRESSURE, maximum: BOUNDARY_PRESSURE },
+        children: [
+          { ...SURFACE, physical_value: "2e7" },
+          { ...SECOND_SURFACE, physical_value: "2e7" },
+        ],
+      },
+      {
+        id: "physical_properties:porosity",
+        title: "Porosity (1)",
+        physical_property: "porosity",
+        attribute_name: "porosity",
+        element_type: "polyhedron",
+        component_type: "Block",
+        coloring: { item: 0, minimum: POROSITY, maximum: POROSITY },
+        children: [{ ...BLOCK, physical_value: "0.05" }],
+      },
+    ]);
   });
 
   test("the model is colored by the range of a property over its components", () => {
@@ -162,11 +155,11 @@ describe("physical properties tree", () => {
     expect(physicalPropertyColoring(free)).toBeUndefined();
   });
 
-  test("no group without any shown property", () => {
-    expect(physicalPropertiesGroup([], COMPONENTS)).toBeUndefined();
+  test("a property on no component of the tree is left out", () => {
+    expect(physicalPropertyNodes([], COMPONENTS)).toStrictEqual([]);
     const onUnknownComponent = physicalProperty("porosity", "porosity", [
       component(UNKNOWN_ID, [POROSITY]),
     ]);
-    expect(physicalPropertiesGroup([onUnknownComponent], COMPONENTS)).toBeUndefined();
+    expect(physicalPropertyNodes([onUnknownComponent], COMPONENTS)).toStrictEqual([]);
   });
 });

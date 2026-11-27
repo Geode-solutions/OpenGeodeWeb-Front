@@ -6,11 +6,8 @@ import FetchingData from "@ogw_front/components/FetchingData.vue";
 import type { ModelComponentMenuPayload } from "@ogw_front/utils/treeview";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
-import PhysicalPropertyActions from "@ogw_front/components/Viewer/ObjectTree/Base/PhysicalPropertyActions.vue";
-import { isPhysicalPropertyId } from "@ogw_front/utils/physical_properties_tree";
 import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
-import { useModelPhysicalProperties } from "@ogw_front/composables/model_physical_properties";
 import { useModelTree } from "@ogw_front/composables/model_tree";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
@@ -28,8 +25,6 @@ interface CollectionTreeItem {
   relation?: string;
   viewer_id?: number;
   title?: string;
-  // Value of a physical property on a component listed under that property
-  physical_value?: string;
 }
 
 const { onHoverEnter, onHoverLeave } = useHoverhighlight();
@@ -69,7 +64,6 @@ const {
   customFilter,
   applySearchFilter,
 } = useTreeFilter(localCategories);
-const { physicalProperties, physicalPropertyRows } = useModelPhysicalProperties(id, search);
 
 function onUpdateSelection(newSelection: string[]): void {
   const finalSelection = applySearchFilter(newSelection, visibleComponents.value);
@@ -102,7 +96,7 @@ function searchGroups(query: string): CollectionTreeItem[] {
   return result;
 }
 
-const componentItems = computed<CollectionTreeItem[]>(() => {
+const itemsForTreeView = computed<CollectionTreeItem[]>(() => {
   if (search.value) {
     const query = search.value.toLowerCase();
     return sortAndFormatItems(
@@ -127,12 +121,6 @@ const componentItems = computed<CollectionTreeItem[]>(() => {
   return result;
 });
 
-// The physical properties come after the component types, also in a search
-const itemsForTreeView = computed<CollectionTreeItem[]>(() => [
-  ...componentItems.value,
-  ...physicalPropertyRows.value,
-]);
-
 function extractComponentIds(node: CollectionTreeItem): string[] {
   if (node.children) {
     return node.children.flatMap((child) => extractComponentIds(child));
@@ -146,8 +134,8 @@ function isCollectionNode(item: CollectionTreeItem): boolean {
 
 function showContextMenu(event: MouseEvent, item: CollectionTreeItem): void {
   const actualItem = item.raw || item;
-  // A boundaries or internals group, or a physical property, is not a component type: no menu
-  if (actualItem.relation !== undefined || isPhysicalPropertyId(actualItem.id)) {
+  // A boundaries or internals group is not a component type: it has no menu
+  if (actualItem.relation !== undefined) {
     return;
   }
   if (isCollectionNode(actualItem)) {
@@ -219,10 +207,6 @@ function expandAll(): void {
   opened.value = allIds;
 }
 
-function actualRow(item: CollectionTreeItem): CollectionTreeItem {
-  return item.raw || item;
-}
-
 function getLeafViewerIds(item: CollectionTreeItem): number[] {
   const actualItem = item.raw || item;
   return extractIds(actualItem);
@@ -278,11 +262,6 @@ function getLeafViewerIds(item: CollectionTreeItem): number[] {
       </template>
 
       <template #append="{ item }">
-        <PhysicalPropertyActions
-          :model-id="id"
-          :row="actualRow(item as unknown as CollectionTreeItem)"
-          :physical-properties="physicalProperties"
-        />
         <v-btn
           v-if="getLeafViewerIds(item as unknown as CollectionTreeItem).length > 0"
           icon="ph-target"

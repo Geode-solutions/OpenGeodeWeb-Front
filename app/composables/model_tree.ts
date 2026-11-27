@@ -45,6 +45,7 @@ function relationGroups(
   );
 }
 
+// The visible components of a model, shown and hidden from its trees
 function useModelVisibility(modelId: ModelId): {
   selection: typeof selection;
   updateVisibility: typeof updateVisibility;
@@ -141,7 +142,7 @@ async function fetchModelTreeData(modelId: ModelId): Promise<{
   return { meshByType, collectionsByType, relations };
 }
 
-export function useModelTree(modelId: ModelId): {
+function useModelTree(modelId: ModelId): {
   isLoading: ComputedRef<boolean>;
   localCategories: Ref<ModelTreeCategory[]>;
   cache: Ref<ModelTreeCache | undefined>;
@@ -195,3 +196,5 @@ export function useModelTree(modelId: ModelId): {
     ...useModelVisibility(modelId),
   };
 }
+
+export { useModelTree, useModelVisibility };

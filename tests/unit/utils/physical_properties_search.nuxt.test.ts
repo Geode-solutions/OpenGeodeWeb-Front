@@ -1,7 +1,8 @@
 import { describe, expect, test } from "vitest";
 import {
-  physicalPropertiesGroup,
+  physicalPropertyNodes,
   searchPhysicalProperties,
+  sortPhysicalPropertyLeaves,
 } from "@ogw_front/utils/physical_properties_tree";
 import type { FormattedComponent } from "@ogw_front/stores/data_helpers/mesh";
 import type { PhysicalProperty } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
@@ -39,7 +40,7 @@ function physicalProperty(
   };
 }
 
-const GROUP = physicalPropertiesGroup(
+const NODES = physicalPropertyNodes(
   [
     physicalProperty("porosity", "Block", "polyhedron", [BLOCK_ID], POROSITY),
     physicalProperty(
@@ -57,47 +58,49 @@ const GROUP = physicalPropertiesGroup(
   ],
 );
 
-// The titles of the rows a search shows, from the group down to the components
+// The titles of the rows a search shows, from the properties down to the components
 function shownTitles(query: string): string[] {
   const titles: string[] = [];
-  for (const found of searchPhysicalProperties(GROUP, query)) {
-    titles.push(found.title);
-    for (const node of found.children) {
-      titles.push(node.title);
-      for (const leaf of node.children) {
-        titles.push(leaf.title);
-      }
+  for (const node of searchPhysicalProperties(NODES, query)) {
+    titles.push(node.title);
+    for (const leaf of node.children) {
+      titles.push(leaf.title);
     }
   }
   return titles;
 }
 
-describe("physical properties search", () => {
+describe("physical properties search and sort", () => {
   test("a property found by its name is kept whole, with its count", () => {
     expect(shownTitles("boundary p")).toStrictEqual([
-      "Physical properties (1)",
       "Boundary pressure (2)",
       "boundary 2",
       "boundary 10",
     ]);
-    expect(shownTitles("poro")).toStrictEqual(["Physical properties (1)", "Porosity (1)", "h2_1"]);
+    expect(shownTitles("poro")).toStrictEqual(["Porosity (1)", "h2_1"]);
   });
 
   test("a component found by its name or id shows the properties it carries", () => {
-    expect(shownTitles("boundary 10")).toStrictEqual([
-      "Physical properties (1)",
-      "Boundary pressure (1)",
-      "boundary 10",
-    ]);
-    expect(shownTitles(BLOCK_ID)).toStrictEqual([
-      "Physical properties (1)",
-      "Porosity (1)",
-      "h2_1",
-    ]);
+    expect(shownTitles("boundary 10")).toStrictEqual(["Boundary pressure (1)", "boundary 10"]);
+    expect(shownTitles(BLOCK_ID)).toStrictEqual(["Porosity (1)", "h2_1"]);
   });
 
   test("no row when nothing matches", () => {
-    expect(searchPhysicalProperties(GROUP, "permeability")).toStrictEqual([]);
-    expect(searchPhysicalProperties(undefined, "poro")).toStrictEqual([]);
+    expect(searchPhysicalProperties(NODES, "permeability")).toStrictEqual([]);
+  });
+
+  test("the components of a property are sorted by name or by id", () => {
+    const leaves = [
+      { ...formattedComponent("surface-b", "boundary 2", "Surface"), physical_value: "1" },
+      { ...formattedComponent("surface-a", "boundary 10", "Surface"), physical_value: "1" },
+    ];
+    expect(sortPhysicalPropertyLeaves(leaves, "name").map((leaf) => leaf.title)).toStrictEqual([
+      "boundary 2",
+      "boundary 10",
+    ]);
+    expect(sortPhysicalPropertyLeaves(leaves, "id").map((leaf) => leaf.title)).toStrictEqual([
+      "boundary 10",
+      "boundary 2",
+    ]);
   });
 });

@@ -1,15 +1,13 @@
 <script setup lang="ts">
-import type {
-  PhysicalPropertiesGroup,
-  PhysicalPropertyNode,
-} from "@ogw_front/utils/physical_properties_tree";
+import type { PhysicalPropertyNode } from "@ogw_front/utils/physical_properties_tree";
 import { usePhysicalPropertyColoring } from "@ogw_front/composables/physical_property_coloring";
 
 interface Props {
   modelId: string;
-  // A row of the model tree: a component listed under a property carries its value
+  // A row of the physical properties tree: a component listed under a property carries its value
   row: { id: string; physical_value?: string };
-  physicalProperties: PhysicalPropertiesGroup | undefined;
+  // All the properties of the model, also those a search hides: the coloring takes all their components
+  physicalProperties: readonly PhysicalPropertyNode[];
 }
 
 const { modelId, row, physicalProperties } = defineProps<Props>();
@@ -18,9 +16,7 @@ const { isColoredBy, toggleColoring } = usePhysicalPropertyColoring(modelId);
 
 // Defined on the row of a property with a value to color the model with
 const node = computed<PhysicalPropertyNode | undefined>(() =>
-  physicalProperties?.children.find(
-    (property) => property.id === row.id && property.coloring !== undefined,
-  ),
+  physicalProperties.find((property) => property.id === row.id && property.coloring !== undefined),
 );
 const active = computed<boolean>(() => node.value !== undefined && isColoredBy(node.value));
 const tooltip = computed<string>(() =>
