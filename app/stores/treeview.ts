@@ -283,6 +283,11 @@ export const useTreeviewStore = defineStore("treeview", () => {
     }
   }
 
+  // The color of an opened tree, undefined while it is closed
+  function viewColor(viewId: string): string | undefined {
+    return opened_views.value.find((view: ReadonlyOpenedView) => view.id === viewId)?.color;
+  }
+
   // The trees of a model share its color: the one of its opened trees (model tree, physical properties)
   function openedModelColor(modelId: string): string | undefined {
     return opened_views.value.find(
@@ -489,6 +494,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     rowHeights,
     hoveredModelId,
     openedModelColor,
+    viewColor,
     setHoveredModel,
     addItem,
     whilePendingImport,

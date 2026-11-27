@@ -19,9 +19,8 @@ const physicalProperties = dataStore.refPhysicalProperties(modelId);
 // Shown only for a model carrying physical properties
 const hasPhysicalProperties = computed<boolean>(() => (physicalProperties.value?.length ?? 0) > 0);
 // The color of its opened tree, the one of the model
-const treeColor = computed<string | undefined>(
-  () =>
-    treeviewStore.opened_views.find((view) => view.id === physicalPropertiesViewId(modelId))?.color,
+const treeColor = computed<string | undefined>(() =>
+  treeviewStore.viewColor(physicalPropertiesViewId(modelId)),
 );
 </script>
 
