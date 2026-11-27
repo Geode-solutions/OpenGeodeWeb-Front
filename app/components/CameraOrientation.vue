@@ -4,6 +4,7 @@ import {
   cameraOrientations,
   isNorth,
 } from "@ogw_front/utils/camera_orientations";
+import { BRAND_ORANGE } from "@ogw_front/utils/brand_colors";
 import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types.js";
 import CameraOrientationDial from "@ogw_front/components/CameraOrientationDial.vue";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
@@ -45,8 +46,6 @@ const orientations = computed(() =>
   cameraOrientations(dataStyleStore.sceneStyle.orientation_widget),
 );
 
-const NORTH_COLOR = "#f48830";
-
 // The cube follows the theme it is shown in: the chrome theme of the panel (GlassCard), the app
 // Theme for the menu
 const theme = useTheme();
@@ -75,7 +74,7 @@ function faceStyle(
   }
   return {
     faceColor: style.faceColor,
-    fontColor: isNorth(orientation) ? NORTH_COLOR : style.fontColor,
+    fontColor: isNorth(orientation) ? BRAND_ORANGE : style.fontColor,
   };
 }
 
@@ -306,7 +305,7 @@ watch(hoveredFace, (newFace, oldFace) => {
   transition: all 0.4s ease;
 }
 .north {
-  color: #f48830;
+  color: v-bind(BRAND_ORANGE);
 }
 .orientation-menu {
   min-width: 180px;

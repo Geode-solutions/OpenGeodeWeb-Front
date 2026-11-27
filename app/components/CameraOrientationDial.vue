@@ -1,6 +1,11 @@
 <script setup lang="ts">
+import { BRAND_ORANGE, BRAND_ORANGE_BORDER } from "@ogw_front/utils/brand_colors";
+import {
+  COMPASS_TICK_ANGLES,
+  compassDialPoint,
+  isCardinalAngle,
+} from "@ogw_front/utils/orientation_compass";
 import { type CameraOrientation, isNorth } from "@ogw_front/utils/camera_orientations";
-import { compassDialPoint } from "@ogw_front/utils/orientation_compass";
 import { useCompassDial } from "@ogw_front/composables/compass_dial";
 
 // Compass layout of the orientation panel, in the look of the scene compass (Viewer/OrientationCompass.vue):
@@ -25,13 +30,6 @@ const BUTTON_RADIUS = 82;
 const TICK_OUTER_RADIUS = 62;
 const TICK_INNER_RADIUS = 57;
 const CARDINAL_TICK_INNER_RADIUS = 51;
-const TICK_STEP = 30;
-const QUARTER_TURN = 90;
-const FULL_TURN = 360;
-const TICK_ANGLES = Array.from(
-  { length: FULL_TURN / TICK_STEP },
-  (_item, index) => index * TICK_STEP,
-);
 // Up and down, in pixels from the panel center
 const VERTICAL_X = 98;
 const VERTICAL_Y = 80;
@@ -48,12 +46,12 @@ interface PlacedOrientation {
 
 const placed = computed<PlacedOrientation[]>(() =>
   orientations.map((orientation) => {
-    if (orientation.heading === undefined) {
-      const isUp = orientation.value === "zplus";
-      return { orientation, x: VERTICAL_X, y: isUp ? -VERTICAL_Y : VERTICAL_Y };
+    if (orientation.vertical !== undefined) {
+      const sign = orientation.vertical === "up" ? -1 : 1;
+      return { orientation, x: VERTICAL_X, y: sign * VERTICAL_Y };
     }
     const { x, y } = compassDialPoint(
-      orientation.heading,
+      orientation.heading ?? 0,
       BUTTON_RADIUS,
       heading.value,
       tilt.value,
@@ -67,7 +65,7 @@ const hoveredHeading = computed(
 );
 
 function tickInnerRadius(angle: number): number {
-  return angle % QUARTER_TURN === 0 ? CARDINAL_TICK_INNER_RADIUS : TICK_INNER_RADIUS;
+  return isCardinalAngle(angle) ? CARDINAL_TICK_INNER_RADIUS : TICK_INNER_RADIUS;
 }
 
 function nodeStyle({ x, y }: PlacedOrientation): Record<string, string> {
@@ -82,7 +80,7 @@ function nodeStyle({ x, y }: PlacedOrientation): Record<string, string> {
         <g :transform="dialTransform">
           <ellipse class="ring" :rx="TICK_OUTER_RADIUS" :ry="TICK_OUTER_RADIUS" />
           <line
-            v-for="angle in TICK_ANGLES"
+            v-for="angle in COMPASS_TICK_ANGLES"
             :key="angle"
             class="tick"
             :class="{ north: angle === 0, hovered: angle === hoveredHeading }"
@@ -107,7 +105,7 @@ function nodeStyle({ x, y }: PlacedOrientation): Record<string, string> {
       class="compass-node position-absolute"
       :class="{
         north: isNorth(item.orientation),
-        vertical: item.orientation.heading === undefined,
+        vertical: item.orientation.vertical !== undefined,
       }"
       :style="nodeStyle(item)"
       :data-testid="`cameraOrientation${item.orientation.vtkKey}Button`"
@@ -146,17 +144,14 @@ function nodeStyle({ x, y }: PlacedOrientation): Record<string, string> {
   transition: stroke 0.2s ease;
 }
 
-.tick.north {
-  stroke: #f48830;
+.tick.north,
+.tick.north.hovered {
+  stroke: v-bind(BRAND_ORANGE);
 }
 
 .tick.hovered {
   stroke: rgb(var(--v-theme-on-surface));
   stroke-width: 2px;
-}
-
-.tick.north.hovered {
-  stroke: #f48830;
 }
 
 /* Round targets of the scene compass: translucent surface, thin border, brighter on hover */
@@ -178,7 +173,7 @@ function nodeStyle({ x, y }: PlacedOrientation): Record<string, string> {
 
 .compass-node.north,
 .compass-node.north:hover {
-  border-color: rgba(244, 136, 48, 0.6);
+  border-color: v-bind(BRAND_ORANGE_BORDER);
 }
 
 .compass-letter {
@@ -190,7 +185,7 @@ function nodeStyle({ x, y }: PlacedOrientation): Record<string, string> {
 }
 
 .compass-node.north .compass-letter {
-  color: #f48830;
+  color: v-bind(BRAND_ORANGE);
   font-weight: 600;
 }
 

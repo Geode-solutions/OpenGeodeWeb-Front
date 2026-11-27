@@ -21,9 +21,13 @@ interface CameraOrientation {
   position: PanelPosition;
   label: string;
   tooltip: string;
-  // Clockwise angle in degrees from north of the side it looks from, undefined for up and down
+  // Clockwise angle in degrees from north of the side it looks from, with the compass marker
   heading?: number;
+  // Looks from above or below, with the compass marker
+  vertical?: Vertical;
 }
+
+type Vertical = "up" | "down";
 
 interface OrientationEntry {
   value: string;
@@ -36,6 +40,7 @@ interface OrientationEntry {
   // Side it looks from, as read in "View from ..."
   compassName: string;
   heading?: number;
+  vertical?: Vertical;
 }
 
 const ORIENTATIONS: readonly OrientationEntry[] = [
@@ -48,6 +53,7 @@ const ORIENTATIONS: readonly OrientationEntry[] = [
     axisLabel: "Z+",
     compassLabel: "Up",
     compassName: "above",
+    vertical: "up",
   },
   {
     value: "zminus",
@@ -58,6 +64,7 @@ const ORIENTATIONS: readonly OrientationEntry[] = [
     axisLabel: "Z-",
     compassLabel: "Down",
     compassName: "below",
+    vertical: "down",
   },
   {
     value: "yplus",
@@ -116,6 +123,7 @@ function cameraOrientations(marker: SceneOrientationWidget): CameraOrientation[]
     label: isCompass ? entry.compassLabel : entry.axisLabel,
     tooltip: isCompass ? `View from ${entry.compassName}` : `${entry.value} View`,
     heading: isCompass ? entry.heading : undefined,
+    vertical: isCompass ? entry.vertical : undefined,
   }));
 }
 
@@ -125,4 +133,4 @@ function isNorth(orientation: CameraOrientation): boolean {
 }
 
 export { cameraOrientations, isNorth };
-export type { CameraOrientation };
+export type { CameraOrientation, Vertical };

@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import { compassDialPoint, facingCameraPose, isFacing } from "@ogw_front/utils/orientation_compass";
+import {
+  COMPASS_TICK_ANGLES,
+  QUARTER_TURN,
+  compassDialPoint,
+  facingCameraPose,
+  isCardinalAngle,
+  isFacing,
+} from "@ogw_front/utils/orientation_compass";
+import { BRAND_ORANGE } from "@ogw_front/utils/brand_colors";
 import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types";
 import { toCameraPose } from "@ogw_front/utils/orientation_gizmo";
 import { useCompassDial } from "@ogw_front/composables/compass_dial";
@@ -21,13 +29,6 @@ const LETTER_HIT_RADIUS = 9;
 const NEEDLE_LENGTH = 18;
 const NEEDLE_HALF_WIDTH = 3.5;
 const HUB_RADIUS = 2.5;
-const TICK_STEP = 30;
-const QUARTER_TURN = 90;
-const FULL_TURN = 360;
-const TICK_ANGLES = Array.from(
-  { length: FULL_TURN / TICK_STEP },
-  (_item, index) => index * TICK_STEP,
-);
 const NORTH = 0;
 const LETTERS = [
   { label: "N", name: "north", angle: NORTH },
@@ -50,7 +51,7 @@ const letters = computed(() =>
 );
 
 function tickInnerRadius(angle: number): number {
-  return angle % QUARTER_TURN === 0 ? CARDINAL_TICK_INNER_RADIUS : TICK_INNER_RADIUS;
+  return isCardinalAngle(angle) ? CARDINAL_TICK_INNER_RADIUS : TICK_INNER_RADIUS;
 }
 
 function face(targetHeading: number): void {
@@ -92,7 +93,7 @@ function face(targetHeading: number): void {
     >
       <g :transform="dialTransform">
         <line
-          v-for="angle in TICK_ANGLES"
+          v-for="angle in COMPASS_TICK_ANGLES"
           :key="angle"
           class="tick"
           :y1="-tickInnerRadius(angle)"
@@ -158,7 +159,7 @@ function face(targetHeading: number): void {
 }
 
 .needle-north {
-  fill: #f48830;
+  fill: v-bind(BRAND_ORANGE);
 }
 
 .needle-south {
@@ -193,7 +194,7 @@ function face(targetHeading: number): void {
 }
 
 .letter.north {
-  fill: #f48830;
+  fill: v-bind(BRAND_ORANGE);
   font-weight: 600;
 }
 </style>
