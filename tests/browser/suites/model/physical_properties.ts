@@ -4,9 +4,13 @@ import { expect } from "@playwright/test";
 // Local imports
 import {
   expandPhysicalProperties,
+  getPhysicalPropertiesObjectTree,
   getPhysicalPropertyColoringButton,
+  getPhysicalPropertyRow,
   getPhysicalValue,
+  openPhysicalPropertiesTree,
   togglePhysicalPropertyColoring,
+  togglePhysicalPropertyVisibility,
 } from "#browser_helpers/object_trees/physical_properties";
 import {
   getModelComponentsObjectTree,
@@ -24,11 +28,12 @@ import type { SuiteRuntime } from "#browser_helpers/suite_runtime";
 // 2e7 Pa on two Surfaces, the second one on top, and a displacement fixed along y only on two others
 const brepFilename = "test_physical_properties.og_brep";
 // Start of the data name, still shown once the label is truncated in the middle
-const dataName = "test_phys";
+const dataName = "test_ph";
 const blockId = "00000000-4335-411d-8000-000079b34fe5";
 const lowPressureSurfaceId = "00000000-dcfe-400a-8000-0000a72c4f30";
 const highPressureSurfaceId = "00000000-8afd-4969-8000-000092a43747";
 const fixedSurfaceId = "00000000-cddf-4c1c-8000-00005ebbcaeb";
+const properties = ["boundary_displacement", "boundary_pressure", "porosity"];
 
 // Shared with the apps built on this layer: each one runs it with its own test fixture and data loader
 function registerTests({ test, loadTestDatas }: SuiteRuntime): void {
@@ -39,13 +44,12 @@ function registerTests({ test, loadTestDatas }: SuiteRuntime): void {
     await resetCamera(window);
   });
 
-  test("the physical properties and their values", async ({ window }) => {
+  test("the physical properties tree, under the model tree", async ({ window }) => {
     await openModelComponentsTree(window, brepGeodeObjectType, dataName);
-    await expandPhysicalProperties(window, [
-      "porosity",
-      "boundary_pressure",
-      "boundary_displacement",
-    ]);
+    await openPhysicalPropertiesTree(window, brepGeodeObjectType, dataName);
+    // The model tree lists the mesh components only
+    await expect(getModelComponentsObjectTree(window).getByText("Porosity")).toHaveCount(0);
+    await expandPhysicalProperties(window, properties);
     await expect(getPhysicalValue(window, blockId)).toHaveText("0.1 – 0.3");
     await expect(getPhysicalValue(window, lowPressureSurfaceId)).toHaveText("1e7");
     await expect(getPhysicalValue(window, highPressureSurfaceId)).toHaveText("2e7");
@@ -74,21 +78,35 @@ function registerTests({ test, loadTestDatas }: SuiteRuntime): void {
     await togglePhysicalPropertyColoring(window, "boundary_pressure");
   });
 
+  test("hide the boundaries carrying a pressure from its eye", async ({ window }) => {
+    await togglePhysicalPropertyVisibility(window, "boundary_pressure");
+    await expect(
+      getPhysicalPropertyRow(window, "boundary_pressure").getByTestId("hiddenObjectEyeButton"),
+    ).toHaveCount(1);
+  });
+
+  test("show them again", async ({ window }) => {
+    await togglePhysicalPropertyVisibility(window, "boundary_pressure");
+    await expect(
+      getPhysicalPropertyRow(window, "boundary_pressure").getByTestId("visibleObjectEyeButton"),
+    ).toHaveCount(1);
+  });
+
   // As in any tree, a search shows the matching rows only: the property, not its components
   test("search a physical property by its name", async ({ window }) => {
-    await fillSearchQuery(window, "poro", getModelComponentsObjectTree(window));
+    await fillSearchQuery(window, "poro", getPhysicalPropertiesObjectTree(window));
     await expect(getPhysicalPropertyColoringButton(window, "porosity")).toBeVisible();
     await expect(getPhysicalPropertyColoringButton(window, "boundary_pressure")).toBeHidden();
   });
 
   test("search the physical properties of a component", async ({ window }) => {
-    await fillSearchQuery(window, fixedSurfaceId, getModelComponentsObjectTree(window));
+    await fillSearchQuery(window, fixedSurfaceId, getPhysicalPropertiesObjectTree(window));
     await expect(getPhysicalValue(window, fixedSurfaceId)).toBeVisible();
     await expect(getPhysicalValue(window, blockId)).toBeHidden();
   });
 
   test("clearing the search shows every physical property again", async ({ window }) => {
-    await fillSearchQuery(window, "", getModelComponentsObjectTree(window));
+    await fillSearchQuery(window, "", getPhysicalPropertiesObjectTree(window));
     await expect(getPhysicalValue(window, blockId)).toBeVisible();
     await expect(getPhysicalValue(window, highPressureSurfaceId)).toBeVisible();
   });
