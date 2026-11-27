@@ -1,4 +1,7 @@
+import type { Vector3, vtkCamera } from "./vtk_types";
+
 const COORDINATES = 3;
+const HALF_DIVISOR = 2;
 const Z_OFFSET = 2;
 const Z_MIN_BOUND = 4;
 const Z_MAX_BOUND = 5;
@@ -33,4 +36,21 @@ function explodeAlongZ(
   }
 }
 
-export { explodeAlongZ };
+function boundsCenter(bounds: number[]): Vector3 {
+  const [xMin = 0, xMax = 0, yMin = 0, yMax = 0, zMin = 0, zMax = 0] = bounds;
+  return [(xMin + xMax) / HALF_DIVISOR, (yMin + yMax) / HALF_DIVISOR, (zMin + zMax) / HALF_DIVISOR];
+}
+
+// The camera keeps its orientation and zoom, and moves with the center of the scene as it explodes
+function followCenter(camera: vtkCamera, boundsBefore: number[], boundsAfter: number[]): void {
+  const before = boundsCenter(boundsBefore);
+  const after = boundsCenter(boundsAfter);
+  const offset = after.map((value, axis) => value - (before[axis] ?? 0));
+  const [focalX, focalY, focalZ] = camera.getFocalPoint();
+  const [positionX, positionY, positionZ] = camera.getPosition();
+  const [offsetX = 0, offsetY = 0, offsetZ = 0] = offset;
+  camera.setFocalPoint(focalX + offsetX, focalY + offsetY, focalZ + offsetZ);
+  camera.setPosition(positionX + offsetX, positionY + offsetY, positionZ + offsetZ);
+}
+
+export { explodeAlongZ, followCenter };

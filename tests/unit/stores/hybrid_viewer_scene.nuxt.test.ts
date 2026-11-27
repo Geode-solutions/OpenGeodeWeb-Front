@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { explodeAlongZ } from "@ogw_internal/stores/hybrid_viewer/explode";
+import { explodeAlongZ, followCenter } from "@ogw_internal/stores/hybrid_viewer/explode";
 import { followZScaling } from "@ogw_internal/stores/hybrid_viewer/scene";
 import { newInstance as vtkCamera } from "@kitware/vtk.js/Rendering/Core/Camera";
 
@@ -89,5 +89,25 @@ describe("explodeAlongZ helper", () => {
     explodeAlongZ(compactPoints, points, [1, 3, 2, 4, 0, COMPACT_Z_MAX]);
 
     expect([...points]).toStrictEqual([...compactPoints]);
+  });
+});
+
+const EXPLODED_TOP = 40;
+
+describe("followCenter helper", () => {
+  test("moves the camera with the center of the exploded scene, keeping its view", () => {
+    const camera = vtkCamera();
+    camera.setFocalPoint(FOCAL_X, FOCAL_Y, FOCAL_Z);
+    camera.setPosition(POSITION_X, POSITION_Y, POSITION_Z);
+    const directionOfProjection = camera.getDirectionOfProjection();
+    const distance = camera.getDistance();
+
+    followCenter(camera, [0, 1, 0, 1, 0, COMPACT_Z_MAX], [0, 1, 0, 1, 0, EXPLODED_TOP]);
+
+    const offset = (EXPLODED_TOP - COMPACT_Z_MAX) / 2;
+    expect(camera.getFocalPoint()).toStrictEqual([FOCAL_X, FOCAL_Y, FOCAL_Z + offset]);
+    expect(camera.getPosition()).toStrictEqual([POSITION_X, POSITION_Y, POSITION_Z + offset]);
+    expect(camera.getDirectionOfProjection()).toStrictEqual(directionOfProjection);
+    expect(camera.getDistance()).toBeCloseTo(distance);
   });
 });

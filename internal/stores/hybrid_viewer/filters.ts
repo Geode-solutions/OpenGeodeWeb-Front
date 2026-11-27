@@ -1,12 +1,15 @@
 import type { JsonRpcSchema, ParamsOf, ResponseOf } from "@ogw_shared/utils/types.js";
+import { explodeAlongZ, followCenter } from "./explode";
+import { requireRenderWindow, useHybridViewerCore } from "./core";
 import viewer_schemas, {
   type ViewerClippingPlanesParams,
 } from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 import type { AttributeName } from "@geode/opengeodeweb-viewer/schema_types";
+import type { CameraOptions } from "./vtk_types";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { SliceAxis } from "@ogw_front/utils/slice";
-import { explodeAlongZ } from "./explode";
-import { useHybridViewerCore } from "./core";
+import { getCameraOptions } from "./camera_animation";
+import { useHybridViewerCamera } from "./camera";
 import { useHybridViewerScene } from "./scene";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
@@ -39,14 +42,13 @@ async function setShrink(ids: string[], shrink_factor: number): Promise<void> {
     shrink_factor,
   });
 }
-async function setExplode(ids: string[], explode_factor: number): Promise<void> {
-  const { exploded_bounds } = await requestAndRender(
-    viewer_schemas.opengeodeweb_viewer.viewer.explode,
-    { ids, explode_factor },
-  );
-  // The simplified view shown while the camera moves follows the explosion
+// The simplified view shown while the camera moves follows the explosion, and so does the camera
+function explodeLightViewables(explodedBounds: { id: DataId; bounds: number[] }[]): CameraOptions {
+  const { genericRenderWindow } = useHybridViewerCore();
   const { hybridDb } = useHybridViewerScene();
-  for (const { id, bounds } of exploded_bounds) {
+  const renderer = requireRenderWindow(genericRenderWindow).getRenderer();
+  const boundsBefore = renderer.computeVisiblePropBounds();
+  for (const { id, bounds } of explodedBounds) {
     const entry = hybridDb[id];
     if (entry) {
       const points = entry.polydata.getPoints();
@@ -55,6 +57,22 @@ async function setExplode(ids: string[], explode_factor: number): Promise<void> 
       entry.polydata.modified();
     }
   }
+  const camera = renderer.getActiveCamera();
+  followCenter(camera, boundsBefore, renderer.computeVisiblePropBounds());
+  renderer.resetCameraClippingRange();
+  return getCameraOptions(camera);
+}
+async function setExplode(ids: string[], explode_factor: number): Promise<void> {
+  const viewerStore = useViewerStore();
+  const { exploded_bounds } = await viewerStore.request({
+    schema: viewer_schemas.opengeodeweb_viewer.viewer.explode,
+    params: { ids, explode_factor },
+  });
+  const camera_options = explodeLightViewables(exploded_bounds);
+  await requestAndRender(viewer_schemas.opengeodeweb_viewer.viewer.update_camera, {
+    camera_options,
+  });
+  Object.assign(useHybridViewerCamera().camera_options, camera_options);
 }
 async function setSlice(
   ids: string[],
