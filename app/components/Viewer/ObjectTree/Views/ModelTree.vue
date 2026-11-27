@@ -6,6 +6,7 @@ import FetchingData from "@ogw_front/components/FetchingData.vue";
 import type { ModelComponentMenuPayload } from "@ogw_front/utils/treeview";
 import ObjectTreeControls from "@ogw_front/components/Viewer/ObjectTree/Base/Controls.vue";
 import ObjectTreeItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
+import { useDataStore } from "@ogw_front/stores/data";
 import { useHoverhighlight } from "@ogw_front/composables/hover_highlight";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useModelTree } from "@ogw_front/composables/model_tree";
@@ -36,6 +37,7 @@ interface Emits {
 const emit = defineEmits<Emits>();
 
 const treeviewStore = useTreeviewStore();
+const dataStore = useDataStore();
 
 const {
   isLoading,
@@ -241,6 +243,7 @@ function getLeafViewerIds(item: CollectionTreeItem): number[] {
       }"
       :scroll-top="currentView?.scrollTop || 0"
       class="transparent-treeview virtual-tree-height"
+      :is-row-viewable="() => dataStore.isViewable(id)"
       @update:selected="(val) => onUpdateSelection(val as string[])"
       @update:scroll-top="treeviewStore.setScrollTop(id, $event)"
       @hover:enter="

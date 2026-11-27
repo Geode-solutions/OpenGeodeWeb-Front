@@ -8,7 +8,7 @@ import type {
 } from "@geode/opengeodeweb-viewer/schema_types";
 import type { AttributeRange, AttributeTimeStep } from "@ogw_front/types/attribute";
 import type { BlockId } from "@ogw_front/types/identifiers";
-import type { CollectionComponent } from "@ogw_front/stores/data_helpers/collections";
+import type { CollectionComponent } from "@ogw_internal/stores/data/model/collections";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";

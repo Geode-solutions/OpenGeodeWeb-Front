@@ -1,11 +1,10 @@
 // oxlint-disable vitest/require-mock-type-parameters
 import { type VueWrapper, flushPromises } from "@vue/test-utils";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { mockAs, setupActivePinia, vuetify } from "@ogw_tests/utils";
+import { setupActivePinia, vuetify } from "@ogw_tests/utils";
 import GlobalObjects from "@ogw_front/components/Viewer/ObjectTree/Views/GlobalObjects.vue";
 import { mountSuspended } from "@nuxt/test-utils/runtime";
-import { ref } from "vue";
-import { useDataStore } from "@ogw_front/stores/data";
+import { setDataItems } from "@ogw_tests/unit/stores/data_helpers";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 vi.setConfig({ testTimeout: 10_000 });
@@ -30,8 +29,7 @@ const TREE_STUB = {
 
 async function mountObjects(): Promise<VueWrapper> {
   const pinia = setupActivePinia();
-  const dataStore = useDataStore();
-  dataStore.refCrsItems = mockAs<typeof dataStore.refCrsItems>(() => ref([]));
+  setDataItems([]);
   const treeviewStore = useTreeviewStore();
   treeviewStore.addItem("BRep", "corbi", "a", "geode-a", "model");
   const wrapper = await mountSuspended(GlobalObjects, {

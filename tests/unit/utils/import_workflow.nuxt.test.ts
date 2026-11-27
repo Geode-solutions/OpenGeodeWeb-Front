@@ -122,7 +122,7 @@ describe("import workflow", () => {
     });
     const dataStore = useDataStore();
     dataStore.addItem = mockAs<typeof dataStore.addItem>(vi.fn().mockResolvedValue(undefined));
-    dataStore.isItemViewable = mockAs<typeof dataStore.isItemViewable>(
+    dataStore.fetchIsViewable = mockAs<typeof dataStore.fetchIsViewable>(
       vi.fn().mockResolvedValue(false),
     );
 
@@ -150,7 +150,7 @@ describe("import workflow", () => {
       .mockResolvedValueOnce({ data: [{ id: "second", name: "c", viewer_object_type: "mesh" }] });
     const dataStore = useDataStore();
     dataStore.addItem = mockAs<typeof dataStore.addItem>(vi.fn().mockResolvedValue(undefined));
-    dataStore.isItemViewable = mockAs<typeof dataStore.isItemViewable>(
+    dataStore.fetchIsViewable = mockAs<typeof dataStore.fetchIsViewable>(
       vi.fn().mockResolvedValue(false),
     );
 
@@ -176,7 +176,7 @@ describe("import file", () => {
     });
     const dataStore = useDataStore();
     dataStore.addItem = mockAs<typeof dataStore.addItem>(vi.fn().mockResolvedValue(undefined));
-    dataStore.isItemViewable = mockAs<typeof dataStore.isItemViewable>(
+    dataStore.fetchIsViewable = mockAs<typeof dataStore.fetchIsViewable>(
       vi.fn().mockResolvedValue(false),
     );
 

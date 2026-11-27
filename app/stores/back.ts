@@ -1,93 +1,72 @@
 import { getRestApiPort, getRestApiProtocol, isCloudMode } from "@ogw_front/utils/stores";
+import {
+  useHttpTransport,
+  useMicroserviceVersion,
+  usePing,
+  useRequestCounter,
+} from "@ogw_internal/stores/microservice";
+import type { RequestHandlers } from "@ogw_shared/utils/types.js";
 import { Status } from "@ogw_front/utils/status";
-import { api_fetch } from "@ogw_internal/utils/api_fetch";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
-import { upload_file } from "@ogw_internal/utils/upload_file.js";
+import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_typed_schemas.js";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
-import type {
-  JsonRpcSchema,
-  MicroserviceVersionSchema,
-  ParamsOf,
-  RequestHandlers,
-  ResponseOf,
-} from "@ogw_shared/utils/types.js";
+export const useBackStore = defineStore(
+  "back",
+  // oxlint-disable-next-line max-lines-per-function
+  () => {
+    const default_local_port = ref("5000");
+    const status = ref(Status.NOT_CONNECTED);
 
-import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_typed_schemas.js";
+    const protocol = computed(() => getRestApiProtocol());
+    const port = computed(() => getRestApiPort(default_local_port.value));
 
-const MILLISECONDS_IN_SECOND = 1000;
-const DEFAULT_PING_INTERVAL_SECONDS = 10;
+    function base_url_for(domain_name: string): string {
+      let back_url = `${protocol.value}://${domain_name}:${port.value}`;
+      if (isCloudMode()) {
+        back_url += `/geode`;
+      }
+      return back_url;
+    }
 
-export const useBackStore = defineStore("back", {
-  state: () => ({
-    default_local_port: "5000",
-    request_counter: 0,
-    status: Status.NOT_CONNECTED,
-    version: "0.0.0",
-  }),
-  getters: {
-    protocol(): string {
-      return getRestApiProtocol();
-    },
-    port(): string {
-      return getRestApiPort(this.default_local_port);
-    },
-    base_url(): string {
-      return this.base_url_for(useInfraStore().microservice_domain_name);
-    },
-    base_url_for(): (domain_name: string) => string {
-      return (domain_name: string) => {
-        let back_url = `${this.protocol}://${domain_name}:${this.port}`;
-        if (isCloudMode()) {
-          back_url += `/geode`;
-        }
-        return back_url;
-      };
-    },
-    is_busy(): boolean {
-      return this.request_counter > 0;
-    },
-  },
-  actions: {
-    set_ping() {
-      // oxlint-disable-next-line typescript/no-floating-promises
-      this.ping();
-      setInterval(() => {
-        // oxlint-disable-next-line typescript/no-floating-promises
-        this.ping();
-      }, DEFAULT_PING_INTERVAL_SECONDS * MILLISECONDS_IN_SECOND);
-    },
-    async ping() {
-      const feedbackStore = useFeedbackStore();
-      const schema = back_schemas.opengeodeweb_back.ping;
-      const result = await this.request(
-        { schema, log_success: false },
+    // The infra store is read lazily: this store can be created before the Nuxt app context
+    const base_url = computed(() => base_url_for(useInfraStore().microservice_domain_name));
+
+    const counter = useRequestCounter();
+    const { request_counter, is_busy, start_request, stop_request } = counter;
+    const transport = useHttpTransport("back", base_url, counter);
+    const { request } = transport;
+    const { version, get_version } = useMicroserviceVersion(request);
+
+    // The status and the server error banner always change together
+    function set_connected(connected: boolean): void {
+      useFeedbackStore().set_server_error(!connected);
+      status.value = connected ? Status.CONNECTED : Status.NOT_CONNECTED;
+    }
+
+    async function ping(): Promise<unknown> {
+      const result = await request(
+        { schema: back_schemas.opengeodeweb_back.ping, log_success: false },
         {
           request_error_function: () => {
-            feedbackStore.$patch({ server_error: true });
-            this.status = Status.NOT_CONNECTED;
+            set_connected(false);
           },
           response_function: () => {
-            feedbackStore.$patch({ server_error: false });
-            this.status = Status.CONNECTED;
+            set_connected(true);
           },
           response_error_function: () => {
-            feedbackStore.$patch({ server_error: true });
-            this.status = Status.NOT_CONNECTED;
+            set_connected(false);
           },
         },
       );
       return result;
-    },
-    start_request() {
-      this.request_counter += 1;
-    },
-    stop_request() {
-      this.request_counter -= 1;
-    },
-    async launch(args: { projectFolderPath: string }) {
+    }
+
+    const { start_ping, stop_ping } = usePing(ping);
+
+    async function launch(args: { projectFolderPath: string }): Promise<unknown> {
       const appStore = useAppStore();
       const { COMMAND_BACK, NUXT_ROOT_PATH } = useRuntimeConfig().public;
       const schema = opengeodeweb_front_schemas.api.local.app.run_back;
@@ -97,86 +76,48 @@ export const useBackStore = defineStore("back", {
         { schema, params },
         {
           response_function: (response) => {
-            this.default_local_port = String(response.port);
+            default_local_port.value = String(response.port);
           },
         },
       );
       return result;
-    },
-    async connect(): Promise<void> {
-      this.set_ping();
-      await Promise.resolve();
-    },
-    async request<Schema extends JsonRpcSchema>(
-      {
-        schema,
-        params,
-        log_success,
-      }: { schema: Schema; params?: ParamsOf<Schema>; log_success?: boolean },
-      callbacks: RequestHandlers<ResponseOf<Schema>> = {},
-    ): Promise<ResponseOf<Schema>> {
-      const rpc_schema: JsonRpcSchema = schema;
-      const result = await api_fetch(
-        this,
-        // The back store is only ever used with HTTP ("front"/"back") schemas,
-        // Which always carry `methods`; the wider JsonRpcSchema param above is
-        // Kept as-is to match this action's public signature.
-        {
-          // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-          schema: rpc_schema as JsonRpcSchema & { methods: string[] },
-          params: params ?? {},
-          headers: {},
-          ...(log_success !== undefined && { log_success }),
-        },
-        {
-          ...callbacks,
-          response_function: async (response: unknown) => {
-            if (callbacks.response_function) {
-              // The back validates its responses against the schema `response` it was generated from.
-              // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-              await callbacks.response_function(response as ResponseOf<Schema>);
-            }
-          },
-        },
-      );
-      // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-      return result as ResponseOf<Schema>;
-    },
-    async upload(file: File, callbacks: RequestHandlers = {}) {
+    }
+
+    function connect(): void {
+      start_ping();
+    }
+
+    async function upload(file: File, callbacks: RequestHandlers = {}): Promise<unknown> {
       const schema = back_schemas.opengeodeweb_back.upload_file;
-      const result = await upload_file(
-        this,
-        {
-          schema,
-          file,
-        },
-        {
-          ...callbacks,
-          response_function: async (response: unknown) => {
-            if (callbacks.response_function) {
-              await callbacks.response_function(response);
-            }
-          },
-        },
-      );
+      const result = await transport.upload({ schema, file }, callbacks);
       return result;
-    },
-    async get_version(schema: MicroserviceVersionSchema | undefined) {
-      if (!schema) {
-        return undefined;
-      }
-      const result = await this.request(
-        { schema },
-        {
-          response_function: ({ microservice_version }) => {
-            this.version = microservice_version;
-          },
-        },
-      );
-      return result;
+    }
+
+    return {
+      default_local_port,
+      request_counter,
+      status,
+      version,
+      protocol,
+      port,
+      base_url,
+      base_url_for,
+      is_busy,
+      ping,
+      start_ping,
+      stop_ping,
+      start_request,
+      stop_request,
+      launch,
+      connect,
+      request,
+      upload,
+      get_version,
+    };
+  },
+  {
+    share: {
+      omit: ["status"],
     },
   },
-  share: {
-    omit: ["status"],
-  },
-});
+);

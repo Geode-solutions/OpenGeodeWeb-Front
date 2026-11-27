@@ -72,7 +72,7 @@ function setup(): {
 function stubData(existing: string[], all: string[]): void {
   const dataStore = useDataStore();
   dataStore.addItem = mockAs<typeof dataStore.addItem>(vi.fn().mockResolvedValue(undefined));
-  dataStore.isItemViewable = mockAs<typeof dataStore.isItemViewable>(
+  dataStore.fetchIsViewable = mockAs<typeof dataStore.fetchIsViewable>(
     vi.fn().mockResolvedValue(false),
   );
   dataStore.allItems = mockAs<typeof dataStore.allItems>(

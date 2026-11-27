@@ -9,23 +9,23 @@ const VIEWABLE_ID = "viewable";
 const NON_VIEWABLE_ID = "non_viewable";
 
 const request = vi.fn<(request: { params: Record<string, unknown> }) => Promise<void>>();
-const isItemViewable = vi.fn<(id: string) => Promise<boolean>>();
+const isViewable = vi.fn<(id: string) => boolean>();
 
 vi.mock(import("@ogw_front/stores/viewer") as Promise<unknown>, () => ({
   useViewerStore: (): { request: typeof request } => ({ request }),
 }));
 vi.mock(import("@ogw_front/stores/data") as Promise<unknown>, () => ({
-  useDataStore: (): { isItemViewable: typeof isItemViewable } => ({ isItemViewable }),
+  useDataStore: (): { isViewable: typeof isViewable } => ({ isViewable }),
 }));
 
 describe("hover highlight", () => {
   beforeEach(() => {
     request.mockReset().mockResolvedValue();
-    isItemViewable.mockReset();
+    isViewable.mockReset();
   });
 
   test("highlights then unhighlights a viewable item", async () => {
-    isItemViewable.mockResolvedValue(true);
+    isViewable.mockReturnValue(true);
     const { onHoverEnter, onHoverLeave } = useHoverhighlight();
     onHoverEnter(VIEWABLE_ID, [], "model", true);
     await flushPromises();
@@ -38,7 +38,7 @@ describe("hover highlight", () => {
   });
 
   test("sends nothing to the viewer for a non viewable item", async () => {
-    isItemViewable.mockResolvedValue(false);
+    isViewable.mockReturnValue(false);
     const { onHoverEnter, onHoverLeave } = useHoverhighlight();
     onHoverEnter(NON_VIEWABLE_ID, [], "model", true);
     await flushPromises();
@@ -48,13 +48,21 @@ describe("hover highlight", () => {
     expect(request).not.toHaveBeenCalled();
   });
 
-  test("sends nothing when left before the viewable check resolves", async () => {
-    const { promise, resolve } = Promise.withResolvers<boolean>();
-    isItemViewable.mockReturnValue(promise);
+  test("sends nothing when left before the block ids resolve", async () => {
+    const { promise, resolve } = Promise.withResolvers<readonly number[]>();
+    isViewable.mockReturnValue(true);
     const { onHoverEnter, onHoverLeave } = useHoverhighlight();
-    onHoverEnter(VIEWABLE_ID, [], "model", true);
+    onHoverEnter(
+      VIEWABLE_ID,
+      async () => {
+        const block_ids = await promise;
+        return block_ids;
+      },
+      "model",
+      true,
+    );
     onHoverLeave(VIEWABLE_ID);
-    resolve(true);
+    resolve([]);
     await flushPromises();
 
     expect(request).not.toHaveBeenCalled();

@@ -1,13 +1,13 @@
 // oxlint-disable vitest/require-mock-type-parameters
-import { type Component, ref } from "vue";
 import { type VueWrapper, flushPromises } from "@vue/test-utils";
 import { describe, expect, test, vi } from "vitest";
 import { mockAs, setupActivePinia, vuetify } from "@ogw_tests/utils";
+import type { Component } from "vue";
 import CropOptions from "@ogw_front/components/Viewer/Basemap/CropOptions.vue";
 import OpacityOptions from "@ogw_front/components/Viewer/Basemap/OpacityOptions.vue";
 import { mountSuspended } from "@nuxt/test-utils/runtime";
+import { setDataItems } from "@ogw_tests/unit/stores/data_helpers";
 import { useBasemapStore } from "@ogw_front/stores/basemap";
-import { useDataStore } from "@ogw_front/stores/data";
 
 vi.setConfig({ testTimeout: 10_000 });
 
@@ -19,21 +19,9 @@ const NEW_OPACITY = 0.7;
 // The circular item only shows its options once opened: the stub always shows them
 const MENU_ITEM_STUB = { template: "<div><slot name='options' /></div>" };
 
-function itemProps(id: string): Record<string, unknown> {
-  return {
-    id,
-    meta_data: {},
-    tooltip_location: "right",
-    tooltip_origin: "left",
-    totalItems: 1,
-    index: 0,
-  };
-}
-
 async function mountOptions(component: Component, id: string): Promise<VueWrapper> {
   const pinia = setupActivePinia();
-  const dataStore = useDataStore();
-  dataStore.refCrsItems = mockAs<typeof dataStore.refCrsItems>(() => ref([]));
+  setDataItems([]);
   const basemapStore = useBasemapStore();
   basemapStore.setOpacity = mockAs<typeof basemapStore.setOpacity>(
     vi.fn().mockResolvedValue(undefined),
@@ -41,7 +29,7 @@ async function mountOptions(component: Component, id: string): Promise<VueWrappe
   basemapStore.setCrop = mockAs<typeof basemapStore.setCrop>(vi.fn().mockResolvedValue(undefined));
   basemapStore.opacities = { satellite: 1, plan: 1, routes: ROUTES_OPACITY };
   const wrapper = await mountSuspended(component, {
-    props: { itemProps: itemProps(id) },
+    props: { dataId: id, index: 0 },
     global: { plugins: [vuetify, pinia], stubs: { ViewerContextMenuItem: MENU_ITEM_STUB } },
   });
   return wrapper;

@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import type { EdgeWidth, Visibility } from "@geode/opengeodeweb-viewer/schema_types";
-import {
-  type ModelMenuItemProps,
-  useModelMenuContext,
-} from "@ogw_front/composables/model_menu_context";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import ModelCardTabs from "./ModelCardTabs.vue";
 import ViewerGenericModelComponentEdgesOptions from "@ogw_front/components/Viewer/Generic/Model/ComponentEdgesOptions.vue";
 import ViewerOptionsWidthSlider from "@ogw_front/components/Viewer/Options/Sliders/Width.vue";
@@ -12,6 +9,7 @@ import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import { useModelMenuContext } from "@ogw_front/composables/model_menu_context";
 import { useModelTabs } from "@ogw_front/composables/model_tabs";
 
 // Lines are edges themselves and corners have none: no edges options for them
@@ -27,10 +25,10 @@ function isEdgesComponentType(type: string | undefined): type is EdgesComponentT
 }
 
 interface Props {
-  itemProps: ModelMenuItemProps;
+  dataId: DataId;
 }
 
-const { itemProps } = defineProps<Props>();
+const { dataId } = defineProps<Props>();
 
 const dataStore = useDataStore();
 const dataStyleStore = useDataStyleStore();
@@ -38,7 +36,7 @@ const hybridViewerStore = useHybridViewerStore();
 const { applyBatchStyle } = useBatchStyle();
 
 const { modelId, componentId, componentType, collections, targetComponentIds } =
-  useModelMenuContext(() => itemProps);
+  useModelMenuContext(() => dataId);
 
 const modelEdgesVisibility = computed<Visibility | undefined>({
   get: () => dataStyleStore.modelEdgesVisibility(modelId.value),

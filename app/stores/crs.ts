@@ -1,13 +1,14 @@
+import { type CrsItem, useDataStore } from "@ogw_front/stores/data";
 import type { CRS } from "@geode/opengeodeweb-back/schema_types";
 import { oldestCrs } from "@ogw_front/utils/crs";
 import { useCrsRequests } from "./crs_helpers/requests.js";
-import { useDataStore } from "@ogw_front/stores/data";
 import { useGeographicList } from "./crs_helpers/geographic_list.js";
 import { useProjectCrsState } from "./crs_helpers/project_crs.js";
 
 // Session cache of the available CRS, the project CRS, and the channel the shared components use to ask the host app for a CRS edit
 export const useCrsStore = defineStore("crs", () => {
-  const crsItems = useDataStore().refCrsItems();
+  const dataStore = useDataStore();
+  const crsItems = computed<CrsItem[]>(() => dataStore.items);
   const { geographicList } = useGeographicList();
   const { projectCrs, mismatchedCrs, setProjectCrs } = useProjectCrsState(crsItems);
   // Edit and alignment requests, returned as they are

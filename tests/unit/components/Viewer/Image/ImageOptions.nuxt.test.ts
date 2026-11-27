@@ -32,16 +32,7 @@ async function mountOptions(visibility: boolean): Promise<VueWrapper> {
     vi.fn().mockResolvedValue(undefined),
   );
   const wrapper = await mountSuspended(ImageOptions, {
-    props: {
-      itemProps: {
-        id: IMAGE_ID,
-        meta_data: {},
-        tooltip_location: "right",
-        tooltip_origin: "left",
-        totalItems: 1,
-        index: 0,
-      },
-    },
+    props: { dataId: IMAGE_ID, index: 0 },
     global: { plugins: [vuetify, pinia], stubs: { ViewerContextMenuItem: MENU_ITEM_STUB } },
   });
   return wrapper;

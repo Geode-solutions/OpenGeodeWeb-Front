@@ -1,18 +1,20 @@
 <script setup lang="ts">
-import type { ItemProps } from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import TriangulatedSurfaceEdgesPoints from "@ogw_front/assets/viewer_svgs/surface_points.svg";
 import ViewerGenericMeshPointsOptions from "@ogw_front/components/Viewer/Generic/Mesh/PointsOptions.vue";
 
 interface Props {
-  itemProps: ItemProps & { index?: number };
+  dataId: DataId;
+  index: number;
 }
 
-const { itemProps } = defineProps<Props>();
+const { dataId, index } = defineProps<Props>();
 </script>
 
 <template>
   <ViewerGenericMeshPointsOptions
-    :itemProps="itemProps"
+    :data-id="dataId"
+    :index="index"
     :btnImage="TriangulatedSurfaceEdgesPoints"
   />
 </template>

@@ -1,13 +1,14 @@
 // Third party imports
 import { describe, expect, test, vi } from "vitest";
-import type { VueWrapper } from "@vue/test-utils";
-import { mountSuspended } from "@nuxt/test-utils/runtime";
-
-// Local imports
 import { mockAs, setupActivePinia, vuetify } from "@ogw_tests/utils";
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
+
+// Local imports
 import ItemLabel from "@ogw_front/components/Viewer/ObjectTree/Base/ItemLabel.vue";
+import type { VueWrapper } from "@vue/test-utils";
+import { mountSuspended } from "@nuxt/test-utils/runtime";
 import { ref } from "vue";
+import { setDataItems } from "@ogw_tests/unit/stores/data_helpers";
 import { useCrsStore } from "@ogw_front/stores/crs";
 import { useDataStore } from "@ogw_front/stores/data";
 
@@ -141,14 +142,11 @@ describe("item label crs mismatch", () => {
   // A pinia per row: the crs store reads the data when it is created
   async function mountRow(id: string, showCrs = true): Promise<VueWrapper> {
     const pinia = setupActivePinia();
-    const dataStore = useDataStore();
-    dataStore.refCrsItems = mockAs<typeof dataStore.refCrsItems>(() =>
-      ref([
-        { data_id: "a", created_at: "1", crs: LAMBERT },
-        { data_id: "b", created_at: "2", crs: UTM },
-        { data_id: "local", created_at: "3" },
-      ]),
-    );
+    setDataItems([
+      { data_id: "a", created_at: "1", crs: LAMBERT },
+      { data_id: "b", created_at: "2", crs: UTM },
+      { data_id: "local", created_at: "3" },
+    ]);
     useCrsStore();
     const wrapper = await mountSuspended(ItemLabel, {
       global: { plugins: [vuetify, pinia], stubs: { VTooltip: VTooltipStub } },

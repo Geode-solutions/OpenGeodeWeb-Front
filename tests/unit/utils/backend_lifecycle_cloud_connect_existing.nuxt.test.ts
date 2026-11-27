@@ -11,9 +11,10 @@ import {
   RESPONSE_OK_STATUS,
   buildFetchContext,
   toHookArray,
-} from "@ogw_tests/unit/stores/cloud_helpers";
+} from "@ogw_tests/unit/utils/cloud_helpers";
 import { Status } from "@ogw_front/utils/status";
 import { appMode } from "@ogw_shared/app_mode";
+import { connectExistingCloud } from "@ogw_front/utils/backend_lifecycle";
 import { setupActivePinia } from "@ogw_tests/utils";
 import { useCloudStore } from "@ogw_front/stores/cloud";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
@@ -31,13 +32,13 @@ vi.mock(import("ofetch"), () => ({
 
 const mockedFetch = vi.mocked($fetch);
 
-describe("cloud store", () => {
+describe("backend lifecycle", () => {
   beforeEach(() => {
     setupActivePinia();
   });
 
-  describe("actions", () => {
-    describe("connect_existing", () => {
+  describe("cloud", () => {
+    describe("connect to a running cloud service", () => {
       beforeEach(() => {
         mockedFetch.mockReset();
         useInfraStore().app_mode = appMode.CLOUD;
@@ -58,7 +59,7 @@ describe("cloud store", () => {
           return data;
         });
 
-        await cloudStore.connect_existing(CLOUD_RUN_HOST);
+        await connectExistingCloud(CLOUD_RUN_HOST);
 
         expect(mockedFetch).toHaveBeenCalledWith(
           "opengeodeweb_back/ping",
@@ -95,7 +96,7 @@ describe("cloud store", () => {
           throw error;
         });
 
-        await expect(cloudStore.connect_existing(CLOUD_RUN_HOST)).rejects.toThrow(
+        await expect(connectExistingCloud(CLOUD_RUN_HOST)).rejects.toThrow(
           "500 Internal Server Error",
         );
 
