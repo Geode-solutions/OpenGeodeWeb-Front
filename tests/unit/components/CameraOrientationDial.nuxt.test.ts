@@ -36,6 +36,10 @@ describe("camera orientations", () => {
     expect(orientations.find(({ label }) => label === "N")?.value).toBe("yplus");
     expect(orientations.find(({ label }) => label === "E")?.value).toBe("xplus");
     expect(orientations.find(({ label }) => label === "N")?.tooltip).toBe("View from north");
+  });
+
+  test("tell up and down apart with the compass marker only", () => {
+    const orientations = cameraOrientations("compass");
     expect(orientations.find(({ label }) => label === "Up")?.vertical).toBe("up");
     expect(orientations.find(({ label }) => label === "Down")?.vertical).toBe("down");
     expect(cameraOrientations("axes").every(({ vertical }) => vertical === undefined)).toBe(true);
