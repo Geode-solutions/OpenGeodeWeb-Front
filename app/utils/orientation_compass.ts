@@ -11,6 +11,13 @@ const MIN_COMPASS_TILT = 0.6;
 // Under this heading gap in degrees, the camera already faces the direction: nothing to turn
 const FACING_TOLERANCE = 0.5;
 const FULL_TURN = 360;
+const QUARTER_TURN = 90;
+// The dials are graduated every 30 degrees, the cardinal ticks longer
+const TICK_STEP = 30;
+const COMPASS_TICK_ANGLES: readonly number[] = Array.from(
+  { length: FULL_TURN / TICK_STEP },
+  (_item, index) => index * TICK_STEP,
+);
 
 interface DialPoint {
   x: number;
@@ -87,16 +94,24 @@ function facingCameraPose(
   };
 }
 
+// Whether the dial angle, clockwise in degrees from north, is a cardinal direction (N, E, S or W)
+function isCardinalAngle(angle: number): boolean {
+  return angle % QUARTER_TURN === 0;
+}
+
 function northUpCameraPose(pose: CameraPose, basis: ViewBasis): CameraPose | undefined {
   return facingCameraPose(pose, basis, 0);
 }
 
 export {
+  COMPASS_TICK_ANGLES,
   MIN_COMPASS_TILT,
+  QUARTER_TURN,
   compassDialPoint,
   compassHeading,
   compassTilt,
   facingCameraPose,
+  isCardinalAngle,
   isFacing,
   northUpCameraPose,
 };
