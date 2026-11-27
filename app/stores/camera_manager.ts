@@ -7,7 +7,7 @@ import { useObservable } from "@vueuse/rxjs";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 // oxlint-disable-next-line max-lines-per-function
-export const useCameraManagerStore = defineStore("camera_manager", () => {
+export const useCameraManagerStore = defineStore("cameraManager", () => {
   const viewerStore = useViewerStore();
   // Keyed by an auto-incremented number
   const cameraPositionsTable = cameraPositionsDb();
