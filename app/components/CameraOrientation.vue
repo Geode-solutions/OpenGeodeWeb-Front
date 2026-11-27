@@ -8,8 +8,11 @@ import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types
 import CameraOrientationDial from "@ogw_front/components/CameraOrientationDial.vue";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import { applyCameraOptions } from "@ogw_internal/stores/hybrid_viewer/camera";
+import { orientationCubeStyle } from "@ogw_front/utils/orientation_cube_style";
+import { useChromeTheme } from "@ogw_front/composables/chrome_theme";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
+import { useTheme } from "vuetify";
 import { newInstance as vtkAnnotatedCubeActor } from "@kitware/vtk.js/Rendering/Core/AnnotatedCubeActor";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 
@@ -42,11 +45,17 @@ const orientations = computed(() =>
   cameraOrientations(dataStyleStore.sceneStyle.orientation_widget),
 );
 
-const FACE_COLOR = "rgba(60, 60, 60, 1)";
-const FONT_COLOR = "white";
-const HOVERED_FACE_COLOR = "rgba(255, 255, 255, 0.95)";
-const HOVERED_FONT_COLOR = "black";
 const NORTH_COLOR = "#f48830";
+
+// The cube follows the theme it is shown in: the chrome theme of the panel (GlassCard), the app
+// Theme for the menu
+const theme = useTheme();
+const chromeTheme = useChromeTheme();
+const cubeStyle = computed(() => {
+  const name = panel ? chromeTheme.value : theme.global.name.value;
+  const colors = theme.computedThemes.value[name]?.colors;
+  return orientationCubeStyle({ surface: colors?.surface, "on-surface": colors?.["on-surface"] });
+});
 
 const hoveredFace = ref<string | undefined>(undefined);
 const hybridViewerStore = useHybridViewerStore();
@@ -60,10 +69,14 @@ function faceStyle(
   orientation: CameraOrientation,
   hovered: boolean,
 ): { faceColor: string; fontColor: string } {
+  const style = cubeStyle.value;
   if (hovered) {
-    return { faceColor: HOVERED_FACE_COLOR, fontColor: HOVERED_FONT_COLOR };
+    return { faceColor: style.hoveredFaceColor, fontColor: style.hoveredFontColor };
   }
-  return { faceColor: FACE_COLOR, fontColor: isNorth(orientation) ? NORTH_COLOR : FONT_COLOR };
+  return {
+    faceColor: style.faceColor,
+    fontColor: isNorth(orientation) ? NORTH_COLOR : style.fontColor,
+  };
 }
 
 function labelFaces(): void {
@@ -76,10 +89,15 @@ function labelFaces(): void {
   }
 }
 
-watch(orientations, () => {
+function edgeStyle(): { edgeColor: string } {
+  return { edgeColor: cubeStyle.value.edgeColor };
+}
+
+watch([orientations, cubeStyle], () => {
   if (!cubeActor) {
     return;
   }
+  cubeActor.setDefaultStyle(edgeStyle());
   labelFaces();
   genericRenderWindow.getRenderWindow().render();
 });
@@ -106,9 +124,7 @@ function initVTK(): void {
   cubeActor.setDefaultStyle({
     fontFamily: "sans-serif",
     fontStyle: "bold",
-    faceColor: FACE_COLOR,
-    fontColor: FONT_COLOR,
-    edgeColor: "rgba(255, 255, 255, 0.4)",
+    ...edgeStyle(),
     edgeThickness: 0.1,
     resolution: 400,
     fontSizeScale: (resolution: number) => resolution / 4,

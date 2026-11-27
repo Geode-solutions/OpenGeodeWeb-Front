@@ -7,6 +7,7 @@ import { mountSuspended } from "@nuxt/test-utils/runtime";
 import { setupActivePinia, vuetify } from "@ogw_tests/utils";
 import CameraOrientationDial from "@ogw_front/components/CameraOrientationDial.vue";
 import { cameraOrientations } from "@ogw_front/utils/camera_orientations";
+import { orientationCubeStyle } from "@ogw_front/utils/orientation_cube_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 const CAMERA_DISTANCE = 10;
@@ -63,6 +64,23 @@ describe("camera orientations", () => {
     expect(orientations.find(({ label }) => label === "N")?.value).toBe("yplus");
     expect(orientations.find(({ label }) => label === "E")?.value).toBe("xplus");
     expect(orientations.find(({ label }) => label === "N")?.tooltip).toBe("View from north");
+  });
+});
+
+describe("orientation cube style", () => {
+  test("follows the light theme: light faces, dark labels, inverted on hover", () => {
+    const style = orientationCubeStyle({ surface: "#FFFFFF", "on-surface": "#000000" });
+    expect(style.faceColor).toBe("rgba(217, 217, 217, 1)");
+    expect(style.fontColor).toBe("rgba(0, 0, 0, 1)");
+    expect(style.edgeColor).toBe("rgba(0, 0, 0, 0.4)");
+    expect(style.hoveredFaceColor).toBe("rgba(0, 0, 0, 0.95)");
+    expect(style.hoveredFontColor).toBe("rgba(255, 255, 255, 1)");
+  });
+
+  test("falls back on the dark cube without usable theme colors", () => {
+    const style = orientationCubeStyle({ surface: undefined, "on-surface": "not a color" });
+    expect(style.fontColor).toBe("rgba(255, 255, 255, 1)");
+    expect(style.hoveredFontColor).toBe("rgba(33, 33, 33, 1)");
   });
 });
 
