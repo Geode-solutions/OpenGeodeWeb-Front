@@ -1,7 +1,14 @@
 <script setup lang="ts">
+import {
+  type CameraOrientation,
+  cameraOrientations,
+  isNorth,
+} from "@ogw_front/utils/camera_orientations";
 import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types.js";
+import CameraOrientationDial from "@ogw_front/components/CameraOrientationDial.vue";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import { applyCameraOptions } from "@ogw_internal/stores/hybrid_viewer/camera";
+import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { newInstance as vtkAnnotatedCubeActor } from "@kitware/vtk.js/Rendering/Core/AnnotatedCubeActor";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
@@ -28,56 +35,18 @@ const emit = defineEmits<Emits>();
 
 const show = defineModel<boolean>("show", { default: false });
 
-const orientations = [
-  {
-    label: "Z+",
-    value: "zplus",
-    face: "top",
-    vtkKey: "ZPlus",
-    rotation: 0,
-    position: { top: "15%", left: "50%" },
-  },
-  {
-    label: "Z-",
-    value: "zminus",
-    face: "bottom",
-    vtkKey: "ZMinus",
-    rotation: 0,
-    position: { top: "85%", left: "50%" },
-  },
-  {
-    label: "Y+",
-    value: "yplus",
-    face: "front",
-    vtkKey: "YPlus",
-    rotation: 180,
-    position: { top: "35%", left: "22%" },
-  },
-  {
-    label: "Y-",
-    value: "yminus",
-    face: "back",
-    vtkKey: "YMinus",
-    rotation: 0,
-    position: { top: "65%", left: "78%" },
-  },
-  {
-    label: "X+",
-    value: "xplus",
-    face: "right",
-    vtkKey: "XPlus",
-    rotation: 90,
-    position: { top: "35%", left: "78%" },
-  },
-  {
-    label: "X-",
-    value: "xminus",
-    face: "left",
-    vtkKey: "XMinus",
-    rotation: -90,
-    position: { top: "65%", left: "22%" },
-  },
-];
+// With the compass marker, the orientations read north, east, south, west, up and down
+const dataStyleStore = useDataStyleStore();
+const isCompass = computed(() => dataStyleStore.sceneStyle.orientation_widget === "compass");
+const orientations = computed(() =>
+  cameraOrientations(dataStyleStore.sceneStyle.orientation_widget),
+);
+
+const FACE_COLOR = "rgba(60, 60, 60, 1)";
+const FONT_COLOR = "white";
+const HOVERED_FACE_COLOR = "rgba(255, 255, 255, 0.95)";
+const HOVERED_FONT_COLOR = "black";
+const NORTH_COLOR = "#f48830";
 
 const hoveredFace = ref<string | undefined>(undefined);
 const hybridViewerStore = useHybridViewerStore();
@@ -86,6 +55,34 @@ const cubeContainer = useTemplateRef("cubeContainer");
 let genericRenderWindow: unknown = undefined;
 let cubeActor: unknown = undefined;
 let isInteracting = false;
+
+function faceStyle(
+  orientation: CameraOrientation,
+  hovered: boolean,
+): { faceColor: string; fontColor: string } {
+  if (hovered) {
+    return { faceColor: HOVERED_FACE_COLOR, fontColor: HOVERED_FONT_COLOR };
+  }
+  return { faceColor: FACE_COLOR, fontColor: isNorth(orientation) ? NORTH_COLOR : FONT_COLOR };
+}
+
+function labelFaces(): void {
+  for (const orientation of orientations.value) {
+    cubeActor[`set${orientation.vtkKey}FaceProperty`]({
+      text: orientation.label,
+      faceRotation: orientation.rotation,
+      ...faceStyle(orientation, orientation.face === hoveredFace.value),
+    });
+  }
+}
+
+watch(orientations, () => {
+  if (!cubeActor) {
+    return;
+  }
+  labelFaces();
+  genericRenderWindow.getRenderWindow().render();
+});
 
 function initVTK(): void {
   if (genericRenderWindow) {
@@ -109,21 +106,15 @@ function initVTK(): void {
   cubeActor.setDefaultStyle({
     fontFamily: "sans-serif",
     fontStyle: "bold",
-    faceColor: "rgba(60, 60, 60, 1)",
-    fontColor: "white",
+    faceColor: FACE_COLOR,
+    fontColor: FONT_COLOR,
     edgeColor: "rgba(255, 255, 255, 0.4)",
     edgeThickness: 0.1,
     resolution: 400,
     fontSizeScale: (resolution: number) => resolution / 4,
   });
 
-  for (const orientation of orientations) {
-    cubeActor[`set${orientation.vtkKey}FaceProperty`]({
-      text: orientation.label,
-      faceRotation: orientation.rotation,
-    });
-  }
-
+  labelFaces();
   cubeActor.getProperty().setBackfaceCulling(true);
 
   const renderer = genericRenderWindow.getRenderer();
@@ -166,12 +157,9 @@ watch(hoveredFace, (newFace, oldFace) => {
     return;
   }
   function updateFace(face: string | undefined, active: boolean): void {
-    const config = orientations.find((orientation) => orientation.face === face);
+    const config = orientations.value.find((orientation) => orientation.face === face);
     if (config) {
-      cubeActor[`set${config.vtkKey}FaceProperty`]({
-        faceColor: active ? "rgba(255, 255, 255, 0.95)" : "rgba(60, 60, 60, 1)",
-        fontColor: active ? "black" : "white",
-      });
+      cubeActor[`set${config.vtkKey}FaceProperty`](faceStyle(config, active));
     }
   }
 
@@ -189,7 +177,16 @@ watch(hoveredFace, (newFace, oldFace) => {
     :width="width"
     :escapeFunction="escapeFunction"
   >
+    <CameraOrientationDial
+      v-if="isCompass"
+      v-model:hoveredFace="hoveredFace"
+      :orientations="orientations"
+      @select="(value) => emit('select', value)"
+    >
+      <div ref="cubeContainer" style="width: 70px; height: 70px; pointer-events: none" />
+    </CameraOrientationDial>
     <div
+      v-else
       class="pa-0 overflow-hidden position-relative"
       style="
         height: 220px;
@@ -236,7 +233,7 @@ watch(hoveredFace, (newFace, oldFace) => {
         @mouseleave="hoveredFace = undefined"
         @click.stop="emit('select', orientation.value)"
       >
-        <v-tooltip activator="parent" location="top">{{ orientation.value }} View</v-tooltip>
+        <v-tooltip activator="parent" location="top">{{ orientation.tooltip }}</v-tooltip>
         <span class="text-caption font-weight-black" style="font-size: 0.7rem !important">{{
           orientation.label
         }}</span>
@@ -266,8 +263,10 @@ watch(hoveredFace, (newFace, oldFace) => {
           @mouseleave="hoveredFace = undefined"
           @click.stop="emit('select', orientation.value)"
         >
-          <v-tooltip activator="parent" location="top">{{ orientation.label }}</v-tooltip>
-          <span class="text-caption font-weight-black">{{ orientation.label }}</span>
+          <v-tooltip activator="parent" location="top">{{ orientation.tooltip }}</v-tooltip>
+          <span class="text-caption font-weight-black" :class="{ north: isNorth(orientation) }">{{
+            orientation.label
+          }}</span>
         </v-btn>
       </div>
     </div>
@@ -289,6 +288,9 @@ watch(hoveredFace, (newFace, oldFace) => {
 }
 .transition-all {
   transition: all 0.4s ease;
+}
+.north {
+  color: #f48830;
 }
 .orientation-menu {
   min-width: 180px;
