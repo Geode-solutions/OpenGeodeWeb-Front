@@ -5,7 +5,9 @@ import viewer_schemas, {
 import type { AttributeName } from "@geode/opengeodeweb-viewer/schema_types";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { SliceAxis } from "@ogw_front/utils/slice";
+import { explodeAlongZ } from "./explode";
 import { useHybridViewerCore } from "./core";
+import { useHybridViewerScene } from "./scene";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 async function requestAndRender<Schema extends JsonRpcSchema>(
@@ -38,10 +40,21 @@ async function setShrink(ids: string[], shrink_factor: number): Promise<void> {
   });
 }
 async function setExplode(ids: string[], explode_factor: number): Promise<void> {
-  await requestAndRender(viewer_schemas.opengeodeweb_viewer.viewer.explode, {
-    ids,
-    explode_factor,
-  });
+  const { exploded_bounds } = await requestAndRender(
+    viewer_schemas.opengeodeweb_viewer.viewer.explode,
+    { ids, explode_factor },
+  );
+  // The simplified view shown while the camera moves follows the explosion
+  const { hybridDb } = useHybridViewerScene();
+  for (const { id, bounds } of exploded_bounds) {
+    const entry = hybridDb[id];
+    if (entry) {
+      const points = entry.polydata.getPoints();
+      explodeAlongZ(entry.compactPoints, points.getData(), bounds);
+      points.modified();
+      entry.polydata.modified();
+    }
+  }
 }
 async function setSlice(
   ids: string[],

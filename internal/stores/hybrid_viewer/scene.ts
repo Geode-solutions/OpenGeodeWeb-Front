@@ -71,7 +71,8 @@ function createHybridDbEntry(binaryLightViewable: string, zScale: number): Hybri
   property.setColor(ACTOR_COLOR);
   actor.setMapper(mapper);
   actor.setScale(1, 1, zScale);
-  return { actor, polydata, mapper };
+  const compactPoints = Float64Array.from(polydata.getPoints().getData());
+  return { actor, polydata, mapper, compactPoints };
 }
 
 // Shared via createSharedComposable (rather than merged into the parent hybridViewer store) so sibling slices, e.g. camera.ts and ruler.ts, can read hybridDb/setZScaling directly without importing the parent store and creating a cycle. A Pinia store would work too but its $id/$patch/... properties would leak into the composed store's spread and collapse its inferred type.

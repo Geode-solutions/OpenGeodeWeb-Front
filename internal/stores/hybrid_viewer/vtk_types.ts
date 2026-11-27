@@ -17,6 +17,8 @@ interface HybridDbEntry {
   actor: vtkActor;
   polydata: vtkPolyData;
   mapper: unknown;
+  // The light viewable points as loaded, before the polydata is stretched over the exploded data
+  compactPoints: Float64Array;
 }
 
 type HybridDb = Record<string, HybridDbEntry>;
