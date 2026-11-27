@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { type TreeMenuPayload, viewHeader, viewModelId } from "@ogw_front/utils/treeview";
 import GlobalObjects from "@ogw_front/components/Viewer/ObjectTree/Views/GlobalObjects.vue";
 import ModelTree from "@ogw_front/components/Viewer/ObjectTree/Views/ModelTree.vue";
-import type { TreeMenuPayload } from "@ogw_front/utils/treeview";
+import PhysicalPropertiesTree from "@ogw_front/components/Viewer/ObjectTree/Views/PhysicalPropertiesTree.vue";
 import ViewerObjectTreeBox from "@ogw_front/components/Viewer/ObjectTree/Box.vue";
-import { geodeObjectImage } from "@ogw_front/assets/geode_objects";
 import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
 import { useModelHeaderHover } from "@ogw_front/composables/model_header_hover";
 import { useModelTreeDrag } from "@ogw_front/composables/model_tree_drag";
@@ -266,14 +266,17 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
             icon
             variant="text"
             density="comfortable"
-            v-tooltip="view.collapsed === true ? `Show ${view.title}` : `Collapse ${view.title}`"
+            v-tooltip="`${view.collapsed === true ? 'Show' : 'Collapse'} ${viewHeader(view).label}`"
             @click="treeviewStore.toggleCollapsed(view.id)"
-            @mouseenter="onModelHeaderEnter(view.id)"
-            @mouseleave="onModelHeaderLeave(view.id)"
+            @mouseenter="onModelHeaderEnter(viewModelId(view))"
+            @mouseleave="onModelHeaderLeave(viewModelId(view))"
           >
+            <v-icon v-if="viewHeader(view).fontIcon" size="22">
+              {{ viewHeader(view).fontIcon }}
+            </v-icon>
             <v-img
-              v-if="view.geode_object_type"
-              :src="geodeObjectImage(view.geode_object_type)"
+              v-else-if="viewHeader(view).icon"
+              :src="viewHeader(view).icon"
               width="22"
               height="22"
               class="model-tree-toggle-icon"
@@ -330,23 +333,27 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
             @drop="onDrop(view.id)"
           >
             <ViewerObjectTreeBox
-              :title="view.title"
-              :icon="view.geode_object_type ? geodeObjectImage(view.geode_object_type) : undefined"
+              :title="viewHeader(view).title"
+              :icon="viewHeader(view).icon"
+              :font-icon="viewHeader(view).fontIcon"
               :scroll-top="view.scrollTop"
               closable
               :border-radius="`0 ${index === 0 ? PANEL_RADIUS : '0'} ${index === shownViews.length - 1 ? PANEL_RADIUS : '0'} 0`"
               :border-left="false"
               :accent="
                 view.color
-                  ? { color: view.color, highlighted: treeviewStore.hoveredModelId === view.id }
+                  ? {
+                      color: view.color,
+                      highlighted: treeviewStore.hoveredModelId === viewModelId(view),
+                    }
                   : undefined
               "
               @close="treeviewStore.closeView(view.id)"
               @dragstart="onDragStart(view.id)"
               @dragend="onDragEnd"
               @update:scroll-top="treeviewStore.setScrollTop(view.id, $event)"
-              @header-enter="onModelHeaderEnter(view.id)"
-              @header-leave="onModelHeaderLeave(view.id)"
+              @header-enter="onModelHeaderEnter(viewModelId(view))"
+              @header-leave="onModelHeaderLeave(viewModelId(view))"
             >
               <template #tooltip>
                 <div data-testid="modelTreeTooltip" class="d-flex flex-column ga-1 text-caption">
@@ -354,12 +361,19 @@ function onVerticalResizeStart(event: MouseEvent, index: number): void {
                   <span v-if="view.geode_object_type">
                     <strong class="mr-1">Type:</strong>{{ view.geode_object_type }}
                   </span>
-                  <span v-if="modelGeodeId(view.id)">
-                    <strong class="mr-1">ID:</strong>{{ modelGeodeId(view.id) }}
+                  <span v-if="modelGeodeId(viewModelId(view))">
+                    <strong class="mr-1">ID:</strong>{{ modelGeodeId(viewModelId(view)) }}
                   </span>
                 </div>
               </template>
+              <PhysicalPropertiesTree
+                v-if="view.type === 'physical_properties'"
+                data-testid="physicalPropertiesObjectTree"
+                :model-id="viewModelId(view)"
+                :view-id="view.id"
+              />
               <ModelTree
+                v-else
                 data-testid="modelComponentsObjectTree"
                 :id="view.id"
                 @show-menu="emit('show-menu', $event)"

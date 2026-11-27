@@ -3,9 +3,14 @@ import {
   dataDb,
   modelComponentsDb,
   modelComponentsRelationDb,
+  modelPhysicalPropertiesDb,
   writeTransaction,
 } from "@ogw_internal/database/database.js";
-import { modelComponentRelationsOf, modelComponentsOf } from "@ogw_internal/database/queries.js";
+import {
+  modelComponentRelationsOf,
+  modelComponentsOf,
+  modelPhysicalPropertiesOf,
+} from "@ogw_internal/database/queries.js";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { DataItem } from "@ogw_internal/database/tables/data";
 import type { ModelComponentRecord } from "@ogw_internal/database/tables/model_components";
@@ -15,7 +20,14 @@ import type { ModelId } from "@ogw_front/types/identifiers";
 const dataTable = dataDb();
 const modelComponentsTable = modelComponentsDb();
 const modelComponentsRelationTable = modelComponentsRelationDb();
-const dataTables = [dataTable, modelComponentsTable, modelComponentsRelationTable];
+// Not in the snapshot: a restored project reads them again from the back
+const modelPhysicalPropertiesTable = modelPhysicalPropertiesDb();
+const modelTables = [
+  modelComponentsTable,
+  modelComponentsRelationTable,
+  modelPhysicalPropertiesTable,
+];
+const dataTables = [dataTable, ...modelTables];
 
 interface DataSnapshot {
   readonly modelComponents: readonly (LegacyDataId<ModelComponentRecord> | ModelComponentRecord)[];
@@ -26,9 +38,10 @@ interface DataSnapshot {
 }
 
 async function deleteModelComponents(modelId: ModelId): Promise<void> {
-  await writeTransaction([modelComponentsTable, modelComponentsRelationTable], async () => {
+  await writeTransaction(modelTables, async () => {
     await modelComponentsOf(modelId).delete();
     await modelComponentRelationsOf(modelId).delete();
+    await modelPhysicalPropertiesOf(modelId).delete();
   });
 }
 
@@ -57,6 +70,7 @@ async function clearTables(): Promise<void> {
     await dataTable.clear();
     await modelComponentsTable.clear();
     await modelComponentsRelationTable.clear();
+    await modelPhysicalPropertiesTable.clear();
   });
 }
 

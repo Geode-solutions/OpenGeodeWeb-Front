@@ -37,6 +37,17 @@ async function applyStyleWhenReady(item: NewDataItem, ready: Promise<unknown>): 
   return useDataStyleStore().applyDefaultStyle(item.data_id);
 }
 
+// Nothing waits for the relations and the physical properties of a model but the end of its import
+async function addModelDetails(item: NewDataItem): Promise<unknown> {
+  const dataStore = useDataStore();
+  const details = await Promise.all([
+    dataStore.addComponentRelations(item),
+    // Read from the back for a restored project too: its snapshot does not hold them
+    dataStore.addPhysicalProperties(item.data_id),
+  ]);
+  return details;
+}
+
 // NewDataItem has mutable array fields (mesh_components, collection_components), so it can't
 // Satisfy prefer-readonly-parameter-types deeply; left unfixed (same pattern as app/plugins/auto_store_register.ts).
 async function importDataItem(item: NewDataItem): Promise<string> {
@@ -50,10 +61,10 @@ async function importDataItem(item: NewDataItem): Promise<string> {
   const addDataTask = dataStore.addItem(item);
   const registerTask = registerWhenViewable(item, addDataTask);
   let addDataComponentsTask: Promise<unknown> = Promise.resolve(undefined);
-  let addDataRelationsTask: Promise<unknown> = Promise.resolve(undefined);
+  let addModelDetailsTask: Promise<unknown> = Promise.resolve(undefined);
   if (isModel(item)) {
     addDataComponentsTask = dataStore.addComponents(item);
-    addDataRelationsTask = dataStore.addComponentRelations(item);
+    addModelDetailsTask = addModelDetails(item);
   }
   treeviewStore.addItem(
     item.geode_object_type,
@@ -72,7 +83,7 @@ async function importDataItem(item: NewDataItem): Promise<string> {
     registerTask,
     addDataTask,
     addDataComponentsTask,
-    addDataRelationsTask,
+    addModelDetailsTask,
     addViewerTask,
     applyStyleTask,
   ]);

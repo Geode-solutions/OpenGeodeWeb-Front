@@ -12,6 +12,10 @@ import type {
   ObjectStyle,
   SceneStyle,
 } from "@ogw_internal/stores/data_style/types";
+import {
+  type ModelPhysicalPropertyRecord,
+  modelPhysicalPropertiesTable,
+} from "./tables/model_physical_properties";
 import { type TreeviewConfigRecord, treeviewConfigTable } from "./tables/treeview_config";
 import { BaseDatabase } from "./base_database";
 import { ExtendedDatabase } from "./extended_database";
@@ -186,6 +190,11 @@ function modelComponentsRelationDb(): Table<ModelComponentRelationRecord, string
   return liveTable(modelComponentsRelationTable.name);
 }
 
+// Keyed by [data_id, name]
+function modelPhysicalPropertiesDb(): Table<ModelPhysicalPropertyRecord, [string, string]> {
+  return liveTable(modelPhysicalPropertiesTable.name);
+}
+
 function dataStyleDb(): Table<ObjectStyle, string> {
   return liveTable(dataStyleTable.name);
 }
@@ -234,6 +243,7 @@ export {
   getTable,
   modelComponentsDb,
   modelComponentsRelationDb,
+  modelPhysicalPropertiesDb,
   sceneStyleDb,
   treeviewConfigDb,
   writeTransaction,

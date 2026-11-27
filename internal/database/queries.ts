@@ -1,10 +1,16 @@
 import { type Collection, Dexie } from "dexie";
-import { modelComponentsDb, modelComponentsRelationDb } from "./database";
+import {
+  modelComponentsDb,
+  modelComponentsRelationDb,
+  modelPhysicalPropertiesDb,
+} from "./database";
 import type { ModelComponentRecord } from "./tables/model_components";
 import type { ModelComponentRelationRecord } from "./tables/model_components_relation";
+import type { ModelPhysicalPropertyRecord } from "./tables/model_physical_properties";
 
 type ModelComponents = Collection<ModelComponentRecord, string>;
 type ModelComponentRelations = Collection<ModelComponentRelationRecord, string>;
+type ModelPhysicalProperties = Collection<ModelPhysicalPropertyRecord, [string, string]>;
 
 function modelComponentsOf(modelId: string): ModelComponents {
   return modelComponentsDb().where("data_id").equals(modelId);
@@ -35,6 +41,10 @@ function componentRelationsOf(modelId: string, parentId: string): ModelComponent
     .between([modelId, parentId, Dexie.minKey], [modelId, parentId, Dexie.maxKey]);
 }
 
+function modelPhysicalPropertiesOf(modelId: string): ModelPhysicalProperties {
+  return modelPhysicalPropertiesDb().where("data_id").equals(modelId);
+}
+
 export {
   componentRelationsOf,
   modelComponent,
@@ -42,4 +52,5 @@ export {
   modelComponentsByGeodeIds,
   modelComponentsOf,
   modelComponentsOfType,
+  modelPhysicalPropertiesOf,
 };
