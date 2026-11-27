@@ -55,7 +55,6 @@ export function useOverlappingPicker(): UseOverlappingPickerReturn {
   const dataStore = useDataStore();
   const dataStyleStore = useDataStyleStore();
   const viewerStore = useViewerStore();
-  const dataItems = computed(() => dataStore.items);
 
   const displayIntermediate = ref(false);
   const intermediateItems = ref<ProposedItem[]>([]);
@@ -114,7 +113,7 @@ export function useOverlappingPicker(): UseOverlappingPickerReturn {
   function getViewableIds(): string[] {
     // Images are not pickable
     const activeIds = new Set(
-      dataItems.value.filter((i: DataItem) => !isImage(i)).map((i: DataItem) => i.data_id),
+      dataStore.items.filter((i: DataItem) => !isImage(i)).map((i: DataItem) => i.data_id),
     );
     const visibleStyleIds = Object.keys(dataStyleStore.styles).filter(
       (styleId) => activeIds.has(styleId) && dataStyleStore.objectVisibility(styleId) === true,
