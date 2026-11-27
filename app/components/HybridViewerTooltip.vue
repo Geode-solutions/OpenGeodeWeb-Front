@@ -1,13 +1,15 @@
 <script setup lang="ts">
+import type { Index, Label, Pixels } from "@ogw_front/types/ui";
+import type { Coordinates } from "@ogw_front/types/geometry";
 import GlassCard from "@ogw_front/components/GlassCard.vue";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
-const TOOLTIP_SCREEN_MARGIN = 10;
-
 interface Props {
-  containerWidth: number;
-  containerHeight: number;
+  containerWidth: Pixels;
+  containerHeight: Pixels;
 }
+
+const TOOLTIP_SCREEN_MARGIN = 10;
 
 const { containerWidth, containerHeight } = defineProps<Props>();
 
@@ -48,7 +50,7 @@ const tooltipStyle = computed<Record<string, string>>(() => {
   };
 });
 
-const originalIndex = computed<number | undefined>(() => {
+const originalIndex = computed<Index | undefined>(() => {
   const attributes = hybridViewerStore.hoverData?.attributes || {};
   const originalId =
     attributes.vtkOriginalCellIds ??
@@ -90,7 +92,7 @@ function capitalize(val: string): string {
   return spaced.charAt(0).toUpperCase() + spaced.slice(1);
 }
 
-const fieldTypeLabel = computed<string>(() => {
+const fieldTypeLabel = computed<Label>(() => {
   const fieldType = hybridViewerStore.hoverData?.fieldType;
   if (typeof fieldType !== "string") {
     return "";
@@ -98,9 +100,9 @@ const fieldTypeLabel = computed<string>(() => {
   return capitalize(fieldType.toLowerCase());
 });
 
-const coordinates = computed<number[] | undefined>(() => {
+const coordinates = computed<Coordinates | undefined>(() => {
   const value = hybridViewerStore.hoverData?.attributes.coordinates;
-  return Array.isArray(value) ? (value as number[]) : undefined;
+  return Array.isArray(value) ? (value as Coordinates) : undefined;
 });
 
 function formatAttributeValue(val: unknown): string {

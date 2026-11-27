@@ -3,6 +3,7 @@ import type {
   AttributeColorMap,
   AttributeRange,
   AttributeTimeStep,
+  ColoringType,
 } from "@ogw_front/types/attribute";
 import type {
   AttributeItem,
@@ -13,6 +14,7 @@ import type {
 import type { LineId, ModelId } from "@ogw_front/types/identifiers";
 import { MODEL_LINE_COLORING } from "@ogw_front/utils/model_component_coloring";
 import type { NonEmptyArray } from "@ogw_front/utils/arrays";
+import type { TabName } from "@ogw_front/types/ui";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -20,11 +22,11 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 interface Props {
   modelId: ModelId;
-  lineId?: LineId;
-  activeTab?: string;
+  lineId: LineId | undefined;
+  activeTab: TabName | undefined;
 }
 
-const { modelId, lineId = undefined, activeTab = undefined } = defineProps<Props>();
+const { modelId, lineId, activeTab } = defineProps<Props>();
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
@@ -58,8 +60,8 @@ const lineColor = computed<ColorRGBA | undefined>({
   },
 });
 
-const lineActiveColoring = computed<string | undefined>({
-  get: () => dataStyleStore.modelLineActiveColoring(modelId, lineId) as string | undefined,
+const lineActiveColoring = computed<ColoringType | undefined>({
+  get: () => dataStyleStore.modelLineActiveColoring(modelId, lineId) as ColoringType | undefined,
   set: async (coloringType) => {
     if (lineId === undefined || typeof coloringType !== "string") {
       return;

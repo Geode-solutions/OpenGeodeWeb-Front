@@ -1,4 +1,5 @@
 import { type ComputedRef, type InjectionKey, computed, inject, provide } from "vue";
+import type { Count, MenuItemIndex } from "@ogw_front/types/ui";
 
 type MenuSide = "right" | "top" | "left" | "bottom";
 
@@ -15,19 +16,19 @@ const OPPOSITE_SIDE: Record<MenuSide, MenuSide> = {
   bottom: "top",
 };
 
-const MENU_ITEM_COUNT_KEY: InjectionKey<ComputedRef<number>> = Symbol("menu_item_count");
+const MENU_ITEM_COUNT_KEY: InjectionKey<ComputedRef<Count>> = Symbol("menu_item_count");
 
 // The circular menu shares its item count with its items: each one places itself on the circle
-function provideMenuItemCount(count: () => number): void {
+function provideMenuItemCount(count: () => Count): void {
   provide(MENU_ITEM_COUNT_KEY, computed(count));
 }
 
-function injectMenuItemCount(): ComputedRef<number> {
+function injectMenuItemCount(): ComputedRef<Count> {
   return inject(MENU_ITEM_COUNT_KEY, () => computed(() => 1), true);
 }
 
 // Side of the circle an item sits on, where its tooltip shows
-function menuItemSide(index: number, count: number): MenuSide {
+function menuItemSide(index: MenuItemIndex, count: Count): MenuSide {
   const angle = (index / count) * FULL_ANGLE;
   if (angle < ANGLE_45 || angle >= ANGLE_315) {
     return "right";

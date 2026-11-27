@@ -1,15 +1,19 @@
 <script setup lang="ts">
+import type { CssColor, IconName, Label } from "@ogw_front/types/ui";
+
 interface Props {
-  label: string;
-  color: string;
-  icon: string;
+  label: Label;
+  color: CssColor;
+  icon: IconName;
+}
+
+interface Emits {
+  close: [];
 }
 
 const { label, color, icon } = defineProps<Props>();
 
-const emit = defineEmits<{
-  close: [];
-}>();
+const emit = defineEmits<Emits>();
 
 defineOptions({ inheritAttrs: false });
 </script>

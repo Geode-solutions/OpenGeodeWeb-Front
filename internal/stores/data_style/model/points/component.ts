@@ -1,6 +1,6 @@
 // oxlint-disable eslint/max-lines
 // oxlint-disable import/max-dependencies -- the shared points/edges component style needs the attribute, time step, viewer and array helpers
-import type { AttributeColorMap, AttributeRange } from "@ogw_front/types/attribute";
+import type { AttributeColorMap, AttributeRange, ColoringType } from "@ogw_front/types/attribute";
 import type {
   AttributeItem,
   AttributeName,
@@ -21,6 +21,7 @@ import {
   POINTS_DEFAULT_VISIBILITY,
 } from "@ogw_front/utils/default_styles/constants";
 import type { NonEmptyArray } from "@ogw_front/utils/arrays";
+import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { groupBy } from "@ogw_internal/stores/data_style/model/component_style";
@@ -55,7 +56,7 @@ interface PointsStyle {
   visibility?: Visibility;
   size?: PointSize;
   coloring?: {
-    active?: string;
+    active?: ColoringType;
     constant?: ColorRGBA;
     vertex?: AttributeState;
   };
@@ -113,7 +114,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
     return pointsStyle(modelId, componentId).coloring?.constant ?? POINTS_DEFAULT_COLOR;
   }
 
-  function activeColoring(modelId: ModelId, componentId?: ModelComponentId): string {
+  function activeColoring(modelId: ModelId, componentId?: ModelComponentId): ColoringType {
     return pointsStyle(modelId, componentId).coloring?.active ?? "constant";
   }
 
@@ -128,7 +129,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
     modelId: ModelId,
     componentId: ModelComponentId | undefined,
     name?: AttributeName,
-  ): number {
+  ): AttributeItem {
     const { storedConfigs } = vertexAttribute(modelId, componentId);
     return name === undefined ? 0 : (storedConfigs?.[name]?.lastItem ?? 0);
   }
@@ -185,7 +186,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
     modelId: ModelId,
     componentIds: ModelComponentId[],
     schema: PointsRequestSchema,
-    values: Record<string, unknown> & { style: PointsStyle },
+    values: StyleValues & { style: PointsStyle },
   ): Promise<unknown> {
     if (componentIds.length === 0) {
       return undefined;
@@ -298,7 +299,7 @@ function useModelComponentPointsStyle(type: PointsComponentType) {
   async function setActiveColoring(
     modelId: ModelId,
     componentIds: NonEmptyArray<ModelComponentId>,
-    activeColoringType: string,
+    activeColoringType: ColoringType,
   ): Promise<unknown> {
     await mutatePoints(modelId, componentIds, { coloring: { active: activeColoringType } });
     if (activeColoringType === "vertex") {

@@ -1,9 +1,10 @@
+import type { CameraPositionId, CameraPositionName } from "@ogw_internal/database/types";
 import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types.js";
 import type { TableDefinition } from "./table_definition";
 
 interface CameraPositionRecord {
-  id?: number;
-  name: string;
+  id?: CameraPositionId;
+  name: CameraPositionName;
   camera_options: CameraOptions;
 }
 

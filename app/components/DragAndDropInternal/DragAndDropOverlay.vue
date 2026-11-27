@@ -1,37 +1,21 @@
 <script setup lang="ts">
+import type { AcceptRule } from "@ogw_front/utils/drag_and_drop";
 import ChromeTheme from "@ogw_front/components/ChromeTheme.vue";
-
-interface DragAndDropTexts {
-  idle: string;
-  drop: string;
-  loading: string;
-}
+import type { DragAndDropTexts } from "@ogw_front/types/props/components_files";
 
 interface Props {
   isDragging: boolean;
   showOverlay: boolean;
   fullscreen: boolean;
   loading: boolean;
-  texts?: DragAndDropTexts;
+  texts: DragAndDropTexts;
   multiple: boolean;
-  accept?: string | string[];
+  accept: AcceptRule | AcceptRule[];
   showExtensions: boolean;
 }
 
-const {
-  isDragging,
-  showOverlay,
-  fullscreen,
-  loading,
-  texts = {
-    idle: "Click or drag and drop",
-    drop: "Drop files here",
-    loading: "Loading...",
-  },
-  multiple,
-  accept = "",
-  showExtensions,
-} = defineProps<Props>();
+const { isDragging, showOverlay, fullscreen, loading, texts, multiple, accept, showExtensions } =
+  defineProps<Props>();
 </script>
 
 <template>

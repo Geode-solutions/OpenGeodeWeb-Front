@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AppName } from "@ogw_front/types/server";
 import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
 import Launcher from "@ogw_front/components/Launcher.vue";
 import PackagesVersions from "@ogw_front/components/PackagesVersions.vue";
@@ -6,12 +7,12 @@ import Stepper from "@ogw_front/components/Stepper.vue";
 import { useInfraStore } from "@ogw_front/stores/infra";
 import { useStepperTree } from "@ogw_front/composables/stepper_tree";
 
-const infraStore = useInfraStore();
-
 interface Props {
   versionsSchema: JsonRpcSchema;
-  appName: string;
+  appName: AppName;
 }
+
+const infraStore = useInfraStore();
 
 const { versionsSchema, appName } = defineProps<Props>();
 

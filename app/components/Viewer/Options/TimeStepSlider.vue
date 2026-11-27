@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { AttributeTimeStep } from "@ogw_front/types/attribute";
-
-const timeStep = defineModel<number>();
+import type { AttributeTimeStep, AttributeTimeValue } from "@ogw_front/types/attribute";
 
 interface Props {
-  timeSteps: number[];
+  timeSteps: AttributeTimeValue[];
 }
+
+const timeStep = defineModel<AttributeTimeStep>();
 
 const { timeSteps } = defineProps<Props>();
 
@@ -19,11 +19,11 @@ watch(
   { immediate: true },
 );
 
-function commitTimeStep(value: number): void {
+function commitTimeStep(value: AttributeTimeStep): void {
   timeStep.value = value;
 }
 
-function formatTime(index: number): string {
+function formatTime(index: AttributeTimeStep): string {
   const time = timeSteps[index];
   return time === undefined ? "" : `timestep = ${time}`;
 }

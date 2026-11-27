@@ -1,22 +1,27 @@
 // Third party imports
 import { type ComputedRef, type Ref, computed, ref } from "vue";
 import { useDevicePixelRatio, useWindowSize } from "@vueuse/core";
+import type { Pixels } from "@ogw_front/types/ui";
+import type { Ratio } from "@ogw_front/types/geometry";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
 // Local imports
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
+// The length of a side of the screenshot, in pixels
+type ScreenshotLength = number;
+
 interface PixelSize {
-  width: number;
-  height: number;
+  width: Pixels;
+  height: Pixels;
 }
 
 interface ScreenshotSizeState {
   screenshot_size: Ref<PixelSize | undefined>;
   displayed_size: ComputedRef<Partial<PixelSize>>;
   resetSize: () => void;
-  setWidth: (value: number | null | undefined) => void;
-  setHeight: (value: number | null | undefined) => void;
+  setWidth: (value: ScreenshotLength | null | undefined) => void;
+  setHeight: (value: ScreenshotLength | null | undefined) => void;
 }
 
 // Pixel bounds accepted by the take_screenshot RPC
@@ -24,7 +29,7 @@ const size_schema = viewer_schemas.opengeodeweb_viewer.viewer.take_screenshot.pr
 const MIN_SCREENSHOT_SIZE = size_schema.minimum;
 const MAX_SCREENSHOT_SIZE = size_schema.maximum;
 
-function clampSize(value: number): number {
+function clampSize(value: ScreenshotLength): ScreenshotLength {
   return Math.min(MAX_SCREENSHOT_SIZE, Math.max(MIN_SCREENSHOT_SIZE, Math.round(value)));
 }
 
@@ -33,7 +38,7 @@ function isSized({ width, height }: Readonly<PixelSize>): boolean {
 }
 
 // Width / height ratio of the view, 1 while the view is not sized yet (0×0)
-function ratioOf(view_size: Readonly<PixelSize>): number {
+function ratioOf(view_size: Readonly<PixelSize>): Ratio {
   return isSized(view_size) ? view_size.width / view_size.height : 1;
 }
 
@@ -56,7 +61,7 @@ function useScreenshotSize(include_ui: Readonly<Ref<boolean>>): ScreenshotSizeSt
   }
 
   // `value` is null when the field is cleared (VNumberInput): keep the current size
-  function setWidth(value: number | null | undefined): void {
+  function setWidth(value: ScreenshotLength | null | undefined): void {
     if (typeof value === "number") {
       // Cap the edited side so the derived one stays within the bounds and keeps the ratio
       const ratio = ratioOf(viewerStore.view_size);
@@ -66,7 +71,7 @@ function useScreenshotSize(include_ui: Readonly<Ref<boolean>>): ScreenshotSizeSt
     }
   }
 
-  function setHeight(value: number | null | undefined): void {
+  function setHeight(value: ScreenshotLength | null | undefined): void {
     if (typeof value === "number") {
       const ratio = ratioOf(viewerStore.view_size);
       const height = clampSize(Math.min(value, MAX_SCREENSHOT_SIZE / ratio));

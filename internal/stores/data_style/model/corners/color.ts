@@ -1,5 +1,6 @@
 import type { CornerId, ModelId } from "@ogw_front/types/identifiers";
 import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
+import type { ColoringType } from "@ogw_front/types/attribute";
 import type { GeodeId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { NonEmptyArray } from "@ogw_front/utils/arrays";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
@@ -17,7 +18,7 @@ interface ModelCornersColorApi {
     modelId: ModelId,
     cornerIds: CornerId[],
     color: ColorRGBA | undefined,
-    activeColoring?: string,
+    activeColoring?: ColoringType,
     collectionId?: GeodeId,
   ) => Promise<unknown>;
   modelCornerColoring: (modelId: ModelId, corner_id?: CornerId) => StyleValues;
@@ -26,7 +27,7 @@ interface ModelCornersColorApi {
   setModelCornersActiveColoring: (
     modelId: ModelId,
     cornerIds: NonEmptyArray<CornerId>,
-    activeColoring: string,
+    activeColoring: ColoringType,
     collectionId?: GeodeId,
   ) => Promise<unknown>;
 }
@@ -72,7 +73,7 @@ export function useModelCornersColor(): ModelCornersColorApi {
   async function setModelCornersActiveColoring(
     modelId: ModelId,
     cornerIds: NonEmptyArray<CornerId>,
-    activeColoring: string,
+    activeColoring: ColoringType,
     collectionId?: GeodeId,
   ): Promise<unknown> {
     const totalCornerIds = await dataStore.getCornersGeodeIds(modelId);

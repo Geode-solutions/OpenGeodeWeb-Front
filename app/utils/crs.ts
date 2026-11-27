@@ -4,11 +4,7 @@ import type { LegacyDataId } from "@ogw_front/utils/legacy_data_id";
 import { z } from "zod";
 
 // Only what a CRS selector shows: the back may add other fields
-interface CrsEntry {
-  authority: string;
-  code: string;
-  name: string;
-}
+type CrsEntry = CRS;
 
 // A stored CRS entry (favorites, history): unknown fields are dropped on read
 const crsEntrySchema = z.object({

@@ -1,13 +1,16 @@
-import type { AttributeSchemas } from "@ogw_front/utils/attribute_range";
-import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
-import type { ModelComponentId } from "@ogw_front/types/identifiers";
+import type { AttributeRangeTarget, AttributeSchemas } from "@ogw_front/utils/attribute_range";
 import type { ThresholdAttribute } from "@ogw_internal/stores/hybrid_viewer/filters";
+import type { TimeStepKey } from "@ogw_front/types/attribute";
+import type { Title } from "@ogw_front/types/ui";
+
+// The data and components of an attribute source, sent as the params of its requests
+type AttributeSourceParams = AttributeRangeTarget & Record<string, unknown>;
 
 interface AttributeSource {
-  title: string;
+  title: Title;
   schemas: AttributeSchemas;
-  timeStepKey: string;
-  params: { id: DataId; component_ids?: ModelComponentId[] };
+  timeStepKey: TimeStepKey;
+  params: AttributeSourceParams;
   location: "point" | "cell";
 }
 
@@ -25,4 +28,4 @@ function isValidThresholdAttribute(
 }
 
 export { isValidThresholdAttribute };
-export type { AttributeSource };
+export type { AttributeSource, AttributeSourceParams };

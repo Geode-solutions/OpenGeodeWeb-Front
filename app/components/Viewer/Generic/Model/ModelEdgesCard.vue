@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import type { EdgeWidth, Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
-import { type NonEmptyArray, isNonEmpty } from "@ogw_front/utils/arrays";
-import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type {
+  ModelEdgesComponentType,
+  ModelEdgesTarget,
+} from "@ogw_front/types/props/viewer/generic_model";
 import ModelCardTabs from "./ModelCardTabs.vue";
+import type { ModelComponentType } from "@ogw_front/types/model";
 import ViewerGenericModelComponentEdgesOptions from "@ogw_front/components/Viewer/Generic/Model/ComponentEdgesOptions.vue";
 import ViewerOptionsWidthSlider from "@ogw_front/components/Viewer/Options/Sliders/Width.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
+import { isNonEmpty } from "@ogw_front/utils/arrays";
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -15,24 +19,21 @@ import { useModelMenuContext } from "@ogw_front/composables/model_menu_context";
 import { useModelTabs } from "@ogw_front/composables/model_tabs";
 
 // Lines are edges themselves and corners have none: no edges options for them
-const EDGES_TYPE_TITLES = {
-  Surface: "Surfaces Edges Options",
-  Block: "Blocks Edges Options",
-} as const;
-type EdgesComponentType = keyof typeof EDGES_TYPE_TITLES;
-const EDGES_COMPONENT_TYPES: EdgesComponentType[] = ["Surface", "Block"];
-
-interface EdgesTarget {
-  componentType: EdgesComponentType;
-  componentIds: NonEmptyArray<ModelComponentId>;
-}
-
-function isEdgesComponentType(type: string | undefined): type is EdgesComponentType {
-  return type !== undefined && type in EDGES_TYPE_TITLES;
-}
 
 interface Props {
-  dataId: DataId;
+  dataId: ModelId;
+}
+
+const EDGES_TYPE_TITLES: Record<ModelEdgesComponentType, string> = {
+  Surface: "Surfaces Edges Options",
+  Block: "Blocks Edges Options",
+};
+const EDGES_COMPONENT_TYPES: ModelEdgesComponentType[] = ["Surface", "Block"];
+
+function isEdgesComponentType(
+  type: ModelComponentType | undefined,
+): type is ModelEdgesComponentType {
+  return type !== undefined && type in EDGES_TYPE_TITLES;
 }
 
 const { dataId } = defineProps<Props>();
@@ -71,11 +72,11 @@ const modelEdgesWidth = computed<EdgeWidth | undefined>({
   },
 });
 
-const edgesComponentType = computed<EdgesComponentType | undefined>(() =>
+const edgesComponentType = computed<ModelEdgesComponentType | undefined>(() =>
   isEdgesComponentType(componentType.value) ? componentType.value : undefined,
 );
 
-const allComponentsTargets = ref<EdgesTarget[]>([]);
+const allComponentsTargets = ref<ModelEdgesTarget[]>([]);
 watch(
   modelId,
   async (currentModelId) => {
@@ -86,7 +87,7 @@ watch(
       })),
     );
     if (modelId.value === currentModelId) {
-      allComponentsTargets.value = targets.filter((target): target is EdgesTarget =>
+      allComponentsTargets.value = targets.filter((target): target is ModelEdgesTarget =>
         isNonEmpty(target.componentIds),
       );
     }
@@ -94,7 +95,7 @@ watch(
   { immediate: true },
 );
 
-const typeTargets = computed<EdgesTarget[]>(() => {
+const typeTargets = computed<ModelEdgesTarget[]>(() => {
   if (edgesComponentType.value === undefined || !isNonEmpty(targetComponentIds.value)) {
     return [];
   }
@@ -104,7 +105,7 @@ const typeReferenceId = computed<ModelComponentId | undefined>(() =>
   collections.value ? targetComponentIds.value[0] : undefined,
 );
 
-const componentTargets = computed<EdgesTarget[]>(() => {
+const componentTargets = computed<ModelEdgesTarget[]>(() => {
   if (edgesComponentType.value === undefined || componentId.value === undefined) {
     return [];
   }

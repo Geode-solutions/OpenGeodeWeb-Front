@@ -1,11 +1,11 @@
-import type { MenuItems } from "./types.js";
+import type { MenusByObjectType } from "./types.js";
 import ModelEdgesOptions from "@ogw_front/components/Viewer/Generic/Model/EdgesOptions.vue";
 import ModelPointsOptions from "@ogw_front/components/Viewer/Generic/Model/PointsOptions.vue";
 import ModelStyleOptions from "@ogw_front/components/Viewer/Generic/Model/ModelStyleOptions.vue";
 
 const Model_menu = [ModelEdgesOptions, ModelPointsOptions, ModelStyleOptions];
 
-const modelMenus: Record<string, MenuItems> = {
+const modelMenus: MenusByObjectType = {
   BRep: Model_menu,
   CrossSection: Model_menu,
   ImplicitCrossSection: Model_menu,
@@ -14,11 +14,11 @@ const modelMenus: Record<string, MenuItems> = {
   StructuralModel: Model_menu,
 };
 
-const modelComponentTypeMenus: Record<string, MenuItems> = {
+const modelComponentTypeMenus: MenusByObjectType = {
   type: Model_menu,
 };
 
-const modelComponentMenus: Record<string, MenuItems> = {
+const modelComponentMenus: MenusByObjectType = {
   component: Model_menu,
 };
 

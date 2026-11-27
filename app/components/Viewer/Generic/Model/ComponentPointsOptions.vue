@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AttributeColorMap, AttributeRange, ColoringType } from "@ogw_front/types/attribute";
 import type {
   AttributeItem,
   AttributeName,
@@ -7,8 +8,11 @@ import type {
   Visibility,
 } from "@geode/opengeodeweb-viewer/schema_types";
 import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
+import type {
+  ModelPointsComponentType,
+  ModelPointsTarget,
+} from "@ogw_front/types/props/viewer/generic_model";
 import { type NonEmptyArray, isNonEmpty } from "@ogw_front/utils/arrays";
-import type { AttributeColorMap } from "@ogw_front/types/attribute";
 import { MODEL_VERTEX_COLORING } from "@ogw_front/utils/model_component_coloring";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import ViewerOptionsSizeSlider from "@ogw_front/components/Viewer/Options/Sliders/Size.vue";
@@ -16,14 +20,9 @@ import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwi
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
-interface PointsTarget {
-  componentType: "Surface" | "Line" | "Block";
-  componentIds: NonEmptyArray<ModelComponentId>;
-}
-
 interface Props {
   modelId: ModelId;
-  targets: PointsTarget[];
+  targets: ModelPointsTarget[];
   referenceComponentId?: ModelComponentId;
 }
 
@@ -95,7 +94,7 @@ const POINTS_STYLES = {
     setVertexAttributeNoDataColor: dataStyleStore.setModelBlocksPointsVertexAttributeNoDataColor,
   },
 };
-type PointsStyle = (typeof POINTS_STYLES)[PointsTarget["componentType"]];
+type PointsStyle = (typeof POINTS_STYLES)[ModelPointsComponentType];
 
 // Values are read from the first target, changes are applied to every target
 const pointsStyle = computed<PointsStyle | undefined>(() => {
@@ -137,7 +136,7 @@ const size = computed<PointSize | undefined>({
   },
 });
 
-const activeColoring = computed<string | undefined>({
+const activeColoring = computed<ColoringType | undefined>({
   get: () => pointsStyle.value?.activeColoring(modelId, referenceComponentId),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -177,7 +176,7 @@ const vertexAttributeItem = computed<AttributeItem | undefined>({
   },
 });
 
-const vertexAttributeRange = computed<(number | undefined)[] | undefined>({
+const vertexAttributeRange = computed<AttributeRange | undefined>({
   get: () => pointsStyle.value?.vertexAttributeRange(modelId, referenceComponentId),
   set: async (newValue) => {
     if (newValue === undefined) {

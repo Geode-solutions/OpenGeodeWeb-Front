@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { MenuItemIndex, Title } from "@ogw_front/types/ui";
 import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
 import type { SceneFontFamily } from "@ogw_internal/stores/data_style/types";
 import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
@@ -7,7 +8,7 @@ import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 interface Props {
-  index: number;
+  index: MenuItemIndex;
 }
 
 const { index } = defineProps<Props>();
@@ -15,7 +16,7 @@ const { index } = defineProps<Props>();
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 
-const FONT_FAMILIES: { title: string; value: SceneFontFamily }[] = [
+const FONT_FAMILIES: { title: Title; value: SceneFontFamily }[] = [
   { title: "Arial", value: "arial" },
   { title: "Courier", value: "courier" },
   { title: "Times", value: "times" },

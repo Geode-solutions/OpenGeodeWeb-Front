@@ -86,7 +86,7 @@ async function convertImported(
   return { converted, failed, withoutCrs };
 }
 
-function reportConversions(converted: DataItem[], failed: DataItem[], code: string): void {
+function reportConversions(converted: DataItem[], failed: DataItem[], code: CRS["code"]): void {
   if (converted.length > 0) {
     useFeedbackStore().add_success(`Converted to ${code}: ${names(converted)}`);
   }
@@ -98,7 +98,7 @@ function reportConversions(converted: DataItem[], failed: DataItem[], code: stri
   }
 }
 
-function warnWithoutCrs(withoutCrs: CrsItem[], code: string): void {
+function warnWithoutCrs(withoutCrs: CrsItem[], code: CRS["code"]): void {
   if (withoutCrs.length > 0) {
     useFeedbackStore().add_warning(
       `No CRS, project in ${code}: ${names(withoutCrs)}`,

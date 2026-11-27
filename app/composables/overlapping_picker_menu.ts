@@ -1,14 +1,17 @@
+import type { Count, Pixels } from "@ogw_front/types/ui";
+import type { Coordinate } from "@ogw_front/types/geometry";
+
 interface MenuPositionParams {
-  x: number;
-  y: number;
-  containerWidth: number;
-  containerHeight: number;
-  itemCount: number;
+  x: Coordinate;
+  y: Coordinate;
+  containerWidth: Pixels;
+  containerHeight: Pixels;
+  itemCount: Count;
 }
 
 interface MenuPosition {
-  x: number;
-  y: number;
+  x: Coordinate;
+  y: Coordinate;
 }
 
 const MENU_WIDTH = 340;
@@ -16,7 +19,7 @@ const MENU_BASE_HEIGHT = 55;
 const MENU_ITEM_HEIGHT = 48;
 const CLAMP_MARGIN = 10;
 
-function clampMenuY(yUI: number, containerHeight: number, menuHeight: number): number {
+function clampMenuY(yUI: Coordinate, containerHeight: Pixels, menuHeight: Pixels): Coordinate {
   let clampedY = yUI;
   if (yUI + menuHeight > containerHeight - CLAMP_MARGIN) {
     clampedY = Math.max(yUI - menuHeight, CLAMP_MARGIN);

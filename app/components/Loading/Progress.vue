@@ -1,9 +1,9 @@
 <script setup lang="ts">
-interface Props {
+interface LoadingProgressProps {
   progress: number;
 }
 
-const { progress } = defineProps<Props>();
+const { progress } = defineProps<LoadingProgressProps>();
 </script>
 
 <template>

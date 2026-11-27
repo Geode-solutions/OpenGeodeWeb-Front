@@ -2,24 +2,19 @@
 import type { CornerId, ModelId } from "@ogw_front/types/identifiers";
 import type { CollectionComponent } from "@ogw_internal/stores/data/model/collections";
 import type { NonEmptyArray } from "@ogw_front/utils/arrays";
+import type { TabName } from "@ogw_front/types/ui";
 import ViewerGenericModelCornerComponentOptions from "@ogw_front/components/Viewer/Generic/Model/CornerComponentOptions.vue";
 import ViewerGenericModelCornersTypeOptions from "@ogw_front/components/Viewer/Generic/Model/CornersTypeOptions.vue";
 
 interface Props {
   modelId: ModelId;
-  cornerId?: CornerId;
   targetCornerIds: NonEmptyArray<CornerId>;
-  collections?: CollectionComponent[];
-  activeTab?: string;
+  collections: CollectionComponent[] | undefined;
+  activeTab: TabName | undefined;
+  cornerId: CornerId | undefined;
 }
 
-const {
-  modelId,
-  cornerId = undefined,
-  targetCornerIds,
-  collections = undefined,
-  activeTab = undefined,
-} = defineProps<Props>();
+const { modelId, cornerId, targetCornerIds, collections, activeTab } = defineProps<Props>();
 </script>
 
 <template>

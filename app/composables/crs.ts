@@ -1,8 +1,10 @@
+import type { AssignResponse, PlausibleEntry } from "@ogw_front/composables/crs_assign";
 import { type DataItem, useDataStore } from "@ogw_front/stores/data";
 import { formatCrsCode, sameCrs } from "@ogw_front/utils/crs";
-import type { AssignResponse } from "@ogw_front/composables/crs_assign";
 import type { CRS } from "@geode/opengeodeweb-back/schema_types";
+import type { Coordinate } from "@ogw_front/types/geometry";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { LightViewable } from "@ogw_front/types/data";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { reloadObject } from "@ogw_front/utils/reload_object";
 import { useBackStore } from "@ogw_front/stores/back";
@@ -11,8 +13,8 @@ import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 interface CrsPoint {
-  x: number;
-  y: number;
+  x: Coordinate;
+  y: Coordinate;
   // Source points only: picked on the displayed data rather than typed
   picked?: boolean;
 }
@@ -24,29 +26,44 @@ interface Alignment {
   linkedItems?: Pick<DataItem, "data_id">[];
 }
 
+// How an assignment treats the data sharing the local frame of the assigned item
+interface AssignCrsOptions {
+  linkedItems?: Pick<DataItem, "data_id">[];
+  onlyPlausible?: boolean;
+}
+
+// Whether a conversion moves the camera, and the data converted in the same request
+interface ConvertCrsOptions {
+  focus?: boolean;
+  linkedItems?: Pick<DataItem, "data_id">[];
+}
+
+// What the back returns for a data whose coordinates it moved
+interface MovedData {
+  binary_light_viewable?: LightViewable;
+  crs?: CRS;
+}
+
 interface UseCrsReturn {
   assignCrs: (
     item: Pick<DataItem, "data_id">,
     crs: CRS,
-    options?: { linkedItems?: Pick<DataItem, "data_id">[]; onlyPlausible?: boolean },
+    options?: AssignCrsOptions,
   ) => Promise<AssignResponse>;
   convertCrs: (
     item: Pick<DataItem, "data_id">,
     crs: CRS,
-    options?: { focus?: boolean; linkedItems?: Pick<DataItem, "data_id">[] },
+    options?: ConvertCrsOptions,
   ) => Promise<void>;
   alignCrs: (item: DataItem, crs: CRS, alignment: Alignment) => Promise<void>;
   changeProjectCrs: (crs: CRS) => Promise<void>;
-  followProject: (
-    entries: { data_id: DataId; name: string; crs: CRS }[],
-    project?: CRS,
-  ) => Promise<void>;
+  followProject: (entries: PlausibleEntry[], project?: CRS) => Promise<void>;
 }
 
 // Converting or aligning rewrites the data coordinates: the viewer object is reloaded and the camera moved to it
 async function refresh(
   item: Pick<DataItem, "data_id">,
-  { binary_light_viewable, crs }: { binary_light_viewable?: string; crs?: CRS },
+  { binary_light_viewable, crs }: MovedData,
   focus = true,
 ): Promise<void> {
   // The local actor is rebuilt from the stored light viewable: store the moved one first
@@ -62,9 +79,7 @@ async function refresh(
 }
 
 // Each reload rebuilds an actor: one after another, then the camera moves once on the item
-async function refreshLinked(
-  linked: { id: DataId; binary_light_viewable?: string; crs?: CRS }[] | undefined,
-): Promise<void> {
+async function refreshLinked(linked: (MovedData & { id: DataId })[] | undefined): Promise<void> {
   for (const entry of linked ?? []) {
     // oxlint-disable-next-line no-await-in-loop
     await refresh({ data_id: entry.id }, entry, false);
@@ -74,10 +89,7 @@ async function refreshLinked(
 async function convertCrs(
   item: Pick<DataItem, "data_id">,
   crs: CRS,
-  {
-    focus = true,
-    linkedItems = [],
-  }: { focus?: boolean; linkedItems?: Pick<DataItem, "data_id">[] } = {},
+  { focus = true, linkedItems = [] }: ConvertCrsOptions = {},
 ): Promise<void> {
   const linkedIds = linkedItems.map(({ data_id }) => data_id);
   const response = await useBackStore().request({
@@ -93,10 +105,7 @@ async function convertCrs(
 async function assignCrs(
   item: Pick<DataItem, "data_id">,
   crs: CRS,
-  {
-    linkedItems = [],
-    onlyPlausible = false,
-  }: { linkedItems?: Pick<DataItem, "data_id">[]; onlyPlausible?: boolean } = {},
+  { linkedItems = [], onlyPlausible = false }: AssignCrsOptions = {},
 ): Promise<AssignResponse> {
   const linkedIds = linkedItems.map(({ data_id }) => data_id);
   const response = await useBackStore().request({
@@ -158,7 +167,7 @@ async function changeProjectCrs(crs: CRS): Promise<void> {
 // The project may already have followed them: callers pass the project CRS taken before.
 // A refused conversion keeps their CRS and the project one: the warning points to their dialog
 async function followProject(
-  entries: { data_id: DataId; name: string; crs: CRS }[],
+  entries: PlausibleEntry[],
   project: CRS | undefined = useCrsStore().projectCrs,
 ): Promise<void> {
   const crsStore = useCrsStore();
@@ -193,5 +202,5 @@ function useCrs(): UseCrsReturn {
   return { assignCrs, convertCrs, alignCrs, changeProjectCrs, followProject };
 }
 
-export type { Alignment, CrsPoint };
+export type { Alignment, AssignCrsOptions, ConvertCrsOptions, CrsPoint };
 export { useCrs };

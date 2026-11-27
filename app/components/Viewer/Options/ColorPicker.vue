@@ -1,8 +1,17 @@
 <script setup lang="ts">
 // oxlint-disable id-length since vuetify require { r,g,b} format to work
 import { formatColorString, parseColorString } from "@ogw_front/utils/color_picker";
+import type { ColorMode } from "@ogw_front/types/ui";
 import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
 import { useCopyToClipboard } from "@ogw_front/composables/copy_to_clipboard";
+
+// A color as the vuetify color picker gives it, with 0-255 channels and a 0-1 alpha
+interface VuetifyColor {
+  r: number;
+  g: number;
+  b: number;
+  a: number;
+}
 
 interface Props {
   disabledAlpha?: boolean;
@@ -16,7 +25,7 @@ const { pressed } = useMousePressed({ target: colorPickerWrapperRef });
 const model = defineModel<ColorRGBA>();
 const { copy, copied } = useCopyToClipboard();
 
-const currentMode = ref(disabledAlpha ? "rgb" : "rgba");
+const currentMode = ref<ColorMode>(disabledAlpha ? "rgb" : "rgba");
 const colorInputText = ref("");
 
 const initialColor = model.value as ColorRGBA;
@@ -32,13 +41,6 @@ function updateInputTextFromColor(red: number, green: number, blue: number, alph
     disabledAlpha || currentMode.value === "rgb"
       ? `${red}, ${green}, ${blue}`
       : `${red}, ${green}, ${blue}, ${alpha}`;
-}
-
-interface VuetifyColor {
-  r: number;
-  g: number;
-  b: number;
-  a: number;
 }
 
 function commitColorToModel(): void {

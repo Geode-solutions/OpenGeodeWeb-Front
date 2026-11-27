@@ -48,7 +48,7 @@ describe("crs selector", () => {
       global: {
         plugins: [vuetify, pinia],
       },
-      props: { geodeObjectType: "BRep" },
+      props: { geodeObjectType: "BRep", favorites: [], recent: [] },
     });
     await wrapper.vm.$nextTick();
     // A click on the row selects it: no checkbox column
@@ -74,7 +74,7 @@ describe("crs selector", () => {
       global: {
         plugins: [vuetify, pinia],
       },
-      props: { geodeObjectType: "BRep" },
+      props: { geodeObjectType: "BRep", favorites: [], recent: [] },
     });
     await wrapper.vm.$nextTick();
     await wrapper.findAll("tbody tr")[ESRI_INDEX]?.trigger("click");
@@ -94,7 +94,7 @@ describe("crs selector", () => {
       global: {
         plugins: [vuetify, pinia],
       },
-      props: { geodeObjectType: "BRep", compact: true },
+      props: { geodeObjectType: "BRep", compact: true, favorites: [], recent: [] },
     });
     await wrapper.vm.$nextTick();
     const headers = wrapper.findAll("th").map((header) => header.text());
@@ -116,6 +116,8 @@ describe("crs selector", () => {
       },
       props: {
         geodeObjectType: "BRep",
+        favorites: [],
+        recent: [],
         "onUpdate:modelValue": async (crs: unknown) => {
           await wrapper.setProps({ modelValue: crs });
         },
@@ -137,7 +139,7 @@ describe("crs selector", () => {
       global: {
         plugins: [vuetify, pinia],
       },
-      props: { geodeObjectType: "BRep" },
+      props: { geodeObjectType: "BRep", favorites: [], recent: [] },
     });
     const options = wrapper.findComponent(VDataTable).props("itemsPerPageOptions");
     expect(options).not.toContainEqual(expect.objectContaining({ value: -1 }));
@@ -154,7 +156,7 @@ describe("crs selector", () => {
       global: {
         plugins: [vuetify, pinia],
       },
-      props: { geodeObjectType: "BRep" },
+      props: { geodeObjectType: "BRep", favorites: [], recent: [] },
     });
     expect(wrapper.text()).toContain("Loading... Please wait");
   });

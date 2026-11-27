@@ -1,5 +1,5 @@
+import type { AttributeTimeStep, TimeStepKey } from "@ogw_front/types/attribute";
 import type { AttributeName } from "@geode/opengeodeweb-viewer/schema_types";
-import type { AttributeTimeStep } from "@ogw_front/types/attribute";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { ModelComponentId } from "@ogw_front/types/identifiers";
 import type { NonEmptyArray } from "@ogw_front/utils/arrays";
@@ -9,16 +9,16 @@ import { useDataStyleState } from "./state";
 interface UseAttributeTimeStepStyleReturn {
   attributeTimeStep: (
     dataId: DataId,
-    key: string,
+    key: TimeStepKey,
     name: AttributeName | undefined,
   ) => AttributeTimeStep | undefined;
   setAttributeTimeStep: (
     dataId: DataId,
-    key: string,
+    key: TimeStepKey,
     name: AttributeName,
     timeStep: AttributeTimeStep,
   ) => Promise<unknown>;
-  seriesArrayName: (dataId: DataId, key: string, name: AttributeName) => string;
+  seriesArrayName: (dataId: DataId, key: TimeStepKey, name: AttributeName) => AttributeName;
 }
 
 // Re-render the other components showing the same series, one request per group.
@@ -56,7 +56,7 @@ function useAttributeTimeStepStyle(): UseAttributeTimeStepStyleReturn {
 
   function attributeTimeStep(
     dataId: DataId,
-    key: string,
+    key: TimeStepKey,
     name: AttributeName | undefined,
   ): AttributeTimeStep | undefined {
     if (name === undefined) {
@@ -67,7 +67,7 @@ function useAttributeTimeStepStyle(): UseAttributeTimeStepStyleReturn {
 
   async function setAttributeTimeStep(
     dataId: DataId,
-    key: string,
+    key: TimeStepKey,
     name: AttributeName,
     timeStep: AttributeTimeStep,
   ): Promise<unknown> {
@@ -78,7 +78,7 @@ function useAttributeTimeStepStyle(): UseAttributeTimeStepStyleReturn {
   }
 
   // VTK array name of the series at its current time step
-  function seriesArrayName(dataId: DataId, key: string, name: AttributeName): string {
+  function seriesArrayName(dataId: DataId, key: TimeStepKey, name: AttributeName): AttributeName {
     return attributeArrayName(name, attributeTimeStep(dataId, key, name));
   }
 

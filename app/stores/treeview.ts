@@ -1,8 +1,11 @@
+import type { CssColor, Pixels, Title } from "@ogw_front/types/ui";
 import type { DataId, GeodeId } from "@geode/opengeodeweb-microservice/schema_types";
 import type {
   GeodeIdentified,
   GeodeObjectTyped,
   ModelId,
+  TreeNodeId,
+  TreeViewId,
   ViewerObjectTyped,
 } from "@ogw_front/types/identifiers";
 import type {
@@ -13,8 +16,10 @@ import type {
   OpenedView,
   TreeviewConfigRecord,
 } from "@ogw_internal/database/tables/treeview_config";
-import type { TreeGroup, TreeNode } from "@ogw_front/types/tree";
+import type { TreeGroup, TreeNode, TreeViewIndex } from "@ogw_front/types/tree";
 import { ref, watch } from "vue";
+import type { DataName } from "@ogw_front/types/data";
+import type { FileName } from "@ogw_front/types/files";
 import { consola } from "consola";
 // Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
 // oxlint-disable eslint/sort-imports, eslint/max-lines
@@ -39,9 +44,9 @@ type TreeviewGroup = TreeGroup<TreeviewChild>;
 
 interface TreeviewSnapshot {
   opened_views?: OpenedView[];
-  panelWidth?: number;
-  additionalPanelWidth?: number;
-  rowHeights?: number[];
+  panelWidth?: Pixels;
+  additionalPanelWidth?: Pixels;
+  rowHeights?: Pixels[];
   selectionIds?: DataId[];
   selection?: (DataId | { id: DataId })[];
 }
@@ -51,23 +56,23 @@ function defaultOpenedViews(): OpenedView[] {
 }
 
 type ReadonlyOpenedView = Omit<OpenedView, "opened"> & {
-  readonly opened: readonly string[];
+  readonly opened: readonly TreeNodeId[];
 };
 type ReadonlyTreeviewGroup = Omit<TreeviewGroup, "children"> & {
   readonly children: readonly TreeviewChild[];
 };
 interface ReadonlyTreeviewSnapshot {
   opened_views?: readonly ReadonlyOpenedView[];
-  panelWidth?: number;
-  additionalPanelWidth?: number;
-  rowHeights?: readonly number[];
+  panelWidth?: Pixels;
+  additionalPanelWidth?: Pixels;
+  rowHeights?: readonly Pixels[];
   selectionIds?: readonly DataId[];
   selection?: readonly (DataId | { id: DataId })[];
 }
 
 // Model trees saved before they had a color get one, distinct from the others
 function withModelTreeColors(views: OpenedView[]): OpenedView[] {
-  const used: (string | undefined)[] = views.map((view) => view.color);
+  const used: (CssColor | undefined)[] = views.map((view) => view.color);
   for (const view of views) {
     if (view.type === "component" && view.color === undefined) {
       view.color = nextModelTreeColor(used);
@@ -90,7 +95,7 @@ function snapshotSelectionIds(snapshot: ReadonlyTreeviewSnapshot | undefined): D
 export const useTreeviewStore = defineStore("treeview", () => {
   const items = ref<TreeviewGroup[]>([]);
   const selection = ref<DataId[]>([]);
-  const activeItems = ref<string[]>([]);
+  const activeItems = ref<TreeNodeId[]>([]);
   const opened_views = ref<OpenedView[]>(defaultOpenedViews());
   const panelWidth = ref(PANEL_WIDTH);
   const additionalPanelWidth = ref(PANEL_WIDTH);
@@ -98,7 +103,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
   const pendingImports = ref<PendingImport[]>([]);
   let lastPendingImport = 0;
   const pendingSelectionIds = ref<DataId[]>([]);
-  const rowHeights = ref<number[]>([]);
+  const rowHeights = ref<Pixels[]>([]);
   // Model hovered in the objects tree or on its model tree header: not saved
   const hoveredModelId = ref<ModelId | undefined>(undefined);
 
@@ -137,7 +142,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
       // oxlint-disable-next-line unicorn/prefer-structured-clone, no-unsafe-type-assertion -- JSON round-trip of a known-shape ref; result matches the source type.
       const cleanSelectionIds = JSON.parse(JSON.stringify(selection.value)) as DataId[];
       // oxlint-disable-next-line unicorn/prefer-structured-clone, no-unsafe-type-assertion -- JSON round-trip of a known-shape ref; result matches the source type.
-      const clean_rowHeights = JSON.parse(JSON.stringify(rowHeights.value)) as number[];
+      const clean_rowHeights = JSON.parse(JSON.stringify(rowHeights.value)) as Pixels[];
 
       // Best-effort persistence: a failure is logged, not thrown.
       try {
@@ -157,18 +162,18 @@ export const useTreeviewStore = defineStore("treeview", () => {
   );
 
   // No mouseleave is sent for an element removed under the cursor: clear the hover here
-  function clearHoveredModel(id: string): void {
+  function clearHoveredModel(id: TreeViewId): void {
     if (hoveredModelId.value === id) {
       hoveredModelId.value = undefined;
     }
   }
 
-  function closeView(id: string): void {
+  function closeView(id: TreeViewId): void {
     clearHoveredModel(id);
     opened_views.value = opened_views.value.filter((view: ReadonlyOpenedView) => view.id !== id);
   }
 
-  function toggleView(id: string): void {
+  function toggleView(id: TreeViewId): void {
     const index = opened_views.value.findIndex((view: ReadonlyOpenedView) => view.id === id);
     if (index !== -1) {
       closeView(id);
@@ -185,7 +190,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
 
   function addItem(
     geodeObjectType: GeodeObjectType,
-    name: string,
+    name: DataName,
     dataId: DataId,
     geode_id: GeodeId,
     viewer_object_type: ViewerObjectType,
@@ -221,7 +226,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     selection.value = [...selection.value, dataId];
   }
 
-  function removePendingImport(id: string): void {
+  function removePendingImport(id: TreeNodeId): void {
     pendingImports.value = pendingImports.value.filter((pending) => pending.id !== id);
     // Its type group shown or hidden as a whole may have selected it
     if (selection.value.includes(id)) {
@@ -232,7 +237,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
   // The file is listed in the tree, by its name, until its conversion is done
   async function whilePendingImport<Result>(
     geodeObjectType: GeodeObjectType,
-    filename: string,
+    filename: FileName,
     conversion: Promise<Result>,
   ): Promise<Result> {
     lastPendingImport += 1;
@@ -283,7 +288,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
 
   function displayAdditionalTree(
     id: ModelId,
-    title: string | undefined,
+    title: Title | undefined,
     geodeObjectType: GeodeObjectType,
   ): void {
     const index = opened_views.value.findIndex((view: ReadonlyOpenedView) => view.id === id);
@@ -303,14 +308,14 @@ export const useTreeviewStore = defineStore("treeview", () => {
     });
   }
 
-  function setCollapsed(id: string, collapsed: boolean): void {
+  function setCollapsed(id: TreeViewId, collapsed: boolean): void {
     const existing = opened_views.value.find((view: ReadonlyOpenedView) => view.id === id);
     if (existing) {
       existing.collapsed = collapsed;
     }
   }
 
-  function toggleCollapsed(id: string): void {
+  function toggleCollapsed(id: TreeViewId): void {
     const existing = opened_views.value.find((view: ReadonlyOpenedView) => view.id === id);
     setCollapsed(id, existing?.collapsed !== true);
   }
@@ -328,7 +333,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
   }
 
   // The objects tree keeps its place, first: only the model trees move
-  function moveView(from_index: number, to_index: number): void {
+  function moveView(from_index: TreeViewIndex, to_index: TreeViewIndex): void {
     const moved = opened_views.value[from_index];
     const target = opened_views.value[to_index];
     if (moved && target && moved.id !== "main" && target.id !== "main") {
@@ -383,15 +388,15 @@ export const useTreeviewStore = defineStore("treeview", () => {
     opened_views.value = defaultOpenedViews();
   }
 
-  function setPanelWidth(width: number): void {
+  function setPanelWidth(width: Pixels): void {
     panelWidth.value = width;
   }
 
-  function setAdditionalPanelWidth(width: number): void {
+  function setAdditionalPanelWidth(width: Pixels): void {
     additionalPanelWidth.value = width;
   }
 
-  function setScrollTop(viewId: string, scrollTop: number): void {
+  function setScrollTop(viewId: TreeViewId, scrollTop: Pixels): void {
     const view = opened_views.value.find(
       (openedView: ReadonlyOpenedView) => openedView.id === viewId,
     );
@@ -400,7 +405,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     }
   }
 
-  function setOpened(viewId: string, opened: readonly string[]): void {
+  function setOpened(viewId: TreeViewId, opened: readonly TreeNodeId[]): void {
     const view = opened_views.value.find(
       (openedView: ReadonlyOpenedView) => openedView.id === viewId,
     );
@@ -409,7 +414,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     }
   }
 
-  function setRowHeights(heights: readonly number[]): void {
+  function setRowHeights(heights: readonly Pixels[]): void {
     rowHeights.value = [...heights];
   }
 
@@ -423,7 +428,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
     };
   }
 
-  function renameItem(dataId: DataId, newName: string): void {
+  function renameItem(dataId: DataId, newName: DataName): void {
     for (const group of items.value) {
       const child = group.children.find((childItem) => childItem.id === dataId);
       if (child) {

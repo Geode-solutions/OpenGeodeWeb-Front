@@ -43,7 +43,7 @@ describe("favorite and recent crs", () => {
     );
     const wrapper = await mountSuspended(CrsSelector, {
       global: { plugins: [vuetify, pinia] },
-      props: { geodeObjectType: "BRep", ...props },
+      props: { geodeObjectType: "BRep", favorites: [], recent: [], ...props },
     });
     await wrapper.vm.$nextTick();
     return wrapper;

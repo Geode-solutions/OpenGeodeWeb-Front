@@ -7,7 +7,9 @@ import {
   facingCameraPose,
   isFacing,
 } from "@ogw_front/utils/orientation_compass";
+import type { Angle } from "@ogw_front/types/geometry";
 import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types";
+import type { Pixels } from "@ogw_front/types/ui";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 // Compass in the app theme: the dial turns with the camera heading (north = world +Y) and flattens
@@ -73,11 +75,11 @@ const letters = computed(() =>
   }),
 );
 
-function tickInnerRadius(angle: number): number {
+function tickInnerRadius(angle: Angle): Pixels {
   return angle % QUARTER_TURN === 0 ? CARDINAL_TICK_INNER_RADIUS : TICK_INNER_RADIUS;
 }
 
-function face(targetHeading: number): void {
+function face(targetHeading: Angle): void {
   // Like a click without drag in the viewer: a camera already facing that way is not moved (no viewer call)
   if (!basis.value || isFacing(basis.value, targetHeading)) {
     return;

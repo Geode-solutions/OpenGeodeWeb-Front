@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import Grid2D_Points from "@ogw_front/assets/viewer_svgs/grid_2d_points.svg";
+import type { MenuItemIndex } from "@ogw_front/types/ui";
 import ViewerGenericMeshPointsOptions from "@ogw_front/components/Viewer/Generic/Mesh/PointsOptions.vue";
 
 interface Props {
   dataId: DataId;
-  index: number;
+  index: MenuItemIndex;
 }
 
 const { dataId, index } = defineProps<Props>();

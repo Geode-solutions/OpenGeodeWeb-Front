@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { MAP_STYLES, mapStyleOf } from "@ogw_front/utils/basemap_tree";
+import type { MenuItemIndex, Tooltip } from "@ogw_front/types/ui";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import { useBasemapStore } from "@ogw_front/stores/basemap";
 
 interface Props {
   dataId: DataId;
-  index: number;
-  tooltip?: string;
+  index: MenuItemIndex;
+  tooltip?: Tooltip;
 }
 
 const { dataId, index, tooltip = "Crop to data" } = defineProps<Props>();

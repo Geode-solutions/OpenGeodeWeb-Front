@@ -1,4 +1,6 @@
 import type { CameraOptions, Vector3, vtkCamera } from "./vtk_types";
+import type { Milliseconds } from "@ogw_front/types/time";
+import type { Ratio } from "@ogw_front/types/geometry";
 import { dot } from "@kitware/vtk.js/Common/Core/Math";
 
 const NEAR_ZERO_THRESHOLD = 1e-10;
@@ -23,7 +25,7 @@ function vecNormalize(vector: Vector3): Vector3 {
   return [vector[0] / len, vector[1] / len, vector[2] / len];
 }
 
-function slerp(from: Vector3, target: Vector3, ratio: number, mid?: Vector3): Vector3 {
+function slerp(from: Vector3, target: Vector3, ratio: Ratio, mid?: Vector3): Vector3 {
   const normFrom = vecNormalize(from);
   const normTarget = vecNormalize(target);
   let dotProduct =
@@ -64,7 +66,10 @@ function getCameraOptions(camera: vtkCamera): CameraOptions {
   };
 }
 
-function computeAnimationDuration(startState: CameraOptions, targetState: CameraOptions): number {
+function computeAnimationDuration(
+  startState: CameraOptions,
+  targetState: CameraOptions,
+): Milliseconds {
   const startDir = vecNormalize(vecSub(startState.position, startState.focal_point));
   const targetDir = vecNormalize(vecSub(targetState.position, targetState.focal_point));
   const dotProduct = Math.max(-1, Math.min(1, dot(startDir, targetDir)));
@@ -79,7 +84,7 @@ interface AnimateCameraOptions {
   camera: vtkCamera;
   startState: CameraOptions;
   targetState: CameraOptions;
-  duration: number;
+  duration: Milliseconds;
   bumpMultiplier: number;
   easeExponent: number;
   onUpdate: () => void;

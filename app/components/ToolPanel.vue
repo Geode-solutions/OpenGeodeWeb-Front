@@ -1,34 +1,33 @@
 <script setup lang="ts">
+import type { Label, Pixels, Title } from "@ogw_front/types/ui";
 import GlassCard from "@ogw_front/components/GlassCard.vue";
 
-const DEFAULT_PANEL_WIDTH = 260;
-
 interface Props {
-  title?: string;
-  width?: number;
-  closeLabel?: string;
-  actionLabel?: string;
+  title?: Title;
+  width: Pixels;
+  closeLabel?: Label;
+  actionLabel?: Label;
   // The content brings its own title and close control
   hideActions?: boolean;
   clickOutside?: boolean;
-  escapeFunction?: () => void;
+  escapeFunction: (() => void) | undefined;
 }
-
-const {
-  title = undefined,
-  width = DEFAULT_PANEL_WIDTH,
-  closeLabel = "Close",
-  actionLabel = undefined,
-  hideActions = false,
-  clickOutside = true,
-  escapeFunction = undefined,
-} = defineProps<Props>();
-
-const model = defineModel<boolean>({ default: false });
 
 interface Emits {
   action: [];
 }
+
+const {
+  title = undefined,
+  width,
+  closeLabel = "Close",
+  actionLabel = undefined,
+  hideActions = false,
+  clickOutside = true,
+  escapeFunction,
+} = defineProps<Props>();
+
+const model = defineModel<boolean>({ default: false });
 
 const emit = defineEmits<Emits>();
 

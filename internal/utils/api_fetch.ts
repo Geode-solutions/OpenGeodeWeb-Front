@@ -1,6 +1,9 @@
 import type { JsonRpcSchema, RequestHandlersWithValidation } from "@ogw_shared/utils/types.js";
 import { endRequestLog, startRequestLog } from "@ogw_front/utils/log";
 import { reportError, reportTimeout } from "./error_feedback.js";
+import type { Milliseconds } from "@ogw_front/types/time";
+import type { StoreId } from "@ogw_front/types/identifiers";
+import type { Url } from "@ogw_front/types/files";
 import { consola } from "consola";
 import { fetchSchema } from "@ogw_shared/utils/fetch_schema";
 import { trackRequest } from "./track_request.js";
@@ -8,15 +11,27 @@ import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 // The microservice-backed Pinia stores (back/app/...) all expose this shape; only the slice actually used here needs to be declared.
 interface Microservice {
-  $id: string;
-  base_url: string;
+  $id: StoreId;
+  base_url: Url;
   start_request: () => void;
   stop_request: () => void;
 }
 
+// An HTTP method a microservice route accepts, such as "POST"
+type HttpMethod = string;
+
+// The schema of an HTTP microservice route, whose methods are always set
+type HttpJsonRpcSchema = JsonRpcSchema & { methods: HttpMethod[] };
+
+// How a request reports: its timeout in milliseconds and whether its errors skip the feedback
+interface RequestFeedbackOptions {
+  timeout?: Milliseconds;
+  skip_feedback_error?: boolean;
+}
+
 interface ApiFetchParams {
   // This function always forwards this schema to fetchSchema, which requires the HTTP-flavored `methods` array (as opposed to the websocket `rpc` field).
-  schema: JsonRpcSchema & { methods: string[] };
+  schema: HttpJsonRpcSchema;
   params?: object;
   headers?: Record<string, string>;
   // False for the requests repeated in the background (pings): the activity panel only shows their failures
@@ -33,7 +48,7 @@ async function api_fetch(
     response_error_function,
     timeout,
     skip_feedback_error,
-  }: RequestHandlersWithValidation & { timeout?: number; skip_feedback_error?: boolean } = {},
+  }: RequestHandlersWithValidation & RequestFeedbackOptions = {},
 ): Promise<unknown> {
   consola.info("[API] Fetching", microservice.base_url);
   const feedbackStore = useFeedbackStore();
@@ -96,4 +111,4 @@ async function api_fetch(
 }
 
 export { api_fetch };
-export type { Microservice };
+export type { HttpJsonRpcSchema, HttpMethod, Microservice, RequestFeedbackOptions };

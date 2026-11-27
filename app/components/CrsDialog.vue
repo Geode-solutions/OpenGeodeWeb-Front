@@ -21,21 +21,25 @@ import { useCrsStore } from "@ogw_front/stores/crs";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 import { useLiveDataItem } from "@ogw_front/composables/live_data_item";
 
-const { show = false, itemId = undefined } = defineProps<{
-  show?: boolean;
-  itemId?: DataId;
-}>();
+interface Props {
+  show: boolean;
+  itemId: DataId | undefined;
+}
+
+interface Emits {
+  "update:show": [value: boolean];
+  assigned: [];
+  converted: [];
+}
+
+const { show, itemId } = defineProps<Props>();
 
 // Read live by its id: the stored CRS shown and the candidates follow the changes
 const liveItem = useLiveDataItem(() => itemId);
 // The live query starts with an empty placeholder: the item is ready once it is the asked one
 const item = computed(() => (liveItem.value?.data_id === itemId ? liveItem.value : undefined));
 
-const emit = defineEmits<{
-  "update:show": [value: boolean];
-  assigned: [];
-  converted: [];
-}>();
+const emit = defineEmits<Emits>();
 
 const backStore = useBackStore();
 const crsStore = useCrsStore();

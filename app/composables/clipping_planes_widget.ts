@@ -14,6 +14,7 @@ import {
   type vtkWidgetManager as WidgetManagerInstance,
   newInstance as vtkWidgetManager,
 } from "@kitware/vtk.js/Widgets/Core/WidgetManager";
+import type { Coordinates } from "@ogw_front/types/geometry";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { DataIdentified } from "@ogw_front/types/identifiers";
 import type { vtkGenericRenderWindow as GenericRenderWindowInstance } from "@ogw_internal/stores/hybrid_viewer/vtk_types";
@@ -64,7 +65,7 @@ function useClippingPlanesWidget({
       ),
     );
   }
-  function getSceneCenter(): readonly number[] {
+  function getSceneCenter(): Readonly<Coordinates> {
     return getSceneBoundsInfo().center;
   }
 

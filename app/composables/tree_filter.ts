@@ -1,13 +1,13 @@
 import type { ComputedRef, Ref } from "vue";
+import type { SearchQuery, SortType, Title } from "@ogw_front/types/ui";
 import type { GeodeIdentified } from "@ogw_front/types/identifiers";
-
-// Same shape as Vue's MaybeRefOrGetter<T>, kept as a local alias for readability at call sites.
-type ReadonlyMaybeRefOrGetter<Value> = Value | Ref<Value> | (() => Value);
+import type { ReadonlyMaybeRefOrGetter } from "@ogw_front/composables/virtual_tree_types";
+import type { TreeFilterCategory } from "@ogw_front/types/tree";
 
 // This composable filters/sorts different flavors of "category with children" trees (treeview groups, model component/collection groups, ...); this shape captures just the fields it reads/writes, generically, across all of them.
 interface FilterableItem extends Readonly<Partial<GeodeIdentified>> {
   readonly id: unknown;
-  readonly title?: string;
+  readonly title?: Title;
   // Geode objects (data and model components) carry a geode_id, group nodes do not.
   readonly children?: readonly FilterableItem[];
 }
@@ -18,16 +18,16 @@ interface FilterContext {
 
 interface TreeFilterOptions {
   readonly recursiveSort?: boolean;
-  readonly defaultSort?: string;
-  readonly defaultFilters?: Record<string, boolean>;
+  readonly defaultSort?: SortType;
+  readonly defaultFilters?: Record<TreeFilterCategory, boolean>;
 }
 
 interface UseTreeFilterReturn {
-  search: Ref<string>;
-  sortType: Ref<string>;
-  filterOptions: Ref<Record<string, boolean>>;
+  search: Ref<SearchQuery>;
+  sortType: Ref<SortType>;
+  filterOptions: Ref<Record<TreeFilterCategory, boolean>>;
   processedItems: ComputedRef<FilterableItem[]>;
-  availableFilterOptions: ComputedRef<string[]>;
+  availableFilterOptions: ComputedRef<TreeFilterCategory[]>;
   toggleSort: () => void;
   customFilter: typeof customFilter;
   applySearchFilter: <TId>(
@@ -38,7 +38,7 @@ interface UseTreeFilterReturn {
 
 function customFilter(
   value: unknown,
-  searchQuery: string | undefined,
+  searchQuery: SearchQuery | undefined,
   item: FilterContext,
 ): boolean {
   if (searchQuery === undefined || searchQuery === "") {
@@ -65,7 +65,7 @@ function toSortKey(item: FilterableItem, field: "title" | "id"): string {
 
 function sortAndFormatItems(
   itemList: readonly FilterableItem[] | undefined | null,
-  sortType: string,
+  sortType: SortType,
   options: TreeFilterOptions = {},
 ): FilterableItem[] {
   if (!itemList) {
@@ -113,8 +113,8 @@ function useTreeFilter(
 ): UseTreeFilterReturn {
   const rawItems = toItemsRef(itemsIn);
   const search = ref("");
-  const sortType = ref(options.defaultSort ?? "name");
-  const filterOptions = ref<Record<string, boolean>>({ ...options.defaultFilters });
+  const sortType = ref<SortType>(options.defaultSort ?? "name");
+  const filterOptions = ref<Record<TreeFilterCategory, boolean>>({ ...options.defaultFilters });
 
   const availableFilterOptions = computed(() =>
     rawItems.value.map((category) => String(category.title ?? category.id)),
@@ -122,7 +122,7 @@ function useTreeFilter(
 
   watch(
     availableFilterOptions,
-    (newOptions: readonly string[]) => {
+    (newOptions: readonly TreeFilterCategory[]) => {
       for (const option of newOptions) {
         filterOptions.value[option] ??= true;
       }

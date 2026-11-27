@@ -1,15 +1,27 @@
 <script setup lang="ts">
+import type { Count, Pixels } from "@ogw_front/types/ui";
 import type { GeodeId } from "@geode/opengeodeweb-microservice/schema_types";
 import GlobalObjects from "@ogw_front/components/Viewer/ObjectTree/Views/GlobalObjects.vue";
 import type { ModelId } from "@ogw_front/types/identifiers";
 import ModelTree from "@ogw_front/components/Viewer/ObjectTree/Views/ModelTree.vue";
 import type { TreeMenuPayload } from "@ogw_front/utils/treeview";
+import type { TreeViewIndex } from "@ogw_front/types/tree";
 import ViewerObjectTreeBox from "@ogw_front/components/Viewer/ObjectTree/Box.vue";
 import { geodeObjectImage } from "@ogw_front/assets/geode_objects";
 import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
 import { useModelHeaderHover } from "@ogw_front/composables/model_header_hover";
 import { useModelTreeDrag } from "@ogw_front/composables/model_tree_drag";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
+
+// The props of the layout of the objects tree and of the model trees
+
+interface Emits {
+  "show-menu": [payload: TreeMenuPayload];
+}
+
+interface ObjectTreeLayoutProps {
+  containerWidth: Pixels;
+}
 
 const WIDTH_MIN = 100;
 const HEIGHT_MIN = 150;
@@ -22,27 +34,19 @@ const AUTO_CLOSE_THRESHOLD = 80;
 // Apps can align the panels on their own shape system (fallbacks: the former look)
 const PANEL_RADIUS = "var(--ogw-viewer-panel-radius, 16px)";
 
-interface Props {
-  containerWidth: number;
-}
-
-const { containerWidth } = defineProps<Props>();
+const { containerWidth } = defineProps<ObjectTreeLayoutProps>();
 
 const treeviewStore = useTreeviewStore();
 const { onModelHeaderEnter, onModelHeaderLeave } = useModelHeaderHover();
 const { draggedId, dropTargetId, onDragStart, onDragOver, onDragEnd, onDrop, dropSide } =
   useModelTreeDrag();
 
-interface Emits {
-  "show-menu": [payload: TreeMenuPayload];
-}
-
 const emit = defineEmits<Emits>();
 
 const activityBar = useTemplateRef("activity-bar");
 const { adaptiveStyles: activityBarAdaptiveStyles } = useAdaptiveStyles(activityBar);
 
-const maxWidth = computed<number>(() => containerWidth * MAX_PANEL_WIDTH_RATIO);
+const maxWidth = computed<Pixels>(() => containerWidth * MAX_PANEL_WIDTH_RATIO);
 
 const mainView = computed(() => treeviewStore.opened_views.find((view) => view.id === "main"));
 const additionalViews = computed(() =>
@@ -63,7 +67,7 @@ const totalWidth = computed<string>(() => {
   return `${firstColWidth + secondColWidth + gap}px`;
 });
 
-const rowHeights = computed<number[]>({
+const rowHeights = computed<Pixels[]>({
   get: () => treeviewStore.rowHeights,
   set: (val) => treeviewStore.setRowHeights(val),
 });
@@ -78,7 +82,7 @@ watch(
   { immediate: true },
 );
 
-watch([maxWidth, (): number => shownViews.value.length], ([newMax]): void => {
+watch([maxWidth, (): Count => shownViews.value.length], ([newMax]): void => {
   const hasAdditional = shownViews.value.length > 0;
   const gap = hasAdditional ? GAP_WIDTH : 0;
   const total =
@@ -173,7 +177,7 @@ function onAdditionalResizeStart(event: MouseEvent): void {
   document.addEventListener("mouseup", stopResize, { signal: listeners.signal });
 }
 
-function onVerticalResizeStart(event: MouseEvent, index: number): void {
+function onVerticalResizeStart(event: MouseEvent, index: TreeViewIndex): void {
   const startY = event.clientY;
   const startHeight1 = rowHeights.value[index] ?? 0;
   const startHeight2 = rowHeights.value[index + 1] ?? 0;

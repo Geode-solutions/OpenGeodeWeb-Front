@@ -1,6 +1,7 @@
-import type { ModelId, ModelIdentified } from "@ogw_front/types/identifiers";
+import type { ModelId, ModelIdentified, TreeNodeId } from "@ogw_front/types/identifiers";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
 import type { ModelComponentRecord } from "@ogw_internal/stores/data/model/mesh_components";
+import type { ModelComponentType } from "@ogw_front/types/model";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { modelComponentsOf } from "@ogw_internal/database/queries";
 import type { useDataStyleState } from "@ogw_internal/stores/data_style/state";
@@ -9,8 +10,8 @@ type DataStyleState = ReturnType<typeof useDataStyleState>;
 
 function groupComponentsByType(
   components: readonly ModelComponentRecord[],
-): Record<string, ModelComponentRecord[]> {
-  const componentsByType: Record<string, ModelComponentRecord[]> = Object.fromEntries(
+): Record<ModelComponentType, ModelComponentRecord[]> {
+  const componentsByType: Record<ModelComponentType, ModelComponentRecord[]> = Object.fromEntries(
     MESH_COMPONENT_TYPES.map((componentType) => [componentType, []]),
   );
   for (const component of components) {
@@ -28,10 +29,10 @@ interface TypeSelectionContext extends Readonly<ModelIdentified> {
 }
 
 function computeTypeSelection(
-  componentType: string,
+  componentType: ModelComponentType,
   typeComponents: readonly ModelComponentRecord[],
   context: TypeSelectionContext,
-): string[] {
+): TreeNodeId[] {
   const { modelId, groupStyles, dataStyleState } = context;
   const typeKey = `${componentType.toLowerCase()}s`;
   const typeStyleKey = `${modelId}_${componentType}`;
@@ -47,7 +48,7 @@ function computeTypeSelection(
     (groupTypeStyle?.visibility as boolean | undefined) ??
     true;
 
-  const selection: string[] = [];
+  const selection: TreeNodeId[] = [];
   let allVisible = true;
   for (const component of typeComponents) {
     const styleKey = `${modelId}_${component.geode_id}`;
@@ -70,12 +71,12 @@ function buildSelection(
   modelId: ModelId,
   components: readonly ModelComponentRecord[],
   dataStyleState: DataStyleState,
-): string[] {
+): TreeNodeId[] {
   const componentsByType = groupComponentsByType(components);
   const groupStyles = dataStyleState.getStyle(modelId);
   const context: TypeSelectionContext = { modelId, groupStyles, dataStyleState };
 
-  const selection: string[] = [];
+  const selection: TreeNodeId[] = [];
   for (const componentType of MESH_COMPONENT_TYPES) {
     const typeComponents = componentsByType[componentType] ?? [];
     if (typeComponents.length === 0) {
@@ -86,14 +87,14 @@ function buildSelection(
   return selection;
 }
 
-const selectionCache = new Map<ModelId, ComputedRef<string[]>>();
+const selectionCache = new Map<ModelId, ComputedRef<TreeNodeId[]>>();
 
 function useModelSelection(
   modelId: ModelId | undefined,
   dataStyleState: DataStyleState,
-): ComputedRef<string[]> {
+): ComputedRef<TreeNodeId[]> {
   if (modelId === undefined || modelId === "") {
-    return computed<string[]>(() => []);
+    return computed<TreeNodeId[]>(() => []);
   }
 
   const cacheKey = modelId;

@@ -13,13 +13,17 @@ import {
   sceneStyleDb,
 } from "@ogw_internal/database/database";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { ModelComponentType } from "@ogw_front/types/model";
 import { getDefaultSceneStyle } from "@ogw_front/utils/default_styles";
 import merge from "lodash/merge";
 
 interface DataStyleStateApi extends SharedState {
   getStyle: (objectId: DataId) => ObjectStyle;
   getComponentStyle: (modelId: ModelId, componentId: ModelComponentId) => ModelComponentStyle;
-  getModelComponentTypeStyle: (modelId: ModelId, componentType: string) => ModelComponentTypeStyle;
+  getModelComponentTypeStyle: (
+    modelId: ModelId,
+    componentType: ModelComponentType,
+  ) => ModelComponentTypeStyle;
   mutateStyle: (objectId: DataId, styleValues: StyleValues) => Promise<DataId>;
   objectVisibility: ComputedRef<(objectId: DataId) => boolean | undefined>;
   selectedObjects: ComputedRef<DataId[]>;
@@ -78,7 +82,7 @@ export function useDataStyleState(): DataStyleStateApi {
 
   function getModelComponentTypeStyle(
     modelId: ModelId,
-    componentType: string,
+    componentType: ModelComponentType,
   ): ModelComponentTypeStyle {
     const cacheKey = `${modelId}_${componentType}`;
     return merge({ coloring: {} }, modelComponentTypeStyles.value[cacheKey]);

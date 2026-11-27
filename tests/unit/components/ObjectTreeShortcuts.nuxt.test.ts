@@ -57,7 +57,15 @@ describe("object tree keyboard shortcuts", () => {
   test.each(cases)("$name", async ({ props, event, expected }) => {
     const wrapper = await mountSuspended(CommonTreeView, {
       global: { plugins: [vuetify, pinia] },
-      props: { items, ...props },
+      props: {
+        items,
+        selected: [],
+        active: [],
+        scrollTop: 0,
+        options: {},
+        isRowViewable: () => true,
+        ...props,
+      },
     });
     await wrapper.find(".common-tree-view-wrapper").trigger("keydown", event);
     expect(wrapper.emitted("update:active")?.at(-1)).toStrictEqual(expected);

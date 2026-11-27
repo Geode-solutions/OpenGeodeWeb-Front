@@ -3,6 +3,7 @@ import type {
   AttributeColorMap,
   AttributeRange,
   AttributeTimeStep,
+  ColoringType,
 } from "@ogw_front/types/attribute";
 import type {
   AttributeItem,
@@ -13,6 +14,7 @@ import type {
 import type { CornerId, ModelId } from "@ogw_front/types/identifiers";
 import { MODEL_VERTEX_COLORING } from "@ogw_front/utils/model_component_coloring";
 import type { NonEmptyArray } from "@ogw_front/utils/arrays";
+import type { TabName } from "@ogw_front/types/ui";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -20,11 +22,11 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 interface Props {
   modelId: ModelId;
-  cornerId?: CornerId;
-  activeTab?: string;
+  cornerId: CornerId | undefined;
+  activeTab: TabName | undefined;
 }
 
-const { modelId, cornerId = undefined, activeTab = undefined } = defineProps<Props>();
+const { modelId, cornerId, activeTab } = defineProps<Props>();
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
@@ -58,8 +60,9 @@ const cornerColor = computed<ColorRGBA | undefined>({
   },
 });
 
-const cornerActiveColoring = computed<string | undefined>({
-  get: () => dataStyleStore.modelCornerActiveColoring(modelId, cornerId) as string | undefined,
+const cornerActiveColoring = computed<ColoringType | undefined>({
+  get: () =>
+    dataStyleStore.modelCornerActiveColoring(modelId, cornerId) as ColoringType | undefined,
   set: async (coloringType) => {
     if (cornerId === undefined || typeof coloringType !== "string") {
       return;

@@ -1,6 +1,7 @@
 import { type ComponentStyleFunctions, dispatchToComponentTypes } from "./visibility_dispatch";
 import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
+import type { ModelComponentType } from "@ogw_front/types/model";
 import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
@@ -21,11 +22,11 @@ interface UseModelVisibilityStyleReturn {
   ) => Promise<unknown[]>;
   setModelComponentTypeVisibility: (
     modelId: ModelId,
-    componentType: string,
+    componentType: ModelComponentType,
     visibility: Visibility,
   ) => Promise<void>;
   modelComponentVisibility: (modelId: ModelId, componentId: ModelComponentId) => Visibility;
-  modelComponentTypeVisibility: (modelId: ModelId, componentType: string) => Visibility;
+  modelComponentTypeVisibility: (modelId: ModelId, componentType: ModelComponentType) => Visibility;
 }
 
 // oxlint-disable-next-line max-lines-per-function
@@ -68,7 +69,7 @@ function useModelVisibilityStyle(
   }
   async function setModelComponentTypeVisibility(
     modelId: ModelId,
-    componentType: string,
+    componentType: ModelComponentType,
     visibility: Visibility,
   ): Promise<void> {
     await modelCommonStyle.mutateModelComponentTypeStyle(modelId, componentType, {
@@ -119,7 +120,10 @@ function useModelVisibilityStyle(
     const selection = useModelSelection(modelId, dataStyleState);
     return selection.value.includes(componentId);
   }
-  function modelComponentTypeVisibility(modelId: ModelId, componentType: string): Visibility {
+  function modelComponentTypeVisibility(
+    modelId: ModelId,
+    componentType: ModelComponentType,
+  ): Visibility {
     const selection = useModelSelection(modelId, dataStyleState);
     return selection.value.includes(componentType);
   }

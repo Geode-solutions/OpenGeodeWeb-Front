@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import type { ModelTabItem } from "@ogw_front/composables/model_tabs";
+import type { TabName } from "@ogw_front/types/ui";
 
 interface Props {
   tabs: ModelTabItem[];
 }
 
 const { tabs } = defineProps<Props>();
-const activeTab = defineModel<string>({ required: true });
+const activeTab = defineModel<TabName>({ required: true });
 </script>
 
 <template>

@@ -1,4 +1,5 @@
-import type { AttributeColorMap, AttributeRange } from "@ogw_front/types/attribute";
+// oxlint-disable eslint/max-lines
+import type { AttributeColorMap, AttributeRange, ColoringType } from "@ogw_front/types/attribute";
 import type {
   AttributeName,
   AttributeRangeMaximum,
@@ -6,7 +7,8 @@ import type {
   ColorRGBA,
 } from "@geode/opengeodeweb-viewer/schema_types";
 import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
-// oxlint-disable eslint/max-lines
+import type { ComponentStyleFunctions } from "./visibility_dispatch";
+import type { ModelComponentType } from "@ogw_front/types/model";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { dispatchToComponentTypes } from "./visibility";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -14,11 +16,8 @@ import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useModelCommonStyle } from "@ogw_internal/stores/data_style/model/common";
 
 // The four per-component-type style composables (Surface/Line/Block/Corner) each expose a different, large set of methods (color, visibility, per-attribute-kind getters/setters...). This module only cares about looking a handful of them up dynamically by name (built into ATTRIBUTE_FUNCTIONS below), so a precise structural type for componentStyleFunctions isn't worth modelling here; `any` keeps the dynamic dispatch table honest about that.
-// oxlint-disable-next-line @typescript-eslint/no-explicit-any
-type ComponentStyleFunctions = Record<"Surface" | "Line" | "Block" | "Corner", any>;
-
 interface AttributeAccessors {
-  getName: (modelId: ModelId, componentId: ModelComponentId) => string | undefined;
+  getName: (modelId: ModelId, componentId: ModelComponentId) => AttributeName | undefined;
   setName: (modelId: ModelId, componentIds: ModelComponentId[], name: AttributeName) => unknown;
   getRange: (modelId: ModelId, componentId: ModelComponentId) => AttributeRange;
   setRange: (
@@ -36,7 +35,10 @@ interface AttributeAccessors {
 }
 
 // The signatures below describe just the per-attribute-kind methods this module reads off each dynamically-typed composable (see the `any` in ComponentStyleFunctions above). `attributeFn` narrows one such method to its known signature so every downstream read/call is a real, checked type instead of `any`.
-type AttributeNameFn = (modelId: ModelId, componentId: ModelComponentId) => string | undefined;
+type AttributeNameFn = (
+  modelId: ModelId,
+  componentId: ModelComponentId,
+) => AttributeName | undefined;
 type SetAttributeNameFn = (
   modelId: ModelId,
   componentIds: ModelComponentId[],
@@ -49,7 +51,10 @@ type SetAttributeRangeFn = (
   minimum: AttributeRangeMinimum,
   maximum: AttributeRangeMaximum,
 ) => unknown;
-type AttributeColorMapFn = (modelId: ModelId, componentId: ModelComponentId) => string | undefined;
+type AttributeColorMapFn = (
+  modelId: ModelId,
+  componentId: ModelComponentId,
+) => AttributeColorMap | undefined;
 type SetAttributeColorMapFn = (
   modelId: ModelId,
   componentIds: ModelComponentId[],
@@ -94,27 +99,31 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
   getModelComponentEffectiveColor: (
     modelId: ModelId,
     componentId: ModelComponentId,
-    type: string,
+    type: ModelComponentType,
   ) => unknown;
   getModelComponentActiveColoring: (modelId: ModelId, componentId: ModelComponentId) => unknown;
-  modelComponentTypeColor: (modelId: ModelId, type: string) => unknown;
-  getModelComponentTypeActiveColoring: (modelId: ModelId, type: string) => unknown;
-  setModelComponentTypeColor: (modelId: ModelId, type: string, color: ColorRGBA) => Promise<void>;
+  modelComponentTypeColor: (modelId: ModelId, type: ModelComponentType) => unknown;
+  getModelComponentTypeActiveColoring: (modelId: ModelId, type: ModelComponentType) => unknown;
+  setModelComponentTypeColor: (
+    modelId: ModelId,
+    type: ModelComponentType,
+    color: ColorRGBA,
+  ) => Promise<void>;
   setModelComponentTypeActiveColoring: (
     modelId: ModelId,
-    type: string,
-    activeColoring: string,
+    type: ModelComponentType,
+    activeColoring: ColoringType,
   ) => Promise<void>;
   setModelComponentActiveColoring: (
     modelId: ModelId,
     componentId: ModelComponentId,
-    activeColoring: string,
+    activeColoring: ColoringType,
   ) => Promise<void>;
   setModelComponentsColor: (
     modelId: ModelId,
     componentIds: ModelComponentId[],
     color: ColorRGBA | undefined,
-    activeColoring?: string,
+    activeColoring?: ColoringType,
   ) => Promise<unknown[]>;
 } {
   const dataStore = useDataStore();
@@ -128,7 +137,10 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
   const Block = componentStyleFunctions.Block as DynamicStyleFunctions;
   // oxlint-disable-next-line no-unsafe-type-assertion -- componentStyleFunctions is a dynamic dispatch table typed any by design; see ComponentStyleFunctions comment above.
   const Corner = componentStyleFunctions.Corner as DynamicStyleFunctions;
-  const ATTRIBUTE_FUNCTIONS: Record<string, Record<string, AttributeAccessors>> = {
+  const ATTRIBUTE_FUNCTIONS: Record<
+    ModelComponentType,
+    Record<ColoringType, AttributeAccessors>
+  > = {
     Surface: {
       vertex: {
         getName: attributeFn<AttributeNameFn>(Surface.modelSurfacesVertexAttributeName),
@@ -211,7 +223,7 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
     const coloring = dataStyleState.getComponentStyle(modelId, componentId).coloring as StyleValues;
     return coloring.constant;
   }
-  function modelComponentTypeColor(modelId: ModelId, type: string): unknown {
+  function modelComponentTypeColor(modelId: ModelId, type: ModelComponentType): unknown {
     const groupStyle = dataStyleState.getModelComponentTypeStyle(modelId, type);
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
     const groupColoring = groupStyle.coloring as StyleValues;
@@ -224,7 +236,7 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
   function getModelComponentEffectiveColor(
     modelId: ModelId,
     componentId: ModelComponentId,
-    type: string,
+    type: ModelComponentType,
   ): unknown {
     const individualColor = getModelComponentColor(modelId, componentId);
     if (individualColor !== undefined) {
@@ -240,7 +252,10 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
     const coloring = dataStyleState.getComponentStyle(modelId, componentId).coloring as StyleValues;
     return coloring.active;
   }
-  function getModelComponentTypeActiveColoring(modelId: ModelId, type: string): unknown {
+  function getModelComponentTypeActiveColoring(
+    modelId: ModelId,
+    type: ModelComponentType,
+  ): unknown {
     const groupStyle = dataStyleState.getModelComponentTypeStyle(modelId, type);
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring shape is defined by the data style schema.
     const groupColoring = groupStyle.coloring as StyleValues;
@@ -275,7 +290,7 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
   }
   async function setModelComponentTypeColor(
     modelId: ModelId,
-    type: string,
+    type: ModelComponentType,
     color: ColorRGBA,
   ): Promise<void> {
     await modelCommonStyle.mutateModelComponentTypeStyle(modelId, type, {
@@ -292,8 +307,8 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
   }
   async function setModelComponentTypeActiveColoring(
     modelId: ModelId,
-    type: string,
-    activeColoring: string,
+    type: ModelComponentType,
+    activeColoring: ColoringType,
   ): Promise<void> {
     await modelCommonStyle.mutateModelComponentTypeStyle(modelId, type, {
       coloring: {
@@ -326,7 +341,7 @@ function useModelColorStyle(componentStyleFunctions: ComponentStyleFunctions): {
   async function setModelComponentActiveColoring(
     modelId: ModelId,
     componentId: ModelComponentId,
-    activeColoring: string,
+    activeColoring: ColoringType,
   ): Promise<void> {
     await modelCommonStyle.mutateComponentStyle(modelId, componentId, {
       coloring: {

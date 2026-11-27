@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { MenuItemIndex, Tooltip } from "@ogw_front/types/ui";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import PolygonalSurfacePolygons from "@ogw_front/assets/viewer_svgs/surface_triangles.svg";
@@ -10,15 +11,15 @@ import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
+interface Props {
+  dataId: DataId;
+  index: MenuItemIndex;
+  tooltip?: Tooltip;
+}
+
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const { applyBatchStyle } = useBatchStyle();
-
-interface Props {
-  dataId: DataId;
-  index: number;
-  tooltip?: string;
-}
 
 const { dataId, index, tooltip = "Polygons options" } = defineProps<Props>();
 

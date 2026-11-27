@@ -1,8 +1,10 @@
+import type { Count, Pixels } from "@ogw_front/types/ui";
 import { type DataItem, useDataStore } from "@ogw_front/stores/data";
 import type {
   GeodeObjectType,
   ViewerObjectType,
 } from "@geode/opengeodeweb-microservice/data_types";
+import type { Coordinate } from "@ogw_front/types/geometry";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { DataIdentified } from "@ogw_front/types/identifiers";
 import type { ViewerId } from "@geode/opengeodeweb-viewer/schema_types";
@@ -20,7 +22,7 @@ interface PickedItem {
 
 interface ProposedItem extends DataIdentified {
   viewer_id: ViewerId | undefined;
-  name: string;
+  name: DataItem["name"];
   viewer_object_type: ViewerObjectType | undefined;
   geode_object_type: GeodeObjectType | undefined;
 }
@@ -32,20 +34,27 @@ interface ViewerIdResult {
   dismissed?: boolean;
 }
 
+// Where the intermediate menu is placed in its container, as CSS values
+interface IntermediateMenuStyle {
+  position: string;
+  left: string;
+  top: string;
+}
+
 interface GetViewerIdParams {
-  x: number;
-  y: number;
-  containerWidth: number;
-  containerHeight: number;
-  containerRect: { left: number; top: number };
+  x: Coordinate;
+  y: Coordinate;
+  containerWidth: Pixels;
+  containerHeight: Pixels;
+  containerRect: { left: Pixels; top: Pixels };
 }
 
 interface UseOverlappingPickerReturn {
   displayIntermediate: Ref<boolean>;
   intermediateItems: Ref<ProposedItem[]>;
-  intermediateMenuX: Ref<number>;
-  intermediateMenuY: Ref<number>;
-  getIntermediateMenuStyle: () => { position: string; left: string; top: string };
+  intermediateMenuX: Ref<Coordinate>;
+  intermediateMenuY: Ref<Coordinate>;
+  getIntermediateMenuStyle: () => IntermediateMenuStyle;
   selectIntermediateItem: (item: ProposedItem | undefined) => void;
   handleIntermediateMenuUpdate: (val: boolean) => void;
   get_viewer_id: (params: GetViewerIdParams) => Promise<ViewerIdResult>;
@@ -88,7 +97,7 @@ export function useOverlappingPicker(): UseOverlappingPickerReturn {
     return proposedItems;
   }
 
-  function getIntermediateMenuStyle(): { position: string; left: string; top: string } {
+  function getIntermediateMenuStyle(): IntermediateMenuStyle {
     return {
       position: "fixed",
       left: `${intermediateMenuX.value}px`,
@@ -124,7 +133,7 @@ export function useOverlappingPicker(): UseOverlappingPickerReturn {
 
   function showIntermediateMenu(
     { x, y, containerWidth, containerHeight, containerRect }: GetViewerIdParams,
-    itemCount: number,
+    itemCount: Count,
   ): void {
     const position = computeMenuPosition({ x, y, containerWidth, containerHeight, itemCount });
     intermediateMenuX.value = containerRect.left + position.x;
@@ -180,4 +189,4 @@ export function useOverlappingPicker(): UseOverlappingPickerReturn {
   };
 }
 
-export type { ProposedItem, ViewerIdResult };
+export type { IntermediateMenuStyle, ProposedItem, ViewerIdResult };

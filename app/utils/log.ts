@@ -1,10 +1,11 @@
 import type { JsonRpcSchema } from "@ogw_shared/utils/types.js";
+import type { MicroserviceId } from "@ogw_front/types/identifiers";
 import { consola } from "consola";
 
 const MILLISECONDS_IN_SECOND = 1000;
 
 interface Loggable {
-  $id: string;
+  $id: MicroserviceId;
 }
 
 function startRequestLog(microservice: Loggable, schema: JsonRpcSchema): Date {

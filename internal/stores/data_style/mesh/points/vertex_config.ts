@@ -9,6 +9,7 @@ import type {
   AttributeStoredConfig,
 } from "@ogw_internal/stores/data_style/attribute_types";
 import type { MeshId } from "@ogw_front/types/identifiers";
+import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 
 // Local imports
@@ -17,7 +18,10 @@ import { useMeshPointsCommonStyle } from "./common";
 interface UseMeshPointsVertexAttributeConfigReturn {
   meshPointsVertexAttribute: (meshId: MeshId) => AttributeState;
   meshPointsVertexAttributeName: (meshId: MeshId) => AttributeName | undefined;
-  meshPointsVertexAttributeLastItem: (meshId: MeshId, name: AttributeName | undefined) => number;
+  meshPointsVertexAttributeLastItem: (
+    meshId: MeshId,
+    name: AttributeName | undefined,
+  ) => AttributeItem;
   meshPointsVertexAttributeItem: (meshId: MeshId) => AttributeItem;
   meshPointsVertexAttributeStoredConfig: (
     meshId: MeshId,
@@ -27,7 +31,7 @@ interface UseMeshPointsVertexAttributeConfigReturn {
 }
 
 interface UseMeshPointsVertexAttributeConfigWriterReturn {
-  mutateMeshPointsVertexStyle: (meshId: MeshId, values: Record<string, unknown>) => Promise<MeshId>;
+  mutateMeshPointsVertexStyle: (meshId: MeshId, values: StyleValues) => Promise<MeshId>;
   setMeshPointsVertexAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
@@ -61,7 +65,7 @@ function useMeshPointsVertexAttributeConfig(): UseMeshPointsVertexAttributeConfi
   function meshPointsVertexAttributeLastItem(
     meshId: MeshId,
     name: AttributeName | undefined,
-  ): number {
+  ): AttributeItem {
     const { storedConfigs } = meshPointsVertexAttribute(meshId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
     if (nameConfig !== undefined) {
@@ -121,10 +125,7 @@ function useMeshPointsVertexAttributeConfigValues(): UseMeshPointsVertexAttribut
 
 function useMeshPointsVertexAttributeConfigWriter(): UseMeshPointsVertexAttributeConfigWriterReturn {
   const meshPointsCommonStyle = useMeshPointsCommonStyle();
-  async function mutateMeshPointsVertexStyle(
-    meshId: MeshId,
-    values: Record<string, unknown>,
-  ): Promise<MeshId> {
+  async function mutateMeshPointsVertexStyle(meshId: MeshId, values: StyleValues): Promise<MeshId> {
     const result = await meshPointsCommonStyle.mutateMeshPointsStyle(meshId, {
       coloring: {
         vertex: values,

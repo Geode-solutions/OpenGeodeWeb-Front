@@ -1,7 +1,15 @@
 <script setup lang="ts">
-defineProps<{ active?: boolean }>();
+interface Props {
+  active: boolean;
+}
 
-const emit = defineEmits<{ click: [] }>();
+interface Emits {
+  click: [];
+}
+
+defineProps<Props>();
+
+const emit = defineEmits<Emits>();
 </script>
 
 <template>

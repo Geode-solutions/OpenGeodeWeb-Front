@@ -4,28 +4,38 @@ import {
   type SliceAxis,
   areAllGrids,
 } from "@ogw_front/utils/slice";
+import type { ClippingItemId } from "@ogw_front/composables/clipping_planes_widget_entries";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { DataIdentified } from "@ogw_front/types/identifiers";
 import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import type { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
+// The layer of cells of a grid a slice shows, counted along the slice axis
+type SliceLayer = number;
+
+// The position of a slice in the list of slices
+type SliceIndex = number;
+
+// The highest layer a slice can show along each axis
+type SliceMaxLayers = [x: SliceLayer, y: SliceLayer, z: SliceLayer];
+
 interface Slice {
-  id: number;
+  id: ClippingItemId;
   axis: SliceAxis;
-  index: number;
+  index: SliceLayer;
 }
 
 interface SliceList {
   sliceEnabled: Ref<boolean>;
   slices: Ref<Slice[]>;
   addSlice: () => void;
-  removeSlice: (index: number) => void;
+  removeSlice: (index: SliceIndex) => void;
   resetSlices: () => void;
 }
 
 interface SliceSyncParams {
   slices: Ref<Slice[]>;
-  sliceMaxIndices: Ref<[number, number, number]>;
+  sliceMaxIndices: Ref<SliceMaxLayers>;
   isAllGrid: ComputedRef<boolean>;
   isSliceActive: ComputedRef<boolean>;
   targetIds: ComputedRef<DataId[]>;
@@ -37,19 +47,19 @@ interface ClippingSlicesParams {
   allItems: ComputedRef<(DataIdentified & { geode_object_type: GeodeObjectType })[]>;
   targetIds: ComputedRef<DataId[]>;
   getUntargetedIds: () => DataId[];
-  newItemId: () => number;
+  newItemId: () => ClippingItemId;
   hybridViewerStore: ReturnType<typeof useHybridViewerStore>;
 }
 
 interface ClippingSlices extends SliceList {
-  sliceMaxIndices: Ref<[number, number, number]>;
+  sliceMaxIndices: Ref<SliceMaxLayers>;
   isAllGrid: ComputedRef<boolean>;
   isSliceActive: ComputedRef<boolean>;
   applySlices: () => Promise<void>;
   removeSlices: (allIds: DataId[]) => Promise<void>;
 }
 
-function useSliceList(newItemId: () => number): SliceList {
+function useSliceList(newItemId: () => ClippingItemId): SliceList {
   const sliceEnabled = ref<boolean>(false);
   const slices = ref<Slice[]>([{ id: newItemId(), axis: DEFAULT_SLICE_AXIS, index: 0 }]);
 
@@ -62,7 +72,7 @@ function useSliceList(newItemId: () => number): SliceList {
     });
   }
 
-  function removeSlice(index: number): void {
+  function removeSlice(index: SliceIndex): void {
     slices.value.splice(index, 1);
   }
 
@@ -97,7 +107,7 @@ function useSliceSync(params: SliceSyncParams): {
   const queueSliceTask = createSliceQueue();
   let areSlicesApplied = false;
 
-  function getSlicesPayload(isActive: boolean): { axis: SliceAxis; index: number }[] {
+  function getSlicesPayload(isActive: boolean): Pick<Slice, "axis" | "index">[] {
     if (!isActive) {
       return [];
     }
@@ -150,7 +160,7 @@ function useSliceSync(params: SliceSyncParams): {
 function useClippingSlices(params: ClippingSlicesParams): ClippingSlices {
   const { allItems, targetIds, getUntargetedIds, newItemId, hybridViewerStore } = params;
   const list = useSliceList(newItemId);
-  const sliceMaxIndices = ref<[number, number, number]>([0, 0, 0]);
+  const sliceMaxIndices = ref<SliceMaxLayers>([0, 0, 0]);
   const isAllGrid = computed<boolean>(() => areAllGrids(allItems.value, targetIds.value));
   const isSliceActive = computed<boolean>(() => isAllGrid.value && list.sliceEnabled.value);
   const sync = useSliceSync({
@@ -167,3 +177,4 @@ function useClippingSlices(params: ClippingSlicesParams): ClippingSlices {
 }
 
 export { useClippingSlices };
+export type { Slice, SliceIndex, SliceLayer, SliceMaxLayers };

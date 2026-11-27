@@ -1,38 +1,33 @@
 <script setup lang="ts">
-interface CsvHeader {
-  title: string;
-  key: string;
-  align: "start" | "end" | "center";
-  sortable: boolean;
-}
-type CsvRow = Record<string, string>;
+import type {
+  CsvColumnKey,
+  CsvHeader,
+  CsvRow,
+  CsvRowIndex,
+  CsvSeparator,
+} from "@ogw_front/types/props/csv_preview";
+
+// The column keys picked as the x, y and z coordinates
 interface CsvCoordinates {
-  x?: string;
-  y?: string;
-  z?: string;
+  x?: CsvColumnKey;
+  y?: CsvColumnKey;
+  z?: CsvColumnKey;
 }
 
 interface Props {
   headers: CsvHeader[];
   rows: CsvRow[];
-  loading?: boolean;
-  coordinates?: CsvCoordinates;
-  separator?: string;
-  headerRow?: number;
-  firstRow?: number;
+  loading: boolean;
+  coordinates: CsvCoordinates;
+  separator: CsvSeparator;
+  headerRow: CsvRowIndex;
+  firstRow: CsvRowIndex;
 }
 
-const {
-  headers,
-  rows,
-  loading = false,
-  coordinates = { x: undefined, y: undefined, z: undefined },
-  separator = ",",
-  headerRow = 0,
-  firstRow = 1,
-} = defineProps<Props>();
+const { headers, rows, loading, coordinates, separator, headerRow, firstRow } =
+  defineProps<Props>();
 
-function getColumnClass(key: string): string {
+function getColumnClass(key: CsvColumnKey): string {
   if (key === coordinates.x) {
     return "x-col-highlight";
   }

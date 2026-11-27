@@ -5,13 +5,16 @@ import { sameCrs } from "@ogw_front/utils/crs";
 import { useCrsStore } from "@ogw_front/stores/crs";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
+// What changes with the project CRS, the georeferenced data or their extent
+type GeoreferencedKey = string;
+
 interface Georeferenced {
   // A map needs at least one data in the project CRS to lie under
   available: ComputedRef<boolean>;
   georeferencedIds: () => DataId[];
   dataBounds: () => Extent | undefined;
   // Changes with the project CRS, the georeferenced data or their extent
-  dataKey: () => string;
+  dataKey: () => GeoreferencedKey;
 }
 
 // Data without a CRS is still in local coordinates, and data in another CRS than the
@@ -39,7 +42,7 @@ function useGeoreferenced(): Georeferenced {
     );
   }
 
-  function dataKey(): string {
+  function dataKey(): GeoreferencedKey {
     const crs = crsStore.projectCrs;
     const extentKey = JSON.stringify(dataBounds() ?? "none");
     return `${crs?.authority}:${crs?.code}|${georeferencedIds().join(",")}|${extentKey}`;

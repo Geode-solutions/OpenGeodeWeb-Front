@@ -1,6 +1,7 @@
 import type { CameraOptions, Vector3 } from "./vtk_types";
 import { applyCameraOptions, centerCameraOnPosition, useHybridViewerCamera } from "./camera";
 import { requireRenderWindow, useHybridViewerCore } from "./core";
+import type { Pixels } from "@ogw_front/types/ui";
 import type { Position } from "@vueuse/core";
 import { getCameraOptions } from "./camera_animation";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -12,8 +13,8 @@ interface ZoomBox {
 }
 
 interface Viewport {
-  width: number;
-  height: number;
+  width: Pixels;
+  height: Pixels;
 }
 
 function viewportShapedBox(start: Position, end: Position, { width, height }: Viewport): ZoomBox {

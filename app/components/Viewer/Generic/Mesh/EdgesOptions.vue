@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { EdgeWidth, Visibility } from "@geode/opengeodeweb-viewer/schema_types";
-import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { ImageSource, MenuItemIndex, Tooltip } from "@ogw_front/types/ui";
+import type { ColoringCapabilities } from "@ogw_front/types/props/viewer/options";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import ViewerGenericMeshEdgesColoring from "@ogw_front/components/Viewer/Generic/Mesh/EdgesColoring.vue";
@@ -10,30 +11,19 @@ import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
+interface Props {
+  dataId: MeshId;
+  index: MenuItemIndex;
+  btnImage: ImageSource;
+  tooltip?: Tooltip;
+  capabilities: ColoringCapabilities;
+}
+
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
 const { applyBatchStyle } = useBatchStyle();
 
-interface CapabilityConfig {
-  available?: boolean;
-  hasColorMap?: boolean;
-}
-
-interface Props {
-  dataId: DataId;
-  index: number;
-  btnImage: string;
-  tooltip?: string;
-  capabilities?: Record<string, CapabilityConfig>;
-}
-
-const {
-  dataId,
-  index,
-  btnImage,
-  tooltip = "Edges options",
-  capabilities = {},
-} = defineProps<Props>();
+const { dataId, index, btnImage, tooltip = "Edges options", capabilities } = defineProps<Props>();
 
 const visibility = computed<Visibility>({
   get: () => dataStyleStore.meshEdgesVisibility(dataId),

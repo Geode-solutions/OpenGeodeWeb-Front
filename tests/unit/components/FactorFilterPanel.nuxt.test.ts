@@ -40,6 +40,7 @@ async function mountOpenedPanel(setFactor: SetFactor): Promise<VueWrapper> {
       label: "Explode Factor",
       testIdPrefix: "explode",
       setFactor,
+      escapeFunction: vi.fn<() => void>(),
       factorRange: {
         min: 0,
         max: 2,

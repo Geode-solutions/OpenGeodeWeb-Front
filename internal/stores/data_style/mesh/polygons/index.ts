@@ -1,6 +1,7 @@
 // Third party imports
 
 // Local imports
+import type { ColoringType } from "@ogw_front/types/attribute";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
@@ -63,7 +64,7 @@ function handleMeshPolygonsPolygonColoring(
 
 async function applyMeshPolygonsActiveColoring(
   meshId: MeshId,
-  type: string | undefined,
+  type: ColoringType | undefined,
   deps: MeshPolygonsActiveColoringDeps,
 ): Promise<unknown> {
   await deps.commonStyle.mutateMeshPolygonsStyle(meshId, {
@@ -98,7 +99,7 @@ async function applyMeshPolygonsActiveColoring(
 
 async function setMeshPolygonsActiveColoring(
   meshId: MeshId,
-  type: string | undefined,
+  type: ColoringType | undefined,
   deps: MeshPolygonsActiveColoringDeps,
 ): Promise<unknown> {
   const result = await applyMeshPolygonsActiveColoring(meshId, type, deps);
@@ -115,7 +116,7 @@ async function setMeshPolygonsActiveColoring(
 async function applyMeshPolygonsStyle(
   meshId: MeshId,
   visibilityStyle: ReturnType<typeof useMeshPolygonsVisibilityStyle>,
-  activeColoringType: string | undefined,
+  activeColoringType: ColoringType | undefined,
   deps: MeshPolygonsActiveColoringDeps,
 ): Promise<unknown[]> {
   const result = await Promise.all([
@@ -130,8 +131,11 @@ async function applyMeshPolygonsStyle(
 
 type UseMeshPolygonsStyleReturn = ReturnType<typeof useMeshPolygonsCommonStyle> & {
   meshPolygonsColoring: (meshId: MeshId) => StyleValues;
-  meshPolygonsActiveColoring: (meshId: MeshId) => string | undefined;
-  setMeshPolygonsActiveColoring: (meshId: MeshId, type: string | undefined) => Promise<unknown>;
+  meshPolygonsActiveColoring: (meshId: MeshId) => ColoringType | undefined;
+  setMeshPolygonsActiveColoring: (
+    meshId: MeshId,
+    type: ColoringType | undefined,
+  ) => Promise<unknown>;
   applyMeshPolygonsStyle: (meshId: MeshId) => Promise<unknown[]>;
 } & ReturnType<typeof useMeshPolygonsVisibilityStyle> &
   ReturnType<typeof useMeshPolygonsColorStyle> &
@@ -159,14 +163,14 @@ export function useMeshPolygonsStyle(): UseMeshPolygonsStyleReturn {
     return meshPolygonsCommonStyle.meshPolygonsColoring(meshId);
   }
 
-  function meshPolygonsActiveColoring(meshId: MeshId): string | undefined {
+  function meshPolygonsActiveColoring(meshId: MeshId): ColoringType | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.active is defined as string in the data style schema.
-    return meshPolygonsColoring(meshId).active as string | undefined;
+    return meshPolygonsColoring(meshId).active as ColoringType | undefined;
   }
 
   async function boundSetMeshPolygonsActiveColoring(
     meshId: MeshId,
-    type: string | undefined,
+    type: ColoringType | undefined,
   ): Promise<unknown> {
     const result = await setMeshPolygonsActiveColoring(meshId, type, activeColoringDeps);
     return result;

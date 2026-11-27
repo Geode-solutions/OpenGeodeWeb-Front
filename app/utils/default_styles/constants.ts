@@ -1,13 +1,15 @@
-import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
+import type { AttributeName, ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
+import type { ColoringType } from "@ogw_front/types/attribute";
+import type { ModelComponentType } from "@ogw_front/types/model";
 
 interface AttributeConfig {
-  name: string | undefined;
-  storedConfigs: Record<string, unknown>;
+  name: AttributeName | undefined;
+  storedConfigs: Record<AttributeName, unknown>;
 }
 
 // How a component of a data is colored: by a constant color or by the attribute of its vertices
 interface ComponentColoring {
-  active: string;
+  active: ColoringType;
   constant: ColorRGBA;
   vertex: AttributeConfig;
 }
@@ -46,7 +48,7 @@ const BLOCKS_DEFAULT_ACTIVE_COLORING = "constant";
 
 const MESH_COMPONENT_TYPES = ["Corner", "Line", "Surface", "Block"];
 
-const DEFAULT_MODEL_COMPONENT_TYPE_COLORS: Record<string, ColorRGBA> = {
+const DEFAULT_MODEL_COMPONENT_TYPE_COLORS: Record<ModelComponentType, ColorRGBA> = {
   Corner: CORNERS_DEFAULT_COLOR,
   Line: LINES_DEFAULT_COLOR,
   Surface: SURFACES_DEFAULT_COLOR,

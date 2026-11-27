@@ -9,6 +9,7 @@ import type {
   AttributeStoredConfig,
 } from "@ogw_internal/stores/data_style/attribute_types";
 import type { MeshId } from "@ogw_front/types/identifiers";
+import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 
 // Local imports
@@ -17,7 +18,10 @@ import { useMeshPolyhedraCommonStyle } from "./common";
 interface UseMeshPolyhedraVertexAttributeConfigReturn {
   meshPolyhedraVertexAttribute: (meshId: MeshId) => AttributeState;
   meshPolyhedraVertexAttributeName: (meshId: MeshId) => AttributeName | undefined;
-  meshPolyhedraVertexAttributeLastItem: (meshId: MeshId, name: AttributeName | undefined) => number;
+  meshPolyhedraVertexAttributeLastItem: (
+    meshId: MeshId,
+    name: AttributeName | undefined,
+  ) => AttributeItem;
   meshPolyhedraVertexAttributeItem: (meshId: MeshId) => AttributeItem;
   meshPolyhedraVertexAttributeStoredConfig: (
     meshId: MeshId,
@@ -27,10 +31,7 @@ interface UseMeshPolyhedraVertexAttributeConfigReturn {
 }
 
 interface UseMeshPolyhedraVertexAttributeConfigWriterReturn {
-  mutateMeshPolyhedraVertexStyle: (
-    meshId: MeshId,
-    values: Record<string, unknown>,
-  ) => Promise<MeshId>;
+  mutateMeshPolyhedraVertexStyle: (meshId: MeshId, values: StyleValues) => Promise<MeshId>;
   setMeshPolyhedraVertexAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
@@ -64,7 +65,7 @@ function useMeshPolyhedraVertexAttributeConfig(): UseMeshPolyhedraVertexAttribut
   function meshPolyhedraVertexAttributeLastItem(
     meshId: MeshId,
     name: AttributeName | undefined,
-  ): number {
+  ): AttributeItem {
     const { storedConfigs } = meshPolyhedraVertexAttribute(meshId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
     if (nameConfig !== undefined) {
@@ -126,7 +127,7 @@ function useMeshPolyhedraVertexAttributeConfigWriter(): UseMeshPolyhedraVertexAt
   const meshPolyhedraCommonStyle = useMeshPolyhedraCommonStyle();
   async function mutateMeshPolyhedraVertexStyle(
     meshId: MeshId,
-    values: Record<string, unknown>,
+    values: StyleValues,
   ): Promise<MeshId> {
     const result = await meshPolyhedraCommonStyle.mutateMeshPolyhedraStyle(meshId, {
       coloring: {

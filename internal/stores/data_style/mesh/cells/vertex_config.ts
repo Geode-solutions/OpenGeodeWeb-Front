@@ -9,6 +9,7 @@ import type {
   AttributeStoredConfig,
 } from "@ogw_internal/stores/data_style/attribute_types";
 import type { MeshId } from "@ogw_front/types/identifiers";
+import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 
 // Local imports
@@ -17,7 +18,10 @@ import { useMeshCellsCommonStyle } from "./common";
 interface UseMeshCellsVertexAttributeConfigReturn {
   meshCellsVertexAttribute: (meshId: MeshId) => AttributeState;
   meshCellsVertexAttributeName: (meshId: MeshId) => AttributeName | undefined;
-  meshCellsVertexAttributeLastItem: (meshId: MeshId, name: AttributeName | undefined) => number;
+  meshCellsVertexAttributeLastItem: (
+    meshId: MeshId,
+    name: AttributeName | undefined,
+  ) => AttributeItem;
   meshCellsVertexAttributeItem: (meshId: MeshId) => AttributeItem;
   meshCellsVertexAttributeStoredConfig: (
     meshId: MeshId,
@@ -27,7 +31,7 @@ interface UseMeshCellsVertexAttributeConfigReturn {
 }
 
 interface UseMeshCellsVertexAttributeConfigWriterReturn {
-  mutateMeshCellsVertexStyle: (meshId: MeshId, values: Record<string, unknown>) => Promise<MeshId>;
+  mutateMeshCellsVertexStyle: (meshId: MeshId, values: StyleValues) => Promise<MeshId>;
   setMeshCellsVertexAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
@@ -61,7 +65,7 @@ function useMeshCellsVertexAttributeConfig(): UseMeshCellsVertexAttributeConfigR
   function meshCellsVertexAttributeLastItem(
     meshId: MeshId,
     name: AttributeName | undefined,
-  ): number {
+  ): AttributeItem {
     const { storedConfigs } = meshCellsVertexAttribute(meshId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
     if (nameConfig !== undefined) {
@@ -121,10 +125,7 @@ function useMeshCellsVertexAttributeConfigValues(): UseMeshCellsVertexAttributeC
 
 function useMeshCellsVertexAttributeConfigWriter(): UseMeshCellsVertexAttributeConfigWriterReturn {
   const meshCellsCommonStyle = useMeshCellsCommonStyle();
-  async function mutateMeshCellsVertexStyle(
-    meshId: MeshId,
-    values: Record<string, unknown>,
-  ): Promise<MeshId> {
+  async function mutateMeshCellsVertexStyle(meshId: MeshId, values: StyleValues): Promise<MeshId> {
     const result = await meshCellsCommonStyle.mutateMeshCellsStyle(meshId, {
       coloring: {
         vertex: values,

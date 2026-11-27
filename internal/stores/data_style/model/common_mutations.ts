@@ -9,6 +9,7 @@ import {
   componentTypeDataStyleDb,
   writeTransaction,
 } from "@ogw_internal/database/database";
+import type { ModelComponentType } from "@ogw_front/types/model";
 import merge from "lodash/merge";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 
@@ -25,7 +26,7 @@ interface UseModelComponentStyleMutationsReturn {
   ) => Promise<unknown>;
   mutateModelComponentTypeStyle: (
     modelId: ModelId,
-    type: string,
+    type: ModelComponentType,
     values: StyleValues,
   ) => Promise<void>;
 }
@@ -67,12 +68,12 @@ function useModelComponentStyleMutations(): UseModelComponentStyleMutationsRetur
 
   async function mutateModelComponentTypeStyle(
     modelId: ModelId,
-    type: string,
+    type: ModelComponentType,
     values: StyleValues,
   ): Promise<void> {
     dataStyleState.updateModelComponentTypeStyleCache(modelId, type, values);
     await writeTransaction([componentTypeDataStyleTable], async () => {
-      const key: [ModelId, string] = [modelId, type];
+      const key: [ModelId, ModelComponentType] = [modelId, type];
       const entry: ModelComponentTypeStyle = (await componentTypeDataStyleTable.get(key)) ?? {
         id_model: modelId,
         type,

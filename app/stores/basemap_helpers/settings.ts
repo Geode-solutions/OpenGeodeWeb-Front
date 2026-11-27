@@ -1,5 +1,7 @@
 import { type MapStyle, sortedMaps } from "@ogw_front/utils/basemap_tree";
+import type { BasemapId } from "@ogw_front/types/identifiers";
 import type { BasemapLayers } from "./layers.js";
+import type { Opacity } from "@geode/opengeodeweb-viewer/schema_types";
 import type { Ref } from "vue";
 import { coalesced } from "./viewer.js";
 import { everyMap } from "./extent.js";
@@ -7,13 +9,13 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 interface BasemapSnapshot {
   maps?: MapStyle[];
-  opacities?: Partial<Record<MapStyle, number>>;
+  opacities?: Partial<Record<MapStyle, Opacity>>;
   crop?: Partial<Record<MapStyle, boolean>>;
 }
 
 interface BasemapSettings {
   setMaps: (newMaps: readonly MapStyle[]) => Promise<void>;
-  setOpacity: (mapStyle: MapStyle, value: number) => Promise<void>;
+  setOpacity: (mapStyle: MapStyle, value: Opacity) => Promise<void>;
   setCrop: (value: boolean, mapStyles: readonly MapStyle[]) => Promise<void>;
   exportStores: () => Required<BasemapSnapshot>;
   importStores: (snapshot: BasemapSnapshot | undefined) => Promise<void>;
@@ -22,7 +24,7 @@ interface BasemapSettings {
 // The choices of the user: a change already built only recomposes, the others rebuild
 function useBasemapSettings(
   layers: BasemapLayers,
-  basemapId: Ref<string | undefined>,
+  basemapId: Ref<BasemapId | undefined>,
   rebuild: () => Promise<void>,
 ): BasemapSettings {
   const hybridViewerStore = useHybridViewerStore();
@@ -54,7 +56,7 @@ function useBasemapSettings(
   }
 
   // No rebuild: each map keeps its opacity
-  async function setOpacity(mapStyle: MapStyle, value: number): Promise<void> {
+  async function setOpacity(mapStyle: MapStyle, value: Opacity): Promise<void> {
     opacities.value = { ...opacities.value, [mapStyle]: value };
     await recompose();
   }

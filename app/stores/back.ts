@@ -1,3 +1,4 @@
+import { type LaunchArgs, useInfraStore } from "@ogw_front/stores/infra";
 import { getRestApiPort, getRestApiProtocol, isCloudMode } from "@ogw_front/utils/stores";
 import {
   useHttpTransport,
@@ -7,11 +8,11 @@ import {
 } from "@ogw_internal/stores/microservice";
 import type { RequestHandlers } from "@ogw_shared/utils/types.js";
 import { Status } from "@ogw_front/utils/status";
+import type { Url } from "@ogw_front/types/files";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_typed_schemas.js";
 import { useAppStore } from "@ogw_front/stores/app";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
-import { useInfraStore } from "@ogw_front/stores/infra";
 
 export const useBackStore = defineStore(
   "back",
@@ -23,7 +24,7 @@ export const useBackStore = defineStore(
     const protocol = computed(() => getRestApiProtocol());
     const port = computed(() => getRestApiPort(default_local_port.value));
 
-    function base_url_for(domain_name: string): string {
+    function base_url_for(domain_name: Url): Url {
       let back_url = `${protocol.value}://${domain_name}:${port.value}`;
       if (isCloudMode()) {
         back_url += `/geode`;
@@ -66,7 +67,7 @@ export const useBackStore = defineStore(
 
     const { start_ping, stop_ping } = usePing(ping);
 
-    async function launch(args: { projectFolderPath: string }): Promise<unknown> {
+    async function launch(args: LaunchArgs): Promise<unknown> {
       const appStore = useAppStore();
       const { COMMAND_BACK, NUXT_ROOT_PATH } = useRuntimeConfig().public;
       const schema = opengeodeweb_front_schemas.api.local.app.run_back;

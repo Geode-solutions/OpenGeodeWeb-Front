@@ -1,21 +1,24 @@
 <script setup lang="ts">
+import type {
+  IntermediateMenuStyle,
+  ProposedItem,
+} from "@ogw_front/composables/use_overlapping_picker";
 import GlassCard from "@ogw_front/components/GlassCard.vue";
-import type { ProposedItem } from "@ogw_front/composables/use_overlapping_picker";
 import { formatListId } from "@ogw_front/utils/name_cleaner";
 import { geodeObjectImage } from "@ogw_front/assets/geode_objects";
 
 interface Props {
   displayIntermediate: boolean;
   intermediateItems: ProposedItem[];
-  menuStyle: Record<string, unknown>;
+  menuStyle: IntermediateMenuStyle;
 }
-
-const { displayIntermediate, intermediateItems, menuStyle } = defineProps<Props>();
 
 interface Emits {
   select: [item: ProposedItem];
-  "update:displayIntermediate": [val: boolean];
+  "update:displayIntermediate": [displayIntermediate: boolean];
 }
+
+const { displayIntermediate, intermediateItems, menuStyle } = defineProps<Props>();
 
 const emit = defineEmits<Emits>();
 
@@ -23,8 +26,8 @@ function selectItem(item: ProposedItem): void {
   emit("select", item);
 }
 
-function handleUpdate(val: boolean): void {
-  emit("update:displayIntermediate", val);
+function handleUpdate(displayed: boolean): void {
+  emit("update:displayIntermediate", displayed);
 }
 </script>
 

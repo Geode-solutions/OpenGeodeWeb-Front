@@ -1,14 +1,19 @@
 <script setup lang="ts">
+import type { MenuItemIndex, Tooltip } from "@ogw_front/types/ui";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import { mapStyleOf } from "@ogw_front/utils/basemap_tree";
 import { useBasemapStore } from "@ogw_front/stores/basemap";
 
+// The opacity of a basemap in percent, as its slider shows it
+
 interface Props {
   dataId: DataId;
-  index: number;
-  tooltip?: string;
+  index: MenuItemIndex;
+  tooltip?: Tooltip;
 }
+
+type BasemapOpacityPercent = number;
 
 const { dataId, index, tooltip = "Opacity" } = defineProps<Props>();
 const basemapStore = useBasemapStore();
@@ -17,7 +22,7 @@ const mapStyle = computed(() => mapStyleOf(dataId));
 // The slider works in percent, the store in 0..1
 const opacityPercent = computed({
   get: () => Math.round((mapStyle.value ? basemapStore.opacities[mapStyle.value] : 1) * PERCENT),
-  set: (value: number) => {
+  set: (value: BasemapOpacityPercent) => {
     if (mapStyle.value) {
       void basemapStore.setOpacity(mapStyle.value, value / PERCENT);
     }

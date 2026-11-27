@@ -1,6 +1,7 @@
 // Third party imports
 import type { IconAliases, IconOptions, IconProps, IconSet } from "vuetify";
 import { type VNode, h } from "vue";
+import type { IconName } from "@ogw_front/types/ui";
 
 // Icons of the apps: Phosphor (https://phosphoricons.com), the flat line icons of the Geode Solutions
 // Brand book. An icon is written "ph-<name>" for the regular weight or "ph-fill ph-<name>" for the
@@ -10,7 +11,7 @@ const REGULAR_WEIGHT = "ph";
 const FILL_WEIGHT = "ph-fill";
 
 // Classes of the rendered tag: the weight class, then the icon classes as written
-function phosphorIconClass(icon: string): string {
+function phosphorIconClass(icon: IconName): string {
   const classes = icon.trim().split(/\s+/u);
   if (classes[0] !== FILL_WEIGHT) {
     classes.unshift(REGULAR_WEIGHT);

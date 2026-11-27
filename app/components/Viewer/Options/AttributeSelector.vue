@@ -1,4 +1,10 @@
 <script setup lang="ts">
+import type {
+  AttributeColorMap,
+  AttributeRange,
+  AttributeTimeStep,
+  AttributeTimeValue,
+} from "@ogw_front/types/attribute";
 import {
   type AttributeInfo,
   type AttributeRequestParams,
@@ -8,6 +14,7 @@ import {
   useAttributeRangeBounds,
   useSeriesTimeStepCommit,
 } from "@ogw_front/composables/attribute_selector";
+import type { AttributeItem, AttributeName } from "@geode/opengeodeweb-viewer/schema_types";
 import {
   type AttributeRangeInfo,
   type AttributeSchemas,
@@ -15,7 +22,6 @@ import {
 } from "@ogw_front/utils/attribute_range";
 import { type RangesPerData, useBatchGroup } from "@ogw_front/composables/batch_style";
 import { getAttributeRange, intersectAttributes } from "@ogw_front/utils/attributes";
-import type { AttributeColorMap } from "@ogw_front/types/attribute";
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { ModelComponentId } from "@ogw_front/types/identifiers";
@@ -26,37 +32,37 @@ import ViewerOptionsTimeStepSlider from "@ogw_front/components/Viewer/Options/Ti
 import { requestForTargets } from "@ogw_front/utils/request_for_targets";
 import { useBackStore } from "@ogw_front/stores/back";
 
-const backStore = useBackStore();
-
-const attributeName = defineModel<string>("attributeName");
-const attributeItem = defineModel<number>("attributeItem");
-const attributeRange = defineModel<(number | undefined)[]>("attributeRange", {
-  default: () => [],
-});
-const attributeColorMap = defineModel<AttributeColorMap>("attributeColorMap");
-const attributeNoDataColor = defineModel<typeof DEFAULT_NO_DATA_COLOR>("attributeNoDataColor");
-const attributeTimeStep = defineModel<number>("attributeTimeStep");
-
 interface Props {
   dataId: DataId;
-  componentIds?: NonEmptyArray<ModelComponentId>;
+  componentIds: NonEmptyArray<ModelComponentId> | undefined;
   schemas: AttributeSchemas;
 }
 
-const { dataId, componentIds = undefined, schemas } = defineProps<Props>();
-
 interface Emits {
   "update:attributeColorMap": [colorMap: AttributeColorMap];
-  "update:attributeTimeStep": [timeStep: number];
+  "update:attributeTimeStep": [timeStep: AttributeTimeStep];
   ranges_per_data: [ranges: RangesPerData];
 }
+
+const backStore = useBackStore();
+
+const attributeName = defineModel<AttributeName>("attributeName");
+const attributeItem = defineModel<AttributeItem>("attributeItem");
+const attributeRange = defineModel<AttributeRange>("attributeRange", {
+  default: () => [undefined, undefined],
+});
+const attributeColorMap = defineModel<AttributeColorMap>("attributeColorMap");
+const attributeNoDataColor = defineModel<typeof DEFAULT_NO_DATA_COLOR>("attributeNoDataColor");
+const attributeTimeStep = defineModel<AttributeTimeStep>("attributeTimeStep");
+
+const { dataId, componentIds, schemas } = defineProps<Props>();
 
 const emit = defineEmits<Emits>();
 
 const attributes = ref<AttributeInfo[]>([]);
 let attributesPerTarget = new Map<DataId, AttributeInfo[]>();
 const rangesPerTarget = ref(new Map<DataId, AttributeRangeInfo>());
-let rangesName: string | undefined = undefined;
+let rangesName: AttributeName | undefined = undefined;
 let rangesLoading: Promise<void> = Promise.resolve();
 
 const groupTargetIds = useBatchGroup(() => dataId);
@@ -64,7 +70,7 @@ const groupTargetIds = useBatchGroup(() => dataId);
 const currentAttribute = computed<AttributeInfo | undefined>(() =>
   attributes.value.find((attr) => attr.attribute_name === attributeName.value),
 );
-const timeSteps = computed<number[]>(() => currentAttribute.value?.time_steps ?? []);
+const timeSteps = computed<AttributeTimeValue[]>(() => currentAttribute.value?.time_steps ?? []);
 const noData = computed<boolean>(() =>
   [...rangesPerTarget.value.values()].some((range) => range.no_data),
 );
@@ -80,18 +86,13 @@ const commitSeriesTimeStep = useSeriesTimeStepCommit(
 
 const { rangeMin, rangeMax } = useAttributeRangeBounds(attributeRange);
 
-const componentItems = computed<{ title: string; value: number }[]>(() => {
-  if (currentAttribute.value) {
-    return attributeItemOptions(currentAttribute.value.nb_items);
-  }
-  return [];
-});
+const componentItems = computed(() => attributeItemOptions(currentAttribute.value?.nb_items ?? 0));
 
 function requestParams(): AttributeRequestParams {
   return attributeRequestParams(dataId, componentIds);
 }
 
-function getRangeTargets(name: string): [DataId, AttributeRequestParams][] {
+function getRangeTargets(name: AttributeName): [DataId, AttributeRequestParams][] {
   if (groupTargetIds.value) {
     return [...attributesPerTarget]
       .filter(([, targetAttributes]) =>
@@ -103,7 +104,7 @@ function getRangeTargets(name: string): [DataId, AttributeRequestParams][] {
 }
 
 // Ranges are computed by the back for the selected attribute only, as scanning every step of every series is slow
-async function requestRanges(name: string): Promise<void> {
+async function requestRanges(name: AttributeName): Promise<void> {
   const targets = getRangeTargets(name);
   const entries = await Promise.all(
     targets.map(async ([targetId, params]): Promise<[DataId, AttributeRangeInfo | undefined]> => [
@@ -119,7 +120,7 @@ async function requestRanges(name: string): Promise<void> {
   );
 }
 
-async function loadRanges(name: string): Promise<void> {
+async function loadRanges(name: AttributeName): Promise<void> {
   if (name !== rangesName) {
     rangesName = name;
     rangesPerTarget.value = new Map();
@@ -157,7 +158,7 @@ async function getGroupAttributes(targetIds: DataId[]): Promise<void> {
   attributes.value = intersectAttributes([...attributesPerTarget.values()]);
 }
 
-async function initGroupAttribute(name: string, item: number): Promise<void> {
+async function initGroupAttribute(name: AttributeName, item: AttributeItem): Promise<void> {
   await loadRanges(name);
   if (attributeName.value !== name) {
     return;

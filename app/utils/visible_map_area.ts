@@ -1,18 +1,23 @@
+import type { Coordinate, Ratio } from "@ogw_front/types/geometry";
+import type { Count, Pixels } from "@ogw_front/types/ui";
 import { cross, multiplyAccumulate, normalize, subtract } from "@kitware/vtk.js/Common/Core/Math";
 import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types";
 import type { Vector3 } from "@kitware/vtk.js/types";
 
 interface MapBounds {
-  x_min: number;
-  y_min: number;
-  x_max: number;
-  y_max: number;
+  x_min: Coordinate;
+  y_min: Coordinate;
+  x_max: Coordinate;
+  y_max: Coordinate;
 }
+
+// The ground size of one pixel, of the map or of the screen
+type GroundResolution = number;
 
 // A map built by the back: its area and its number of tile columns
 interface MapGrid {
   bounds: MapBounds;
-  columns: number;
+  columns: Count;
 }
 
 type ViewCamera = Pick<
@@ -27,7 +32,7 @@ const DEGREES = 180;
 const HALF = 2;
 
 // The ground size of one pixel of the map
-function mapResolution(grid: MapGrid): number {
+function mapResolution(grid: MapGrid): GroundResolution {
   return (grid.bounds.x_max - grid.bounds.x_min) / (grid.columns * TILE_SIZE);
 }
 
@@ -35,9 +40,9 @@ function mapResolution(grid: MapGrid): number {
 function groundPoint(
   origin: Vector3,
   direction: Vector3,
-  planeZ: number,
+  planeZ: Coordinate,
   reach: number,
-): [number, number] {
+): [Coordinate, Coordinate] {
   const distance = (planeZ - origin[2]) / direction[2];
   if (direction[2] < 0 && distance > 0) {
     return [origin[0] + direction[0] * distance, origin[1] + direction[1] * distance];
@@ -49,8 +54,8 @@ function groundPoint(
 // The part of the base map the screen shows, from the rays of its 4 corners
 function visibleMapArea(
   camera: ViewCamera,
-  aspect: number,
-  planeZ: number,
+  aspect: Ratio,
+  planeZ: Coordinate,
   base: MapBounds,
 ): MapBounds | undefined {
   const forward = subtract(camera.focal_point, camera.position, [0, 0, 0]);
@@ -86,7 +91,7 @@ function visibleMapArea(
 }
 
 // The ground size of one screen pixel at the focal point
-function screenPixelGroundSize(camera: ViewCamera, viewportHeight: number): number {
+function screenPixelGroundSize(camera: ViewCamera, viewportHeight: Pixels): GroundResolution {
   return (
     (HALF * camera.distance * Math.tan((camera.view_angle * Math.PI) / DEGREES / HALF)) /
     viewportHeight
@@ -94,7 +99,7 @@ function screenPixelGroundSize(camera: ViewCamera, viewportHeight: number): numb
 }
 
 // Below this gain the detail would look the same as the base
-function needsSharperMap(baseResolution: number, wanted: number): boolean {
+function needsSharperMap(baseResolution: GroundResolution, wanted: GroundResolution): boolean {
   return baseResolution > DETAIL_RATIO * wanted;
 }
 
@@ -109,7 +114,7 @@ function covers(area: MapBounds, visible: MapBounds): boolean {
 }
 
 // A detail map stays while the view keeps within its area and its step of resolution
-function stillSharp(detail: MapGrid, visible: MapBounds, wanted: number): boolean {
+function stillSharp(detail: MapGrid, visible: MapBounds, wanted: GroundResolution): boolean {
   const resolution = mapResolution(detail);
   return (
     covers(detail.bounds, visible) &&
@@ -118,7 +123,7 @@ function stillSharp(detail: MapGrid, visible: MapBounds, wanted: number): boolea
   );
 }
 
-export type { MapBounds, MapGrid, ViewCamera };
+export type { GroundResolution, MapBounds, MapGrid, ViewCamera };
 export {
   covers,
   mapResolution,

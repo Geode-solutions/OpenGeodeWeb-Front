@@ -21,10 +21,11 @@ import {
   surfaceDefaultStyle,
 } from "./meshes";
 import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
+import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import type { SceneStyle } from "@ogw_internal/stores/data_style/types";
 import { imageDefaultStyle } from "./images";
 
-function default_styles(): Record<string, unknown> {
+function default_styles(): Partial<Record<GeodeObjectType, unknown>> {
   return {
     BRep: brepDefaultStyle(),
     CrossSection: crossSectionDefaultStyle(),
@@ -54,8 +55,8 @@ function default_styles(): Record<string, unknown> {
   };
 }
 
-function getDefaultStyle(type: string): unknown {
-  const styles: Record<string, unknown> = default_styles();
+function getDefaultStyle(type: GeodeObjectType): unknown {
+  const styles = default_styles();
   return styles[type];
 }
 

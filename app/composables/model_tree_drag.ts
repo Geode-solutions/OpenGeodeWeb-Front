@@ -1,3 +1,5 @@
+import type { TreeViewId } from "@ogw_front/types/identifiers";
+import type { TreeViewIndex } from "@ogw_front/types/tree";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 // A drop target has to accept the drag over it
@@ -7,24 +9,24 @@ function onDragOver(event: DragEvent): void {
 
 // Model trees are reordered by dragging their panel header or their button in the activity bar
 export function useModelTreeDrag(): {
-  draggedId: Ref<string | undefined>;
-  dropTargetId: Ref<string | undefined>;
-  onDragStart: (id: string) => void;
+  draggedId: Ref<TreeViewId | undefined>;
+  dropTargetId: Ref<TreeViewId | undefined>;
+  onDragStart: (id: TreeViewId) => void;
   onDragOver: (event: DragEvent) => void;
   onDragEnd: () => void;
-  onDrop: (targetId: string) => void;
-  dropSide: (targetId: string) => string | undefined;
+  onDrop: (targetId: TreeViewId) => void;
+  dropSide: (targetId: TreeViewId) => string | undefined;
 } {
   const treeviewStore = useTreeviewStore();
-  const draggedId = ref<string | undefined>(undefined);
+  const draggedId = ref<TreeViewId | undefined>(undefined);
   // Model button hovered while dragging another one: the line shows where the dragged one lands
-  const dropTargetId = ref<string | undefined>(undefined);
+  const dropTargetId = ref<TreeViewId | undefined>(undefined);
 
-  function viewIndex(id: string): number {
+  function viewIndex(id: TreeViewId): TreeViewIndex {
     return treeviewStore.opened_views.findIndex((view) => view.id === id);
   }
 
-  function onDragStart(id: string): void {
+  function onDragStart(id: TreeViewId): void {
     draggedId.value = id;
   }
 
@@ -33,7 +35,7 @@ export function useModelTreeDrag(): {
     dropTargetId.value = undefined;
   }
 
-  function onDrop(targetId: string): void {
+  function onDrop(targetId: TreeViewId): void {
     if (draggedId.value !== undefined && draggedId.value !== targetId) {
       treeviewStore.moveView(viewIndex(draggedId.value), viewIndex(targetId));
     }
@@ -41,7 +43,7 @@ export function useModelTreeDrag(): {
   }
 
   // The dragged tree takes the place of the target: before it when moving up, after it when moving down
-  function dropSide(targetId: string): string | undefined {
+  function dropSide(targetId: TreeViewId): string | undefined {
     if (
       draggedId.value === undefined ||
       dropTargetId.value !== targetId ||

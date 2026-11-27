@@ -5,6 +5,7 @@ import { mountSuspended } from "@nuxt/test-utils/runtime";
 
 // Local imports
 import ClippingPlaneCard from "@ogw_front/components/ClippingPlaneCard.vue";
+import type { ClippingPlaneGeometry } from "@ogw_front/composables/clipping_planes_widget_entries";
 import { parseCoordinates } from "@ogw_front/utils/coordinates";
 import { vuetify } from "@ogw_tests/utils";
 
@@ -20,13 +21,7 @@ const FIRST = 1.5;
 const SECOND = 2;
 const PASTED_POINT = `${EASTING}, ${NORTHING}, ${DEPTH}`;
 
-interface Plane {
-  origin?: number[];
-  normal: number[];
-  opacity: number;
-}
-
-async function mountCard(plane: Plane): Promise<VueWrapper> {
+async function mountCard(plane: ClippingPlaneGeometry): Promise<VueWrapper> {
   const wrapper = await mountSuspended(ClippingPlaneCard, {
     global: { plugins: [vuetify] },
     props: { plane, index: 0 },
@@ -63,7 +58,7 @@ describe("pasted coordinates", () => {
 
 describe("clipping plane card", () => {
   test("a pasted point fills the three origin coordinates", async () => {
-    const plane: Plane = { origin: [0, 0, 0], normal: [1, 0, 0], opacity: OPACITY };
+    const plane: ClippingPlaneGeometry = { origin: [0, 0, 0], normal: [1, 0, 0], opacity: OPACITY };
     const wrapper = await mountCard(plane);
     const isDefaultPasted = paste(axisInput(wrapper, "planeOriginInput", 1), PASTED_POINT);
     expect(isDefaultPasted).toBe(false);
@@ -71,14 +66,14 @@ describe("clipping plane card", () => {
   });
 
   test("a pasted vector fills the three normal coordinates", async () => {
-    const plane: Plane = { origin: [0, 0, 0], normal: [1, 0, 0], opacity: OPACITY };
+    const plane: ClippingPlaneGeometry = { origin: [0, 0, 0], normal: [1, 0, 0], opacity: OPACITY };
     const wrapper = await mountCard(plane);
     paste(axisInput(wrapper, "planeNormalInput", 0), "0 0.5 -1");
     expect(plane.normal).toStrictEqual([0, HALF, -1]);
   });
 
   test("a single pasted number is left to the field", async () => {
-    const plane: Plane = { origin: [1, 2, 3], normal: [1, 0, 0], opacity: OPACITY };
+    const plane: ClippingPlaneGeometry = { origin: [1, 2, 3], normal: [1, 0, 0], opacity: OPACITY };
     const wrapper = await mountCard(plane);
     const isDefaultPasted = paste(axisInput(wrapper, "planeOriginInput", 0), "42");
     expect(isDefaultPasted).toBe(true);

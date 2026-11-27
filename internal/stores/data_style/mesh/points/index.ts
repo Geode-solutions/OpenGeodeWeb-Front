@@ -1,6 +1,7 @@
 // Third party imports
 
 // Local imports
+import type { ColoringType } from "@ogw_front/types/attribute";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
@@ -37,7 +38,7 @@ function handleMeshPointsVertexColoring(
 
 async function applyMeshPointsActiveColoring(
   meshId: MeshId,
-  type: string | undefined,
+  type: ColoringType | undefined,
   deps: MeshPointsActiveColoringDeps,
 ): Promise<unknown> {
   await deps.commonStyle.mutateMeshPointsStyle(meshId, {
@@ -59,7 +60,7 @@ async function applyMeshPointsActiveColoring(
 
 async function setMeshPointsActiveColoring(
   meshId: MeshId,
-  type: string | undefined,
+  type: ColoringType | undefined,
   deps: MeshPointsActiveColoringDeps,
 ): Promise<unknown> {
   const result = await applyMeshPointsActiveColoring(meshId, type, deps);
@@ -77,7 +78,7 @@ async function applyMeshPointsStyle(
   meshId: MeshId,
   visibilityStyle: ReturnType<typeof useMeshPointsVisibilityStyle>,
   sizeStyle: ReturnType<typeof useMeshPointsSizeStyle>,
-  activeColoringType: string | undefined,
+  activeColoringType: ColoringType | undefined,
   deps: MeshPointsActiveColoringDeps,
 ): Promise<unknown[]> {
   const result = await Promise.all([
@@ -96,8 +97,8 @@ async function applyMeshPointsStyle(
 
 type UseMeshPointsStyleReturn = ReturnType<typeof useMeshPointsCommonStyle> & {
   meshPointsColoring: (meshId: MeshId) => StyleValues;
-  meshPointsActiveColoring: (meshId: MeshId) => string | undefined;
-  setMeshPointsActiveColoring: (meshId: MeshId, type: string | undefined) => Promise<unknown>;
+  meshPointsActiveColoring: (meshId: MeshId) => ColoringType | undefined;
+  setMeshPointsActiveColoring: (meshId: MeshId, type: ColoringType | undefined) => Promise<unknown>;
   applyMeshPointsStyle: (meshId: MeshId) => Promise<unknown[]>;
 } & ReturnType<typeof useMeshPointsVisibilityStyle> &
   ReturnType<typeof useMeshPointsColorStyle> &
@@ -121,14 +122,14 @@ export function useMeshPointsStyle(): UseMeshPointsStyleReturn {
     return meshPointsCommonStyle.meshPointsColoring(meshId);
   }
 
-  function meshPointsActiveColoring(meshId: MeshId): string | undefined {
+  function meshPointsActiveColoring(meshId: MeshId): ColoringType | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.active is defined as string in the data style schema.
-    return meshPointsColoring(meshId).active as string | undefined;
+    return meshPointsColoring(meshId).active as ColoringType | undefined;
   }
 
   async function boundSetMeshPointsActiveColoring(
     meshId: MeshId,
-    type: string | undefined,
+    type: ColoringType | undefined,
   ): Promise<unknown> {
     const result = await setMeshPointsActiveColoring(meshId, type, activeColoringDeps);
     return result;

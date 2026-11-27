@@ -1,7 +1,22 @@
-import { Status } from "@ogw_front/utils/status";
+import type { FilePath, Url } from "@ogw_front/types/files";
+import { type MicroserviceStatus, Status } from "@ogw_front/utils/status";
+import type { MicroserviceId } from "@ogw_front/types/identifiers";
 
 const LOCALHOST = "localhost";
 const IPV4_LOOPBACK = "127.0.0.1";
+
+// What a microservice is launched with: the project folder it works in
+interface LaunchArgs {
+  projectFolderPath: FilePath;
+}
+
+interface Microservice {
+  $id: MicroserviceId;
+  status?: MicroserviceStatus;
+  is_busy?: boolean;
+  launch?: (params: LaunchArgs) => Promise<unknown>;
+  connect: () => void | Promise<void>;
+}
 
 export const useInfraStore = defineStore(
   "infra",
@@ -33,7 +48,7 @@ export const useInfraStore = defineStore(
       }
     }
 
-    function unregister_microservice(microserviceId: string): void {
+    function unregister_microservice(microserviceId: MicroserviceId): void {
       microservices.value = microservices.value.filter(
         (microservice) => microservice.$id !== microserviceId,
       );
@@ -47,11 +62,11 @@ export const useInfraStore = defineStore(
       );
     }
 
-    function set_status(value: string): void {
+    function set_status(value: MicroserviceStatus): void {
       status.value = value;
     }
 
-    function set_domain_name(value: string): void {
+    function set_domain_name(value: Url): void {
       domain_name.value = value;
     }
 
@@ -77,10 +92,4 @@ export const useInfraStore = defineStore(
   },
 );
 
-export interface Microservice {
-  $id: string;
-  status?: string;
-  is_busy?: boolean;
-  launch?: (params: { projectFolderPath: string }) => Promise<unknown>;
-  connect: () => void | Promise<void>;
-}
+export type { LaunchArgs, Microservice };

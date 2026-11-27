@@ -1,13 +1,15 @@
 import { coalesced, ignoreError, useBasemapViewer } from "./viewer.js";
 import type { BasemapBuildResponse } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import type { DetailMap } from "./detail_map.js";
+import type { SentLayers } from "./layers.js";
+import { sortedMaps } from "@ogw_front/utils/basemap_tree";
 import { useBasemapStore } from "@ogw_front/stores/basemap";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 interface DetailLayers {
   syncLayers: () => Promise<void>;
-  replaceDetail: (response: BasemapBuildResponse, sentLayers: string) => Promise<void>;
+  replaceDetail: (response: BasemapBuildResponse, sentLayers: SentLayers) => Promise<void>;
   rememberStep: (response: BasemapBuildResponse) => Promise<void>;
 }
 
@@ -36,11 +38,14 @@ function useDetailLayers(detail: DetailMap): DetailLayers {
     await hybridViewerStore.remoteRender();
   });
 
-  async function replaceDetail(response: BasemapBuildResponse, sentLayers: string): Promise<void> {
+  async function replaceDetail(
+    response: BasemapBuildResponse,
+    sentLayers: SentLayers,
+  ): Promise<void> {
     const previous = detailId.value;
     detailId.value = response.id;
     shown.grid = response;
-    shown.maps = response.maps.map(({ map }) => map);
+    shown.maps = sortedMaps(response.maps.map(({ map }) => map));
     // Out of the viewer before the render, deleted on the back after it: shown sooner
     if (previous !== undefined) {
       await dataStore.deregisterObject(previous).catch(ignoreError);

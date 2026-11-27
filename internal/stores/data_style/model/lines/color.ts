@@ -1,5 +1,6 @@
 import type { LineId, ModelId } from "@ogw_front/types/identifiers";
 import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
+import type { ColoringType } from "@ogw_front/types/attribute";
 import type { GeodeId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { NonEmptyArray } from "@ogw_front/utils/arrays";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
@@ -18,7 +19,7 @@ export function useModelLinesColor(): {
     modelId: ModelId,
     lineIds: LineId[],
     color: ColorRGBA | undefined,
-    activeColoring?: string,
+    activeColoring?: ColoringType,
     collectionId?: GeodeId,
   ) => Promise<unknown>;
   modelLineColoring: (modelId: ModelId, line_id?: LineId) => StyleValues;
@@ -27,7 +28,7 @@ export function useModelLinesColor(): {
   setModelLinesActiveColoring: (
     modelId: ModelId,
     lineIds: NonEmptyArray<LineId>,
-    activeColoring: string,
+    activeColoring: ColoringType,
     collectionId?: GeodeId,
   ) => Promise<unknown>;
 } {
@@ -129,7 +130,7 @@ export function useModelLinesColor(): {
   async function setModelLinesActiveColoring(
     modelId: ModelId,
     lineIds: NonEmptyArray<LineId>,
-    activeColoring: string,
+    activeColoring: ColoringType,
     collectionId?: GeodeId,
   ): Promise<unknown> {
     const totalLineIds = await dataStore.getLinesGeodeIds(modelId);

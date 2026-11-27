@@ -1,18 +1,22 @@
 <script setup lang="ts">
+import type {
+  ClippingPlaneGeometry,
+  ClippingPlaneIndex,
+} from "@ogw_front/composables/clipping_planes_widget_entries";
 import { getPlaneCssColor } from "@ogw_front/utils/clipping_planes";
 import { pasteCoordinates } from "@ogw_front/utils/coordinates";
 
 interface Props {
-  plane: { origin?: number[]; normal: number[]; opacity: number };
-  index: number;
+  plane: ClippingPlaneGeometry;
+  index: ClippingPlaneIndex;
 }
-
-const { plane, index } = defineProps<Props>();
 
 interface Emits {
   remove: [];
   flipNormal: [];
 }
+
+const { plane, index } = defineProps<Props>();
 
 const emit = defineEmits<Emits>();
 </script>

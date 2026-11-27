@@ -19,6 +19,7 @@ import type {
 } from "@geode/opengeodeweb-viewer/schema_types";
 import type { ModelId, SurfaceId } from "@ogw_front/types/identifiers";
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
+import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
@@ -113,7 +114,7 @@ type ModelSurfacesPolygonAttributeGetters = Pick<
     modelId: ModelId,
     componentId: SurfaceId | undefined,
     name: AttributeName | undefined,
-  ) => number;
+  ) => AttributeItem;
 };
 
 // oxlint-disable-next-line max-lines-per-function
@@ -151,7 +152,7 @@ function useModelSurfacesPolygonAttributeGetters(
     modelId: ModelId,
     surfaceId: SurfaceId | undefined,
     name: AttributeName | undefined,
-  ): number {
+  ): AttributeItem {
     const { storedConfigs } = modelSurfacesPolygonAttribute(modelId, surfaceId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
     if (nameConfig !== undefined) {
@@ -238,7 +239,7 @@ function useModelSurfacesPolygonAttribute(): UseModelSurfacesPolygonAttributeRet
   async function mutateModelSurfacesPolygonStyle(
     modelId: ModelId,
     surfaceIds: NonEmptyArray<SurfaceId>,
-    values: Record<string, unknown>,
+    values: StyleValues,
   ): Promise<void> {
     const tasks: Promise<void>[] = [
       modelSurfacesCommonStyle.mutateModelSurfacesColoring(modelId, surfaceIds, {

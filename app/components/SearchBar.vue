@@ -1,14 +1,16 @@
 <script setup lang="ts">
+import type { Label, SearchQuery } from "@ogw_front/types/ui";
+
 interface Props {
-  modelValue?: string;
-  label?: string;
+  modelValue?: SearchQuery;
+  label?: Label;
+}
+
+interface Emits {
+  "update:modelValue": [value: SearchQuery];
 }
 
 const { modelValue = "", label = "" } = defineProps<Props>();
-
-interface Emits {
-  "update:modelValue": [value: string];
-}
 
 const emit = defineEmits<Emits>();
 </script>

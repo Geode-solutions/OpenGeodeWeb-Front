@@ -1,29 +1,38 @@
 <script setup lang="ts">
+import type { DataIdentified, GeodeObjectTyped } from "@ogw_front/types/identifiers";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { DataName } from "@ogw_front/types/data";
+import type { FileName } from "@ogw_front/types/files";
+import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 
-import type { DataIdentified, GeodeObjectTyped } from "@ogw_front/types/identifiers";
 import FetchingData from "@ogw_front/components/FetchingData.vue";
-import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStore } from "@ogw_front/stores/data";
 
-const schema = schemas.opengeodeweb_back.time_series_allowed_objects;
-
-interface Target extends DataIdentified, GeodeObjectTyped {
-  name: string;
+// A data a time series can be added to
+interface TimeSeriesTarget extends DataIdentified, GeodeObjectTyped {
+  name: DataName;
 }
 
-const emit = defineEmits<{
+interface Props {
+  filename: FileName;
+}
+
+interface Emits {
   update_values: [values: { target_id: DataId; geode_object_type: GeodeObjectType }];
   increment_step: [];
   decrement_step: [];
-}>();
+}
 
-const { filename } = defineProps<{ filename: string }>();
+const schema = schemas.opengeodeweb_back.time_series_allowed_objects;
+
+const emit = defineEmits<Emits>();
+
+const { filename } = defineProps<Props>();
 
 const loading = ref(true);
-const targets = ref<Target[]>([]);
+const targets = ref<TimeSeriesTarget[]>([]);
 
 async function get_targets(): Promise<void> {
   const backStore = useBackStore();
@@ -38,7 +47,7 @@ async function get_targets(): Promise<void> {
   loading.value = false;
 }
 
-function select(target: Target): void {
+function select(target: TimeSeriesTarget): void {
   emit("update_values", { target_id: target.data_id, geode_object_type: target.geode_object_type });
   emit("increment_step");
 }

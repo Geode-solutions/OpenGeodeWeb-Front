@@ -4,8 +4,10 @@ import {
   useOverlappingPicker,
 } from "@ogw_front/composables/use_overlapping_picker";
 import BasemapAttribution from "@ogw_front/components/BasemapAttribution.vue";
+import type { Coordinate } from "@ogw_front/types/geometry";
 import CrsOverlays from "@ogw_front/components/Viewer/CrsOverlays.vue";
 import OverlappingObjectsPicker from "@ogw_front/components/Viewer/OverlappingObjectsPicker.vue";
+import type { Pixels } from "@ogw_front/types/ui";
 import ToolActiveChip from "@ogw_front/components/Viewer/ToolActiveChip.vue";
 import type { TreeMenuPayload } from "@ogw_front/utils/treeview";
 import ViewerContextMenu from "@ogw_front/components/Viewer/ContextMenu/ContextMenu.vue";
@@ -16,17 +18,21 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useMenuStore } from "@ogw_front/stores/menu";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
-interface Props {
+// Props of the interface laid over the viewer
+interface ViewerUiProps {
   displayMenu: boolean;
-  containerWidth: number;
-  containerHeight: number;
+  containerWidth: Pixels;
+  containerHeight: Pixels;
 }
 
-const { displayMenu, containerWidth, containerHeight } = defineProps<Props>();
-
-const emit = defineEmits<{
+// Events of the interface laid over the viewer
+interface ViewerUiEmits {
   "show-menu": [payload: TreeMenuPayload];
-}>();
+}
+
+const { displayMenu, containerWidth, containerHeight } = defineProps<ViewerUiProps>();
+
+const emit = defineEmits<ViewerUiEmits>();
 
 const menuStore = useMenuStore();
 const viewerStore = useViewerStore();
@@ -76,7 +82,7 @@ const {
   get_viewer_id: trigger_picker,
 } = useOverlappingPicker();
 
-function get_viewer_id(x: number, y: number): Promise<ViewerIdResult> {
+function get_viewer_id(x: Coordinate, y: Coordinate): Promise<ViewerIdResult> {
   const instance = getCurrentInstance();
   const containerRect = instance?.proxy?.$el
     ?.closest?.('[data-testid="hybridViewer"]')

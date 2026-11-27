@@ -1,5 +1,5 @@
+import type { ModelId, TreeNodeId } from "@ogw_front/types/identifiers";
 import type { ComputedRef } from "vue";
-import type { ModelId } from "@ogw_front/types/identifiers";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleState } from "@ogw_internal/stores/data_style/state";
 import { useModelBlocksStyle } from "./blocks";
@@ -20,7 +20,7 @@ type UseModelStyleReturn = ReturnType<typeof useModelColorStyle> &
   ReturnType<typeof useModelLinesStyle> &
   ReturnType<typeof useModelPointsStyle> &
   ReturnType<typeof useModelSurfacesStyle> & {
-    visibleMeshComponents: (modelId: ModelId) => ComputedRef<string[]>;
+    visibleMeshComponents: (modelId: ModelId) => ComputedRef<TreeNodeId[]>;
     applyModelStyle: (modelId: ModelId) => Promise<unknown[]>;
     setModelMeshComponentsDefaultStyle: (modelId: ModelId) => Promise<unknown[]>;
   };
@@ -46,7 +46,7 @@ function useModelStyle(): UseModelStyleReturn {
   const modelColorStyle = useModelColorStyle(componentStyleFunctions);
   const modelVisibilityStyle = useModelVisibilityStyle(componentStyleFunctions);
 
-  function visibleMeshComponents(modelId: ModelId): ComputedRef<string[]> {
+  function visibleMeshComponents(modelId: ModelId): ComputedRef<TreeNodeId[]> {
     return useModelSelection(modelId, dataStyleState);
   }
 

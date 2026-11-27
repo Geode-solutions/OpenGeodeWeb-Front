@@ -9,6 +9,7 @@ import type {
   AttributeStoredConfig,
 } from "@ogw_internal/stores/data_style/attribute_types";
 import type { MeshId } from "@ogw_front/types/identifiers";
+import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 
 // Local imports
@@ -20,7 +21,7 @@ interface UseMeshPolyhedraPolyhedronAttributeConfigReturn {
   meshPolyhedraPolyhedronAttributeLastItem: (
     meshId: MeshId,
     name: AttributeName | undefined,
-  ) => number;
+  ) => AttributeItem;
   meshPolyhedraPolyhedronAttributeItem: (meshId: MeshId) => AttributeItem;
   meshPolyhedraPolyhedronAttributeStoredConfig: (
     meshId: MeshId,
@@ -30,10 +31,7 @@ interface UseMeshPolyhedraPolyhedronAttributeConfigReturn {
 }
 
 interface UseMeshPolyhedraPolyhedronAttributeConfigWriterReturn {
-  mutateMeshPolyhedraPolyhedronStyle: (
-    meshId: MeshId,
-    values: Record<string, unknown>,
-  ) => Promise<MeshId>;
+  mutateMeshPolyhedraPolyhedronStyle: (meshId: MeshId, values: StyleValues) => Promise<MeshId>;
   setMeshPolyhedraPolyhedronAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
@@ -67,7 +65,7 @@ function useMeshPolyhedraPolyhedronAttributeConfig(): UseMeshPolyhedraPolyhedron
   function meshPolyhedraPolyhedronAttributeLastItem(
     meshId: MeshId,
     name: AttributeName | undefined,
-  ): number {
+  ): AttributeItem {
     const { storedConfigs } = meshPolyhedraPolyhedronAttribute(meshId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
     if (nameConfig !== undefined) {
@@ -129,7 +127,7 @@ function useMeshPolyhedraPolyhedronAttributeConfigWriter(): UseMeshPolyhedraPoly
   const meshPolyhedraCommonStyle = useMeshPolyhedraCommonStyle();
   async function mutateMeshPolyhedraPolyhedronStyle(
     meshId: MeshId,
-    values: Record<string, unknown>,
+    values: StyleValues,
   ): Promise<MeshId> {
     const result = await meshPolyhedraCommonStyle.mutateMeshPolyhedraStyle(meshId, {
       coloring: {

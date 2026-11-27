@@ -1,16 +1,22 @@
 <script setup lang="ts">
-const DEFAULT_ICON_SIZE = 28;
+import type { ComponentSize, CssColor, IconName, Tooltip } from "@ogw_front/types/ui";
 
 interface Props {
-  icon: string;
-  tooltip: string;
-  color?: string;
-  size?: string | number;
+  icon: IconName;
+  tooltip: Tooltip;
+  color?: CssColor;
+  size?: ComponentSize;
   variant?: unknown;
   density?: unknown;
-  tooltipLocation?: string;
-  iconSize?: string | number;
+  tooltipLocation: string;
+  iconSize?: ComponentSize;
 }
+
+interface Emits {
+  click: [event: MouseEvent];
+}
+
+const DEFAULT_ICON_SIZE = 28;
 
 const {
   icon,
@@ -19,13 +25,9 @@ const {
   size = undefined,
   variant = undefined,
   density = "comfortable",
-  tooltipLocation = "left",
+  tooltipLocation,
   iconSize = DEFAULT_ICON_SIZE,
 } = defineProps<Props>();
-
-interface Emits {
-  click: [event: MouseEvent];
-}
 
 const emit = defineEmits<Emits>();
 </script>

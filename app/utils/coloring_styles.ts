@@ -1,4 +1,6 @@
 import type { AttributeSchemas } from "@ogw_front/utils/attribute_range";
+import type { ColoringType } from "@ogw_front/types/attribute";
+import type { Label } from "@ogw_front/types/ui";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 
 interface Schemas {
@@ -11,7 +13,13 @@ interface Schemas {
 
 interface ColoringStyle {
   name: string;
-  value: string;
+  value: ColoringType;
+}
+
+// The coloring styles a selector offers: the labels it shows and the coloring types they stand for
+interface ColoringStyleOptions {
+  labels: Label[];
+  values: ColoringType[];
 }
 
 interface ColoringAvailability {
@@ -50,7 +58,7 @@ const ATTRIBUTE_STYLE_KEYS = [
 function buildColoringStyles(
   available: ColoringAvailability,
   allowRandom: boolean,
-): { labels: string[]; values: string[] } {
+): ColoringStyleOptions {
   const array: ColoringStyle[] = [];
   if (available.color) {
     array.push(COLORING_STYLES.color);
@@ -98,4 +106,4 @@ function resolveAttributeSchemas(schemas: Schemas): Required<Schemas> {
 }
 
 export { COLORING_STYLES, buildColoringStyles, resolveAttributeSchemas };
-export type { Schemas };
+export type { ColoringStyleOptions, Schemas };

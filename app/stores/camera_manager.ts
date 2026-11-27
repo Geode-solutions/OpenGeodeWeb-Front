@@ -1,4 +1,5 @@
 // Local imports
+import type { CameraPositionId, CameraPositionName } from "@ogw_internal/database/types";
 import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types.js";
 import type { CameraPositionRecord } from "@ogw_internal/database/tables/camera_positions";
 import { cameraPositionsDb } from "@ogw_internal/database/database.js";
@@ -22,19 +23,24 @@ export const useCameraManagerStore = defineStore("cameraManager", () => {
     );
   }
 
-  async function getCameraPosition(id: number): Promise<CameraPositionRecord | undefined> {
+  async function getCameraPosition(
+    id: CameraPositionId,
+  ): Promise<CameraPositionRecord | undefined> {
     const position = await cameraPositionsTable.get(id);
     return position;
   }
 
-  async function saveCameraPosition(name: string, camera_options: CameraOptions): Promise<void> {
+  async function saveCameraPosition(
+    name: CameraPositionName,
+    camera_options: CameraOptions,
+  ): Promise<void> {
     await cameraPositionsTable.put({
       name,
       camera_options,
     });
   }
 
-  async function restoreCameraPosition(id: number): Promise<void> {
+  async function restoreCameraPosition(id: CameraPositionId): Promise<void> {
     const position = await cameraPositionsTable.get(id);
     if (position) {
       const schema = viewer_schemas.opengeodeweb_viewer.viewer.update_camera;
@@ -43,11 +49,14 @@ export const useCameraManagerStore = defineStore("cameraManager", () => {
     }
   }
 
-  async function deleteCameraPosition(id: number): Promise<void> {
+  async function deleteCameraPosition(id: CameraPositionId): Promise<void> {
     await cameraPositionsTable.delete(id);
   }
 
-  async function renameCameraPosition(id: number, newName: string): Promise<void> {
+  async function renameCameraPosition(
+    id: CameraPositionId,
+    newName: CameraPositionName,
+  ): Promise<void> {
     await cameraPositionsTable.update(id, { name: newName });
   }
 

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { FileName, UploadFile } from "@ogw_front/types/files";
+import type { Message } from "@ogw_front/types/ui";
 import schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 
 import { matchExpectedFiles, uploadPath } from "@ogw_front/utils/upload_path";
@@ -10,37 +12,40 @@ import { useBackStore } from "@ogw_front/stores/back";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
 // Files carry extra app-specific bookkeeping fields once picked up here.
-type UploadFile = File & { isConfigured?: boolean; relativePath?: string };
-interface FilePlan {
+
+// The files a file needs (mandatory) or can use (additional) to be loaded
+interface MissingFilesPlan {
   has_missing_files: boolean;
-  mandatory_files: string[];
-  additional_files: string[];
+  mandatory_files: FileName[];
+  additional_files: FileName[];
 }
+
+// The files a given file is missing
 interface FileMissingFiles {
-  filename: string;
-  mandatory_files: string[];
-  additional_files: string[];
+  filename: FileName;
+  mandatory_files: FileName[];
+  additional_files: FileName[];
+}
+
+interface Props {
+  multiple: boolean;
+  // Filename -> geode object types, each file is checked with each of its types (unused for time series)
+  geodeObjectTypes?: Record<FileName, GeodeObjectType[]>;
+  filenames: FileName[];
+  files?: UploadFile[];
+  timeSeries?: boolean;
+}
+
+interface Emits {
+  update_values: [value: { additional_files?: UploadFile[]; skipped_files?: FileName[] }];
+  increment_step: [];
+  decrement_step: [];
 }
 
 const schema = schemas.opengeodeweb_back.data_missing_files;
 const time_series_schema = schemas.opengeodeweb_back.time_series_missing_files;
 
-interface Emits {
-  update_values: [value: { additional_files?: UploadFile[]; skipped_files?: string[] }];
-  increment_step: [];
-  decrement_step: [];
-}
-
 const emit = defineEmits<Emits>();
-
-interface Props {
-  multiple: boolean;
-  // Filename -> geode object types, each file is checked with each of its types (unused for time series)
-  geodeObjectTypes?: Record<string, GeodeObjectType[]>;
-  filenames: string[];
-  files?: UploadFile[];
-  timeSeries?: boolean;
-}
 
 const {
   multiple,
@@ -53,8 +58,8 @@ const {
 const accept = ref<string>("");
 const loading = ref<boolean>(false);
 const has_missing_files = ref<boolean>(false);
-const mandatory_files = ref<string[]>([]);
-const additional_files = ref<string[]>([]);
+const mandatory_files = ref<FileName[]>([]);
+const additional_files = ref<FileName[]>([]);
 const missing_by_file = ref<FileMissingFiles[]>([]);
 // Files left out at the data type step are not checked
 const checked_filenames = computed(() => {
@@ -92,7 +97,7 @@ function skip_step(): void {
   emit("increment_step");
 }
 
-function isCsvFile(filename: string): boolean {
+function isCsvFile(filename: FileName): boolean {
   return filename.toLowerCase().endsWith(".csv") || filename.toLowerCase().endsWith(".csv.json");
 }
 
@@ -104,15 +109,15 @@ function reset_missing_state(): void {
 }
 
 function request_type_plan(
-  filename: string,
+  filename: FileName,
   geode_object_type: GeodeObjectType,
-): Promise<FilePlan> {
+): Promise<MissingFilesPlan> {
   const params = { geode_object_type, filename };
   return backStore.request({ schema, params });
 }
 
 // A file holding several contents is checked once per type, the missing files are merged
-async function request_file_plan(filename: string): Promise<FilePlan> {
+async function request_file_plan(filename: FileName): Promise<MissingFilesPlan> {
   if (isCsvFile(filename)) {
     return { has_missing_files: false, mandatory_files: [], additional_files: [] };
   }
@@ -128,7 +133,7 @@ async function request_file_plan(filename: string): Promise<FilePlan> {
   };
 }
 
-function collect_file_plans(values: FilePlan[]): void {
+function collect_file_plans(values: MissingFilesPlan[]): void {
   for (const [index, value] of values.entries()) {
     if (value.has_missing_files) {
       has_missing_files.value = true;
@@ -213,7 +218,7 @@ async function upload_folder(folder_files: UploadFile[]): Promise<void> {
   }
 }
 
-function warn_folder_read_error(message: string): void {
+function warn_folder_read_error(message: Message): void {
   useFeedbackStore().add_warning(`Could not read the dropped folder: ${message}`);
 }
 

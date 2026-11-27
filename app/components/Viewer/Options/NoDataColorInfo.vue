@@ -1,10 +1,11 @@
 <script setup lang="ts">
+import type { CssColor } from "@ogw_front/types/ui";
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
 import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
 
 const attributeNoDataColor = defineModel<typeof DEFAULT_NO_DATA_COLOR>();
 
-const cssNoDataColor = computed<string>(() => {
+const cssNoDataColor = computed<CssColor>(() => {
   const { red, green, blue, alpha } = attributeNoDataColor.value ?? DEFAULT_NO_DATA_COLOR;
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 });

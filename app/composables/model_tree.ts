@@ -7,24 +7,31 @@ import type {
   FormattedComponent,
   FormattedComponentGroup,
 } from "@ogw_internal/stores/data/model/mesh_components";
-import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
+import type { Label, SortType, Title } from "@ogw_front/types/ui";
+import type { ModelComponentId, ModelId, TreeNodeId } from "@ogw_front/types/identifiers";
 import type { ComponentRelations } from "@ogw_internal/stores/data/model/relations";
+import type { ModelComponentType } from "@ogw_front/types/model";
 import { compareSelections } from "@ogw_front/utils/treeview";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 type ModelTreeCategory = FormattedComponentGroup | CollectionComponentGroup;
-type ModelTreeCache = Record<string, (FormattedComponent | CollectionComponent)[]>;
+type ModelTreeCache = Record<ModelComponentType, (FormattedComponent | CollectionComponent)[]>;
+
+// A component of a model shown in the tree, by its id in the model
+interface TreeComponent {
+  readonly id: ModelComponentId;
+}
 
 interface RelationGroup {
-  readonly id: string;
-  readonly title: string;
+  readonly id: TreeNodeId;
+  readonly title: Title;
   readonly relation: keyof ComponentRelations;
   readonly children: FilterableItem[];
 }
 
-const RELATION_GROUPS: readonly { key: keyof ComponentRelations; label: string }[] = [
+const RELATION_GROUPS: readonly { key: keyof ComponentRelations; label: Label }[] = [
   { key: "boundaries", label: "Boundaries" },
   { key: "internals", label: "Internals" },
 ];
@@ -33,7 +40,7 @@ const RELATION_GROUPS: readonly { key: keyof ComponentRelations; label: string }
 function relationGroups(
   componentId: ModelComponentId,
   componentRelations: ComponentRelations,
-  sortType: string,
+  sortType: SortType,
 ): RelationGroup[] {
   return RELATION_GROUPS.filter(({ key }) => componentRelations[key].length > 0).map(
     ({ key, label }) => ({
@@ -76,14 +83,14 @@ type WithRelationDetails<Component> = Component & { details?: RelationGroup[] };
 // Recomputing the tree (filter, search, cache update) reuses them instead of rebuilding them all
 function useRelationDetails(): {
   setRelations: (relations: Record<ModelComponentId, ComponentRelations>) => void;
-  attach: <Component extends { readonly id: string }>(
+  attach: <Component extends TreeComponent>(
     components: readonly Component[],
-    sortType: string,
+    sortType: SortType,
   ) => WithRelationDetails<Component>[];
 } {
   const relations = shallowRef<Readonly<Record<ModelComponentId, ComponentRelations>>>({});
   const groupsByComponent = new Map<ModelComponentId, RelationGroup[]>();
-  let groupsSortType: string | undefined = undefined;
+  let groupsSortType: SortType | undefined = undefined;
 
   function setRelations(newRelations: Record<ModelComponentId, ComponentRelations>): void {
     groupsByComponent.clear();
@@ -93,7 +100,7 @@ function useRelationDetails(): {
   function groupsOf(
     componentId: ModelComponentId,
     componentRelations: ComponentRelations,
-    sortType: string,
+    sortType: SortType,
   ): RelationGroup[] {
     if (sortType !== groupsSortType) {
       groupsByComponent.clear();
@@ -107,9 +114,9 @@ function useRelationDetails(): {
     return groups;
   }
 
-  function attach<Component extends { readonly id: string }>(
+  function attach<Component extends TreeComponent>(
     components: readonly Component[],
-    sortType: string,
+    sortType: SortType,
   ): WithRelationDetails<Component>[] {
     return components.map((component) => {
       const componentRelations = relations.value[component.id];
@@ -124,8 +131,8 @@ function useRelationDetails(): {
 }
 
 async function fetchModelTreeData(modelId: ModelId): Promise<{
-  meshByType: Record<string, FormattedComponent[]>;
-  collectionsByType: Record<string, CollectionComponent[]>;
+  meshByType: Record<ModelComponentType, FormattedComponent[]>;
+  collectionsByType: Record<ModelComponentType, CollectionComponent[]>;
   relations: Record<ModelComponentId, ComponentRelations>;
 }> {
   const dataStore = useDataStore();
@@ -145,7 +152,7 @@ export function useModelTree(modelId: ModelId): {
   isLoading: ComputedRef<boolean>;
   localCategories: Ref<ModelTreeCategory[]>;
   cache: Ref<ModelTreeCache | undefined>;
-  collectionTypes: Ref<Set<string>>;
+  collectionTypes: Ref<Set<ModelComponentType>>;
   withRelations: typeof withRelations;
 } & ReturnType<typeof useModelVisibility> {
   const dataStore = useDataStore();
@@ -154,7 +161,7 @@ export function useModelTree(modelId: ModelId): {
   const collectionGroups = dataStore.refFormatedCollectionComponents(modelId);
   const cache = ref<ModelTreeCache | undefined>(undefined);
   const localCategories = ref<ModelTreeCategory[]>([]);
-  const collectionTypes = ref<Set<string>>(new Set());
+  const collectionTypes = ref<Set<ModelComponentType>>(new Set());
   const relationDetails = useRelationDetails();
 
   // The mesh cache also groups collection components by their type; the collections cache overrides those keys with the real collection -> mesh components hierarchy.
@@ -175,10 +182,10 @@ export function useModelTree(modelId: ModelId): {
 
   const isLoading = computed(() => cache.value === undefined);
 
-  function withRelations<Component extends { readonly id: string }>(
-    categoryId: string,
+  function withRelations<Component extends TreeComponent>(
+    categoryId: ModelComponentType,
     components: readonly Component[],
-    sortType: string,
+    sortType: SortType,
   ): WithRelationDetails<Component>[] {
     if (collectionTypes.value.has(categoryId)) {
       return [...components];

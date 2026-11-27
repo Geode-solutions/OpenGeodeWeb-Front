@@ -2,33 +2,38 @@ import { consola } from "consola";
 import { killExtension } from "@ogw_front/utils/extension.js";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
+import type { ExtensionId } from "@ogw_front/types/identifiers";
+import type { FilePath } from "@ogw_front/types/files";
 import type { RegisterableStore } from "@ogw_front/stores/app";
 
+// What rewrites the code of an extension module before it is imported
+type CodeTransformer = (code: string) => string;
+
 interface ExtensionMetadata {
-  id: string;
+  id: ExtensionId;
   store: () => RegisterableStore;
   [key: string]: unknown;
 }
 
 interface ExtensionModule {
   metadata: ExtensionMetadata;
-  install: (api: unknown, backendPath?: string) => Promise<void>;
+  install: (api: unknown, backendPath?: FilePath) => Promise<void>;
   [key: string]: unknown;
 }
 
 interface ExtensionData {
   module: ExtensionModule;
-  id: string;
-  path: string;
-  backendPath: string | undefined;
+  id: ExtensionId;
+  path: FilePath;
+  backendPath: FilePath | undefined;
   loadedAt: string;
   metadata: ExtensionMetadata;
   enabled: boolean;
 }
 
 async function transformBlobUrl(
-  path: string,
-  transformer: ((code: string) => string) | undefined,
+  path: FilePath,
+  transformer: CodeTransformer | undefined,
 ): Promise<string> {
   if (!transformer || !path.startsWith("blob:")) {
     return path;
@@ -44,8 +49,8 @@ async function transformBlobUrl(
 }
 
 async function importExtensionModule(
-  path: string,
-  transformer: ((code: string) => string) | undefined,
+  path: FilePath,
+  transformer: CodeTransformer | undefined,
   extensionPort: string,
   serverPort?: string,
 ): Promise<ExtensionModule> {
@@ -67,7 +72,7 @@ async function importExtensionModule(
 function validateExtensionModule(
   extensionModule: ExtensionModule,
   api: unknown,
-  loaded: Map<string, ExtensionData>,
+  loaded: Map<ExtensionId, ExtensionData>,
 ): void {
   if (!extensionModule.metadata?.id) {
     throw new Error("Extension must have metadata.id");
@@ -91,8 +96,8 @@ function validateExtensionModule(
 
 function createExtensionData(
   extensionModule: ExtensionModule,
-  path: string,
-  backendPath: string | undefined,
+  path: FilePath,
+  backendPath: FilePath | undefined,
 ): ExtensionData {
   return {
     module: extensionModule,
@@ -119,27 +124,27 @@ export function useAppExtensions(): {
   setExtensionEnabled: typeof setExtensionEnabled;
   getExtensionEnabled: typeof getExtensionEnabled;
 } {
-  const loadedExtensions = ref<Map<string, ExtensionData>>(new Map());
+  const loadedExtensions = ref<Map<ExtensionId, ExtensionData>>(new Map());
   const extensionAPI = ref<unknown>(undefined);
-  const codeTransformer = ref<((code: string) => string) | undefined>(undefined);
+  const codeTransformer = ref<CodeTransformer | undefined>(undefined);
 
   function setExtensionAPI(api: unknown): void {
     extensionAPI.value = api;
   }
 
-  function setCodeTransformer(transformer: (code: string) => string): void {
+  function setCodeTransformer(transformer: CodeTransformer): void {
     codeTransformer.value = transformer;
   }
 
-  function getExtension(id: string): ExtensionData | undefined {
+  function getExtension(id: ExtensionId): ExtensionData | undefined {
     return loadedExtensions.value.get(id);
   }
 
   async function loadExtension(
-    path: string,
+    path: FilePath,
     extensionPort: string,
     serverPort?: string,
-    backendPath?: string,
+    backendPath?: FilePath,
   ): Promise<ExtensionModule> {
     try {
       const extensionModule = await importExtensionModule(
@@ -170,7 +175,7 @@ export function useAppExtensions(): {
     return [...loadedExtensions.value.values()];
   }
 
-  async function unloadExtension(extensionId: string): Promise<boolean> {
+  async function unloadExtension(extensionId: ExtensionId): Promise<boolean> {
     consola.info(`[AppStore] Unloading extension: ${extensionId}`);
     const infraStore = useInfraStore();
     infraStore.unregister_microservice(extensionId);
@@ -181,7 +186,7 @@ export function useAppExtensions(): {
     return true;
   }
 
-  function toggleExtension(extensionId: string): boolean {
+  function toggleExtension(extensionId: ExtensionId): boolean {
     const extensionData = getExtension(extensionId);
     if (!extensionData) {
       return false;
@@ -193,7 +198,7 @@ export function useAppExtensions(): {
     return extensionData.enabled;
   }
 
-  function setExtensionEnabled(extensionId: string, enabled: boolean): boolean {
+  function setExtensionEnabled(extensionId: ExtensionId, enabled: boolean): boolean {
     const extensionData = getExtension(extensionId);
     if (!extensionData) {
       return false;
@@ -203,7 +208,7 @@ export function useAppExtensions(): {
     return true;
   }
 
-  function getExtensionEnabled(extensionId: string): boolean {
+  function getExtensionEnabled(extensionId: ExtensionId): boolean {
     return getExtension(extensionId)?.enabled ?? false;
   }
 

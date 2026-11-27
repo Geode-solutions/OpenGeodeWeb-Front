@@ -9,6 +9,7 @@ import type {
   AttributeStoredConfig,
 } from "@ogw_internal/stores/data_style/attribute_types";
 import type { MeshId } from "@ogw_front/types/identifiers";
+import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 
 // Local imports
@@ -17,7 +18,10 @@ import { useMeshEdgesCommonStyle } from "./common";
 interface UseMeshEdgesEdgeAttributeConfigReturn {
   meshEdgesEdgeAttribute: (meshId: MeshId) => AttributeState;
   meshEdgesEdgeAttributeName: (meshId: MeshId) => AttributeName | undefined;
-  meshEdgesEdgeAttributeLastItem: (meshId: MeshId, name: AttributeName | undefined) => number;
+  meshEdgesEdgeAttributeLastItem: (
+    meshId: MeshId,
+    name: AttributeName | undefined,
+  ) => AttributeItem;
   meshEdgesEdgeAttributeItem: (meshId: MeshId) => AttributeItem;
   meshEdgesEdgeAttributeStoredConfig: (
     meshId: MeshId,
@@ -27,7 +31,7 @@ interface UseMeshEdgesEdgeAttributeConfigReturn {
 }
 
 interface UseMeshEdgesEdgeAttributeConfigWriterReturn {
-  mutateMeshEdgesEdgeStyle: (meshId: MeshId, values: Record<string, unknown>) => Promise<MeshId>;
+  mutateMeshEdgesEdgeStyle: (meshId: MeshId, values: StyleValues) => Promise<MeshId>;
   setMeshEdgesEdgeAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
@@ -58,7 +62,10 @@ function useMeshEdgesEdgeAttributeConfig(): UseMeshEdgesEdgeAttributeConfigRetur
   function meshEdgesEdgeAttributeName(meshId: MeshId): AttributeName | undefined {
     return meshEdgesEdgeAttribute(meshId).name;
   }
-  function meshEdgesEdgeAttributeLastItem(meshId: MeshId, name: AttributeName | undefined): number {
+  function meshEdgesEdgeAttributeLastItem(
+    meshId: MeshId,
+    name: AttributeName | undefined,
+  ): AttributeItem {
     const { storedConfigs } = meshEdgesEdgeAttribute(meshId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
     if (nameConfig !== undefined) {
@@ -118,10 +125,7 @@ function useMeshEdgesEdgeAttributeConfigValues(): UseMeshEdgesEdgeAttributeConfi
 
 function useMeshEdgesEdgeAttributeConfigWriter(): UseMeshEdgesEdgeAttributeConfigWriterReturn {
   const meshEdgesCommonStyle = useMeshEdgesCommonStyle();
-  async function mutateMeshEdgesEdgeStyle(
-    meshId: MeshId,
-    values: Record<string, unknown>,
-  ): Promise<MeshId> {
+  async function mutateMeshEdgesEdgeStyle(meshId: MeshId, values: StyleValues): Promise<MeshId> {
     const result = await meshEdgesCommonStyle.mutateMeshEdgesStyle(meshId, {
       coloring: {
         edge: values,

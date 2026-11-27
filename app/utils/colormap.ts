@@ -1,10 +1,12 @@
 // oxlint-disable unicorn/prefer-export-from
+import type { Pixels } from "@ogw_front/types/ui";
 import colormaps from "@ogw_front/assets/colormaps.json";
 
+import type { AttributeColorMap } from "@ogw_front/types/attribute";
 import { newInstance as vtkColorTransferFunction } from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction";
 
 interface ColormapPreset {
-  readonly Name: string;
+  readonly Name: AttributeColorMap;
   readonly RGBPoints: readonly number[];
 }
 
@@ -15,18 +17,18 @@ interface ColormapCategory {
 
 const typedColormaps = colormaps as readonly ColormapCategory[];
 
-function getPresetByName(presetName: string): ColormapPreset | undefined {
+function getPresetByName(presetName: AttributeColorMap): ColormapPreset | undefined {
   return typedColormaps
     .flatMap((category: ColormapCategory) => category.Children)
     .find((preset: ColormapPreset) => preset.Name === presetName);
 }
 
-function getRGBPointsFromPreset(presetName: string): readonly number[] {
+function getRGBPointsFromPreset(presetName: AttributeColorMap): readonly number[] {
   return getPresetByName(presetName)?.RGBPoints ?? [];
 }
 
 function getPresetsWithCurrentAtTop(
-  presetName: string,
+  presetName: AttributeColorMap,
 ): readonly (ColormapPreset | ColormapCategory)[] {
   const currentPreset = getPresetByName(presetName);
   return [currentPreset, ...typedColormaps].filter(
@@ -38,7 +40,7 @@ function getPresetsWithCurrentAtTop(
 const LAST_POINT_OFFSET = 4;
 const THREE = 3;
 
-function buildColorTable(rgbPoints: readonly number[], width: number): Float32Array {
+function buildColorTable(rgbPoints: readonly number[], width: Pixels): Float32Array {
   const lut = vtkColorTransferFunction();
   // oxlint-disable id-length
   const nodes = [];
@@ -61,8 +63,8 @@ function fillImageDataFromTable(
   imageData: ImageData,
   // Float32Array's numeric index signature is inherently mutable and can't satisfy prefer-readonly-parameter-types, so this finding is left unfixed (same pattern as app/plugins/auto_store_register.ts).
   table: Float32Array,
-  width: number,
-  height: number,
+  width: Pixels,
+  height: Pixels,
 ): void {
   for (let xCoord = 0; xCoord < width; xCoord += 1) {
     const alpha = table[xCoord * 4 + THREE] ?? 0;
@@ -80,7 +82,7 @@ function fillImageDataFromTable(
 }
 
 function drawCanvasForPreset(
-  presetName: string,
+  presetName: AttributeColorMap,
   // HTMLCanvasElement can't satisfy prefer-readonly-parameter-types since lib.dom.d.ts types are inherently mutable, so this finding is left unfixed (same pattern as app/plugins/auto_store_register.ts).
   canvas: HTMLCanvasElement | undefined | null,
 ): void {

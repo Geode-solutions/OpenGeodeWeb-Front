@@ -19,6 +19,7 @@ import type {
 } from "@geode/opengeodeweb-viewer/schema_types";
 import type { BlockId, ModelId } from "@ogw_front/types/identifiers";
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
+import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
@@ -113,7 +114,7 @@ type ModelBlocksPolyhedronAttributeGetters = Pick<
     modelId: ModelId,
     componentId: BlockId | undefined,
     name: AttributeName | undefined,
-  ) => number;
+  ) => AttributeItem;
 };
 
 // oxlint-disable-next-line max-lines-per-function
@@ -149,7 +150,7 @@ function useModelBlocksPolyhedronAttributeGetters(
     modelId: ModelId,
     blockId: BlockId | undefined,
     name: AttributeName | undefined,
-  ): number {
+  ): AttributeItem {
     const { storedConfigs } = modelBlocksPolyhedronAttribute(modelId, blockId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
     if (nameConfig !== undefined) {
@@ -233,7 +234,7 @@ function useModelBlocksPolyhedronAttribute(): UseModelBlocksPolyhedronAttributeR
   async function mutateModelBlocksPolyhedronStyle(
     modelId: ModelId,
     blockIds: NonEmptyArray<BlockId>,
-    values: Record<string, unknown>,
+    values: StyleValues,
   ): Promise<void> {
     const tasks: Promise<void>[] = [
       modelBlocksCommonStyle.mutateModelBlocksColoring(modelId, blockIds, {

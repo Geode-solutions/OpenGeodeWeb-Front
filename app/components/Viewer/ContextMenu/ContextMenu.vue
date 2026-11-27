@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import type { Count, Pixels } from "@ogw_front/types/ui";
 import CenterButton from "@ogw_front/components/Viewer/ContextMenu/CenterButton.vue";
 import CircularItems from "@ogw_front/components/Viewer/ContextMenu/CircularItems.vue";
 import type { Component } from "vue";
+import type { Coordinate } from "@ogw_front/types/geometry";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import InfoCard from "@ogw_front/components/Viewer/ContextMenu/InfoCard.vue";
 import { provideBatchGroup } from "@ogw_front/composables/batch_style";
 import { useEventListener } from "@vueuse/core";
@@ -9,11 +12,17 @@ import { useMenuStore } from "@ogw_front/stores/menu";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
 interface Props {
-  id: string;
-  x: number;
-  y: number;
-  containerWidth: number;
-  containerHeight: number;
+  id: DataId;
+  x: Coordinate;
+  y: Coordinate;
+  containerWidth: Pixels;
+  containerHeight: Pixels;
+}
+
+// A position of the context menu in its container, in pixels
+interface ContextMenuPosition {
+  x: Coordinate;
+  y: Coordinate;
 }
 
 const { id, x, y, containerWidth, containerHeight } = defineProps<Props>();
@@ -36,17 +45,12 @@ provideBatchGroup(() => meta_data.value.targetIds ?? []);
 const show_menu = ref<boolean>(true);
 const showName = ref<boolean>(false);
 const isDragging = ref<boolean>(false);
-const dragStartX = ref<number>(0);
-const dragStartY = ref<number>(0);
-const menuX = ref<number>(x);
-const menuY = ref<number>(y);
+const dragStartX = ref<Coordinate>(0);
+const dragStartY = ref<Coordinate>(0);
+const menuX = ref<Coordinate>(x);
+const menuY = ref<Coordinate>(y);
 
-interface Position {
-  x: number;
-  y: number;
-}
-
-function clampPosition(posX: number, posY: number): Position {
+function clampPosition(posX: Coordinate, posY: Coordinate): ContextMenuPosition {
   const margin = menuStore.menuRadius + MARGIN_OFFSET;
   return {
     x: Math.min(Math.max(posX, margin), containerWidth - margin),
@@ -121,7 +125,7 @@ watch(
   { immediate: true },
 );
 
-const menuItemCount = computed<number>(() => menu_items.value.length);
+const menuItemCount = computed<Count>(() => menu_items.value.length);
 
 const isOverTreeview = computed<boolean>(() => {
   const hasAdditional = treeviewStore.opened_views.some((view) => view.id !== "main");

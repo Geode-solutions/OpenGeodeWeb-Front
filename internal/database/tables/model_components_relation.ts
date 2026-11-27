@@ -1,10 +1,11 @@
-import type { DataIdentified } from "@ogw_front/types/identifiers";
+import type { DataIdentified, ModelComponentId } from "@ogw_front/types/identifiers";
+import type { ModelComponentRelationType } from "@ogw_front/types/model";
 import type { TableDefinition } from "./table_definition";
 
 interface ModelComponentRelationRecord extends DataIdentified {
-  parent: string;
-  child: string;
-  type: string;
+  parent: ModelComponentId;
+  child: ModelComponentId;
+  type: ModelComponentRelationType;
 }
 
 const modelComponentsRelationTable: TableDefinition = {

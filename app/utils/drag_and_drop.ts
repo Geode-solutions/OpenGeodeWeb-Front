@@ -1,8 +1,11 @@
-import type { UploadFile } from "@ogw_front/utils/upload_path";
+import type { FilePath, UploadFile } from "@ogw_front/types/files";
+
+// What a file input accepts: a MIME type, a wildcard such as "image/*" or an extension such as ".csv"
+type AcceptRule = string;
 
 const WILDCARD_SUFFIX_LENGTH = 2;
 
-function isFileAccepted(file: File, acceptValue: string | string[] | undefined): boolean {
+function isFileAccepted(file: File, acceptValue: AcceptRule | AcceptRule[] | undefined): boolean {
   const fileName = (file.name || "").toLowerCase();
   const fileType = (file.type || "").toLowerCase();
   const isVext = fileName.endsWith(".vext");
@@ -10,7 +13,7 @@ function isFileAccepted(file: File, acceptValue: string | string[] | undefined):
   if (acceptValue === undefined || acceptValue === "") {
     return !isVext;
   }
-  let rules: string[] = [];
+  let rules: AcceptRule[] = [];
   if (Array.isArray(acceptValue)) {
     rules = acceptValue;
   } else if (typeof acceptValue === "string") {
@@ -57,7 +60,7 @@ async function readAllEntries(reader: FileSystemDirectoryReader): Promise<FileSy
   return [...batch, ...(await readAllEntries(reader))];
 }
 
-async function filesFromEntry(entry: FileSystemEntry, path: string): Promise<UploadFile[]> {
+async function filesFromEntry(entry: FileSystemEntry, path: FilePath): Promise<UploadFile[]> {
   if (entry.isFile) {
     // oxlint-disable-next-line promise/avoid-new
     const file = await new Promise<File>((resolve, reject) => {
@@ -78,3 +81,4 @@ async function filesFromEntry(entry: FileSystemEntry, path: string): Promise<Upl
 }
 
 export { filesFromEntry, isFileAccepted };
+export type { AcceptRule };

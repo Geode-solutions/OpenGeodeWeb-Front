@@ -1,5 +1,7 @@
 <script setup lang="ts">
-const opacity = defineModel<number>();
+import type { Opacity } from "@geode/opengeodeweb-viewer/schema_types";
+
+const opacity = defineModel<Opacity>();
 </script>
 
 <template>

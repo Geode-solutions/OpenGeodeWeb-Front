@@ -1,15 +1,19 @@
 <script setup lang="ts">
+import type { IconName, Index, Message, Title } from "@ogw_front/types/ui";
+import type { AppName } from "@ogw_front/types/server";
+
 interface Props {
-  appName: string;
+  appName: AppName;
+}
+
+// A message displayed while the application loads, with its icon and title
+interface EcoMessage {
+  icon: IconName;
+  title: Title;
+  message: Message;
 }
 
 const { appName } = defineProps<Props>();
-
-interface EcoMessage {
-  icon: string;
-  title: string;
-  message: string;
-}
 
 const ecoMessages = computed<EcoMessage[]>(() => [
   {
@@ -30,7 +34,7 @@ const ecoMessages = computed<EcoMessage[]>(() => [
 ]);
 
 const MESSAGE_INTERVAL_MS = 5000;
-const currentMessage = ref<number>(0);
+const currentMessage = ref<Index>(0);
 let interval: ReturnType<typeof setInterval> | undefined = undefined;
 
 // Fallback only guards against noUncheckedIndexedAccess; currentMessage is always kept in range by the modulo below, so it is never actually used.

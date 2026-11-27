@@ -1,3 +1,4 @@
+// oxlint-disable import/max-dependencies -- the import workflow drives the back, data, crs, viewer and tree stores
 // Third party imports
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { consola } from "consola";
@@ -6,6 +7,7 @@ import { consola } from "consola";
 import { type NewDataItem, useDataStore } from "@ogw_front/stores/data";
 import type { CRS } from "@geode/opengeodeweb-back/schema_types";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { FileName } from "@ogw_front/types/files";
 import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import type { GeodeObjectTyped } from "@ogw_front/types/identifiers";
 import type { LegacyDataId } from "@ogw_front/utils/legacy_data_id";
@@ -17,12 +19,18 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useProjectCrs } from "@ogw_front/composables/project_crs";
 import { useTreeviewStore } from "@ogw_front/stores/treeview";
 
+// A chunk of the files imported together, by its index
+type ChunkIndex = number;
+
 interface FileToImport extends Readonly<GeodeObjectTyped> {
-  readonly filename: string;
+  readonly filename: FileName;
 }
 
 // A single file can hold several objects: every one of them is imported, ids are returned in the response order
-async function importFile(filename: string, geode_object_type: GeodeObjectType): Promise<DataId[]> {
+async function importFile(
+  filename: FileName,
+  geode_object_type: GeodeObjectType,
+): Promise<DataId[]> {
   const backStore = useBackStore();
   const schema = back_schemas.opengeodeweb_back.save_viewable_file;
   const params = { geode_object_type, filename };
@@ -55,7 +63,7 @@ async function importFiles(files: readonly FileToImport[]): Promise<DataId[]> {
 
   const results: DataId[] = [];
   const errors: unknown[] = [];
-  async function processChunk(chunkIndex: number): Promise<void> {
+  async function processChunk(chunkIndex: ChunkIndex): Promise<void> {
     if (chunkIndex >= chunks.length) {
       return;
     }
@@ -126,7 +134,7 @@ async function importWorkflowFromSnapshot(
     chunks.push(items.slice(i, i + chunk_size));
   }
   const ids: DataId[] = [];
-  async function processChunk(chunkIndex: number): Promise<void> {
+  async function processChunk(chunkIndex: ChunkIndex): Promise<void> {
     if (chunkIndex >= chunks.length) {
       return;
     }
@@ -149,7 +157,7 @@ async function importWorkflowFromSnapshot(
 }
 
 // The time series only adds attributes to the model, so the viewer object is reloaded.
-async function applyTimeSeriesWorkflow(filename: string, dataId: DataId): Promise<DataId> {
+async function applyTimeSeriesWorkflow(filename: FileName, dataId: DataId): Promise<DataId> {
   const backStore = useBackStore();
   await backStore.request({
     schema: back_schemas.opengeodeweb_back.apply_time_series,

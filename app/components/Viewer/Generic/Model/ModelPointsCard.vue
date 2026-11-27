@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
-import { type NonEmptyArray, isNonEmpty } from "@ogw_front/utils/arrays";
-import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type {
+  ModelPointsComponentType,
+  ModelPointsTarget,
+} from "@ogw_front/types/props/viewer/generic_model";
 import ModelCardTabs from "./ModelCardTabs.vue";
+import type { ModelComponentType } from "@ogw_front/types/model";
 import ViewerGenericModelComponentPointsOptions from "@ogw_front/components/Viewer/Generic/Model/ComponentPointsOptions.vue";
 import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
+import { isNonEmpty } from "@ogw_front/utils/arrays";
 import { useBatchStyle } from "@ogw_front/composables/batch_style";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -14,25 +18,22 @@ import { useModelMenuContext } from "@ogw_front/composables/model_menu_context";
 import { useModelTabs } from "@ogw_front/composables/model_tabs";
 
 // Corners have no points options: their points are the corners themselves
-const POINTS_TYPE_TITLES = {
+
+interface Props {
+  dataId: ModelId;
+}
+
+const POINTS_TYPE_TITLES: Record<ModelPointsComponentType, string> = {
   Surface: "Surfaces Points Options",
   Line: "Lines Points Options",
   Block: "Blocks Points Options",
-} as const;
-type PointsComponentType = keyof typeof POINTS_TYPE_TITLES;
-const POINTS_COMPONENT_TYPES: PointsComponentType[] = ["Surface", "Line", "Block"];
+};
+const POINTS_COMPONENT_TYPES: ModelPointsComponentType[] = ["Surface", "Line", "Block"];
 
-interface PointsTarget {
-  componentType: PointsComponentType;
-  componentIds: NonEmptyArray<ModelComponentId>;
-}
-
-function isPointsComponentType(type: string | undefined): type is PointsComponentType {
+function isPointsComponentType(
+  type: ModelComponentType | undefined,
+): type is ModelPointsComponentType {
   return type !== undefined && type in POINTS_TYPE_TITLES;
-}
-
-interface Props {
-  dataId: DataId;
 }
 
 const { dataId } = defineProps<Props>();
@@ -55,11 +56,11 @@ const modelPointsVisibility = computed<Visibility>({
   },
 });
 
-const pointsComponentType = computed<PointsComponentType | undefined>(() =>
+const pointsComponentType = computed<ModelPointsComponentType | undefined>(() =>
   isPointsComponentType(componentType.value) ? componentType.value : undefined,
 );
 
-const allComponentsTargets = ref<PointsTarget[]>([]);
+const allComponentsTargets = ref<ModelPointsTarget[]>([]);
 watch(
   modelId,
   async (currentModelId) => {
@@ -70,7 +71,7 @@ watch(
       })),
     );
     if (modelId.value === currentModelId) {
-      allComponentsTargets.value = targets.filter((target): target is PointsTarget =>
+      allComponentsTargets.value = targets.filter((target): target is ModelPointsTarget =>
         isNonEmpty(target.componentIds),
       );
     }
@@ -78,7 +79,7 @@ watch(
   { immediate: true },
 );
 
-const typeTargets = computed<PointsTarget[]>(() => {
+const typeTargets = computed<ModelPointsTarget[]>(() => {
   if (pointsComponentType.value === undefined || !isNonEmpty(targetComponentIds.value)) {
     return [];
   }
@@ -88,7 +89,7 @@ const typeReferenceId = computed<ModelComponentId | undefined>(() =>
   collections.value ? targetComponentIds.value[0] : undefined,
 );
 
-const componentTargets = computed<PointsTarget[]>(() => {
+const componentTargets = computed<ModelPointsTarget[]>(() => {
   if (pointsComponentType.value === undefined || componentId.value === undefined) {
     return [];
   }

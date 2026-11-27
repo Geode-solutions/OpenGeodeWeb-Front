@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import type { ColorRGBA, Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
+// oxlint-disable import/max-dependencies -- the card composes the options of the four component types and the style types they share
+import type { ColorRGBA, Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import BlocksOptions from "./BlocksOptions.vue";
+import type { ColoringType } from "@ogw_front/types/attribute";
 import CornersOptions from "./CornersOptions.vue";
 import LinesOptions from "./LinesOptions.vue";
 import ModelCardTabs from "./ModelCardTabs.vue";
@@ -15,13 +17,13 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useModelMenuContext } from "@ogw_front/composables/model_menu_context";
 import { useModelTabs } from "@ogw_front/composables/model_tabs";
 
-const dataStyleStore = useDataStyleStore();
-const hybridViewerStore = useHybridViewerStore();
-const { applyBatchStyle } = useBatchStyle();
-
 interface Props {
   dataId: ModelId;
 }
+
+const dataStyleStore = useDataStyleStore();
+const hybridViewerStore = useHybridViewerStore();
+const { applyBatchStyle } = useBatchStyle();
 
 const { dataId } = defineProps<Props>();
 
@@ -68,8 +70,8 @@ const modelComponentsColor = computed<ColorRGBA | undefined>({
   },
 });
 
-const modelComponentsActiveColoring = computed<string | undefined>({
-  get: () => dataStyleStore.getModelActiveColoring(modelId.value) as string | undefined,
+const modelComponentsActiveColoring = computed<ColoringType | undefined>({
+  get: () => dataStyleStore.getModelActiveColoring(modelId.value) as ColoringType | undefined,
   set: async (coloringType) => {
     if (typeof coloringType !== "string") {
       return;

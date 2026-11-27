@@ -1,6 +1,6 @@
 // oxlint-disable eslint/max-lines
 // oxlint-disable import/max-dependencies -- the shared points/edges component style needs the attribute, time step, viewer and array helpers
-import type { AttributeColorMap, AttributeRange } from "@ogw_front/types/attribute";
+import type { AttributeColorMap, AttributeRange, ColoringType } from "@ogw_front/types/attribute";
 import type {
   AttributeItem,
   AttributeName,
@@ -21,6 +21,7 @@ import {
 } from "@ogw_front/utils/default_styles/constants";
 import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
 import type { NonEmptyArray } from "@ogw_front/utils/arrays";
+import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 import { getRGBPointsFromPreset } from "@ogw_front/utils/colormap";
 import { groupBy } from "@ogw_internal/stores/data_style/model/component_style";
@@ -54,7 +55,7 @@ interface EdgesStyle {
   visibility?: Visibility;
   width?: EdgeWidth;
   coloring?: {
-    active?: string;
+    active?: ColoringType;
     constant?: ColorRGBA;
     vertex?: AttributeState;
   };
@@ -110,7 +111,7 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
     return edgesStyle(modelId, componentId).coloring?.constant ?? EDGES_DEFAULT_COLOR;
   }
 
-  function activeColoring(modelId: ModelId, componentId?: ModelComponentId): string {
+  function activeColoring(modelId: ModelId, componentId?: ModelComponentId): ColoringType {
     return edgesStyle(modelId, componentId).coloring?.active ?? "constant";
   }
 
@@ -125,7 +126,7 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
     modelId: ModelId,
     componentId: ModelComponentId | undefined,
     name?: AttributeName,
-  ): number {
+  ): AttributeItem {
     const { storedConfigs } = vertexAttribute(modelId, componentId);
     return name === undefined ? 0 : (storedConfigs?.[name]?.lastItem ?? 0);
   }
@@ -182,7 +183,7 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
     modelId: ModelId,
     componentIds: ModelComponentId[],
     schema: EdgesRequestSchema,
-    values: Record<string, unknown> & { style: EdgesStyle },
+    values: StyleValues & { style: EdgesStyle },
   ): Promise<unknown> {
     if (componentIds.length === 0) {
       return undefined;
@@ -295,7 +296,7 @@ function useModelComponentEdgesStyle(type: EdgesComponentType) {
   async function setActiveColoring(
     modelId: ModelId,
     componentIds: NonEmptyArray<ModelComponentId>,
-    activeColoringType: string,
+    activeColoringType: ColoringType,
   ): Promise<unknown> {
     await mutateEdges(modelId, componentIds, { coloring: { active: activeColoringType } });
     if (activeColoringType === "vertex") {

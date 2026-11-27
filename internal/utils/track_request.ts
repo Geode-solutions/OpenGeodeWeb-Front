@@ -3,14 +3,17 @@ import {
   type ActivityOutcome,
   useActivityStore,
 } from "@ogw_front/stores/activity";
+import type { Label } from "@ogw_front/types/ui";
+import type { Route } from "@ogw_front/types/server";
+import type { StoreId } from "@ogw_front/types/identifiers";
 import { TimeoutError } from "p-timeout";
 import { toErrorFeedback } from "./error_feedback.js";
 
 interface TrackedRequest {
-  source: string;
+  source: StoreId;
   kind: ActivityEntryKind;
-  route: string;
-  label?: string;
+  route: Route;
+  label?: Label;
   params?: unknown;
   // False for the requests repeated in the background (pings): only their failures are logged
   log_success?: boolean;

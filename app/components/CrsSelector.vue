@@ -1,28 +1,36 @@
 <script setup lang="ts">
+import type { Count, SearchQuery } from "@ogw_front/types/ui";
 import type { CRS } from "@geode/opengeodeweb-back/schema_types";
 import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
 import { useCrsStore } from "@ogw_front/stores/crs";
+
+// A column of the CRS table of the CrsSelector, by its key
+type CrsTableColumnKey = string;
 
 interface Props {
   geodeObjectType: GeodeObjectType;
   // Narrow containers: one "AUTHORITY:CODE" column and a truncated name
   compact?: boolean;
   // Shown as chips above the search, one row each, when they are in the list of this data type
-  favorites?: CRS[];
-  recent?: CRS[];
+  favorites: CRS[];
+  recent: CRS[];
 }
 
-const { geodeObjectType, compact = false, favorites = [], recent = [] } = defineProps<Props>();
+interface Emits {
+  "toggle-favorite": [crs: CRS];
+}
+
+const { geodeObjectType, compact = false, favorites, recent } = defineProps<Props>();
 const selectedCrs = defineModel<CRS | undefined>();
-const emit = defineEmits<{ "toggle-favorite": [crs: CRS] }>();
+const emit = defineEmits<Emits>();
 // The star column is only shown to a parent that keeps the favorites
 const canToggleFavorite = getCurrentInstance()?.vnode.props?.onToggleFavorite !== undefined;
 
 const DEFAULT_ITEMS_PER_PAGE = 10;
-const search = ref<string>("");
+const search = ref<SearchQuery>("");
 const page = ref<number>(1);
-const items_per_page = ref<number>(DEFAULT_ITEMS_PER_PAGE);
-const sort_by = ref<{ key: string; order?: "asc" | "desc" }[]>([]);
+const items_per_page = ref<Count>(DEFAULT_ITEMS_PER_PAGE);
+const sortBy = ref<{ key: CrsTableColumnKey; order?: "asc" | "desc" }[]>([]);
 const data_table_loading = ref<boolean>(false);
 // Thousands of rows that are never mutated: no deep reactivity
 const crs_list = shallowRef<CRS[]>([]);
@@ -44,7 +52,7 @@ function select_crs(crs: CRS): void {
 async function show_crs(crs: CRS): Promise<void> {
   select_crs(crs);
   search.value = "";
-  sort_by.value = [];
+  sortBy.value = [];
   await nextTick();
   const index = crs_list.value.findIndex((listed_item) => crs_key(listed_item) === crs_key(crs));
   page.value = Math.floor(index / items_per_page.value) + 1;
@@ -173,7 +181,7 @@ onMounted(async () => {
   <v-data-table
     v-model:page="page"
     v-model:items-per-page="items_per_page"
-    v-model:sort-by="sort_by"
+    v-model:sort-by="sortBy"
     :items-per-page-options="items_per_page_options"
     :headers="headers"
     :items="crs_list"

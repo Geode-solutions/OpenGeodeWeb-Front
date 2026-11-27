@@ -9,6 +9,7 @@ import type {
   AttributeStoredConfig,
 } from "@ogw_internal/stores/data_style/attribute_types";
 import type { MeshId } from "@ogw_front/types/identifiers";
+import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 
 // Local imports
@@ -17,7 +18,10 @@ import { useMeshPolygonsCommonStyle } from "./common";
 interface UseMeshPolygonsPolygonAttributeConfigReturn {
   meshPolygonsPolygonAttribute: (meshId: MeshId) => AttributeState;
   meshPolygonsPolygonAttributeName: (meshId: MeshId) => AttributeName | undefined;
-  meshPolygonsPolygonAttributeLastItem: (meshId: MeshId, name: AttributeName | undefined) => number;
+  meshPolygonsPolygonAttributeLastItem: (
+    meshId: MeshId,
+    name: AttributeName | undefined,
+  ) => AttributeItem;
   meshPolygonsPolygonAttributeItem: (meshId: MeshId) => AttributeItem;
   meshPolygonsPolygonAttributeStoredConfig: (
     meshId: MeshId,
@@ -27,10 +31,7 @@ interface UseMeshPolygonsPolygonAttributeConfigReturn {
 }
 
 interface UseMeshPolygonsPolygonAttributeConfigWriterReturn {
-  mutateMeshPolygonsPolygonStyle: (
-    meshId: MeshId,
-    values: Record<string, unknown>,
-  ) => Promise<MeshId>;
+  mutateMeshPolygonsPolygonStyle: (meshId: MeshId, values: StyleValues) => Promise<MeshId>;
   setMeshPolygonsPolygonAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
@@ -64,7 +65,7 @@ function useMeshPolygonsPolygonAttributeConfig(): UseMeshPolygonsPolygonAttribut
   function meshPolygonsPolygonAttributeLastItem(
     meshId: MeshId,
     name: AttributeName | undefined,
-  ): number {
+  ): AttributeItem {
     const { storedConfigs } = meshPolygonsPolygonAttribute(meshId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
     if (nameConfig !== undefined) {
@@ -126,7 +127,7 @@ function useMeshPolygonsPolygonAttributeConfigWriter(): UseMeshPolygonsPolygonAt
   const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle();
   async function mutateMeshPolygonsPolygonStyle(
     meshId: MeshId,
-    values: Record<string, unknown>,
+    values: StyleValues,
   ): Promise<MeshId> {
     const result = await meshPolygonsCommonStyle.mutateMeshPolygonsPolygonStyle(meshId, values);
     return result;

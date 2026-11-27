@@ -1,4 +1,5 @@
 import type { TreeGroup, TreeNode } from "@ogw_front/types/tree";
+import type { TreeNodeId } from "@ogw_front/types/identifiers";
 
 type MapStyle = "satellite" | "plan" | "routes";
 
@@ -14,11 +15,11 @@ const MAP_TITLES: Record<MapStyle, string> = {
 const BASEMAP_GROUP_ID = "basemap";
 const MAP_ID_PREFIX = `${BASEMAP_GROUP_ID}:`;
 
-function mapId(style: MapStyle): string {
+function mapId(style: MapStyle): TreeNodeId {
   return `${MAP_ID_PREFIX}${style}`;
 }
 
-function mapStyleOf(id: string): MapStyle | undefined {
+function mapStyleOf(id: TreeNodeId): MapStyle | undefined {
   return MAP_STYLES.find((style) => mapId(style) === id);
 }
 
@@ -27,7 +28,7 @@ function sortedMaps(maps: readonly string[]): MapStyle[] {
 }
 
 // Tree ids of the basemap: never project data
-function isBasemapId(id: string): boolean {
+function isBasemapId(id: TreeNodeId): boolean {
   return id === BASEMAP_GROUP_ID || id.startsWith(MAP_ID_PREFIX);
 }
 
@@ -44,8 +45,8 @@ function basemapGroup(): BasemapTreeGroup {
 function nextBasemapMaps(
   current: readonly MapStyle[],
   last: readonly MapStyle[],
-  added: readonly string[],
-  removed: readonly string[],
+  added: readonly TreeNodeId[],
+  removed: readonly TreeNodeId[],
 ): MapStyle[] {
   const addedMaps = added.flatMap((id) => mapStyleOf(id) ?? []);
   if (added.includes(BASEMAP_GROUP_ID) || addedMaps.length > 1) {

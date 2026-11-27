@@ -2,10 +2,12 @@ import type { ComputedRef, Ref } from "vue";
 import {
   type DisplayItem,
   type ItemPropsConfig,
+  type TreeDepth,
   type TreeItem,
   type VirtualTreeProps,
   toDisplayString,
 } from "./virtual_tree_types";
+import type { SearchQuery } from "@ogw_front/types/ui";
 
 interface FlattenContext {
   props: Ref<VirtualTreeProps>;
@@ -16,7 +18,12 @@ interface FlattenContext {
   getDetailsOf: (item: TreeItem) => TreeItem[] | undefined;
 }
 
-function matchesSearch(ctx: FlattenContext, item: TreeItem, id: unknown, search: string): boolean {
+function matchesSearch(
+  ctx: FlattenContext,
+  item: TreeItem,
+  id: unknown,
+  search: SearchQuery,
+): boolean {
   const { customFilter } = ctx.props.value;
   if (customFilter) {
     return customFilter(id, search, { raw: item });
@@ -28,7 +35,7 @@ function matchesSearch(ctx: FlattenContext, item: TreeItem, id: unknown, search:
   );
 }
 
-function createDisplayItem(ctx: FlattenContext, item: TreeItem, depth: number): DisplayItem {
+function createDisplayItem(ctx: FlattenContext, item: TreeItem, depth: TreeDepth): DisplayItem {
   const id = item[ctx.actualItemProps.value.value];
   return {
     raw: item,
@@ -91,7 +98,7 @@ function flattenLeafDetails(
 function flattenNode(
   ctx: FlattenContext,
   item: TreeItem,
-  depth: number,
+  depth: TreeDepth,
   flattenChildren: FlattenChildren,
 ): DisplayItem[] {
   const { search } = ctx.props.value;

@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { Texture } from "@ogw_front/types/texture";
+import type { TextureFieldUpdate } from "@ogw_front/types/props/viewer/options";
 import ViewerOptionsTextureItem from "@ogw_front/components/Viewer/Options/TextureItem.vue";
 
-const textures = defineModel<Texture[]>();
+// A texture of a textures selector, by its position in the list of textures
+type TextureIndex = number;
 
 interface Props {
   dataId: DataId;
 }
+
+const textures = defineModel<Texture[]>();
 
 const { dataId } = defineProps<Props>();
 
@@ -21,12 +25,12 @@ onMounted(() => {
   }
 });
 
-function update_value_event($event: { key: keyof Texture; value: string }, index: number): void {
+function updateValueEvent(fieldUpdate: TextureFieldUpdate, index: TextureIndex): void {
   const texture = internal_textures.value[index];
   if (!texture) {
     return;
   }
-  texture[$event.key] = $event.value;
+  texture[fieldUpdate.key] = fieldUpdate.value;
   const filtered = internal_textures.value.filter(
     (item) => item.texture_name !== "" && item.id !== "",
   );
@@ -51,7 +55,7 @@ function update_value_event($event: { key: keyof Texture; value: string }, index
       :data-id="dataId"
       :texture-name="texture.texture_name"
       :texture-id="texture.id"
-      @update_value="update_value_event($event, index)"
+      @update_value="updateValueEvent($event, index)"
     />
   </v-row>
   <v-row>

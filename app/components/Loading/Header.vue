@@ -1,9 +1,11 @@
 <script setup lang="ts">
-interface Props {
-  logo?: string;
+import type { ImageSource } from "@ogw_front/types/ui";
+
+interface LoadingHeaderProps {
+  logo?: ImageSource;
 }
 
-const { logo = "" } = defineProps<Props>();
+const { logo = "" } = defineProps<LoadingHeaderProps>();
 </script>
 
 <template>

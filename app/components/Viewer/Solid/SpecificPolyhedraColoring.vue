@@ -3,6 +3,7 @@ import type {
   AttributeColorMap,
   AttributeRange,
   AttributeTimeStep,
+  ColoringType,
 } from "@ogw_front/types/attribute";
 import type {
   AttributeItem,
@@ -22,17 +23,17 @@ import { useBatchStyleModel } from "@ogw_front/composables/batch_style_model";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
-const dataStyleStore = useDataStyleStore();
-const hybridViewerStore = useHybridViewerStore();
-const { applyBatchStyle } = useBatchStyle();
-
 interface Props {
   dataId: DataId;
 }
 
+const dataStyleStore = useDataStyleStore();
+const hybridViewerStore = useHybridViewerStore();
+const { applyBatchStyle } = useBatchStyle();
+
 const { dataId } = defineProps<Props>();
 
-const coloring_style_key = computed<string>({
+const coloringStyleKey = computed<ColoringType>({
   get: () => dataStyleStore.meshPolyhedraActiveColoring(dataId),
   set: async (newValue) => {
     await applyBatchStyle(dataId, (meshId: MeshId) =>
@@ -204,7 +205,7 @@ async function setPolyhedronAttributeRangesPerData(ranges: RangesPerData): Promi
 <template>
   <ViewerOptionsColoringTypeSelector
     :data-id="dataId"
-    v-model:coloring_style_key="coloring_style_key"
+    v-model:coloring_style_key="coloringStyleKey"
     v-model:color="color"
     v-model:opacity="opacity"
     v-model:vertex_attribute_name="vertex_attribute_name"

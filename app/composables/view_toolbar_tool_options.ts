@@ -1,12 +1,20 @@
+import type {
+  ComponentSize,
+  CssColor,
+  IconName,
+  TestId,
+  Title,
+  Tooltip,
+} from "@ogw_front/types/ui";
 import type { ViewToolbarTools } from "@ogw_front/composables/view_toolbar_tools";
 
 interface CameraOptionAction {
-  title?: string;
-  testId: string;
-  tooltip?: string;
-  icon: string;
-  iconSize?: number;
-  color?: string;
+  title?: Title;
+  testId: TestId;
+  tooltip?: Tooltip;
+  icon: IconName;
+  iconSize?: ComponentSize;
+  color?: CssColor;
   action?: () => void;
   menu?: CameraOptionAction[];
 }

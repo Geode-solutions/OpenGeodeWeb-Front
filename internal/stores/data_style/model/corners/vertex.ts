@@ -19,6 +19,7 @@ import type {
 } from "@geode/opengeodeweb-viewer/schema_types";
 import type { CornerId, ModelId } from "@ogw_front/types/identifiers";
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
+import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
@@ -102,7 +103,7 @@ type ModelCornersVertexAttributeGetters = Pick<
     modelId: ModelId,
     componentId: CornerId | undefined,
     name: AttributeName | undefined,
-  ) => number;
+  ) => AttributeItem;
 };
 
 // oxlint-disable-next-line max-lines-per-function
@@ -139,7 +140,7 @@ function useModelCornersVertexAttributeGetters(
     modelId: ModelId,
     cornerId: CornerId | undefined,
     name: AttributeName | undefined,
-  ): number {
+  ): AttributeItem {
     if (name === undefined) {
       return 0;
     }
@@ -221,7 +222,7 @@ function useModelCornersVertexAttribute(): ModelCornersVertexAttributeApi {
   async function mutateModelCornersVertexStyle(
     modelId: ModelId,
     cornerIds: NonEmptyArray<CornerId>,
-    values: Record<string, unknown>,
+    values: StyleValues,
   ): Promise<void> {
     const tasks: Promise<void>[] = [
       modelCornersCommonStyle.mutateModelCornersColoring(modelId, cornerIds, {

@@ -6,13 +6,14 @@ import {
   modelComponentsByGeodeIds,
 } from "@ogw_internal/database/queries.js";
 import type { ModelComponentRelationRecord } from "@ogw_internal/database/tables/model_components_relation";
+import type { ModelComponentRelationType } from "@ogw_front/types/model";
 
 interface ComponentRelations {
   readonly boundaries: readonly FormattedComponent[];
   readonly internals: readonly FormattedComponent[];
 }
 
-const RELATION_KEYS: Readonly<Record<string, keyof ComponentRelations>> = {
+const RELATION_KEYS: Readonly<Record<ModelComponentRelationType, keyof ComponentRelations>> = {
   boundary: "boundaries",
   internal: "internals",
 };
@@ -39,7 +40,7 @@ function groupRelationsByParent(
 async function getRelatedComponents(
   modelId: ModelId,
   relations: readonly ModelComponentRelationRecord[],
-  type: string,
+  type: ModelComponentRelationType,
 ): Promise<FormattedComponent[]> {
   const childIds = relations
     .filter((relation) => relation.type === type)

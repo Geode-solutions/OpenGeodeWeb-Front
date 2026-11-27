@@ -3,31 +3,34 @@
 // Third party imports
 
 // Local imports
+import type { ExtensionName, PackageVersion, Port } from "@ogw_front/types/server";
+import type { FileName, Url } from "@ogw_front/types/files";
 import type { RegisterableStore, useAppStore } from "@ogw_front/stores/app";
+import type { ExtensionId } from "@ogw_front/types/identifiers";
 import type { Microservice } from "@ogw_front/stores/infra";
 import { consola } from "consola";
 import { isCloudMode } from "@ogw_front/utils/stores";
 import opengeodeweb_front_schemas from "@geode/opengeodeweb-front/opengeodeweb_front_typed_schemas.js";
 
 interface ExtensionDescriptor {
-  id: string;
-  name: string;
-  version: string;
+  id: ExtensionId;
+  name: ExtensionName;
+  version: PackageVersion;
   frontendContent: string;
-  port: number;
-  serverPort?: number;
+  port: Port;
+  serverPort?: Port;
 }
 
 interface DownloadExtensionParams {
-  url: string;
-  extensionFileName: string;
+  url: Url;
+  extensionFileName: FileName;
 }
 
 type AppStoreInstance = ReturnType<typeof useAppStore>;
 type ExtensionModuleType = Awaited<ReturnType<AppStoreInstance["loadExtension"]>>;
 interface RegisteredExtension {
-  name: string;
-  version: string;
+  name: ExtensionName;
+  version: PackageVersion;
   extensionModule: ExtensionModuleType;
 }
 
@@ -130,7 +133,7 @@ async function importExtensionURL(url: DownloadExtensionParams): Promise<Registe
   return registerRunningExtensions();
 }
 
-async function unloadExtension(extensionId: string): Promise<boolean> {
+async function unloadExtension(extensionId: ExtensionId): Promise<boolean> {
   const { useAppStore } = await import("@ogw_front/stores/app");
   const appStore = useAppStore();
   consola.info("[ExtensionManager] Unloading extension:", extensionId);
@@ -156,7 +159,7 @@ async function unloadExtension(extensionId: string): Promise<boolean> {
   return true;
 }
 
-async function killExtension(extensionId: string): Promise<unknown> {
+async function killExtension(extensionId: ExtensionId): Promise<unknown> {
   const { useAppStore } = await import("@ogw_front/stores/app");
   const appStore = useAppStore();
   const { projectFolderPath } = appStore;

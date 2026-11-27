@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import type { BlockId, ModelId } from "@ogw_front/types/identifiers";
+import type { CollectionComponent } from "@ogw_internal/stores/data/model/collections";
+import type { TabName } from "@ogw_front/types/ui";
 // oxlint-disable eslint/max-lines
 import type {
   AttributeColorMap,
   AttributeRange,
   AttributeTimeStep,
+  ColoringType,
 } from "@ogw_front/types/attribute";
 import type {
   AttributeItem,
@@ -11,9 +15,7 @@ import type {
   ColorRGBA,
   Visibility,
 } from "@geode/opengeodeweb-viewer/schema_types";
-import type { BlockId, ModelId } from "@ogw_front/types/identifiers";
 import { type NonEmptyArray, isNonEmpty } from "@ogw_front/utils/arrays";
-import type { CollectionComponent } from "@ogw_internal/stores/data/model/collections";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
@@ -22,19 +24,13 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 interface Props {
   modelId: ModelId;
-  blockId?: BlockId;
+  blockId: BlockId | undefined;
   targetBlockIds: NonEmptyArray<BlockId>;
-  collections?: CollectionComponent[];
-  activeTab?: string;
+  collections: CollectionComponent[] | undefined;
+  activeTab: TabName | undefined;
 }
 
-const {
-  modelId,
-  blockId = undefined,
-  targetBlockIds,
-  collections = undefined,
-  activeTab = undefined,
-} = defineProps<Props>();
+const { modelId, blockId, targetBlockIds, collections, activeTab } = defineProps<Props>();
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
@@ -96,9 +92,11 @@ const blockColor = computed<ColorRGBA | undefined>({
   },
 });
 
-const blocksActiveColoring = computed<string | undefined>({
+const blocksActiveColoring = computed<ColoringType | undefined>({
   get: () =>
-    dataStyleStore.modelBlockActiveColoring(modelId, referenceBlockId.value) as string | undefined,
+    dataStyleStore.modelBlockActiveColoring(modelId, referenceBlockId.value) as
+      | ColoringType
+      | undefined,
   set: async (coloringType) => {
     if (typeof coloringType !== "string") {
       return;
@@ -125,8 +123,8 @@ const blocksActiveColoring = computed<string | undefined>({
   },
 });
 
-const blockActiveColoring = computed<string | undefined>({
-  get: () => dataStyleStore.modelBlockActiveColoring(modelId, blockId) as string | undefined,
+const blockActiveColoring = computed<ColoringType | undefined>({
+  get: () => dataStyleStore.modelBlockActiveColoring(modelId, blockId) as ColoringType | undefined,
   set: async (coloringType) => {
     if (blockId === undefined || typeof coloringType !== "string") {
       return;

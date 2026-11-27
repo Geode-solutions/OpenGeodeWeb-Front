@@ -1,54 +1,56 @@
 <script setup lang="ts">
 import { type DisplayItem, type EmitFn, useVirtualTree } from "@ogw_front/composables/virtual_tree";
+import type { LinkedTreeRow, TreeRowHoverPayload } from "@ogw_front/types/props/viewer/object_tree";
+import type { Pixels } from "@ogw_front/types/ui";
 import StickyHeader from "@ogw_front/components/Viewer/ObjectTree/Base/StickyHeader.vue";
 import TreeRow from "@ogw_front/components/Viewer/ObjectTree/Base/TreeRow.vue";
+import type { TreeRowIndex } from "@ogw_front/types/tree";
+import type { VirtualTreeProps } from "@ogw_front/composables/virtual_tree_types";
 import { useTreeKeyboardNav } from "@ogw_front/composables/tree_keyboard_nav";
 import { useTreeScroll } from "@ogw_front/composables/tree_scroll";
 
-// The useVirtualTree composable's own props type (VirtualTreeProps) isn't exported; this component intentionally stays generic over whatever item shape callers use (plain treeview groups, model component groups, ...), so it is extracted from the composable's signature instead of re-declared here.
-type UnwrapMaybeRefOrGetter<Source> = Source extends () => infer Result
-  ? Result
-  : Source extends { value: infer Result }
-    ? Result
-    : Source;
-type VirtualTreeProps = UnwrapMaybeRefOrGetter<Parameters<typeof useVirtualTree>[0]>;
+// What a tree row sends when it is right-clicked
+interface TreeRowContextMenuPayload {
+  event: MouseEvent;
+  item: DisplayItem["raw"];
+}
 
 interface Props {
   items: unknown[];
-  opened?: unknown[];
-  selected?: unknown[];
-  active?: unknown[];
-  scrollTop?: number;
-  options?: Record<string, unknown>;
+  opened: unknown[];
+  selected: unknown[];
+  active: unknown[];
+  scrollTop: Pixels;
+  options: Record<string, unknown>;
   // Row tinted from outside the tree, e.g. while its model tree header is hovered
-  linked?: { id: unknown; color: string };
+  linked?: LinkedTreeRow;
   // Whether a row shows its visibility toggle: the view knows which data a row stands for
   isRowViewable: (item: DisplayItem) => boolean;
 }
 
+interface Emits {
+  "update:opened": [opened: unknown[]];
+  "update:selected": [selected: unknown[]];
+  "update:active": [active: unknown[]];
+  "click:item": [item: DisplayItem["raw"]];
+  "update:scrollTop": [scrollTop: Pixels];
+  "hover:enter": [payload: TreeRowHoverPayload];
+  "hover:leave": [payload: TreeRowHoverPayload];
+  contextmenu: [payload: TreeRowContextMenuPayload];
+}
+
 const {
   items,
-  opened = [],
-  selected = [],
-  active = [],
-  scrollTop = 0,
-  options = {},
+  opened,
+  selected,
+  active,
+  scrollTop,
+  options,
   linked = undefined,
   isRowViewable,
 } = defineProps<Props>();
 
 const treeWrapper = ref<HTMLDivElement | undefined>(undefined);
-
-interface Emits {
-  "update:opened": [value: unknown[]];
-  "update:selected": [value: unknown[]];
-  "update:active": [value: unknown[]];
-  "click:item": [item: DisplayItem["raw"]];
-  "update:scrollTop": [value: number];
-  "hover:enter": [payload: { item: DisplayItem; immediate?: boolean }];
-  "hover:leave": [payload: { item: DisplayItem }];
-  contextmenu: [payload: { event: MouseEvent; item: DisplayItem["raw"] }];
-}
 
 const emit = defineEmits<Emits>();
 
@@ -82,10 +84,10 @@ const { virtualScrollRef, stickyHeader, handleScroll, scrollToIndex, getScrollIn
     actualItemProps,
   );
 
-const focusedIndex = ref<number>(-1);
-const lastActiveIndex = ref<number>(-1);
+const focusedIndex = ref<TreeRowIndex>(-1);
+const lastActiveIndex = ref<TreeRowIndex>(-1);
 
-function applyRangeSelect(newActive: Set<unknown>, index: number): void {
+function applyRangeSelect(newActive: Set<unknown>, index: TreeRowIndex): void {
   const start = Math.min(lastActiveIndex.value, index);
   const end = Math.max(lastActiveIndex.value, index);
   for (let i = start; i <= end; i += 1) {
@@ -96,7 +98,11 @@ function applyRangeSelect(newActive: Set<unknown>, index: number): void {
   }
 }
 
-function applyToggleActive(newActive: Set<unknown>, id: unknown, index: number | undefined): void {
+function applyToggleActive(
+  newActive: Set<unknown>,
+  id: unknown,
+  index: TreeRowIndex | undefined,
+): void {
   if (newActive.has(id)) {
     newActive.delete(id);
   } else {
@@ -109,7 +115,7 @@ function applyToggleActive(newActive: Set<unknown>, id: unknown, index: number |
 
 function handleMultiSelectClick(
   item: DisplayItem,
-  index: number | undefined,
+  index: TreeRowIndex | undefined,
   event: MouseEvent | KeyboardEvent,
 ): void {
   const newActive = new Set(active);
@@ -122,7 +128,7 @@ function handleMultiSelectClick(
   emit("update:active", [...newActive]);
 }
 
-function handleNormalClick(item: DisplayItem, index: number | undefined): void {
+function handleNormalClick(item: DisplayItem, index: TreeRowIndex | undefined): void {
   if (!item.isLeaf) {
     toggleOpen(item.raw);
     return;
@@ -140,7 +146,7 @@ function isMultiSelectEvent(event: MouseEvent | KeyboardEvent): void {
 
 function handleItemClick(
   item: DisplayItem,
-  index: number | undefined,
+  index: TreeRowIndex | undefined,
   event?: MouseEvent | KeyboardEvent,
 ): void {
   // A row still loading cannot be shown, hidden or picked yet

@@ -1,3 +1,5 @@
+import type { Coordinate } from "@ogw_front/types/geometry";
+import type { LaunchArgs } from "@ogw_front/stores/infra";
 import type { Vector3 } from "@kitware/vtk.js/types";
 import type { ViewerRequest } from "./request.js";
 import { consola } from "consola";
@@ -6,7 +8,11 @@ import opengeodeweb_viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb
 import { useAppStore } from "@ogw_front/stores/app";
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
-async function pickWorldPosition(request: ViewerRequest, x: number, y: number): Promise<Vector3> {
+async function pickWorldPosition(
+  request: ViewerRequest,
+  x: Coordinate,
+  y: Coordinate,
+): Promise<Vector3> {
   const schema = opengeodeweb_viewer_schemas.opengeodeweb_viewer.viewer.get_point_position;
   const {
     x: world_x,
@@ -20,7 +26,7 @@ async function pickWorldPosition(request: ViewerRequest, x: number, y: number): 
 }
 
 async function launchViewerMicroservice(
-  args: Readonly<{ projectFolderPath: string }>,
+  args: Readonly<LaunchArgs>,
   onPort: (port: string) => void,
 ): Promise<unknown> {
   const appStore = useAppStore();

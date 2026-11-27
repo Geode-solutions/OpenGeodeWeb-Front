@@ -2,6 +2,12 @@ import type { Ref, ShallowRef } from "vue";
 import { useLocalStorage } from "@vueuse/core";
 import type { z } from "zod";
 
+// A setting, by its key in the desktop settings.json
+type UserSettingKey = string;
+
+// A setting, by its key in the browser local storage
+type BrowserStorageKey = string;
+
 interface DesktopSettingsAPI {
   app_settings: unknown;
   app_settings_write: (settings: Record<string, unknown>) => Promise<unknown>;
@@ -11,29 +17,30 @@ interface DesktopSettingsAPI {
 // Its value is replaced, never changed in place: `favorites.value = [...favorites.value, entry]`
 interface UserSettingDefinition<Value> {
   // Its key in the desktop settings.json
-  key: string;
+  key: UserSettingKey;
   // Checks the stored value on read, strictly: an invalid one gives the fallback. A setting whose type
   // Changes takes a new key: the old value is left as is, never converted
   schema: z.ZodType<Value>;
   // A JSON value: copied for each use, compared when the setting is declared again
   fallback: Value;
   // Its key in the browser local storage
-  browserKey: string;
+  browserKey: BrowserStorageKey;
   // The value shared by every caller on the desktop, with the settings API it is saved through
   desktop?: { api: DesktopSettingsAPI; setting: ShallowRef<Value> };
 }
 
+// What a feature declares about a setting: its browser key is optional, "ogw-<key>" by default
+type UserSettingOptions<Value> = Omit<UserSettingDefinition<Value>, "browserKey" | "desktop"> &
+  Partial<Pick<UserSettingDefinition<Value>, "browserKey">>;
+
 // The browser key and fallback of each declared setting, as JSON
-const declared = new Map<string, string>();
+const declared = new Map<UserSettingKey, string>();
 
 // Declares a setting, at module level. Declaring it again the same way (hot reload, tests) is fine;
 // Declaring it differently is an error: two features would overwrite each other's value.
-function defineUserSetting<Value>(options: {
-  key: string;
-  schema: z.ZodType<Value>;
-  fallback: Value;
-  browserKey?: string;
-}): UserSettingDefinition<Value> {
+function defineUserSetting<Value>(
+  options: UserSettingOptions<Value>,
+): UserSettingDefinition<Value> {
   const definition: UserSettingDefinition<Value> = {
     ...options,
     browserKey: options.browserKey ?? `ogw-${options.key}`,
@@ -68,9 +75,12 @@ function validated<Value>(definition: UserSettingDefinition<Value>, value: unkno
   return structuredClone(definition.fallback);
 }
 
+// A setting as the browser stores it: JSON, or a raw string stored by a previous version
+type StoredSetting = string;
+
 // Every value is stored as JSON. A value that is not JSON is a string stored raw by a previous version
 // (the Vease color theme was stored as `dark`)
-function parseStored(raw: string): unknown {
+function parseStored(raw: StoredSetting): unknown {
   try {
     return JSON.parse(raw);
   } catch {
@@ -82,7 +92,7 @@ function browserSetting<Value>(definition: UserSettingDefinition<Value>): Ref<Va
   return useLocalStorage<Value>(definition.browserKey, structuredClone(definition.fallback), {
     shallow: true,
     serializer: {
-      read: (raw: string): Value => validated(definition, parseStored(raw)),
+      read: (raw: StoredSetting): Value => validated(definition, parseStored(raw)),
       write: (value: Value): string => JSON.stringify(value),
     },
   });
@@ -136,5 +146,5 @@ function useUserSetting<Value>(definition: UserSettingDefinition<Value>): Ref<Va
   return desktopSetting(globalScope.electronAPI, definition);
 }
 
-export type { UserSettingDefinition };
+export type { BrowserStorageKey, UserSettingDefinition, UserSettingKey, UserSettingOptions };
 export { defineUserSetting, useUserSetting };

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import ColormapQuickPicker from "@ogw_front/components/Viewer/Options/ColormapQuickPicker.vue";
 import HybridViewerTooltip from "@ogw_front/components/HybridViewerTooltip.vue";
+import type { Milliseconds } from "@ogw_front/types/time";
 import OrientationOverlay from "@ogw_front/components/Viewer/OrientationOverlay.vue";
 import ViewToolbar from "@ogw_front/components/ViewToolbar.vue";
 import ZoomBoxOverlay from "@ogw_front/components/ZoomBoxOverlay.vue";
@@ -11,11 +12,11 @@ import { useMenuStore } from "@ogw_front/stores/menu";
 import { useQuickColormap } from "@ogw_front/composables/use_quick_colormap";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
-const DEFAULT_ELEMENT_HEIGHT = 100;
-
 interface Emits {
   click: [event: PointerEvent];
 }
+
+const DEFAULT_ELEMENT_HEIGHT = 100;
 
 const emit = defineEmits<Emits>();
 
@@ -28,7 +29,10 @@ const dataStore = useDataStore();
 const { width: elementWidth, height: elementHeight } = useElementSize(container);
 const { width: windowWidth, height: windowHeight } = useWindowSize();
 
-function debounce<Callback extends (...args: unknown[]) => void>(func: Callback, wait: number) {
+function debounce<Callback extends (...args: unknown[]) => void>(
+  func: Callback,
+  wait: Milliseconds,
+) {
   let timeout: ReturnType<typeof setTimeout> | undefined = undefined;
   return function executedFunction(...args: Parameters<Callback>): void {
     function later(): void {

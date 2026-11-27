@@ -9,10 +9,20 @@ import { useCrsStore } from "@ogw_front/stores/crs";
 import { useProjectCrs } from "@ogw_front/composables/project_crs";
 
 // The geographic CRS list is the same for every data type
+
+interface Props {
+  show: boolean;
+}
+
+interface Emits {
+  "update:show": [value: boolean];
+  changed: [];
+}
+
 const LIST_TYPE = "PointSet3D";
 
-const { show = false } = defineProps<{ show?: boolean }>();
-const emit = defineEmits<{ "update:show": [value: boolean]; changed: [] }>();
+const { show } = defineProps<Props>();
+const emit = defineEmits<Emits>();
 
 const crsStore = useCrsStore();
 const { changeProjectCrs } = useCrs();

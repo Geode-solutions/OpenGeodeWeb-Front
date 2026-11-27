@@ -5,7 +5,13 @@ import {
   getAttributeRange,
 } from "@ogw_front/utils/attributes";
 import { type AttributeSource, isValidThresholdAttribute } from "@ogw_front/utils/threshold";
-import type { Threshold, ThresholdAttribute } from "@ogw_internal/stores/hybrid_viewer/filters";
+import type { Index, Title } from "@ogw_front/types/ui";
+import type {
+  Threshold,
+  ThresholdAttribute,
+  ThresholdIndex,
+} from "@ogw_internal/stores/hybrid_viewer/filters";
+import type { AttributeItemOption } from "@ogw_front/composables/attribute_selector";
 import type { AttributeTimeStep } from "@ogw_front/types/attribute";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import ViewerOptionsAttributeRangeSelector from "@ogw_front/components/Viewer/Options/AttributeRangeSelector.vue";
@@ -13,18 +19,18 @@ import { fetchAttributeRange } from "@ogw_front/utils/attribute_range";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 
+interface Emits {
+  remove: [];
+}
+
 interface Props {
   datasetId: DataId;
   sources: AttributeSource[];
-  index: number;
+  index: ThresholdIndex;
   threshold: Threshold;
 }
 
 const { datasetId, sources, index, threshold } = defineProps<Props>();
-
-interface Emits {
-  remove: [];
-}
 
 const emit = defineEmits<Emits>();
 
@@ -40,7 +46,7 @@ const {
 } = toRefs(threshold);
 const attributes = ref<AttributeInfo[]>([]);
 
-const availableSources = computed<{ title: string; value: number }[]>(() =>
+const availableSources = computed<{ title: Title; value: Index }[]>(() =>
   sources.map((source, sourceIndex) => ({
     title: source.title,
     value: sourceIndex,
@@ -64,7 +70,7 @@ const currentTimeStep = computed<AttributeTimeStep | undefined>(() => {
     ) ?? 0;
   return Math.min(step, currentAttribute.value.time_steps.length - 1);
 });
-const itemOptions = computed<{ title: string; value: number }[]>(() =>
+const itemOptions = computed<AttributeItemOption[]>(() =>
   Array.from({ length: currentAttribute.value?.nb_items ?? 0 }, (_, itemIndex) => ({
     title: `Item ${itemIndex + 1}`,
     value: itemIndex,

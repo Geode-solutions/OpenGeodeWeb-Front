@@ -1,5 +1,6 @@
 import type { ModelId, SurfaceId } from "@ogw_front/types/identifiers";
 import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
+import type { ColoringType } from "@ogw_front/types/attribute";
 import type { GeodeId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { NonEmptyArray } from "@ogw_front/utils/arrays";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
@@ -18,7 +19,7 @@ export function useModelSurfacesColor(): {
     modelId: ModelId,
     surfaceIds: SurfaceId[],
     color: ColorRGBA | undefined,
-    activeColoring?: string,
+    activeColoring?: ColoringType,
     collectionId?: GeodeId,
   ) => Promise<unknown>;
   modelSurfaceColoring: (modelId: ModelId, surface_id?: SurfaceId) => StyleValues;
@@ -27,7 +28,7 @@ export function useModelSurfacesColor(): {
   setModelSurfacesActiveColoring: (
     modelId: ModelId,
     surfaceIds: NonEmptyArray<SurfaceId>,
-    activeColoring: string,
+    activeColoring: ColoringType,
     collectionId?: GeodeId,
   ) => Promise<unknown>;
 } {
@@ -144,7 +145,7 @@ export function useModelSurfacesColor(): {
   async function setModelSurfacesActiveColoring(
     modelId: ModelId,
     surfaceIds: NonEmptyArray<SurfaceId>,
-    activeColoring: string,
+    activeColoring: ColoringType,
     collectionId?: GeodeId,
   ): Promise<unknown> {
     const totalSurfaceIds = await dataStore.getSurfacesGeodeIds(modelId);

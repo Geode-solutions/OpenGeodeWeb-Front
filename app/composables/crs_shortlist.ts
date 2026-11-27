@@ -24,8 +24,11 @@ interface CrsShortlistApi {
   recordUse: (crs: CRS) => void;
 }
 
+// What identifies a CRS in the shortlist: "<authority>:<code>"
+type CrsKey = string;
+
 // Codes are only unique within an authority (e.g. EPSG:4812 and ESRI:4812)
-function crsKey({ authority, code }: CrsEntry): string {
+function crsKey({ authority, code }: CrsEntry): CrsKey {
   return `${authority}:${code}`;
 }
 

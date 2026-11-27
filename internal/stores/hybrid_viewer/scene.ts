@@ -1,10 +1,13 @@
+// oxlint-disable import/max-dependencies -- the scene loads light viewables of the data store into vtk.js actors and syncs them with the viewer
 import { ACTOR_COLOR, RGB_MAX } from "./constants";
 import type { HybridDb, HybridDbEntry, vtkActor as VtkActorInstance, vtkCamera } from "./vtk_types";
+import type { Ratio, ZScale } from "@ogw_front/types/geometry";
 import { requireRenderWindow, useHybridViewerCore } from "./core";
 import viewer_schemas, {
   type ViewerSetBackgroundColorParams,
 } from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { LightViewable } from "@ogw_front/types/data";
 import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
 import { base64ToArrayBuffer } from "./base64";
 import { getCameraOptions } from "./camera_animation";
@@ -41,7 +44,7 @@ async function setBackgroundColor(color: ViewerSetBackgroundColorParams["color"]
 }
 
 // The actors are stretched along z around the origin: translate the camera along z so the point it looks at stays under it, keeping the user's view instead of jumping back to the whole scene.
-function followZScaling(camera: vtkCamera, ratio: number): void {
+function followZScaling(camera: vtkCamera, ratio: Ratio): void {
   const [focalX, focalY, focalZ] = camera.getFocalPoint();
   const [positionX, positionY, positionZ] = camera.getPosition();
   const offset = focalZ * (ratio - 1);
@@ -49,7 +52,7 @@ function followZScaling(camera: vtkCamera, ratio: number): void {
   camera.setPosition(positionX, positionY, positionZ + offset);
 }
 
-async function fetchBinaryLightViewable(dataId: DataId): Promise<string | undefined> {
+async function fetchBinaryLightViewable(dataId: DataId): Promise<LightViewable | undefined> {
   const dataStore = useDataStore();
   const isViewable = await dataStore.fetchIsViewable(dataId);
   if (!isViewable) {
@@ -59,7 +62,7 @@ async function fetchBinaryLightViewable(dataId: DataId): Promise<string | undefi
   return value.binary_light_viewable;
 }
 
-function createHybridDbEntry(binaryLightViewable: string, zScale: number): HybridDbEntry {
+function createHybridDbEntry(binaryLightViewable: LightViewable, zScale: ZScale): HybridDbEntry {
   const reader = vtkXMLPolyDataReader();
   reader.parseAsArrayBuffer(base64ToArrayBuffer(binaryLightViewable));
   const actor = vtkActor();
@@ -125,7 +128,7 @@ const useHybridViewerScene = createSharedComposable(() => {
     renderWindow.render();
   }
 
-  async function setZScaling(z_scale: number): Promise<void> {
+  async function setZScaling(z_scale: ZScale): Promise<void> {
     const { genericRenderWindow, remoteRender } = useHybridViewerCore();
     const ratio = z_scale / zScale.value;
     zScale.value = z_scale;

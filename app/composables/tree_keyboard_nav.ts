@@ -1,33 +1,31 @@
-import type { DisplayItem, EmitFn } from "./virtual_tree";
+import type { EmitFn, ReadonlyDisplayItem } from "./virtual_tree";
+import type { KeyboardKey } from "@ogw_front/types/ui";
 import type { ScrollInfo } from "./tree_scroll";
+import type { TreeRowIndex } from "@ogw_front/types/tree";
 
 interface VisibleBounds {
-  firstVisible: number;
-  lastVisible: number;
+  firstVisible: TreeRowIndex;
+  lastVisible: TreeRowIndex;
 }
 
-type ReadonlyDisplayItem = Omit<DisplayItem, "raw"> & {
-  readonly raw: Record<string, unknown>;
-};
-
 interface KeyboardEventLike {
-  readonly key: string;
+  readonly key: KeyboardKey;
   readonly ctrlKey: boolean;
   readonly metaKey: boolean;
   preventDefault: () => void;
 }
 
 interface UseTreeKeyboardNavReturn {
-  focusedIndex: Ref<number>;
+  focusedIndex: Ref<TreeRowIndex>;
   handleKeyDown: (event: KeyboardEventLike) => void;
 }
 
 function getBaseIndex(
-  currentIndex: number,
-  lastIndex: number,
+  currentIndex: TreeRowIndex,
+  lastIndex: TreeRowIndex,
   bounds: VisibleBounds | undefined,
-  key: string,
-): number {
+  key: KeyboardKey,
+): TreeRowIndex {
   if (currentIndex < 0 || currentIndex > lastIndex) {
     if (bounds) {
       return key === "End" ? lastIndex : bounds.firstVisible;
@@ -48,17 +46,17 @@ function getBaseIndex(
 export function useTreeKeyboardNav(
   displayItems: Ref<readonly ReadonlyDisplayItem[]>,
   emit: EmitFn,
-  scrollToIndex: (index: number) => void,
+  scrollToIndex: (index: TreeRowIndex) => void,
   toggleOpen: (raw: Record<string, unknown>) => void,
-  handleItemClick: (item: ReadonlyDisplayItem, index: number) => void,
+  handleItemClick: (item: ReadonlyDisplayItem, index: TreeRowIndex) => void,
   getScrollInfo: (() => ScrollInfo | undefined) | undefined,
-  externalFocusedIndex: Ref<number> | undefined,
+  externalFocusedIndex: Ref<TreeRowIndex> | undefined,
   selectAll: () => void,
   clearActive: () => boolean,
 ): UseTreeKeyboardNavReturn {
   const focusedIndex = externalFocusedIndex ?? ref(-1);
 
-  function findParentIndex(item: ReadonlyDisplayItem, currentIndex: number): number {
+  function findParentIndex(item: ReadonlyDisplayItem, currentIndex: TreeRowIndex): TreeRowIndex {
     for (let index = currentIndex - 1; index >= 0; index -= 1) {
       const candidate = displayItems.value[index];
       if (candidate && candidate.depth < item.depth) {
@@ -87,9 +85,9 @@ export function useTreeKeyboardNav(
 
   function handleExpandOrNext(
     item: ReadonlyDisplayItem | undefined,
-    currentIndex: number,
-    lastIndex: number,
-  ): number {
+    currentIndex: TreeRowIndex,
+    lastIndex: TreeRowIndex,
+  ): TreeRowIndex {
     if (item && item.isExpandable && !item.isOpen) {
       toggleOpen(item.raw);
       return currentIndex;
@@ -99,8 +97,8 @@ export function useTreeKeyboardNav(
 
   function handleCollapseOrParent(
     item: ReadonlyDisplayItem | undefined,
-    currentIndex: number,
-  ): number {
+    currentIndex: TreeRowIndex,
+  ): TreeRowIndex {
     if (item && item.isExpandable && item.isOpen) {
       toggleOpen(item.raw);
       return currentIndex;
@@ -112,7 +110,7 @@ export function useTreeKeyboardNav(
     return currentIndex;
   }
 
-  function getNextIndex(key: string): number {
+  function getNextIndex(key: KeyboardKey): TreeRowIndex {
     const total = displayItems.value.length;
     if (total === 0) {
       return -1;

@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import type { ModelId, SurfaceId } from "@ogw_front/types/identifiers";
+import type { CollectionComponent } from "@ogw_internal/stores/data/model/collections";
+import type { TabName } from "@ogw_front/types/ui";
 // oxlint-disable eslint/max-lines
 import type {
   AttributeColorMap,
   AttributeRange,
   AttributeTimeStep,
+  ColoringType,
 } from "@ogw_front/types/attribute";
 import type {
   AttributeItem,
@@ -11,9 +15,7 @@ import type {
   ColorRGBA,
   Visibility,
 } from "@geode/opengeodeweb-viewer/schema_types";
-import type { ModelId, SurfaceId } from "@ogw_front/types/identifiers";
 import { type NonEmptyArray, isNonEmpty } from "@ogw_front/utils/arrays";
-import type { CollectionComponent } from "@ogw_internal/stores/data/model/collections";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
@@ -22,19 +24,13 @@ import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 interface Props {
   modelId: ModelId;
-  surfaceId?: SurfaceId;
+  surfaceId: SurfaceId | undefined;
   targetSurfaceIds: NonEmptyArray<SurfaceId>;
-  collections?: CollectionComponent[];
-  activeTab?: string;
+  collections: CollectionComponent[] | undefined;
+  activeTab: TabName | undefined;
 }
 
-const {
-  modelId,
-  surfaceId = undefined,
-  targetSurfaceIds,
-  collections = undefined,
-  activeTab = undefined,
-} = defineProps<Props>();
+const { modelId, surfaceId, targetSurfaceIds, collections, activeTab } = defineProps<Props>();
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
@@ -96,10 +92,10 @@ const surfaceColor = computed<ColorRGBA | undefined>({
   },
 });
 
-const surfacesActiveColoring = computed<string | undefined>({
+const surfacesActiveColoring = computed<ColoringType | undefined>({
   get: () =>
     dataStyleStore.modelSurfaceActiveColoring(modelId, referenceSurfaceId.value) as
-      | string
+      | ColoringType
       | undefined,
   set: async (coloringType) => {
     if (typeof coloringType !== "string") {
@@ -127,8 +123,9 @@ const surfacesActiveColoring = computed<string | undefined>({
   },
 });
 
-const surfaceActiveColoring = computed<string | undefined>({
-  get: () => dataStyleStore.modelSurfaceActiveColoring(modelId, surfaceId) as string | undefined,
+const surfaceActiveColoring = computed<ColoringType | undefined>({
+  get: () =>
+    dataStyleStore.modelSurfaceActiveColoring(modelId, surfaceId) as ColoringType | undefined,
   set: async (coloringType) => {
     if (surfaceId === undefined || typeof coloringType !== "string") {
       return;

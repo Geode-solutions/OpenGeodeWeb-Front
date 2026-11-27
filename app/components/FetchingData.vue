@@ -1,12 +1,14 @@
 <script setup lang="ts">
-const DEFAULT_SIZE = 22;
-const DEFAULT_WIDTH = 3;
+import type { ComponentSize, DisplayText } from "@ogw_front/types/ui";
 
 interface Props {
-  text?: string;
-  size?: number | string;
+  text?: DisplayText;
+  size?: ComponentSize;
   width?: number | string;
 }
+
+const DEFAULT_SIZE = 22;
+const DEFAULT_WIDTH = 3;
 
 const {
   text = "Fetching data...",

@@ -1,15 +1,16 @@
+import type { DetailMap, DetailRefreshNumber } from "./detail_map.js";
 import { type MapBounds, covers, stillSharp } from "@ogw_front/utils/visible_map_area";
+import { type ViewportSize, useDetailView } from "./detail_view.js";
 import type { BasemapBuildResponse } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import type { BasemapGrid } from "./builds.js";
+import type { BasemapId } from "@ogw_front/types/identifiers";
 import type { DetailLayers } from "./detail_layers.js";
-import type { DetailMap } from "./detail_map.js";
 import { useBasemapStore } from "@ogw_front/stores/basemap";
 import { useBasemapViewer } from "./viewer.js";
 import { useDebounceFn } from "@vueuse/core";
-import { useDetailView } from "./detail_view.js";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
-type BuildDetail = (grid: BasemapGrid, view: MapBounds, size: readonly number[]) => Promise<void>;
+type BuildDetail = (grid: BasemapGrid, view: MapBounds, size: ViewportSize) => Promise<void>;
 
 interface DetailRefresh {
   // When the camera rests: a refresh waits for the last camera change
@@ -32,8 +33,8 @@ function useBuildDetail(detail: DetailMap, layers: DetailLayers): BuildDetail {
   // Shown unless a newer refresh or base came while it was applied
   async function show(
     response: BasemapBuildResponse,
-    basemapId: string,
-    refreshNumber: number,
+    basemapId: BasemapId,
+    refreshNumber: DetailRefreshNumber,
   ): Promise<void> {
     let sentLayers = "";
     try {

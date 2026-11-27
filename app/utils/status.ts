@@ -1,10 +1,13 @@
+// The state of a microservice or of the viewer: created, connecting, connected...
+type MicroserviceStatus = string;
+
 interface StatusValues {
-  NOT_CREATED: string;
-  CREATING: string;
-  CREATED: string;
-  NOT_CONNECTED: string;
-  CONNECTING: string;
-  CONNECTED: string;
+  NOT_CREATED: MicroserviceStatus;
+  CREATING: MicroserviceStatus;
+  CREATED: MicroserviceStatus;
+  NOT_CONNECTED: MicroserviceStatus;
+  CONNECTING: MicroserviceStatus;
+  CONNECTED: MicroserviceStatus;
 }
 
 const Status: StatusValues = {
@@ -17,3 +20,4 @@ const Status: StatusValues = {
 };
 
 export { Status };
+export type { MicroserviceStatus };

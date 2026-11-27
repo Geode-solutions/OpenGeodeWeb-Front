@@ -1,3 +1,5 @@
+import type { Count } from "@ogw_front/types/ui";
+
 const DEFAULT_MAX_LENGTH = 20;
 const DEFAULT_START_CHARS = 8;
 const DEFAULT_END_CHARS = 6;
@@ -12,9 +14,9 @@ const DEFAULT_END_CHARS = 6;
  */
 function middleTruncate(
   text: string | undefined | null,
-  maxLength: number = DEFAULT_MAX_LENGTH,
-  startChars: number = DEFAULT_START_CHARS,
-  endChars: number = DEFAULT_END_CHARS,
+  maxLength: Count = DEFAULT_MAX_LENGTH,
+  startChars: Count = DEFAULT_START_CHARS,
+  endChars: Count = DEFAULT_END_CHARS,
 ): string | undefined | null {
   if (text === undefined || text === null || text.length <= maxLength) {
     return text;

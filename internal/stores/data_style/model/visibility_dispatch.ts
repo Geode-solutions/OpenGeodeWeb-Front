@@ -1,5 +1,6 @@
 import type { GeodeIdentified, ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
+import type { ModelComponentType } from "@ogw_front/types/model";
 import { useDataStore } from "@ogw_front/stores/data";
 
 // The four per-component-type style composables (Surface/Line/Block/Corner) each expose a different, large set of methods (color, visibility, per-attribute-kind getters/setters...). This module only cares about looking a handful of them up dynamically by name, so a precise structural type for componentStyleFunctions isn't worth modelling here; `any` keeps the dynamic dispatch table honest about that.
@@ -7,7 +8,7 @@ import { useDataStore } from "@ogw_front/stores/data";
 type ComponentStyleFunctions = Record<"Surface" | "Line" | "Block" | "Corner", any>;
 
 interface ModelComponent extends GeodeIdentified {
-  type: string;
+  type: ModelComponentType;
 }
 
 async function callComponentStyleFunction(

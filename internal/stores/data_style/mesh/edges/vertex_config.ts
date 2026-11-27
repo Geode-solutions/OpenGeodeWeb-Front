@@ -9,6 +9,7 @@ import type {
   AttributeStoredConfig,
 } from "@ogw_internal/stores/data_style/attribute_types";
 import type { MeshId } from "@ogw_front/types/identifiers";
+import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 
 // Local imports
@@ -17,7 +18,10 @@ import { useMeshEdgesCommonStyle } from "./common";
 interface UseMeshEdgesVertexAttributeConfigReturn {
   meshEdgesVertexAttribute: (meshId: MeshId) => AttributeState;
   meshEdgesVertexAttributeName: (meshId: MeshId) => AttributeName | undefined;
-  meshEdgesVertexAttributeLastItem: (meshId: MeshId, name: AttributeName | undefined) => number;
+  meshEdgesVertexAttributeLastItem: (
+    meshId: MeshId,
+    name: AttributeName | undefined,
+  ) => AttributeItem;
   meshEdgesVertexAttributeItem: (meshId: MeshId) => AttributeItem;
   meshEdgesVertexAttributeStoredConfig: (
     meshId: MeshId,
@@ -27,7 +31,7 @@ interface UseMeshEdgesVertexAttributeConfigReturn {
 }
 
 interface UseMeshEdgesVertexAttributeConfigWriterReturn {
-  mutateMeshEdgesVertexStyle: (meshId: MeshId, values: Record<string, unknown>) => Promise<MeshId>;
+  mutateMeshEdgesVertexStyle: (meshId: MeshId, values: StyleValues) => Promise<MeshId>;
   setMeshEdgesVertexAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
@@ -61,7 +65,7 @@ function useMeshEdgesVertexAttributeConfig(): UseMeshEdgesVertexAttributeConfigR
   function meshEdgesVertexAttributeLastItem(
     meshId: MeshId,
     name: AttributeName | undefined,
-  ): number {
+  ): AttributeItem {
     const { storedConfigs } = meshEdgesVertexAttribute(meshId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
     if (nameConfig !== undefined) {
@@ -121,10 +125,7 @@ function useMeshEdgesVertexAttributeConfigValues(): UseMeshEdgesVertexAttributeC
 
 function useMeshEdgesVertexAttributeConfigWriter(): UseMeshEdgesVertexAttributeConfigWriterReturn {
   const meshEdgesCommonStyle = useMeshEdgesCommonStyle();
-  async function mutateMeshEdgesVertexStyle(
-    meshId: MeshId,
-    values: Record<string, unknown>,
-  ): Promise<MeshId> {
+  async function mutateMeshEdgesVertexStyle(meshId: MeshId, values: StyleValues): Promise<MeshId> {
     const result = await meshEdgesCommonStyle.mutateMeshEdgesStyle(meshId, {
       coloring: {
         vertex: values,

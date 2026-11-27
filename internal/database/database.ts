@@ -1,3 +1,13 @@
+import type {
+  CameraPositionId,
+  CurrentSchema,
+  ModelComponentStyleKey,
+  ModelComponentTypeStyleKey,
+  SchemaDefinition,
+  TableName,
+  TableSchemas,
+  TreeviewConfigId,
+} from "./types";
 import { type CameraPositionRecord, cameraPositionsTable } from "./tables/camera_positions";
 import { type DataItem, dataTable } from "./tables/data";
 import { Dexie, type IndexableType, type Table } from "dexie";
@@ -14,6 +24,7 @@ import type {
 } from "@ogw_internal/stores/data_style/types";
 import { type TreeviewConfigRecord, treeviewConfigTable } from "./tables/treeview_config";
 import { BaseDatabase } from "./base_database";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import { ExtendedDatabase } from "./extended_database";
 import { dataStyleTable } from "./tables/data_style";
 import { modelComponentDataStyleTable } from "./tables/model_component_datastyle";
@@ -26,12 +37,7 @@ interface DatabaseContainer {
 
 const databaseContainer: DatabaseContainer = { instance: undefined };
 
-interface CurrentSchema {
-  currentVersion: number;
-  currentStores: Record<string, string>;
-}
-
-function tableStoreDefinition(table: Table): string {
+function tableStoreDefinition(table: Table): SchemaDefinition {
   const keyPath = table.schema.primKey.src;
   const indexes = table.schema.indexes.map((index) => index.src);
   if (keyPath) {
@@ -41,7 +47,7 @@ function tableStoreDefinition(table: Table): string {
 }
 
 async function readCurrentSchema(): Promise<CurrentSchema> {
-  const currentStores: Record<string, string> = { ...BaseDatabase.initialStores };
+  const currentStores: TableSchemas = { ...BaseDatabase.initialStores };
   if (!(await Dexie.exists("Database"))) {
     return { currentVersion: 1, currentStores };
   }
@@ -55,10 +61,10 @@ async function readCurrentSchema(): Promise<CurrentSchema> {
   return { currentVersion, currentStores };
 }
 
-async function openExistingDatabase(
-  currentVersion: number,
-  currentStores: Record<string, string>,
-): Promise<Dexie> {
+async function openExistingDatabase({
+  currentVersion,
+  currentStores,
+}: CurrentSchema): Promise<Dexie> {
   const existingDb = new Dexie("Database");
   for (let version = 1; version <= currentVersion; version += 1) {
     if (version === 1) {
@@ -78,11 +84,14 @@ class Database extends BaseDatabase {
     this.version(3).stores(BaseDatabase.initialStores);
   }
 
-  public static async addTable(tableName: string, schemaDefinition: string): Promise<void> {
+  public static async addTable(
+    tableName: TableName,
+    schemaDefinition: SchemaDefinition,
+  ): Promise<void> {
     await this.addTables({ [tableName]: schemaDefinition });
   }
 
-  public static async addTables(newTables: Record<string, string>): Promise<void> {
+  public static async addTables(newTables: TableSchemas): Promise<void> {
     const { currentVersion, currentStores } = await readCurrentSchema();
 
     const allExisting = Object.keys(newTables).every(
@@ -93,7 +102,7 @@ class Database extends BaseDatabase {
     databaseContainer.instance?.close();
 
     if (allExisting) {
-      databaseContainer.instance = await openExistingDatabase(currentVersion, currentStores);
+      databaseContainer.instance = await openExistingDatabase({ currentVersion, currentStores });
     } else {
       const newDb = new ExtendedDatabase(currentVersion, currentStores, newTables);
       await newDb.open();
@@ -122,7 +131,7 @@ function currentInstance(): Dexie {
   return databaseContainer.instance;
 }
 
-function liveTable<TRow, TKey extends IndexableType>(tableName: string): Table<TRow, TKey> {
+function liveTable<TRow, TKey extends IndexableType>(tableName: TableName): Table<TRow, TKey> {
   const handler: ProxyHandler<object> = {
     get(_target, prop: string | symbol): unknown {
       const table = currentInstance().table(tableName);
@@ -169,12 +178,14 @@ const database = new Proxy<DatabaseTables>(
 
 // For the tables an extension registers at runtime, which the accessors below do not know.
 // The caller gives the row type, and the key type when it is not a string.
-function getTable<TRow, TKey extends IndexableType = string>(tableName: string): Table<TRow, TKey> {
+function getTable<TRow, TKey extends IndexableType = string>(
+  tableName: TableName,
+): Table<TRow, TKey> {
   return liveTable<TRow, TKey>(tableName);
 }
 
 // One accessor per table: its row and key types are written once, here
-function dataDb(): Table<DataItem, string> {
+function dataDb(): Table<DataItem, DataId> {
   return liveTable(dataTable.name);
 }
 
@@ -186,17 +197,17 @@ function modelComponentsRelationDb(): Table<ModelComponentRelationRecord, string
   return liveTable(modelComponentsRelationTable.name);
 }
 
-function dataStyleDb(): Table<ObjectStyle, string> {
+function dataStyleDb(): Table<ObjectStyle, DataId> {
   return liveTable(dataStyleTable.name);
 }
 
 // Keyed by [id_model, id_component]
-function componentDataStyleDb(): Table<ModelComponentStyle, [string, string]> {
+function componentDataStyleDb(): Table<ModelComponentStyle, ModelComponentStyleKey> {
   return liveTable(modelComponentDataStyleTable.name);
 }
 
 // Keyed by [id_model, type]
-function componentTypeDataStyleDb(): Table<ModelComponentTypeStyle, [string, string]> {
+function componentTypeDataStyleDb(): Table<ModelComponentTypeStyle, ModelComponentTypeStyleKey> {
   return liveTable(modelComponentTypeDataStyleTable.name);
 }
 
@@ -205,11 +216,11 @@ function sceneStyleDb(): Table<SceneStyle, string> {
 }
 
 // Keyed by an auto-incremented number
-function cameraPositionsDb(): Table<CameraPositionRecord, number> {
+function cameraPositionsDb(): Table<CameraPositionRecord, CameraPositionId> {
   return liveTable(cameraPositionsTable.name);
 }
 
-function treeviewConfigDb(): Table<TreeviewConfigRecord, string> {
+function treeviewConfigDb(): Table<TreeviewConfigRecord, TreeviewConfigId> {
   return liveTable(treeviewConfigTable.name);
 }
 

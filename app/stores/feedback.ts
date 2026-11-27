@@ -1,3 +1,5 @@
+import type { Description, Label } from "@ogw_front/types/ui";
+import type { Route, StatusCode } from "@ogw_front/types/server";
 import { v4 as uuidv4 } from "uuid";
 
 const MILLISECONDS_IN_SECOND = 1000;
@@ -5,20 +7,26 @@ const DEFAULT_FEEDBACKS_TIMEOUT_SECONDS = 10;
 const DEFAULT_ERROR_NAME = "Error";
 const DEFAULT_ERROR_DESCRIPTION = "An unexpected error occurred";
 
+// A feedback shown to the user, by the uuid it is pushed with
+type FeedbackId = string;
+
+// The name of the error a feedback reports, such as "Error" or the exception name
+type ErrorName = string;
+
 type FeedbackType = "error" | "success" | "warning";
 
 interface FeedbackAction {
-  label: string;
+  label: Label;
   onClick: () => void;
 }
 
 interface Feedback {
-  id: string;
+  id: FeedbackId;
   type: FeedbackType;
-  code?: number;
-  route?: string;
-  name?: string;
-  description?: string;
+  code?: StatusCode;
+  route?: Route;
+  name?: ErrorName;
+  description?: Description;
   action?: FeedbackAction;
 }
 
@@ -29,7 +37,7 @@ export const useFeedbackStore = defineStore("feedback", () => {
     DEFAULT_FEEDBACKS_TIMEOUT_SECONDS * MILLISECONDS_IN_SECOND,
   );
 
-  function delete_feedback(feedbackId: string): void {
+  function delete_feedback(feedbackId: FeedbackId): void {
     feedbacks.value = feedbacks.value.filter((feedback) => feedback.id !== feedbackId);
   }
 
@@ -41,7 +49,12 @@ export const useFeedbackStore = defineStore("feedback", () => {
     }, feedbacks_timeout_miliseconds.value);
   }
 
-  function add_error(code: number, route: string, name: string, description: string): void {
+  function add_error(
+    code: StatusCode,
+    route: Route,
+    name: ErrorName,
+    description: Description,
+  ): void {
     push_feedback({
       type: "error",
       code,
@@ -52,11 +65,11 @@ export const useFeedbackStore = defineStore("feedback", () => {
     });
   }
 
-  function add_success(description: string, action?: FeedbackAction): void {
+  function add_success(description: Description, action?: FeedbackAction): void {
     push_feedback({ type: "success", description, ...(action !== undefined && { action }) });
   }
 
-  function add_warning(description: string, action?: FeedbackAction): void {
+  function add_warning(description: Description, action?: FeedbackAction): void {
     push_feedback({ type: "warning", description, ...(action !== undefined && { action }) });
   }
 
@@ -81,4 +94,4 @@ export const useFeedbackStore = defineStore("feedback", () => {
   };
 });
 
-export type { FeedbackAction };
+export type { FeedbackAction, ErrorName, FeedbackId };

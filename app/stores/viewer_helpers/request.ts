@@ -4,13 +4,16 @@ import type {
   RequestHandlers,
   ResponseOf,
 } from "@ogw_shared/utils/types.js";
+import type { MicroserviceId } from "@ogw_front/types/identifiers";
+import type { Milliseconds } from "@ogw_front/types/time";
 import type { RpcClient } from "@ogw_shared/utils/call_raw.js";
+import type { Url } from "@ogw_front/types/files";
 import { viewer_call } from "@ogw_internal/utils/viewer_call";
 
 interface ViewerRequestMicroservice {
-  $id: string;
+  $id: MicroserviceId;
   client: RpcClient;
-  base_url: string;
+  base_url: Url;
   start_request: () => void;
   stop_request: () => void;
 }
@@ -18,7 +21,7 @@ interface ViewerRequestMicroservice {
 interface ViewerRequestArgs<Schema extends JsonRpcSchema> {
   schema: Schema;
   params?: ParamsOf<Schema>;
-  timeout?: number;
+  timeout?: Milliseconds;
 }
 
 type ViewerRequest = <Schema extends JsonRpcSchema>(

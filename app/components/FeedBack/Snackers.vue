@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { useFeedbackStore } from "@ogw_front/stores/feedback";
 
+// The position of a snackbar in the stack of displayed feedbacks
+type SnackbarIndex = number;
+
 const MARGIN_BETWEEN_SNACKERS = 60;
 const FIRST_SNACKER_MARGIN = 8;
 
 const feedbackStore = useFeedbackStore();
 const show = ref<boolean>(true);
 
-function calc_margin(index: number): string {
+function calc_margin(index: SnackbarIndex): string {
   return `${index * MARGIN_BETWEEN_SNACKERS + FIRST_SNACKER_MARGIN}px`;
 }
 

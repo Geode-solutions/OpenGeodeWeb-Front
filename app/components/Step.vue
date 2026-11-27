@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import type { useStepperTree } from "@ogw_front/composables/stepper_tree";
+import type { Count, DisplayText, StepIndex, Title } from "@ogw_front/types/ui";
+import type { StepperTree } from "@ogw_front/types/props/components_files";
 
+// A step of a stepper: its title, its chips and the component it displays
 interface StepConfig {
-  step_title: string;
+  step_title: Title;
   chips?: string[];
   component: {
     component_name: string;
@@ -10,29 +12,29 @@ interface StepConfig {
   };
 }
 
-function truncate(text: string, maxLength: number): string {
+interface Props {
+  stepIndex: StepIndex;
+  stepperTree: StepperTree;
+}
+
+interface Emits {
+  reset_values: [];
+}
+
+function truncate(text: DisplayText, maxLength: Count): DisplayText {
   if (text.length > maxLength) {
     return `${text.slice(0, maxLength)}...`;
   }
   return text;
 }
 
-interface Props {
-  stepIndex: number;
-  stepperTree: ReturnType<typeof useStepperTree>;
-}
-
 const { stepIndex, stepperTree } = defineProps<Props>();
-
-interface Emits {
-  reset_values: [];
-}
 
 const emit = defineEmits<Emits>();
 
 const { state, increment_step, decrement_step, update_values } = stepperTree;
 const { current_step_index, steps } = toRefs(state) as unknown as {
-  current_step_index: Ref<number>;
+  current_step_index: Ref<StepIndex>;
   steps: Ref<StepConfig[]>;
 };
 

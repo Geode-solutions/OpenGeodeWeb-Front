@@ -1,6 +1,7 @@
 // Third party imports
 
 // Local imports
+import type { ColoringType } from "@ogw_front/types/attribute";
 import type { MeshId } from "@ogw_front/types/identifiers";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
@@ -62,7 +63,7 @@ function handleMeshPolyhedraPolyhedronColoring(
 
 async function applyMeshPolyhedraActiveColoring(
   meshId: MeshId,
-  type: string | undefined,
+  type: ColoringType | undefined,
   deps: MeshPolyhedraActiveColoringDeps,
 ): Promise<unknown> {
   await deps.commonStyle.mutateMeshPolyhedraStyle(meshId, {
@@ -91,7 +92,7 @@ async function applyMeshPolyhedraActiveColoring(
 
 async function setMeshPolyhedraActiveColoring(
   meshId: MeshId,
-  type: string | undefined,
+  type: ColoringType | undefined,
   deps: MeshPolyhedraActiveColoringDeps,
 ): Promise<unknown> {
   const result = await applyMeshPolyhedraActiveColoring(meshId, type, deps);
@@ -108,7 +109,7 @@ async function setMeshPolyhedraActiveColoring(
 async function applyMeshPolyhedraStyle(
   meshId: MeshId,
   visibilityStyle: ReturnType<typeof useMeshPolyhedraVisibilityStyle>,
-  activeColoringType: string | undefined,
+  activeColoringType: ColoringType | undefined,
   deps: MeshPolyhedraActiveColoringDeps,
 ): Promise<unknown[]> {
   const result = await Promise.all([
@@ -123,8 +124,11 @@ async function applyMeshPolyhedraStyle(
 
 type UseMeshPolyhedraStyleReturn = ReturnType<typeof useMeshPolyhedraCommonStyle> & {
   meshPolyhedraColoring: (meshId: MeshId) => StyleValues;
-  meshPolyhedraActiveColoring: (meshId: MeshId) => string | undefined;
-  setMeshPolyhedraActiveColoring: (meshId: MeshId, type: string | undefined) => Promise<unknown>;
+  meshPolyhedraActiveColoring: (meshId: MeshId) => ColoringType | undefined;
+  setMeshPolyhedraActiveColoring: (
+    meshId: MeshId,
+    type: ColoringType | undefined,
+  ) => Promise<unknown>;
   applyMeshPolyhedraStyle: (meshId: MeshId) => Promise<unknown[]>;
 } & ReturnType<typeof useMeshPolyhedraVisibilityStyle> &
   ReturnType<typeof useMeshPolyhedraColorStyle> &
@@ -149,14 +153,14 @@ export function useMeshPolyhedraStyle(): UseMeshPolyhedraStyleReturn {
     return meshPolyhedraCommonStyle.meshPolyhedraColoring(meshId);
   }
 
-  function meshPolyhedraActiveColoring(meshId: MeshId): string | undefined {
+  function meshPolyhedraActiveColoring(meshId: MeshId): ColoringType | undefined {
     // oxlint-disable-next-line no-unsafe-type-assertion -- coloring.active is defined as string in the data style schema.
-    return meshPolyhedraColoring(meshId).active as string | undefined;
+    return meshPolyhedraColoring(meshId).active as ColoringType | undefined;
   }
 
   async function boundSetMeshPolyhedraActiveColoring(
     meshId: MeshId,
-    type: string | undefined,
+    type: ColoringType | undefined,
   ): Promise<unknown> {
     const result = await setMeshPolyhedraActiveColoring(meshId, type, activeColoringDeps);
     return result;

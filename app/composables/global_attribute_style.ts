@@ -6,6 +6,7 @@ import {
   storeMethod,
   useAttributeColoringStyle,
 } from "@ogw_front/composables/attribute_coloring_style";
+import type { ColoringType } from "@ogw_front/types/attribute";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 
@@ -25,7 +26,7 @@ const MESH_ELEMENTS: MeshElement[] = [
 
 const ATTRIBUTE_COLORINGS = new Set(["vertex", "edge", "polygon", "cell", "polyhedron"]);
 
-function isColoring(value: unknown): value is { active?: string } {
+function isColoring(value: unknown): value is { active?: ColoringType } {
   return typeof value === "object" && value !== null;
 }
 
@@ -38,7 +39,7 @@ export function useGlobalAttributeStyle(
   function meshColoring(
     dataId: DataId,
     { storeName }: MeshElement,
-    activeColoring: string,
+    activeColoring: ColoringType,
   ): AttributeColoring {
     const methodName = `${storeName}${attributeType(activeColoring)}`;
     const getterName = `${methodName.charAt(0).toLowerCase()}${methodName.slice(1)}`;

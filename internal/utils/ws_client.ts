@@ -3,7 +3,9 @@ import vtkWSLinkClient, {
   type vtkWSLinkClient as VtkWSLinkClient,
   newInstance,
 } from "@kitware/vtk.js/IO/Core/WSLinkClient";
+import type { Message } from "@ogw_front/types/ui";
 import SmartConnect from "wslink/src/SmartConnect";
+import type { Url } from "@ogw_front/types/files";
 import { consola } from "consola";
 
 interface WsClientCallbacks {
@@ -12,7 +14,7 @@ interface WsClientCallbacks {
 
 // Wslink's connection event shape is untyped upstream; this describes the fields we read.
 interface WsConnectionEvent {
-  response?: { error?: string };
+  response?: { error?: Message };
 }
 
 function isVtkWSLinkClient(value: unknown): value is VtkWSLinkClient {
@@ -33,7 +35,7 @@ function resolveClient(initialClient: unknown): VtkWSLinkClient {
 }
 
 async function initWebSocketClient(
-  baseUrl: string,
+  baseUrl: Url,
   initialClient: unknown = {},
   { onConnectionClose }: WsClientCallbacks = {},
 ): Promise<VtkWSLinkClient> {

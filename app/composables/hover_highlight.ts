@@ -1,5 +1,6 @@
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { HighlightableObjectType } from "@ogw_front/types/identifiers";
+import type { Milliseconds } from "@ogw_front/types/time";
 import type { ParamsOf } from "@ogw_shared/utils/types";
 import type { ViewerId } from "@geode/opengeodeweb-viewer/schema_types";
 import { consola } from "consola";
@@ -115,7 +116,7 @@ function useHoverhighlight(): {
     request: {
       schema: HighlightSchema;
       params?: ParamsOf<HighlightSchema>;
-      timeout?: number;
+      timeout?: Milliseconds;
     },
   ): Promise<void> {
     try {

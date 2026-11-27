@@ -1,14 +1,17 @@
 // Strata fills of the orientation globe (Viewer/OrientationGlobe.vue): the sphere is cut by horizontal
 // Planes of the world into alternate light and clear layers, like the slices of the Geode Solutions mark.
 // Rasterized per pixel with supersampling for smooth edges. Pure math: no vtk.js nor Vue here.
+import type { CssColor, Pixels } from "@ogw_front/types/ui";
+import type { Coordinate } from "@ogw_front/types/geometry";
+import type { Opacity } from "@geode/opengeodeweb-viewer/schema_types";
 import type { ViewBasis } from "@ogw_front/utils/orientation_gizmo";
 
 interface Strata {
   // World height range of the stratum on the unit sphere
-  bottom: number;
-  top: number;
+  bottom: Coordinate;
+  top: Coordinate;
   // Fill opacity, 0 for the strata left clear
-  opacity: number;
+  opacity: Opacity;
 }
 
 interface StrataSample {
@@ -38,7 +41,7 @@ const HEX_CHANNEL_LENGTH = 2;
 
 // World height of the visible sphere point under the given screen offset, as a ratio of the radius
 // (x right, y down). Undefined outside the sphere.
-function visibleHeight(basis: ViewBasis, x: number, y: number): number | undefined {
+function visibleHeight(basis: ViewBasis, x: Coordinate, y: Coordinate): Coordinate | undefined {
   const squared = x * x + y * y;
   if (squared > 1) {
     return undefined;
@@ -48,12 +51,12 @@ function visibleHeight(basis: ViewBasis, x: number, y: number): number | undefin
 }
 
 // Fill opacity of the stratum at this world height
-function strataOpacity(height: number): number {
+function strataOpacity(height: Coordinate): Opacity {
   return STRATA.find(({ bottom, top }) => height >= bottom && height <= top)?.opacity ?? 0;
 }
 
 // "#RRGGBB" to its red, green and blue channels
-function hexChannels(color: string): number[] {
+function hexChannels(color: CssColor): number[] {
   return Array.from({ length: RGB_CHANNELS }, (_item, channel) => {
     const start = 1 + channel * HEX_CHANNEL_LENGTH;
     return Number.parseInt(color.slice(start, start + HEX_CHANNEL_LENGTH), HEX_BASE);
@@ -61,7 +64,7 @@ function hexChannels(color: string): number[] {
 }
 
 // Coverage and lighting of one sample of the globe (x, y in radius units, y down)
-function strataSample(basis: ViewBasis, x: number, y: number): StrataSample {
+function strataSample(basis: ViewBasis, x: Coordinate, y: Coordinate): StrataSample {
   const height = visibleHeight(basis, x, y);
   if (height === undefined) {
     return { coverage: 0, shade: 0 };
@@ -93,7 +96,7 @@ function strataPixel(
 
 // RGBA pixels of the strata fills for a square canvas of the given side covering the globe:
 // Alternate light and clear layers, like the slices of the brand mark, lit a bit more towards the viewer
-function strataPixels(basis: ViewBasis, side: number, color: string): Uint8ClampedArray {
+function strataPixels(basis: ViewBasis, side: Pixels, color: CssColor): Uint8ClampedArray {
   const channels = hexChannels(color);
   const pixels = new Uint8ClampedArray(side * side * BYTES_PER_PIXEL);
   const pixelsPerRadius = side / 2;

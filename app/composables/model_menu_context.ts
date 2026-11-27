@@ -4,19 +4,20 @@ import type { ModelComponentId, ModelId, ModelIdentified } from "@ogw_front/type
 import type { CollectionComponent } from "@ogw_internal/stores/data/model/collections";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import { MESH_COMPONENT_TYPES } from "@ogw_front/utils/default_styles";
+import type { ModelComponentType } from "@ogw_front/types/model";
 import { useDataStore } from "@ogw_front/stores/data";
 
 interface ModelMenuMetaData extends Partial<ModelIdentified> {
   viewer_object_type?: MenuViewerObjectType;
   pickedComponentId?: ModelComponentId;
-  modelComponentType?: string;
+  modelComponentType?: ModelComponentType;
   targetComponentIds?: ModelComponentId[];
 }
 
 interface ModelMenuContext {
   modelId: ComputedRef<ModelId>;
   componentId: ComputedRef<ModelComponentId | undefined>;
-  componentType: Ref<string | undefined>;
+  componentType: Ref<ModelComponentType | undefined>;
   collections: Ref<CollectionComponent[] | undefined>;
   targetComponentIds: Ref<ModelComponentId[]>;
 }
@@ -33,7 +34,7 @@ function useModelMenuContext(getDataId: () => DataId): ModelMenuContext {
   const componentId = computed<ModelComponentId | undefined>(
     () => metaData.value.pickedComponentId,
   );
-  const componentType = ref<string | undefined>(undefined);
+  const componentType = ref<ModelComponentType | undefined>(undefined);
   const collections = ref<CollectionComponent[] | undefined>(undefined);
 
   // A function so the check after an await is not narrowed by the one before it

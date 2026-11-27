@@ -1,28 +1,26 @@
 <script setup lang="ts">
 import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types.js";
+import type { CameraOrientation } from "@ogw_internal/stores/hybrid_viewer/camera_helpers";
+import type { Pixels } from "@ogw_front/types/ui";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import { applyCameraOptions } from "@ogw_internal/stores/hybrid_viewer/camera";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { newInstance as vtkAnnotatedCubeActor } from "@kitware/vtk.js/Rendering/Core/AnnotatedCubeActor";
 import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering/Misc/GenericRenderWindow";
 
-const DEFAULT_PANEL_WIDTH = 260;
-
 interface Props {
-  panel?: boolean;
-  width?: number;
+  panel: boolean;
+  width?: Pixels;
   escapeFunction?: () => void;
 }
 
-const {
-  panel = false,
-  width = DEFAULT_PANEL_WIDTH,
-  escapeFunction = undefined,
-} = defineProps<Props>();
-
 interface Emits {
-  select: [value: string];
+  select: [value: CameraOrientation];
 }
+
+const DEFAULT_PANEL_WIDTH = 260;
+
+const { panel, width = DEFAULT_PANEL_WIDTH, escapeFunction = undefined } = defineProps<Props>();
 
 const emit = defineEmits<Emits>();
 

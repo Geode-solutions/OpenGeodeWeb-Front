@@ -1,5 +1,5 @@
+import type { MenuViewerObjectType, MenusByObjectType } from "./types.js";
 import { modelComponentMenus, modelComponentTypeMenus, modelMenus } from "./model.js";
-import type { MenuItems } from "./types.js";
 import { basemapMenus } from "./basemap.js";
 import { edgedCurveMenus } from "./mesh/edged_curve.js";
 import { gridMenus } from "./mesh/grid.js";
@@ -9,7 +9,7 @@ import { sceneMenus } from "./scene.js";
 import { solidMenus } from "./mesh/solid.js";
 import { surfaceMenus } from "./mesh/surface.js";
 
-const menusData: Record<string, Record<string, MenuItems>> = {
+const menusData: Partial<Record<MenuViewerObjectType, MenusByObjectType>> = {
   image: imageMenus,
   mesh: {
     ...edgedCurveMenus,

@@ -2,16 +2,25 @@ import type {
   GeodeObjectTyped,
   ModelComponentId,
   ModelIdentified,
+  TreeNodeId,
 } from "@ogw_front/types/identifiers";
 import type { TreeGroup, TreeNode } from "@ogw_front/types/tree";
+import type { CssColor } from "@ogw_front/types/ui";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { DisplayItem } from "@ogw_front/composables/virtual_tree";
+import type { ModelComponentType } from "@ogw_front/types/model";
 import { isBasemapId } from "@ogw_front/utils/basemap_tree";
+
+// What a new selection adds to the previous one and removes from it
+interface SelectionChanges<Item> {
+  added: Item[];
+  removed: Item[];
+}
 
 function compareSelections<Item>(
   current: readonly Item[],
   previous: readonly Item[],
-): { added: Item[]; removed: Item[] } {
+): SelectionChanges<Item> {
   const added = current.filter((item) => !previous.includes(item));
   const removed = previous.filter((item) => !current.includes(item));
   return { added, removed };
@@ -25,23 +34,23 @@ interface DataMenuPayload {
 
 interface GeodeObjectTypeMenuPayload {
   event: MouseEvent;
-  itemId: string;
+  itemId: TreeNodeId;
   context_type: "geode_object_type";
   targetIds: DataId[];
 }
 
 interface ModelComponentMenuPayload extends ModelIdentified {
   event: MouseEvent;
-  itemId: string;
+  itemId: TreeNodeId;
   context_type: "model_component" | "model_component_type";
-  modelComponentType?: string;
+  modelComponentType?: ModelComponentType;
   targetComponentIds?: ModelComponentId[];
 }
 
 // The basemap category and its maps: not project data
 interface BasemapMenuPayload {
   event: MouseEvent;
-  itemId: string;
+  itemId: TreeNodeId;
   context_type: "basemap";
 }
 
@@ -64,7 +73,7 @@ const MODEL_TREE_COLORS = [
 ] as const;
 
 // The first color no opened tree uses, cycling once they are all taken
-function nextModelTreeColor(usedColors: readonly (string | undefined)[]): string {
+function nextModelTreeColor(usedColors: readonly (CssColor | undefined)[]): CssColor {
   const free = MODEL_TREE_COLORS.find((color) => !usedColors.includes(color));
   return free ?? MODEL_TREE_COLORS[usedColors.length % MODEL_TREE_COLORS.length] ?? "";
 }

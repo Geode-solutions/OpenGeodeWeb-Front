@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import Step from "@ogw_front/components/Step.vue";
-import type { useStepperTree } from "@ogw_front/composables/stepper_tree";
+import type { StepIndex } from "@ogw_front/types/ui";
+import type { StepperTree } from "@ogw_front/types/props/components_files";
+
+interface Props {
+  stepperTree: StepperTree;
+}
 
 interface Emits {
   reset_values: [];
@@ -9,15 +14,11 @@ interface Emits {
 
 const emit = defineEmits<Emits>();
 
-interface Props {
-  stepperTree: ReturnType<typeof useStepperTree>;
-}
-
 const { stepperTree } = defineProps<Props>();
 const { state } = stepperTree;
 const { steps, current_step_index } = toRefs(state) as unknown as {
   steps: Ref<unknown[]>;
-  current_step_index: Ref<number>;
+  current_step_index: Ref<StepIndex>;
 };
 </script>
 

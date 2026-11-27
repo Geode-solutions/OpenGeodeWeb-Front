@@ -1,6 +1,13 @@
 <script setup lang="ts">
+import type {
+  AttributeRangeMaximum,
+  AttributeRangeMinimum,
+  BlockIds,
+} from "@geode/opengeodeweb-viewer/schema_types";
 import AttributeRangeSelector from "@ogw_front/components/Viewer/Options/AttributeRangeSelector.vue";
 import ColorMapList from "@ogw_front/components/Viewer/Options/ColorMapList.vue";
+import type { ColorMapPreset } from "@ogw_front/types/props/viewer/options";
+import type { Coordinate } from "@ogw_front/types/geometry";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import TimeStepSlider from "@ogw_front/components/Viewer/Options/TimeStepSlider.vue";
 
@@ -9,13 +16,13 @@ import { useGlobalAttributeStyle } from "@ogw_front/composables/global_attribute
 import { useModelAttributeStyle } from "@ogw_front/composables/model_attribute_style";
 
 interface Props {
-  dataId?: DataId;
-  blockIds?: number[];
-  x: number;
-  y: number;
+  dataId: DataId | undefined;
+  blockIds: BlockIds | undefined;
+  x: Coordinate;
+  y: Coordinate;
 }
 
-const { dataId = undefined, blockIds = undefined, x, y } = defineProps<Props>();
+const { dataId, blockIds, x, y } = defineProps<Props>();
 
 const show = defineModel<boolean>("show", { default: false });
 
@@ -28,7 +35,7 @@ function useAttributeStyle():
   }
   return useModelAttributeStyle(
     dataIdRef,
-    computed<number[]>(() => blockIds),
+    computed<BlockIds>(() => blockIds),
   );
 }
 
@@ -49,25 +56,25 @@ watch(show, async (isShown) => {
   }
 });
 
-const minimum = computed<number>({
+const minimum = computed<AttributeRangeMinimum>({
   get: () => currentRange.value[0],
   set: (val) => {
     currentRange.value = [val, currentRange.value[1]];
   },
 });
 
-const maximum = computed<number>({
+const maximum = computed<AttributeRangeMaximum>({
   get: () => currentRange.value[1],
   set: (val) => {
     currentRange.value = [currentRange.value[0], val];
   },
 });
 
-const quickColormapPresets = computed<{ Name: string }[]>(() =>
+const quickColormapPresets = computed<readonly ColorMapPreset[]>(() =>
   getPresetsWithCurrentAtTop(currentColormap.value),
 );
 
-async function onQuickColormapSelect(preset: { Name: string }): Promise<void> {
+async function onQuickColormapSelect(preset: ColorMapPreset): Promise<void> {
   await applyGlobalColormap(preset.Name);
 }
 </script>

@@ -1,6 +1,7 @@
 import type { ComputedRef, Ref } from "vue";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { DataItem } from "@ogw_internal/database/tables/data";
+import type { DataName } from "@ogw_front/types/data";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 
@@ -25,7 +26,7 @@ function useDataRegistration(items: Readonly<Ref<DataItem[]>>): {
     items.value.filter((dataItem) => isRegistered(dataItem.data_id)),
   );
 
-  async function registerObject(dataId: DataId, name: string): Promise<unknown> {
+  async function registerObject(dataId: DataId, name: DataName): Promise<unknown> {
     const result = await viewerStore.request({
       schema: viewerGenericSchemas.register,
       params: { id: dataId, name },

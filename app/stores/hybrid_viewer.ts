@@ -8,6 +8,7 @@ import {
   useHybridViewerScene,
 } from "@ogw_internal/stores/hybrid_viewer/scene";
 import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types";
+import type { ZScale } from "@ogw_front/types/geometry";
 import { getCameraOptions } from "@ogw_internal/stores/hybrid_viewer/camera_animation";
 import { useHybridViewerBrightness } from "@ogw_internal/stores/hybrid_viewer/brightness";
 import { useHybridViewerCore } from "@ogw_internal/stores/hybrid_viewer/core";
@@ -19,6 +20,12 @@ import { newInstance as vtkGenericRenderWindow } from "@kitware/vtk.js/Rendering
 
 import { Status } from "@ogw_front/utils/status";
 import { useViewerStore } from "@ogw_front/stores/viewer";
+
+// What a project saves of the viewer: the z scale and the camera
+interface HybridViewerSnapshot {
+  zScale: ZScale;
+  camera_options: CameraOptions | Record<string, unknown>;
+}
 
 // oxlint-disable max-lines-per-function, max-statements
 export const useHybridViewerStore = defineStore("hybridViewer", () => {
@@ -105,10 +112,7 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     status.value = Status.CREATED;
   }
 
-  function exportStores(): {
-    zScale: number;
-    camera_options: CameraOptions | Record<string, unknown>;
-  } {
+  function exportStores(): HybridViewerSnapshot {
     const renderer = genericRenderWindow.value?.getRenderer();
     const camera = renderer?.getActiveCamera();
     return {
@@ -136,3 +140,4 @@ export const useHybridViewerStore = defineStore("hybridViewer", () => {
     ...zoomBoxStore,
   };
 });
+export type { HybridViewerSnapshot };

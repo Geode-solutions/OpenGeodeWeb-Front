@@ -6,7 +6,9 @@ import {
   useModelComponentsStyleMutation,
 } from "./common_mutations";
 import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
+import type { ColoringType } from "@ogw_front/types/attribute";
 import type { GeodeId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { ModelComponentType } from "@ogw_front/types/model";
 import type { ParamsOf } from "@ogw_shared/utils/types.js";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -22,7 +24,7 @@ type ModelColorSchema = ModelComponentSchemas["color"];
 type ModelVisibilitySchema = ModelComponentSchemas["visibility"];
 type ModelColorMode = ParamsOf<ModelColorSchema>["color_mode"];
 
-function isModelColorMode(value: string): value is ModelColorMode {
+function isModelColorMode(value: ColoringType): value is ModelColorMode {
   return value === "constant" || value === "random";
 }
 
@@ -34,7 +36,7 @@ interface UseModelCommonStyleReturn {
   ) => Promise<unknown>;
   mutateModelComponentTypeStyle: (
     modelId: ModelId,
-    type: string,
+    type: ModelComponentType,
     values: StyleValues,
   ) => Promise<void>;
   mutateComponentStyles: (
@@ -51,7 +53,7 @@ interface UseModelCommonStyleReturn {
     componentIds: ModelComponentId[],
     color: ColorRGBA | undefined,
     schema: ModelColorSchema,
-    activeColoring?: string,
+    activeColoring?: ColoringType,
     collectionId?: GeodeId,
   ) => Promise<unknown>;
   setModelTypeVisibility: (

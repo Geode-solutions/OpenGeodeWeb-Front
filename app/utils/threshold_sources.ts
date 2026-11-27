@@ -1,20 +1,22 @@
+import type { AttributeSource, AttributeSourceParams } from "@ogw_front/utils/threshold";
 import {
   MESH_ELEMENT_KINDS,
   MODEL_COMPONENT_ATTRIBUTE_SCHEMAS,
   MODEL_COMPONENT_KINDS,
 } from "@ogw_front/utils/attributes";
 import { isImage, isMesh } from "@ogw_front/utils/viewer_object_type";
-import type { AttributeSource } from "@ogw_front/utils/threshold";
+import type { AttributeLocation } from "@ogw_front/types/attribute";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
-import type { ModelComponentId } from "@ogw_front/types/identifiers";
+import type { ModelComponentType } from "@ogw_front/types/model";
+import type { Title } from "@ogw_front/types/ui";
 import { attributeSchemas } from "@ogw_front/composables/attribute_coloring_style";
 import type { useDataStore } from "@ogw_front/stores/data";
 
 function attributeSource(
-  kind: string,
-  title: string,
-  params: { id: DataId; component_ids?: ModelComponentId[] },
-  modelType?: string,
+  kind: AttributeLocation,
+  title: Title,
+  params: AttributeSourceParams,
+  modelType?: ModelComponentType,
 ): AttributeSource {
   const schemas = attributeSchemas(modelType === undefined ? "" : "model_component_", kind);
   return {
@@ -40,7 +42,7 @@ async function fetchSources(
   }
   if (isMesh(item)) {
     return ["vertex", MESH_ELEMENT_KINDS[item.geode_object_type]]
-      .filter((kind): kind is string => kind !== undefined)
+      .filter((kind): kind is AttributeLocation => kind !== undefined)
       .map((kind) => attributeSource(kind, "", { id: dataId }));
   }
   const modelSources = await Promise.all(

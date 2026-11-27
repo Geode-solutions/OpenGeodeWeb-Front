@@ -1,4 +1,15 @@
-import type { AttributeTimeStep, ValidAttributeRange } from "@ogw_front/types/attribute";
+import type {
+  AttributeItem,
+  AttributeName,
+  AttributeRangeMaximum,
+  AttributeRangeMinimum,
+} from "@geode/opengeodeweb-viewer/schema_types";
+import type {
+  AttributeTimeStep,
+  AttributeTimeValue,
+  ValidAttributeRange,
+} from "@ogw_front/types/attribute";
+import type { Count, Title } from "@ogw_front/types/ui";
 import type { AttributeRangeInfo } from "@ogw_front/utils/attribute_range";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { ModelComponentId } from "@ogw_front/types/identifiers";
@@ -7,12 +18,12 @@ import { getAttributeRange } from "@ogw_front/utils/attributes";
 
 // The minimum and maximum of an attribute range: each one is clamped by the other
 function useAttributeRangeBounds(attributeRange: Ref<(number | undefined)[]>): {
-  rangeMin: WritableComputedRef<number | undefined>;
-  rangeMax: WritableComputedRef<number | undefined>;
+  rangeMin: WritableComputedRef<AttributeRangeMinimum | undefined>;
+  rangeMax: WritableComputedRef<AttributeRangeMaximum | undefined>;
 } {
-  const rangeMin = computed<number | undefined>({
+  const rangeMin = computed<AttributeRangeMinimum | undefined>({
     get: () => attributeRange.value[0],
-    set: (val: number | undefined) => {
+    set: (val: AttributeRangeMinimum | undefined) => {
       if (val === undefined) {
         return;
       }
@@ -24,9 +35,9 @@ function useAttributeRangeBounds(attributeRange: Ref<(number | undefined)[]>): {
       attributeRange.value = [newMin, currentMax];
     },
   });
-  const rangeMax = computed<number | undefined>({
+  const rangeMax = computed<AttributeRangeMaximum | undefined>({
     get: () => attributeRange.value[1],
-    set: (val: number | undefined) => {
+    set: (val: AttributeRangeMaximum | undefined) => {
       if (val === undefined) {
         return;
       }
@@ -42,7 +53,13 @@ function useAttributeRangeBounds(attributeRange: Ref<(number | undefined)[]>): {
 }
 
 // The items of an attribute with several components
-function attributeItemOptions(itemCount: number): { title: string; value: number }[] {
+// An entry of the item select of an attribute with several components
+interface AttributeItemOption {
+  title: Title;
+  value: AttributeItem;
+}
+
+function attributeItemOptions(itemCount: Count): AttributeItemOption[] {
   return Array.from({ length: itemCount }, (_, index) => ({
     title: `Item ${index + 1}`,
     value: index,
@@ -52,7 +69,7 @@ function attributeItemOptions(itemCount: number): { title: string; value: number
 // The range of every target for the picked item
 function attributeRangesPerTarget(
   rangesPerTarget: ReadonlyMap<DataId, AttributeRangeInfo>,
-  item: number,
+  item: AttributeItem,
 ): Map<DataId, ValidAttributeRange> {
   const ranges = new Map<DataId, ValidAttributeRange>();
   for (const [targetId, range] of rangesPerTarget) {
@@ -64,12 +81,12 @@ function attributeRangesPerTarget(
 
 // Commits the first time step when the picked series changes and the stored one is not valid
 function useSeriesTimeStepCommit(
-  timeSteps: ComputedRef<number[]>,
-  seriesName: () => string | undefined,
+  timeSteps: ComputedRef<AttributeTimeValue[]>,
+  seriesName: () => AttributeName | undefined,
   attributeTimeStep: Readonly<Ref<AttributeTimeStep | undefined>>,
   resetTimeStep: () => void,
 ): () => void {
-  let committedSeries: string | undefined = undefined;
+  let committedSeries: AttributeName | undefined = undefined;
 
   return (): void => {
     if (timeSteps.value.length === 0) {
@@ -108,6 +125,7 @@ function attributeRequestParams(
 
 export type { AttributeInfo } from "@ogw_front/utils/attributes";
 export {
+  type AttributeItemOption,
   type AttributeRequestParams,
   attributeItemOptions,
   attributeRequestParams,

@@ -5,6 +5,7 @@ import type {
   SelectionConfig,
   TreeItem,
 } from "@ogw_front/composables/virtual_tree";
+import type { Count } from "@ogw_front/types/ui";
 
 interface Props {
   item: DisplayItem;
@@ -16,15 +17,15 @@ interface Props {
   isRowViewable: (item: DisplayItem) => boolean;
 }
 
-const { item, itemProps, selection, isSelected, getIndeterminate, isRowViewable } =
-  defineProps<Props>();
-
 interface Emits {
   "toggle-open": [item: TreeItem];
   "toggle-select": [item: TreeItem];
   "hover-eye-enter": [item: unknown];
   "hover-eye-leave": [item: unknown];
 }
+
+const { item, itemProps, selection, isSelected, getIndeterminate, isRowViewable } =
+  defineProps<Props>();
 
 const emit = defineEmits<Emits>();
 
@@ -42,7 +43,7 @@ function isLoading(child: unknown): boolean {
     typeof child === "object" && child !== null && "loading" in child && child.loading === true
   );
 }
-const loadingChildren = computed<number>(() =>
+const loadingChildren = computed<Count>(() =>
   Array.isArray(item.raw.children)
     ? item.raw.children.filter((child) => isLoading(child)).length
     : 0,

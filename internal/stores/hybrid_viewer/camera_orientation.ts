@@ -1,6 +1,7 @@
 import {
   ALIGNMENT_THRESHOLD,
   BUMP_MULTIPLIER,
+  type CameraOrientation,
   EASE_EXPONENT,
   ORIENTATIONS,
   applyCameraOptions,
@@ -15,7 +16,10 @@ import {
 import { requireRenderWindow, useHybridViewerCore } from "./core";
 import { dot } from "@kitware/vtk.js/Common/Core/Math";
 
-function animateCameraOrientation(orientation: string, syncRemoteCamera: () => void): void {
+function animateCameraOrientation(
+  orientation: CameraOrientation,
+  syncRemoteCamera: () => void,
+): void {
   const config = ORIENTATIONS[orientation.toLowerCase()];
   if (!config) {
     return;

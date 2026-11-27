@@ -1,3 +1,5 @@
+import type { Coordinate } from "@ogw_front/types/geometry";
+import type { Pixels } from "@ogw_front/types/ui";
 import { RGB_MAX } from "./constants";
 import { getDefaultSceneStyle } from "@ogw_front/utils/default_styles";
 import { useHybridViewerCore } from "./core";
@@ -7,10 +9,10 @@ const SAMPLE_SIZE = 10;
 const TOTAL_CHANNELS = 400;
 
 interface Rect {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+  x: Coordinate;
+  y: Coordinate;
+  width: Pixels;
+  height: Pixels;
 }
 
 // The decoded background image handed to us by the viewer's image stream (see app/stores/hybrid_viewer.ts's onImageReady) - draw-able onto a 2D canvas.

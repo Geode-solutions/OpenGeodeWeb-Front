@@ -8,6 +8,8 @@ import {
   strataRings,
 } from "@ogw_front/utils/orientation_globe";
 import { cameraViewBasis, toCameraPose } from "@ogw_front/utils/orientation_gizmo";
+import type { CssColor } from "@ogw_front/types/ui";
+import type { Opacity } from "@geode/opengeodeweb-viewer/schema_types";
 import { compassHeading } from "@ogw_front/utils/orientation_compass";
 import { strataPixels } from "@ogw_front/utils/orientation_strata";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
@@ -102,11 +104,11 @@ const readout = computed(() => {
   return orientationReadout(heading.value, cameraElevation(basis.value));
 });
 
-function axisColor(label: GlobeLabel): string {
+function axisColor(label: GlobeLabel): CssColor {
   return AXIS_COLORS[label.axis];
 }
 
-function opacity(depth: number): number {
+function opacity(depth: number): Opacity {
   const fade = Math.min(1, Math.max(0, (FADE_START_DEPTH - depth) / FADE_RANGE));
   return 1 - (1 - AWAY_OPACITY) * fade;
 }

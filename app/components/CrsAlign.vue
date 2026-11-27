@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Count, Message } from "@ogw_front/types/ui";
 import type { CRS } from "@geode/opengeodeweb-back/schema_types";
 import CrsSelector from "@ogw_front/components/CrsSelector.vue";
 import PickButton from "@ogw_front/components/PickButton.vue";
@@ -45,7 +46,7 @@ watch(
   { immediate: true },
 );
 
-function successMessage(count: number): string {
+function successMessage(count: Count): Message {
   return count > 1 ? `Data georeferenced (${count} items)` : "Data georeferenced";
 }
 

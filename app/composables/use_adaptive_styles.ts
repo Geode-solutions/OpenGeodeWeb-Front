@@ -1,5 +1,6 @@
 import type { BrightnessRange } from "@ogw_internal/stores/hybrid_viewer/brightness";
 import type { MaybeComputedElementRef } from "@vueuse/core";
+import type { Opacity } from "@geode/opengeodeweb-viewer/schema_types";
 import { consola } from "consola";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 import { useTheme } from "vuetify";
@@ -24,8 +25,8 @@ const ADAPTIVE_REFRESH_RATE = 150;
 type AdaptiveStylesTarget = unknown;
 
 interface AdaptiveStylesOptions {
-  minOpacity?: number;
-  maxOpacity?: number;
+  minOpacity?: Opacity;
+  maxOpacity?: Opacity;
 }
 
 interface CoordinatesLike {

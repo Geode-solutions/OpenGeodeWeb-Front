@@ -19,6 +19,7 @@ import type {
 } from "@geode/opengeodeweb-viewer/schema_types";
 import type { LineId, ModelId } from "@ogw_front/types/identifiers";
 import { DEFAULT_NO_DATA_COLOR } from "@ogw_front/utils/default_styles/constants";
+import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 import { isAttributeValid } from "@ogw_internal/stores/data_style/attribute_valid";
 // Third party imports
@@ -109,7 +110,7 @@ type ModelLinesEdgeAttributeGetters = Pick<
     modelId: ModelId,
     componentId: LineId | undefined,
     name: AttributeName | undefined,
-  ) => number;
+  ) => AttributeItem;
 };
 
 // oxlint-disable-next-line max-lines-per-function
@@ -145,7 +146,7 @@ function useModelLinesEdgeAttributeGetters(
     modelId: ModelId,
     lineId: LineId | undefined,
     name: AttributeName | undefined,
-  ): number {
+  ): AttributeItem {
     const { storedConfigs } = modelLinesEdgeAttribute(modelId, lineId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
     if (nameConfig !== undefined) {
@@ -222,7 +223,7 @@ function useModelLinesEdgeAttribute(): UseModelLinesEdgeAttributeReturn {
   async function mutateModelLinesEdgeStyle(
     modelId: ModelId,
     lineIds: NonEmptyArray<LineId>,
-    values: Record<string, unknown>,
+    values: StyleValues,
   ): Promise<void> {
     const tasks: Promise<void>[] = [
       modelLinesCommonStyle.mutateModelLinesColoring(modelId, lineIds, {

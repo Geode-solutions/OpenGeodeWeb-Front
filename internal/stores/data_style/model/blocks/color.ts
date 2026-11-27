@@ -1,5 +1,6 @@
 import type { BlockId, ModelId } from "@ogw_front/types/identifiers";
 import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
+import type { ColoringType } from "@ogw_front/types/attribute";
 import type { GeodeId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { NonEmptyArray } from "@ogw_front/utils/arrays";
 import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
@@ -20,14 +21,14 @@ export function useModelBlocksColor(): {
     modelId: ModelId,
     blockIds: BlockId[],
     color: ColorRGBA | undefined,
-    activeColoring?: string,
+    activeColoring?: ColoringType,
     collectionId?: GeodeId,
   ) => Promise<unknown>;
   modelBlockActiveColoring: (modelId: ModelId, block_id?: BlockId) => unknown;
   setModelBlocksActiveColoring: (
     modelId: ModelId,
     blockIds: NonEmptyArray<BlockId>,
-    activeColoring: string,
+    activeColoring: ColoringType,
     collectionId?: GeodeId,
   ) => Promise<void>;
 } {
@@ -130,7 +131,7 @@ export function useModelBlocksColor(): {
   async function setModelBlocksActiveColoring(
     modelId: ModelId,
     blockIds: NonEmptyArray<BlockId>,
-    activeColoring: string,
+    activeColoring: ColoringType,
     collectionId?: GeodeId,
   ): Promise<void> {
     const totalBlockIds = await dataStore.getBlocksGeodeIds(modelId);

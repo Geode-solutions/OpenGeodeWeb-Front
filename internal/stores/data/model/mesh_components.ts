@@ -9,15 +9,17 @@ import type {
 } from "@ogw_front/types/identifiers";
 import { modelComponentsOf, modelComponentsOfType } from "@ogw_internal/database/queries.js";
 import type { ModelComponentRecord } from "@ogw_internal/database/tables/model_components";
+import type { ModelComponentType } from "@ogw_front/types/model";
 import type { ReadonlyTreeGroup } from "@ogw_front/types/tree";
+import type { Title } from "@ogw_front/types/ui";
 import type { ViewerId } from "@geode/opengeodeweb-viewer/schema_types";
 import { liveObservable } from "@ogw_front/utils/live_observable";
 import { useObservable } from "@vueuse/rxjs";
 
 interface FormattedComponent extends Readonly<GeodeIdentified> {
   readonly id: ModelComponentId;
-  readonly title: string;
-  readonly category: string;
+  readonly title: Title;
+  readonly category: ModelComponentType;
   readonly viewer_id: ViewerId;
   readonly is_active: boolean;
 }
@@ -37,7 +39,7 @@ function toFormattedComponent(meshComponent: ModelComponentRecord): FormattedCom
 
 async function getMeshComponentGeodeIds(
   modelId: ModelId,
-  type: string,
+  type: ModelComponentType,
 ): Promise<ModelComponentId[]> {
   const components = await modelComponentsOfType(modelId, type).toArray();
   return components.map((component: ModelComponentRecord) => component.geode_id);
@@ -45,14 +47,14 @@ async function getMeshComponentGeodeIds(
 
 async function formatedMeshComponents(modelId: ModelId): Promise<FormattedComponentGroup[]> {
   const items = await modelComponentsOf(modelId).toArray();
-  const componentTitles: Record<string, string> = {
+  const componentTitles: Record<ModelComponentType, Title> = {
     Corner: "Corners",
     Line: "Lines",
     Surface: "Surfaces",
     Block: "Blocks",
   };
 
-  const componentsByType: Record<string, ModelComponentRecord[]> = {};
+  const componentsByType: Record<ModelComponentType, ModelComponentRecord[]> = {};
   for (const component_item of items) {
     if (componentTitles[component_item.type] !== undefined) {
       componentsByType[component_item.type] ??= [];
@@ -85,7 +87,7 @@ function refFormatedMeshComponents(modelId: ModelId): Ref<FormattedComponentGrou
 
 async function getMeshComponentsByType(
   modelId: ModelId,
-  type: string,
+  type: ModelComponentType,
 ): Promise<FormattedComponent[]> {
   const components = await modelComponentsOfType(modelId, type).toArray();
   return components.map((item: ModelComponentRecord) => toFormattedComponent(item));
@@ -98,9 +100,9 @@ async function getAllMeshComponents(modelId: ModelId): Promise<FormattedComponen
 
 async function fetchAllMeshComponents(
   modelId: ModelId,
-): Promise<Record<string, FormattedComponent[]>> {
+): Promise<Record<ModelComponentType, FormattedComponent[]>> {
   const components = await getAllMeshComponents(modelId);
-  const byType: Record<string, FormattedComponent[]> = {};
+  const byType: Record<ModelComponentType, FormattedComponent[]> = {};
   for (const component of components) {
     byType[component.category] ??= [];
     byType[component.category]?.push(component);

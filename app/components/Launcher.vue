@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { AppName, AuthToken } from "@ogw_front/types/server";
+import type { ImageSource } from "@ogw_front/types/ui";
 import Loading from "@ogw_front/components/Loading.vue";
 import { Status } from "@ogw_front/utils/status";
 import { appMode } from "@ogw_shared/app_mode";
@@ -7,11 +9,11 @@ import { getCloudUrlParam } from "@ogw_front/utils/cloud";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
 interface Props {
-  appName: string;
+  appName: AppName;
   // Firebase ID token for the cloud launch; required in cloud mode.
-  authToken?: string;
+  authToken?: AuthToken;
   isUserAuthenticated?: boolean;
-  logo?: string;
+  logo?: ImageSource;
 }
 
 const {

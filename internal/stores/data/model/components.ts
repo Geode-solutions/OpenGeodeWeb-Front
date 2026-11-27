@@ -1,4 +1,9 @@
 import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
+import type {
+  ModelComponentRelationType,
+  ModelComponentType,
+  ModelComponentViewerId,
+} from "@ogw_front/types/model";
 import {
   modelComponent,
   modelComponentsByGeodeIds,
@@ -9,6 +14,7 @@ import type { ModelComponentInput } from "@ogw_internal/stores/data/model/types"
 import type { ModelComponentRecord } from "@ogw_internal/database/tables/model_components";
 import type { ModelComponentRelationRecord } from "@ogw_internal/database/tables/model_components_relation";
 import type { NewDataItem } from "@ogw_internal/stores/data/types";
+import type { ViewerId } from "@geode/opengeodeweb-viewer/schema_types";
 
 const modelComponentsTable = modelComponentsDb();
 const modelComponentsRelationTable = modelComponentsRelationDb();
@@ -16,12 +22,12 @@ const modelComponentsRelationTable = modelComponentsRelationDb();
 async function meshComponentType(
   modelId: ModelId,
   geodeId: ModelComponentId,
-): Promise<string | undefined> {
+): Promise<ModelComponentType | undefined> {
   const component = await modelComponent(modelId, geodeId).first();
   return component?.type;
 }
 
-async function getAllModelComponentsViewerIds(modelId: ModelId): Promise<number[]> {
+async function getAllModelComponentsViewerIds(modelId: ModelId): Promise<ViewerId[]> {
   const components = await modelComponentsOf(modelId).toArray();
   return components.map((component: ModelComponentRecord) =>
     Math.trunc(Number(component.viewer_id)),
@@ -31,7 +37,7 @@ async function getAllModelComponentsViewerIds(modelId: ModelId): Promise<number[
 async function getMeshComponentsViewerIds(
   modelId: ModelId,
   meshComponentGeodeIds: readonly ModelComponentId[],
-): Promise<number[]> {
+): Promise<ViewerId[]> {
   const components = await modelComponentsByGeodeIds(modelId, meshComponentGeodeIds).toArray();
   return components.map((component: ModelComponentRecord) =>
     Math.trunc(Number(component.viewer_id)),
@@ -40,7 +46,7 @@ async function getMeshComponentsViewerIds(
 
 async function getComponentByViewerId(
   modelId: ModelId,
-  viewerId: string | number,
+  viewerId: ModelComponentViewerId,
 ): Promise<ModelComponentRecord | undefined> {
   const component = await modelComponentsTable
     .where("viewer_id")
@@ -52,7 +58,7 @@ async function getComponentByViewerId(
 
 async function getComponentsByViewerIds(
   modelId: ModelId,
-  viewerIds: number[],
+  viewerIds: ViewerId[],
 ): Promise<ModelComponentRecord[]> {
   const components = await modelComponentsTable
     .where("viewer_id")
@@ -97,7 +103,7 @@ async function addComponentRelations(newItem: NewDataItem): Promise<string> {
   function addModelComponentRelations(
     components: readonly ModelComponentId[],
     parent: ModelComponentId,
-    type: string,
+    type: ModelComponentRelationType,
   ): void {
     for (const child of components) {
       relations.push({ data_id: newItem.data_id, parent, child, type });

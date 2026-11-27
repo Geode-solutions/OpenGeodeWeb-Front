@@ -2,30 +2,33 @@
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import FileUploader from "@ogw_front/components/FileUploader.vue";
 import type { ImageId } from "@ogw_front/types/identifiers";
+import type { Texture } from "@ogw_front/types/texture";
+import type { TextureFieldUpdate } from "@ogw_front/types/props/viewer/options";
+import type { UploadFile } from "@ogw_front/types/files";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { intersectBy } from "@ogw_front/utils/attributes";
 import { requestForTargets } from "@ogw_front/utils/request_for_targets";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useBatchGroup } from "@ogw_front/composables/batch_style";
 
-// Mirrors FileUploader's own (unexported) UploadFile type.
-type UploadFile = File & { isConfigured?: boolean; displayName?: string };
-
-interface Emits {
-  update_value: [payload: { key: "texture_name" | "id"; value: string }];
-}
-
-const emit = defineEmits<Emits>();
+// The name of the texture coordinates a texture is mapped with
+type TextureCoordinatesName = Texture["texture_name"];
 
 interface Props {
   dataId: DataId;
   textureId: ImageId;
-  textureName: string;
+  textureName: TextureCoordinatesName;
 }
+
+interface Emits {
+  update_value: [payload: TextureFieldUpdate];
+}
+
+const emit = defineEmits<Emits>();
 
 const { dataId, textureId: propTextureId, textureName: propTextureName } = defineProps<Props>();
 
-const textureName = ref<string>(propTextureName);
+const textureName = ref<TextureCoordinatesName>(propTextureName);
 const textureId = ref<ImageId>(propTextureId);
 
 watch(
@@ -42,7 +45,7 @@ watch(
   },
 );
 
-const textureCoordinates = ref<string[]>([]);
+const textureCoordinates = ref<TextureCoordinatesName[]>([]);
 const backStore = useBackStore();
 
 const groupTargetIds = useBatchGroup(() => dataId);
@@ -50,9 +53,13 @@ const groupTargetIds = useBatchGroup(() => dataId);
 async function getTextureCoordinates(): Promise<void> {
   const schema = back_schemas.opengeodeweb_back.texture_coordinates;
   const targetIds = groupTargetIds.value ?? [dataId];
-  const responses = await requestForTargets<{ texture_coordinates: string[] }>(schema, targetIds, {
-    texture_coordinates: [],
-  });
+  const responses = await requestForTargets<{ texture_coordinates: TextureCoordinatesName[] }>(
+    schema,
+    targetIds,
+    {
+      texture_coordinates: [],
+    },
+  );
   textureCoordinates.value = intersectBy(
     responses.map(([, response]) => response.texture_coordinates),
     (coordinate) => coordinate,

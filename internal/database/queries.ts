@@ -3,6 +3,7 @@ import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
 import { modelComponentsDb, modelComponentsRelationDb } from "./database";
 import type { ModelComponentRecord } from "./tables/model_components";
 import type { ModelComponentRelationRecord } from "./tables/model_components_relation";
+import type { ModelComponentType } from "@ogw_front/types/model";
 
 type ModelComponents = Collection<ModelComponentRecord, string>;
 type ModelComponentRelations = Collection<ModelComponentRelationRecord, string>;
@@ -11,7 +12,7 @@ function modelComponentsOf(modelId: ModelId): ModelComponents {
   return modelComponentsDb().where("data_id").equals(modelId);
 }
 
-function modelComponentsOfType(modelId: ModelId, type: string): ModelComponents {
+function modelComponentsOfType(modelId: ModelId, type: ModelComponentType): ModelComponents {
   return modelComponentsDb().where("[data_id+type]").equals([modelId, type]);
 }
 

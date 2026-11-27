@@ -2,19 +2,21 @@
 import { useAdaptiveStyles } from "@ogw_front/composables/use_adaptive_styles";
 import { useMenuStore } from "@ogw_front/stores/menu";
 
-interface Props {
+// Props of the button at the center of the context menu
+interface ContextMenuCenterButtonProps {
   isOverTreeview: boolean;
   isOverToolbar?: boolean;
 }
 
-const { isOverTreeview, isOverToolbar = false } = defineProps<Props>();
-
-interface Emits {
+// Events of the button at the center of the context menu
+interface ContextMenuCenterButtonEmits {
   drag: [event: MouseEvent];
   click: [event: MouseEvent];
 }
 
-const emit = defineEmits<Emits>();
+const { isOverTreeview, isOverToolbar = false } = defineProps<ContextMenuCenterButtonProps>();
+
+const emit = defineEmits<ContextMenuCenterButtonEmits>();
 
 const ADAPTIVE_BLUR_VAL = "15px";
 const ADAPTIVE_OPACITY_VAL = 0.85;

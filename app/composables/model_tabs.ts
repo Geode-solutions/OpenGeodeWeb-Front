@@ -1,27 +1,29 @@
+import type { Label, TabName, TestId } from "@ogw_front/types/ui";
 import { type Ref, computed, ref, watch } from "vue";
 import type { ModelComponentId } from "@ogw_front/types/identifiers";
+import type { ModelComponentType } from "@ogw_front/types/model";
 
 interface ModelTabItem {
-  label: string;
-  value: string;
-  testId: string;
+  label: Label;
+  value: TabName;
+  testId: TestId;
 }
 
 interface ModelTabsOptions {
-  componentType: Ref<string | undefined>;
+  componentType: Ref<ModelComponentType | undefined>;
   componentId: Ref<ModelComponentId | undefined>;
-  isTypeSupported?: (type: string) => boolean;
+  isTypeSupported?: (type: ModelComponentType) => boolean;
   hasComponentsOptions?: Ref<boolean>;
 }
 
-const COMPONENT_TYPE_PLURALS: Record<string, string> = {
+const COMPONENT_TYPE_PLURALS: Record<ModelComponentType, string> = {
   Surface: "Surfaces",
   Line: "Lines",
   Corner: "Corners",
   Block: "Blocks",
 };
 
-function getComponentTypePlural(type: string): string {
+function getComponentTypePlural(type: ModelComponentType): string {
   return COMPONENT_TYPE_PLURALS[type] ?? `${type}s`;
 }
 
@@ -35,7 +37,7 @@ function isFilled(value: string | undefined): value is string {
 function useModelTabs(options: ModelTabsOptions) {
   const { componentType, componentId, isTypeSupported, hasComponentsOptions } = options;
 
-  const supportedType = computed<string | undefined>(() => {
+  const supportedType = computed<ModelComponentType | undefined>(() => {
     const type = componentType.value;
     if (!isFilled(type)) {
       return undefined;
@@ -67,7 +69,7 @@ function useModelTabs(options: ModelTabsOptions) {
     return items;
   });
 
-  const activeTab = ref<string>("model");
+  const activeTab = ref<TabName>("model");
   watch(
     [supportedType, componentId],
     ([type, id]) => {

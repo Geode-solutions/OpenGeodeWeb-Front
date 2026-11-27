@@ -1,4 +1,5 @@
-import { Status } from "@ogw_front/utils/status";
+import { type MicroserviceStatus, Status } from "@ogw_front/utils/status";
+import type { MicroserviceId } from "@ogw_front/types/identifiers";
 import { useActivityStore } from "@ogw_front/stores/activity";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
@@ -6,7 +7,7 @@ import { useInfraStore } from "@ogw_front/stores/infra";
 function watchMicroserviceConnections(): void {
   const infraStore = useInfraStore();
   const activityStore = useActivityStore();
-  const known = new Map<string, string | undefined>();
+  const known = new Map<MicroserviceId, MicroserviceStatus | undefined>();
 
   watch(
     () => infraStore.microservices.map((store) => [store.$id, store.status] as const),

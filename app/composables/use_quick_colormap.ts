@@ -1,3 +1,5 @@
+import type { BlockIds } from "@geode/opengeodeweb-viewer/schema_types";
+import type { Coordinate } from "@ogw_front/types/geometry";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import { consola } from "consola";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -10,10 +12,10 @@ export function useQuickColormap(): {
   const viewerStore = useViewerStore();
   const quickColormap = reactive<{
     data_id: DataId | undefined;
-    block_ids: number[] | undefined;
+    block_ids: BlockIds | undefined;
     show: boolean;
-    x: number;
-    y: number;
+    x: Coordinate;
+    y: Coordinate;
   }>({
     data_id: undefined,
     block_ids: undefined,
@@ -23,10 +25,10 @@ export function useQuickColormap(): {
   });
 
   async function pickColormap(
-    offsetX: number,
-    offsetY: number,
-    clientX: number,
-    clientY: number,
+    offsetX: Coordinate,
+    offsetY: Coordinate,
+    clientX: Coordinate,
+    clientY: Coordinate,
   ): Promise<boolean> {
     try {
       const schema = viewer_schemas.opengeodeweb_viewer.viewer.pick_colormap;

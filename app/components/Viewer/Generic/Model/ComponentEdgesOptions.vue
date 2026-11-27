@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AttributeColorMap, AttributeRange, ColoringType } from "@ogw_front/types/attribute";
 import type {
   AttributeItem,
   AttributeName,
@@ -7,8 +8,11 @@ import type {
   Visibility,
 } from "@geode/opengeodeweb-viewer/schema_types";
 import type { ModelComponentId, ModelId } from "@ogw_front/types/identifiers";
+import type {
+  ModelEdgesComponentType,
+  ModelEdgesTarget,
+} from "@ogw_front/types/props/viewer/generic_model";
 import { type NonEmptyArray, isNonEmpty } from "@ogw_front/utils/arrays";
-import type { AttributeColorMap } from "@ogw_front/types/attribute";
 import ViewerOptionsColoringTypeSelector from "@ogw_front/components/Viewer/Options/ColoringTypeSelector.vue";
 import ViewerOptionsWidthSlider from "@ogw_front/components/Viewer/Options/Sliders/Width.vue";
 import VisibilitySwitch from "@ogw_front/components/Viewer/Options/VisibilitySwitch.vue";
@@ -16,14 +20,9 @@ import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schem
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
-interface EdgesTarget {
-  componentType: "Surface" | "Block";
-  componentIds: NonEmptyArray<ModelComponentId>;
-}
-
 interface Props {
   modelId: ModelId;
-  targets: EdgesTarget[];
+  targets: ModelEdgesTarget[];
   referenceComponentId?: ModelComponentId;
 }
 
@@ -75,7 +74,7 @@ const EDGES_STYLES = {
     setVertexAttributeNoDataColor: dataStyleStore.setModelBlocksEdgesVertexAttributeNoDataColor,
   },
 };
-type EdgesStyle = (typeof EDGES_STYLES)[EdgesTarget["componentType"]];
+type EdgesStyle = (typeof EDGES_STYLES)[ModelEdgesComponentType];
 
 // Values are read from the first target, changes are applied to every target
 const edgesStyle = computed<EdgesStyle | undefined>(() => {
@@ -117,7 +116,7 @@ const width = computed<EdgeWidth | undefined>({
   },
 });
 
-const activeColoring = computed<string | undefined>({
+const activeColoring = computed<ColoringType | undefined>({
   get: () => edgesStyle.value?.activeColoring(modelId, referenceComponentId),
   set: async (newValue) => {
     if (newValue === undefined) {
@@ -157,7 +156,7 @@ const vertexAttributeItem = computed<AttributeItem | undefined>({
   },
 });
 
-const vertexAttributeRange = computed<(number | undefined)[] | undefined>({
+const vertexAttributeRange = computed<AttributeRange | undefined>({
   get: () => edgesStyle.value?.vertexAttributeRange(modelId, referenceComponentId),
   set: async (newValue) => {
     if (newValue === undefined) {

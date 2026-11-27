@@ -22,6 +22,8 @@ describe("tool panel", () => {
         props: {
           modelValue: true,
           title: "Test Panel",
+          width: 260,
+          escapeFunction: undefined,
         },
         slots: {
           default: () => "Panel Content",
@@ -44,6 +46,8 @@ describe("tool panel", () => {
         props: {
           modelValue: true,
           hideActions: true,
+          width: 260,
+          escapeFunction: undefined,
         },
         slots: {
           default: () => "Panel Content",
@@ -67,6 +71,8 @@ describe("tool panel", () => {
         props: {
           modelValue: true,
           title: "Test Panel",
+          width: 260,
+          escapeFunction: undefined,
         },
       });
 
@@ -91,6 +97,7 @@ describe("tool panel", () => {
           escapeFunction,
           modelValue: true,
           title: "Test Panel",
+          width: 260,
         },
       });
 

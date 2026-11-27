@@ -1,28 +1,31 @@
 <script setup lang="ts">
+import type { DisplayText, FilterFactor, Label, TestId, Title } from "@ogw_front/types/ui";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { DatasetOption } from "@ogw_front/types/props/components_tools";
 import ToolPanel from "@ogw_front/components/ToolPanel.vue";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useDebounceFn } from "@vueuse/core";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
-const DEBOUNCE_DELAY = 100;
-
+// The bounds, default and neutral values of a factor
 interface FactorRange {
-  min: number;
-  max: number;
-  defaultValue: number;
-  neutralValue: number;
+  min: FilterFactor;
+  max: FilterFactor;
+  defaultValue: FilterFactor;
+  neutralValue: FilterFactor;
 }
 
 interface Props {
-  title: string;
-  label: string;
-  testIdPrefix: string;
-  setFactor: (ids: DataId[], factor: number) => Promise<void>;
+  title: Title;
+  label: Label;
+  testIdPrefix: TestId;
+  setFactor: (ids: DataId[], factor: FilterFactor) => Promise<void>;
   factorRange: FactorRange;
-  formatValue?: (value: number) => string;
-  escapeFunction?: () => void;
+  formatValue?: (value: FilterFactor) => DisplayText;
+  escapeFunction: () => void;
 }
+
+const DEBOUNCE_DELAY = 100;
 
 const {
   title,
@@ -30,11 +33,11 @@ const {
   testIdPrefix,
   setFactor,
   factorRange,
-  formatValue = (value: number): string => value.toFixed(2),
-  escapeFunction = undefined,
+  formatValue = (value: FilterFactor): DisplayText => value.toFixed(2),
+  escapeFunction,
 } = defineProps<Props>();
 
-const capitalizedPrefix = computed<string>(
+const capitalizedPrefix = computed<TestId>(
   () => `${testIdPrefix.charAt(0).toUpperCase()}${testIdPrefix.slice(1)}`,
 );
 const show = defineModel<boolean>("show", { default: false });
@@ -42,17 +45,17 @@ const dataStore = useDataStore();
 const hybridViewerStore = useHybridViewerStore();
 const targetAllVisible = ref<boolean>(true);
 const selectedDatasetIds = ref<DataId[]>([]);
-const factor = ref<number>(factorRange.defaultValue);
+const factor = ref<FilterFactor>(factorRange.defaultValue);
 
 const allItems = computed(() => dataStore.registeredItems);
-const availableDatasets = computed<{ title: string; value: DataId }[]>(() =>
+const availableDatasets = computed<DatasetOption[]>(() =>
   allItems.value.map((item) => ({
     title: item.name || item.data_id,
     value: item.data_id,
   })),
 );
 
-let appliedFactor: number | undefined = undefined;
+let appliedFactor: FilterFactor | undefined = undefined;
 
 async function applyFactor(): Promise<void> {
   appliedFactor = factor.value;

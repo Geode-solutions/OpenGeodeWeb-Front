@@ -9,6 +9,7 @@ import type {
   AttributeStoredConfig,
 } from "@ogw_internal/stores/data_style/attribute_types";
 import type { MeshId } from "@ogw_front/types/identifiers";
+import type { StyleValues } from "@ogw_internal/stores/data_style/types.js";
 import { defaultAttributeStoredConfig } from "@ogw_internal/stores/data_style/attribute_default";
 
 // Local imports
@@ -17,7 +18,10 @@ import { useMeshPolygonsCommonStyle } from "./common";
 interface UseMeshPolygonsVertexAttributeConfigReturn {
   meshPolygonsVertexAttribute: (meshId: MeshId) => AttributeState;
   meshPolygonsVertexAttributeName: (meshId: MeshId) => AttributeName | undefined;
-  meshPolygonsVertexAttributeLastItem: (meshId: MeshId, name: AttributeName | undefined) => number;
+  meshPolygonsVertexAttributeLastItem: (
+    meshId: MeshId,
+    name: AttributeName | undefined,
+  ) => AttributeItem;
   meshPolygonsVertexAttributeItem: (meshId: MeshId) => AttributeItem;
   meshPolygonsVertexAttributeStoredConfig: (
     meshId: MeshId,
@@ -27,10 +31,7 @@ interface UseMeshPolygonsVertexAttributeConfigReturn {
 }
 
 interface UseMeshPolygonsVertexAttributeConfigWriterReturn {
-  mutateMeshPolygonsVertexStyle: (
-    meshId: MeshId,
-    values: Record<string, unknown>,
-  ) => Promise<MeshId>;
+  mutateMeshPolygonsVertexStyle: (meshId: MeshId, values: StyleValues) => Promise<MeshId>;
   setMeshPolygonsVertexAttributeStoredConfig: (
     meshId: MeshId,
     name: AttributeName | undefined,
@@ -64,7 +65,7 @@ function useMeshPolygonsVertexAttributeConfig(): UseMeshPolygonsVertexAttributeC
   function meshPolygonsVertexAttributeLastItem(
     meshId: MeshId,
     name: AttributeName | undefined,
-  ): number {
+  ): AttributeItem {
     const { storedConfigs } = meshPolygonsVertexAttribute(meshId);
     const nameConfig = name === undefined ? undefined : storedConfigs?.[name];
     if (nameConfig !== undefined) {
@@ -126,7 +127,7 @@ function useMeshPolygonsVertexAttributeConfigWriter(): UseMeshPolygonsVertexAttr
   const meshPolygonsCommonStyle = useMeshPolygonsCommonStyle();
   async function mutateMeshPolygonsVertexStyle(
     meshId: MeshId,
-    values: Record<string, unknown>,
+    values: StyleValues,
   ): Promise<MeshId> {
     const result = await meshPolygonsCommonStyle.mutateMeshPolygonsStyle(meshId, {
       coloring: {

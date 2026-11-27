@@ -13,6 +13,7 @@ import {
   sceneStyleDb,
 } from "@ogw_internal/database/database";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
+import type { ModelComponentType } from "@ogw_front/types/model";
 import type { Observable as RxObservable } from "rxjs";
 import { getDefaultSceneStyle } from "@ogw_front/utils/default_styles";
 import { liveQuery } from "dexie";
@@ -44,7 +45,7 @@ interface SharedState {
   ) => void;
   updateModelComponentTypeStyleCache: (
     modelId: ModelId,
-    componentType: string,
+    componentType: ModelComponentType,
     styleValues: StyleValues,
   ) => void;
   updateStyleCache: (objectId: DataId, styleValues: StyleValues) => void;
@@ -172,7 +173,7 @@ function getSharedState(): SharedState {
 
   function updateModelComponentTypeStyleCache(
     modelId: ModelId,
-    componentType: string,
+    componentType: ModelComponentType,
     styleValues: StyleValues,
   ): void {
     const cacheKey = `${modelId}_${componentType}`;

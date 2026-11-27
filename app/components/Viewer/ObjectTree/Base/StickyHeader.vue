@@ -13,16 +13,17 @@ interface Props {
   selection: SelectionConfig;
   isSelected: (item: TreeItem) => boolean;
   getIndeterminate: (item: TreeItem) => boolean;
+  // Given by the view: it knows which data a row stands for
   isRowViewable: (item: DisplayItem) => boolean;
 }
-
-const { item, itemProps, selection, isSelected, getIndeterminate, isRowViewable } =
-  defineProps<Props>();
 
 interface Emits {
   "toggle-open": [item: TreeItem];
   "toggle-select": [item: TreeItem];
 }
+
+const { item, itemProps, selection, isSelected, getIndeterminate, isRowViewable } =
+  defineProps<Props>();
 
 const emit = defineEmits<Emits>();
 </script>

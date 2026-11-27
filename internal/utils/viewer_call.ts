@@ -2,6 +2,7 @@ import type { JsonRpcSchema, RequestHandlersWithValidation } from "@ogw_shared/u
 import { endRequestLog, startRequestLog } from "@ogw_front/utils/log";
 import { reportError, reportTimeout } from "./error_feedback.js";
 import type { Microservice } from "./api_fetch.js";
+import type { Milliseconds } from "@ogw_front/types/time";
 import type { RpcClient } from "@ogw_shared/utils/call_raw.js";
 import { callSchema } from "@ogw_shared/utils/call_schema";
 import { trackRequest } from "./track_request.js";
@@ -14,7 +15,7 @@ interface ViewerMicroservice extends Microservice {
 interface ViewerCallParams {
   schema: JsonRpcSchema;
   params?: object;
-  timeout?: number;
+  timeout?: Milliseconds;
 }
 
 // Stops the request and reports its errors once, around the caller's own handlers
