@@ -12,31 +12,22 @@ import viewer_schemas from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed
 const useHybridViewerCamera = createSharedComposable(() => {
   const camera_options = reactive<Record<string, unknown>>({});
 
-  function performSyncRemoteCamera(): void {
+  async function syncRemoteCameraAsync(): Promise<void> {
     const { genericRenderWindow, remoteRender } = useHybridViewerCore();
     const viewerStore = useViewerStore();
     const renderer = requireRenderWindow(genericRenderWindow).getRenderer();
-    const camera = renderer.getActiveCamera();
-    const options_camera = getCameraOptions(camera);
-    const schema = viewer_schemas.opengeodeweb_viewer.viewer.update_camera;
-    const params = {
-      camera_options: options_camera,
-    };
-    viewerStore
-      .request(
-        {
-          schema,
-          params,
-        },
-        {
-          response_function: async () => {
-            await remoteRender().catch(() => undefined);
-            Object.assign(camera_options, options_camera);
-          },
-        },
-      )
-      // oxlint-disable-next-line promise/prefer-await-to-then -- fire-and-forget inside a sync caller; see codebase convention in global_attribute_style.ts.
-      .catch(() => undefined);
+    const options_camera = getCameraOptions(renderer.getActiveCamera());
+    await viewerStore.request({
+      schema: viewer_schemas.opengeodeweb_viewer.viewer.update_camera,
+      params: { camera_options: options_camera },
+    });
+    await remoteRender();
+    Object.assign(camera_options, options_camera);
+  }
+
+  function performSyncRemoteCamera(): void {
+    // oxlint-disable-next-line promise/prefer-await-to-then -- fire-and-forget inside a sync caller; see codebase convention in global_attribute_style.ts.
+    syncRemoteCameraAsync().catch(() => undefined);
   }
 
   function syncRemoteCamera(): void {
@@ -132,6 +123,7 @@ const useHybridViewerCamera = createSharedComposable(() => {
   return {
     camera_options,
     syncRemoteCamera,
+    syncRemoteCameraAsync,
     setCamera,
     resetCamera,
     focusCameraOnObject,

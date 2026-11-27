@@ -1,11 +1,14 @@
 import type { JsonRpcSchema, ParamsOf, ResponseOf } from "@ogw_shared/utils/types.js";
+import { explodeAlongZ, followCenter } from "./explode";
+import { requireRenderWindow, useHybridViewerCore } from "./core";
 import viewer_schemas, {
   type ViewerClippingPlanesParams,
 } from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 import type { AttributeName } from "@geode/opengeodeweb-viewer/schema_types";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { SliceAxis } from "@ogw_front/utils/slice";
-import { useHybridViewerCore } from "./core";
+import { useHybridViewerCamera } from "./camera";
+import { useHybridViewerScene } from "./scene";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 async function requestAndRender<Schema extends JsonRpcSchema>(
@@ -37,11 +40,33 @@ async function setShrink(ids: string[], shrink_factor: number): Promise<void> {
     shrink_factor,
   });
 }
+// The simplified view shown while the camera moves follows the explosion, and so does the camera
+function explodeLightViewables(explodedBounds: { id: DataId; bounds: number[] }[]): void {
+  const { genericRenderWindow } = useHybridViewerCore();
+  const { hybridDb } = useHybridViewerScene();
+  const renderer = requireRenderWindow(genericRenderWindow).getRenderer();
+  const boundsBefore = renderer.computeVisiblePropBounds();
+  for (const { id, bounds } of explodedBounds) {
+    const entry = hybridDb[id];
+    if (entry) {
+      const points = entry.polydata.getPoints();
+      explodeAlongZ(entry.compactPoints, points.getData(), bounds);
+      points.modified();
+      entry.polydata.modified();
+    }
+  }
+  const camera = renderer.getActiveCamera();
+  followCenter(camera, boundsBefore, renderer.computeVisiblePropBounds());
+  renderer.resetCameraClippingRange();
+}
 async function setExplode(ids: string[], explode_factor: number): Promise<void> {
-  await requestAndRender(viewer_schemas.opengeodeweb_viewer.viewer.explode, {
-    ids,
-    explode_factor,
+  const viewerStore = useViewerStore();
+  const { exploded_bounds } = await viewerStore.request({
+    schema: viewer_schemas.opengeodeweb_viewer.viewer.explode,
+    params: { ids, explode_factor },
   });
+  explodeLightViewables(exploded_bounds);
+  await useHybridViewerCamera().syncRemoteCameraAsync();
 }
 async function setSlice(
   ids: string[],

@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 
+import { explodeAlongZ, followCenter } from "@ogw_internal/stores/hybrid_viewer/explode";
 import { followZScaling } from "@ogw_internal/stores/hybrid_viewer/scene";
 import { newInstance as vtkCamera } from "@kitware/vtk.js/Rendering/Core/Camera";
 
@@ -41,5 +42,72 @@ describe("followZScaling helper", () => {
 
     expect(camera.getFocalPoint()).toStrictEqual([FOCAL_X, FOCAL_Y, FOCAL_Z]);
     expect(camera.getPosition()).toStrictEqual([POSITION_X, POSITION_Y, POSITION_Z]);
+  });
+});
+
+const COMPACT_Z_MAX = 10;
+const EXPLODED_Z_MIN = 2;
+const EXPLODED_Z_MAX = 32;
+const TOP_X = 5;
+const TOP_Y = 6;
+
+describe("explodeAlongZ helper", () => {
+  test("stretches the compact points along z over the exploded bounds", () => {
+    const compactPoints = Float64Array.from([
+      1,
+      2,
+      0,
+      3,
+      4,
+      COMPACT_Z_MAX / 2,
+      TOP_X,
+      TOP_Y,
+      COMPACT_Z_MAX,
+    ]);
+    const points = new Float32Array(compactPoints.length);
+
+    explodeAlongZ(compactPoints, points, [0, 1, 0, 1, EXPLODED_Z_MIN, EXPLODED_Z_MAX]);
+
+    const middleZ = (EXPLODED_Z_MIN + EXPLODED_Z_MAX) / 2;
+    expect([...points]).toStrictEqual([
+      1,
+      2,
+      EXPLODED_Z_MIN,
+      3,
+      4,
+      middleZ,
+      TOP_X,
+      TOP_Y,
+      EXPLODED_Z_MAX,
+    ]);
+  });
+
+  test("restores the compact points when the data is no longer exploded", () => {
+    const compactPoints = Float64Array.from([1, 2, 0, 3, 4, COMPACT_Z_MAX]);
+    const points = new Float64Array(compactPoints.length);
+
+    explodeAlongZ(compactPoints, points, [1, 3, 2, 4, 0, COMPACT_Z_MAX]);
+
+    expect([...points]).toStrictEqual([...compactPoints]);
+  });
+});
+
+const EXPLODED_TOP = 40;
+
+describe("followCenter helper", () => {
+  test("moves the camera with the center of the exploded scene, keeping its view", () => {
+    const camera = vtkCamera();
+    camera.setFocalPoint(FOCAL_X, FOCAL_Y, FOCAL_Z);
+    camera.setPosition(POSITION_X, POSITION_Y, POSITION_Z);
+    const directionOfProjection = camera.getDirectionOfProjection();
+    const distance = camera.getDistance();
+
+    followCenter(camera, [0, 1, 0, 1, 0, COMPACT_Z_MAX], [0, 1, 0, 1, 0, EXPLODED_TOP]);
+
+    const offset = (EXPLODED_TOP - COMPACT_Z_MAX) / 2;
+    expect(camera.getFocalPoint()).toStrictEqual([FOCAL_X, FOCAL_Y, FOCAL_Z + offset]);
+    expect(camera.getPosition()).toStrictEqual([POSITION_X, POSITION_Y, POSITION_Z + offset]);
+    expect(camera.getDirectionOfProjection()).toStrictEqual(directionOfProjection);
+    expect(camera.getDistance()).toBeCloseTo(distance);
   });
 });
