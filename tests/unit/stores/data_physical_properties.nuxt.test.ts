@@ -20,9 +20,7 @@ const POROSITY_PROPERTY: PhysicalProperty = {
   attribute_name: "porosity",
   element_type: "polyhedron",
   nb_items: 1,
-  components: [
-    { geode_id: "block", min_values: [POROSITY], max_values: [POROSITY], no_data: false },
-  ],
+  components: [{ geode_id: "block", min_values: [POROSITY], max_values: [POROSITY] }],
 };
 
 type BackRequest = (request: {

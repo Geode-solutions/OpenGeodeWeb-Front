@@ -4,13 +4,15 @@ import back_schemas, {
 import type { ModelId } from "@ogw_front/types/identifiers";
 import type { ModelPhysicalPropertyRecord } from "@ogw_internal/database/tables/model_physical_properties";
 import type { Ref } from "vue";
+import { consola } from "consola";
 import { liveObservable } from "@ogw_front/utils/live_observable";
 import { modelPhysicalPropertiesDb } from "@ogw_internal/database/database.js";
 import { modelPhysicalPropertiesOf } from "@ogw_internal/database/queries.js";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useObservable } from "@vueuse/rxjs";
 
-// The back reports its errors itself: the model is then imported without physical properties
+// A failed request leaves the model without physical properties, and does not stop its import:
+// The back shows its error, the console keeps it
 async function fetchPhysicalProperties(modelId: ModelId): Promise<PhysicalProperty[]> {
   try {
     const response = await useBackStore().request({
@@ -18,17 +20,18 @@ async function fetchPhysicalProperties(modelId: ModelId): Promise<PhysicalProper
       params: { id: modelId },
     });
     return response.physical_properties;
-  } catch {
+  } catch (error) {
+    consola.error(`Failed to read the physical properties of model ${modelId}:`, error);
     return [];
   }
 }
 
 // Read from the back once per import: a model never changes once imported
 async function addPhysicalProperties(modelId: ModelId): Promise<void> {
-  const physicalProperties = await fetchPhysicalProperties(modelId);
-  const records = physicalProperties.map((physicalProperty) =>
-    Object.assign(physicalProperty, { data_id: modelId }),
-  );
+  const records: ModelPhysicalPropertyRecord[] = [];
+  for (const physicalProperty of await fetchPhysicalProperties(modelId)) {
+    records.push({ ...physicalProperty, data_id: modelId });
+  }
   await modelPhysicalPropertiesDb().bulkPut(records);
 }
 
