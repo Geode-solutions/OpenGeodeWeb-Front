@@ -34,7 +34,7 @@ function component(
   min_values: (number | null)[],
   max_values: (number | null)[] = min_values,
 ): PhysicalProperty["components"][number] {
-  return { geode_id, min_values, max_values, no_data: false };
+  return { geode_id, min_values, max_values };
 }
 
 function physicalProperty(
@@ -109,6 +109,7 @@ describe("physical properties tree", () => {
         element_type: "polygon",
         component_type: "Surface",
         coloring: { item: 0, minimum: BOUNDARY_PRESSURE, maximum: BOUNDARY_PRESSURE },
+        viewer_ids: [SURFACE.viewer_id, SECOND_SURFACE.viewer_id],
         children: [
           { ...SURFACE, physical_value: "2e7" },
           { ...SECOND_SURFACE, physical_value: "2e7" },
@@ -122,6 +123,7 @@ describe("physical properties tree", () => {
         element_type: "polyhedron",
         component_type: "Block",
         coloring: { item: 0, minimum: POROSITY, maximum: POROSITY },
+        viewer_ids: [BLOCK.viewer_id],
         children: [{ ...BLOCK, physical_value: "0.05" }],
       },
     ]);

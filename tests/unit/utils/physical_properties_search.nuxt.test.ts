@@ -1,3 +1,8 @@
+import type {
+  ComponentType,
+  ElementType,
+  PhysicalProperty,
+} from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { describe, expect, test } from "vitest";
 import {
   physicalPropertyNodes,
@@ -5,7 +10,6 @@ import {
   sortPhysicalPropertyLeaves,
 } from "@ogw_front/utils/physical_properties_tree";
 import type { FormattedComponent } from "@ogw_internal/stores/data/model/mesh_components";
-import type { PhysicalProperty } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 
 const BLOCK_ID = "block-1";
 const SURFACE_ID = "surface-1";
@@ -19,8 +23,8 @@ function formattedComponent(id: string, title: string, category: string): Format
 
 function physicalProperty(
   name: string,
-  componentType: string,
-  elementType: string,
+  componentType: ComponentType,
+  elementType: ElementType,
   componentIds: string[],
   value: number,
 ): PhysicalProperty {
@@ -35,7 +39,6 @@ function physicalProperty(
       geode_id,
       min_values: [value],
       max_values: [value],
-      no_data: false,
     })),
   };
 }

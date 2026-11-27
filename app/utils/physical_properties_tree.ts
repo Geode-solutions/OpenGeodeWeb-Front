@@ -1,6 +1,8 @@
 import type {
+  ComponentType,
+  ElementType,
   PhysicalProperty,
-  Component as PhysicalPropertyComponent,
+  PhysicalPropertyComponent,
 } from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import type { FormattedComponent } from "@ogw_internal/stores/data/model/mesh_components";
 
@@ -21,10 +23,12 @@ interface PhysicalPropertyNode {
   readonly title: string;
   readonly physical_property: string;
   readonly attribute_name: string;
-  readonly element_type: string;
-  readonly component_type: string;
+  readonly element_type: ElementType;
+  readonly component_type: ComponentType;
   // Undefined when no component has a value
   readonly coloring: PhysicalPropertyColoring | undefined;
+  // Of all the components carrying the property, for the hover and the focus of its row
+  readonly viewer_ids: number[];
   readonly children: PhysicalPropertyLeaf[];
 }
 
@@ -134,6 +138,7 @@ function physicalPropertyNode(
     element_type: physicalProperty.element_type,
     component_type: physicalProperty.component_type,
     coloring: physicalPropertyColoring(physicalProperty),
+    viewer_ids: children.map((child) => child.viewer_id),
     children,
   };
 }

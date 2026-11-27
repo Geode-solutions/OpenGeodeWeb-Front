@@ -34,6 +34,7 @@ const POROSITY_NODE: PhysicalPropertyNode = {
   element_type: "polyhedron",
   component_type: "Block",
   coloring: { item: 0, minimum: 0.05, maximum: 0.3 },
+  viewer_ids: [0, 0],
   children: BLOCK_IDS.map((id) => ({
     id,
     geode_id: id,

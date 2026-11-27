@@ -1,6 +1,10 @@
+import type {
+  ComponentType,
+  ElementType,
+} from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import type { ModelId } from "@ogw_front/types/identifiers";
 import type { PhysicalPropertyNode } from "@ogw_front/utils/physical_properties_tree";
-import { storeMethod } from "@ogw_front/composables/attribute_coloring_style";
+import type { ValidAttributeInput } from "@ogw_internal/stores/data_style/attribute_types";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
@@ -9,9 +13,76 @@ const DEFAULT_COLOR_MAP = "batlow";
 // The coloring a component goes back to when the property coloring is removed
 const CONSTANT_COLORING = "constant";
 
-// "polyhedron" -> "Polyhedron", as in the style store method names
-function capitalize(word: string): string {
-  return `${word.charAt(0).toUpperCase()}${word.slice(1)}`;
+type DataStyleStore = ReturnType<typeof useDataStyleStore>;
+
+// The style store methods coloring the components of one type by an attribute of one element
+interface ColoringMethods {
+  setAttribute: (modelId: ModelId, ids: string[], input: ValidAttributeInput) => Promise<unknown>;
+  setActiveColoring: (modelId: ModelId, ids: string[], activeColoring: string) => Promise<unknown>;
+  activeColoring: (modelId: ModelId, id: string) => unknown;
+  attributeName: (modelId: ModelId, id: string) => string | undefined;
+}
+
+// The same methods as the coloring options, for each element a component type has: a pair the
+// Back schema allows but no component has (e.g. a Corner polygon) has none
+function coloringMethods(
+  store: DataStyleStore,
+  componentType: ComponentType,
+  elementType: ElementType,
+): ColoringMethods | undefined {
+  const methods: Record<ComponentType, Partial<Record<ElementType, ColoringMethods>>> = {
+    Block: {
+      polyhedron: {
+        setAttribute: store.setModelBlocksPolyhedronAttribute,
+        setActiveColoring: store.setModelBlocksActiveColoring,
+        activeColoring: store.modelBlockActiveColoring,
+        attributeName: store.modelBlocksPolyhedronAttributeName,
+      },
+      vertex: {
+        setAttribute: store.setModelBlocksVertexAttribute,
+        setActiveColoring: store.setModelBlocksActiveColoring,
+        activeColoring: store.modelBlockActiveColoring,
+        attributeName: store.modelBlocksVertexAttributeName,
+      },
+    },
+    Surface: {
+      polygon: {
+        setAttribute: store.setModelSurfacesPolygonAttribute,
+        setActiveColoring: store.setModelSurfacesActiveColoring,
+        activeColoring: store.modelSurfaceActiveColoring,
+        attributeName: store.modelSurfacesPolygonAttributeName,
+      },
+      vertex: {
+        setAttribute: store.setModelSurfacesVertexAttribute,
+        setActiveColoring: store.setModelSurfacesActiveColoring,
+        activeColoring: store.modelSurfaceActiveColoring,
+        attributeName: store.modelSurfacesVertexAttributeName,
+      },
+    },
+    Line: {
+      edge: {
+        setAttribute: store.setModelLinesEdgeAttribute,
+        setActiveColoring: store.setModelLinesActiveColoring,
+        activeColoring: store.modelLineActiveColoring,
+        attributeName: store.modelLinesEdgeAttributeName,
+      },
+      vertex: {
+        setAttribute: store.setModelLinesVertexAttribute,
+        setActiveColoring: store.setModelLinesActiveColoring,
+        activeColoring: store.modelLineActiveColoring,
+        attributeName: store.modelLinesVertexAttributeName,
+      },
+    },
+    Corner: {
+      vertex: {
+        setAttribute: store.setModelCornersVertexAttribute,
+        setActiveColoring: store.setModelCornersActiveColoring,
+        activeColoring: store.modelCornerActiveColoring,
+        attributeName: store.modelCornersVertexAttributeName,
+      },
+    },
+  };
+  return methods[componentType][elementType];
 }
 
 // Colors the components carrying a physical property by its attribute, through the same style
@@ -23,44 +94,41 @@ export function usePhysicalPropertyColoring(modelId: ModelId): {
   const dataStyleStore = useDataStyleStore();
   const hybridViewerStore = useHybridViewerStore();
 
+  function nodeMethods(node: PhysicalPropertyNode): ColoringMethods | undefined {
+    return coloringMethods(dataStyleStore, node.component_type, node.element_type);
+  }
+
   // The components of a property share its coloring: reading the first one is enough
   function isColoredBy(node: PhysicalPropertyNode): boolean {
     const [component] = node.children;
-    if (component === undefined) {
+    const methods = nodeMethods(node);
+    if (component === undefined || methods === undefined) {
       return false;
     }
-    const type = node.component_type;
-    const element = capitalize(node.element_type);
-    const activeColoring = storeMethod(dataStyleStore, `model${type}ActiveColoring`)(
-      modelId,
-      component.id,
+    return (
+      methods.activeColoring(modelId, component.id) === node.element_type &&
+      methods.attributeName(modelId, component.id) === node.attribute_name
     );
-    const attributeName = storeMethod(dataStyleStore, `model${type}s${element}AttributeName`)(
-      modelId,
-      component.id,
-    );
-    return activeColoring === node.element_type && attributeName === node.attribute_name;
   }
 
   async function toggleColoring(node: PhysicalPropertyNode): Promise<void> {
-    const type = node.component_type;
+    const methods = nodeMethods(node);
+    if (methods === undefined) {
+      return;
+    }
     const componentIds = node.children.map((component) => component.id);
-    const setActiveColoring = storeMethod(dataStyleStore, `setModel${type}sActiveColoring`);
     if (isColoredBy(node)) {
-      await setActiveColoring(modelId, componentIds, CONSTANT_COLORING);
+      await methods.setActiveColoring(modelId, componentIds, CONSTANT_COLORING);
     } else if (node.coloring !== undefined) {
       const { item, minimum, maximum } = node.coloring;
-      await storeMethod(
-        dataStyleStore,
-        `setModel${type}s${capitalize(node.element_type)}Attribute`,
-      )(modelId, componentIds, {
+      await methods.setAttribute(modelId, componentIds, {
         name: node.attribute_name,
         item,
         minimum,
         maximum,
         colorMap: DEFAULT_COLOR_MAP,
       });
-      await setActiveColoring(modelId, componentIds, node.element_type);
+      await methods.setActiveColoring(modelId, componentIds, node.element_type);
     }
     await hybridViewerStore.remoteRender();
   }

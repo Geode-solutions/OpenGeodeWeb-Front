@@ -27,6 +27,8 @@ interface PhysicalPropertyRow {
   title?: string;
   children?: PhysicalPropertyRow[];
   viewer_id?: number;
+  // Of all the components carrying a property
+  viewer_ids?: number[];
   physical_value?: string;
 }
 
@@ -52,6 +54,8 @@ const opened = computed<string[]>({
 });
 
 const items = computed(() => rows.value as unknown as PhysicalPropertyRow[]);
+// All the properties, also those a search hides: the coloring takes all their components
+const nodesById = computed(() => new Map(physicalProperties.value.map((node) => [node.id, node])));
 
 function actualRow(item: PhysicalPropertyRow): PhysicalPropertyRow {
   return item.raw ?? item;
@@ -60,8 +64,8 @@ function actualRow(item: PhysicalPropertyRow): PhysicalPropertyRow {
 // The viewer ids of a component, or of all the components carrying a property
 function viewerIds(item: PhysicalPropertyRow): number[] {
   const row = actualRow(item);
-  if (row.children) {
-    return row.children.flatMap((child) => viewerIds(child));
+  if (row.viewer_ids) {
+    return row.viewer_ids;
   }
   if (Number.isInteger(row.viewer_id)) {
     return [row.viewer_id as number];
@@ -131,7 +135,7 @@ function expandAll(): void {
         <PhysicalPropertyActions
           :model-id="modelId"
           :row="actualRow(item as unknown as PhysicalPropertyRow)"
-          :physical-properties="physicalProperties"
+          :node="nodesById.get(actualRow(item as unknown as PhysicalPropertyRow).id)"
         />
         <v-btn
           v-if="viewerIds(item as unknown as PhysicalPropertyRow).length > 0"

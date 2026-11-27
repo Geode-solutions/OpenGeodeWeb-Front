@@ -6,18 +6,22 @@ interface Props {
   modelId: string;
   // A row of the physical properties tree: a component listed under a property carries its value
   row: { id: string; physical_value?: string };
-  // All the properties of the model, also those a search hides: the coloring takes all their components
-  physicalProperties: readonly PhysicalPropertyNode[];
+  // The property of the row, whole even when a search hides some of its components: undefined
+  // On a component row
+  node: PhysicalPropertyNode | undefined;
 }
 
-const { modelId, row, physicalProperties } = defineProps<Props>();
+const { modelId, row, node: rowNode } = defineProps<Props>();
 
 const { isColoredBy, toggleColoring } = usePhysicalPropertyColoring(modelId);
 
 // Defined on the row of a property with a value to color the model with
-const node = computed<PhysicalPropertyNode | undefined>(() =>
-  physicalProperties.find((property) => property.id === row.id && property.coloring !== undefined),
-);
+const node = computed<PhysicalPropertyNode | undefined>(() => {
+  if (rowNode?.coloring === undefined) {
+    return undefined;
+  }
+  return rowNode;
+});
 const active = computed<boolean>(() => node.value !== undefined && isColoredBy(node.value));
 const tooltip = computed<string>(() =>
   active.value ? "Remove the coloring by this property" : "Color the model by this property",
