@@ -5,10 +5,8 @@ import viewer_schemas, {
   type ViewerClippingPlanesParams,
 } from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 import type { AttributeName } from "@geode/opengeodeweb-viewer/schema_types";
-import type { CameraOptions } from "./vtk_types";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { SliceAxis } from "@ogw_front/utils/slice";
-import { getCameraOptions } from "./camera_animation";
 import { useHybridViewerCamera } from "./camera";
 import { useHybridViewerScene } from "./scene";
 import { useViewerStore } from "@ogw_front/stores/viewer";
@@ -43,7 +41,7 @@ async function setShrink(ids: string[], shrink_factor: number): Promise<void> {
   });
 }
 // The simplified view shown while the camera moves follows the explosion, and so does the camera
-function explodeLightViewables(explodedBounds: { id: DataId; bounds: number[] }[]): CameraOptions {
+function explodeLightViewables(explodedBounds: { id: DataId; bounds: number[] }[]): void {
   const { genericRenderWindow } = useHybridViewerCore();
   const { hybridDb } = useHybridViewerScene();
   const renderer = requireRenderWindow(genericRenderWindow).getRenderer();
@@ -60,7 +58,6 @@ function explodeLightViewables(explodedBounds: { id: DataId; bounds: number[] }[
   const camera = renderer.getActiveCamera();
   followCenter(camera, boundsBefore, renderer.computeVisiblePropBounds());
   renderer.resetCameraClippingRange();
-  return getCameraOptions(camera);
 }
 async function setExplode(ids: string[], explode_factor: number): Promise<void> {
   const viewerStore = useViewerStore();
@@ -68,11 +65,8 @@ async function setExplode(ids: string[], explode_factor: number): Promise<void> 
     schema: viewer_schemas.opengeodeweb_viewer.viewer.explode,
     params: { ids, explode_factor },
   });
-  const camera_options = explodeLightViewables(exploded_bounds);
-  await requestAndRender(viewer_schemas.opengeodeweb_viewer.viewer.update_camera, {
-    camera_options,
-  });
-  Object.assign(useHybridViewerCamera().camera_options, camera_options);
+  explodeLightViewables(exploded_bounds);
+  await useHybridViewerCamera().syncRemoteCameraAsync();
 }
 async function setSlice(
   ids: string[],
