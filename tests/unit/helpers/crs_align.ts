@@ -1,11 +1,7 @@
-// Third party imports
 import { type VueWrapper, flushPromises, mount } from "@vue/test-utils";
-import { ref } from "vue";
-import { vi } from "vitest";
-
-// Local imports
-import { type DataItem, useDataStore } from "@ogw_front/stores/data";
 import CrsAlign from "@ogw_front/components/CrsAlign.vue";
+import type { DataItem } from "@ogw_front/stores/data";
+import { setDataItems } from "@ogw_tests/unit/stores/data_helpers";
 import { useCrsStore } from "@ogw_front/stores/crs";
 import { vuetify } from "@ogw_tests/utils";
 
@@ -49,7 +45,7 @@ function mountWithWells(lambert: DataItem["crs"]): {
   const stored: DataItem = { ...item, created_at: "2026-10-27" };
   const wells: DataItem = { ...stored, data_id: "item-2", name: "Wells" };
   const georeferenced: DataItem = { ...stored, data_id: "item-3", name: "Map", crs: lambert };
-  vi.spyOn(useDataStore(), "refCrsItems").mockReturnValue(ref([stored, wells, georeferenced]));
+  setDataItems([stored, wells, georeferenced]);
   useCrsStore().openCrsAlign(item);
   return { wrapper: mount(CrsAlign, { global: { plugins: [vuetify] } }), wells };
 }

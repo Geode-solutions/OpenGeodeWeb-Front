@@ -29,7 +29,7 @@ vi.mock(import("@ogw_front/stores/back") as Promise<unknown>, () => ({
 }));
 vi.mock(import("@ogw_front/stores/data") as Promise<unknown>, () => ({
   useDataStore: (): Record<string, unknown> => ({
-    refAllItems: (): Ref<unknown[]> => ref([]),
+    items: [],
     item: vi.fn<() => Promise<unknown>>().mockResolvedValue({
       viewer_object_type: "mesh",
       geode_object_type: "TriangulatedSurface3D",

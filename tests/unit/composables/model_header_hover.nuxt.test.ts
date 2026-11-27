@@ -18,7 +18,7 @@ vi.mock(import("@ogw_front/stores/viewer") as Promise<unknown>, () => ({
 }));
 vi.mock(import("@ogw_front/stores/data") as Promise<unknown>, () => ({
   useDataStore: (): Record<string, unknown> => ({
-    isItemViewable: vi.fn<() => Promise<boolean>>().mockResolvedValue(true),
+    isViewable: vi.fn<() => boolean>().mockReturnValue(true),
     getAllModelComponentsViewerIds: vi.fn<() => Promise<number[]>>().mockResolvedValue([2, 3]),
   }),
 }));

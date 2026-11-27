@@ -1,3 +1,4 @@
+import type { BrightnessRange } from "@ogw_internal/stores/hybrid_viewer/brightness";
 import type { MaybeComputedElementRef } from "@vueuse/core";
 import { consola } from "consola";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -62,9 +63,10 @@ function getValue(val: unknown): number {
 }
 
 // How much the glass has to cover its backdrop to keep the text readable: dark text (light theme)
-// Needs it over a dark backdrop, light text (dark theme) over a bright one. Same curve both ways.
-function contrastFactor(brightness: number, isDark: boolean): number {
-  const backdrop = isDark ? 1 - brightness : brightness;
+// Needs it over the darkest pixel of the backdrop, light text (dark theme) over the brightest one. Same curve
+// Both ways.
+function contrastFactor(range: BrightnessRange, isDark: boolean): number {
+  const backdrop = isDark ? 1 - range.brightest : range.darkest;
   const normalized = Math.min(1, backdrop / LUMINANCE_THRESHOLD);
   return (1 - normalized) ** ADAPTIVE_EXPONENT;
 }
@@ -76,7 +78,7 @@ interface GlassStyles {
 }
 
 function useGlassStyles(
-  brightness: Ref<number>,
+  brightness: Ref<BrightnessRange>,
   options: AdaptiveStylesOptions,
 ): ComputedRef<GlassStyles> {
   const theme = useTheme();
@@ -99,12 +101,12 @@ function useGlassStyles(
 }
 
 // oxlint-disable max-lines-per-function
-export function useAdaptiveStyles(
+function useAdaptiveStyles(
   target: AdaptiveStylesTarget,
   options: AdaptiveStylesOptions = {},
 ): {
   adaptiveStyles: ComputedRef<GlassStyles>;
-  brightness: Ref<number>;
+  brightness: Ref<BrightnessRange>;
 } {
   const hybridViewerStore = useHybridViewerStore();
   const treeviewStore = useTreeviewStore();
@@ -154,10 +156,13 @@ export function useAdaptiveStyles(
   const width = computed(() => unwrapped.value.width);
   const height = computed(() => unwrapped.value.height);
 
-  const brightness = ref(LUMINANCE_THRESHOLD);
+  const brightness = ref<BrightnessRange>({
+    darkest: LUMINANCE_THRESHOLD,
+    brightest: LUMINANCE_THRESHOLD,
+  });
 
   function calculateBrightness(): void {
-    brightness.value = hybridViewerStore.getAverageBrightness({
+    brightness.value = hybridViewerStore.getBrightnessRange({
       x: x.value,
       y: y.value,
       width: width.value,
@@ -207,3 +212,5 @@ export function useAdaptiveStyles(
     brightness,
   };
 }
+
+export { contrastFactor, useAdaptiveStyles };

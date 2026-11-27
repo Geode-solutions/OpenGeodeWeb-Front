@@ -56,10 +56,10 @@ function mockImageItem(imageId: string, geode_object_type: GeodeImageType): void
       return { data_id: dataId, is_viewable: false };
     }),
   );
-  dataStore.isItemViewable = mockAs<typeof dataStore.isItemViewable>(
-    vi.fn(async (meta: { is_viewable?: boolean }) => {
+  dataStore.fetchIsViewable = mockAs<typeof dataStore.fetchIsViewable>(
+    vi.fn(async (dataId: string) => {
       await Promise.resolve();
-      return meta.is_viewable !== false;
+      return dataId === imageId;
     }),
   );
 }

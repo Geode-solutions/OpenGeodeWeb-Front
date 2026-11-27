@@ -1,14 +1,13 @@
 // Third party imports
 import { describe, expect, test, vi } from "vitest";
-import type { VueWrapper } from "@vue/test-utils";
-import { mountSuspended } from "@nuxt/test-utils/runtime";
-import { ref } from "vue";
+import { setupActivePinia, vuetify } from "@ogw_tests/utils";
+import ProjectCrs from "@ogw_front/components/ProjectCrs.vue";
 
 // Local imports
-import { mockAs, setupActivePinia, vuetify } from "@ogw_tests/utils";
-import ProjectCrs from "@ogw_front/components/ProjectCrs.vue";
+import type { VueWrapper } from "@vue/test-utils";
+import { mountSuspended } from "@nuxt/test-utils/runtime";
+import { setDataItems } from "@ogw_tests/unit/stores/data_helpers";
 import { useCrsStore } from "@ogw_front/stores/crs";
-import { useDataStore } from "@ogw_front/stores/data";
 
 const LAMBERT = { authority: "EPSG", code: "2154", name: "RGF93 v1 / Lambert-93" };
 const WIDGET = '[data-testid="projectCrs"]';
@@ -19,8 +18,7 @@ async function mountWidget(
   setup: (store: ReturnType<typeof useCrsStore>) => void,
 ): Promise<VueWrapper> {
   const pinia = setupActivePinia();
-  const dataStore = useDataStore();
-  dataStore.refCrsItems = mockAs<typeof dataStore.refCrsItems>(() => ref([]));
+  setDataItems([]);
   setup(useCrsStore());
   const wrapper = await mountSuspended(ProjectCrs, { global: { plugins: [vuetify, pinia] } });
   return wrapper;

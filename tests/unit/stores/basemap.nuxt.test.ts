@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { mockAs, setupActivePinia } from "@ogw_tests/utils";
 import back_schemas from "@geode/opengeodeweb-back/opengeodeweb_back_typed_schemas.js";
 import { setBasemapOption } from "@ogw_tests/unit/helpers/basemap_option";
+import { setDataItems } from "@ogw_tests/unit/stores/data_helpers";
 import { useBackStore } from "@ogw_front/stores/back";
 import { useBasemapStore } from "@ogw_front/stores/basemap";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
@@ -61,7 +62,6 @@ describe("basemap store", () => {
   let viewerRequest = vi.fn();
   let registerObject = vi.fn();
   let deregisterObject = vi.fn();
-  let items = ref<DataItem[]>([]);
 
   function setup(basemapOption = true): ReturnType<typeof useBasemapStore> {
     setupActivePinia();
@@ -72,7 +72,6 @@ describe("basemap store", () => {
     viewerRequest = vi.fn().mockResolvedValue({});
     registerObject = vi.fn().mockResolvedValue({});
     deregisterObject = vi.fn().mockResolvedValue({});
-    items = ref(georeferenced());
 
     const backStore = useBackStore();
     // Builds and deletions are spied apart: build counts stay readable.
@@ -89,7 +88,7 @@ describe("basemap store", () => {
     const viewerStore = useViewerStore();
     viewerStore.request = mockAs<typeof viewerStore.request>(viewerRequest);
     const dataStore = useDataStore();
-    dataStore.refCrsItems = mockAs<typeof dataStore.refCrsItems>(() => items);
+    setDataItems(georeferenced());
     dataStore.registerObject = mockAs<typeof dataStore.registerObject>(registerObject);
     dataStore.deregisterObject = mockAs<typeof dataStore.deregisterObject>(deregisterObject);
     const hybridViewerStore = useHybridViewerStore();
@@ -198,7 +197,7 @@ describe("basemap store", () => {
     const store = setup();
     await store.setMaps(["satellite"]);
     await store.setMaps([]);
-    items.value = georeferenced().slice(0, 1);
+    setDataItems(georeferenced().slice(0, 1));
     await nextTick();
     await vi.advanceTimersByTimeAsync(REBUILD_DELAY);
     expect(deleteRequest).toHaveBeenCalledWith(
@@ -252,16 +251,16 @@ describe("basemap store", () => {
     const store = setup();
     await store.setMaps(["satellite"]);
     expect(backRequest).toHaveBeenCalledTimes(ONCE);
-    items.value = [
+    setDataItems([
       ...georeferenced(),
       mockAs<DataItem>({ data_id: "d", created_at: "4", crs: LAMBERT }),
-    ];
+    ]);
     await nextTick();
     vi.advanceTimersByTime(HALF_DELAY);
-    items.value = [
+    setDataItems([
       ...georeferenced(),
       mockAs<DataItem>({ data_id: "e", created_at: "5", crs: LAMBERT }),
-    ];
+    ]);
     await nextTick();
     await vi.advanceTimersByTimeAsync(REBUILD_DELAY);
     expect(backRequest).toHaveBeenCalledTimes(TWICE);
@@ -273,7 +272,7 @@ describe("basemap store", () => {
     const store = setup();
     await store.setMaps(["satellite"]);
     expect(store.available).toBe(true);
-    items.value = mockAs<DataItem[]>([{ data_id: "a", created_at: "1" }]);
+    setDataItems([{ data_id: "a", created_at: "1" }]);
     await nextTick();
     await vi.advanceTimersByTimeAsync(REBUILD_DELAY);
     // The viewer lets the mesh go before the back deletes its files
@@ -342,7 +341,7 @@ describe("basemap store", () => {
     backRequest.mockRejectedValueOnce(new Error("Basemap unavailable: no API key"));
     await store.setMaps(["satellite"]);
     expect(store.maps).toStrictEqual([]);
-    items.value = georeferenced().slice(0, 1);
+    setDataItems(georeferenced().slice(0, 1));
     await nextTick();
     await vi.advanceTimersByTimeAsync(REBUILD_DELAY);
     expect(backRequest).toHaveBeenCalledTimes(ONCE);
@@ -497,7 +496,7 @@ describe("basemap store", () => {
     const store = setup();
     expect(store.maps).toStrictEqual(["satellite"]);
     // No setStyle call: a data change is enough to build the default map
-    items.value = georeferenced().slice(0, 1);
+    setDataItems(georeferenced().slice(0, 1));
     await nextTick();
     await vi.advanceTimersByTimeAsync(REBUILD_DELAY);
     const satelliteParams: unknown = expect.objectContaining({ maps: ["satellite"] });
@@ -506,7 +505,7 @@ describe("basemap store", () => {
 
   test("an app without the basemap option builds none and shows no basemap category", async () => {
     const store = setup(false);
-    items.value = georeferenced().slice(0, 1);
+    setDataItems(georeferenced().slice(0, 1));
     await nextTick();
     await vi.advanceTimersByTimeAsync(REBUILD_DELAY);
     await store.importStores({ maps: ["satellite"] });
@@ -516,7 +515,7 @@ describe("basemap store", () => {
 
   test("data in another crs than the project stays out of the basemap", async () => {
     const store = setup();
-    items.value = mockAs<DataItem[]>([
+    setDataItems([
       { data_id: "a", created_at: "1", crs: LAMBERT },
       { data_id: "c", created_at: "3", crs: { authority: "EPSG", code: "32631", name: "UTM" } },
     ]);

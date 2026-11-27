@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import { cameraViewBasis, toCameraPose } from "@ogw_front/utils/orientation_gizmo";
 import {
+  COMPASS_TICK_ANGLES,
+  QUARTER_TURN,
   compassDialPoint,
-  compassHeading,
-  compassTilt,
   facingCameraPose,
+  isCardinalAngle,
   isFacing,
 } from "@ogw_front/utils/orientation_compass";
+import { BRAND_ORANGE } from "@ogw_front/utils/brand_colors";
 import type { CameraOptions } from "@ogw_internal/stores/hybrid_viewer/vtk_types";
+import { toCameraPose } from "@ogw_front/utils/orientation_gizmo";
+import { useCompassDial } from "@ogw_front/composables/compass_dial";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 // Compass in the app theme: the dial turns with the camera heading (north = world +Y) and flattens
@@ -26,13 +29,6 @@ const LETTER_HIT_RADIUS = 9;
 const NEEDLE_LENGTH = 18;
 const NEEDLE_HALF_WIDTH = 3.5;
 const HUB_RADIUS = 2.5;
-const TICK_STEP = 30;
-const QUARTER_TURN = 90;
-const FULL_TURN = 360;
-const TICK_ANGLES = Array.from(
-  { length: FULL_TURN / TICK_STEP },
-  (_item, index) => index * TICK_STEP,
-);
 const NORTH = 0;
 const LETTERS = [
   { label: "N", name: "north", angle: NORTH },
@@ -44,26 +40,7 @@ const NORTH_NEEDLE = `M0 ${-NEEDLE_LENGTH} L${NEEDLE_HALF_WIDTH} 0 L${-NEEDLE_HA
 const SOUTH_NEEDLE = `M0 ${NEEDLE_LENGTH} L${NEEDLE_HALF_WIDTH} 0 L${-NEEDLE_HALF_WIDTH} 0 Z`;
 
 const hybridViewerStore = useHybridViewerStore();
-
-const basis = computed(() => {
-  const pose = toCameraPose(hybridViewerStore.camera_options);
-  return pose && cameraViewBasis(pose);
-});
-
-// The last readable heading is kept while the camera is rolled until no heading can be read
-const heading = ref(0);
-const tilt = ref(1);
-watch(
-  basis,
-  (value) => {
-    if (!value) {
-      return;
-    }
-    heading.value = compassHeading(value) ?? heading.value;
-    tilt.value = compassTilt(value);
-  },
-  { immediate: true },
-);
+const { basis, heading, tilt } = useCompassDial();
 
 const dialTransform = computed(() => `scale(1 ${tilt.value}) rotate(${-heading.value})`);
 const letters = computed(() =>
@@ -74,7 +51,7 @@ const letters = computed(() =>
 );
 
 function tickInnerRadius(angle: number): number {
-  return angle % QUARTER_TURN === 0 ? CARDINAL_TICK_INNER_RADIUS : TICK_INNER_RADIUS;
+  return isCardinalAngle(angle) ? CARDINAL_TICK_INNER_RADIUS : TICK_INNER_RADIUS;
 }
 
 function face(targetHeading: number): void {
@@ -116,7 +93,7 @@ function face(targetHeading: number): void {
     >
       <g :transform="dialTransform">
         <line
-          v-for="angle in TICK_ANGLES"
+          v-for="angle in COMPASS_TICK_ANGLES"
           :key="angle"
           class="tick"
           :y1="-tickInnerRadius(angle)"
@@ -182,7 +159,7 @@ function face(targetHeading: number): void {
 }
 
 .needle-north {
-  fill: #f48830;
+  fill: v-bind(BRAND_ORANGE);
 }
 
 .needle-south {
@@ -217,7 +194,7 @@ function face(targetHeading: number): void {
 }
 
 .letter.north {
-  fill: #f48830;
+  fill: v-bind(BRAND_ORANGE);
   font-weight: 600;
 }
 </style>

@@ -1,18 +1,16 @@
 <script setup lang="ts">
-import ViewerContextMenuItem, {
-  type ItemProps,
-} from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
 import type { SceneFontFamily } from "@ogw_internal/stores/data_style/types";
+import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 import { useHybridViewerStore } from "@ogw_front/stores/hybrid_viewer";
 
 interface Props {
-  itemProps: ItemProps & { index: number };
+  index: number;
 }
 
-const { itemProps } = defineProps<Props>();
+const { index } = defineProps<Props>();
 
 const dataStyleStore = useDataStyleStore();
 const hybridViewerStore = useHybridViewerStore();
@@ -43,8 +41,7 @@ const fontFamily = computed<SceneFontFamily>({
 <template>
   <ViewerContextMenuItem
     data-testid="sceneTextMenu"
-    :index="itemProps.index"
-    :itemProps="itemProps"
+    :index="index"
     tooltip="Text"
     btnIcon="ph-text-aa"
   >

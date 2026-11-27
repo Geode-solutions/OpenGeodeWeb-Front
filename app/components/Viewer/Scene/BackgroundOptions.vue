@@ -1,16 +1,14 @@
 <script setup lang="ts">
-import ViewerContextMenuItem, {
-  type ItemProps,
-} from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import type { ColorRGBA } from "@geode/opengeodeweb-viewer/schema_types";
+import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 import ViewerOptionsColorPicker from "@ogw_front/components/Viewer/Options/ColorPicker.vue";
 import { useDataStyleStore } from "@ogw_front/stores/data_style";
 
 interface Props {
-  itemProps: ItemProps & { index: number };
+  index: number;
 }
 
-const { itemProps } = defineProps<Props>();
+const { index } = defineProps<Props>();
 
 const dataStyleStore = useDataStyleStore();
 
@@ -25,8 +23,7 @@ const backgroundColor = computed<ColorRGBA>({
 <template>
   <ViewerContextMenuItem
     data-testid="sceneBackgroundMenu"
-    :index="itemProps.index"
-    :itemProps="itemProps"
+    :index="index"
     tooltip="Background"
     btnIcon="ph-image"
   >

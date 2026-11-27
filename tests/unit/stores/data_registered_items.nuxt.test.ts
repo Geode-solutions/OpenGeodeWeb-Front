@@ -34,7 +34,7 @@ describe("useDataStore - collections", () => {
     await dataStore.clear();
   });
 
-  describe("refRegisteredItems", () => {
+  describe("registeredItems", () => {
     beforeEach(() => {
       const viewerStore = useViewerStore();
       viewerStore.request = mockAs<typeof viewerStore.request>(vi.fn().mockResolvedValue({}));
@@ -42,28 +42,26 @@ describe("useDataStore - collections", () => {
 
     test("only lists the items registered in the viewer", async () => {
       const dataStore = useDataStore();
-      const registeredItems = dataStore.refRegisteredItems();
       await addItems(["registered", "pending"]);
       await dataStore.registerObject("registered", "registered");
 
       await vi.waitFor(() => {
-        expect(registeredIds(registeredItems.value)).toStrictEqual(["registered"]);
+        expect(registeredIds(dataStore.registeredItems)).toStrictEqual(["registered"]);
       });
       expect(dataStore.isRegistered("pending")).toBe(false);
     });
 
     test("updates when an item is registered or deregistered", async () => {
       const dataStore = useDataStore();
-      const registeredItems = dataStore.refRegisteredItems();
       await addItems(["first", "second"]);
       await dataStore.registerObject("first", "first");
       await dataStore.registerObject("second", "second");
       await vi.waitFor(() => {
-        expect(registeredIds(registeredItems.value)).toStrictEqual(["first", "second"]);
+        expect(registeredIds(dataStore.registeredItems)).toStrictEqual(["first", "second"]);
       });
 
       await dataStore.deregisterObject("first");
-      expect(registeredIds(registeredItems.value)).toStrictEqual(["second"]);
+      expect(registeredIds(dataStore.registeredItems)).toStrictEqual(["second"]);
     });
 
     test("is emptied by clear", async () => {

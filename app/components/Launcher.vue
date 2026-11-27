@@ -2,6 +2,7 @@
 import Loading from "@ogw_front/components/Loading.vue";
 import { Status } from "@ogw_front/utils/status";
 import { appMode } from "@ogw_shared/app_mode";
+import { createBackend } from "@ogw_front/utils/backend_lifecycle";
 import { getCloudUrlParam } from "@ogw_front/utils/cloud";
 import { useInfraStore } from "@ogw_front/stores/infra";
 
@@ -24,11 +25,11 @@ const infraStore = useInfraStore();
 // In cloud mode, wait for the user to authenticate and load the app, unless a `?cloud_url=` link
 // Points at an already running service: that one is connected straight away, without authentication.
 if (infraStore.app_mode !== appMode.CLOUD || getCloudUrlParam() !== undefined) {
-  infraStore.create_backend(authToken);
+  void createBackend(authToken);
 }
 
 function cloudCreateBackend(): Promise<void> {
-  return infraStore.create_backend(authToken);
+  return createBackend(authToken);
 }
 </script>
 

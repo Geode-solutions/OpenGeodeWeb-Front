@@ -1,9 +1,3 @@
-import { consola } from "consola";
-
-// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
-// oxlint-disable eslint/sort-imports, eslint/max-lines
-import { defineStore } from "pinia";
-
 import type { DataId, GeodeId } from "@geode/opengeodeweb-microservice/schema_types";
 import type {
   GeodeIdentified,
@@ -14,22 +8,20 @@ import type {
   GeodeObjectType,
   ViewerObjectType,
 } from "@geode/opengeodeweb-microservice/data_types";
+import type {
+  OpenedView,
+  TreeviewConfigRecord,
+} from "@ogw_internal/database/tables/treeview_config";
 import type { TreeGroup, TreeNode } from "@ogw_front/types/tree";
 import { ref, watch } from "vue";
-import { getTable } from "@ogw_internal/database/database";
+import { consola } from "consola";
+// Not auto-fixable (eslint's sort-imports core rule has no autofixer) and this file's import order doesn't match its syntax-kind-then-alphabetical requirement - left as-is rather than manually reordered across the codebase for a purely cosmetic rule.
+// oxlint-disable eslint/sort-imports, eslint/max-lines
+import { defineStore } from "pinia";
 import { nextModelTreeColor } from "@ogw_front/utils/treeview";
+import { treeviewConfigDb } from "@ogw_internal/database/database";
 
 const PANEL_WIDTH = 300;
-
-interface OpenedView extends Partial<GeodeObjectTyped> {
-  type: "object" | "component";
-  id: string;
-  title: string;
-  scrollTop: number;
-  opened: string[];
-  // Ties a model tree to its row in the objects tree
-  color?: string;
-}
 
 interface TreeviewChild extends TreeNode, GeodeIdentified, GeodeObjectTyped, ViewerObjectTyped {
   // Still being loaded in the viewer: shown with a spinner and not interactive yet
@@ -42,15 +34,6 @@ interface PendingImport extends TreeNode, GeodeObjectTyped {
 }
 
 type TreeviewGroup = TreeGroup<TreeviewChild>;
-
-interface TreeviewConfigRecord {
-  id: string;
-  opened_views: OpenedView[];
-  panelWidth: number;
-  additionalPanelWidth: number;
-  selectionIds: string[];
-  rowHeights: number[];
-}
 
 interface TreeviewSnapshot {
   opened_views?: OpenedView[];
@@ -117,11 +100,11 @@ export const useTreeviewStore = defineStore("treeview", () => {
   // Model hovered in the objects tree or on its model tree header: not saved
   const hoveredModelId = ref<string | undefined>(undefined);
 
-  const treeview_config_db = getTable<TreeviewConfigRecord>("treeview_config");
+  const treeviewConfigTable = treeviewConfigDb();
 
   async function loadConfig(): Promise<void> {
     try {
-      const config = await treeview_config_db.get("main");
+      const config = await treeviewConfigTable.get("main");
       if (config?.opened_views) {
         opened_views.value = withModelTreeColors(config.opened_views);
       }
@@ -156,7 +139,7 @@ export const useTreeviewStore = defineStore("treeview", () => {
 
       // Best-effort persistence: a failure is logged, not thrown.
       try {
-        await treeview_config_db.put({
+        await treeviewConfigTable.put({
           id: "main",
           opened_views: clean_opened_views,
           panelWidth: panelWidth.value,
@@ -318,12 +301,35 @@ export const useTreeviewStore = defineStore("treeview", () => {
     });
   }
 
+  function setCollapsed(id: string, collapsed: boolean): void {
+    const existing = opened_views.value.find((view: ReadonlyOpenedView) => view.id === id);
+    if (existing) {
+      existing.collapsed = collapsed;
+    }
+  }
+
+  function toggleCollapsed(id: string): void {
+    const existing = opened_views.value.find((view: ReadonlyOpenedView) => view.id === id);
+    setCollapsed(id, existing?.collapsed !== true);
+  }
+
+  function setAllCollapsed(collapsed: boolean): void {
+    for (const view of opened_views.value) {
+      if (view.type === "component") {
+        view.collapsed = collapsed;
+      }
+    }
+  }
+
   function setHoveredModel(id: string | undefined): void {
     hoveredModelId.value = id;
   }
 
+  // The objects tree keeps its place, first: only the model trees move
   function moveView(from_index: number, to_index: number): void {
-    if (from_index !== 0 && to_index !== 0) {
+    const moved = opened_views.value[from_index];
+    const target = opened_views.value[to_index];
+    if (moved && target && moved.id !== "main" && target.id !== "main") {
       const [element] = opened_views.value.splice(from_index, 1);
       if (element) {
         opened_views.value.splice(to_index, 0, element);
@@ -455,6 +461,9 @@ export const useTreeviewStore = defineStore("treeview", () => {
     displayAdditionalTree,
     closeView,
     toggleView,
+    setCollapsed,
+    toggleCollapsed,
+    setAllCollapsed,
     moveView,
     importStores,
     displayFileTree,

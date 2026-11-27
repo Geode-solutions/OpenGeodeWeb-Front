@@ -1,27 +1,26 @@
 <script setup lang="ts">
-import ViewerContextMenuItem, {
-  type ItemProps,
-} from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
+import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import ModelEdgesCard from "./ModelEdgesCard.vue";
 import SurfaceEdges from "@ogw_front/assets/viewer_svgs/surface_edges.svg";
+import ViewerContextMenuItem from "@ogw_front/components/Viewer/ContextMenu/ContextMenuItem.vue";
 
 interface Props {
-  itemProps: ItemProps & { index: number };
+  dataId: DataId;
+  index: number;
 }
 
-const { itemProps } = defineProps<Props>();
+const { dataId, index } = defineProps<Props>();
 </script>
 
 <template>
   <ViewerContextMenuItem
     data-testid="modelEdgesMenu"
-    :index="itemProps.index"
-    :itemProps="itemProps"
+    :index="index"
     tooltip="Edges options"
     :btnImage="SurfaceEdges"
   >
     <template #options>
-      <ModelEdgesCard :itemProps="itemProps" />
+      <ModelEdgesCard :data-id="dataId" />
     </template>
   </ViewerContextMenuItem>
 </template>

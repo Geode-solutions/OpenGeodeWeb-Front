@@ -5,11 +5,17 @@ import type {
   ObjectStyle,
   SceneStyle,
 } from "@ogw_internal/stores/data_style/types";
+import {
+  componentDataStyleDb,
+  componentTypeDataStyleDb,
+  dataStyleDb,
+  sceneStyleDb,
+  writeTransaction,
+} from "@ogw_internal/database/database.js";
+import { isImage, isMesh, isModel } from "@ogw_front/utils/viewer_object_type";
 import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { GeodeObjectType } from "@geode/opengeodeweb-microservice/data_types";
-import type { Table } from "dexie";
 import type { Visibility } from "@geode/opengeodeweb-viewer/schema_types";
-import { database } from "@ogw_internal/database/database.js";
 import { getDefaultStyle } from "@ogw_front/utils/default_styles";
 import { useAttributeTimeStepStyle } from "@ogw_internal/stores/data_style/time_step";
 import { useDataStore } from "@ogw_front/stores/data";
@@ -23,19 +29,9 @@ interface DataStyleSnapshot {
   // Projects saved before data_id existed hold their styles with an `id`
   readonly styles: Record<string, LegacyDataId<ObjectStyle> | ObjectStyle>;
   readonly componentStyles: Record<string, ModelComponentStyle>;
-  readonly modelComponentTypeStyles: Record<string, ModelComponentTypeStyle>;
+  // Projects saved before the styles by component type (2026-04) have none
+  readonly modelComponentTypeStyles?: Record<string, ModelComponentTypeStyle>;
   readonly sceneStyle?: SceneStyle;
-}
-
-// The database's table map is dynamically assembled at runtime (see internal/database/database.ts), so its exported type is a loose `{}`; cast it to the shape it actually has at runtime rather than widening every call site.
-type DatabaseTables = Record<string, Table<Record<string, unknown>, string> | undefined>;
-
-// `noUncheckedIndexedAccess` sees these as possibly undefined even though they're always registered before this store is used; guard defensively rather than asserting.
-function requireTable<TableValue>(table: TableValue | undefined, name: string): TableValue {
-  if (table === undefined) {
-    throw new Error(`Database table not initialized: ${name}`);
-  }
-  return table;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -51,63 +47,86 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   const sceneStyleStore = useSceneStyle();
   const attributeTimeStepStyle = useAttributeTimeStepStyle();
   const dataStore = useDataStore();
-  // oxlint-disable-next-line no-unsafe-type-assertion -- the database Proxy is typed as `{}` at its export site; this cast documents its real runtime shape.
-  const typedDatabase = database as unknown as DatabaseTables;
-  const data_style_db = requireTable(typedDatabase.data_style, "data_style");
-  const model_component_type_datastyle_db = requireTable(
-    typedDatabase.model_component_type_datastyle,
-    "model_component_type_datastyle",
-  );
-  const component_datastyle_db = requireTable(
-    typedDatabase.model_component_datastyle,
-    "model_component_datastyle",
-  );
+  const dataStyleTable = dataStyleDb();
+  // Keyed by [id_model, type] and [id_model, id_component]
+  const componentTypeDataStyleTable = componentTypeDataStyleDb();
+  const componentDataStyleTable = componentDataStyleDb();
 
   async function addDataStyle(dataId: DataId, geodeObjectType: GeodeObjectType): Promise<void> {
     const defaultStyle = getDefaultStyle(geodeObjectType);
-    await data_style_db.put(
+    await dataStyleTable.put(
       structuredClone({ data_id: dataId, ...(isRecord(defaultStyle) ? defaultStyle : {}) }),
     );
   }
 
-  async function setVisibility(dataId: DataId, visibility: Visibility): Promise<unknown> {
+  // Runs the image, the mesh or the model implementation for a data, or `notViewable` for a data the viewer
+  // Does not show. An unknown viewer_object_type throws, unless `unknownType` handles it
+  async function forViewerType<Result>(
+    dataId: DataId,
+    handlers: {
+      image: (id: DataId) => Promise<Result>;
+      mesh: (id: DataId) => Promise<Result>;
+      model: (id: DataId) => Promise<Result>;
+      notViewable: (id: DataId) => Promise<Result> | Result;
+      unknownType?: (id: DataId) => Result;
+    },
+  ): Promise<Result> {
     const item = await dataStore.item(dataId);
-    if (!(await dataStore.isItemViewable(item))) {
-      return dataStyleState.mutateStyle(dataId, { visibility });
+    if (!(await dataStore.fetchIsViewable(dataId))) {
+      const result = await handlers.notViewable(dataId);
+      return result;
     }
+    if (isImage(item)) {
+      const result = await handlers.image(dataId);
+      return result;
+    }
+    if (isMesh(item)) {
+      const result = await handlers.mesh(dataId);
+      return result;
+    }
+    if (isModel(item)) {
+      const result = await handlers.model(dataId);
+      return result;
+    }
+    if (handlers.unknownType) {
+      return handlers.unknownType(dataId);
+    }
+    throw new Error(`Unknown viewer_object_type: ${item.viewer_object_type}`);
+  }
 
-    const { viewer_object_type } = item;
-
-    if (viewer_object_type === "image") {
-      return imageStyleStore.setImageVisibility(dataId, visibility);
-    }
-    if (viewer_object_type === "mesh") {
-      return meshStyleStore.setMeshVisibility(dataId, visibility);
-    }
-    if (viewer_object_type === "model") {
-      return modelStyleStore.setModelVisibility(dataId, visibility);
-    }
-    throw new Error("Unknown viewer_object_type");
+  // A data the viewer does not show only keeps its visibility in its style
+  async function setVisibility(dataId: DataId, visibility: Visibility): Promise<unknown> {
+    const result = await forViewerType<unknown>(dataId, {
+      image: async (id) => {
+        const image_result = await imageStyleStore.setImageVisibility(id, visibility);
+        return image_result;
+      },
+      mesh: async (id) => {
+        const mesh_result = await meshStyleStore.setMeshVisibility(id, visibility);
+        return mesh_result;
+      },
+      model: async (id) => {
+        const model_result = await modelStyleStore.setModelVisibility(id, visibility);
+        return model_result;
+      },
+      notViewable: async (id) => {
+        const style_result = await dataStyleState.mutateStyle(id, { visibility });
+        return style_result;
+      },
+    });
+    return result;
   }
 
   async function applyDefaultStyle(dataId: DataId): Promise<unknown[]> {
-    const item = await dataStore.item(dataId);
-    if (!(await dataStore.isItemViewable(item))) {
-      throw new Error(`applyDefaultStyle called for non-viewable item: ${dataId}`);
-    }
-
-    const { viewer_object_type } = item;
-
-    if (viewer_object_type === "image") {
-      return imageStyleStore.applyImageStyle(dataId);
-    }
-    if (viewer_object_type === "mesh") {
-      return meshStyleStore.applyMeshStyle(dataId);
-    }
-    if (viewer_object_type === "model") {
-      return modelStyleStore.applyModelStyle(dataId);
-    }
-    throw new Error(`Unknown viewer_object_type: ${String(viewer_object_type)}`);
+    const result = await forViewerType(dataId, {
+      image: imageStyleStore.applyImageStyle,
+      mesh: meshStyleStore.applyMeshStyle,
+      model: modelStyleStore.applyModelStyle,
+      notViewable: () => {
+        throw new Error(`applyDefaultStyle called for non-viewable item: ${dataId}`);
+      },
+    });
+    return result;
   }
 
   function exportStores(): DataStyleSnapshot {
@@ -123,56 +142,43 @@ export const useDataStyleStore = defineStore("dataStyle", () => {
   async function importStores(snapshot: DataStyleSnapshot): Promise<void> {
     const stylesSnapshot = snapshot.styles;
     const componentStylesSnapshot = snapshot.componentStyles;
-    const modelComponentTypeStylesSnapshot = snapshot.modelComponentTypeStyles;
+    const modelComponentTypeStylesSnapshot = snapshot.modelComponentTypeStyles ?? {};
 
-    await dataStyleState.clear();
-
-    const style_promises = Object.entries(stylesSnapshot).map(
+    const styles = Object.entries(stylesSnapshot).map(
       // oxlint-disable-next-line prefer-readonly-parameter-types -- same external ObjectStyle limitation as above.
-      async ([dataId, style]: readonly [string, LegacyDataId<ObjectStyle> | ObjectStyle]) => {
-        const key = await data_style_db.put(
-          structuredClone({ ...fromLegacyDataId<ObjectStyle>(style), data_id: dataId }),
-        );
-        return key;
-      },
+      ([dataId, style]: readonly [string, LegacyDataId<ObjectStyle> | ObjectStyle]) =>
+        structuredClone({ ...fromLegacyDataId<ObjectStyle>(style), data_id: dataId }),
     );
-    const component_style_promises = Object.values(componentStylesSnapshot).map(
-      async (style: ModelComponentStyle) => {
-        const key = await component_datastyle_db.put(structuredClone(style));
-        return key;
-      },
-    );
-    const model_component_type_style_promises = Object.values(modelComponentTypeStylesSnapshot).map(
-      async (style: ModelComponentTypeStyle) => {
-        const key = await model_component_type_datastyle_db.put(structuredClone(style));
-        return key;
-      },
+    const componentStyles = structuredClone(Object.values(componentStylesSnapshot));
+    const modelComponentTypeStyles = structuredClone(
+      Object.values(modelComponentTypeStylesSnapshot),
     );
 
-    await Promise.all([
-      ...style_promises,
-      ...component_style_promises,
-      ...model_component_type_style_promises,
-    ]);
+    // The snapshot replaces the stored styles as a whole: a failed import leaves the previous ones
+    await writeTransaction(
+      [dataStyleTable, componentDataStyleTable, componentTypeDataStyleTable, sceneStyleDb()],
+      async () => {
+        await dataStyleState.clear();
+        await dataStyleTable.bulkPut(styles);
+        await componentDataStyleTable.bulkPut(componentStyles);
+        await componentTypeDataStyleTable.bulkPut(modelComponentTypeStyles);
+      },
+    );
     await dataStyleState.loadFromDatabase();
     await sceneStyleStore.importSceneStyle(snapshot.sceneStyle);
   }
 
   async function applyAllStylesFromState(): Promise<void> {
     const ids = Object.keys(dataStyleState.styles.value);
+    // Restores what can be shown: a non viewable data or an unknown type is skipped
     const promises = ids.map(async (dataId) => {
-      const meta = await dataStore.item(dataId);
-      if (!(await dataStore.isItemViewable(meta))) {
-        return;
-      }
-      const viewerObjectType = meta.viewer_object_type;
-      if (viewerObjectType === "image") {
-        await imageStyleStore.applyImageStyle(dataId);
-      } else if (viewerObjectType === "mesh") {
-        await meshStyleStore.applyMeshStyle(dataId);
-      } else if (viewerObjectType === "model") {
-        await modelStyleStore.applyModelStyle(dataId);
-      }
+      await forViewerType<unknown>(dataId, {
+        image: imageStyleStore.applyImageStyle,
+        mesh: meshStyleStore.applyMeshStyle,
+        model: modelStyleStore.applyModelStyle,
+        notViewable: () => undefined,
+        unknownType: () => undefined,
+      });
     });
     await Promise.all(promises);
     await sceneStyleStore.applySceneStyle();

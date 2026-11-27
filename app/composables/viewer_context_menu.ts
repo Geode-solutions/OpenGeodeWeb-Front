@@ -5,6 +5,7 @@ import type { DataId } from "@geode/opengeodeweb-microservice/schema_types";
 import type { TreeMenuPayload } from "@ogw_front/utils/treeview";
 import type { ViewerId } from "@geode/opengeodeweb-viewer/schema_types";
 import type { ViewerIdResult } from "@ogw_front/composables/use_overlapping_picker";
+import { isModel } from "@ogw_front/utils/viewer_object_type";
 import { useDataStore } from "@ogw_front/stores/data";
 import { useElementSize } from "@vueuse/core";
 
@@ -76,7 +77,7 @@ async function viewerMenuTarget(
 ): Promise<MenuTarget> {
   const item = await dataStore.item(pickedId);
   const meta_data: MenuMetaData = { ...item };
-  if (item.viewer_object_type === "model" && viewer_id !== undefined) {
+  if (isModel(item) && viewer_id !== undefined) {
     const component = await dataStore.getComponentByViewerId(pickedId, viewer_id);
     if (component) {
       meta_data.pickedComponentId = component.geode_id;

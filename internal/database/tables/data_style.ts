@@ -1,6 +1,8 @@
 import type { TableDefinition } from "./table_definition";
 
-export const dataStyleTable: TableDefinition = {
+const dataStyleTable: TableDefinition = {
   name: "data_style",
   schema: "data_id",
 };
+
+export { dataStyleTable };

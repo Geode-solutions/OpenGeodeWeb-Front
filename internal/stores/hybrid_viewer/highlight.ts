@@ -1,4 +1,3 @@
-import type { GeodeIdentified, ModelId } from "@ogw_front/types/identifiers";
 import { HOVER_DEBOUNCE_MS, HOVER_TIMEOUT_MS } from "./constants";
 import type { HoverComponentInfo, HoverData } from "./vtk_types";
 import viewer_schemas, {
@@ -6,14 +5,15 @@ import viewer_schemas, {
   type ViewerHighlightResponse,
 } from "@geode/opengeodeweb-viewer/opengeodeweb_viewer_typed_schemas.js";
 import type { GeodeId } from "@geode/opengeodeweb-microservice/schema_types";
-import type { IndexableType } from "dexie";
-import { database } from "@ogw_internal/database/database.js";
+import type { ModelId } from "@ogw_front/types/identifiers";
+import { dataDb } from "@ogw_internal/database/database.js";
+import { modelComponent } from "@ogw_internal/database/queries.js";
 import { useHybridViewerCore } from "./core";
 import { useHybridViewerScene } from "./scene";
 import { useViewerStore } from "@ogw_front/stores/viewer";
 
 async function lookupModelName(modelId: ModelId): Promise<string | undefined> {
-  const modelRecord = (await database.data?.get(modelId)) as { name?: string } | undefined;
+  const modelRecord = await dataDb().get(modelId);
   return modelRecord?.name;
 }
 
@@ -21,22 +21,17 @@ async function lookupComponentInfo(
   modelId: ModelId,
   geodeId: GeodeId | undefined,
 ): Promise<HoverComponentInfo | undefined> {
-  const modelComponentsTable = database.model_components;
-  if (geodeId === undefined || !modelComponentsTable) {
+  if (geodeId === undefined) {
     return undefined;
   }
-  const components = modelComponentsTable.where("[data_id+geode_id]");
-  const query = components.equals([modelId, geodeId] as IndexableType);
-  const component = (await query.first()) as
-    | (Partial<GeodeIdentified> & { name?: string; type?: string })
-    | undefined;
+  const component = await modelComponent(modelId, geodeId).first();
   if (!component) {
     return undefined;
   }
   return {
-    name: component.name ?? "",
-    id: component.geode_id ?? "",
-    type: component.type ?? "",
+    name: component.name,
+    id: component.geode_id,
+    type: component.type,
   };
 }
 
