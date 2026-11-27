@@ -23,13 +23,21 @@ const POROSITY_PROPERTY: PhysicalProperty = {
   components: [{ geode_id: "block", min_values: [POROSITY], max_values: [POROSITY] }],
 };
 
-type BackRequest = (request: {
-  params: { id: string };
-}) => Promise<{ physical_properties: PhysicalProperty[] }>;
+type BackRequest = (
+  request: { params: { id: string } },
+  callbacks?: { skip_feedback_error?: boolean },
+) => Promise<{ physical_properties: PhysicalProperty[] }>;
+
+// The callbacks of the last request
+const lastRequest: { callbacks?: { skip_feedback_error?: boolean } } = {};
 
 vi.mock(import("@ogw_front/stores/back") as Promise<unknown>, () => ({
   useBackStore: (): { request: BackRequest } => ({
-    request: async ({ params }): Promise<{ physical_properties: PhysicalProperty[] }> => {
+    request: async (
+      { params },
+      callbacks,
+    ): Promise<{ physical_properties: PhysicalProperty[] }> => {
+      lastRequest.callbacks = callbacks;
       if (params.id === FAILING_MODEL_ID) {
         throw new Error("Not a model");
       }
@@ -54,10 +62,12 @@ describe("useDataStore - physical properties", () => {
     ]);
   });
 
-  test("a failed back request stores nothing", async () => {
+  // A model another microservice has just created may not be readable yet: no error for the user
+  test("a failed back request stores nothing and shows no error", async () => {
     const dataStore = useDataStore();
     await dataStore.addPhysicalProperties(FAILING_MODEL_ID);
     await expect(dataStore.getPhysicalProperties(FAILING_MODEL_ID)).resolves.toStrictEqual([]);
+    expect(lastRequest.callbacks).toStrictEqual({ skip_feedback_error: true });
   });
 
   test("deleting a model deletes its physical properties only", async () => {
