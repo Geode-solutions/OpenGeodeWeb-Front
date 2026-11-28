@@ -27,7 +27,7 @@ async function mountOptions(component: Component, id: string): Promise<VueWrappe
     vi.fn().mockResolvedValue(undefined),
   );
   basemapStore.setCrop = mockAs<typeof basemapStore.setCrop>(vi.fn().mockResolvedValue(undefined));
-  basemapStore.opacities = { satellite: 1, plan: 1, routes: ROUTES_OPACITY };
+  basemapStore.opacities = { satellite: 1, plan: 1, geology: 1, routes: ROUTES_OPACITY };
   const wrapper = await mountSuspended(component, {
     props: { dataId: id, index: 0 },
     global: { plugins: [vuetify, pinia], stubs: { ViewerContextMenuItem: MENU_ITEM_STUB } },
@@ -56,12 +56,17 @@ describe("basemap context menus", () => {
 
   test("the basemap category crops every map, mixed when the maps differ", async () => {
     const wrapper = await mountOptions(CropOptions, "basemap");
-    useBasemapStore().crop = { satellite: false, plan: false, routes: true };
+    useBasemapStore().crop = { satellite: false, plan: false, geology: false, routes: true };
     await flushPromises();
     const crop = wrapper.getComponent({ name: "VSwitch" });
     expect(crop.props("indeterminate")).toBe(true);
     await crop.setValue(true);
     await flushPromises();
-    expect(useBasemapStore().setCrop).toHaveBeenCalledWith(true, ["satellite", "plan", "routes"]);
+    expect(useBasemapStore().setCrop).toHaveBeenCalledWith(true, [
+      "satellite",
+      "plan",
+      "geology",
+      "routes",
+    ]);
   });
 });
